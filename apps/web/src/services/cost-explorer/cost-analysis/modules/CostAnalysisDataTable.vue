@@ -84,7 +84,31 @@ const state = reactive({
     })),
     visibleExcelNotiModal: false,
     isIncludedUsageTypeInGroupBy: computed<boolean>(() => costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE)),
-
+    analyzeQuery: computed(() => {
+        let dateFormat = 'YYYY-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
+        const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
+        return {
+            granularity: costAnalysisPageState.granularity,
+            group_by: groupBy,
+            start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
+            end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
+            fields: {
+                cost_sum: {
+                    key: 'cost',
+                    operator: 'sum',
+                },
+                ...(state.isIncludedUsageTypeInGroupBy && {
+                    usage_quantity_sum: {
+                        key: 'usage_quantity',
+                        operator: 'sum',
+                    },
+                }),
+            },
+            sort: [{ key: '_total_cost_sum', desc: true }],
+            field_group: ['date'],
+        };
+    }),
 });
 const tableState = reactive({
     loading: true,
@@ -252,30 +276,10 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         analyzeApiQueryHelper
             .setFilters(costAnalysisPageStore.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
-        let dateFormat = 'YYYY-MM';
-        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
-        const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
             query: {
-                granularity: costAnalysisPageState.granularity,
-                group_by: groupBy,
-                start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
-                end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
-                fields: {
-                    cost_sum: {
-                        key: 'cost',
-                        operator: 'sum',
-                    },
-                    ...(state.isIncludedUsageTypeInGroupBy && {
-                        usage_quantity_sum: {
-                            key: 'usage_quantity',
-                            operator: 'sum',
-                        },
-                    }),
-                },
-                sort: [{ key: '_total_cost_sum', desc: true }],
-                field_group: ['date'],
+                ...state.analyzeQuery,
                 ...analyzeApiQueryHelper.data,
             },
         });
@@ -306,21 +310,18 @@ const handleChange = async (options: any = {}) => {
     if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
+const costAnalyzeExportQueryHelper = new QueryHelper();
 const handleExcelDownload = async () => {
     try {
-        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
-        const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
-
-
+        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         await store.dispatch('file/downloadExcel', {
             url: '/cost-analysis/cost/analyze',
             param: {
-                granularity: costAnalysisPageState.granularity,
-                group_by: costAnalysisPageState.groupBy,
-                start: dayjs.utc(costAnalysisPageState?.period?.start).format(dateFormat),
-                end: dayjs.utc(costAnalysisPageState?.period?.end).format(dateFormat),
-                filter: analyzeApiQueryHelper.data.filter,
-                query: analyzeApiQueryHelper.data,
+                data_source_id: costAnalysisPageStore.selectedDataSourceId,
+                query: {
+                    ...state.analyzeQuery,
+                    ...costAnalyzeExportQueryHelper.apiQuery,
+                },
             },
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,

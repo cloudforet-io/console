@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
     computed, defineEmits, defineProps, reactive,
 } from 'vue';
@@ -8,6 +7,7 @@ import {
     PDataLoader,
 } from '@spaceone/design-system';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -59,7 +59,10 @@ const state = reactive({
             .setPage(state.pageStart, state.pageLimit);
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
         return {
-            query: { ..._query, ...budgetUsageApiQueryHelper.data },
+            query: {
+                ...budgetUsageApiQueryHelper.data,
+                ..._query,
+            },
         };
     }),
 });
@@ -105,6 +108,7 @@ const handleRefresh = () => {
     listBudgets();
 };
 
+const budgetUsageExportQueryHelper = new QueryHelper();
 const handleExport = async () => {
     const excelFields = [
         { key: 'budget_id', name: 'Budget ID' },
@@ -117,14 +121,19 @@ const handleExport = async () => {
         { key: 'total_budget', name: 'Total Budget' },
         { key: 'budget_usage', name: 'Usage (%)' },
     ];
+    budgetUsageExportQueryHelper.setFilters(state.queryStoreFilters);
+    const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
     await store.dispatch('file/downloadExcel', {
         url: '/cost-analysis/budget-usage/analyze',
         param: {
-            ...state.budgetUsageParams,
-            query: budgetUsageApiQueryHelper.data,
+            query: {
+                ...budgetUsageExportQueryHelper.apiQuery,
+                ..._query,
+            },
         },
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.budget,
+        version: 'v2',
     });
 };
 
