@@ -103,7 +103,7 @@ const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<Dashboard
     dashboardDetailStore.updateWidgetInfo(widgetKey, { ...originWidgetInfo, ...widgetInfo });
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
-    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
+    dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
 };
 
 watch(() => props.visible, async (visible) => {
@@ -183,7 +183,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                 >
                     <component :is="state.component"
                                ref="widgetRef"
-                               :widget-key="widgetFormState.widgetInfo.widget_key"
+                               :widget-key="widgetFormState.widgetKey"
                                :widget-config-id="widgetFormState.widgetInfo.widget_name"
                                :title="widgetFormState.widgetTitle"
                                :options="widgetFormState.widgetOptions"
@@ -191,16 +191,16 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :schema-properties="widgetFormState.schemaProperties"
                                size="full"
                                :theme="widgetFormState.theme"
-                               :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
+                               :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetKey] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"
                                :initiated="state.initiated"
                                :dashboard-settings="dashboardDetailState.settings"
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
-                               @update-data="handleUpdateData(widgetFormState.widgetInfo.widget_key, $event)"
-                               @update-widget-info="handleUpdateWidgetInfo(widgetFormState.widgetInfo.widget_key, $event)"
-                               @update-widget-validation="handleUpdateValidation(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-data="handleUpdateData(widgetFormState.widgetKey, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(widgetFormState.widgetKey, $event)"
+                               @update-widget-validation="handleUpdateValidation(widgetFormState.widgetKey, $event)"
                     />
                 </div>
             </div>

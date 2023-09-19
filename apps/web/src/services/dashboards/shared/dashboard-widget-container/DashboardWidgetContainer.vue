@@ -89,7 +89,7 @@ const handleUpdateWidgetInfo = (widget: DashboardLayoutWidgetInfo, widgetInfo: P
     dashboardDetailStore.updateWidgetInfo(originWidgetInfo.widget_key, { ...originWidgetInfo, ...widgetInfo });
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
-    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
+    dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
 };
 const handleClickWidgetEdit = (widget: DashboardLayoutWidgetInfo) => {
     widgetEditState.targetWidget = widget;
@@ -105,6 +105,7 @@ const handleClickWidgetExpand = (widget: DashboardLayoutWidgetInfo) => {
     } else {
         widgetFormStore.$patch({
             widgetKey: widget.widget_key,
+            widgetConfigId: widget.widget_name,
         });
         dashboardDetailStore.$patch((_state) => {
             _state.widgetViewModeModalVisible = true;

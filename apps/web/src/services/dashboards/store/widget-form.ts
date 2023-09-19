@@ -110,6 +110,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 widget_options: mergedWidgetState.options,
                 schema_properties: mergedWidgetState.schemaProperties,
             };
+            this.widgetKey = widgetKey;
             this.widgetConfigId = widgetConfigId;
             this.widgetTitle = mergedWidgetState.title;
             this.widgetOptions = mergedWidgetState.options;
