@@ -9884,7 +9884,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>MY_QUERY</name>
+                                        <name>NAME_LABEL</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>

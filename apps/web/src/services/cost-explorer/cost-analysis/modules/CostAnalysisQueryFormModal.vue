@@ -120,7 +120,7 @@ watch(() => state.proxyVisible, (visible) => {
     >
         <template #body>
             <p-field-group class="query-name-input-wrap"
-                           :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_COST_ANALYSIS_NAME')"
+                           :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NAME_LABEL')"
                            :invalid="!state.isQueryNameValid"
                            :invalid-text="state.queryNameInvalidText"
                            required
@@ -128,7 +128,7 @@ watch(() => state.proxyVisible, (visible) => {
                 <template #default>
                     <p-text-input v-model="formState.queryName"
                                   class="block w-full"
-                                  :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MY_QUERY')"
+                                  :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_COST_ANALYSIS_NAME')"
                                   :invalid="!state.isQueryNameValid"
                                   @update:value.once="handleFirstQueryNameInput"
                     />
