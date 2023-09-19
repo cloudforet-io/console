@@ -1,7 +1,6 @@
 <script setup lang="ts">
-
 import {
-    computed, defineEmits, defineProps, reactive,
+    defineEmits, defineProps, reactive,
 } from 'vue';
 
 import {
@@ -53,21 +52,21 @@ const state = reactive({
         key: 'budget_usage',
         desc: true,
     } as Query['sort'],
-    budgetUsageParams: computed(() => {
-        budgetUsageApiQueryHelper
-            .setFilters(state.queryStoreFilters)
-            .setPage(state.pageStart, state.pageLimit);
-        const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
-        return {
-            query: { ..._query, ...budgetUsageApiQueryHelper.data },
-        };
-    }),
 });
 
 const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeResult[]}> => {
     try {
         state.loading = true;
-        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze(state.budgetUsageParams);
+        budgetUsageApiQueryHelper
+            .setFilters(state.queryStoreFilters)
+            .setPage(state.pageStart, state.pageLimit);
+        const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
+        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+            query: {
+                ..._query,
+                ...budgetUsageApiQueryHelper.data,
+            },
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
         return { more: false, results: [] };
@@ -105,6 +104,7 @@ const handleRefresh = () => {
     listBudgets();
 };
 
+const budgetUsageExportApiQueryHelper = new ApiQueryHelper();
 const handleExport = async () => {
     const excelFields = [
         { key: 'budget_id', name: 'Budget ID' },
@@ -117,14 +117,19 @@ const handleExport = async () => {
         { key: 'total_budget', name: 'Total Budget' },
         { key: 'budget_usage', name: 'Usage (%)' },
     ];
+    budgetUsageExportApiQueryHelper.setFilters(state.queryStoreFilters);
+    const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
     await store.dispatch('file/downloadExcel', {
         url: '/cost-analysis/budget-usage/analyze',
         param: {
-            ...state.budgetUsageParams,
-            query: budgetUsageApiQueryHelper.data,
+            query: {
+                ..._query,
+                ...budgetUsageExportApiQueryHelper.data,
+            },
         },
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.budget,
+        version: 'v2',
     });
 };
 
