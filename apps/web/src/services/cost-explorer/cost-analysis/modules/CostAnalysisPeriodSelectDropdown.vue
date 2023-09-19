@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { isEqual, range } from 'lodash';
 import {
@@ -23,7 +23,7 @@ import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeMo
 
 
 const today = dayjs.utc();
-interface PeriodItem extends SelectDropdownMenu {
+interface PeriodItem extends SelectDropdownMenuItem {
     period?: {
         start: string
         end: string;
@@ -205,7 +205,9 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 
 <template>
     <div class="cost-analysis-period-select-dropdown">
-        <p-select-dropdown :items="state.periodMenuItems"
+        <p-select-dropdown :menu="state.periodMenuItems"
+                           :selection-label="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.PERIOD')"
+                           style-type="rounded"
                            :selected="state.selectedPeriod"
                            :invalid="state.isPeriodInvalid"
                            @select="handleSelectPeriod"

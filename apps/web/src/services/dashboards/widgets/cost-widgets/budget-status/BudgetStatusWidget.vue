@@ -18,11 +18,10 @@ import { indigo, red, yellow } from '@/styles/colors';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type';
-
 
 type Data = BudgetDataModel['results'];
 
@@ -33,13 +32,16 @@ const emit = defineEmits<WidgetEmit>();
 const { t } = useI18n();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {},
-        query: {
-            filters: budgetQueryHelper.setFilters(widgetState.budgetConsoleFilters).rawQueryStrings,
-        },
-    })),
+    widgetLocation: computed<RouteLocationRaw>(() => {
+        const dataSourceId = widgetState.options.cost_data_source;
+        return {
+            name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+            params: {},
+            query: {
+                filters: budgetQueryHelper.setFilters([{ k: 'data_source_id', v: [dataSourceId], o: '=' }]).rawQueryStrings,
+            },
+        };
+    }),
 });
 
 const state = reactive({

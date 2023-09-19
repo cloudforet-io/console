@@ -1,6 +1,5 @@
-import { isEmpty } from 'lodash';
-
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import { isEmpty } from 'lodash';
 
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type { Period } from '@/services/cost-explorer/type';

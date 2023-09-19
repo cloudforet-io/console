@@ -13,8 +13,8 @@ import {
 import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -24,13 +24,11 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
-
-
 
 type Data = BudgetDataModel;
 
@@ -40,13 +38,16 @@ const emit = defineEmits<WidgetEmit>();
 const store = useStore();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<RouteLocationRaw>(() => ({
-        name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-        params: {},
-        query: {
-            filters: budgetQueryHelper.setFilters(widgetState.budgetConsoleFilters).rawQueryStrings,
-        },
-    })),
+    widgetLocation: computed<RouteLocationRaw>(() => {
+        const dataSourceId = widgetState.options.cost_data_source;
+        return {
+            name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+            params: {},
+            query: {
+                filters: budgetQueryHelper.setFilters([{ k: 'data_source_id', v: [dataSourceId], o: '=' }]).rawQueryStrings,
+            },
+        };
+    }),
 });
 
 const state = reactive({

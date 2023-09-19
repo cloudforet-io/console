@@ -168,7 +168,7 @@ const handleConfirm = async () => {
                     <div class="condition-input-wrapper">
                         <p-select-dropdown :selected="condition.unit"
                                            class="condition"
-                                           :items="state.units"
+                                           :menu="state.units"
                                            use-fixed-menu-style
                                            @update:selected="handleUpdateUnit(idx, $event)"
                         />
@@ -191,13 +191,15 @@ const handleConfirm = async () => {
                         </p-text-input>
                         <p-select-dropdown :selected="condition.notification_type"
                                            class="condition"
-                                           :items="state.types"
+                                           :menu="state.types"
                                            use-fixed-menu-style
                                            @update:selected="handleUpdateNotificationType(idx, $event)"
                         >
-                            <span :class="{'text-alert': condition.notification_type === BUDGET_NOTIFICATIONS_TYPE.CRITICAL}">
-                                {{ state.types.find(d => d.name === condition.notification_type).label }}
-                            </span>
+                            <template #dropdown-button>
+                                <span :class="{'text-alert': condition.notification_type === BUDGET_NOTIFICATIONS_TYPE.CRITICAL}">
+                                    {{ state.types.find(d => d.name === condition.notification_type).label }}
+                                </span>
+                            </template>
                         </p-select-dropdown>
                         <p-icon-button name="ic_delete"
                                        class="delete-button"

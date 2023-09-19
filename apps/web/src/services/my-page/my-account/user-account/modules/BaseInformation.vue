@@ -144,7 +144,7 @@ watch(() => store.state.user.language, (language) => {
                        class="input-form"
         >
             <p-select-dropdown v-model:selected="formState.language"
-                               :items="state.languages"
+                               :menu="state.languages"
                                is-fixed-width
             />
         </p-field-group>

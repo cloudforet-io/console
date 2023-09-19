@@ -79,12 +79,12 @@ const fetchDataSource = async () => {
                    class="budget-data-source-select-field"
     >
         <p-select-dropdown class="data-source-dropdown"
-                           :items="state.dataSourceItems"
+                           :menu="state.dataSourceItems"
                            :selected="selectedDataSource"
                            is-fixed-width
                            @update:selected="setForm('selectedDataSource', $event)"
         >
-            <template #default="{ item }">
+            <template #dropdown-button="item">
                 <div class="selected-input">
                     <p-lazy-img :src="item?.imageUrl"
                                 class="left-icon"
@@ -110,6 +110,7 @@ const fetchDataSource = async () => {
         width: 100%;
         .selected-input {
             @apply flex items-center gap-1;
+            flex: 1;
         }
         .selected-item-postfix {
             @apply text-gray-400;

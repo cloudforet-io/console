@@ -55,7 +55,7 @@ const handleChangeScope = (selected) => {
             {{ view.label }}
         </p-select-status>
         <p-select-dropdown class="select-tablet"
-                           :items="state.viewerFilterList"
+                           :menu="state.viewerFilterList"
                            :selected="state.viewersStatus"
                            style-type="transparent"
                            @update:selected="handleChangeViewers"
@@ -75,7 +75,7 @@ const handleChangeScope = (selected) => {
                 {{ scope.label }}
             </p-select-status>
             <p-select-dropdown class="select-tablet"
-                               :items="state.scopeFilterList"
+                               :menu="state.scopeFilterList"
                                :selected="state.scopeStatus"
                                style-type="transparent"
                                @update:selected="handleChangeScope"
@@ -107,6 +107,7 @@ const handleChangeScope = (selected) => {
 
     @screen tablet {
         .select-tablet {
+            @apply relative;
             display: block;
         }
         .select-desktop {

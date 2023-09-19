@@ -1,4 +1,4 @@
-import type { RouteLocation } from 'vue-router';
+import type { RouteLocationRaw } from 'vue-router';
 
 import type { Tags, TimeStamp } from '@/models';
 
@@ -109,7 +109,7 @@ export interface ProtocolItem {
 
 export interface EnrichedProtocolItem extends ProtocolItem {
 	label: string;
-	link: Partial<RouteLocation>;
+	link: Partial<RouteLocationRaw>;
 	protocolType: string;
 	tags: Tags;
 	icon: any;

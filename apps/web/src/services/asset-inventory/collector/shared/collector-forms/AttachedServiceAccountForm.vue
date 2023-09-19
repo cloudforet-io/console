@@ -25,7 +25,7 @@
                 <!-- NOTE: screen mobile size-->
                 <p-select-dropdown class="attached-service-account-dropdown"
                                    :selected="collectorFormState.attachedServiceAccountType"
-                                   :items="attachedServiceAccountList"
+                                   :menu="attachedServiceAccountList"
                                    @update:selected="handleChangeAttachedServiceAccountType"
                 />
                 <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">

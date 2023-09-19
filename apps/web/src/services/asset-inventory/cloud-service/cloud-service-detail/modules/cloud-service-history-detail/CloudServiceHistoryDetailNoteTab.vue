@@ -1,12 +1,152 @@
+<script lang="ts" setup>
+import { iso8601Formatter } from '@cloudforet/core-lib';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import {
+    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, watch,
+} from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { NoteModel } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
+
+interface Props {
+    recordId: string,
+    manageDisabled: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    recordId: undefined,
+    manageDisabled: false,
+});
+
+const emit = defineEmits<{(e: 'refresh-note-count'): void;
+}>();
+
+const store = useStore();
+const { t } = useI18n();
+
+const state = reactive({
+    id: '',
+    noteInput: '',
+    noteList: [] as NoteModel[],
+    loading: true,
+    timezone: computed(() => store.state.user.timezone),
+    userId: computed(() => store.state.user.userId),
+    menuItems: computed(() => [
+        {
+            label: t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',
+        },
+    ]),
+    selectedNoteIdForDelete: '',
+    totalCount: 0,
+});
+
+const handleChangeNoteInput = (e) => {
+    state.noteInput = e.target?.value;
+};
+const apiQuery = new ApiQueryHelper();
+const listNote = async () => {
+    try {
+        state.loading = true;
+        apiQuery.setFilters([{ k: 'record_id', v: props.recordId, o: '=' }]).setSort('created_at');
+        const res = await SpaceConnector.client.inventory.note.list({
+            query: apiQuery.data,
+        });
+        state.noteList = res.results.map((d) => ({
+            title: d.created_by,
+            data: {
+                note: d.note,
+                note_id: d.note_id,
+            },
+            ...d,
+        }));
+        state.totalCount = res.total_count;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.noteList = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+const handleCreateNote = async () => {
+    try {
+        await SpaceConnector.client.inventory.note.create({
+            record_id: props.recordId,
+            user_id: state.userId,
+            note: state.noteInput,
+        });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to Create Note');
+    } finally {
+        state.noteInput = '';
+        await listNote();
+        // eslint-disable-next-line vue/require-explicit-emits
+        emit('refresh-note-count');
+    }
+};
+
+const checkDeleteState = reactive({
+    headerTitle: computed(() => t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE_HELP_TEXT')),
+    visible: false,
+    loading: false,
+});
+
+const openDeleteModal = () => {
+    checkDeleteState.visible = true;
+};
+
+const handleSelect = (noteId) => {
+    state.selectedNoteIdForDelete = noteId;
+    openDeleteModal();
+};
+
+const handleDeleteNote = async () => {
+    checkDeleteState.loading = true;
+    try {
+        await SpaceConnector.client.inventory.note.delete({
+            note_id: state.selectedNoteIdForDelete,
+        });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ALT_E_DELETE_NOTE'));
+    } finally {
+        checkDeleteState.loading = false;
+        checkDeleteState.visible = false;
+        await listNote();
+        // eslint-disable-next-line vue/require-explicit-emits
+        emit('refresh-note-count');
+    }
+};
+
+watch(() => props.recordId, (recordId) => {
+    state.id = recordId;
+});
+
+watch(() => state.id, () => {
+    listNote();
+});
+
+(async () => {
+    await listNote();
+})();
+</script>
+
 <template>
     <p-pane-layout class="cloud-service-history-detail-note">
         <p-heading heading-type="sub"
                    use-total-count
-                   :total-count="totalCount"
+                   :total-count="state.totalCount"
                    :title="t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE')"
         />
         <article class="note-wrapper">
-            <p-collapsible-list :items="noteList"
+            <p-collapsible-list :items="state.noteList"
                                 toggle-position="contents"
                                 :line-clamp="2"
             >
@@ -14,13 +154,13 @@
                     <div class="title-wrapper">
                         <p>
                             <span class="author">{{ title }}</span>
-                            <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
+                            <span class="date">{{ iso8601Formatter(state.noteList[index].created_at, state.timezone) }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button"
                                            button-icon="ic_ellipsis-horizontal"
-                                           :items="menuItems"
+                                           :menu="state.menuItems"
                                            menu-position="right"
-                                           :disabled="manageDisabled"
+                                           :disabled="props.manageDisabled"
                                            @select="handleSelect(data.note_id)"
                         />
                     </div>
@@ -33,12 +173,12 @@
             </p-collapsible-list>
         </article>
         <article class="add-note-wrapper">
-            <p-textarea :value="noteInput"
+            <p-textarea :value="state.noteInput"
                         @input="handleChangeNoteInput"
             />
             <p-button style-type="tertiary"
                       class="add-btn"
-                      :disabled="(noteInput.trim()).length === 0 || manageDisabled"
+                      :disabled="(state.noteInput.trim()).length === 0 || props.manageDisabled"
                       @click="handleCreateNote"
             >
                 {{ t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ADD_NOTE') }}
@@ -51,171 +191,6 @@
         />
     </p-pane-layout>
 </template>
-
-<script lang="ts">
-import { iso8601Formatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import {
-    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
-} from '@spaceone/design-system';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
-
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import type { NoteModel } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-
-export default {
-    name: 'CloudServiceHistoryDetailNote',
-    components: {
-        PPaneLayout,
-        PHeading,
-        PTextarea,
-        PButton,
-        PCollapsibleList,
-        PSelectDropdown,
-        PTextBeautifier,
-        DeleteModal,
-    },
-    props: {
-        recordId: {
-            type: String,
-            default: undefined,
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const store = useStore();
-        const { t } = useI18n();
-
-        const state = reactive({
-            id: '',
-            noteInput: '',
-            noteList: [] as NoteModel[],
-            loading: true,
-            timezone: computed(() => store.state.user.timezone),
-            userId: computed(() => store.state.user.userId),
-            menuItems: computed(() => [
-                {
-                    label: t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE'), name: 'delete',
-                },
-            ]),
-            selectedNoteIdForDelete: '',
-            totalCount: 0,
-        });
-
-        const handleChangeNoteInput = (e) => {
-            state.noteInput = e.target?.value;
-        };
-        const apiQuery = new ApiQueryHelper();
-        const listNote = async () => {
-            try {
-                state.loading = true;
-                apiQuery.setFilters([{ k: 'record_id', v: props.recordId, o: '=' }]).setSort('created_at');
-                const res = await SpaceConnector.client.inventory.note.list({
-                    query: apiQuery.data,
-                });
-                state.noteList = res.results.map((d) => ({
-                    title: d.created_by,
-                    data: {
-                        note: d.note,
-                        note_id: d.note_id,
-                    },
-                    ...d,
-                }));
-                state.totalCount = res.total_count;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.noteList = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const handleCreateNote = async () => {
-            try {
-                await SpaceConnector.client.inventory.note.create({
-                    record_id: props.recordId,
-                    user_id: state.userId,
-                    note: state.noteInput,
-                });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, 'Failed to Create Note');
-            } finally {
-                state.noteInput = '';
-                await listNote();
-                // eslint-disable-next-line vue/require-explicit-emits
-                emit('refresh-note-count');
-            }
-        };
-
-        const checkDeleteState = reactive({
-            headerTitle: computed(() => t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.DELETE_HELP_TEXT')),
-            visible: false,
-            loading: false,
-        });
-
-        const openDeleteModal = () => {
-            checkDeleteState.visible = true;
-        };
-
-        const handleSelect = (noteId) => {
-            state.selectedNoteIdForDelete = noteId;
-            openDeleteModal();
-        };
-
-        const handleDeleteNote = async () => {
-            checkDeleteState.loading = true;
-            try {
-                await SpaceConnector.client.inventory.note.delete({
-                    note_id: state.selectedNoteIdForDelete,
-                });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, t('INVENTORY.CLOUD_SERVICE.HISTORY.DETAIL.NOTE_TAB.ALT_E_DELETE_NOTE'));
-            } finally {
-                checkDeleteState.loading = false;
-                checkDeleteState.visible = false;
-                await listNote();
-                // eslint-disable-next-line vue/require-explicit-emits
-                emit('refresh-note-count');
-            }
-        };
-
-        watch(() => props.recordId, (recordId) => {
-            state.id = recordId;
-        });
-
-        watch(() => state.id, () => {
-            listNote();
-        });
-
-        (async () => {
-            await listNote();
-        })();
-
-        return {
-            t,
-            ...toRefs(state),
-            checkDeleteState,
-            iso8601Formatter,
-            handleChangeNoteInput,
-            handleCreateNote,
-            handleSelect,
-            handleDeleteNote,
-            openDeleteModal,
-        };
-    },
-};
-
-</script>
 
 <style lang="postcss" scoped>
 .cloud-service-history-detail-note {

@@ -199,7 +199,7 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
                         {{ urgency.label }}
                     </p-radio>
                     <p-select-dropdown v-model:selected="state.selectedUrgency"
-                                       :items="state.urgencyList"
+                                       :menu="state.urgencyList"
                     />
                 </div>
             </div>

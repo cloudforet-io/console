@@ -115,14 +115,14 @@ const handleLinkClick = () => {
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_arrows-uturn-left"
-                       :disabled="!editor.can().undo()"
-                       @click="editor.chain().focus().undo().run()"
+                       :disabled="!props.editor.can().undo()"
+                       @click="props.editor.chain().focus().undo().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_arrows-uturn-right"
-                       :disabled="!editor.can().redo()"
-                       @click="editor.chain().focus().redo().run()"
+                       :disabled="!props.editor.can().redo()"
+                       @click="props.editor.chain().focus().redo().run()"
         />
 
         <p-divider class="menu-divider"
@@ -132,7 +132,7 @@ const handleLinkClick = () => {
         <p-select-dropdown :selected="state.selectedTextStyle"
                            class="menu-dropdown text-style"
                            style-type="transparent"
-                           :items="state.textStyleItems"
+                           :menu="state.textStyleItems"
                            @select="handleTextStyleSelect"
         >
             <template #menu-item--format="{item}">
@@ -148,30 +148,32 @@ const handleLinkClick = () => {
                    vertical
         />
 
-        <p-select-dropdown :selected="state.selectedTextAlign"
-                           class="menu-dropdown"
-                           style-type="transparent"
-                           :items="state.textAlignItems"
-                           @select="handleTextAlignSelect"
-        >
-            <template #default>
-                <p-i :name="TEXT_ALIGN_ICONS[state.selectedTextAlign]"
-                     color="inherit"
-                />
-            </template>
-            <template #menu-item--format="{item}">
-                <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
-                {{ item.label }}
-            </template>
-        </p-select-dropdown>
+        <div class="text-align-wrapper">
+            <p-select-dropdown :selected="state.selectedTextAlign"
+                               class="menu-dropdown"
+                               style-type="transparent"
+                               :menu="state.textAlignItems"
+                               @select="handleTextAlignSelect"
+            >
+                <template #menu-item--format="{item}">
+                    <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
+                    {{ item.label }}
+                </template>
+                <template #dropdown-button>
+                    <p-i :name="TEXT_ALIGN_ICONS[state.selectedTextAlign]"
+                         color="inherit"
+                    />
+                </template>
+            </p-select-dropdown>
+        </div>
 
         <p-divider class="menu-divider"
                    vertical
         />
 
         <color-picker class="menu-dropdown"
-                      :editor="editor"
-                      @select="editor.chain().focus().setColor($event).run()"
+                      :editor="props.editor"
+                      @select="props.editor.chain().focus().setColor($event).run()"
         />
 
         <p-divider class="menu-divider"
@@ -181,33 +183,33 @@ const handleLinkClick = () => {
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_text-bold"
-                       :class="{ 'selected': editor.isActive('bold') }"
-                       @click="editor.chain().focus().toggleBold().run()"
+                       :class="{ 'selected': props.editor.isActive('bold') }"
+                       @click="props.editor.chain().focus().toggleBold().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_text-italic"
-                       :class="{ 'selected': editor.isActive('italic') }"
-                       @click="editor.chain().focus().toggleItalic().run()"
+                       :class="{ 'selected': props.editor.isActive('italic') }"
+                       @click="props.editor.chain().focus().toggleItalic().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_text-underline"
-                       :class="{ 'selected': editor.isActive('underline') }"
-                       @click="editor.chain().focus().toggleUnderline().run()"
+                       :class="{ 'selected': props.editor.isActive('underline') }"
+                       @click="props.editor.chain().focus().toggleUnderline().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_text-strikethrough"
-                       :class="{ 'selected': editor.isActive('strike') }"
-                       @click="editor.chain().focus().toggleStrike().run()"
+                       :class="{ 'selected': props.editor.isActive('strike') }"
+                       @click="props.editor.chain().focus().toggleStrike().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_inline-code"
-                       :class="{ 'selected': editor.isActive('code') }"
-                       :disabled="!editor.can().setCode()"
-                       @click="editor.chain().focus().toggleCode().run()"
+                       :class="{ 'selected': props.editor.isActive('code') }"
+                       :disabled="!props.editor.can().setCode()"
+                       @click="props.editor.chain().focus().toggleCode().run()"
         />
 
         <p-divider class="menu-divider"
@@ -217,14 +219,14 @@ const handleLinkClick = () => {
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_list-bulleted-2"
-                       :class="{ 'selected': editor.isActive('bulletList') }"
-                       @click="editor.chain().focus().toggleBulletList().run()"
+                       :class="{ 'selected': props.editor.isActive('bulletList') }"
+                       @click="props.editor.chain().focus().toggleBulletList().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_list-numbered"
-                       :class="{ 'selected': editor.isActive('orderedList') }"
-                       @click="editor.chain().focus().toggleOrderedList().run()"
+                       :class="{ 'selected': props.editor.isActive('orderedList') }"
+                       @click="props.editor.chain().focus().toggleOrderedList().run()"
         />
 
         <p-divider class="menu-divider"
@@ -234,7 +236,7 @@ const handleLinkClick = () => {
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_link"
-                       :class="{ 'selected': editor.isActive('link') }"
+                       :class="{ 'selected': props.editor.isActive('link') }"
                        @click="handleLinkClick"
         />
         <p-popover v-model:is-visible="state.imagePopoverVisible"
@@ -258,22 +260,22 @@ const handleLinkClick = () => {
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_editor-code"
-                       :class="{ 'selected': editor.isActive('codeBlock') }"
-                       :disabled="!editor.can().setCodeBlock()"
-                       @click="editor.chain().focus().toggleCodeBlock().run()"
+                       :class="{ 'selected': props.editor.isActive('codeBlock') }"
+                       :disabled="!props.editor.can().setCodeBlock()"
+                       @click="props.editor.chain().focus().toggleCodeBlock().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_quotes"
-                       :class="{ 'selected': editor.isActive('blockquote') }"
-                       :disabled="!editor.can().setBlockquote()"
-                       @click="editor.chain().focus().toggleBlockquote().run()"
+                       :class="{ 'selected': props.editor.isActive('blockquote') }"
+                       :disabled="!props.editor.can().setBlockquote()"
+                       @click="props.editor.chain().focus().toggleBlockquote().run()"
         />
         <p-icon-button class="menu-button"
                        style-type="transparent"
                        name="ic_horizontal-rule"
-                       :disabled="!editor.can().setHorizontalRule()"
-                       @click="editor.chain().focus().setHorizontalRule().run()"
+                       :disabled="!props.editor.can().setHorizontalRule()"
+                       @click="props.editor.chain().focus().setHorizontalRule().run()"
         />
     </div>
 </template>
@@ -289,15 +291,23 @@ const handleLinkClick = () => {
         margin: 0.25rem 0.5rem;
     }
 
+    .text-align-wrapper {
+        @apply flex items-center;
+    }
+
+    .menu-dropdown {
+        min-width: unset;
+        &.text-style {
+            min-width: 7.5rem;
+        }
+    }
+
     .menu-button, .menu-dropdown {
         &:not(:first-of-type) {
             margin-left: 0.125rem;
         }
         &:not(:last-of-type) {
             margin-right: 0.125rem;
-        }
-        &.text-style {
-            width: 110px;
         }
 
         @mixin text-style;
@@ -321,27 +331,6 @@ const handleLinkClick = () => {
         }
 
         &:active:not(.disabled), &.selected:not(.disabled) {
-            @apply bg-gray-700 text-white outline-none;
-        }
-    }
-
-    /* custom design-system component - p-select-dropdown */
-    :deep(.menu-dropdown.p-select-dropdown:not(.invalid):not(.disabled):not(.read-only).transparent) {
-        > .dropdown-button {
-            @apply rounded text-gray-900 outline-none;
-            padding-left: 0.5rem;
-
-            @media (hover: hover) {
-                &:hover {
-                    @apply bg-gray-200 text-gray-900;
-                }
-            }
-
-            &:active, &.selected {
-                @apply bg-gray-700 text-white outline-none;
-            }
-        }
-        &.active > .dropdown-button {
             @apply bg-gray-700 text-white outline-none;
         }
     }

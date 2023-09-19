@@ -9,12 +9,11 @@
         >
             {{ button.label }}
         </p-button>
-        <p-select-dropdown :items="state.buttonGroup"
+        <p-select-dropdown :menu="state.buttonGroup"
+                           :placeholder="t('PLUGIN.COLLECTOR.MAIN.ACTION')"
                            class="only-mobile"
                            @select="onSelectAction"
-        >
-            {{ t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
-        </p-select-dropdown>
+        />
 
         <p-table-check-modal
             v-model:visible="state.visibleDeleteModal"

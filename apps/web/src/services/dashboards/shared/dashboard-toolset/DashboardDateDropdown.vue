@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
-            :items="state.monthMenuItems"
+            :menu="state.monthMenuItems"
             :selected="state.selectedMonthMenuIndex"
             index-mode
             menu-position="right"
@@ -45,31 +45,31 @@ const { t } = useI18n();
 
 const { i18nDayjs } = useI18nDayjs();
 const state = reactive({
-    getMonthMenuItem: computed(() => {
+    monthMenuItems: computed<MenuItem[]>(() => {
         const monthData: MenuItem[] = [];
         range(12).forEach((i) => {
             monthData.push({
                 type: 'item',
-                label: i18nDayjs.value.utc(dayjs.utc().format('YYYY-MM-DD')).subtract(i, 'month').format('MMMM YYYY'),
+                label: i18nDayjs.value.utc(dayjs.utc().format('YYYY-MM')).subtract(i, 'month').format('MMMM YYYY'),
                 name: dayjs.utc().subtract(i, 'month').format('YYYY-MM'),
             });
         });
-        return monthData;
+
+        return [
+            {
+                type: 'item',
+                name: 'current',
+                label: t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
+            },
+            ...monthData,
+            { type: 'divider' },
+            {
+                type: 'item',
+                name: 'custom',
+                label: t('DASHBOARDS.DETAIL.CUSTOM'),
+            },
+        ];
     }),
-    monthMenuItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: 'current',
-            label: t('DASHBOARDS.DETAIL.CURRENT_MONTH'),
-        },
-        ...state.getMonthMenuItem,
-        { type: 'divider' },
-        {
-            type: 'item',
-            name: 'custom',
-            label: t('DASHBOARDS.DETAIL.CUSTOM'),
-        },
-    ])),
     selectedMonthLabel: computed(() => {
         if (state.monthMenuItems[state.selectedMonthMenuIndex]?.name === 'custom') {
             return i18nDayjs.value.utc(dayjs.utc(state.selectedDateRange?.start).format('YYYY-MM-DD')).format('MMMM YYYY');
@@ -82,8 +82,8 @@ const state = reactive({
 });
 
 const setSelectedDateRange = (start, end) => {
-    const _start = dayjs.utc(start).startOf('month').format('YYYY-MM-DD');
-    const _end = dayjs.utc(end).endOf('month').format('YYYY-MM-DD');
+    const _start = dayjs.utc(start).startOf('month').format('YYYY-MM');
+    const _end = dayjs.utc(end).endOf('month').format('YYYY-MM');
     state.selectedDateRange = { start: _start, end: _end };
 };
 
@@ -112,19 +112,18 @@ const setInitialDateRange = () => {
 
     // 1. default month => start is (month 'current' + day '1'), end is (month 'current + day 'today')
     // Index 0 is 'Current' menu index
-
     if (!props.dateRange?.start
         || !props.dateRange?.end
-        || (_start.isSame(_current.startOf('month'), 'day')
-            && _end.isSame(_current, 'day'))
+        || (_start.isSame(_current, 'month')
+            && _end.isSame(_current, 'month'))
     ) {
         return 0;
     }
 
     // 2. some month => start is (month 'n' + day '1'), end is (month 'n' + day '{last day}')
     if (_start.isSame(_end, 'month')
-        && _start.isSame(_start.startOf('month'), 'day')
-        && _end.isSame(_end.endOf('month'), 'day')
+        && _start.isSame(_start, 'month')
+        && _end.isSame(_end, 'month')
     ) {
         const itemIndex = state.monthMenuItems.findIndex((d) => d.name === _start.format('YYYY-MM'));
         if (itemIndex > -1) return itemIndex;
@@ -142,10 +141,8 @@ watch(() => props.dateRange, () => {
 </script>
 <style lang="postcss" scoped>
 .dashboard-date-dropdown {
-    /* custom design-system component - p-select-dropdown */
-    :deep(.p-select-dropdown) {
-        min-width: auto;
-    }
+    @apply relative flex items-center justify-center;
+    min-height: 2rem;
 }
 </style>
 

@@ -1,10 +1,9 @@
+import { merge } from 'lodash';
 import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
 
-import dayjs from 'dayjs';
-import { merge } from 'lodash';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 
@@ -17,6 +16,7 @@ import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/w
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+
 
 export interface MergedWidgetState {
     widgetConfig: ComputedRef<WidgetConfig>;
@@ -68,8 +68,8 @@ export function useMergedWidgetState(
             return {
                 date_range: dateRange ? {
                     enabled: dateRange.enabled ?? false,
-                    start: dateRange.start ? dayjs(dateRange.start).utc().format('YYYY-MM') : undefined,
-                    end: dateRange.end ? dayjs(dateRange.end).utc().format('YYYY-MM') : undefined,
+                    start: dateRange.start,
+                    end: dateRange.end,
                 } : { enabled: false },
                 currency: currency ? {
                     enabled: currency.enabled ?? false,

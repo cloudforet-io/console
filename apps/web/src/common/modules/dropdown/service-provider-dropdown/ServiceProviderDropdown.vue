@@ -43,27 +43,29 @@ const handleSelect = (provider: string) => {
 <template>
     <p-select-dropdown class="service-provider-dropdown"
                        :selected="cloudServicePageState.selectedProvider"
-                       :items="state.contextMenuItems"
+                       :menu="state.contextMenuItems"
                        @select="handleSelect"
     >
-        <span v-if="state.selectedProviderItem"
-              class="text"
-        >
-            <p-lazy-img width="1rem"
-                        height="1rem"
-                        :src="state.selectedProviderItem.icon"
-                        class="mr-1"
-            /><span>{{ state.selectedProviderItem.name }}</span>
-        </span>
-        <span v-else-if="hasAll"
-              class="text"
-        >
-            <p-lazy-img error-icon="ic_cloud-filled"
-                        width="1rem"
-                        height="1rem"
-                        class="mr-1"
-            /><span>All</span>
-        </span>
+        <template #dropdown-button>
+            <span v-if="state.selectedProviderItem"
+                  class="text"
+            >
+                <p-lazy-img width="1rem"
+                            height="1rem"
+                            :src="state.selectedProviderItem.icon"
+                            class="mr-1"
+                /><span>{{ state.selectedProviderItem.name }}</span>
+            </span>
+            <span v-else-if="props.hasAll"
+                  class="text"
+            >
+                <p-lazy-img error-icon="ic_cloud-filled"
+                            width="1rem"
+                            height="1rem"
+                            class="mr-1"
+                /><span>All</span>
+            </span>
+        </template>
         <template #menu-item--format="{ item }">
             <div class="content-menu-item">
                 <p-lazy-img width="1rem"
@@ -80,6 +82,7 @@ const handleSelect = (provider: string) => {
 <style lang="postcss" scoped>
 /* custom design-system component - p-select-dropdown */
 .service-provider-dropdown {
+    min-width: unset;
     :deep(.dropdown-button) {
         @apply rounded-2xl border-gray-200 bg-gray-100;
         width: unset;

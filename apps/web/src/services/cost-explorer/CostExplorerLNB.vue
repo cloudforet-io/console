@@ -179,6 +179,7 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
 };
 
 const handleSelectDataSource = (selected: string) => {
+    if (!selected) return;
     costQuerySetStore.$patch({ selectedDataSourceId: selected });
     router.push({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
@@ -245,13 +246,13 @@ onMounted(() => {
             </template>
             <template #slot-data-source-dropdown>
                 <p-select-dropdown class="select-options-dropdown"
-                                   :items="dataSourceState.items"
+                                   :menu="dataSourceState.items"
                                    :selected="dataSourceState.selected"
                                    use-fixed-menu-style
                                    is-fixed-width
                                    @update:selected="handleSelectDataSource"
                 >
-                    <template #default="{ item }">
+                    <template #dropdown-button="item">
                         <div class="selected-wrapper">
                             <p-lazy-img v-if="item && item.imageUrl"
                                         class="left-icon"
@@ -285,9 +286,9 @@ onMounted(() => {
         margin-left: 0.25rem;
     }
     .select-options-dropdown {
-        @apply w-full;
         .selected-wrapper {
-            @apply flex items-center w-full;
+            @apply flex items-center;
+            width: calc(100% - 1.8rem);
             .left-icon {
                 margin-right: 0.25rem;
                 flex-shrink: 0;

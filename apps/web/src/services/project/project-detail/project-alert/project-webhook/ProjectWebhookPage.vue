@@ -316,12 +316,12 @@ onActivated(() => {
                     {{ t('PROJECT.DETAIL.ADD') }}
                 </p-button>
                 <p-select-dropdown
-                    :items="state.dropdown"
+                    :menu="state.dropdown"
                     :disabled="!state.hasManagePermission || !state.isSelectedItem"
+                    :placeholder="t('PROJECT.DETAIL.WEBHOOK_ACTION')"
+                    class="relative"
                     @select="onSelectDropdown"
-                >
-                    {{ t('PROJECT.DETAIL.WEBHOOK_ACTION') }}
-                </p-select-dropdown>
+                />
             </template>
             <template #col-plugin_info.plugin_id-format="{value}">
                 <div class="col-type">

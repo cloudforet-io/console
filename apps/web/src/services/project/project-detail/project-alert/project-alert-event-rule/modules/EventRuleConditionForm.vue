@@ -145,12 +145,12 @@ const onClickDelete = (idx) => {
                     <div class="left-part">
                         <p-select-dropdown v-model:selected="condition.key"
                                            class="input"
-                                           :items="keys"
+                                           :menu="keys"
                                            use-fixed-menu-style
                         />
                         <p-select-dropdown v-model:selected="condition.operator"
                                            class="input"
-                                           :items="state.operators"
+                                           :menu="state.operators"
                                            use-fixed-menu-style
                         />
                         <p-text-input v-model:value="condition.value"

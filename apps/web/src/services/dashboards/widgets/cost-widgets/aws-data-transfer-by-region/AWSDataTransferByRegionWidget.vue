@@ -10,7 +10,6 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
-import { useStore } from 'vuex';
 
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
@@ -28,19 +27,18 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNe
 import type {
     WidgetExpose, WidgetProps, SelectorType, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
-
 
 const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
 const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
@@ -79,13 +77,6 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed(() => {
-        const { end } = widgetState.settings?.date_range ?? {};
-        return {
-            start: end,
-            end,
-        };
-    }),
     widgetLocation: computed<RouteLocationRaw>(() => ({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
@@ -93,14 +84,10 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
         },
         query: {
-            granularity: primitiveToQueryString(widgetState.granularity),
-            group_by: arrayToQueryString([widgetState.groupBy]),
+            granularity: primitiveToQueryString(GRANULARITY.DAILY),
+            group_by: arrayToQueryString([COST_GROUP_BY.REGION, COST_GROUP_BY.USAGE_TYPE]),
             period: objectToQueryString(widgetState.dateRange),
-            filters: objectToQueryString({
-                ...getWidgetLocationFilters(widgetState.options.filters),
-                provider: ['aws'],
-                product: ['AWSDataTransfer'],
-            }),
+            filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
         },
     })),
 });
