@@ -118,7 +118,7 @@ export interface WidgetFilter {
     v: null|string|boolean|number|Array<null|string|boolean|number>;
     o?: ConsoleFilterOperator;
 }
-const WIDGET_FILTER_KEYS = [
+export const WIDGET_FILTER_KEYS = [
     // resource reference type
     REFERENCE_TYPE_INFO.provider.type,
     REFERENCE_TYPE_INFO.project.type,

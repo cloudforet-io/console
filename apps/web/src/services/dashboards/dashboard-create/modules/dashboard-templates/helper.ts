@@ -12,7 +12,12 @@ import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
-
+export const getVariableKeyFromWidgetSchemaProperty = (property: string): string => {
+    if (property.startsWith('filters.')) {
+        return property.replace('filters.', '');
+    }
+    return property;
+};
 export const getDefaultWidgetFormData = (widgetId: string): Record<string, string> => {
     const widgetConfig = getWidgetConfig(widgetId);
     const fixedProperties: string[] = widgetConfig.options_schema?.fixed_properties ?? [];

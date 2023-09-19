@@ -13,7 +13,10 @@ import {
     isEmpty, isEqual, xor,
 } from 'lodash';
 
-import { getDefaultWidgetFormData } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
+import {
+    getDefaultWidgetFormData,
+    getVariableKeyFromWidgetSchemaProperty,
+} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import {
     useReferenceStore,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-reference-store';
@@ -36,7 +39,9 @@ import type {
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { getWidgetFilterSchemaPropertyName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import {
+    getWidgetFilterSchemaPropertyName,
+} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type {
     InheritOptionsErrorMap,
 } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
@@ -163,18 +168,25 @@ const handleReturnToInitialSettings = () => {
 };
 
 /* inherit */
-const handleChangeInheritToggle = (propertyName: string, value) => {
+const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => {
     widgetFormStore.$patch((_state) => {
-        _state.inheritOptions = { ..._state.inheritOptions, [propertyName]: { enabled: value } };
+        _state.inheritOptions = {
+            ..._state.inheritOptions,
+            [propertyName]: {
+                enabled: isInherit,
+                variable_info: isInherit ? { key: getVariableKeyFromWidgetSchemaProperty(propertyName) } : undefined,
+            },
+        };
     });
 
     // update widget option schema
     const originPropertySchema = state.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
+    const newPropertySchema = getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, isInherit, dashboardDetailState.projectId);
     state.widgetOptionsJsonSchema = {
         ...state.widgetOptionsJsonSchema,
         properties: {
             ...state.widgetOptionsJsonSchema.properties,
-            [propertyName]: getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, value),
+            [propertyName]: newPropertySchema,
         },
     };
 
