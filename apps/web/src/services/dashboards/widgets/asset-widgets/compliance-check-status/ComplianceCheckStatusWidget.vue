@@ -12,7 +12,6 @@ import { sum } from 'lodash';
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
-import type { ComputedRef } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -21,16 +20,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import {
     COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP,
 } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 
 interface Data extends CloudServiceStatsModel {
     value: number;

@@ -16,14 +16,21 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { indigo, red, yellow } from '@/styles/colors';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-import type { Legend, BudgetDataModel } from '@/services/dashboards/widgets/type';
+import type { Legend, BudgetUsageAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
-type Data = BudgetDataModel['results'];
+
+interface Data {
+    budget_id: string,
+    name?: string;
+    total_spent?: number;
+    total_budget?: number;
+    budget_usage?: number;
+}
+type Response = BudgetUsageAnalyzeResponse<Data>;
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
@@ -46,7 +53,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 
 const state = reactive({
     loading: true,
-    data: undefined as Data | undefined,
+    data: undefined as Response | undefined,
     legends: computed<Omit<Legend, 'name'>[]>(() => ([
         { label: t('BILLING.COST_MANAGEMENT.MAIN.OVERSPENT'), color: red[400] },
         { label: '90-100%', color: yellow[500] },
@@ -57,12 +64,12 @@ const state = reactive({
 
 /* Util */
 const getTooltipText = (rowIdx: number, colIdx: number): string => {
-    const _target = state.data?.[colIdx * 10 + rowIdx];
+    const _target = state.data?.results?.[colIdx * 10 + rowIdx];
     const budgetUsage = _target?.budget_usage ?? 0;
     return `${_target?.name} (${budgetUsage.toFixed(2)}%)`;
 };
 const getColor = (rowIdx: number, colIdx: number): string => {
-    const _target = state.data?.[colIdx * 10 + rowIdx];
+    const _target = state.data?.results?.[colIdx * 10 + rowIdx];
     const totalBudget = _target?.total_budget ?? 0;
     const totalSpent = _target?.total_spent ?? 0;
 
@@ -80,14 +87,14 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchBudgetUsageAnalyze = getCancellableFetcher<BudgetDataModel>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
-const fetchData = async (): Promise<Data> => {
+const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchData = async (): Promise<Response> => {
     try {
         apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
-                // granularity: widgetState.granularity,
+                granularity: widgetState.granularity,
                 group_by: [widgetState.groupBy, 'name'],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
@@ -122,20 +129,21 @@ const fetchData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') return response;
+        return { more: false, results: [] };
     } catch (e) {
         ErrorHandler.handleError(e);
+        return { more: false, results: [] };
     }
-    return [];
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
+const initWidget = async (data?: Response): Promise<Response> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (): Promise<Data> => {
+const refreshWidget = async (): Promise<Response> => {
     await nextTick();
     state.loading = true;
     state.data = await fetchData();
@@ -151,7 +159,7 @@ useWidgetLifecycle({
     widgetState,
 });
 
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose<Response>>({
     initWidget,
     refreshWidget,
 });
@@ -175,7 +183,7 @@ defineExpose<WidgetExpose<Data>>({
                      class="status-col-wrapper"
                 >
                     <template v-for="rowIdx in range(0, 10)">
-                        <div v-if="!!state.data?.[colIdx * 10 + rowIdx]"
+                        <div v-if="!!state.data?.results?.[colIdx * 10 + rowIdx]"
                              :key="`status-box-${colIdx}-${rowIdx}`"
                              v-tooltip.bottom="getTooltipText(rowIdx, colIdx)"
                              class="box status-box"

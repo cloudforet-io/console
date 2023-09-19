@@ -76,8 +76,6 @@ const state = reactive({
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     //
-    currency: computed(() => store.state.settings.currency),
-    currencyRates: computed(() => store.state.settings.currencyRates),
     groupByStoreMap: computed(() => ({
         [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
         [GROUP_BY.PROJECT]: state.projects,
@@ -101,8 +99,7 @@ const tableState = reactive({
         if (d.name.startsWith('cost')) {
             field.type = 'currency';
             field.options = {
-                currency: state.currency,
-                currencyRates: state.currencyRates,
+                currency: costAnalysisPageStore.currency,
             };
         }
         return field;
@@ -328,6 +325,7 @@ const handleExcelDownload = async () => {
             },
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,
+            version: 'v2',
         });
     } catch (e) {
         ErrorHandler.handleError(e);

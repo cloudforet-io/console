@@ -1,9 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { defineStore } from 'pinia';
-
-
-import { store } from '@/store';
+import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -12,14 +10,16 @@ import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
 
-interface CostAnalysisLNBState {
+interface CostQuerySetState {
     costQuerySetList: CostQuerySetModel[];
     selectedQuerySetId?: string;
     selectedDataSourceId?: string;
 }
 
+const store = useStore();
+
 export const useCostQuerySetStore = defineStore('cost-query-set', {
-    state: (): CostAnalysisLNBState => ({
+    state: (): CostQuerySetState => ({
         costQuerySetList: [],
         selectedQuerySetId: undefined,
         selectedDataSourceId: undefined,

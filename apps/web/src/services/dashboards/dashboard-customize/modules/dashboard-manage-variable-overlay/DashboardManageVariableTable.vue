@@ -27,7 +27,7 @@
             </template>
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
-                                 :disabled="item.disabled"
+                                 :disabled="item.disabled || item.required"
                                  @change-toggle="handleToggleUse(item.propertyName, value)"
                 />
             </template>

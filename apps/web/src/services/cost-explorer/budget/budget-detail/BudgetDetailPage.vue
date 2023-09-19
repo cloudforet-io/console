@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { PHeading, PIconButton } from '@spaceone/design-system';
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -24,7 +23,6 @@ const props = withDefaults(defineProps<Props>(), {
     budgetId: '',
 });
 
-const store = useStore();
 const router = useRouter();
 
 const budgetPageStore = useBudgetDetailPageStore();
@@ -32,8 +30,6 @@ const budgetPageState = budgetPageStore.$state;
 
 const state = reactive({
     loading: true,
-    currency: computed(() => store.state.settings.currency),
-    currencyRates: computed(() => store.state.settings.currencyRates),
     hasManagePermission: useManagePermissionState(),
 });
 
@@ -74,7 +70,7 @@ const handleConfirmDelete = () => {
         <section class="page-title-wrapper">
             <p-heading :show-back-button="!state.loading"
                        :title="state.loading ? '' : budgetPageState.budgetData?.name"
-                       @click-back-button="$router.go(-1)"
+                       @click-back-button="router.go(-1)"
             >
                 <template v-if="!state.loading"
                           #title-right-extra
@@ -89,13 +85,8 @@ const handleConfirmDelete = () => {
             </p-heading>
         </section>
         <section class="content">
-            <budget-detail-info class="summary"
-                                :currency="state.currency"
-                                :currency-rates="state.currencyRates"
-            />
+            <budget-detail-info class="summary" />
             <budget-summary :budget-loading="state.loading"
-                            :currency="state.currency"
-                            :currency-rates="state.currencyRates"
                             class="summary"
             />
             <budget-notifications class="alert"

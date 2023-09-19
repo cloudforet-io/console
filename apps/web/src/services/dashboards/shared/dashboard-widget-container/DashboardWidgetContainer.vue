@@ -8,7 +8,6 @@ import {
     reactive, ref, watch, computed, toRef,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -39,7 +38,6 @@ const props = withDefaults(defineProps<{
     editMode: false,
     reusePreviousData: false,
 });
-const store = useStore();
 const { t } = useI18n();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -53,7 +51,6 @@ const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
     initiatedWidgetMap: {} as Record<string, any>,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
-    currencyRates: computed(() => store.state.settings.currencyRates),
 });
 
 /* container width */
@@ -209,7 +206,7 @@ const handleDeleteModalConfirm = () => {
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <template v-if="!dashboardDetailState.loadingDashboard">
+        <template v-if="!dashboardDetailState.loadingDashboard && dashboardDetailStore.isAllVariablesInitialized">
             <template v-for="(widget) in reformedWidgetInfoList"
                       :key="widget.widget_key"
             >
@@ -226,7 +223,6 @@ const handleDeleteModalConfirm = () => {
                            :size="widget.size"
                            :width="widget.width"
                            :theme="widget.theme"
-                           :currency-rates="state.currencyRates"
                            :edit-mode="props.editMode"
                            :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
@@ -252,7 +248,6 @@ const handleDeleteModalConfirm = () => {
                            :error-mode="editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                            :disable-refresh-on-variable-change="dashboardDetailState.widgetViewModeModalVisible && widget.widget_key !== widgetFormState.widgetKey"
                            :initiated="!!initiatedWidgetMap[widget.widget_key]"
-                           :currency-rates="currencyRates"
                            :all-reference-type-info="allReferenceTypeInfo"
                            :settings="dashboardDetailState.settings"
                            :variables-schema="dashboardDetailState.variablesSchema"

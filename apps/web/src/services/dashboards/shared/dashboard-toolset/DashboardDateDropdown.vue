@@ -1,25 +1,3 @@
-<template>
-    <div class="dashboard-date-dropdown">
-        <p-select-dropdown
-            :menu="state.monthMenuItems"
-            :selected="state.selectedMonthMenuIndex"
-            index-mode
-            menu-position="right"
-            @select="handleSelectMonthMenuItem"
-        >
-            <span>{{ state.selectedMonthLabel }}</span>
-            <template #menu-item--format="{ item }">
-                <span>{{ item.label }}</span>
-            </template>
-        </p-select-dropdown>
-        <dashboard-custom-date-range-modal v-model:visible="state.customRangeModalVisible"
-                                           granularity="MONTHLY"
-                                           :selected-date-range="props.dateRange"
-                                           @confirm="handleCustomRangeModalConfirm"
-        />
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -139,15 +117,38 @@ watch(() => props.dateRange, () => {
 }, { immediate: true });
 
 </script>
-<style lang="postcss" scoped>
-.dashboard-date-dropdown {
-    @apply relative flex items-center justify-center;
-    min-height: 2rem;
-}
-</style>
+
+<template>
+    <div class="dashboard-date-dropdown">
+        <p-select-dropdown
+            :menu="state.monthMenuItems"
+            :selection-label="t('DASHBOARDS.DETAIL.PERIOD')"
+            :selected="state.selectedMonthMenuIndex"
+            style-type="rounded"
+            index-mode
+            menu-position="right"
+            @select="handleSelectMonthMenuItem"
+        >
+            <template #dropdown-button>
+                <span class="flex-grow">{{ state.selectedMonthLabel }}</span>
+            </template>
+            <template #menu-item--format="{ item }">
+                <span>{{ item.label }}</span>
+            </template>
+        </p-select-dropdown>
+        <dashboard-custom-date-range-modal v-model:visible="state.customRangeModalVisible"
+                                           granularity="MONTHLY"
+                                           :selected-date-range="props.dateRange"
+                                           @confirm="handleCustomRangeModalConfirm"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-date-dropdown {
+    @apply flex items-center justify-center;
+    min-height: 2rem;
+
     /* custom design-system component - p-select-dropdown */
     :deep(.p-select-dropdown) {
         min-width: auto;

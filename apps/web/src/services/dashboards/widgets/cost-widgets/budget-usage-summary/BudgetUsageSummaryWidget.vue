@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 import {
     computed, defineExpose,
     defineProps, nextTick, reactive, ref,
@@ -24,12 +24,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { indigo, red, gray } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 
 
 interface Data {
@@ -301,7 +301,7 @@ defineExpose<WidgetExpose<Data[]>>({
                             <span class="currency-symbol">{{ displayState.currencySymbol }}</span>{{ currencyMoneyFormatter(displayState.recentSpent, undefined, undefined, true) }}
                         </span>
                         <i18n-t path="DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.OUT_OF"
-                              class="recent-budget"
+                                class="recent-budget"
                         >
                             <template #value>
                                 <span class="currency-symbol">{{ displayState.currencySymbol }}</span>
@@ -311,7 +311,7 @@ defineExpose<WidgetExpose<Data[]>>({
                     </div>
                     <div class="row-wrapper">
                         <i18n-t path="DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGET_USAGE_IN"
-                              class="period"
+                                class="period"
                         >
                             <template #period>
                                 <strong>{{ recentSpentPeriod }}</strong>

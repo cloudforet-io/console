@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import {
     PI, PCollapsibleToggle, PSelectDropdown, PLazyImg,
 } from '@spaceone/design-system';
@@ -7,6 +8,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import {
     computed, onMounted, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
@@ -128,7 +130,7 @@ const dataSourceState = reactive({
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
             name: key,
             label: value.name,
-            imageUrl: dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon,
+            imageUrl: dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon ? dataSourceState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
         }));
         return dataSourceMenuItemList;
     }),
@@ -136,21 +138,27 @@ const dataSourceState = reactive({
 });
 const relocateNotificationState = reactive({
     isShow: false,
-    data: computed<LNBItem>(() => ({
-        type: 'item',
-        id: MENU_ID.DASHBOARDS,
-        label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
-        to: {
-            name: DASHBOARDS_ROUTE._NAME,
-            query: {
-                // TODO: refactor
-                filters: ['[["Cost"],"label","="]'],
+    data: computed<LNBItem>(() => {
+        const dashboardQuery = new QueryHelper().setFilters([{
+            k: 'label',
+            v: ['Cost'],
+            o: '=',
+        }]).rawQueryStrings;
+        return ({
+            type: 'item',
+            id: MENU_ID.DASHBOARDS,
+            label: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
+            to: {
+                name: DASHBOARDS_ROUTE.ALL._NAME,
+                query: {
+                    filters: dashboardQuery,
+                },
             },
-        },
-        // TODO: may be isUpdated?
-        hightlightTag: 'update',
-        hideFavorite: true,
-    })),
+            // TODO: may be isUpdated?
+            hightlightTag: 'update',
+            hideFavorite: true,
+        });
+    }),
     isModalVisible: false,
     userId: computed(() => store.state.user.userId),
 });

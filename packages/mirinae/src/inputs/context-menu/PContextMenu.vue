@@ -190,140 +190,141 @@ defineExpose({
             </p>
         </slot>
         <div class="menu-container">
-            <slot v-show="props.menu.length > 0"
-                  name="menu"
-                  v-bind="{...props}"
-            >
-                <div v-if="props.showSelectHeader && props.multiSelectable"
-                     class="selected-list-wrapper"
+            <div v-show="props.menu.length > 0">
+                <slot name="menu"
+                      v-bind="{...props}"
                 >
-                    <div>
-                        <b>{{ t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
-                        <span class="pl-2">({{ state.selectedCount }})</span>
+                    <div v-if="props.showSelectHeader && props.multiSelectable"
+                         class="selected-list-wrapper"
+                    >
+                        <div>
+                            <b>{{ t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
+                            <span class="pl-2">({{ state.selectedCount }})</span>
+                        </div>
+                        <p-button size="sm"
+                                  style-type="primary"
+                                  :disabled="!state.proxySelected.length"
+                                  :readonly="props.readonly"
+                                  @click="$emit('click-done', $event)"
+                        >
+                            {{ t('COMPONENT.CONTEXT_MENU.DONE') }}
+                        </p-button>
                     </div>
-                    <p-button size="sm"
-                              style-type="primary"
-                              :disabled="!state.proxySelected.length"
-                              :readonly="readonly"
-                              @click="$emit('click-done', $event)"
+                    <div v-if="props.searchable"
+                         class="search-wrapper"
                     >
-                        {{ t('COMPONENT.CONTEXT_MENU.DONE') }}
-                    </p-button>
-                </div>
-                <div v-if="props.searchable"
-                     class="search-wrapper"
-                >
-                    <p-search v-model:is-focused="state.isFocusedOnSearch"
-                              :value="state.proxySearchText"
-                              @update:value="handleUpdateSearchText"
-                              @keydown.up="onKeyUp()"
-                              @keydown.down="onKeyDown()"
-                    >
-                        <template v-for="(_, slot) of searchSlots"
-                                  #[slot]="scope"
+                        <p-search v-model:is-focused="state.isFocusedOnSearch"
+                                  :value="state.proxySearchText"
+                                  @update:value="handleUpdateSearchText"
+                                  @keydown.up="onKeyUp()"
+                                  @keydown.down="onKeyDown()"
                         >
-                            <slot :name="`search-${slot}`"
-                                  v-bind="scope"
+                            <template v-for="(_, slot) of searchSlots"
+                                      #[slot]="scope"
+                            >
+                                <slot :name="`search-${slot}`"
+                                      v-bind="scope"
+                                />
+                            </template>
+                        </p-search>
+                    </div>
+                    <p-text-button v-if="props.showClearSelection && props.multiSelectable"
+                                   class="clear-all-wrapper"
+                                   style-type="highlight"
+                                   size="md"
+                                   :readonly="props.readonly"
+                                   @click.stop="handleClickClearSelection"
+                    >
+                        {{ t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.clearableSelectedCount }})
+                    </p-text-button>
+                    <slot name="items">
+                        <template v-for="(item, index) in props.menu"
+                                  :key="`item-${item.name}-${index}`"
+                        >
+                            <p-context-menu-item v-if="item.type === undefined || item.type === 'item'"
+                                                 :id="getItemId(index)"
+                                                 :name="item.name"
+                                                 :label="item.label"
+                                                 :link="item.link"
+                                                 :target="item.target"
+                                                 :disabled="item.disabled"
+                                                 :image-url="item.imageUrl"
+                                                 :icon="item.icon"
+                                                 :icon-color="item.iconColor"
+                                                 :readonly="readonly"
+                                                 :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
+                                                 :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
+                                                 :ellipsis="props.itemHeightFixed"
+                                                 :highlight-term="state.proxySearchText || props.highlightTerm"
+                                                 :tabindex="index"
+                                                 @click.stop="onClickMenu(item, index, $event)"
+                                                 @keyup.enter="onClickMenu(item, index, $event)"
+                                                 @keydown.up="onKeyUp(index)"
+                                                 @keydown.down="onKeyDown(index)"
+                            >
+                                <template #default>
+                                    <slot name="item--format"
+                                          v-bind="{...props, item, index}"
+                                    />
+                                </template>
+                                <template #text-list="{text, matched, textList, regex, index: textIndex}">
+                                    <slot name="item-text-list"
+                                          v-bind="{...props, item, index, text, matched, textList, regex, textIndex}"
+                                    />
+                                </template>
+                            </p-context-menu-item>
+                            <div v-else-if="item.type==='divider'"
+                                 :key="`divider-${index}`"
+                                 class="context-divider"
                             />
-                        </template>
-                    </p-search>
-                </div>
-                <p-text-button v-if="props.showClearSelection && props.multiSelectable"
-                               class="clear-all-wrapper"
-                               style-type="highlight"
-                               size="md"
-                               :readonly="readonly"
-                               @click.stop="handleClickClearSelection"
-                >
-                    {{ t('COMPONENT.CONTEXT_MENU.CLEAR_SELECTION') }} ({{ state.clearableSelectedCount }})
-                </p-text-button>
-                <slot name="items">
-                    <template v-for="(item, index) in props.menu"
-                              :key="`item-${item.name}-${index}`"
-                    >
-                        <p-context-menu-item v-if="item.type === undefined || item.type === 'item'"
-                                             :id="getItemId(index)"
-                                             :name="item.name"
-                                             :label="item.label"
-                                             :link="item.link"
-                                             :target="item.target"
-                                             :disabled="item.disabled"
-                                             :image-url="item.imageUrl"
-                                             :icon="item.icon"
-                                             :icon-color="item.iconColor"
-                                             :readonly="readonly"
-                                             :selected="!props.noSelectIndication && state.selectedNameMap[item.name] !== undefined"
-                                             :select-marker="props.showSelectMarker ? props.multiSelectable ? 'checkbox' : 'radio' : undefined"
-                                             :ellipsis="props.itemHeightFixed"
-                                             :highlight-term="state.proxySearchText || props.highlightTerm"
-                                             :tabindex="index"
-                                             @click.stop="onClickMenu(item, index, $event)"
-                                             @keyup.enter="onClickMenu(item, index, $event)"
-                                             @keydown.up="onKeyUp(index)"
-                                             @keydown.down="onKeyDown(index)"
-                        >
-                            <template #default>
-                                <slot name="item--format"
-                                      v-bind="{...props, item, index}"
-                                />
-                            </template>
-                            <template #text-list="{text, matched, textList, regex, index: textIndex}">
-                                <slot name="item-text-list"
-                                      v-bind="{...props, item, index, text, matched, textList, regex, textIndex}"
-                                />
-                            </template>
-                        </p-context-menu-item>
-                        <div v-else-if="item.type==='divider'"
-                             :key="`divider-${index}`"
-                             class="context-divider"
-                        />
-                        <slot v-else-if="item.type==='header'"
-                              :name="`header-${item.name}`"
-                              v-bind="{...props, item, key: index}"
-                        >
-                            <div :key="index"
-                                 class="context-header"
+                            <slot v-else-if="item.type==='header'"
+                                  :name="`header-${item.name}`"
+                                  v-bind="{...props, item, key: index}"
                             >
-                                {{ item.label }}
+                                <div :key="index"
+                                     class="context-header"
+                                >
+                                    {{ item.label }}
+                                </div>
+                            </slot>
+                            <div v-else-if="item.type === 'button'"
+                                 :key="`button-${index}`"
+                                 class="context-button"
+                                 :class="{disabled: item.disabled}"
+                            >
+                                <p-button :disabled="item.disabled"
+                                          size="md"
+                                          style-type="secondary"
+                                          :block="true"
+                                          :icon-left="item.icon"
+                                          :readonly="readonly"
+                                          @click="$emit('click-button', item, index, $event)"
+                                >
+                                    {{ item.label }}
+                                </p-button>
                             </div>
-                        </slot>
-                        <div v-else-if="item.type === 'button'"
-                             :key="`button-${index}`"
-                             class="context-button"
-                             :class="{disabled: item.disabled}"
-                        >
-                            <p-button :disabled="item.disabled"
-                                      size="md"
-                                      style-type="secondary"
-                                      :block="true"
-                                      :icon-left="item.icon"
-                                      :readonly="readonly"
-                                      @click="$emit('click-button', item, index, $event)"
+                            <div v-else-if="item.type === 'showMore'"
+                                 :key="`show-more-${index}`"
+                                 class="context-show-more"
                             >
-                                {{ item.label }}
-                            </p-button>
-                        </div>
-                        <div v-else-if="item.type === 'showMore'"
-                             :key="`show-more-${index}`"
-                             class="context-show-more"
-                        >
-                            <p-text-button style-type="highlight"
-                                           size="sm"
-                                           icon-right="ic_chevron-down"
-                                           :disabled="loading"
-                                           @click="$emit('click-show-more', item, index, $event)"
-                            >
-                                {{ item.label ? item.label : t('COMPONENT.CONTEXT_MENU.SHOW_MORE') }}
-                            </p-text-button>
-                        </div>
-                    </template>
+                                <p-text-button style-type="highlight"
+                                               size="sm"
+                                               icon-right="ic_chevron-down"
+                                               :disabled="loading"
+                                               @click="$emit('click-show-more', item, index, $event)"
+                                >
+                                    {{ item.label ? item.label : t('COMPONENT.CONTEXT_MENU.SHOW_MORE') }}
+                                </p-text-button>
+                            </div>
+                        </template>
+                    </slot>
+                    <div v-if="slots.bottom"
+                         class="bottom-slot-area"
+                    >
+                        <slot name="bottom" />
+                    </div>
                 </slot>
-                <div v-if="slots.bottom"
-                     class="bottom-slot-area"
-                >
-                    <slot name="bottom" />
-                </div>
-            </slot>
+            </div>
             <div v-show="menu.length === 0"
                  class="no-data"
             >
@@ -366,7 +367,7 @@ defineExpose({
         min-height: inherit;
         max-height: inherit;
         overflow-y: auto;
-        > .selected-list-wrapper {
+        .selected-list-wrapper {
             @apply border-b border-gray-200;
             display: flex;
             justify-content: space-between;
@@ -374,13 +375,13 @@ defineExpose({
             line-height: 1.5;
             padding: 0.5rem;
         }
-        > .search-wrapper {
+        .search-wrapper {
             padding: 0.5rem;
         }
-        > .clear-all-wrapper {
-            padding: 0.375rem 0.5rem 0.25rem 0.5rem;
+        .clear-all-wrapper {
+            padding: 0.375rem 0.5rem 0.25rem;
         }
-        > .context-header {
+        .context-header {
             @apply text-gray-500;
             margin-top: 0.5rem;
             margin-bottom: 0.25rem;
@@ -390,12 +391,12 @@ defineExpose({
             font-size: 0.75rem;
             line-height: 1.5;
         }
-        > .context-divider {
+        .context-divider {
             @apply border-t border-gray-200;
             border-top-width: 1px;
             border-top-style: solid;
         }
-        > .context-button {
+        .context-button {
             padding: 0.5rem;
 
             @media (hover: hover) {
@@ -404,14 +405,14 @@ defineExpose({
                 }
             }
         }
-        > .context-show-more {
+        .context-show-more {
             padding: 0.5rem;
         }
-        > .bottom-slot-area {
+        .bottom-slot-area {
             padding: 0.5rem;
         }
 
-        > .no-data {
+        .no-data {
             @apply text-gray-300;
             padding: 0.5rem;
             line-height: 1.25;

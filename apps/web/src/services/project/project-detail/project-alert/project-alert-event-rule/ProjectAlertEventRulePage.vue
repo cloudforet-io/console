@@ -180,7 +180,7 @@ const onClickFormCancel = () => {
         />
         <p-heading show-back-button
                    class="page-title"
-                   @click-back-button="$router.go(-1)"
+                   @click-back-button="router.go(-1)"
         >
             <template #title>
                 <span>{{ t('PROJECT.EVENT_RULE.EVENT_RULE') }}</span>

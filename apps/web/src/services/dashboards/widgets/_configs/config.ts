@@ -4,7 +4,6 @@ import type { defineAsyncComponent } from 'vue';
 
 import type { Tags } from '@/models';
 
-import type { CurrencyRates } from '@/store/modules/settings/type';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
@@ -149,6 +148,7 @@ export type AssetWidgetOptionsSchemaProperty = 'asset_group_by'|WidgetFiltersSch
 export interface BaseWidgetOptionsSchema<T extends string> {
     default_properties?: T[];
     fixed_properties?: T[];
+    non_inheritable_properties?: T[];
     schema: JsonSchema;
 }
 export type WidgetOptionsSchema =
@@ -200,7 +200,7 @@ export type InheritOptions = Record<string, {
     enabled?: boolean;
     variable_info?: {
         key: string;
-    }
+    },
 }>;
 
 export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
@@ -223,7 +223,6 @@ export interface WidgetProps {
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
     widgetKey: string; // unique widget key to identify widgets in layout
-    currencyRates?: CurrencyRates;
     editMode?: boolean;
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
@@ -242,7 +241,6 @@ export interface NewWidgetProps {
     errorMode?: boolean;
     disableViewMode?: boolean;
     disableRefreshOnVariableChange?: boolean;
-    currencyRates?: CurrencyRates;
     allReferenceTypeInfo: AllReferenceTypeInfo;
     settings?: DashboardSettings;
     variablesSchema?: DashboardVariablesSchema;

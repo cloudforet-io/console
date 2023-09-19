@@ -6,8 +6,8 @@ import { computed, reactive } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
@@ -22,7 +22,6 @@ import type {
 } from '@/services/cost-explorer/budget/budget-main/modules/budget-list/budget-main-page-api-helper';
 import BudgetUsageProgressBar from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-
 
 interface Props {
     budgetUsage: BudgetUsageAnalyzeResult;
@@ -42,8 +41,6 @@ const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-    currency: computed(() => store.state.settings.currency),
-    currencyRates: computed(() => store.state.settings.currencyRates),
 });
 const state = reactive({
     linkLocation: computed<RouteLocationRaw>(() => ({

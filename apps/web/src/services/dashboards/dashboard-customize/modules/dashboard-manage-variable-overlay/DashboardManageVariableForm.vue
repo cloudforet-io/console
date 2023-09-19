@@ -234,7 +234,7 @@ const {
     .selection-type-field {
         @apply w-1/3;
         .selection-type-dropdown {
-            @apply relative w-full;
+            @apply w-full;
         }
     }
 

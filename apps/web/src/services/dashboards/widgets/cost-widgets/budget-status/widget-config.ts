@@ -27,13 +27,12 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     sizes: ['sm'],
     options: {
         chart_type: CHART_TYPE.WAFFLE,
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
         cost_group_by: 'budget_id',
     },
     inherit_options: {
         ...getWidgetInheritOptions('cost_data_source'),
         ...getWidgetInheritOptionsForFilter(
-            'provider',
             'project',
             'region',
             'cost_product',
@@ -43,7 +42,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
         default_properties: [
             'cost_data_source',
             ...getWidgetFilterSchemaPropertyNames(
-                'provider',
                 'project',
                 'region',
                 'cost_product',
@@ -55,7 +53,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
             properties: {
                 ...getWidgetOptionsSchema('cost_data_source'),
                 ...getWidgetFilterOptionsSchema(
-                    'provider',
                     'project',
                     'service_account',
                     'cost_product',
@@ -65,7 +62,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
             order: [
                 'cost_data_source',
                 ...getWidgetFilterSchemaPropertyNames(
-                    'provider',
                     'project',
                     'service_account',
                     'cost_product',

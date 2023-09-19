@@ -8,9 +8,9 @@ import {
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -29,7 +29,6 @@ const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 const costAnalysisPageStore = useCostAnalysisPageStore();
 
 const { t } = useI18n();
-const store = useStore();
 const router = useRouter();
 
 const state = reactive({
@@ -38,8 +37,6 @@ const state = reactive({
     dataSourceImage: computed(() => costAnalysisPageStore.dataSourceImageUrl),
     isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId ? managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId) : false)),
     itemIdForDeleteQuery: '',
-    currency: computed(() => store.state.settings.currency),
-    currencySymbol: computed(() => store.getters['settings/currencySymbol']),
     selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
@@ -104,7 +101,7 @@ const handleDeleteQueryConfirm = async () => {
                     </div>
                     <div class="title-right-extra currency-wrapper">
                         <span class="label">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
-                        <span>{{ state.currencySymbol }}{{ state.currency }}</span>
+                        <span>{{ CURRENCY_SYMBOL[costAnalysisPageStore.currency] }}{{ costAnalysisPageStore.currency }}</span>
                     </div>
                 </template>
             </p-heading>

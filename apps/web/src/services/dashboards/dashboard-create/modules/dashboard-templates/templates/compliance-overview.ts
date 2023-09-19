@@ -44,9 +44,6 @@ export const complianceOverviewDashboard: DashboardConfig = {
         date_range: {
             enabled: true,
         },
-        currency: {
-            enabled: false,
-        },
         refresh_interval_option: '5m',
     },
     variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.ASSET),

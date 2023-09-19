@@ -103,10 +103,17 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             return '';
         },
         isPeriodInvalid: (state) => {
-            if (state.granularity === GRANULARITY.DAILY) {
-                return dayjs.utc().diff(state.period?.start, 'year') > 1;
-            }
-            return dayjs.utc().diff(state.period?.start, 'year') > 3;
+            const now = dayjs().utc();
+            const checkPeriod = (limit:number):{isStartInvalid:boolean, isEndInvalid:boolean} => {
+                const isStartInvalid = now.diff(state.period?.start, 'month') >= limit;
+                const isEndInvalid = now.diff(state.period?.end, 'month') >= limit;
+                return { isStartInvalid, isEndInvalid };
+            };
+            const DAILY_LIMIT_MONTH = 12;
+            const OTHER_LIMIT_MONTH = 36;
+            const isGranularityDaily = state.granularity === GRANULARITY.DAILY;
+            const { isStartInvalid, isEndInvalid } = checkPeriod(isGranularityDaily ? DAILY_LIMIT_MONTH : OTHER_LIMIT_MONTH);
+            return isStartInvalid || isEndInvalid;
         },
     },
     actions: {
