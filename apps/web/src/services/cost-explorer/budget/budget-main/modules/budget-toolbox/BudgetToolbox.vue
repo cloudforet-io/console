@@ -10,7 +10,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import {
     PToolbox, PSelectStatus, PButton, PSelectDropdown, PDivider, PTextPagination,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import dayjs from 'dayjs';
 import { computed, reactive, watch } from 'vue';
@@ -27,7 +27,7 @@ import type { Period } from '@/services/cost-explorer/type';
 
 
 
-type I18nSelectDropdownMenu = SelectDropdownMenu | {
+type I18nSelectDropdownMenu = SelectDropdownMenuItem | {
     label: string;
 };
 
@@ -215,7 +215,7 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
                 <div class="left-area">
                     <p-select-dropdown
                         v-model:selected="state.selectedSortKey"
-                        :items="state.sortKeyList"
+                        :menu="state.sortKeyList"
                     />
                     <p-button class="sort-box"
                               style-type="tertiary"
@@ -268,6 +268,9 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
     .left-area {
         @apply flex flex-wrap gap-4;
+        .sort-key-select-dropdown {
+            @apply relative;
+        }
     }
 }
 </style>

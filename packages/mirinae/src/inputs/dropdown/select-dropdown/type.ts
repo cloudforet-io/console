@@ -1,42 +1,35 @@
 import type { MenuItem } from '@/inputs/context-menu/type';
 
-export const CONTEXT_MENU_POSITION = Object.freeze({
+export type SelectDropdownMenuItem = MenuItem;
+
+export const CONTEXT_MENU_POSITION = {
     LEFT: 'left',
     RIGHT: 'right',
-} as const);
-
-export const SELECT_DROPDOWN_STYLE_TYPE = Object.freeze({
-    DEFAULT: 'default',
-    ICON_BUTTON: 'icon-button',
-    TRANSPARENT: 'transparent',
-    SECONDARY_BUTTON: 'secondary-button',
-} as const);
-
-export const SELECT_DROPDOWN_SIZE = {
-    md: 'md',
-    lg: 'lg',
 } as const;
 
-export type CONTEXT_MENU_POSITION = typeof CONTEXT_MENU_POSITION[keyof typeof CONTEXT_MENU_POSITION];
-export type SELECT_DROPDOWN_STYLE_TYPE = typeof SELECT_DROPDOWN_STYLE_TYPE[keyof typeof SELECT_DROPDOWN_STYLE_TYPE];
-export type SelectDropdownSize = typeof SELECT_DROPDOWN_SIZE[keyof typeof SELECT_DROPDOWN_SIZE];
+export const SELECT_DROPDOWN_STYLE_TYPE = {
+    DEFAULT: 'default',
+    ROUNDED: 'rounded',
+    TRANSPARENT: 'transparent',
+    ICON_BUTTON: 'icon-button',
+} as const;
 
-export type SelectDropdownMenu = MenuItem;
+export const SELECT_DROPDOWN_APPEARANCE_TYPE = {
+    BASIC: 'basic',
+    STACK: 'stack',
+    BADGE: 'badge',
+} as const;
 
-export interface SelectDropdownProps {
-    items?: SelectDropdownMenu[];
-    selected?: string | number;
-    invalid?: boolean;
-    disabled?: boolean;
-    loading?: boolean;
-    indexMode?: boolean;
-    placeholder?: string;
-    styleType?: SELECT_DROPDOWN_STYLE_TYPE;
-    buttonIcon?: string;
-    readOnly?: boolean;
-    // context menu fixed style props
-    useFixedMenuStyle?: boolean;
-    visibleMenu?: boolean;
-    size?: SelectDropdownSize;
-    isFixedWidth?: boolean;
+
+export type ContextMenuPosition = typeof CONTEXT_MENU_POSITION[keyof typeof CONTEXT_MENU_POSITION];
+export type SelectDropdownStyleType = typeof SELECT_DROPDOWN_STYLE_TYPE[keyof typeof SELECT_DROPDOWN_STYLE_TYPE];
+export type SelectDropdownAppearanceType = typeof SELECT_DROPDOWN_APPEARANCE_TYPE[keyof typeof SELECT_DROPDOWN_APPEARANCE_TYPE];
+
+interface HandlerRes {
+    results: SelectDropdownMenuItem[];
+    totalCount?: number;
+    more?: boolean;
+}
+export interface AutocompleteHandler {
+    (inputText: string, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
 }

@@ -5,7 +5,7 @@ import {
     PSelectButton, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { xor } from 'lodash';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -29,11 +29,11 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const { t } = useI18n();
 
 const state = reactive({
-    selectedGroupByItems: computed<SelectDropdownMenu[]>(() => costAnalysisPageState.groupBy.map((d) => {
+    selectedGroupByItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) return GROUP_BY_ITEM_MAP[d];
         return { name: d, label: d.split('.')[1] };
     })),
-    selectedTagsMenu: [] as SelectDropdownMenu[],
+    selectedTagsMenu: [] as SelectDropdownMenuItem[],
 });
 
 /* fetcher */
@@ -87,7 +87,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
         });
     }
 };
-const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenu, isSelected: boolean) => {
+const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected) {
         if (state.selectedGroupByItems.length + 1 > 3) {
             showErrorMessage('', t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
@@ -131,8 +131,8 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-filterable-dropdown :handler="tagsMenuHandler"
-                                   v-model:selected="state.selectedTagsMenu"
+            <p-filterable-dropdown v-model:selected="state.selectedTagsMenu"
+                                   :handler="tagsMenuHandler"
                                    selection-label="Tags"
                                    appearance-type="badge"
                                    :show-delete-all-button="false"

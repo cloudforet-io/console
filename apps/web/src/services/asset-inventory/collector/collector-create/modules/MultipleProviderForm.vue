@@ -63,7 +63,7 @@ const handleChangeProvider = (provider) => {
         <!-- NOTE: screen mobile size-->
         <div class="dropdown-container">
             <p-select-dropdown :selected="state.selectedProvider"
-                               :items="state.providerList"
+                               :menu="state.providerList"
                                class="select-dropdown"
                                @update:selected="handleChangeProvider"
             >

@@ -192,12 +192,11 @@ watch(() => rolePageState.selectedIndices, (after) => {
                     {{ t('IAM.ROLE.CREATE') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
-                                   :items="state.dropdownMenu"
+                                   :menu="state.dropdownMenu"
+                                   :placeholder="t('IAM.ROLE.ACTION')"
                                    :disabled="manageDisabled"
                                    @select="handleSelectDropdown"
-                >
-                    {{ t('IAM.ROLE.ACTION') }}
-                </p-select-dropdown>
+                />
             </template>
             <template #col-role_type-format="{ value }">
                 <p-badge v-if="value"

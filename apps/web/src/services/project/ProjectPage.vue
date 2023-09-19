@@ -279,7 +279,7 @@ onUnmounted(() => {
                                     {{ t('PROJECT.LANDING.CREATE_GROUP') }}
                                 </p-button>
                                 <p-select-dropdown v-if="storeState.groupId && state.hasManagePermission && !state.isPermissionDenied"
-                                                   :items="state.settingMenu"
+                                                   :menu="state.settingMenu"
                                                    style-type="icon-button"
                                                    button-icon="ic_settings-filled"
                                                    class="settings-button"

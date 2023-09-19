@@ -52,8 +52,8 @@ const handleUpdateToggle = () => {
 };
 const handleSelectedMenuIndex = (selectedIndex: number) => {
     state.selectedMenuIndex = selectedIndex;
-    formState.domainRole = formState.domainRoleList[selectedIndex].label;
-    formState.roleId = formState.domainRoleList[selectedIndex].name;
+    formState.domainRole = formState.domainRoleList[selectedIndex]?.label;
+    formState.roleId = formState.domainRoleList[selectedIndex]?.name;
     emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
 };
 const setForm = async () => {
@@ -61,8 +61,8 @@ const setForm = async () => {
         state.selectedMenuIndex = formState.domainRoleList.findIndex((data) => data.name === props.item?.role_bindings?.find((role) => role.role_info.role_type === 'DOMAIN')?.role_info.role_id);
         if (state.selectedMenuIndex === -1) return;
         state.isToggled = true;
-        formState.domainRole = formState.domainRoleList[state.selectedMenuIndex].label;
-        formState.roleId = formState.domainRoleList[state.selectedMenuIndex].name;
+        formState.domainRole = formState.domainRoleList[state.selectedMenuIndex]?.label;
+        formState.roleId = formState.domainRoleList[state.selectedMenuIndex]?.name;
         emit('change-input', { ...formState, domainRole: formState.domainRole, roleId: formState.roleId });
     } else formState.domainRole = '';
 };
@@ -112,7 +112,7 @@ const getRoleList = async () => {
         <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
         <p-select-dropdown v-if="state.isToggled"
                            :key="`admin-role-${props.activeTab}`"
-                           :items="formState.domainRoleList"
+                           :menu="formState.domainRoleList"
                            :disabled="formState.domainRoleList.length < 2 || state.isSameId"
                            use-fixed-menu-style
                            :selected="state.selectedMenuIndex"

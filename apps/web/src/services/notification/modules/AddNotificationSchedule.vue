@@ -158,7 +158,7 @@ const handleSelectEndHour = (value) => {
             </p-select-button>
             <div class="dropdown-wrapper">
                 <p-select-dropdown :selected="timePeriod.startHour"
-                                   :items="state.startTimeList"
+                                   :menu="state.startTimeList"
                                    :invalid="invalidState.timePeriod"
                                    class="dropdown"
                                    use-fixed-menu-style
@@ -166,7 +166,7 @@ const handleSelectEndHour = (value) => {
                 />
                 <span class="text">{{ t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
                 <p-select-dropdown :selected="timePeriod.endHour"
-                                   :items="state.endTimeList"
+                                   :menu="state.endTimeList"
                                    :invalid="invalidState.timePeriod"
                                    class="dropdown"
                                    use-fixed-menu-style

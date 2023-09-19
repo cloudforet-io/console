@@ -42,7 +42,7 @@ const onChangeLevel = (value) => {
     >
         <template #default>
             <p-select-dropdown v-model:selected="state.proxyNotificationLevel"
-                               :items="LEVEL_LIST"
+                               :menu="LEVEL_LIST"
                                @select="onChangeLevel"
             />
         </template>

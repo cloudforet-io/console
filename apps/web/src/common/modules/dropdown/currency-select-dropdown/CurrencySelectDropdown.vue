@@ -44,13 +44,13 @@ const handleSelectCurrency = (currency: Currency) => {
 </script>
 
 <template>
-    <p-select-dropdown :items="state.currencyItems"
+    <p-select-dropdown :menu="state.currencyItems"
                        :selected="state.currency"
                        style-type="transparent"
                        class="currency-select-dropdown"
                        @select="handleSelectCurrency"
     >
-        <template v-if="defaultCurrencyMode"
+        <template v-if="props.defaultCurrencyMode"
                   #default="{ item }"
         >
             <span>
@@ -64,7 +64,7 @@ const handleSelectCurrency = (currency: Currency) => {
                 </p-badge>
             </span>
         </template>
-        <template v-if="defaultCurrencyMode"
+        <template v-if="props.defaultCurrencyMode"
                   #menu-item--format="{ item }"
         >
             <span>

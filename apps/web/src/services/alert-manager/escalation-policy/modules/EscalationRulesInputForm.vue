@@ -174,7 +174,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
             </span>
             <span class="col-notification">
                 <p-select-dropdown v-model:selected="rule.notification_level"
-                                   :items="NOTIFICATION_LEVELS"
+                                   :menu="NOTIFICATION_LEVELS"
                                    use-fixed-menu-style
                 >
                     <template #menu-item--format="{item}">
@@ -219,7 +219,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 </span>
                 <span class="input">
                     <p-select-dropdown v-model:selected="rule.notification_level"
-                                       :items="MINIFIED_NOTIFICATION_LEVELS"
+                                       :menu="MINIFIED_NOTIFICATION_LEVELS"
                                        use-fixed-menu-style
                     >
                         <template #menu-item--format="{item}">
@@ -429,9 +429,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
 
     /* custom design-system component - p-select-dropdown */
     :deep(.p-select-dropdown) {
-        .dropdown-button {
-            min-width: 6rem;
-        }
+        min-width: 6rem;
         .context-item {
             @apply border-b border-secondary;
             box-sizing: border-box;

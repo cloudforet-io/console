@@ -168,7 +168,7 @@ const handleConfirm = async () => {
                     <div class="condition-input-wrapper">
                         <p-select-dropdown :selected="condition.unit"
                                            class="condition"
-                                           :items="state.units"
+                                           :menu="state.units"
                                            use-fixed-menu-style
                                            @update:selected="handleUpdateUnit(idx, $event)"
                         />
@@ -191,7 +191,7 @@ const handleConfirm = async () => {
                         </p-text-input>
                         <p-select-dropdown :selected="condition.notification_type"
                                            class="condition"
-                                           :items="state.types"
+                                           :menu="state.types"
                                            use-fixed-menu-style
                                            @update:selected="handleUpdateNotificationType(idx, $event)"
                         >

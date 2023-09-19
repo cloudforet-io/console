@@ -1,5 +1,5 @@
 <template>
-    <p-select-dropdown :items="state.currencyItems"
+    <p-select-dropdown :menu="state.currencyItems"
                        :selected="state.currency"
                        style-type="transparent"
                        menu-position="right"
@@ -85,9 +85,8 @@ const handleSelectCurrency = (currency: DashboardCurrency) => {
 </script>
 
 <style lang="postcss" scoped>
-/* custom design-system component - p-select-dropdown */
-:deep(.p-select-dropdown) {
-    min-width: auto;
+.currency-select-dropdown {
+    @apply relative;
 }
 .p-badge {
     margin-left: 0.25rem;

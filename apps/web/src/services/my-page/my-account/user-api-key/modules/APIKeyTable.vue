@@ -292,7 +292,7 @@ watch(() => props.userId, async (after) => {
                         {{ t('IDENTITY.USER.MAIN.CREATE_API_KEY') }}
                     </p-button>
                     <p-select-dropdown class="dropdown-btn"
-                                       :items="state.dropdownMenu"
+                                       :menu="state.dropdownMenu"
                                        :disabled="disabled"
                                        @select="onSelectDropdown"
                     >
@@ -367,6 +367,7 @@ watch(() => props.userId, async (after) => {
         display: inherit;
     }
     .dropdown-btn {
+        @apply relative;
         margin-left: 1rem;
     }
     .table-desc {

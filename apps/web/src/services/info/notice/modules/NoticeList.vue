@@ -159,7 +159,7 @@ const handlePageChange = (page: number) => {
             >
                 <template #left-area>
                     <p-select-dropdown v-if="state.domainName !== 'root'"
-                                       :items="state.dropdownItems"
+                                       :menu="state.dropdownItems"
                                        :selected="state.selectedPostType"
                                        @update:selected="handleSearchPostTypeChange"
                     />

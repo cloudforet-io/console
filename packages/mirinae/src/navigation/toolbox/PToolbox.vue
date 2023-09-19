@@ -1,95 +1,3 @@
-<template>
-    <div class="p-toolbox">
-        <div class="toolbox-inner">
-            <div v-if="slots['left-area']"
-                 class="left-area-wrapper"
-            >
-                <slot name="left-area" />
-            </div>
-            <div v-if="searchable"
-                 class="search-wrapper"
-            >
-                <p-search v-if="searchType === SEARCH_TYPES.plain"
-                          v-model:value="proxyState.searchText"
-                          @search="onSearch"
-                          @delete="onSearch()"
-                />
-                <p-query-search v-else-if="searchType === SEARCH_TYPES.query"
-                                :key-item-sets="keyItemSets"
-                                :value-handler-map="valueHandlerMap"
-                                @search="onSearch"
-                />
-            </div>
-            <div class="tools-wrapper">
-                <div v-if="paginationVisible"
-                     class="tool"
-                >
-                    <div v-if="slots['pagination-area']">
-                        <slot name="pagination-area" />
-                    </div>
-                    <p-text-pagination v-else
-                                       :this-page="proxyState.thisPage"
-                                       :all-page="state.allPage"
-                                       @pageChange="onChangeThisPage"
-                    />
-                </div>
-                <div v-if="pageSizeChangeable"
-                     class="tool"
-                >
-                    <p-select-dropdown class="dropdown-list"
-                                       :items="state.pageMenu"
-                                       @select="onChangePageSize"
-                    >
-                        {{ proxyState.pageSize }}
-                    </p-select-dropdown>
-                </div>
-                <div v-if="sortable"
-                     class="tool"
-                >
-                    <p-select-dropdown class="dropdown-list"
-                                       :items="sortByOptions"
-                                       :sort-by="sortBy"
-                                       @select="onChangeSortBy"
-                    >
-                        {{ state.selectedSortBy }}
-                    </p-select-dropdown>
-                </div>
-                <div class="right-tool-group">
-                    <div v-if="exportable"
-                         class="tool"
-                    >
-                        <p-icon-button name="ic_excel"
-                                       @click="handleExport"
-                        />
-                    </div>
-                    <div v-if="settingsVisible"
-                         class="tool"
-                    >
-                        <p-icon-button name="ic_settings-filled"
-                                       @click="handleClickSettings"
-                        />
-                    </div>
-                    <div v-if="refreshable"
-                         class="tool"
-                    >
-                        <p-icon-button name="ic_refresh"
-                                       @click="handleRefresh"
-                        />
-                    </div>
-                </div>
-            </div>
-            <div class="filters-wrapper">
-                <p-query-search-tags v-show="searchable && filtersVisible && searchType === SEARCH_TYPES.query"
-                                     :tags="proxyState.queryTags"
-                                     :timezone="timezone"
-                                     :converter="state.queryTagConverter"
-                                     @change="onQueryTagsChange"
-                />
-            </div>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { groupBy } from 'lodash';
 import {
@@ -240,8 +148,100 @@ const onQueryTagsChange = (tags: QueryTag[]) => {
         });
     }
 };
-
 </script>
+
+<template>
+    <div class="p-toolbox">
+        <div class="toolbox-inner">
+            <div v-if="slots['left-area']"
+                 class="left-area-wrapper"
+            >
+                <slot name="left-area" />
+            </div>
+            <div v-if="searchable"
+                 class="search-wrapper"
+            >
+                <p-search v-if="searchType === SEARCH_TYPES.plain"
+                          v-model:value="proxyState.searchText"
+                          @search="onSearch"
+                          @delete="onSearch()"
+                />
+                <p-query-search v-else-if="searchType === SEARCH_TYPES.query"
+                                :key-item-sets="props.keyItemSets"
+                                :value-handler-map="props.valueHandlerMap"
+                                @search="onSearch"
+                />
+            </div>
+            <div class="tools-wrapper">
+                <div v-if="paginationVisible"
+                     class="tool"
+                >
+                    <div v-if="slots['pagination-area']">
+                        <slot name="pagination-area" />
+                    </div>
+                    <p-text-pagination v-else
+                                       :this-page="proxyState.thisPage"
+                                       :all-page="state.allPage"
+                                       @page-change="onChangeThisPage"
+                    />
+                </div>
+                <div v-if="pageSizeChangeable"
+                     class="tool"
+                >
+                    <p-select-dropdown class="dropdown-list"
+                                       :selected="pageSize"
+                                       :menu="state.pageMenu"
+                                       @select="onChangePageSize"
+                    >
+                        {{ proxyState.pageSize }}
+                    </p-select-dropdown>
+                </div>
+                <div v-if="sortable"
+                     class="tool"
+                >
+                    <p-select-dropdown class="dropdown-list"
+                                       :selected="state.selectedSortBy"
+                                       :menu="sortByOptions"
+                                       @select="onChangeSortBy"
+                    >
+                        {{ state.selectedSortBy }}
+                    </p-select-dropdown>
+                </div>
+                <div class="right-tool-group">
+                    <div v-if="exportable"
+                         class="tool"
+                    >
+                        <p-icon-button name="ic_excel"
+                                       @click="handleExport"
+                        />
+                    </div>
+                    <div v-if="settingsVisible"
+                         class="tool"
+                    >
+                        <p-icon-button name="ic_settings-filled"
+                                       @click="handleClickSettings"
+                        />
+                    </div>
+                    <div v-if="refreshable"
+                         class="tool"
+                    >
+                        <p-icon-button name="ic_refresh"
+                                       @click="handleRefresh"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="filters-wrapper">
+                <p-query-search-tags v-show="searchable && filtersVisible && searchType === SEARCH_TYPES.query"
+                                     :tags="proxyState.queryTags"
+                                     :timezone="props.timezone"
+                                     :converter="state.queryTagConverter"
+                                     @change="onQueryTagsChange"
+                />
+            </div>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss">
 .p-toolbox {
@@ -268,6 +268,7 @@ const onQueryTagsChange = (tags: QueryTag[]) => {
             display: flex;
         }
         .dropdown-list {
+            min-width: 6.5rem;
             .p-dropdown-btn {
                 min-width: 6rem;
             }

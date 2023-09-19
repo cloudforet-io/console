@@ -155,8 +155,8 @@ const handleDeleteNote = async () => {
                             <span class="date">{{ iso8601Formatter(state.noteList[index].created_at, state.timezone) }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button"
-                                           button-icon="ic_more"
-                                           :items="state.menuItems"
+                                           button-icon="ic_chevron-down"
+                                           :menu="state.menuItems"
                                            menu-position="right"
                                            :disabled="manageDisabled"
                                            @select="handleSelect(data.note_id)"

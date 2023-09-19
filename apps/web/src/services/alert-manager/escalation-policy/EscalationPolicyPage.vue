@@ -210,12 +210,11 @@ const onChange = async (options: any = {}) => {
                     </p-button>
                     <p-select-dropdown
                         :selected="t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
-                        :items="state.actionItems"
+                        :menu="state.actionItems"
+                        :placeholder="t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :disabled="!state.selectedItem || !state.hasManagePermission"
                         @select="onSelectAction"
-                    >
-                        {{ t('MONITORING.ALERT.ESCALATION_POLICY.ACTION') }}
-                    </p-select-dropdown>
+                    />
                 </template>
             </p-toolbox>
             <escalation-policy-data-table

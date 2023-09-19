@@ -43,7 +43,7 @@ const handleSelect = (provider: string) => {
 <template>
     <p-select-dropdown class="service-provider-dropdown"
                        :selected="cloudServicePageState.selectedProvider"
-                       :items="state.contextMenuItems"
+                       :menu="state.contextMenuItems"
                        @select="handleSelect"
     >
         <span v-if="state.selectedProviderItem"
@@ -55,7 +55,7 @@ const handleSelect = (provider: string) => {
                         class="mr-1"
             /><span>{{ state.selectedProviderItem.name }}</span>
         </span>
-        <span v-else-if="hasAll"
+        <span v-else-if="props.hasAll"
               class="text"
         >
             <p-lazy-img error-icon="ic_cloud-filled"

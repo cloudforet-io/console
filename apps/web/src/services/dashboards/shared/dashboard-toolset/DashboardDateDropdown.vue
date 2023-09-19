@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-date-dropdown">
         <p-select-dropdown
-            :items="state.monthMenuItems"
+            :menu="state.monthMenuItems"
             :selected="state.selectedMonthMenuIndex"
             index-mode
             menu-position="right"
@@ -142,10 +142,8 @@ watch(() => props.dateRange, () => {
 </script>
 <style lang="postcss" scoped>
 .dashboard-date-dropdown {
-    /* custom design-system component - p-select-dropdown */
-    :deep(.p-select-dropdown) {
-        min-width: auto;
-    }
+    @apply relative flex items-center justify-center;
+    min-height: 2rem;
 }
 </style>
 

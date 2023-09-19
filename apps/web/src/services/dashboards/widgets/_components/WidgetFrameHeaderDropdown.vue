@@ -18,7 +18,7 @@ const handleSelectItem = (selected: string) => {
 
 <template>
     <p-select-dropdown :selected="selected"
-                       :items="props.items"
+                       :menu="props.items"
                        style-type="transparent"
                        class="widget-frame-header-dropdown"
                        @select="handleSelectItem"

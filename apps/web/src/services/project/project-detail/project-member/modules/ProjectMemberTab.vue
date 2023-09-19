@@ -256,17 +256,17 @@ watch(() => store.state.reference.project.items, (projects) => {
                 <p-button style-type="primary"
                           class="mr-4 add-btn"
                           icon-left="ic_plus_bold"
-                          :disabled="manageDisabled"
+                          :disabled="props.manageDisabled"
                           @click="handleClickInviteMember"
                 >
                     {{ t('PROJECT.DETAIL.MEMBER.INVITE') }}
                 </p-button>
-                <p-select-dropdown :items="state.dropdownMenu"
-                                   :disabled="manageDisabled"
+                <p-select-dropdown :menu="state.dropdownMenu"
+                                   :disabled="props.manageDisabled"
+                                   :placeholder="t('IDENTITY.USER.MAIN.ACTION')"
+                                   class="relative"
                                    @select="handleSelectDropdown"
-                >
-                    {{ t('IDENTITY.USER.MAIN.ACTION') }}
-                </p-select-dropdown>
+                />
             </template>
             <template #col-resource_id-format="{ value }">
                 {{ storeState.users[value] ? storeState.users[value].name : value }}

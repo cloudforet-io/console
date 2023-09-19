@@ -75,10 +75,9 @@
                             <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
                                                :key="`PSelectDropdown-${schemaProperty.propertyName}`"
                                                :selected="state.rawFormData[schemaProperty.propertyName]"
-                                               :items="schemaProperty.menuItems"
+                                               :menu="schemaProperty.menuItems"
                                                :disabled="schemaProperty.disabled"
                                                :use-fixed-menu-style="useFixedMenuStyle"
-                                               :button-text-ellipsis="uniformWidth"
                                                is-fixed-width
                                                class="input-form select-dropdown"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"

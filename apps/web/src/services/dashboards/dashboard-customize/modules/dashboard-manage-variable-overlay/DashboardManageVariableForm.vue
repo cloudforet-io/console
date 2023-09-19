@@ -190,7 +190,7 @@ const {
         >
             <p-select-dropdown v-model:selected="selectionType"
                                class="selection-type-dropdown"
-                               :items="selectionMenu"
+                               :menu="selectionMenu"
             />
         </p-field-group>
         <p-field-group class="description-field"
@@ -234,7 +234,7 @@ const {
     .selection-type-field {
         @apply w-1/3;
         .selection-type-dropdown {
-            @apply w-full;
+            @apply relative w-full;
         }
     }
 

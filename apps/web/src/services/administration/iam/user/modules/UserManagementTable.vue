@@ -324,12 +324,11 @@ const handleUserStatusModalConfirm = () => {
                     {{ t('IDENTITY.USER.MAIN.ADD') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item"
-                                   :items="state.dropdownMenu"
+                                   :menu="state.dropdownMenu"
+                                   :placeholder="t('IDENTITY.USER.MAIN.ACTION')"
                                    :disabled="manageDisabled"
                                    @select="handleSelectDropdown"
-                >
-                    {{ t('IDENTITY.USER.MAIN.ACTION') }}
-                </p-select-dropdown>
+                />
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"

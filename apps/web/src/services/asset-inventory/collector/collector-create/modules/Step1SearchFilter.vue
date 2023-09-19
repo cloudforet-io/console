@@ -54,7 +54,7 @@
         <div class="dropdown-container">
             <div class="provider">
                 <p-select-dropdown :selected="state.selectedProvider"
-                                   :items="state.providerList"
+                                   :menu="state.providerList"
                                    class="select-dropdown"
                                    @update:selected="handleChangeProvider"
                 >
@@ -84,7 +84,7 @@
             </div>
             <div class="repository">
                 <p-select-dropdown v-model:selected="state.selectedRepository"
-                                   :items="state.repositoryList"
+                                   :menu="state.repositoryList"
                                    class="select-dropdown"
                 >
                     <template #default="{ item }">
