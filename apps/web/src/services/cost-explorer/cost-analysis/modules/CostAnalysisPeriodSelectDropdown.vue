@@ -213,7 +213,6 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
                            @select="handleSelectPeriod"
         />
         <custom-date-range-modal :visible.sync="state.customRangeModalVisible"
-                                 :granularity="costAnalysisPageState.granularity"
                                  :selected-date-range="state.period"
                                  @confirm="handleCustomRangeModalConfirm"
         />
