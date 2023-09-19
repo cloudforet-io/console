@@ -151,8 +151,8 @@ const isInheritDisabled = (propertyName: string): boolean => {
 
 
 const handleReturnToInitialSettings = () => {
-    if (!widgetFormState.widgetInfo) return;
-    state.schemaFormData = getInitialFormData(widgetFormState.widgetInfo, dashboardDetailState.variablesSchema);
+    if (!widgetFormState.widgetConfigId) return;
+    initSchemaAndFormData(widgetFormState.widgetConfigId, widgetFormState.widgetKey);
 };
 
 /* inherit */
@@ -194,16 +194,7 @@ const resetStates = () => {
     resetTitle();
 };
 
-watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
-    // do nothing if still loading
-    if (loading) return;
-
-    // reset all states if required props are not given
-    if (!widgetConfigId) {
-        resetStates();
-        return;
-    }
-
+const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     // init widgetInfo - refined widget info
     const widgetInfo = widgetFormStore.initWidgetForm(widgetKey, widgetConfigId, dashboardDetailState.projectId);
 
@@ -223,6 +214,19 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
 
     // initiate form data
     state.schemaFormData = getInitialFormData(widgetInfo, dashboardDetailState.variablesSchema);
+};
+
+watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
+    // do nothing if still loading
+    if (loading) return;
+
+    // reset all states if required props are not given
+    if (!widgetConfigId) {
+        resetStates();
+        return;
+    }
+
+    initSchemaAndFormData(widgetConfigId, widgetKey);
 
     // set focus on text input
     if (widgetConfigId) {
