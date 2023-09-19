@@ -12,14 +12,14 @@ import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
 
-interface CostAnalysisLNBState {
+interface CostQuerySetState {
     costQuerySetList: CostQuerySetModel[];
     selectedQuerySetId?: string;
     selectedDataSourceId?: string;
 }
 
 export const useCostQuerySetStore = defineStore('cost-query-set', {
-    state: (): CostAnalysisLNBState => ({
+    state: (): CostQuerySetState => ({
         costQuerySetList: [],
         selectedQuerySetId: undefined,
         selectedDataSourceId: undefined,
