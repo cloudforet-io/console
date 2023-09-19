@@ -237,6 +237,8 @@ export default {
                 state.loading = true;
                 await getDailyAlertHistory();
                 state.loading = false;
+            } else {
+                state.loading = false;
             }
         }, { immediate: true });
 
