@@ -10,7 +10,7 @@ import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/i
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
-    isEmpty, isEqual, xor,
+    isEmpty, isEqual,
 } from 'lodash';
 
 import {
@@ -20,6 +20,9 @@ import {
 import {
     useReferenceStore,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-reference-store';
+import {
+    useWidgetMoreOptions,
+} from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-more-options';
 import {
     useWidgetTitleInput,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-title-input';
@@ -100,55 +103,7 @@ const {
 const { referenceStoreState } = useReferenceStore();
 
 /* more options */
-const updateSchemaFormDataBySchemaProperties = (oldSchemaProperties: string[], newSchemaProperties: string[]) => {
-    if (oldSchemaProperties.length > newSchemaProperties.length) { // delete case
-        const deletedProperties = xor(oldSchemaProperties, newSchemaProperties);
-        deletedProperties.forEach((propertyName) => {
-            delete state.schemaFormData[propertyName];
-        });
-    } else if (oldSchemaProperties.length < newSchemaProperties.length) { // add case
-        const addedProperties = xor(oldSchemaProperties, newSchemaProperties);
-        addedProperties.forEach((propertyName) => {
-            state.schemaFormData[propertyName] = undefined;
-        });
-    }
-    state.schemaFormData = { ...state.schemaFormData };
-};
-const updateSchemaProperties = (properties: string[]) => {
-    updateSchemaFormDataBySchemaProperties(widgetFormState.schemaProperties ?? [], properties);
-
-    widgetFormStore.$patch((_state) => {
-        _state.schemaProperties = properties;
-    });
-
-    // update inherit options
-    const inheritOptions = {};
-    const origin = widgetFormState.inheritOptions ?? {};
-    Object.keys(origin).forEach((name) => {
-        if (properties.includes(name)) inheritOptions[name] = origin[name];
-        else inheritOptions[name] = { enabled: false };
-    });
-    widgetFormStore.$patch((_state) => {
-        _state.inheritOptions = inheritOptions;
-    });
-
-    // update schema
-    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
-        referenceStoreState,
-        state.widgetConfig?.options_schema ?? {},
-        dashboardDetailState.variablesSchema,
-        widgetFormState.inheritOptions ?? {},
-        properties,
-        dashboardDetailState.projectId,
-    );
-};
-const handleSelectWidgetOptions = (selectedProperties: string[]) => {
-    updateSchemaProperties(selectedProperties);
-};
-const handleDeleteProperty = (property: string) => {
-    const _properties = widgetFormState.schemaProperties?.filter((d) => d !== property) ?? [];
-    updateSchemaProperties(_properties);
-};
+const { handleSelectWidgetOptions, handleDeleteProperty } = useWidgetMoreOptions(state);
 
 /* utils */
 const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMenuItem[]): boolean => {
