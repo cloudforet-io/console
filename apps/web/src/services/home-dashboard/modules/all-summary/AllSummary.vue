@@ -1,7 +1,5 @@
-<script lang="ts" setup>
-
-import * as am4charts from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
+<script setup lang="ts">
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
@@ -9,28 +7,34 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import dayjs from 'dayjs';
-import { forEach, orderBy, range } from 'lodash';
 import {
-    computed, onBeforeUnmount, reactive, ref, watch,
+    cloneDeep, forEach, orderBy, range,
+} from 'lodash';
+import {
+    computed, reactive, ref, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
 
-import config from '@/lib/config';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+
 import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray, primary, primary1 } from '@/styles/colors';
+import {
+    primary, primary1,
+} from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Period } from '@/services/cost-explorer/type';
 import AllSummaryDataSummary from '@/services/home-dashboard/modules/all-summary/AllSummaryDataSummary.vue';
-import { DAY_COUNT, MONTH_COUNT } from '@/services/home-dashboard/modules/config';
 import type {
-    DateItem, DateType, DataType, ExtraParams,
+    DateItem, DateType, DataType,
 } from '@/services/home-dashboard/modules/type';
 import {
     DATA_TYPE,
@@ -51,15 +55,21 @@ interface CountMap {
 }
 
 interface Props {
-    extraParams?: ExtraParams;
+    extraParams?: {
+        [key: string]: string | number | boolean;
+    };
 }
-
 const props = withDefaults(defineProps<Props>(), {
     extraParams: () => ({}),
 });
 const { t } = useI18n();
 
-const chartRef = ref<HTMLElement | null>(null);
+const DAY_COUNT = 14;
+const MONTH_COUNT = 12;
+
+const allReferenceStore = useAllReferenceStore();
+const chartContext = ref<HTMLElement | null>(null);
+const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
     chart: null as any,
     //
@@ -109,95 +119,82 @@ const state = reactive({
             label: t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
         },
     ]),
+    //
+    // HACK: this is temp code for data_source_id parameter in analyze API
+    dataSourceId: computed(() => {
+        const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
+        const dataSourceKeys: string[] = Object.keys(dataSourceMap);
+        return dataSourceKeys.length > 0 ? dataSourceKeys[1] : '';
+    }),
 });
 const chartState = reactive({
     loading: true,
+    registry: {},
     data: [] as ChartData[],
 });
 
-const chartRegistry = {} as Record<string, any>;
-
 /* Util */
-const disposeChart = (chartContext) => {
-    if (chartRegistry[chartContext]) {
-        chartRegistry[chartContext].dispose();
-        delete chartRegistry[chartContext];
-    }
-};
-const drawChart = (chartContext) => {
-    const createChart = () => {
-        disposeChart(chartContext);
-        chartRegistry[chartContext] = am4core.create(chartContext, am4charts.XYChart);
-        return chartRegistry[chartContext];
-    };
-    const chart = createChart();
-    state.chart = chart;
+const drawChart = () => {
+    // refresh root for deleting previous chart
+    chartHelper.refreshRoot();
 
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.paddingLeft = -5;
-    chart.paddingBottom = 0;
-    chart.paddingTop = 10;
-    chart.data = chartState.data;
+    let timeUnit: TimeUnit = 'day';
+    if (state.selectedDateType === 'MONTHLY') timeUnit = 'month';
 
-    const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-    dateAxis.dataFields.category = 'date';
-    dateAxis.renderer.minGridDistance = 40;
-    dateAxis.renderer.grid.template.disabled = true;
-    dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
-    dateAxis.tooltip.disabled = true;
-    dateAxis.fontSize = 11;
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({
+        paddingLeft: -5,
+        paddingTop: 10,
+        paddingBottom: 0,
+    });
 
-    const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    valueAxis.renderer.minGridDistance = 30;
-    valueAxis.renderer.grid.template.strokeOpacity = 1;
-    valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-    valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
-    valueAxis.tooltip.disabled = true;
-    valueAxis.fontSize = 11;
-    valueAxis.extraMax = 0.15;
-    if (state.activeTab === DATA_TYPE.BILLING) {
-        valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
-    } else {
-        valueAxis.min = 0;
-    }
+    // set base interval of xAxis
+    xAxis.get('baseInterval').timeUnit = timeUnit;
+    yAxis.set('extraMax', 0.02);
 
-    const series = chart.series.push(new am4charts.ColumnSeries());
-    series.dataFields.valueY = 'count';
-    series.dataFields.categoryX = 'date';
-    series.fill = am4core.color(primary1);
-    series.columns.template.width = am4core.percent(30);
-    series.columns.template.column.cornerRadiusTopLeft = 3;
-    series.columns.template.column.cornerRadiusTopRight = 3;
-    series.strokeWidth = 0;
-    series.columns.template.propertyFields.fillOpacity = 'fillOpacity';
+    // create column series
+    const columnSeries = chartHelper.createXYColumnSeries(chart, {
+        name: 'date',
+        valueYField: 'count',
+        stacked: true,
+    });
+    columnSeries.columns.template.setAll({
+        width: chartHelper.percent(25),
+        cornerRadiusTL: 3,
+        cornerRadiusTR: 3,
+    });
 
-    series.tooltipText = '{tooltipText}';
-    series.tooltip.pointerOrientation = 'down';
-    series.tooltip.fontSize = 14;
-    series.tooltip.strokeWidth = 0;
-    series.tooltip.dy = -5;
-    series.tooltip.getFillFromObject = false;
-    series.tooltip.label.fill = am4core.color(primary);
-    series.tooltip.background.stroke = am4core.color(primary);
+    // set data processor
+    let dateFormat = 'yyyy-MM-dd';
+    if (state.selectedDateType === 'MONTHLY') dateFormat = 'yyyy-MM';
+    columnSeries.data.processor = chartHelper.createDataProcessor({
+        dateFormat,
+        dateFields: ['date'],
+    });
 
-    const bullet = series.bullets.push(new am4charts.LabelBullet());
-    bullet.label.text = '{bulletText}';
-    bullet.label.fontSize = 14;
-    bullet.label.truncate = false;
-    bullet.label.hideOversized = false;
-    bullet.label.propertyFields.fill = 'bulletColor';
-    bullet.label.dy = -10;
-    if (state.activeTab === DATA_TYPE.BILLING) {
-        bullet.label.adapter.add('dy', (dy, target) => {
-            if (target.dataItem.valueY < 0) return 10;
-            return dy;
+    // create bullet
+    columnSeries.bullets.push(() => {
+        const label = chartHelper.createLabel({
+            text: '{bulletText}',
+            populateText: true,
+            fontSize: 14,
+            fill: chartHelper.color(primary),
+            textAlign: 'center',
+            centerX: chartHelper.percent(50),
+            centerY: chartHelper.percent(80),
         });
-    }
+        return chartHelper.createBullet({
+            locationX: 0.5,
+            locationY: 1,
+            sprite: label,
+            dynamic: true,
+        });
+    });
 
-    chart.cursor = new am4charts.XYCursor();
-    chart.cursor.lineX.strokeOpacity = 0;
-    chart.cursor.lineY.strokeOpacity = 0;
-    chart.cursor.behavior = 'none';
+    // set series to chart and set data
+    columnSeries.data.setAll(cloneDeep(chartState.data));
+    chart.series.push(columnSeries);
+
+    state.chart = chart;
 };
 
 const setChartData = (data) => {
@@ -216,7 +213,7 @@ const setChartData = (data) => {
         let count = d.total;
         if (state.activeTab === DATA_TYPE.STORAGE) {
             const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
-            if (formattedSize) count = formattedSize.split(' ')[0];
+            if (formattedSize) count = Number(formattedSize.split(' ')[0]);
         }
         return {
             date: d.date,
@@ -252,17 +249,10 @@ const setChartData = (data) => {
             bulletColor = primary1;
         }
 
-        const date = dayjs(d.date);
-        let dateLabel;
-        if (dateType === 'MONTHLY' && (date.format('M') === '1' || date.format('M') === '12')) {
-            dateLabel = date.format('MMM, YY');
-        } else {
-            const labelFormat = dateType === 'MONTHLY' ? 'MMM' : 'MM/DD';
-            dateLabel = date.format(labelFormat);
-        }
+        const date = dayjs.utc(d.date).format(dateFormat);
 
         return {
-            date: dateLabel,
+            date,
             count: d.count,
             fillOpacity,
             bulletColor,
@@ -280,8 +270,8 @@ const getAllSummaryTabLocation = (type: DataType): RouteLocationRaw => {
         return {
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
             query: {
-                granularity: primitiveToQueryString(GRANULARITY.MONTHLY) as string,
-                period: objectToQueryString(_period) as string,
+                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
+                period: objectToQueryString(_period),
             },
         };
     }
@@ -296,16 +286,23 @@ const getAllSummaryTabLocation = (type: DataType): RouteLocationRaw => {
 /* Api */
 const getBillingCount = async () => {
     try {
-        const { results } = await SpaceConnector.client.statistics.topic.billingSummary({
+        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
             ...props.extraParams,
-            granularity: 'MONTHLY',
-            start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
-            end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
+            data_source_id: state.dataSourceId,
+            query: {
+                granularity: GRANULARITY.MONTHLY,
+                start: dayjs.utc().format('YYYY-MM'),
+                end: dayjs.utc().format('YYYY-MM'),
+                fields: {
+                    cost_sum: {
+                        key: 'cost',
+                        operator: 'sum',
+                    },
+                },
+            },
         });
-        if (results.length > 0) {
-            const count = results[0].billing_data[0].cost;
-            state.count[DATA_TYPE.BILLING] = commaFormatter(numberFormatter(count));
-        }
+        const costSum = results[0]?.cost_sum ?? 0;
+        state.count[DATA_TYPE.BILLING] = commaFormatter(numberFormatter(costSum));
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -335,22 +332,25 @@ const getCount = async () => {
 };
 const getTrend = async (type) => {
     try {
-        let data;
+        chartState.loading = true;
+        let data = [];
         if (type === DATA_TYPE.BILLING) {
-            const res = await SpaceConnector.client.statistics.topic.billingSummary({
+            const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
                 ...props.extraParams,
-                granularity: state.selectedDateType,
-                start: state.period.start,
-                end: state.period.end,
+                data_source_id: state.dataSourceId,
+                query: {
+                    granularity: state.selectedDateType,
+                    start: state.period.start,
+                    end: state.period.end,
+                    fields: {
+                        total: {
+                            key: 'cost',
+                            operator: 'sum',
+                        },
+                    },
+                },
             });
-            if (res.results.length > 0) {
-                data = res.results[0].billing_data.map((d) => ({
-                    date: d.date,
-                    total: d.cost,
-                }));
-            } else {
-                data = [];
-            }
+            if (results.length) data = results;
         } else {
             const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                 ...props.extraParams,
@@ -362,12 +362,15 @@ const getTrend = async (type) => {
         setChartData(data);
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        chartState.loading = false;
     }
 };
 
 /* Event */
 const handleChangeTab = (name) => {
-    if (state.activeTab !== name) disposeChart(chartRef.value);
+    // if (state.activeTab !== name) disposeChart(chartContext.value);
+    if (state.activeTab !== name) chartHelper.refreshRoot();
     state.activeTab = name;
 };
 const handleChangeDateType = (type) => {
@@ -378,45 +381,47 @@ const init = async () => {
     state.loading = true;
     await Promise.all([
         getCount(),
-        getBillingCount(),
+        getTrend(DATA_TYPE.SERVER),
     ]);
     state.loading = false;
 };
-const chartInit = async () => {
-    await getTrend(DATA_TYPE.SERVER);
-    setTimeout(() => {
-        chartState.loading = false;
-    }, 300);
-};
+// const chartInit = async () => {
+//     await getTrend(DATA_TYPE.SERVER);
+//     setTimeout(() => {
+//         chartState.loading = false;
+//     }, 300);
+// };
 init();
-chartInit();
+// chartInit();
+
 
 /* Watcher */
-watch([() => chartState.loading, () => chartRef.value], async ([loading, chartContext]) => {
-    if (!loading && chartContext) {
-        requestIdleCallback(() => drawChart(chartContext));
+watch([() => chartState.loading, () => chartContext.value], async ([loading, _chartContext]) => {
+    if (!loading && _chartContext) {
+        drawChart();
+        // requestIdleCallback(() => drawChart(_chartContext));
     }
 }, { immediate: false });
 watch(() => state.activeTab, async (type) => {
     await getTrend(type);
-    drawChart(chartRef.value);
+    drawChart();
 }, { immediate: false });
 watch(() => state.selectedDateType, async () => {
     await getTrend(state.activeTab);
-    drawChart(chartRef.value);
+    drawChart();
 }, { immediate: false });
+watch(() => state.dataSourceId, (dataSourceId) => {
+    if (dataSourceId) getBillingCount();
+}, { immediate: true });
 
-onBeforeUnmount(() => {
-    Object.values(chartRegistry).forEach((chart) => {
-        if (chart) chart.dispose();
-    });
-});
-
+// onUnmounted(() => {
+//     if (state.chart) state.chart.dispose();
+// });
 </script>
 
 <template>
     <div class="all-summary">
-        <p-balloon-tab v-model:activeTab="state.activeTab"
+        <p-balloon-tab v-model="state.activeTab"
                        :tabs="state.tabs"
                        tail
                        stretch
@@ -480,17 +485,18 @@ onBeforeUnmount(() => {
                                         height="100%"
                             />
                         </template>
-                        <div ref="chartRef"
+                        <div ref="chartContext"
                              class="chart"
                         />
                     </p-data-loader>
                 </div>
-                <all-summary-data-summary :extra-params="extraParams"
+                <all-summary-data-summary :extra-params="props.extraParams"
                                           :active-tab="state.activeTab"
                                           :label="state.tabs.find(d => d.name === state.activeTab).label"
                                           :count="state.count[state.activeTab]"
                                           :selected-date-type="state.selectedDateType"
                                           :storage-suffix="state.storageBoxSuffix"
+                                          :data-source-id="state.dataSourceId"
                 />
             </div>
         </p-balloon-tab>

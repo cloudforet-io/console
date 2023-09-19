@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { PButton } from '@spaceone/design-system';
 import {
@@ -34,7 +33,7 @@ const createBudget = async () => {
 
     state.loading = true;
     try {
-        await SpaceConnector.client.costAnalysis.budget.create({
+        await SpaceConnector.clientV2.costAnalysis.budget.create({
             ...state.baseInfo,
             ...state.amountPlanInfo,
         });
@@ -72,13 +71,14 @@ const handleClickConfirm = () => {
         <budget-form-amount-plan class="mt-4"
                                  :project-group-id="state.baseInfo.project_group_id"
                                  :project-id="state.baseInfo.project_id"
-                                 :cost-types="state.baseInfo.cost_types"
+                                 :provider-filter="state.baseInfo.provider_filter"
+                                 :data-source-id="state.baseInfo.data_source_id"
                                  @update="handleChangeAmountPlanning"
         />
         <div class="text-right mt-4">
             <p-button style-type="secondary"
                       class="mr-4"
-                      @click="SpaceRouter.router.go(-1)"
+                      @click="router.go(-1)"
             >
                 {{ t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CANCEL') }}
             </p-button>

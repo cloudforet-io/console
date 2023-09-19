@@ -17,7 +17,6 @@ import type { Legend } from '@/services/cost-explorer/cost-analysis/type';
 import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
-
 interface Props {
     loading: boolean;
     legends: Legend[];
@@ -146,7 +145,6 @@ watch(() => state.groupByMenuItems, (after) => {
 <style lang="postcss" scoped>
 .cost-analysis-chart-legends {
     .group-by-select-dropdown {
-        @apply relative;
         width: 100%;
         margin-bottom: 0.5rem;
     }

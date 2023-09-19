@@ -23,7 +23,7 @@
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-                <button v-if="!state.variableProperty.disabled"
+                <button v-if="!state.variableProperty.disabled && !state.variableProperty.required"
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
@@ -53,7 +53,7 @@
                         :selected="state.selected"
                         :multi-selectable="variableProperty.selection_type === 'MULTI'"
                         show-select-marker
-                        :show-clear-selection="variableProperty.selection_type === 'MULTI'"
+                        :show-clear-selection="variableProperty.selection_type === 'MULTI' && !variableProperty.required"
                         @click-show-more="showMoreMenu"
                         @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectOption"
@@ -74,7 +74,7 @@ import { onClickOutside } from '@vueuse/core';
 import { cloneDeep, debounce, flattenDeep } from 'lodash';
 import type { MaybeRef } from 'vue';
 import {
-    computed, onMounted,
+    computed,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 
@@ -112,12 +112,18 @@ const state = reactive({
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
         }
         if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
+            if (state.searchResourceOptions.length) {
+                return arrayOfSelectedOptions.map((d) => ({
+                    name: d,
+                    label: state.searchResourceOptions.find((optionItem) => optionItem.key === d)?.name ?? d,
+                }));
+            }
             return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
         }
         return arrayOfSelectedOptions.map((d) => ({ name: d, label: state.options.find((optionItem) => optionItem.name === d).label }));
     }),
     // Options State
-    searchResourceOptions: [],
+    searchResourceOptions: []as {key: string; name: string}[],
     options: computed<MenuItem[]>(() => {
         let result;
 
@@ -126,7 +132,7 @@ const state = reactive({
                 name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
             }));
         } else if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
-            result = state.searchResourceOptions;
+            result = state.searchResourceOptions.map((d) => ({ name: d.key, label: d.name }));
         } else if (state.variableProperty.options?.type === 'ENUM') {
             result = state.variableProperty.options.values.map((d) => ({ name: d.key, label: d.label }));
         }
@@ -217,21 +223,32 @@ const getFilters = (variableProperty: DashboardVariableSchemaProperty): QueryHel
 const loadSearchResourceOptions = async () => {
     try {
         const options = state.variableProperty.options as SearchResourceOptions|undefined;
-        if (options?.type === 'SEARCH_RESOURCE') {
-            const { status, response } = await state.autocompleteApi({
-                resource_type: options.resource_type ?? 'cost_analysis.Cost',
-                distinct_key: options.resource_key,
-                options: {
-                    filter: getFilters(state.variableProperty),
-                },
-            });
-            if (status === 'succeed') {
-                state.searchResourceOptions = response.results.map((d) => ({ name: d.name, label: d.name }));
-            }
+        if (options?.type !== 'SEARCH_RESOURCE') throw new Error('Invalid options type');
+        const { status, response } = await state.autocompleteApi({
+            resource_type: options.resource_type ?? 'cost_analysis.Cost',
+            distinct_key: options.resource_key,
+            options: {
+                filter: getFilters(state.variableProperty),
+            },
+        });
+        if (status === 'succeed') {
+            state.searchResourceOptions = response.results;
         }
     } catch (e) {
         ErrorHandler.handleError(e);
     }
+};
+
+const initVariable = () => {
+    if (state.variableProperty.required) {
+        if (state.variableProperty.options?.type === 'SEARCH_RESOURCE') {
+            const firstOption = state.searchResourceOptions[0];
+            if (firstOption) changeVariables([{ name: firstOption.key, label: firstOption.name }]);
+        }
+    }
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesInitMap[props.propertyName] = true;
+    });
 };
 
 watch(visibleMenu, (_visibleMenu) => {
@@ -240,13 +257,11 @@ watch(visibleMenu, (_visibleMenu) => {
     } else state.searchText = '';
 }, { immediate: true });
 
-onMounted(async () => {
-    await loadSearchResourceOptions();
-    if (state.variableProperty.required) {
-        const firstOption = state.searchResourceOptions[0];
-        if (firstOption) changeVariables([firstOption]);
-    }
-});
+watch(() => state.variableProperty, async (property) => {
+    if (property.options?.type === 'SEARCH_RESOURCE') await loadSearchResourceOptions();
+    initVariable();
+}, { immediate: true });
+
 
 const {
     targetRef,

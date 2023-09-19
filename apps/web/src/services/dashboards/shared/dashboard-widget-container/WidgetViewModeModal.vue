@@ -8,7 +8,6 @@ import {
     computed, reactive, toRef, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -36,7 +35,6 @@ interface WidgetViewModeModalProps {
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
-const store = useStore();
 const { t } = useI18n();
 
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
@@ -52,7 +50,6 @@ const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
     hasManagePermission: useManagePermissionState(),
-    currencyRates: computed(() => store.state.settings.currencyRates),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
@@ -113,7 +110,7 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
 watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
-        await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string);
+        await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string, widgetFormState.widgetConfigId as string);
         await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
         state.widgetRef?.initWidget();
         state.initiated = true;
@@ -195,7 +192,6 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                :schema-properties="widgetFormState.schemaProperties"
                                size="full"
                                :theme="widgetFormState.theme"
-                               :currency-rates="state.currencyRates"
                                :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { PButton, PDivider } from '@spaceone/design-system';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -34,11 +35,15 @@ const handleReject = () => {
 };
 
 const handleRouteToDashboard = () => {
+    const dashboardQuery = new QueryHelper().setFilters([{
+        k: 'label',
+        v: ['Cost'],
+        o: '=',
+    }]).rawQueryStrings;
     const routeData = router.resolve({
         name: DASHBOARDS_ROUTE._NAME,
         query: {
-            // TODO: refactor
-            filters: ['[["Cost"],"label","="]'],
+            filters: dashboardQuery,
         },
     });
     window.open(routeData.href, '_blank');

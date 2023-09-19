@@ -1,3 +1,202 @@
+<script setup lang="ts">
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    PDivider, PI, PIconButton, PHeading, PSkeleton,
+} from '@spaceone/design-system';
+import {
+    computed, onMounted, onUnmounted,
+    reactive, ref, watch,
+} from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
+import type { RouteQueryString } from '@/lib/router-query-string';
+import {
+    objectToQueryString, primitiveToQueryString,
+    queryStringToObject, queryStringToString,
+    replaceUrlQuery,
+} from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
+import { gray } from '@/styles/colors';
+
+import type { RefreshIntervalOption } from '@/services/dashboards/config';
+import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
+import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
+import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
+import DashboardVariablesSelectDropdown from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import DashboardWidgetContainer from '@/services/dashboards/shared/dashboard-widget-container/DashboardWidgetContainer.vue';
+import DashboardCloneModal from '@/services/dashboards/shared/DashboardCloneModal.vue';
+import DashboardLabels from '@/services/dashboards/shared/DashboardLabels.vue';
+import DashboardRefreshDropdown from '@/services/dashboards/shared/DashboardRefreshDropdown.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+
+const PUBLIC_ICON_COLOR = gray[500];
+
+interface Props {
+  dashboardId: string;
+}
+const props = defineProps<Props>();
+const router = useRouter();
+const store = useStore();
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
+
+const state = reactive({
+    hasManagePermission: useManagePermissionState(),
+    nameEditModalVisible: false,
+    deleteModalVisible: false,
+    cloneModalVisible: false,
+});
+
+const queryState = reactive({
+    variables: computed(() => dashboardDetailState.variables),
+    settings: computed(() => dashboardDetailState.settings),
+    urlQueryString: computed(() => {
+        const result = { variables: objectToQueryString(queryState.variables) } as Record<string, RouteQueryString>;
+        if (queryState.settings.date_range.enabled) {
+            result.dateRange = objectToQueryString({
+                start: queryState.settings.date_range.start,
+                end: queryState.settings.date_range.end,
+            });
+        }
+        if (queryState.settings.refresh_interval_option) {
+            result.refresh_interval_option = primitiveToQueryString(queryState.settings.refresh_interval_option);
+        }
+        return result;
+    }),
+});
+
+const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
+
+const getDashboardData = async (dashboardId: string, force = false) => {
+    try {
+        await dashboardDetailStore.getDashboardInfo(dashboardId, force);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        await router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
+    }
+};
+
+// name edit
+const handleVisibleNameEditModal = () => {
+    state.nameEditModalVisible = true;
+};
+const handleNameUpdate = (name: string) => {
+    dashboardDetailStore.$patch({ name });
+    dashboardDetailStore.setOriginDashboardName(name);
+};
+
+// delete dashboard
+const handleVisibleDeleteModal = () => {
+    state.deleteModalVisible = true;
+};
+
+// clone dashboard
+const handleVisibleCloneModal = () => {
+    state.cloneModalVisible = true;
+};
+
+// else
+const handleRefresh = () => {
+    if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
+};
+const handleUpdateLabels = async (labels: string[]) => {
+    try {
+        const isProjectDashboard = props.dashboardId?.startsWith('project');
+        if (isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
+                project_dashboard_id: props.dashboardId,
+                labels,
+            });
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
+                domain_dashboard_id: props.dashboardId,
+                labels,
+            });
+        }
+        await store.dispatch('dashboard/loadAllDashboard');
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+/* init */
+let urlQueryStringWatcherStop;
+const init = async () => {
+    const currentQuery = router.currentRoute.value.query;
+    const useQueryValue = {
+        variables: queryStringToObject(currentQuery.variables),
+        dateRange: queryStringToObject(currentQuery.dateRange),
+        refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
+    };
+
+    if (useQueryValue.variables) {
+        dashboardDetailStore.$patch((_state) => {
+            _state.variables = useQueryValue.variables;
+        });
+    }
+    if (useQueryValue.dateRange) {
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                date_range: {
+                    enabled: true,
+                    ...useQueryValue.dateRange,
+                },
+            };
+        });
+    }
+    if (useQueryValue.refresh_interval_option) {
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                refresh_interval_option: useQueryValue.refresh_interval_option,
+            };
+        });
+    }
+
+    urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
+        replaceUrlQuery(urlQueryString);
+    }, { immediate: true });
+};
+
+(async () => {
+    await getDashboardData(props.dashboardId, true);
+    await init();
+})();
+
+onUnmounted(() => {
+    if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
+});
+
+watch(() => props.dashboardId, (_dashboardId) => {
+    getDashboardData(_dashboardId);
+});
+
+onUnmounted(() => {
+    dashboardDetailStore.revertDashboardData();
+});
+
+onMounted(() => {
+    /*
+  Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
+   */
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap = {};
+    });
+});
+</script>
+
 <template>
     <div class="dashboard-detail-page">
         <p-heading :title="dashboardDetailState.name">
@@ -78,223 +277,6 @@
         />
     </div>
 </template>
-
-<script setup lang="ts">
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import {
-    PDivider, PI, PIconButton, PHeading, PSkeleton,
-} from '@spaceone/design-system';
-import {
-    computed, onMounted, onUnmounted,
-    reactive, ref, watch,
-} from 'vue';
-import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
-
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-
-import type { RouteQueryString } from '@/lib/router-query-string';
-import {
-    objectToQueryString, primitiveToQueryString,
-    queryStringToObject, queryStringToString,
-    replaceUrlQuery,
-} from '@/lib/router-query-string';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-
-import { gray } from '@/styles/colors';
-
-import type { RefreshIntervalOption } from '@/services/dashboards/config';
-import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
-import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
-import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
-import DashboardVariablesSelectDropdown from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
-import DashboardWidgetContainer from '@/services/dashboards/shared/dashboard-widget-container/DashboardWidgetContainer.vue';
-import DashboardCloneModal from '@/services/dashboards/shared/DashboardCloneModal.vue';
-import DashboardLabels from '@/services/dashboards/shared/DashboardLabels.vue';
-import DashboardRefreshDropdown from '@/services/dashboards/shared/DashboardRefreshDropdown.vue';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-
-
-const PUBLIC_ICON_COLOR = gray[500];
-
-interface Props {
-  dashboardId: string;
-}
-const props = defineProps<Props>();
-const router = useRouter();
-const store = useStore();
-
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
-
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-    nameEditModalVisible: false,
-    deleteModalVisible: false,
-    cloneModalVisible: false,
-});
-
-const queryState = reactive({
-    variables: computed(() => dashboardDetailState.variables),
-    settings: computed(() => dashboardDetailState.settings),
-    urlQueryString: computed(() => {
-        const result = { variables: objectToQueryString(queryState.variables) } as Record<string, RouteQueryString>;
-        if (queryState.settings.date_range.enabled) {
-            result.dateRange = objectToQueryString({
-                start: queryState.settings.date_range.start,
-                end: queryState.settings.date_range.end,
-            });
-        }
-        if (queryState.settings.currency.enabled) {
-            result.currency = objectToQueryString({
-                value: queryState.settings.currency.value,
-            });
-        }
-        if (queryState.settings.refresh_interval_option) {
-            result.refresh_interval_option = primitiveToQueryString(queryState.settings.refresh_interval_option);
-        }
-        return result;
-    }),
-});
-
-const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
-
-const getDashboardData = async (dashboardId: string, force = false) => {
-    try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId, force);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        await router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
-    }
-};
-
-// name edit
-const handleVisibleNameEditModal = () => {
-    state.nameEditModalVisible = true;
-};
-const handleNameUpdate = (name: string) => {
-    dashboardDetailStore.$patch({ name });
-    dashboardDetailStore.setOriginDashboardName(name);
-};
-
-// delete dashboard
-const handleVisibleDeleteModal = () => {
-    state.deleteModalVisible = true;
-};
-
-// clone dashboard
-const handleVisibleCloneModal = () => {
-    state.cloneModalVisible = true;
-};
-
-// else
-const handleRefresh = () => {
-    if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
-};
-const handleUpdateLabels = async (labels: string[]) => {
-    try {
-        const isProjectDashboard = props.dashboardId?.startsWith('project');
-        if (isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
-                labels,
-            });
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
-                labels,
-            });
-        }
-        await store.dispatch('dashboard/loadAllDashboard');
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-/* init */
-let urlQueryStringWatcherStop;
-const init = async () => {
-    const currentQuery = router.currentRoute.value.query;
-    const useQueryValue = {
-        variables: queryStringToObject(currentQuery.variables),
-        dateRange: queryStringToObject(currentQuery.dateRange),
-        currency: queryStringToObject(currentQuery.currency),
-        refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
-    };
-
-    if (useQueryValue.variables) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.variables = useQueryValue.variables;
-        });
-    }
-    if (useQueryValue.dateRange) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.settings = {
-                ..._state.settings,
-                date_range: {
-                    enabled: true,
-                    ...useQueryValue.dateRange,
-                },
-            };
-        });
-    }
-    if (useQueryValue.currency) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.settings = {
-                ..._state.settings,
-                currency: {
-                    enabled: true,
-                    ...useQueryValue.currency,
-                },
-            };
-        });
-    }
-    if (useQueryValue.refresh_interval_option) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.settings = {
-                ..._state.settings,
-                refresh_interval_option: useQueryValue.refresh_interval_option,
-            };
-        });
-    }
-
-    urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
-        replaceUrlQuery(urlQueryString);
-    }, { immediate: true });
-};
-
-(async () => {
-    await getDashboardData(props.dashboardId, true);
-    await init();
-})();
-
-onUnmounted(() => {
-    if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
-});
-
-watch(() => props.dashboardId, (_dashboardId) => {
-    getDashboardData(_dashboardId);
-});
-
-onUnmounted(() => {
-    dashboardDetailStore.revertDashboardData();
-});
-
-onMounted(() => {
-    /*
-  Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
-   */
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap = {};
-    });
-});
-</script>
 
 <style lang="postcss" scoped>
 .p-heading {

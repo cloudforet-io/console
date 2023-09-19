@@ -17,7 +17,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type {
     WidgetExpose, WidgetProps, WidgetEmit, CostGroupBy,
 } from '@/services/dashboards/widgets/_configs/config';
@@ -118,7 +118,7 @@ const drawChart = (chartData: TreemapChartData[]) => {
 
     const tooltip = chartHelper.createTooltip();
     series.set('tooltip', tooltip);
-    chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency, props.currencyRates);
+    chartHelper.setTreemapTooltipText(series, tooltip, widgetState.currency);
     chartHelper.setTreemapLabelText(series, {
         oversizedBehavior: 'truncate',
     });

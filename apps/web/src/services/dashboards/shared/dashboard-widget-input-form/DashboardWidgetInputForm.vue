@@ -1,85 +1,4 @@
-<template>
-    <div class="dashboard-widget-input-form">
-        <p-field-group :label="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
-                       :invalid="isTitleInvalid"
-                       :invalid-text="titleInvalidText"
-                       class="name-field"
-                       required
-        >
-            <p-text-input v-model:is-focused="state.isFocused"
-                          :value="title"
-                          :invalid="isTitleInvalid"
-                          :placeholder="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_PLACEHOLDER')"
-                          class="input"
-                          @update:value="updateTitle"
-            />
-        </p-field-group>
-        <div v-if="widgetConfig?.description?.translation_id"
-             class="description-text"
-        >
-            {{ t(widgetConfig.description.translation_id) }}
-        </div>
-        <p-data-loader :loading="referenceStoreState.loading"
-                       class="widget-options-form-wrapper"
-        >
-            <p-text-button icon-left="ic_refresh"
-                           style-type="highlight"
-                           :disabled="!isFormDataChanged"
-                           class="return-to-initial-settings-button"
-                           @click="handleReturnToInitialSettings"
-            >
-                {{ t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
-            </p-text-button>
-            <p-json-schema-form v-if="state.widgetOptionsJsonSchema.properties"
-                                v-model:form-data="state.schemaFormData"
-                                :schema="state.widgetOptionsJsonSchema"
-                                :custom-error-map="inheritOptionsErrorMap"
-                                :validation-mode="widgetKey ? 'all' : 'input'"
-                                use-fixed-menu-style
-                                uniform-width
-                                :reference-handler="referenceHandler"
-                                class="widget-options-form"
-                                @validate="handleFormValidate"
-            >
-                <template #label-extra="{ propertyName }">
-                    <div class="inherit-toggle-button-wrapper">
-                        <span class="text"
-                              :class="{inherit: state.inheritableProperties.includes(propertyName)}"
-                        >{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
-                        <p-toggle-button :value="state.inheritableProperties.includes(propertyName)"
-                                         :disabled="isInheritDisabled(propertyName)"
-                                         @change-toggle="handleChangeInheritToggle(propertyName, $event)"
-                        />
-                    </div>
-                </template>
-                <template #input-extra="{ propertyName }">
-                    <p-icon-button v-if="!state.fixedProperties.includes(propertyName)"
-                                   class="delete-button"
-                                   shape="square"
-                                   style-type="negative-secondary"
-                                   name="ic_delete"
-                                   @click="handleDeleteProperty(propertyName)"
-                    />
-                </template>
-                <template #dropdown-extra="{ propertyName, selectedItem }">
-                    <div v-if="isSelected(selectedItem) && state.inheritableProperties.includes(propertyName)"
-                         class="dropdown-inner"
-                    >
-                        <span class="item-label">{{ selectedItem.label }}</span>
-                        <span class="suffix-text">{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
-                    </div>
-                </template>
-            </p-json-schema-form>
-        </p-data-loader>
-        <dashboard-widget-more-options class="more-option-container"
-                                       :widget-config-id="widgetConfigId"
-                                       :selected-properties="widgetFormState.schemaProperties"
-                                       @update:selected-properties="handleSelectWidgetOptions"
-        />
-    </div>
-</template>
-
-<script lang="ts" setup>
+<script setup lang="ts">
 
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton, PTextButton,
@@ -88,7 +7,7 @@ import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/i
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
-    cloneDeep, isEmpty, isEqual, union, xor,
+    isEmpty, isEqual, xor,
 } from 'lodash';
 import {
     computed, reactive, watch,
@@ -104,19 +23,17 @@ import {
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-title-input';
 import DashboardWidgetMoreOptions
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
+import { getInitialFormData } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/form-data-helper';
 import {
     getReferenceHandler,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/reference-handler-helper';
 import {
-    getRefinedWidgetInheritOptions,
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
-    DashboardLayoutWidgetInfo, WidgetConfig,
-    WidgetFiltersMap,
-    WidgetOptionsSchema,
+    WidgetConfig,
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -131,7 +48,6 @@ interface Props {
     widgetConfigId?: string;
     widgetKey?: string;
 }
-
 const props = defineProps<Props>();
 const { t } = useI18n();
 
@@ -228,40 +144,16 @@ const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMen
     if (Array.isArray(selectedItem)) return !!selectedItem.length;
     return selectedItem && !isEmpty(selectedItem);
 };
-const isInheritDisabled = (propertyName: string): boolean => state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled || state.fixedProperties.includes(propertyName);
-
-const getFormDataFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
-    const { widget_options, inherit_options } = widgetInfo;
-    const formData = {};
-
-    // set schema keywords
-    Object.entries(widget_options).forEach(([optionKey, optionValue]) => {
-        if (optionKey === 'filters') {
-            Object.entries((optionValue ?? {}) as WidgetFiltersMap).forEach(([key, value]) => {
-                if (Array.isArray(value)) {
-                    formData[`filters.${key}`] = value.map((filter) => filter.v).flat();
-                }
-            });
-        } else {
-            formData[optionKey] = cloneDeep(optionValue);
-        }
-    });
-
-    // override if inherit is enabled
-    Object.entries(inherit_options).forEach(([optionKey, optionValue]) => {
-        if (optionValue?.enabled) formData[optionKey] = optionValue?.variable_info?.key;
-    });
-    return formData;
+const isInheritDisabled = (propertyName: string): boolean => {
+    const inputDisabled = !!state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled;
+    const nonInheritable = !!state.widgetConfig?.options_schema?.non_inheritable_properties?.includes(propertyName);
+    return inputDisabled || nonInheritable;
 };
-const getSchemaPropertiesFromWidgetInfo = (widgetInfo: DashboardLayoutWidgetInfo) => {
-    if (!widgetInfo.schema_properties) {
-        return getRefinedSchemaProperties(state.widgetConfig?.options_schema ?? {});
-    }
-    return widgetInfo.schema_properties ?? [];
-};
+
 
 const handleReturnToInitialSettings = () => {
-    initStatesByWidgetConfig(props.widgetConfigId as string, true);
+    if (!widgetFormState.widgetInfo) return;
+    state.schemaFormData = getInitialFormData(widgetFormState.widgetInfo, dashboardDetailState.variablesSchema);
 };
 
 /* inherit */
@@ -284,32 +176,6 @@ const handleChangeInheritToggle = (propertyName: string, value) => {
     state.schemaFormData = { ...state.schemaFormData, [propertyName]: undefined };
 };
 
-/* schema refining helpers */
-const getRefinedSchemaProperties = (widgetOptionsSchema: WidgetOptionsSchema): string[] => {
-    const fixedProperties: string[] = widgetOptionsSchema.fixed_properties ?? [];
-    const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
-    const allProperties = union(fixedProperties, defaultProperties);
-
-    const fixedIdxMap: Record<string, number> = {};
-    fixedProperties.forEach((name, idx) => { fixedIdxMap[name] = idx; });
-    const defaultIdxMap = {};
-    defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
-
-    return allProperties.sort((a, b) => {
-        if (fixedIdxMap[a] !== undefined) {
-            // if both are fixed, follow required index order
-            if (fixedIdxMap[b] !== undefined) return fixedIdxMap[a] > fixedIdxMap[b] ? 1 : -1;
-            // otherwise, fixed item comes before
-            return -1;
-        }
-        // if one is default and one is fixed, fixed one comes before
-        if (fixedIdxMap[b] !== undefined) return 1;
-
-        // if both are default, follow default index order
-        return defaultIdxMap[a] > defaultIdxMap[b] ? 1 : -1;
-    });
-};
-
 /* states settings */
 const resetStates = () => {
     // reset widget form store states
@@ -328,73 +194,7 @@ const resetStates = () => {
     state.schemaFormData = {};
     resetTitle();
 };
-const initStatesByWidgetConfig = (widgetConfigId: string, forceInit = false) => {
-    state.schemaFormData = {};
-    const widgetOptionsSchema: WidgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
-    // init widget form store states
-    widgetFormStore.$patch((_state) => {
-        _state.widgetConfigId = widgetConfigId;
-        _state.schemaProperties = getRefinedSchemaProperties(widgetOptionsSchema);
-        _state.inheritOptions = {};
-    });
-    if (!props.widgetKey || forceInit) {
-        let _inheritOptions = widgetFormState.inheritOptions;
-        // set default value to fixed properties
-        widgetFormState.schemaProperties?.filter((d) => state.fixedProperties.includes(d)).forEach((propertyName) => {
-            state.schemaFormData[propertyName] = state.widgetConfig?.options?.[propertyName];
-        });
-        // set default value to default properties
-        widgetFormState.schemaProperties?.filter((d) => !state.fixedProperties.includes(d)).forEach((propertyName) => {
-            const filterProperty = propertyName.replace('filters.', '');
-            if (dashboardDetailState.variablesSchema.properties[filterProperty]?.use) {
-                state.schemaFormData[propertyName] = filterProperty;
-            }
-            _inheritOptions = {
-                ..._inheritOptions,
-                [propertyName]: { enabled: true },
 
-            };
-        });
-        widgetFormStore.$patch((_state) => {
-            _state.inheritOptions = _inheritOptions;
-        });
-    }
-    // init states
-    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
-        referenceStoreState,
-        widgetOptionsSchema,
-        dashboardDetailState.variablesSchema,
-        widgetFormState.inheritOptions ?? {},
-        widgetFormState.schemaProperties ?? [],
-        dashboardDetailState.projectId,
-    );
-};
-const setStatesForEditMode = (widgetKey: string) => {
-    const widgetOptionsSchema = state.widgetConfig?.options_schema ?? {};
-
-    // set widget form store states
-    const widgetInfo = widgetFormStore.initWidgetForm(widgetKey);
-    if (!widgetInfo) return;
-
-    // init title
-    updateTitle(widgetInfo.title);
-    // init widget form store states
-    widgetFormStore.$patch((_state) => {
-        _state.inheritOptions = getRefinedWidgetInheritOptions(widgetInfo, dashboardDetailState.projectId);
-        _state.schemaProperties = getSchemaPropertiesFromWidgetInfo(widgetInfo);
-    });
-    // init options schema
-    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
-        referenceStoreState,
-        widgetOptionsSchema,
-        dashboardDetailState.variablesSchema,
-        widgetFormState.inheritOptions ?? {},
-        widgetFormState.schemaProperties ?? [],
-        dashboardDetailState.projectId,
-    );
-    // init form data
-    state.schemaFormData = getFormDataFromWidgetInfo(widgetInfo);
-};
 watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
     // do nothing if still loading
     if (loading) return;
@@ -405,11 +205,25 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
         return;
     }
 
-    // initiate states by widget config
-    initStatesByWidgetConfig(widgetConfigId);
+    // init widgetInfo - refined widget info
+    const widgetInfo = widgetFormStore.initWidgetForm(widgetKey, widgetConfigId, dashboardDetailState.projectId);
 
-    // set states if widget key exists. this is for updating widget case.
-    if (widgetKey) setStatesForEditMode(widgetKey);
+    // init title
+    updateTitle(widgetInfo.title);
+
+
+    // init schema
+    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
+        referenceStoreState,
+        state.widgetConfig?.options_schema ?? {},
+        dashboardDetailState.variablesSchema,
+        widgetFormState.inheritOptions ?? {},
+        widgetFormState.schemaProperties ?? [],
+        dashboardDetailState.projectId,
+    );
+
+    // initiate form data
+    state.schemaFormData = getInitialFormData(widgetInfo, dashboardDetailState.variablesSchema);
 
     // set focus on text input
     if (widgetConfigId) {
@@ -434,6 +248,87 @@ watch(() => state.isAllValid, (_isAllValid) => {
 }, { immediate: true });
 
 </script>
+
+<template>
+    <div class="dashboard-widget-input-form">
+        <p-field-group :label="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
+                       :invalid="isTitleInvalid"
+                       :invalid-text="titleInvalidText"
+                       class="name-field"
+                       required
+        >
+            <p-text-input v-model:is-focused="state.isFocused"
+                          :value="title"
+                          :invalid="isTitleInvalid"
+                          :placeholder="t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_PLACEHOLDER')"
+                          class="input"
+                          @update:value="updateTitle"
+            />
+        </p-field-group>
+        <div v-if="state.widgetConfig?.description?.translation_id"
+             class="description-text"
+        >
+            {{ t(state.widgetConfig.description.translation_id) }}
+        </div>
+        <p-data-loader :loading="referenceStoreState.loading"
+                       class="widget-options-form-wrapper"
+        >
+            <p-text-button icon-left="ic_refresh"
+                           style-type="highlight"
+                           :disabled="!state.isFormDataChanged"
+                           class="return-to-initial-settings-button"
+                           @click="handleReturnToInitialSettings"
+            >
+                {{ t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
+            </p-text-button>
+            <p-json-schema-form v-if="state.widgetOptionsJsonSchema.properties"
+                                v-model:form-data="state.schemaFormData"
+                                :schema="state.widgetOptionsJsonSchema"
+                                :custom-error-map="state.inheritOptionsErrorMap"
+                                :validation-mode="widgetKey ? 'all' : 'input'"
+                                use-fixed-menu-style
+                                uniform-width
+                                :reference-handler="referenceHandler"
+                                class="widget-options-form"
+                                @validate="handleFormValidate"
+            >
+                <template #label-extra="{ propertyName }">
+                    <div class="inherit-toggle-button-wrapper">
+                        <span class="text"
+                              :class="{inherit: state.inheritableProperties.includes(propertyName)}"
+                        >{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
+                        <p-toggle-button :value="state.inheritableProperties.includes(propertyName)"
+                                         :disabled="isInheritDisabled(propertyName)"
+                                         @change-toggle="handleChangeInheritToggle(propertyName, $event)"
+                        />
+                    </div>
+                </template>
+                <template #input-extra="{ propertyName }">
+                    <p-icon-button v-if="!state.fixedProperties.includes(propertyName)"
+                                   class="delete-button"
+                                   shape="square"
+                                   style-type="negative-secondary"
+                                   name="ic_delete"
+                                   @click="handleDeleteProperty(propertyName)"
+                    />
+                </template>
+                <template #dropdown-extra="{ propertyName, selectedItem }">
+                    <div v-if="isSelected(selectedItem) && state.inheritableProperties.includes(propertyName)"
+                         class="dropdown-inner"
+                    >
+                        <span class="item-label">{{ selectedItem.label }}</span>
+                        <span class="suffix-text">{{ t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
+                    </div>
+                </template>
+            </p-json-schema-form>
+        </p-data-loader>
+        <dashboard-widget-more-options class="more-option-container"
+                                       :widget-config-id="widgetConfigId"
+                                       :selected-properties="widgetFormState.schemaProperties"
+                                       @update:selected-properties="handleSelectWidgetOptions"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-widget-input-form {

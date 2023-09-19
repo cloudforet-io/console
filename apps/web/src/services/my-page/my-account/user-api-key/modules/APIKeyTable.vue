@@ -367,7 +367,6 @@ watch(() => props.userId, async (after) => {
         display: inherit;
     }
     .dropdown-btn {
-        @apply relative;
         margin-left: 1rem;
     }
     .table-desc {

@@ -1,71 +1,10 @@
-<template>
-    <div ref="containerRef"
-         class="dashboard-variables-more-button"
-         :class="{'open-menu': visibleMenu}"
-    >
-        <p-button ref="targetRef"
-                  icon-left="ic_plus_bold"
-                  style-type="highlight"
-                  :disabled="props.disabled"
-                  @click="handleClickButton"
-        >
-            {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
-        </p-button>
-        <p-context-menu v-show="visibleMenu"
-                        ref="contextMenuRef"
-                        class="variables-menu"
-                        searchable
-                        :search-text="state.searchText"
-                        :style="contextMenuStyle"
-                        :menu="refinedMenu"
-                        :selected="state.selected"
-                        multi-selectable
-                        show-select-marker
-                        show-clear-selection
-                        @click-show-more="showMoreMenu"
-                        @keyup:down:end="focusOnContextMenu()"
-                        @update:selected="handleSelectVariable"
-                        @update:search-text="handleUpdateSearchText"
-        >
-            <template #bottom>
-                <p-button class="manage-variable-button"
-                          style-type="secondary"
-                          icon-left="ic_settings-filled"
-                          :disabled="!props.isManageable"
-                          @click="handleOpenOverlay"
-                >
-                    {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
-                </p-button>
-            </template>
-        </p-context-menu>
-        <delete-modal v-model:visible="state.uncheckConfirmModalVisible"
-                      :header-title="t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_TITLE')"
-                      @confirm="handleConfirmUncheckModal"
-                      @cancel="handleCancelUncheckModal"
-                      @close="handleCancelUncheckModal"
-        >
-            <p>
-                <b>{{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_1') }} </b>
-                <span>{{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_2') }}</span>
-            </p>
-            <div class="affected-widget-wrapper">
-                <ul>
-                    <li v-for="(title, idx) in state.affectedWidgetTitlesByCustomVariable"
-                        :key="`affected-widget-${idx}`"
-                    >
-                        • {{ title }}
-                    </li>
-                </ul>
-            </div>
-        </delete-modal>
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { onClickOutside } from '@vueuse/core';
-import { cloneDeep, debounce, union } from 'lodash';
+import {
+    cloneDeep, debounce, merge, union,
+} from 'lodash';
 import type { MaybeRef } from 'vue';
 import {
     computed,
@@ -80,8 +19,7 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-
-
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
     isManageable: boolean;
@@ -103,7 +41,9 @@ const state = reactive({
     variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
         return ({
-            name: property, label: currentProperty?.name ?? property,
+            name: property,
+            label: currentProperty?.name ?? property,
+            disabled: currentProperty?.required,
         });
     })),
     selected: computed<MenuItem[]>(() => {
@@ -111,7 +51,7 @@ const state = reactive({
         state.variableSchema.order.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
-            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled });
+            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled || currentProperty.required });
         });
         return result;
     }),
@@ -148,10 +88,14 @@ onClickOutside(containerRef as MaybeRef, hideContextMenu);
 // helper
 const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string[] => {
     const widgetTitles: string[] = [];
+
     dashboardDetailState.dashboardWidgetInfoList.forEach((widgetInfo) => {
-        const widgetInheritVariableKeys = Object.values(widgetInfo.inherit_options).filter((d) => d.enabled).map((d) => d.variable_info?.key);
+        const widgetConfig = getWidgetConfig(widgetInfo.widget_name);
+        const mergedInheritOptions = merge({}, widgetConfig?.inherit_options ?? {}, widgetInfo.inherit_options);
+
+        const widgetInheritVariableKeys = Object.values(mergedInheritOptions).filter((d) => d.enabled).map((d) => d.variable_info?.key);
         if (widgetInheritVariableKeys.includes(targetProperty)) {
-            widgetTitles.push(widgetInfo.title);
+            widgetTitles.push(widgetInfo.title ?? widgetConfig.title as string);
         }
     });
     return widgetTitles;
@@ -202,6 +146,7 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 
     // Normal case
     beforePropertiesEntries.forEach(([k, v]) => {
+        if (v.required) return; /* required variable case */
         if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
             if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
                 state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(k);
@@ -277,6 +222,69 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <div ref="containerRef"
+         class="dashboard-variables-more-button"
+         :class="{'open-menu': visibleMenu}"
+    >
+        <p-button ref="targetRef"
+                  icon-left="ic_plus_bold"
+                  style-type="highlight"
+                  :disabled="props.disabled"
+                  @click="handleClickButton"
+        >
+            {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
+        </p-button>
+        <p-context-menu v-show="visibleMenu"
+                        ref="contextMenuRef"
+                        class="variables-menu"
+                        searchable
+                        :search-text="state.searchText"
+                        :style="contextMenuStyle"
+                        :menu="refinedMenu"
+                        :selected="state.selected"
+                        multi-selectable
+                        show-select-marker
+                        show-clear-selection
+                        @click-show-more="showMoreMenu"
+                        @keyup:down:end="focusOnContextMenu()"
+                        @update:selected="handleSelectVariable"
+                        @update:search-text="handleUpdateSearchText"
+        >
+            <template #bottom>
+                <p-button class="manage-variable-button"
+                          style-type="secondary"
+                          icon-left="ic_settings-filled"
+                          :disabled="!props.isManageable"
+                          @click="handleOpenOverlay"
+                >
+                    {{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
+                </p-button>
+            </template>
+        </p-context-menu>
+        <delete-modal v-model:visible="state.uncheckConfirmModalVisible"
+                      :header-title="t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_TITLE')"
+                      @confirm="handleConfirmUncheckModal"
+                      @cancel="handleCancelUncheckModal"
+                      @close="handleCancelUncheckModal"
+        >
+            <p>
+                <b>{{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_1') }} </b>
+                <span>{{ t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_2') }}</span>
+            </p>
+            <div class="affected-widget-wrapper">
+                <ul>
+                    <li v-for="(title, idx) in state.affectedWidgetTitlesByCustomVariable"
+                        :key="`affected-widget-${idx}`"
+                    >
+                        • {{ title }}
+                    </li>
+                </ul>
+            </div>
+        </delete-modal>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-variables-more-button {

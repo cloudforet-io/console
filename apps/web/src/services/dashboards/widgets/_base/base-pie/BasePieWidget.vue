@@ -25,7 +25,7 @@ import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-ana
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
@@ -162,7 +162,7 @@ const drawChart = (chartData: ChartData[]) => {
 
     if (chartData.some((d) => d.cost_sum && d.cost_sum > 0)) {
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setPieTooltipText(series, tooltip, widgetState.currency, props.currencyRates);
+        chartHelper.setPieTooltipText(series, tooltip, widgetState.currency);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(chartData);
     } else {
@@ -263,7 +263,6 @@ defineExpose<WidgetExpose<FullData>>({
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results: []"
                                :currency="widgetState.currency"
-                               :currency-rates="props.currencyRates"
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more: false"
                                :color-set="colorSet"

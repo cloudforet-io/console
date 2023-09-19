@@ -6,9 +6,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import { debounce } from 'lodash';
 import {
-    computed, reactive, watch,
+    reactive, watch,
 } from 'vue';
-import { useStore } from 'vuex';
 
 import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -32,7 +31,6 @@ import type {
     Period,
 } from '@/services/cost-explorer/type';
 
-
 type CostAnalyzeRawData = {
     [groupBy: string]: string | any;
     cost_sum?: Array<{
@@ -45,10 +43,7 @@ type CostAnalyzeRawData = {
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
-const store = useStore();
-
 const state = reactive({
-    currency: computed(() => store.state.settings.currency),
     loading: true,
     legends: [] as Legend[],
     chartData: [] as XYChartData[],

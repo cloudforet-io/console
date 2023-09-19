@@ -19,15 +19,15 @@ import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/x
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import WidgetChartNoDataOverlay from '@/services/dashboards/widgets/_components/WidgetChartNoDataOverlay.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 import countOfPassAndFailFindingsWidgetConfig
     from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import type { Legend } from '@/services/dashboards/widgets/type';

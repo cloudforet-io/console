@@ -13,24 +13,30 @@ import {
 import type { RouteLocationRaw } from 'vue-router';
 import { useStore } from 'vuex';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-import type { BudgetDataModel } from '@/services/dashboards/widgets/type';
+import type { BudgetUsageAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
-type Data = BudgetDataModel;
+interface Data {
+    budget_id: string,
+    name?: string;
+    project_id?: string;
+    project_group_id?: string;
+    total_spent?: number;
+    total_budget?: number;
+    budget_usage?: number;
+}
+type Response = BudgetUsageAnalyzeResponse<Data>;
 
 const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
@@ -52,8 +58,9 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 
 const state = reactive({
     loading: true,
-    data: undefined as Data | undefined,
+    data: undefined as Response | undefined,
     tableFields: computed<Field[]>(() => [
+        { label: 'Budget', name: 'name' },
         { label: 'Target', name: 'target', textOptions: { type: 'reference', referenceType: 'projectGroup' } },
         {
             label: 'Total spent', name: 'total_spent', textOptions: { type: 'cost' }, textAlign: 'right',
@@ -73,31 +80,27 @@ const state = reactive({
     })) ?? []),
 });
 
-const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-});
-
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 /* Util */
 const targetTextFormatter = (value: string): string => {
     const isProjectGroup = value.startsWith('pg-');
-    if (isProjectGroup) return storeState.projectGroups[value].label;
-    return storeState.projects[value].label;
+    if (isProjectGroup) return props.allReferenceTypeInfo.projectGroup.referenceMap[value].label ?? value;
+    return props.allReferenceTypeInfo.project.referenceMap[value]?.label ?? value;
 };
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchBudgetUsageAnalyze = getCancellableFetcher<Data>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
-const fetchData = async (): Promise<Data> => {
+const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchData = async (): Promise<Response> => {
     try {
         apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
-                group_by: [COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
+                granularity: widgetState.granularity,
+                group_by: ['budget_id', 'name', COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -111,6 +114,8 @@ const fetchData = async (): Promise<Data> => {
                     },
                 },
                 select: {
+                    budget_id: 'budget_id',
+                    name: 'name',
                     [COST_GROUP_BY.PROJECT_GROUP]: COST_GROUP_BY.PROJECT_GROUP,
                     [COST_GROUP_BY.PROJECT]: COST_GROUP_BY.PROJECT,
                     total_spent: 'total_spent',
@@ -137,13 +142,13 @@ const fetchData = async (): Promise<Data> => {
     return { results: [], more: false };
 };
 
-const initWidget = async (data?: Data): Promise<Data> => {
+const initWidget = async (data?: Response): Promise<Response> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (_thisPage = 1): Promise<Data> => {
+const refreshWidget = async (_thisPage = 1): Promise<Response> => {
     await nextTick();
     state.loading = true;
     thisPage.value = _thisPage;
@@ -173,7 +178,7 @@ useWidgetLifecycle({
     widgetState,
 });
 
-defineExpose<WidgetExpose<Data>>({
+defineExpose<WidgetExpose<Response>>({
     initWidget,
     refreshWidget,
 });
@@ -188,7 +193,6 @@ defineExpose<WidgetExpose<Data>>({
                            :fields="state.tableFields"
                            :items="state.tableItems"
                            :currency="widgetState.currency"
-                           :currency-rates="props.currencyRates"
                            @update:this-page="handleUpdateThisPage"
         >
             <template #col-target="{value}">

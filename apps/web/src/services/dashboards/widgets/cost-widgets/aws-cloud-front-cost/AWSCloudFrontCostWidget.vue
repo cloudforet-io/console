@@ -28,8 +28,8 @@ import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-ana
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrameNew.vue';
 import type {
     UsageType, WidgetEmit, WidgetExpose, WidgetProps,
     SelectorType,

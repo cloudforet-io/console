@@ -49,6 +49,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
             'asset_account',
         )],
         fixed_properties: ['asset_group_by'],
+        non_inheritable_properties: ['asset_group_by'],
         schema: {
             type: 'object',
             properties: {

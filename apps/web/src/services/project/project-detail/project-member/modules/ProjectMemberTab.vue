@@ -264,7 +264,6 @@ watch(() => store.state.reference.project.items, (projects) => {
                 <p-select-dropdown :menu="state.dropdownMenu"
                                    :disabled="props.manageDisabled"
                                    :placeholder="t('IDENTITY.USER.MAIN.ACTION')"
-                                   class="relative"
                                    @select="handleSelectDropdown"
                 />
             </template>

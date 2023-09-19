@@ -25,8 +25,6 @@ import { useQueryTags } from '@/common/composables/query-tags';
 
 import type { Period } from '@/services/cost-explorer/type';
 
-
-
 type I18nSelectDropdownMenu = SelectDropdownMenuItem | {
     label: string;
 };
@@ -155,7 +153,7 @@ watch(() => props.filters, (filters) => {
     if (filters !== queryTagsHelper.filters.value) {
         queryTagsHelper.setFilters(filters);
     }
-});
+}, { immediate: true });
 watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
 (async () => {
@@ -268,9 +266,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 
     .left-area {
         @apply flex flex-wrap gap-4;
-        .sort-key-select-dropdown {
-            @apply relative;
-        }
     }
 }
 </style>

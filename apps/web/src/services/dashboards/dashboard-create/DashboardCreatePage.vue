@@ -1,11 +1,31 @@
 <script lang="ts">
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+// eslint-disable-next-line import/order,import/no-duplicates
+import { defineComponent, type ComponentPublicInstance } from 'vue';
+
+interface IInstance extends ComponentPublicInstance {
+    setPathFrom(from: any): void
+}
+
+export default defineComponent({
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            const instance = vm as unknown as IInstance;
+            instance.setPathFrom(from);
+        });
+    },
+});
+</script>
+
+<script setup lang="ts">
+/* eslint-disable import/first */
+// eslint-disable-next-line import/order,import/no-duplicates
 import {
     PButton, PCenteredLayoutHeader,
 } from '@spaceone/design-system';
-import {
-    computed, reactive, toRefs, type ComponentPublicInstance,
-} from 'vue';
+
+// eslint-disable-next-line import/order
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { computed, defineExpose, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
@@ -29,184 +49,146 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { ProjectItemResp } from '@/services/project/type';
 
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
-interface IInstance extends ComponentPublicInstance {
-    setPathFrom(from: any): void
-}
+const router = useRouter();
+const store = useStore();
+const { t } = useI18n();
 
-export default {
-    name: 'CreateDashboardPage',
-    components: {
-        ConfirmBackModal,
-        DashboardCustomize,
-        DashboardViewerForm,
-        DashboardTemplateForm,
-        DashboardScopeForm,
-        PButton,
-        PCenteredLayoutHeader,
+const {
+    forms: { dashboardTemplate, dashboardProject },
+    setForm,
+    isAllValid,
+} = useFormValidator({
+    dashboardTemplate: {} as DashboardModel,
+    dashboardProject: undefined as undefined|ProjectItemResp,
+}, {
+    dashboardTemplate(value: DashboardModel) {
+        return !Object.keys(value).length ? t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
     },
-    beforeRouteEnter(to, from, next) {
-        next((vm) => {
-            const instance = vm as unknown as IInstance;
-            instance.setPathFrom(from);
-        });
+    dashboardProject(value: ProjectItemResp|undefined) {
+        return !value && state.dashboardScope === DASHBOARD_SCOPE.PROJECT
+            ? t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
     },
-    setup() {
-        const dashboardDetailStore = useDashboardDetailInfoStore();
-        const dashboardDetailState = dashboardDetailStore.$state;
+});
 
-        const router = useRouter();
-        const store = useStore();
-        const { t } = useI18n();
+const state = reactive({
+    loading: false,
+    dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
+    dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
+    steps: computed(() => [
+        { step: 1, description: t('DASHBOARDS.CREATE.STEP1_DESC') },
+        { step: 2, description: t('DASHBOARDS.CREATE.STEP2_DESC') },
+        { step: 3 },
+    ]),
+    currentStep: 1,
+    isValid: computed(() => {
+        if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return !!dashboardProject.value?.id;
+        if (state.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return true;
+        return false;
+    }),
+    closeConfirmModalVisible: false,
+});
 
-        const {
-            forms: { dashboardTemplate, dashboardProject },
-            setForm,
-            isAllValid,
-        } = useFormValidator({
-            dashboardTemplate: {} as DashboardModel,
-            dashboardProject: undefined as undefined|ProjectItemResp,
-        }, {
-            dashboardTemplate(value: DashboardModel) {
-                return !Object.keys(value).length ? t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
-            },
-            dashboardProject(value: ProjectItemResp|undefined) {
-                return !value && state.dashboardScope === DASHBOARD_SCOPE.PROJECT
-                    ? t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
-            },
-        });
-
-        const state = reactive({
-            loading: false,
-            dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
-            dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
-            steps: computed(() => [
-                { step: 1, description: t('DASHBOARDS.CREATE.STEP1_DESC') },
-                { step: 2, description: t('DASHBOARDS.CREATE.STEP2_DESC') },
-                { step: 3 },
-            ]),
-            currentStep: 1,
-            isValid: computed(() => {
-                if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return !!dashboardProject.value?.id;
-                if (state.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return true;
-                return false;
-            }),
-            closeConfirmModalVisible: false,
-        });
-
-        const goStep = (direction: 'prev'|'next') => {
-            if (state.currentStep === 2 && direction === 'next') {
-                saveCurrentStateToStore();
-            }
-            if (direction === 'prev') state.currentStep--;
-            else state.currentStep++;
-        };
-
-        const saveCurrentStateToStore = () => {
-            let _dashboardTemplate: DashboardModel;
-            if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
-                _dashboardTemplate = {
-                    ...dashboardTemplate.value,
-                    project_id: dashboardProject.value?.id ?? '',
-                    name: '',
-                    viewers: state.dashboardViewerType,
-                };
-            } else {
-                _dashboardTemplate = {
-                    ...dashboardTemplate.value,
-                    name: '',
-                    viewers: state.dashboardViewerType,
-                };
-            }
-
-            dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
-            dashboardDetailStore.$patch({
-                dashboardId: undefined,
-                placeholder: dashboardTemplate.value.name,
-            });
-        };
-
-        const createDashboard = async () => {
-            try {
-                state.loading = true;
-
-                const apiParam = {
-                    name: dashboardDetailState.name,
-                    labels: dashboardDetailState.labels,
-                    settings: dashboardDetailState.settings,
-                    layouts: [dashboardDetailState.dashboardWidgetInfoList],
-                    variables: dashboardDetailState.variables,
-                    variables_schema: dashboardDetailState.variablesSchema,
-                    tags: { created_by: store.state.user.userId },
-                    viewers: dashboardDetailStore.dashboardViewer,
-                };
-                if (dashboardDetailStore.isProjectDashboard) {
-                    const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
-                        ...apiParam,
-                        project_id: dashboardDetailState.projectId,
-                    });
-                    dashboardDetailStore.$patch({ dashboardId: result.project_dashboard_id });
-                } else {
-                    const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(apiParam);
-                    dashboardDetailStore.$patch({ dashboardId: result.domain_dashboard_id });
-                }
-                const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-                await router.push({
-                    name: routeName,
-                    params: {
-                        dashboardId: dashboardDetailState.dashboardId as string,
-                    },
-                });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const handleClickClose = () => {
-            state.closeConfirmModalVisible = true;
-        };
-
-        const { setPathFrom, handleClickBackButton } = useGoBack({
-            name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
-        });
-
-        return {
-            t,
-            router,
-            ...toRefs(state),
-            dashboardTemplate,
-            dashboardProject,
-            setForm,
-            isAllValid,
-            goStep,
-            createDashboard,
-            handleClickClose,
-            handleClickBackButton,
-            setPathFrom,
-        };
-    },
+const goStep = (direction: 'prev'|'next') => {
+    if (state.currentStep === 2 && direction === 'next') {
+        saveCurrentStateToStore();
+    }
+    if (direction === 'prev') state.currentStep--;
+    else state.currentStep++;
 };
+
+const saveCurrentStateToStore = () => {
+    let _dashboardTemplate: DashboardModel;
+    if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
+        _dashboardTemplate = {
+            ...dashboardTemplate.value,
+            project_id: dashboardProject.value?.id ?? '',
+            name: '',
+            viewers: state.dashboardViewerType,
+        };
+    } else {
+        _dashboardTemplate = {
+            ...dashboardTemplate.value,
+            name: '',
+            viewers: state.dashboardViewerType,
+        };
+    }
+
+    dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
+    dashboardDetailStore.$patch({
+        dashboardId: undefined,
+        placeholder: dashboardTemplate.value.name,
+    });
+};
+
+const createDashboard = async () => {
+    try {
+        state.loading = true;
+
+        const apiParam = {
+            name: dashboardDetailState.name,
+            labels: dashboardDetailState.labels,
+            settings: dashboardDetailState.settings,
+            layouts: [dashboardDetailState.dashboardWidgetInfoList],
+            variables: dashboardDetailState.variables,
+            variables_schema: dashboardDetailState.variablesSchema,
+            tags: { created_by: store.state.user.userId },
+            viewers: dashboardDetailStore.dashboardViewer,
+        };
+        if (dashboardDetailStore.isProjectDashboard) {
+            const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
+                ...apiParam,
+                project_id: dashboardDetailState.projectId,
+            });
+            dashboardDetailStore.$patch({ dashboardId: result.project_dashboard_id });
+        } else {
+            const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(apiParam);
+            dashboardDetailStore.$patch({ dashboardId: result.domain_dashboard_id });
+        }
+        const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+        await router.push({
+            name: routeName,
+            params: {
+                dashboardId: dashboardDetailState.dashboardId as string,
+            },
+        });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, t('DASHBOARDS.CUSTOMIZE.ALT_E_UPDATE_DASHBOARD'));
+    } finally {
+        state.loading = false;
+    }
+};
+
+const handleClickClose = () => {
+    state.closeConfirmModalVisible = true;
+};
+
+const { setPathFrom, handleClickBackButton } = useGoBack({
+    name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
+});
+
+defineExpose({ setPathFrom });
 </script>
 
 <template>
     <div class="dashboard-create-page"
-         :class="`step-${currentStep}`"
+         :class="`step-${state.currentStep}`"
     >
-        <div v-if="currentStep === steps[0].step">
+        <div v-if="state.currentStep === state.steps[0].step">
             <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="steps[currentStep - 1].description"
-                                      :total-steps="steps.length"
-                                      :current-step="currentStep"
+                                      :description="state.steps[state.currentStep - 1].description"
+                                      :total-steps="state.steps.length"
+                                      :current-step="state.currentStep"
                                       show-step
                                       show-close-button
                                       @close="handleClickClose"
             />
-            <dashboard-scope-form v-model:dashboard-scope="dashboardScope"
+            <dashboard-scope-form v-model:dashboard-scope="state.dashboardScope"
                                   @set-project="setForm('dashboardProject', $event)"
             />
-            <dashboard-viewer-form v-model:dashboard-viewer-type="dashboardViewerType" />
+            <dashboard-viewer-form v-model:dashboard-viewer-type="state.dashboardViewerType" />
             <div class="button-area">
                 <p-button
                     style-type="transparent"
@@ -218,24 +200,24 @@ export default {
                 <p-button
                     style-type="primary"
                     size="lg"
-                    :disabled="!isValid"
+                    :disabled="!state.isValid"
                     @click="goStep('next')"
                 >
                     {{ t('DASHBOARDS.CREATE.CONTINUE') }}
                 </p-button>
             </div>
         </div>
-        <div v-if="currentStep === steps[1].step">
+        <div v-if="state.currentStep === state.steps[1].step">
             <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="steps[currentStep - 1].description"
-                                      :total-steps="steps.length"
-                                      :current-step="currentStep"
+                                      :description="state.steps[state.currentStep - 1].description"
+                                      :total-steps="state.steps.length"
+                                      :current-step="state.currentStep"
                                       show-step
                                       show-close-button
                                       @close="handleClickClose"
             />
             <dashboard-template-form
-                :dashboard-scope="dashboardScope"
+                :dashboard-scope="state.dashboardScope"
                 @set-template="setForm('dashboardTemplate', $event)"
             />
             <div class="button-area">
@@ -257,22 +239,22 @@ export default {
                 </p-button>
             </div>
         </div>
-        <div v-if="currentStep === steps[2].step">
+        <div v-if="state.currentStep === state.steps[2].step">
             <p-centered-layout-header :title="t('DASHBOARDS.CREATE.TITLE')"
-                                      :total-steps="steps.length"
-                                      :current-step="currentStep"
+                                      :total-steps="state.steps.length"
+                                      :current-step="state.currentStep"
                                       show-step
                                       show-close-button
                                       @close="handleClickClose"
             />
-            <dashboard-customize :loading="loading"
+            <dashboard-customize :loading="state.loading"
                                  :save-button-text="t('DASHBOARDS.CREATE.CREATE_NEW_DASHBOARD')"
                                  hide-cancel-button
                                  @go-back="goStep('prev')"
                                  @save="createDashboard"
             />
         </div>
-        <confirm-back-modal v-model:visible="closeConfirmModalVisible"
+        <confirm-back-modal v-model:visible="state.closeConfirmModalVisible"
                             @confirm="handleClickBackButton"
         />
     </div>

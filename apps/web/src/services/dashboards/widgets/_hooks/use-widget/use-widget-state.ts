@@ -1,10 +1,10 @@
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import dayjs from 'dayjs';
+import { flattenDeep, isEmpty } from 'lodash';
 import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
     computed, reactive, toRef, toRefs,
 } from 'vue';
-
-
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -30,7 +30,6 @@ import {
     useMergedWidgetState,
 } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
 import type { ChartType } from '@/services/dashboards/widgets/type';
-
 
 export interface WidgetState extends MergedWidgetState {
     granularity: ComputedRef<Granularity|undefined>;
@@ -104,8 +103,8 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
             filterItems.forEach((d) => {
                 const value = Array.isArray(d.v) ? d.v : [d.v];
                 results.push({
-                    k: `cost_types.${d.k}`,
-                    v: [null, ...value],
+                    k: d.k,
+                    v: value,
                     o: d.o,
                 });
             });
