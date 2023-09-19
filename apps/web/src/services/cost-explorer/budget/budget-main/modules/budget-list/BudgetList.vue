@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import {
-    defineEmits, defineProps, reactive,
+    computed, defineEmits, defineProps, reactive,
 } from 'vue';
 
 import {
     PDataLoader,
 } from '@spaceone/design-system';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -52,21 +53,24 @@ const state = reactive({
         key: 'budget_usage',
         desc: true,
     } as Query['sort'],
+    budgetUsageParams: computed(() => {
+        budgetUsageApiQueryHelper
+            .setFilters(state.queryStoreFilters)
+            .setPage(state.pageStart, state.pageLimit);
+        const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
+        return {
+            query: {
+                ...budgetUsageApiQueryHelper.data,
+                ..._query,
+            },
+        };
+    }),
 });
 
 const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeResult[]}> => {
     try {
         state.loading = true;
-        budgetUsageApiQueryHelper
-            .setFilters(state.queryStoreFilters)
-            .setPage(state.pageStart, state.pageLimit);
-        const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
-        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
-            query: {
-                ..._query,
-                ...budgetUsageApiQueryHelper.data,
-            },
-        });
+        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze(state.budgetUsageParams);
     } catch (e) {
         ErrorHandler.handleError(e);
         return { more: false, results: [] };
@@ -104,7 +108,7 @@ const handleRefresh = () => {
     listBudgets();
 };
 
-const budgetUsageExportApiQueryHelper = new ApiQueryHelper();
+const budgetUsageExportQueryHelper = new QueryHelper();
 const handleExport = async () => {
     const excelFields = [
         { key: 'budget_id', name: 'Budget ID' },
@@ -117,14 +121,14 @@ const handleExport = async () => {
         { key: 'total_budget', name: 'Total Budget' },
         { key: 'budget_usage', name: 'Usage (%)' },
     ];
-    budgetUsageExportApiQueryHelper.setFilters(state.queryStoreFilters);
+    budgetUsageExportQueryHelper.setFilters(state.queryStoreFilters);
     const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
     await store.dispatch('file/downloadExcel', {
         url: '/cost-analysis/budget-usage/analyze',
         param: {
             query: {
+                ...budgetUsageExportQueryHelper.apiQuery,
                 ..._query,
-                ...budgetUsageExportApiQueryHelper.data,
             },
         },
         fields: excelFields,

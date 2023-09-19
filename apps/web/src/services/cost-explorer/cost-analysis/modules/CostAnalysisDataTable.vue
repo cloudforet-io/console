@@ -310,17 +310,17 @@ const handleChange = async (options: any = {}) => {
     if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
-const costAnalyzeExportApiQueryHelper = new ApiQueryHelper();
+const costAnalyzeExportQueryHelper = new QueryHelper();
 const handleExcelDownload = async () => {
     try {
-        costAnalyzeExportApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         await store.dispatch('file/downloadExcel', {
             url: '/cost-analysis/cost/analyze',
             param: {
                 data_source_id: costAnalysisPageStore.selectedDataSourceId,
                 query: {
                     ...state.analyzeQuery,
-                    ...costAnalyzeExportApiQueryHelper.data,
+                    ...costAnalyzeExportQueryHelper.apiQuery,
                 },
             },
             fields: tableState.excelFields,
