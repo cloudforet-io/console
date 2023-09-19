@@ -528,7 +528,7 @@
 				"COLUMN": "Column",
 				"COST_ANALYSIS": "Cost Analysis",
 				"CURRENCY": "Currency",
-				"DAILY": "Daily",
+				"DAILY": "Daily (Accumulated)",
 				"DEFAULT": "Default",
 				"DONUT": "Donut",
 				"DOWNLOAD": "Download",
