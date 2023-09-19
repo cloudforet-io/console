@@ -206,7 +206,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 <template>
     <div class="cost-analysis-period-select-dropdown">
         <p-select-dropdown :menu="state.periodMenuItems"
-                           :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.PERIOD')"
+                           :selection-label="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PERIOD.PERIOD')"
                            style-type="rounded"
                            :selected="state.selectedPeriod"
                            :invalid="state.isPeriodInvalid"

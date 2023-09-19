@@ -127,7 +127,7 @@ const handleClickFilter = () => {
         >
             <div class="left-part">
                 <p-select-dropdown :menu="state.granularityItems"
-                                   :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
+                                   :selection-label="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
                                    style-type="rounded"
                                    :selected="costAnalysisPageState.granularity"
                                    @select="handleSelectGranularity"
