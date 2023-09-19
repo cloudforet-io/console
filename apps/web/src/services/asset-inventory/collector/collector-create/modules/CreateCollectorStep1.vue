@@ -107,7 +107,8 @@ const state = reactive({
     selectedRepository: '',
     currentPage: 1,
     totalCount: 0,
-    initialLoad: true,
+    // this state is for preventing duplicated getPlugins call
+    isInitialLoad: true,
 });
 
 
@@ -152,7 +153,9 @@ const loadMorePlugin = async () => {
 const handleSearch = async () => {
     disconnectObserver();
     state.pluginList = await getPlugins();
-    state.initialLoad = false;
+
+    // this is for preventing duplicated getPlugins call
+    if (state.isInitialLoad && state.searchValue) state.isInitialLoad = false;
     connectObserver();
 };
 const handleClickNextStep = (item: RepositoryPluginModel) => {
@@ -165,8 +168,9 @@ const handleChangeRepository = (value:string) => {
 
 const handleDeleteSearchValue = () => {
     state.searchValue = '';
-    if (state.initialLoad) return;
+    if (state.isInitialLoad) return;
     handleSearch();
+    state.isInitialLoad = true;
 };
 
 const pluginListContainerRef = ref<HTMLElement|null>(null);
@@ -179,7 +183,7 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
     disconnectObserver();
     state.currentPage = 1;
     state.pluginList = await getPlugins();
-    state.initialLoad = true;
+    state.isInitialLoad = true;
     connectObserver();
 }, { immediate: true });
 
