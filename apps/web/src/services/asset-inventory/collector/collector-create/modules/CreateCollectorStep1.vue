@@ -2,9 +2,9 @@
     <div ref="containerRef"
          class="create-collector-step-1"
     >
-        <p-search :value.sync="state.searchValue"
+        <p-search :value="state.inputValue"
                   @search="handleSearch"
-                  @delete="handleDeleteSearchValue"
+                  @delete="handleDeleteInputValue"
         />
         <div class="contents-container">
             <step1-search-filter @selectRepository="handleChangeRepository" />
@@ -101,14 +101,12 @@ const collectorFormState = collectorFormStore.$state;
 
 
 const state = reactive({
-    searchValue: '',
+    inputValue: '',
     pluginList: [] as RepositoryPluginModel[],
     loading: false,
     selectedRepository: '',
     currentPage: 1,
     totalCount: 0,
-    // this state is for preventing duplicated getPlugins call
-    isInitialLoad: true,
 });
 
 
@@ -118,7 +116,7 @@ const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
     try {
         state.loading = true;
         pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
-            .setFilters([{ v: state.searchValue }]);
+            .setFilters([{ v: state.inputValue }]);
 
         const params = {
             service_type: 'inventory.Collector',
@@ -150,13 +148,9 @@ const loadMorePlugin = async () => {
     connectObserver();
 };
 
-const handleSearch = async () => {
-    disconnectObserver();
-    state.pluginList = await getPlugins();
-
-    // this is for preventing duplicated getPlugins call
-    if (state.isInitialLoad && state.searchValue) state.isInitialLoad = false;
-    connectObserver();
+const handleSearch = async (keyword) => {
+    if (!state.inputValue && !keyword) return;
+    await updateKeyword(keyword);
 };
 const handleClickNextStep = (item: RepositoryPluginModel) => {
     emit('update:currentStep', 2);
@@ -166,11 +160,16 @@ const handleChangeRepository = (value:string) => {
     state.selectedRepository = value;
 };
 
-const handleDeleteSearchValue = () => {
-    state.searchValue = '';
-    if (state.isInitialLoad) return;
-    handleSearch();
-    state.isInitialLoad = true;
+const handleDeleteInputValue = async () => {
+    if (!state.inputValue) return;
+    await updateKeyword('');
+};
+
+const updateKeyword = async (keyword) => {
+    disconnectObserver();
+    state.inputValue = keyword;
+    state.pluginList = await getPlugins();
+    connectObserver();
 };
 
 const pluginListContainerRef = ref<HTMLElement|null>(null);
@@ -183,7 +182,6 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
     disconnectObserver();
     state.currentPage = 1;
     state.pluginList = await getPlugins();
-    state.isInitialLoad = true;
     connectObserver();
 }, { immediate: true });
 
