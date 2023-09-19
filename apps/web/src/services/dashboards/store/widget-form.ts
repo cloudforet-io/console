@@ -50,6 +50,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
         widgetOptions: undefined,
         widgetInfo: undefined,
         schemaProperties: undefined,
+        widgetKey: undefined,
     }),
     actions: {
         setFormData(formData: any) {
@@ -94,6 +95,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 dashboardSettings: dashboardDetailState.settings,
                 dashboardVariablesSchema: dashboardDetailState.variablesSchema,
                 dashboardVariables: dashboardDetailState.variables,
+                title: widgetInfo?.title,
             });
 
             // refine inheritOptions
