@@ -167,16 +167,16 @@ const resetStates = () => {
 
 const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     // init widgetInfo - refined widget info
-    const widgetInfo = widgetFormStore.initWidgetForm(widgetKey, widgetConfigId, dashboardDetailState.projectId);
+    widgetFormStore.initWidgetForm(widgetKey, widgetConfigId);
 
     // init title
-    updateTitle(widgetInfo.title);
+    updateTitle(widgetFormStore.mergedWidgetInfo?.title);
 
 
     // init schema
     state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
         referenceStoreState,
-        widgetFormStore.widgetConfig?.options_schema ?? {},
+        widgetFormStore.widgetConfig?.options_schema ?? { schema: {} },
         dashboardDetailState.variablesSchema,
         widgetFormState.inheritOptions ?? {},
         widgetFormState.schemaProperties ?? [],
@@ -184,7 +184,7 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     );
 
     // initiate form data
-    state.schemaFormData = getInitialFormData(widgetInfo, dashboardDetailState.variablesSchema);
+    state.schemaFormData = getInitialFormData(widgetFormStore.mergedWidgetInfo, dashboardDetailState.variablesSchema);
 };
 
 watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {

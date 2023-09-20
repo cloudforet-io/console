@@ -110,7 +110,7 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
         await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string, widgetFormState.widgetConfigId as string);
-        await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
+        await initWidgetComponent(widgetFormStore.mergedWidgetInfo as DashboardLayoutWidgetInfo);
         state.widgetRef?.initWidget();
         state.initiated = true;
     } else {
@@ -184,7 +184,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                     <component :is="state.component"
                                ref="widgetRef"
                                :widget-key="widgetFormState.widgetKey"
-                               :widget-config-id="widgetFormState.widgetInfo.widget_name"
+                               :widget-config-id="widgetFormStore.mergedWidgetInfo?.widget_name"
                                :title="widgetFormState.widgetTitle"
                                :options="widgetFormState.widgetOptions"
                                :inherit-options="widgetFormState.inheritOptions"

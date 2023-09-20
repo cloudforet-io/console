@@ -43,18 +43,53 @@ const dashboardDetailState = dashboardDetailStore.$state;
 
 export const useWidgetFormStore = defineStore('widget-form', {
     state: (): WidgetFormState => ({
-        widgetConfigId: undefined,
+        widgetConfigId: undefined, // widget config name that is used to get widget config
+        widgetKey: undefined, // widget key to find widget in dashboard layout
+        //
         widgetTitle: undefined,
-        isValid: false,
         inheritOptions: undefined,
         widgetOptions: undefined,
-        widgetInfo: undefined,
         schemaProperties: undefined,
-        widgetKey: undefined,
+        //
+        isValid: false, // schema validation result
     }),
     getters: {
         widgetConfig(): WidgetConfig|undefined {
             return this.widgetConfigId ? getWidgetConfig(this.widgetConfigId) : undefined;
+        },
+        originWidgetInfo(): DashboardLayoutWidgetInfo|undefined {
+            if (!this.widgetKey) return undefined;
+            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
+            return _dashboardWidgetInfoList.find((w) => w.widget_key === this.widgetKey);
+        },
+        mergedWidgetInfo(): PartialDashboardLayoutWidgetInfo|undefined {
+            if (!this.widgetConfigId) return undefined;
+            const widgetInfo = this.originWidgetInfo;
+
+            const mergedWidgetState = useMergedWidgetState({
+                inheritOptions: widgetInfo?.inherit_options,
+                widgetOptions: widgetInfo?.widget_options,
+                widgetName: this.widgetConfigId,
+                dashboardSettings: dashboardDetailState.settings,
+                dashboardVariablesSchema: dashboardDetailState.variablesSchema,
+                dashboardVariables: dashboardDetailState.variables,
+                title: widgetInfo?.title,
+            });
+
+            // refine inheritOptions
+            const projectId = dashboardDetailState.projectId;
+            const refinedInheritOptions = projectId ? getProjectCaseInheritOptions(mergedWidgetState.inheritOptions) : mergedWidgetState.inheritOptions;
+
+            return {
+                ...(widgetInfo ?? {}),
+                widget_key: this.widgetKey,
+                widget_name: this.widgetConfigId,
+                version: widgetInfo?.version ?? '1',
+                title: mergedWidgetState.title,
+                inherit_options: refinedInheritOptions,
+                widget_options: mergedWidgetState.options,
+                schema_properties: mergedWidgetState.schemaProperties,
+            };
         },
     },
     actions: {
@@ -89,42 +124,16 @@ export const useWidgetFormStore = defineStore('widget-form', {
             this.widgetOptions = _widgetOptions;
             this.inheritOptions = _inheritOptions;
         },
-        initWidgetForm(widgetKey: string|undefined, widgetConfigId: string, projectId?: string): PartialDashboardLayoutWidgetInfo {
-            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
-            const widgetInfo: DashboardLayoutWidgetInfo|undefined = _dashboardWidgetInfoList.find((w) => w.widget_key === widgetKey);
-
-            const mergedWidgetState = useMergedWidgetState({
-                inheritOptions: widgetInfo?.inherit_options,
-                widgetOptions: widgetInfo?.widget_options,
-                widgetName: widgetConfigId,
-                dashboardSettings: dashboardDetailState.settings,
-                dashboardVariablesSchema: dashboardDetailState.variablesSchema,
-                dashboardVariables: dashboardDetailState.variables,
-                title: widgetInfo?.title,
-            });
-
-            // refine inheritOptions
-            const refinedInheritOptions = projectId ? getProjectCaseInheritOptions(mergedWidgetState.inheritOptions) : mergedWidgetState.inheritOptions;
-
-            // set states
-            this.widgetInfo = {
-                ...(widgetInfo ?? {}),
-                widget_key: widgetKey,
-                widget_name: widgetConfigId,
-                version: widgetInfo?.version ?? '1',
-                title: mergedWidgetState.title,
-                inherit_options: refinedInheritOptions,
-                widget_options: mergedWidgetState.options,
-                schema_properties: mergedWidgetState.schemaProperties,
-            };
+        initWidgetForm(widgetKey: string|undefined, widgetConfigId: string) {
             this.widgetKey = widgetKey;
             this.widgetConfigId = widgetConfigId;
-            this.widgetTitle = mergedWidgetState.title;
-            this.widgetOptions = mergedWidgetState.options;
-            this.inheritOptions = refinedInheritOptions;
-            this.schemaProperties = mergedWidgetState.schemaProperties;
+            const widgetInfo = this.mergedWidgetInfo;
+            if (!widgetInfo) return;
 
-            return this.widgetInfo;
+            this.widgetTitle = widgetInfo.title;
+            this.widgetOptions = widgetInfo.widget_options;
+            this.inheritOptions = widgetInfo.inherit_options;
+            this.schemaProperties = widgetInfo.schema_properties;
         },
     },
 });

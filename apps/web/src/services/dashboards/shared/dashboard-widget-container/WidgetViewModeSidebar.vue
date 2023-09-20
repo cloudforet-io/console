@@ -52,7 +52,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    const widgetInfo = cloneDeep(widgetFormState.widgetInfo) as DashboardLayoutWidgetInfo;
+    const widgetInfo = cloneDeep(widgetFormStore.mergedWidgetInfo) as DashboardLayoutWidgetInfo;
     widgetInfo.title = widgetFormState.widgetTitle ?? '';
     widgetInfo.widget_options = widgetFormState.widgetOptions ?? {};
     widgetInfo.schema_properties = widgetFormState.schemaProperties ?? [];
