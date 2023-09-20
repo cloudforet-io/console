@@ -320,7 +320,7 @@ const handleExcelDownload = async () => {
                 data_source_id: costAnalysisPageStore.selectedDataSourceId,
                 query: {
                     ...state.analyzeQuery,
-                    ...costAnalyzeExportQueryHelper.apiQuery,
+                    filter: costAnalyzeExportQueryHelper.apiQuery.filter,
                 },
             },
             fields: tableState.excelFields,

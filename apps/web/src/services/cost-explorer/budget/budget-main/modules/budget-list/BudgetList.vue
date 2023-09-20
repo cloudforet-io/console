@@ -127,8 +127,8 @@ const handleExport = async () => {
         url: '/cost-analysis/budget-usage/analyze',
         param: {
             query: {
-                ...budgetUsageExportQueryHelper.apiQuery,
                 ..._query,
+                filter: budgetUsageExportQueryHelper.apiQuery.filter,
             },
         },
         fields: excelFields,
