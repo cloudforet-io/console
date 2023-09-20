@@ -41,7 +41,9 @@
                                        :menu="pageMenu"
                                        @select="onChangePageSize"
                     >
-                        {{ proxyState.pageSize }}
+                        <template #dropdown-button>
+                            {{ proxyState.pageSize }}
+                        </template>
                     </p-select-dropdown>
                 </div>
                 <div v-if="sortable"
@@ -52,7 +54,9 @@
                                        :menu="sortByOptions"
                                        @select="onChangeSortBy"
                     >
-                        {{ selectedSortBy }}
+                        <template #dropdown-button>
+                            {{ selectedSortBy }}
+                        </template>
                     </p-select-dropdown>
                 </div>
                 <div class="right-tool-group">
