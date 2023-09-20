@@ -79,6 +79,7 @@ const state = reactive({
         .filter(([, inheritOption]) => !!inheritOption.enabled)
         .map(([propertyName]) => propertyName)),
     inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
+        widgetFormState.schemaProperties,
         widgetFormState.inheritOptions,
         widgetFormStore.widgetConfig?.options_schema?.schema,
         dashboardDetailState.variablesSchema,

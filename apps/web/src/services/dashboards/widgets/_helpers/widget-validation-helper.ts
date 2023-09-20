@@ -3,10 +3,14 @@ import {
 } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
     InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetFilterSchemaPropertyName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import {
+    getWidgetFilterSchemaPropertyName,
+    getWidgetOptionName,
+} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 export interface InheritOptionsErrorMap {
@@ -14,6 +18,7 @@ export interface InheritOptionsErrorMap {
 }
 
 export const getWidgetInheritOptionsErrorMap = (
+    schemaProperties: string[],
     inheritOptions?: InheritOptions,
     widgetOptionsSchema?: WidgetOptionsSchema['schema'],
     dashboardVariablesSchema?: DashboardVariablesSchema,
@@ -23,10 +28,10 @@ export const getWidgetInheritOptionsErrorMap = (
         return {};
     }
     const errorMap: InheritOptionsErrorMap = {};
-    Object.entries(inheritOptions).forEach(([propertyName, inheritOption]) => {
-        if (!inheritOption?.enabled) return;
+    schemaProperties.forEach((propertyName) => {
+        if (!inheritOptions[propertyName]?.enabled) return;
 
-        const variableKey = inheritOption?.variable_info?.key;
+        const variableKey = inheritOptions[propertyName]?.variable_info?.key;
         if (!variableKey) return;
         if (!dashboardVariablesSchema?.properties?.[variableKey]?.use) {
             errorMap[propertyName] = errorMessage;
@@ -64,7 +69,11 @@ export const validateWidgetByVariablesSchemaUpdate = ({
     let isWidgetOptionChanged: boolean|undefined;
     let isWidgetOptionAdded: boolean|undefined;
     let isWidgetOptionDeleted: boolean|undefined;
-    const newWidgetInfo: Partial<DashboardLayoutWidgetInfo> = {};
+    const newWidgetInfo: Partial<DashboardLayoutWidgetInfo> = {
+        inherit_options: cloneDeep(widgetInfo.inherit_options),
+        schema_properties: widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [],
+        widget_options: cloneDeep(widgetInfo.widget_options),
+    };
     if (addedVariableSchemaProperties.length) {
         const affected = getAffectedWidgetInfoByAddingVariableSchemaProperty(
             addedVariableSchemaProperties,
@@ -95,14 +104,15 @@ export const validateWidgetByVariablesSchemaUpdate = ({
     }
 
     const isWidgetUpdated = isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged;
-    const isValid = isWidgetUpdated && newWidgetInfo.inherit_options
-        ? validateWidget(newWidgetInfo.inherit_options, widgetConfig, updatedVariablesSchema)
+    const updatedWidgetInfo = getUpdatedWidgetInfo(widgetConfig, newWidgetInfo);
+    const isValid = isWidgetUpdated && updatedWidgetInfo.inherit_options
+        ? validateWidget(newWidgetInfo.schema_properties ?? [], updatedWidgetInfo.inherit_options, widgetConfig, updatedVariablesSchema)
         : undefined;
 
     return {
         isWidgetUpdated,
         isValid,
-        updatedWidgetInfo: isEmpty(newWidgetInfo) ? undefined : newWidgetInfo,
+        updatedWidgetInfo: isEmpty(updatedWidgetInfo) ? undefined : updatedWidgetInfo,
     };
 };
 
@@ -138,9 +148,12 @@ const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
     const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.schema.properties ?? {});
     let isAffected = false;
     dashboardVariables.forEach((variableKey) => {
-        const property = getWidgetFilterSchemaPropertyName(variableKey);
+        const property = getWidgetOptionName(variableKey);
+
         const isInWidgetOptionsSchema = optionsSchemaProperties.some((d) => d.includes(property));
-        if (!isInWidgetOptionsSchema) return;
+        if (!isInWidgetOptionsSchema) return; // not exist in widget options schema
+
+        if (_schemaProperties.includes(property)) return; // already added property
 
         // enable widget option that match added variable
         isAffected = true;
@@ -160,8 +173,8 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
     // check whether the deleted variable exists in inherit options
     const enabledInheritOptions = Object.entries(widgetInfo.inherit_options ?? {})
         .filter(([, v]) => v.enabled)
-        .map(([, v]) => v.variable_info?.key as WidgetFilterKey);
-    if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) {
+        .map(([, v]) => getWidgetOptionName(v.variable_info?.key as string));
+    if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d as WidgetFilterKey))) {
         return undefined;
     }
 
@@ -198,10 +211,11 @@ const isAffectedByChangedVariableSchemaProperties = (
     return true;
 };
 const validateWidget = (
+    schemaProperties: string[],
     inheritOptions: InheritOptions,
     widgetConfig: WidgetConfig,
     dashboardVariableSchema?: DashboardVariablesSchema,
 ): boolean => {
-    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema);
+    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(schemaProperties, inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema, 'Invalid');
     return isEmpty(_widgetSchemaErrorMap);
 };
