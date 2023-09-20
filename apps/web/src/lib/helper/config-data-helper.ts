@@ -10,6 +10,8 @@ import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+
 interface ConfigData extends FavoriteConfig, RecentConfig {
     [key: string]: any;
 }
@@ -108,6 +110,24 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
                         name: resource.data?.group,
                         label: resource.data?.group,
                     }],
+                    updatedAt: d.updatedAt,
+                });
+            }
+        });
+    }
+    return results;
+};
+
+export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, costQuerySetList: CostQuerySetModel[]) => {
+    const results: ReferenceData[] = [];
+    if (config) {
+        config.forEach((d) => {
+            const resource: CostQuerySetModel|undefined = find(costQuerySetList, { cost_query_set_id: d.itemId });
+            if (resource) {
+                results.push({
+                    ...d,
+                    name: resource.cost_query_set_id,
+                    label: resource.name,
                     updatedAt: d.updatedAt,
                 });
             }
