@@ -19,11 +19,14 @@
 </template>
 
 <script lang="ts">
-import { onUnmounted, watch } from 'vue';
+import { computed, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
+import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+
+import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -31,6 +34,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 
 
@@ -44,13 +48,27 @@ export default {
     },
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
+        const userId = computed(() => store.state.user.userId);
         const costQuerySetStore = useCostQuerySetStore();
         const costQuerySetState = costQuerySetStore.$state;
+        const costExplorerSettingsStore = useCostExplorerSettingsStore();
+        costExplorerSettingsStore.initState();
+        costExplorerSettingsStore.$onAction((action) => {
+            action.after(() => {
+                if (window) {
+                    const settings = LocalStorageAccessor.getItem(userId.value) ?? {};
+                    settings.costExplorer = action.store.$state;
+                    LocalStorageAccessor.setItem(userId.value, settings);
+                }
+            });
+        });
         const route = useRoute();
 
         onUnmounted(() => {
             costQuerySetStore.$dispose();
             costQuerySetStore.$reset();
+            costExplorerSettingsStore.$dispose();
+            costExplorerSettingsStore.$reset();
         });
 
         watch(() => route.params, async (params) => {
