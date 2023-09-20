@@ -530,6 +530,9 @@
 				"CURRENCY": "通貨",
 				"DAILY": "日別データ (累積データ)",
 				"DEFAULT": "デフォルト",
+				"DETAIL": {
+					"ORIGINAL_CURRENCY": ""
+				},
 				"DONUT": "ドーナツ",
 				"DOWNLOAD": "ダウンロード",
 				"EDIT_COST_ANALYSIS": "分析ページ名の編集",
