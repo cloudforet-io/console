@@ -469,7 +469,8 @@
 						"REGION": "リージョン",
 						"REQUIRED_COST_TYPE": "一つ以上のコストタイプを選択してください",
 						"REQUIRED_NAME": "名前を入力してください",
-						"REQUIRED_TARGET": "ターゲットを選択してください"
+						"REQUIRED_TARGET": "ターゲットを選択してください",
+						"SPECIFIC_PROVIDER": ""
 					},
 					"CANCEL": "取消",
 					"CONFIRM": "確認",
@@ -485,11 +486,9 @@
 					"BUDGET": "予算",
 					"BUDGETED": "予算",
 					"BUDGET_NAME": "予算名",
-					"BULK_BUDGET": "一括予算",
 					"COST_TYPE": "コストタイプ",
 					"CREATE": "予算作成",
 					"CREATE_BUDGET": "予算作成",
-					"CREATE_BULK_BUDGET": "予算一括追加",
 					"DATA_SOURCE": "データソース",
 					"DESC": "降順",
 					"NO_BUDGET": "",
