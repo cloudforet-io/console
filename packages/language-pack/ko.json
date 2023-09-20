@@ -530,6 +530,9 @@
 				"CURRENCY": "통화",
 				"DAILY": "일별 데이터 (누적 데이터)",
 				"DEFAULT": "기본",
+				"DETAIL": {
+					"ORIGINAL_CURRENCY": ""
+				},
 				"DONUT": "도넛",
 				"DOWNLOAD": "다운로드",
 				"EDIT_COST_ANALYSIS": "분석 페이지 이름 수정",
