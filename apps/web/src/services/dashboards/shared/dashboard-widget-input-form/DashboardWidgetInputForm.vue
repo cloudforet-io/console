@@ -150,10 +150,6 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
 const resetStates = () => {
     // reset widget form store states
     widgetFormStore.$reset();
-    widgetFormStore.$patch((_state) => {
-        _state.schemaProperties = [];
-        _state.inheritOptions = {};
-    });
     // reset states
     state.widgetOptionsJsonSchema = {
         type: 'object',

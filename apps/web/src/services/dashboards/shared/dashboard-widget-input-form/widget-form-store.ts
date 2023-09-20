@@ -20,18 +20,6 @@ import { useMergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-w
     *   2) widget edit modal (in dashboard customize page)
 * */
 
-interface WidgetFormState {
-    widgetConfigId?: string;
-    widgetTitle?: string;
-    isValid: boolean;
-    inheritOptions?: InheritOptions;
-    widgetOptions?: WidgetOptions;
-    widgetInfo?: PartialDashboardLayoutWidgetInfo;
-    schemaProperties?: string[];
-    // view modal
-    widgetKey?: string;
-}
-
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export interface PartialDashboardLayoutWidgetInfo extends DashboardLayoutWidgetInfo {
@@ -42,14 +30,14 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
 export const useWidgetFormStore = defineStore('widget-form', {
-    state: (): WidgetFormState => ({
-        widgetConfigId: undefined, // widget config name that is used to get widget config
-        widgetKey: undefined, // widget key to find widget in dashboard layout
+    state: () => ({
+        widgetConfigId: undefined as string|undefined, // widget config name that is used to get widget config
+        widgetKey: undefined as string|undefined, // widget key to find widget in dashboard layout
         //
-        widgetTitle: undefined,
-        inheritOptions: undefined,
-        widgetOptions: undefined,
-        schemaProperties: undefined,
+        widgetTitle: '',
+        inheritOptions: {} as InheritOptions,
+        widgetOptions: {} as WidgetOptions,
+        schemaProperties: [] as string[],
         //
         isValid: false, // schema validation result
     }),
@@ -130,10 +118,10 @@ export const useWidgetFormStore = defineStore('widget-form', {
             const widgetInfo = this.mergedWidgetInfo;
             if (!widgetInfo) return;
 
-            this.widgetTitle = widgetInfo.title;
-            this.widgetOptions = widgetInfo.widget_options;
-            this.inheritOptions = widgetInfo.inherit_options;
-            this.schemaProperties = widgetInfo.schema_properties;
+            this.widgetTitle = widgetInfo.title ?? '';
+            this.widgetOptions = widgetInfo.widget_options ?? {};
+            this.inheritOptions = widgetInfo.inherit_options ?? {};
+            this.schemaProperties = widgetInfo.schema_properties ?? [];
         },
     },
 });
