@@ -58,7 +58,9 @@ const handleRouteToDashboard = () => {
             <div class="modal-mask">
                 <article class="modal-content">
                     <div class="image-wrapper">
-                        <img src="@/assets/images/CA_db-disappear.png"
+                        <img src="@/assets/images/go_to_dashboard.png"
+                             srcset="@/assets/images/go_to_dashboard@2x.png 2x,
+                                    @/assets/images/go_to_dashboard@3x.png 3x"
                              alt="relocate-dashboard-image"
                         >
                     </div>
