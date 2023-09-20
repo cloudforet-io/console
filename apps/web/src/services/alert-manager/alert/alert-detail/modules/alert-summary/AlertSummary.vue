@@ -219,7 +219,6 @@ export default {
         width: 9rem;
         .text-alert, .selected-urgency {
             @apply flex items-center;
-            flex: 1;
         }
     }
 
