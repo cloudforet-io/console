@@ -43,9 +43,21 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+import type { TranslateResult } from 'vue-i18n';
+
 import PFieldTitle from '@/data-display/field-title/PFieldTitle.vue';
 
-export default defineComponent({
+interface PFieldGroup {
+    label?: string|TranslateResult;
+    helpText?: string;
+    invalidText?: string;
+    validText?: string;
+    invalid?: boolean;
+    valid?: boolean;
+    required?: boolean;
+}
+
+export default defineComponent<PFieldGroup>({
     name: 'PFieldGroup',
     components: { PFieldTitle },
     props: {
