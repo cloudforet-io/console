@@ -5,7 +5,7 @@ import {
 } from 'vue';
 
 import {
-    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover,
+    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover, PBadge,
     useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -71,6 +71,13 @@ const state = reactive({
     granularity: undefined as Granularity|undefined,
     isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
     invalidPeriodMessage: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.INVALID_PERIOD_TEXT')),
+    selectedFiltersCount: computed(() => {
+        let count = 0;
+        Object.values(costAnalysisPageState.filters ?? {}).forEach((filterItems) => {
+            count += filterItems.length;
+        });
+        return count;
+    }),
 });
 
 const {
@@ -160,6 +167,13 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                               @click="handleClickFilter"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}
+                        <p-badge v-if="!state.filtersPopoverVisible && state.selectedFiltersCount"
+                                 badge-type="subtle"
+                                 style-type="gray200"
+                                 class="filters-badge"
+                        >
+                            {{ state.selectedFiltersCount }}
+                        </p-badge>
                     </p-button>
                     <template #content>
                         <cost-analysis-filters-popper ref="filtersPopperRef"
@@ -254,6 +268,11 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 .p-context-menu-item {
                     min-width: 9rem;
                 }
+            }
+        }
+        .filters-button {
+            .filters-badge {
+                margin-left: 0.25rem;
             }
         }
 
