@@ -195,7 +195,7 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     * This is because in case of project dashboard, there are some different variables settings, so it is not safe to reuse dashboard store data with domain dashboard.
     * But in case of the same type of dashboard, the dashboard store must be reused to smoothly update the dashboard data without blinking.
      */
-    if (dashboardId && !prevDashboardId) {
+    if (dashboardId && !prevDashboardId) { // this includes all three cases
         dashboardDetailStore.$reset();
     }
     await getDashboardData(dashboardId);
