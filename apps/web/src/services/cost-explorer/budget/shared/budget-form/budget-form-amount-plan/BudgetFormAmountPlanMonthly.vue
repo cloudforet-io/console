@@ -125,16 +125,18 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
 <template>
     <div class="budget-form-amount-plan-monthly">
         <div class="header">
-            <p class="title">
-                <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
-            </p>
+            <div class="header-text-wrapper">
+                <p class="title">
+                    <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
+                </p>
+                <slot name="last-3-months" />
+            </div>
             <p-button style-type="tertiary"
                       @click="handleAutofillButtonClick"
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>
-        <slot name="last-3-months" />
         <p-divider class="mt-2" />
         <div class="input-wrapper">
             <budget-form-amount-plan-month-input v-for="(_, month, index) in state.monthAmountInputMap"
@@ -155,15 +157,18 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
 
 <style lang="postcss" scoped>
 .budget-form-amount-plan-monthly {
-    max-width: 87rem;
     .header {
-        @apply flex;
+        @apply flex justify-between;
         margin-bottom: 1.5rem;
-        .title {
-            @apply flex;
-            gap: 0.25rem;
-            flex-grow: 1;
-            flex-shrink: 0;
+        .header-text-wrapper {
+            @apply flex flex-col;
+            gap: 0.5rem;
+            .title {
+                @apply flex;
+                gap: 0.25rem;
+                flex-grow: 1;
+                flex-shrink: 0;
+            }
         }
         .p-button {
             margin-top: auto;

@@ -508,7 +508,8 @@
 					"MTD": "MTD",
 					"TOTAL_BUDGET": "Total Budget",
 					"TOTAL_COST": "Total Cost"
-				}
+				},
+				"VIEW_ALL": "View All"
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",

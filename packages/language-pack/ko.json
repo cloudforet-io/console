@@ -508,7 +508,8 @@
 					"MTD": "현재까지",
 					"TOTAL_BUDGET": "총 예산",
 					"TOTAL_COST": "총 비용"
-				}
+				},
+				"VIEW_ALL": "전체보기"
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "누적 데이터",

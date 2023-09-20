@@ -508,7 +508,8 @@
 					"MTD": "現在まで",
 					"TOTAL_BUDGET": "総予算",
 					"TOTAL_COST": "トータルコスト"
-				}
+				},
+				"VIEW_ALL": "すべて表示"
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "累積データ",
