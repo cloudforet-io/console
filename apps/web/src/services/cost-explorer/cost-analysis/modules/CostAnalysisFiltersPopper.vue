@@ -161,7 +161,7 @@ const handleClickResetFilters = () => {
                        class="reset-button"
                        @click="handleClickResetFilters"
         >
-            Reset
+            {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RESET') }}
         </p-text-button>
     </div>
 </template>

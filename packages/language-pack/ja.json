@@ -596,6 +596,7 @@
 				"RELOCATE_MODAL_DESCRIPTION_SECOND": "したがって、古いダッシュボードはサポートされなくなりました。 'ダッシュボード' メニューに移動し、拡張されたウィジェットオプション、より優れた視覚効果を持つ高度な変数を探索してください。",
 				"RELOCATE_MODAL_DISMISS_TEXT": "次から表示しない",
 				"RELOCATE_MODAL_TITLE": "完全に新しくなったコストダッシュボード、ぜひ体験してみてください！",
+				"RESET": "初期化",
 				"SAVE": "保存",
 				"SAVED_QUERY": "保存されたクエリ",
 				"SAVE_AS": "名前を付けて保存",

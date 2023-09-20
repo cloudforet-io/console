@@ -596,6 +596,7 @@
 				"RELOCATE_MODAL_DESCRIPTION_SECOND": "이에 따라, 이전의 대시보드는 더 이상 지원되지 않습니다. 지금 바로 “대시보드” 메뉴로 이동하여 다양한 위젯 옵션과 고급 변수, 그리고 더욱 향상된 시각화를 경험해 보실 수 있습니다.",
 				"RELOCATE_MODAL_DISMISS_TEXT": "다시 보지 않기",
 				"RELOCATE_MODAL_TITLE": "완전히 새로워진 비용 대시보드, 지금 경험해 보세요!",
+				"RESET": "초기화",
 				"SAVE": "저장",
 				"SAVED_QUERY": "저장된 쿼리",
 				"SAVE_AS": "다른 이름으로 저장",
