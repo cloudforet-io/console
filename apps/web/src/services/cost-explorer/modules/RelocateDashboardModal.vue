@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { PButton, PDivider } from '@spaceone/design-system';
 
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import { store } from '@/store';
 
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
@@ -19,7 +17,8 @@ const router = useRouter();
 withDefaults(defineProps<Props>(), {
     visible: false,
 });
-const userId = computed(() => store.state.user.userId);
+const costExplorerSettingsStore = useCostExplorerSettingsStore();
+const costExplorerSettinsState = costExplorerSettingsStore.$state;
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
 
 const handleClose = () => {
@@ -27,12 +26,10 @@ const handleClose = () => {
 };
 
 const handleReject = () => {
-    const settings = LocalStorageAccessor.getItem(userId.value);
-    settings.costExplorer = {
-        ...settings.costExplorer,
-        hideRelocateDashboardNotification: true,
-    };
-    LocalStorageAccessor.setItem(userId.value, settings);
+    costExplorerSettingsStore.setRelocateDashboardState({
+        ...costExplorerSettinsState.relocateDashboardStatus,
+        hideModal: true,
+    });
     emit('update:visible', false);
 };
 
