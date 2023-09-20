@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PLink, PI, PTextButton,
+    PPaneLayout, PLink, PI, PTextButton, PPopover,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
@@ -48,6 +48,7 @@ const state = reactive({
         return changeToLabelList(providerFilter?.providers ?? []);
     }),
     isTextTruncate: undefined as boolean|undefined,
+    popoverVisible: false,
 });
 
 const getTargetLabel = (projects: ProjectReferenceMap): BudgetTargetLabel => {
@@ -70,9 +71,6 @@ const getTargetLabel = (projects: ProjectReferenceMap): BudgetTargetLabel => {
     };
 };
 
-const handleClickViewAll = () => {
-    state.isTextTruncate = false;
-};
 
 /* Watcher */
 watch(() => costTypeRef.value, (costType) => {
@@ -158,16 +156,21 @@ watch(() => costTypeRef.value, (costType) => {
             >
                 <span ref="costTypeRef"
                       class="summary-content cost-type"
-                      :class="['summary-content', 'cost-type', {'is-view-all': !state.isTextTruncate}]"
                 >
                     <span class="cost-type-content">{{ state.processedProviderValue }}</span>
                 </span>
-                <p-text-button v-if="state.isTextTruncate"
-                               style-type="highlight"
-                               @click="handleClickViewAll"
-                >
-                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.VIEW_ALL') }}
-                </p-text-button>
+                <p-popover :is-visible="state.popoverVisible">
+                    <p-text-button v-if="state.isTextTruncate"
+                                   style-type="highlight"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.VIEW_ALL') }}
+                    </p-text-button>
+                    <template #content>
+                        <div class="content-wrapper">
+                            {{ state.processedProviderValue }}
+                        </div>
+                    </template>
+                </p-popover>
             </div>
         </p-pane-layout>
     </section>
@@ -226,6 +229,12 @@ watch(() => costTypeRef.value, (costType) => {
         font-size: 0.875rem;
         margin-left: 0.5rem;
         flex-shrink: 0;
+    }
+
+    .content-wrapper {
+        @apply flex flex-col;
+        line-height: 125%;
+        font-size: 0.875rem;
     }
 
     @screen tablet {
