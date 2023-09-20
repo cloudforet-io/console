@@ -1458,7 +1458,7 @@
 				"BUDGETED": "{count} budgeted",
 				"BUDGET_USAGE_IN": "budget usage in {period}",
 				"DESC": "Displays an overview of the total budget consumption along with total cost, budget, and usage rate.",
-				"EXCEED": "{value} exceed",
+				"EXCEED": "{value} exceeded",
 				"LEFT": "{value} left",
 				"OUT_OF": "out of {value}"
 			},
