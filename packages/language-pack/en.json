@@ -469,7 +469,8 @@
 						"REGION": "Region",
 						"REQUIRED_COST_TYPE": "Particular cost type must be selected.",
 						"REQUIRED_NAME": "Please enter name.",
-						"REQUIRED_TARGET": "Please select target."
+						"REQUIRED_TARGET": "Please select target.",
+						"SPECIFIC_PROVIDER": "Specific Provider"
 					},
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
@@ -485,11 +486,9 @@
 					"BUDGET": "Budget",
 					"BUDGETED": "Budgeted",
 					"BUDGET_NAME": "Budget Name",
-					"BULK_BUDGET": "Bulk Budget",
 					"COST_TYPE": "Cost Type",
 					"CREATE": "Create",
 					"CREATE_BUDGET": "Create Budget",
-					"CREATE_BULK_BUDGET": "Create Bulk Budget",
 					"DATA_SOURCE": "Data Source",
 					"DESC": "Desc",
 					"NO_BUDGET": "No Budget",

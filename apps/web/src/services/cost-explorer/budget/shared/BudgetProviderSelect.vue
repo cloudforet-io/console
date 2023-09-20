@@ -77,7 +77,7 @@ const state = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     costTypeItems: computed<BudgetProviderFilter>(() => ({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
-        provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
+        provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.SPECIFIC_PROVIDER'),
     })),
     resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => (selectedCostType.value === 'provider' ? getSearchDropdownItems(state.providers) : undefined)),
     resourceMenuLoading: false,
@@ -157,7 +157,7 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
 </script>
 
 <template>
-    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_COST_TYPE')"
+    <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER')"
                    required
                    :invalid="!props.disableValidation && invalidState.selectedResources"
                    :invalid-text="invalidTexts.selectedResources"

@@ -469,7 +469,8 @@
 						"REGION": "지역",
 						"REQUIRED_COST_TYPE": "1개 이상의 비용 발생 기준을 선택해 주세요.",
 						"REQUIRED_NAME": "이름을 입력하세요.",
-						"REQUIRED_TARGET": "타겟을 선택하세요."
+						"REQUIRED_TARGET": "타겟을 선택하세요.",
+						"SPECIFIC_PROVIDER": ""
 					},
 					"CANCEL": "취소",
 					"CONFIRM": "확인",
@@ -485,11 +486,9 @@
 					"BUDGET": "예산",
 					"BUDGETED": "책정된 예산",
 					"BUDGET_NAME": "예산명",
-					"BULK_BUDGET": "대량의 예산",
 					"COST_TYPE": "비용 발생 기준",
 					"CREATE": "예산 생성",
 					"CREATE_BUDGET": "예산 생성",
-					"CREATE_BULK_BUDGET": "예산 일괄 추가",
 					"DATA_SOURCE": "데이터 소스",
 					"DESC": "내림차순",
 					"NO_BUDGET": "",
