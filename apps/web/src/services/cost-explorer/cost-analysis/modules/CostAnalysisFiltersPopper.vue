@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PFilterableDropdown,
+    PFilterableDropdown, PTextButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type {
@@ -119,6 +119,11 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
         });
     }
 };
+const handleClickResetFilters = () => {
+    costAnalysisPageStore.$patch((_state) => {
+        _state.filters = {};
+    });
+};
 
 (async () => {
     await Promise.allSettled([
@@ -151,6 +156,13 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
         <cost-analysis-filters-add-more-button @disable-filter="handleDisabledFilters(false, $event)"
                                                @disable-all-filters="handleDisabledFilters(true, $event)"
         />
+        <p-text-button icon-left="ic_refresh"
+                       style-type="highlight"
+                       class="reset-button"
+                       @click="handleClickResetFilters"
+        >
+            Reset
+        </p-text-button>
     </div>
 </template>
 
@@ -168,6 +180,12 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
         .dropdown-context-menu {
             min-width: 12rem;
         }
+    }
+
+    .reset-button {
+        display: inline-block;
+        vertical-align: middle;
+        padding: 0.5rem 0;
     }
 }
 </style>
