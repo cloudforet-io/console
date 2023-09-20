@@ -45,8 +45,8 @@
                               @update="handleUpdateTarget"
         />
 
-        <budget-cost-type-select disable-validation
-                                 @update="handleUpdateCostTypes"
+        <budget-provider-select disable-validation
+                                @update="handleUpdateCostTypes"
         />
     </p-pane-layout>
 </template>
@@ -69,8 +69,8 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { BudgetModel, BudgetTimeUnit } from '@/services/cost-explorer/budget/model';
-import BudgetCostTypeSelect from '@/services/cost-explorer/budget/shared/BudgetCostTypeSelect.vue';
 import BudgetPeriodSelect from '@/services/cost-explorer/budget/shared/BudgetPeriodSelect.vue';
+import BudgetProviderSelect from '@/services/cost-explorer/budget/shared/BudgetProviderSelect.vue';
 import BudgetTargetSelect from '@/services/cost-explorer/budget/shared/BudgetTargetSelect.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
@@ -85,7 +85,7 @@ interface BudgetBulkCreateTemplateSource {
 export default {
     name: 'BudgetBulkCreateTemplateDownload',
     components: {
-        BudgetCostTypeSelect,
+        BudgetProviderSelect,
         BudgetTargetSelect,
         BudgetPeriodSelect,
         PPaneLayout,
