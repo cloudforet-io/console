@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 
-import { PPaneLayout, PLink } from '@spaceone/design-system';
+import {
+    PPaneLayout, PLink, PI, PTextButton,
+} from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
@@ -11,12 +15,15 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import { gray } from '@/styles/colors';
+
 import AmountPlanningTypePopover
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
 import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 import {
     BUDGET_TIME_UNIT,
 } from '@/services/cost-explorer/budget/model';
+import type { BudgetTargetLabel } from '@/services/cost-explorer/budget/type';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
 const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => state.providers[provider]?.label ?? '').join(', ') || 'All';
@@ -25,6 +32,9 @@ const allReferenceStore = useAllReferenceStore();
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+
+const costTypeWrapperRef = ref<HTMLElement|null>(null);
+const costTypeRef = ref<HTMLElement|null>(null);
 
 const state = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
@@ -37,14 +47,41 @@ const state = reactive({
         if (providerFilter?.state === 'DISABLED') return 'All';
         return changeToLabelList(providerFilter?.providers ?? []);
     }),
-    buttonRef: null as HTMLElement | null,
+    isTextTruncate: undefined as boolean|undefined,
 });
 
-const getTargetLabel = (projects: ProjectReferenceMap) => {
-    if (budgetPageState.budgetData?.project_id) return projects[budgetPageState.budgetData.project_id]?.label ?? '';
-    if (budgetPageState.budgetData?.project_group_id) return state.projectGroups[budgetPageState.budgetData.project_group_id]?.label ?? '';
-    return 'No Item';
+const getTargetLabel = (projects: ProjectReferenceMap): BudgetTargetLabel => {
+    let project;
+    if (budgetPageState.budgetData?.project_id) {
+        project = projects[budgetPageState.budgetData.project_id];
+        return {
+            group: project.data.groupInfo?.name ?? '',
+            name: project?.name ?? '',
+        };
+    }
+    if (budgetPageState.budgetData?.project_group_id) {
+        project = state.projectGroups[budgetPageState.budgetData.project_group_id];
+        return {
+            name: project?.name ?? '',
+        };
+    }
+    return {
+        name: 'No Item',
+    };
 };
+
+const handleClickViewAll = () => {
+    state.isTextTruncate = false;
+};
+
+/* Watcher */
+watch(() => costTypeRef.value, (costType) => {
+    if (costTypeWrapperRef.value && costType) {
+        const costTypeWrapperWidth = costTypeWrapperRef.value.offsetWidth;
+        const costTypeWidth = costType.offsetWidth;
+        state.isTextTruncate = costTypeWrapperWidth <= (costTypeWidth + 60);
+    }
+});
 
 // LOAD REFERENCE STORE
 (async () => {
@@ -87,26 +124,51 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TARGET') }}</span>
             <p v-if="!budgetPageState.loading"
-               class="summary-content"
+               class="summary-content target"
             >
+                <span v-if="budgetPageState.budgetData?.project_id"
+                      class="target-project-group"
+                >
+                    <span>
+                        {{ getTargetLabel(state.projects).group }}
+                    </span>
+                    <p-i name="ic_chevron-right-thin"
+                         width="0.75rem"
+                         height="0.75rem"
+                         :color="gray[400]"
+                    />
+                </span>
                 <p-link v-if="state.budgetData?.project_group_id || state.budgetData?.project_id"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
+                        highlight
                         :to="referenceRouter(
                             (state.budgetData?.project_id || state.budgetData?.project_group_id) ?? '',
                             { resource_type: state.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
-                    {{ getTargetLabel(state.projects) }}
+                    {{ getTargetLabel(state.projects).name }}
                 </p-link>
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PROVIDER') }}</span>
-            <p v-if="!budgetPageState.loading"
-               class="summary-content cost-type"
+            <div v-if="!budgetPageState.loading"
+                 ref="costTypeWrapperRef"
+                 class="cost-type-wrapper"
             >
-                <span class="cost-type-content">{{ state.processedProviderValue }}</span>
-            </p>
+                <span ref="costTypeRef"
+                      class="summary-content cost-type"
+                      :class="['summary-content', 'cost-type', {'is-view-all': !state.isTextTruncate}]"
+                >
+                    <span class="cost-type-content">{{ state.processedProviderValue }}</span>
+                </span>
+                <p-text-button v-if="state.isTextTruncate"
+                               style-type="highlight"
+                               @click="handleClickViewAll"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.VIEW_ALL') }}
+                </p-text-button>
+            </div>
         </p-pane-layout>
     </section>
 </template>
@@ -116,6 +178,7 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
     @apply flex;
     column-gap: 1rem;
     .summary-card {
+        @apply flex flex-col justify-between;
         width: 33%;
         min-height: 4.875rem;
         padding: 1rem 1rem;
@@ -125,18 +188,36 @@ const getTargetLabel = (projects: ProjectReferenceMap) => {
         font-size: 0.875rem;
         line-height: 130%;
     }
-    .summary-content {
-        margin-top: 0.5rem;
-        font-size: 0.875rem;
-        line-height: 120%;
-        &.cost-type {
+    .cost-type-wrapper {
+        @apply relative flex justify-between items-end;
+        .summary-content.cost-type {
             @apply flex justify-between;
-            position: relative;
+            max-width: calc(100% - 3.75rem);
+            &.is-view-all {
+                max-width: initial;
+                margin-top: 0.5rem;
+                .cost-type-content {
+                    overflow: initial;
+                    text-overflow: initial;
+                    white-space: initial;
+                }
+            }
             .cost-type-content {
                 @apply truncate;
-                max-width: calc(100% - 4rem);
                 font-size: 0.875rem;
                 line-height: 130%;
+            }
+        }
+    }
+    .summary-content {
+        font-size: 0.875rem;
+        line-height: 120%;
+        &.target {
+            @apply flex;
+            gap: 0.125rem;
+            .target-project-group {
+                @apply flex items-center;
+                gap: 0.125rem;
             }
         }
     }
