@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
-import { PHeading, PIconButton } from '@spaceone/design-system';
+import { PHeading, PIconButton, PDivider } from '@spaceone/design-system';
+
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -14,6 +17,7 @@ import BudgetNotifications
 import BudgetSummary
     from '@/services/cost-explorer/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetDeleteModal from '@/services/cost-explorer/budget/budget-detail/modules/BudgetDeleteModal.vue';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 
@@ -28,10 +32,14 @@ const router = useRouter();
 
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
+const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
 
 const state = reactive({
     loading: true,
     hasManagePermission: useManagePermissionState(),
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
+    dataSourceMap: computed(() => costDataSourceReferenceStore.getters.costDataSourceItems),
+    dataSourceName: computed(() => state.dataSourceMap[state.budgetData?.data_source_id]?.label),
 });
 
 const checkDeleteState = reactive({
@@ -70,7 +78,7 @@ const handleConfirmDelete = () => {
     <div>
         <section class="page-title-wrapper">
             <p-heading :show-back-button="!state.loading"
-                       :title="state.loading ? '' : budgetPageState.budgetData?.name"
+                       :title="state.loading ? '' : state.budgetData?.name"
                        @click-back-button="$router.go(-1)"
             >
                 <template v-if="!state.loading"
@@ -81,6 +89,19 @@ const handleConfirmDelete = () => {
                                        :disabled="!state.hasManagePermission"
                                        @click="handleClickDelete"
                         />
+                    </div>
+                    <div class="title-right-extra">
+                        <div class="right-item">
+                            <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.DATA_SOURCE') }}:</span>
+                            <span>{{ state.dataSourceName }}</span>
+                        </div>
+                        <p-divider vertical
+                                   class="divider"
+                        />
+                        <div class="right-item">
+                            <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DETAIL.ORIGINAL_CURRENCY') }}:</span>
+                            <span>{{ CURRENCY_SYMBOL[state.budgetData?.currency] }}{{ state.budgetData?.currency }}</span>
+                        </div>
                     </div>
                 </template>
             </p-heading>
@@ -105,14 +126,31 @@ const handleConfirmDelete = () => {
 
 
 <style lang="postcss" scoped>
+.page-title-wrapper {
+
+    .title-right-extra {
+        @apply inline-flex items-center;
+        float: right;
+        .divider {
+            height: 0.875rem;
+            margin: 0 0.5rem;
+        }
+
+        .right-item {
+            @apply text-gray-800;
+            font-size: 0.875rem;
+            .label {
+                font-weight: 700;
+                padding-right: 0.25rem;
+            }
+        }
+    }
+}
 .content {
     @apply flex flex-col;
     gap: 1rem;
     .summary {
         flex-grow: 1;
-    }
-    .summary-chart {
-        flex-grow: 2;
     }
     .alert {
         flex-grow: 1;
