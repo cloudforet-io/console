@@ -130,6 +130,7 @@ const handleConfirmDelete = () => {
 
     .title-right-extra {
         @apply inline-flex items-center;
+        line-height: 1.09375rem;
         float: right;
         .divider {
             height: 0.875rem;
