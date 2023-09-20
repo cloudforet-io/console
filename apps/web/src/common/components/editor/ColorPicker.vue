@@ -96,7 +96,6 @@ export default defineComponent<Props>({
     @apply flex items-center;
 
     .color-picker {
-        min-width: unset;
         .color-picker-menu {
             padding: 0.625rem;
         }
