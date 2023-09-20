@@ -288,6 +288,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 max-width: 100%;
                 left: 2rem;
                 transform: translate(0, 3rem) !important;
+                .arrow {
+                    left: 1.25rem !important;
+                }
             }
         }
         .filters-popper {
