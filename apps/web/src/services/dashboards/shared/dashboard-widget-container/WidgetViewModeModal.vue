@@ -21,8 +21,8 @@ import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/Das
 import DashboardVariablesSelectDropdown
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
 import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';

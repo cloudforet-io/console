@@ -4,7 +4,7 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 
 export const useWidgetTitleInput = () => {
     const widgetFormStore = useWidgetFormStore();

@@ -35,8 +35,8 @@ import {
 import {
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
     WidgetConfig,
     InheritOptions,

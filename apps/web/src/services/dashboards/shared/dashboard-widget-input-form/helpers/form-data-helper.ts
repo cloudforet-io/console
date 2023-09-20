@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import type { PartialDashboardLayoutWidgetInfo } from '@/services/dashboards/store/widget-form';
+import type { PartialDashboardLayoutWidgetInfo } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import type { InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
 
 

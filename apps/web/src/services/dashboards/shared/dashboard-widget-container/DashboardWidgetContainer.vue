@@ -21,9 +21,9 @@ import {
     useWidgetReformer,
 } from '@/services/dashboards/shared/dashboard-widget-container/composables/use-widget-reformer';
 import WidgetViewModeModal from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeModal.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+import DashboardWidgetEditModal from '@/services/dashboards/shared/DashboardWidgetEditModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
-import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
 import type {
     DashboardLayoutWidgetInfo,
     WidgetExpose, WidgetProps,
