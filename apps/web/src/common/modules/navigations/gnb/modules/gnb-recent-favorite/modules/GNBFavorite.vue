@@ -130,6 +130,13 @@ export default {
                     });
                     results.push(...state.favoriteMenuItems.slice(0, FAVORITE_LIMIT));
                 }
+                if (state.favoriteDashboardItems.length) {
+                    if (results.length !== 0) results.push({ type: 'divider' });
+                    results.push({
+                        name: 'title', label: i18n.t('MENU.DASHBOARDS'), type: 'header', itemType: SUGGESTION_TYPE.DASHBOARD,
+                    });
+                    results.push(...state.favoriteDashboardItems.slice(0, FAVORITE_LIMIT));
+                }
                 if (state.favoriteProjects.length) {
                     if (results.length !== 0) results.push({ type: 'divider' });
                     results.push({
@@ -144,6 +151,13 @@ export default {
                     });
                     results.push(...state.favoriteCloudServiceItems.slice(0, FAVORITE_LIMIT));
                 }
+                if (state.favoriteCostAnalysisItems.length) {
+                    if (results.length !== 0) results.push({ type: 'divider' });
+                    results.push({
+                        name: 'title', label: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'), type: 'header', itemType: SUGGESTION_TYPE.COST_ANALYSIS,
+                    });
+                    results.push(...state.favoriteCostAnalysisItems.slice(0, FAVORITE_LIMIT));
+                }
                 return results;
             }),
             allItems: computed<SuggestionItem[]>(() => {
@@ -153,6 +167,10 @@ export default {
                     items = state.favoriteMenuItems;
                     label = i18n.t('COMMON.GNB.FAVORITES.ALL_MENU');
                 }
+                if (state.showAllType === SUGGESTION_TYPE.DASHBOARD) {
+                    items = state.favoriteDashboardItems;
+                    label = i18n.t('COMMON.GNB.FAVORITES.ALL_DASHBOARDS');
+                }
                 if (state.showAllType === SUGGESTION_TYPE.PROJECT) {
                     items = state.favoriteProjects;
                     label = i18n.t('COMMON.GNB.FAVORITES.ALL_PROJECTS');
@@ -160,6 +178,10 @@ export default {
                 if (state.showAllType === SUGGESTION_TYPE.CLOUD_SERVICE) {
                     items = state.favoriteCloudServiceItems;
                     label = i18n.t('COMMON.GNB.FAVORITES.ALL_CLOUD_SERVICES');
+                }
+                if (state.showAllType === SUGGESTION_TYPE.COST_ANALYSIS) {
+                    items = state.favoriteCostAnalysisItems;
+                    label = i18n.t('COMMON.GNB.FAVORITES.ALL_COST_ANALYSIS');
                 }
                 return [
                     {
@@ -173,6 +195,8 @@ export default {
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             //
+            favoriteDashboardItems: computed<FavoriteItem[]>(() => []),
+            favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => []),
             favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
                 store.state.favorite.menuItems,
                 store.getters['display/allMenuList'],
@@ -196,13 +220,16 @@ export default {
         /* Util */
         const getItemLength = (type: SuggestionType): number => {
             if (type === SUGGESTION_TYPE.MENU) return state.favoriteMenuItems.length;
+            if (type === SUGGESTION_TYPE.DASHBOARD) return state.favoriteDashboardItems.length;
             if (type === SUGGESTION_TYPE.PROJECT) return state.favoriteProjects.length;
             if (type === SUGGESTION_TYPE.CLOUD_SERVICE) return state.favoriteCloudServiceItems.length;
+            if (type === SUGGESTION_TYPE.COST_ANALYSIS) return state.favoriteCostAnalysisItems.length;
             return 0;
         };
 
         /* Event */
         const handleClickMenuButton = (type: SuggestionType) => {
+            // Dashboard and Cost Analysis are added after (Planning).
             if (type === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.replace({
                     name: PROJECT_ROUTE._NAME,
@@ -259,6 +286,8 @@ export default {
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
                 store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
+                store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
+                store.dispatch('favorite/load', FAVORITE_TYPE.COST_ANALYSIS),
             ]);
             state.loading = false;
         })();
