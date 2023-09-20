@@ -530,6 +530,9 @@
 				"CURRENCY": "Currency",
 				"DAILY": "Daily (Accumulated)",
 				"DEFAULT": "Default",
+				"DETAIL": {
+					"ORIGINAL_CURRENCY": "Original Currency"
+				},
 				"DONUT": "Donut",
 				"DOWNLOAD": "Download",
 				"EDIT_COST_ANALYSIS": "Edit Analysis Name",
