@@ -3,6 +3,9 @@ import { defineStore } from 'pinia';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
+import {
+    getVariableKeyFromWidgetSchemaProperty,
+} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo,
@@ -81,16 +84,14 @@ export const useWidgetFormStore = defineStore('widget-form', {
         },
     },
     actions: {
-        setFormData(formData: any) {
-            if (!this.widgetConfigId) return;
-            const widgetConfig = getWidgetConfig(this.widgetConfigId);
-            const _widgetOptions: WidgetOptions = {
-                ...widgetConfig.options,
-            };
-            const widgetFiltersMap: WidgetOptions['filters'] = {};
+        updateInheritOptionsAndWidgetOptionsByFormData(formData: any) {
+            if (!this.widgetConfig) return;
+            const _widgetOptions: WidgetOptions = cloneDeep(this.widgetConfig.options ?? {});
+            const _widgetFilters: WidgetOptions['filters'] = {};
             const _inheritOptions = cloneDeep(this.inheritOptions);
+
             Object.entries(formData).forEach(([key, val]) => {
-                const _propertyName = key.replace('filters.', '');
+                // inherit widget option case
                 if (_inheritOptions?.[key]?.enabled && val) {
                     _inheritOptions[key] = {
                         enabled: true,
@@ -98,17 +99,20 @@ export const useWidgetFormStore = defineStore('widget-form', {
                             key: val as string,
                         },
                     };
+                // widget option filters case
                 } else if (key.startsWith('filters.')) {
                     if (val) {
-                        const filterDataKey = getWidgetFilterDataKey(_propertyName);
-                        widgetFiltersMap[_propertyName] = [{ k: filterDataKey, v: val, o: '=' }];
+                        const variableKey = getVariableKeyFromWidgetSchemaProperty(key); // variable key is the same with the options.filters property name
+                        const filterDataKey = getWidgetFilterDataKey(variableKey);
+                        _widgetFilters[variableKey] = [{ k: filterDataKey, v: val, o: '=' }];
                     }
+                // other widget option case
                 } else {
                     _widgetOptions[key] = val;
                 }
             });
-            _widgetOptions.filters = widgetFiltersMap;
 
+            _widgetOptions.filters = _widgetFilters;
             this.widgetOptions = _widgetOptions;
             this.inheritOptions = _inheritOptions;
         },

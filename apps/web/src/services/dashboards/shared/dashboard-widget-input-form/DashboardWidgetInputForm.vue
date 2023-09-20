@@ -211,7 +211,7 @@ watch(() => state.schemaFormData, (schemaFormData, before) => {
     if (isEmpty(state.widgetOptionsJsonSchema)) return;
     if (state.widgetOptionsJsonSchema.properties?.cost_group_by && !schemaFormData?.cost_group_by) return;
     if (state.widgetOptionsJsonSchema.properties?.asset_group_by && !before?.asset_group_by) return;
-    widgetFormStore.setFormData(schemaFormData);
+    widgetFormStore.updateInheritOptionsAndWidgetOptionsByFormData(schemaFormData);
 }, { immediate: true });
 watch(() => state.isAllValid, (_isAllValid) => {
     widgetFormStore.$patch({ isValid: _isAllValid });
