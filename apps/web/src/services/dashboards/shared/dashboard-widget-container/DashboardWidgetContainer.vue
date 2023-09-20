@@ -103,10 +103,8 @@ const handleClickWidgetExpand = (widget: DashboardLayoutWidgetInfo) => {
     if (props.editMode) {
         dashboardDetailStore.toggleWidgetSize(widget.widget_key);
     } else {
-        widgetFormStore.$patch({
-            widgetKey: widget.widget_key,
-            widgetConfigId: widget.widget_name,
-        });
+        widgetFormStore.$reset();
+        widgetFormStore.initWidgetForm(widget.widget_key, widget.widget_name);
         dashboardDetailStore.$patch((_state) => {
             _state.widgetViewModeModalVisible = true;
         });
