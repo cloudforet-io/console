@@ -323,7 +323,6 @@ export default defineComponent<Props>({
     }
 
     .menu-dropdown {
-        min-width: unset;
         &.text-style {
             min-width: 7.5rem;
         }
