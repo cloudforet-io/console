@@ -13,6 +13,8 @@ import {
     isEmpty, isEqual,
 } from 'lodash';
 
+import { i18n } from '@/translations';
+
 import {
     getDefaultWidgetFormData,
     getVariableKeyFromWidgetSchemaProperty,
@@ -80,6 +82,7 @@ const state = reactive({
         widgetFormState.inheritOptions,
         widgetFormStore.widgetConfig?.options_schema?.schema,
         dashboardDetailState.variablesSchema,
+        i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string,
     )),
     isFocused: false,
     //
