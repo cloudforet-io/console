@@ -6,7 +6,7 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo,
-    InheritOptions,
+    InheritOptions, WidgetConfig,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
@@ -52,6 +52,11 @@ export const useWidgetFormStore = defineStore('widget-form', {
         schemaProperties: undefined,
         widgetKey: undefined,
     }),
+    getters: {
+        widgetConfig(): WidgetConfig|undefined {
+            return this.widgetConfigId ? getWidgetConfig(this.widgetConfigId) : undefined;
+        },
+    },
     actions: {
         setFormData(formData: any) {
             if (!this.widgetConfigId) return;

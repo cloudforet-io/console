@@ -38,10 +38,8 @@ import {
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
-    WidgetConfig,
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import {
     getWidgetFilterSchemaPropertyName,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
@@ -65,11 +63,10 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
     widgetOptionsJsonSchema: {} as JsonSchema,
     schemaFormData: {},
     fixedProperties: computed<string[]>(() => {
-        const fixedProperties = state.widgetConfig?.options_schema?.fixed_properties ?? [];
+        const fixedProperties = widgetFormStore.widgetConfig?.options_schema?.fixed_properties ?? [];
         if (dashboardDetailState.projectId) {
             fixedProperties.push(getWidgetFilterSchemaPropertyName('project'));
         }
@@ -80,7 +77,7 @@ const state = reactive({
         .map(([propertyName]) => propertyName)),
     inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
         widgetFormState.inheritOptions,
-        state.widgetConfig?.options_schema?.schema,
+        widgetFormStore.widgetConfig?.options_schema?.schema,
         dashboardDetailState.variablesSchema,
     )),
     isFocused: false,
@@ -112,7 +109,7 @@ const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMen
 };
 const isInheritDisabled = (propertyName: string): boolean => {
     const inputDisabled = !!state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled;
-    const nonInheritable = !!state.widgetConfig?.options_schema?.non_inheritable_properties?.includes(propertyName);
+    const nonInheritable = !!widgetFormStore.widgetConfig?.options_schema?.non_inheritable_properties?.includes(propertyName);
     return inputDisabled || nonInheritable;
 };
 
@@ -135,7 +132,7 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
     });
 
     // update widget option schema
-    const originPropertySchema = state.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
+    const originPropertySchema = widgetFormStore.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
     const newPropertySchema = getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, isInherit, dashboardDetailState.projectId);
     state.widgetOptionsJsonSchema = {
         ...state.widgetOptionsJsonSchema,
@@ -179,7 +176,7 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     // init schema
     state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
         referenceStoreState,
-        state.widgetConfig?.options_schema ?? {},
+        widgetFormStore.widgetConfig?.options_schema ?? {},
         dashboardDetailState.variablesSchema,
         widgetFormState.inheritOptions ?? {},
         widgetFormState.schemaProperties ?? [],
@@ -242,10 +239,10 @@ watch(() => state.isAllValid, (_isAllValid) => {
                           @update:value="updateTitle"
             />
         </p-field-group>
-        <div v-if="state.widgetConfig?.description?.translation_id"
+        <div v-if="widgetFormStore.widgetConfig?.description?.translation_id"
              class="description-text"
         >
-            {{ $t(state.widgetConfig.description.translation_id) }}
+            {{ $t(widgetFormStore.widgetConfig.description.translation_id) }}
         </div>
         <p-data-loader :loading="referenceStoreState.loading"
                        class="widget-options-form-wrapper"
