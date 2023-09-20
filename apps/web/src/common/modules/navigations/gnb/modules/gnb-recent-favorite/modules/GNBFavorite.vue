@@ -92,8 +92,12 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
-    convertCloudServiceConfigToReferenceData, convertDashboardConfigToReferenceData,
-    convertMenuConfigToReferenceData, convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
+    convertCloudServiceConfigToReferenceData,
+    convertCodyAnalysisConfigToReferenceData,
+    convertDashboardConfigToReferenceData,
+    convertMenuConfigToReferenceData,
+    convertProjectConfigToReferenceData,
+    convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -106,6 +110,7 @@ import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-se
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
@@ -201,10 +206,14 @@ export default {
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             costQuerySets: [],
-            allDashboardItems: computed<DashboardModel[]>(() => [
-                ...store.getters['dashboard/getDomainItems'],
-                ...store.getters['dashboard/getProjectItems'],
-            ]),
+            domainDashboardItems: computed<DashboardModel[]>(() => {
+                const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_WORKSPACE, store.getters['user/pagePermissionList']);
+                return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
+            }),
+            projectDashboardItems: computed<DashboardModel[]>(() => {
+                const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_PROJECT, store.getters['user/pagePermissionList']);
+                return isUserAccessibleToProjectDashboards ? store.getters['dashboard/getProjectItems'] : [];
+            }),
             //
             favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
                 store.state.favorite.menuItems,
@@ -212,9 +221,23 @@ export default {
             )),
             favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_COST_ANALYSIS, store.getters['user/pagePermissionList']);
-                return isUserAccessible ? convertDashboardConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets) : [];
+                return isUserAccessible ? convertCodyAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets) : [];
             }),
-            favoriteDashboardItems: computed<FavoriteItem[]>(() => []),
+            favoriteDashboardItems: computed<FavoriteItem[]>(() => {
+                const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
+                if (!isUserAccessibleToDashboards) return [];
+                const domainDashboardReferenceData = convertDashboardConfigToReferenceData(
+                    store.state.favorite.dashboardItems,
+                    state.domainDashboardItems,
+                    DASHBOARD_SCOPE.DOMAIN,
+                );
+                const projectDashboardReferenceData = convertDashboardConfigToReferenceData(
+                    store.state.favorite.dashboardItems,
+                    state.projectDashboardItems,
+                    DASHBOARD_SCOPE.PROJECT,
+                );
+                return [...domainDashboardReferenceData, ...projectDashboardReferenceData];
+            }),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(

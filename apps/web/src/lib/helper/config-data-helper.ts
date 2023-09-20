@@ -11,6 +11,9 @@ import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { DashboardScope } from '@/services/dashboards/config';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
+import type { DashboardModel } from '@/services/dashboards/model';
 
 interface ConfigData extends FavoriteConfig, RecentConfig {
     [key: string]: any;
@@ -118,7 +121,7 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
     return results;
 };
 
-export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, costQuerySetList: CostQuerySetModel[]) => {
+export const convertCodyAnalysisConfigToReferenceData = (config: ConfigData[]|null, costQuerySetList: CostQuerySetModel[]) => {
     const results: ReferenceData[] = [];
     if (config) {
         config.forEach((d) => {
@@ -129,6 +132,26 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
                     name: resource.cost_query_set_id,
                     label: resource.name,
                     updatedAt: d.updatedAt,
+                });
+            }
+        });
+    }
+    return results;
+};
+
+export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, dashboardList: DashboardModel[], type: DashboardScope) => {
+    const results: ReferenceData[] = [];
+    const dashboardId = type === DASHBOARD_SCOPE.DOMAIN ? 'domain_dashboard_id' : 'project_dashboard_id';
+    if (config) {
+        config.forEach((d) => {
+            const resource: DashboardModel|undefined = find(dashboardList, { [dashboardId]: d.itemId });
+            if (resource) {
+                results.push({
+                    ...d,
+                    name: resource[dashboardId],
+                    label: resource.name,
+                    updatedAt: d.updatedAt,
+                    type,
                 });
             }
         });
