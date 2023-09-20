@@ -260,6 +260,7 @@ const drawChart = (chartData: ChartData[]) => {
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
