@@ -20,7 +20,7 @@
             </div>
             <div class="col-span-12 md:col-span-9">
                 <div class="chart-wrapper">
-                    <p-data-loader :loading="chartState.loading">
+                    <p-data-loader :loading="loading">
                         <template #loader>
                             <p-skeleton width="100%"
                                         height="100%"
@@ -82,35 +82,32 @@
                 <p-data-table
                     :loading="tableState.loading"
                     :fields="tableState.fields"
-                    :items="tableState.isCollapsed ? tableState.data.slice(0, 5) : tableState.data"
+                    :items="tableState.isCollapsed ? tableState.refinedData.slice(0, 5) : tableState.refinedData"
                     :bordered="false"
                 >
                     <template #th-service-format>
                         <span />
                     </template>
-                    <template v-for="field in tableState.fields"
-                              #[`col-${field.name}-format`]="{value}"
-                    >
-                        <template v-if="field.name !== 'service'">
-                            <span v-if="value"
-                                  :key="field.name"
-                                  :style="{ 'color': value.color }"
-                            >{{ value.cost }}</span>
-                            <span v-else
-                                  :key="field.name"
-                            >-</span>
-                        </template>
-                        <span v-else
-                              :key="field.name"
-                              class="col-service"
-                              :class="{'link-text': !!value.to.name }"
-                        >
-                            <router-link v-if="!!value.to.name"
-                                         :to="value.to"
-                            >{{ value.name }}</router-link>
-                            <span v-else>{{ value.name }}</span>
-                        </span>
-                    </template>
+                    <!--                    <template v-for="field in tableState.fields"-->
+                    <!--                              #[`col-${field.name}-format`]="{value}"-->
+                    <!--                    >-->
+                    <!--                        <template v-if="field.name !== 'service'">-->
+                    <!--                            <span v-if="value"-->
+                    <!--                                  :key="field.name"-->
+                    <!--                                  :style="{ 'color': value.color }"-->
+                    <!--                            >{{ value.cost }}</span>-->
+                    <!--                            <span v-else-->
+                    <!--                                  :key="field.name"-->
+                    <!--                            >-</span>-->
+                    <!--                        </template>-->
+                    <!--                        <span v-else-->
+                    <!--                              :key="field.name"-->
+                    <!--                              class="col-service"-->
+                    <!--                              :class="{'link-text': !!value.to.name }"-->
+                    <!--                        >-->
+                    <!--                            <span>{{ value.name }}</span>-->
+                    <!--                        </span>-->
+                    <!--                    </template>-->
                 </p-data-table>
                 <div v-if="tableState.data.length > 5"
                      class="toggle-button-wrapper"
@@ -127,22 +124,15 @@
 <script lang="ts">
 
 import {
-    computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+    computed, onUnmounted, reactive, toRefs, watch,
 } from 'vue';
 import type { NumberFormatOptions } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import {
-    PSelectButton,
-    PDataLoader,
-    PCollapsibleToggle,
-    PDataTable,
-    PI,
-    PIconButton,
-    PSkeleton,
+    PSelectButton, PDataLoader, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton,
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
@@ -150,11 +140,15 @@ import { orderBy, range } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { i18n } from '@/translations';
+
 import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import config from '@/lib/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -162,7 +156,8 @@ import {
     gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { GROUP_BY } from '@/services/cost-explorer/lib/config';
+
 
 interface ChartData {
     date: string;
@@ -199,28 +194,39 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const queryHelper = new QueryHelper();
+        const allReferenceStore = useAllReferenceStore();
         const state = reactive({
-            loading: false,
+            loading: true,
             chart: null as XYChart | null,
             chartRef: null as any, // HTMLElement | null,
             skeletons: range(4),
             dateTypes: computed(() => ([
-                { name: DATE_TYPE.daily, label: vm.$t('COMMON.WIDGETS.BILLING.DAY') },
-                { name: DATE_TYPE.monthly, label: vm.$t('COMMON.WIDGETS.BILLING.MONTH') },
+                { name: DATE_TYPE.daily, label: i18n.t('COMMON.WIDGETS.BILLING.DAY') },
+                { name: DATE_TYPE.monthly, label: i18n.t('COMMON.WIDGETS.BILLING.MONTH') },
             ])),
             data: [],
             selectedDateType: DATE_TYPE.monthly,
+            // HACK: this is temp code for data_source_id parameter in analyze API
+            dataSourceId: computed(() => {
+                const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
+                const dataSourceKeys: string[] = Object.keys(dataSourceMap);
+                return dataSourceKeys.length > 0 ? dataSourceKeys[1] : '';
+            }),
+            currency: computed<Currency>(() => {
+                const targetDataSource = allReferenceStore.getters.costDataSource[state.dataSourceId ?? ''];
+                if (!targetDataSource) return CURRENCY.USD;
+                const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
+                return currentCurrency ?? CURRENCY.USD;
+            }),
         });
         const summaryState = reactive({
             pastDateText: computed(() => {
-                if (state.selectedDateType === DATE_TYPE.monthly) return vm.$t('COMMON.WIDGETS.BILLING.LAST_MONTH');
-                return vm.$t('COMMON.WIDGETS.BILLING.TWO_DAYS_AGO');
+                if (state.selectedDateType === DATE_TYPE.monthly) return i18n.t('COMMON.WIDGETS.BILLING.LAST_MONTH');
+                return i18n.t('COMMON.WIDGETS.BILLING.TWO_DAYS_AGO');
             }),
             currentDateText: computed(() => {
-                if (state.selectedDateType === DATE_TYPE.monthly) return vm.$t('COMMON.WIDGETS.BILLING.THIS_MONTH');
-                return vm.$t('COMMON.WIDGETS.BILLING.YESTERDAY');
+                if (state.selectedDateType === DATE_TYPE.monthly) return i18n.t('COMMON.WIDGETS.BILLING.THIS_MONTH');
+                return i18n.t('COMMON.WIDGETS.BILLING.YESTERDAY');
             }),
             pastDate: computed(() => {
                 if (state.selectedDateType === DATE_TYPE.monthly) {
@@ -238,10 +244,53 @@ export default {
             currentCost: 0,
         });
         const tableState = reactive({
-            loading: false,
             isCollapsed: true,
-            fields: [] as any,
+            loading: true,
+            fields: computed(() => {
+                const fields: any = [];
+                const timeUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
+                const dateNameFormat = state.selectedDateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
+                const dateLabelFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM/YYYY' : 'MM/DD/YYYY';
+                let now = tableState.endDate.clone();
+
+                const start = now.subtract(DATA_TABLE_COLUMN, timeUnit);
+                while (now.isAfter(start, timeUnit)) {
+                    fields.unshift({
+                        name: now.format(dateNameFormat),
+                        label: now.format(dateLabelFormat),
+                    });
+                    now = now.subtract(1, timeUnit);
+                }
+                fields.unshift({ name: 'service', label: '' });
+                return fields;
+            }),
             data: [],
+            refinedData: computed(() => {
+                if (!tableState.data.length) return [];
+                const data: any = [];
+                tableState.data.forEach((d) => {
+                    const costData: Record<string, string> = {};
+                    // const timeUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
+                    // const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
+                    // const pastDate = dayjs.utc(d.date).subtract(1, timeUnit).format(dateFormat);
+                    // const pastCost = results.find((bd) => bd.date === pastDate)?.cost_sum || 0;
+                    // costData[d.date] = {
+                    //     cost: currencyMoneyFormatter(d.value, state.currency),
+                    // };
+                    // if (pastCost && pastCost < d.cost_sum && (d.cost_sum - pastCost) / Math.abs(pastCost) > 0.5) {
+                    //     costData[d.date].color = 'red';
+                    // }
+                    d.cost_sum.forEach((cost) => {
+                        costData[cost.date] = currencyMoneyFormatter(cost.value, state.currency);
+                    });
+
+                    data.push({
+                        service: d.product,
+                        ...costData,
+                    });
+                });
+                return data;
+            }),
             endDate: dayjs.utc(),
             nextButtonDisabled: computed(() => {
                 const now = dayjs.utc();
@@ -252,9 +301,8 @@ export default {
             }),
         });
         const chartState = reactive({
-            loading: true,
             registry: {},
-            data: [] as ChartData[],
+            data: computed(() => getRefinedChartData(state.data)),
         });
 
         /* util */
@@ -355,19 +403,86 @@ export default {
 
             state.chart = chart;
         };
-        const getLink = (data) => ({
-            name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-            query: {
-                provider: primitiveToQueryString(data.provider),
-                filters: queryHelper.setFilters([
-                    { k: 'project_id', v: props.projectId, o: '=' },
-                    { k: 'cloud_service_group', v: data.cloud_service_group, o: '=' },
-                ]).rawQueryStrings,
-            },
-        });
 
-        /* api */
-        const getCount = async () => {
+        /* Api */
+        const costAnalyzeQueryHelper = new QueryHelper();
+        const fetchTrendData = async () => {
+            try {
+                state.loading = true;
+                let start = dayjs.utc().subtract(DAY_COUNT - 1, 'day').format('YYYY-MM-DD');
+                let end = dayjs.utc().format('YYYY-MM-DD');
+                if (state.selectedDateType === 'MONTHLY') {
+                    start = dayjs.utc().subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
+                    end = dayjs.utc().format('YYYY-MM');
+                }
+                costAnalyzeQueryHelper.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+                const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+                    data_source_id: state.dataSourceId,
+                    query: {
+                        granularity: state.selectedDateType,
+                        fields: {
+                            cost_sum: {
+                                key: 'cost',
+                                operator: 'sum',
+                            },
+                        },
+                        sort: [{ key: 'date', desc: false }],
+                        filter: costAnalyzeQueryHelper.apiQuery.filter,
+                        start,
+                        end,
+                    },
+                });
+                state.data = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.data = [];
+            } finally {
+                state.loading = false;
+            }
+        };
+        const fetchTableData = async () => {
+            try {
+                tableState.loading = true;
+                const today = tableState.endDate;
+                let start;
+                let end;
+                if (state.selectedDateType === DATE_TYPE.monthly) {
+                    start = today.subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
+                    end = today.format('YYYY-MM');
+                } else {
+                    start = today.subtract(DAY_COUNT - 1, 'day').format('YYYY-MM-DD');
+                    end = today.format('YYYY-MM-DD');
+                }
+                costAnalyzeQueryHelper.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+                const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
+                    data_source_id: state.dataSourceId,
+                    query: {
+                        granularity: state.selectedDateType,
+                        group_by: [GROUP_BY.PRODUCT],
+                        fields: {
+                            cost_sum: {
+                                key: 'cost',
+                                operator: 'sum',
+                            },
+                        },
+                        sort: [{ key: '_total_cost_sum', desc: true }],
+                        field_group: ['date'],
+                        filter: costAnalyzeQueryHelper.apiQuery.filter,
+                        start,
+                        end,
+                    },
+                });
+                tableState.data = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                tableState.data = [];
+            } finally {
+                tableState.loading = false;
+            }
+        };
+
+        /* Util */
+        const setCountData = (results) => {
             const utcToday = dayjs.utc();
             let start;
             let end;
@@ -378,176 +493,47 @@ export default {
                 start = utcToday.subtract(2, 'day').format('YYYY-MM-DD');
                 end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
             }
-            try {
-                const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                    granularity: state.selectedDateType,
-                    project_id: props.projectId,
-                    start,
-                    end,
-                });
-                if (res.results.length > 0) {
-                    const billingData = res.results[0].billing_data;
-                    summaryState.pastCost = commaFormatter(numberFormatter(billingData.find((d) => d.date === start)?.cost || 0));
-                    summaryState.currentCost = commaFormatter(numberFormatter(billingData.find((d) => d.date === end)?.cost || 0));
+            summaryState.pastCost = commaFormatter(numberFormatter(results.find((d) => d.date === start)?.cost_sum || 0)) ?? 0;
+            summaryState.currentCost = commaFormatter(numberFormatter(results.find((d) => d.date === end)?.cost_sum || 0)) ?? 0;
+        };
+        const getRefinedChartData = (results): ChartData[] => {
+            const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+            let data;
+            if (results.length > 0) {
+                data = results.map((d) => ({
+                    date: dayjs(d.date),
+                    value: d.cost_sum,
+                }));
+            } else {
+                data = [];
+            }
+
+            const orderedData = orderBy(data, ['date'], ['asc']);
+            return orderedData.map((d, index) => {
+                let date;
+                if (state.selectedDateType === DATE_TYPE.monthly && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
+                    date = d.date.format('MMM, YY');
                 } else {
-                    summaryState.pastCost = 0;
-                    summaryState.currentCost = 0;
+                    date = d.date.format(dateFormat);
                 }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-        const getTrend = async () => {
-            const utcToday = dayjs.utc();
-            const dateType = state.selectedDateType;
-            const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
-            let start;
-            let end;
-            if (dateType === DATE_TYPE.monthly) {
-                start = utcToday.subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
-                end = utcToday.format('YYYY-MM');
-            } else {
-                start = utcToday.subtract(DAY_COUNT - 1, 'day').format('YYYY-MM-DD');
-                end = utcToday.format('YYYY-MM-DD');
-            }
 
-            chartState.loading = true;
-            try {
-                let data;
-                const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                    granularity: state.selectedDateType,
-                    project_id: props.projectId,
-                    start,
-                    end,
-                });
-
-                if (res.results.length > 0) {
-                    data = res.results[0].billing_data.map((d) => ({
-                        date: dayjs(d.date),
-                        value: d.cost,
-                    }));
+                const chartData: ChartData = {
+                    date,
+                    value: d.value,
+                };
+                if (index === orderedData.length - 2) {
+                    chartData.color = safe;
+                    chartData.dash = '2, 2';
+                }
+                if (index === orderedData.length - 1) {
+                    chartData.tooltipTextColor = safe;
+                    chartData.tooltipBorderColor = green[300];
                 } else {
-                    data = [];
+                    chartData.tooltipTextColor = secondary;
+                    chartData.tooltipBorderColor = blue[300];
                 }
-
-                const orderedData = orderBy(data, ['date'], ['asc']);
-                chartState.data = orderedData.map((d, index) => {
-                    let date;
-                    if (dateType === DATE_TYPE.monthly && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
-                        date = d.date.format('MMM, YY');
-                    } else {
-                        date = d.date.format(dateFormat);
-                    }
-
-                    const chartData: ChartData = {
-                        date,
-                        value: d.value,
-                    };
-                    if (index === orderedData.length - 2) {
-                        chartData.color = safe;
-                        chartData.dash = '2, 2';
-                    }
-                    if (index === orderedData.length - 1) {
-                        chartData.tooltipTextColor = safe;
-                        chartData.tooltipBorderColor = green[300];
-                    } else {
-                        chartData.tooltipTextColor = secondary;
-                        chartData.tooltipBorderColor = blue[300];
-                    }
-                    return chartData;
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                chartState.loading = false;
-            }
-        };
-        const setTableFields = () => {
-            const fields: any = [];
-            let now = tableState.endDate.clone();
-            if (state.selectedDateType === DATE_TYPE.monthly) {
-                const start = now.subtract(DATA_TABLE_COLUMN, 'month');
-                while (now.isAfter(start, 'month')) {
-                    fields.unshift({
-                        name: now.format('YYYY-MM'),
-                        label: now.format('MMM/YYYY'),
-                    });
-                    now = now.subtract(1, 'month');
-                }
-            } else {
-                now = tableState.endDate.clone().subtract(1, 'day');
-                const start = now.subtract(DATA_TABLE_COLUMN, 'day');
-                while (now.isAfter(start, 'day')) {
-                    fields.unshift({
-                        name: now.format('YYYY-MM-DD'),
-                        label: now.format('MM/DD/YYYY'),
-                    });
-                    now = now.subtract(1, 'day');
-                }
-            }
-            fields.unshift({ name: 'service', label: '' });
-            tableState.fields = fields;
-        };
-        const getTableData = async () => {
-            tableState.loading = true;
-
-            const today = tableState.endDate;
-            let start;
-            let end;
-            if (state.selectedDateType === DATE_TYPE.monthly) {
-                start = today.subtract(DATA_TABLE_COLUMN, 'month').format('YYYY-MM');
-                end = today.format('YYYY-MM');
-            } else {
-                start = today.subtract(DATA_TABLE_COLUMN + 1, 'day').format('YYYY-MM-DD');
-                end = today.subtract(1, 'day').format('YYYY-MM-DD');
-            }
-
-            try {
-                const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                    granularity: state.selectedDateType,
-                    aggregation: 'inventory.CloudServiceType',
-                    project_id: props.projectId,
-                    start,
-                    end,
-                });
-
-                const data: any = [];
-                res.results.forEach((result) => {
-                    const billingData = {};
-                    result.billing_data.forEach((d) => {
-                        const dateUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
-                        const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
-                        const pastDate = dayjs.utc(d.date).subtract(1, dateUnit).format(dateFormat);
-                        const pastCost = result.billing_data.find((bd) => bd.date === pastDate)?.cost || 0;
-                        billingData[d.date] = {
-                            cost: currencyMoneyFormatter(d.cost, CURRENCY.USD),
-                        };
-                        if (pastCost && pastCost < d.cost && (d.cost - pastCost) / Math.abs(pastCost) > 0.5) {
-                            billingData[d.date].color = 'red';
-                        }
-                    });
-
-                    let to = {};
-                    if (result.cloud_service_group && result.cloud_service_type) {
-                        to = getLink(result);
-                    }
-
-                    data.push({
-                        service: {
-                            name: result.cloud_service_group || result.service_code,
-                            to,
-                        },
-                        ...billingData,
-                    });
-                });
-                tableState.data = data;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                tableState.data = [];
-            } finally {
-                setTableFields();
-                tableState.loading = false;
-            }
+                return chartData;
+            });
         };
 
         /* Event */
@@ -559,24 +545,24 @@ export default {
             } else {
                 tableState.endDate = tableState.endDate.add(DATA_TABLE_COLUMN, dateUnit);
             }
-            getTableData();
+            fetchTableData();
         };
 
-        /* Init */
-        (async () => {
-            await Promise.allSettled([getTrend(), getTableData(), getCount()]);
-        })();
-
         /* Watcher */
-        watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
-            if (!loading && chartContext) {
+        watch([() => state.selectedDateType, () => state.dataSourceId], async ([, dataSourceId]) => {
+            if (dataSourceId) {
+                await Promise.all([
+                    fetchTrendData(),
+                    fetchTableData(),
+                ]);
+                setCountData(state.data);
+            }
+        }, { immediate: true });
+        watch([() => chartState.data, () => state.chartRef], async ([data, chartContext]) => {
+            if (data.length && chartContext) {
                 drawChart();
             }
-        }, { immediate: false });
-        watch(() => state.selectedDateType, async () => {
-            await Promise.all([getTrend(), getTableData(), getCount()]);
-            drawChart();
-        }, { immediate: false });
+        });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
