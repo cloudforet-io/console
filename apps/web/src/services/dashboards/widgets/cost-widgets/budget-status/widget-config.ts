@@ -34,8 +34,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
         ...getWidgetInheritOptions('cost_data_source'),
         ...getWidgetInheritOptionsForFilter(
             'project',
-            'region',
-            'cost_product',
         ),
     },
     options_schema: {
@@ -43,8 +41,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
             'cost_data_source',
             ...getWidgetFilterSchemaPropertyNames(
                 'project',
-                'region',
-                'cost_product',
             ),
         ],
         fixed_properties: ['cost_data_source'],
@@ -55,8 +51,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
                 ...getWidgetFilterOptionsSchema(
                     'project',
                     'service_account',
-                    'cost_product',
-                    'region',
                 ),
             },
             order: [
@@ -64,8 +58,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
                 ...getWidgetFilterSchemaPropertyNames(
                     'project',
                     'service_account',
-                    'cost_product',
-                    'region',
                 ),
             ],
         },
