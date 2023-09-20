@@ -83,7 +83,7 @@ export default defineComponent({
                 ];
             }),
             selectedMonthLabel: computed(() => {
-                if (state.monthMenuItems[state.selectedMonthMenuIndex]?.name === 'custom') {
+                if (state.monthMenuItems[state.selectedMonthMenuIndex]?.name === 'custom' && (state.selectedDateRange?.start || state.selectedDateRange?.end)) {
                     return i18nDayjs.value.utc(dayjs.utc(state.selectedDateRange?.start).format('YYYY-MM')).format('MMMM YYYY');
                 }
                 return state.monthMenuItems[state.selectedMonthMenuIndex]?.label;
@@ -100,7 +100,6 @@ export default defineComponent({
         };
 
         const handleSelectMonthMenuItem = (selectedIndex: number) => {
-            state.selectedMonthMenuIndex = selectedIndex;
             if (state.monthMenuItems[selectedIndex].name === 'current') {
                 state.selectedDateRange = { start: undefined, end: undefined };
                 emit('update:date-range', state.selectedDateRange);
@@ -109,26 +108,27 @@ export default defineComponent({
                 setSelectedDateRange(state.monthMenuItems[selectedIndex].name, state.monthMenuItems[selectedIndex].name);
                 emit('update:date-range', state.selectedDateRange);
             }
+
+            const customItemIndex = state.monthMenuItems.findIndex((d) => d.name === 'custom');
+            if (selectedIndex !== customItemIndex) state.selectedMonthMenuIndex = selectedIndex;
         };
         const handleCustomRangeModalConfirm = (dateRange: DateRange) => {
             const { start, end } = dateRange;
             setSelectedDateRange(start, end);
             emit('update:date-range', state.selectedDateRange);
+            state.selectedMonthMenuIndex = state.monthMenuItems.findIndex((d) => d.name === 'custom');
             state.customRangeModalVisible = false;
         };
 
         const setInitialDateRange = () => {
-            const _current = dayjs.utc();
             const _start = dayjs.utc(props.dateRange?.start);
             const _end = dayjs.utc(props.dateRange?.end);
 
-            // 1. default month => start is (month 'current' + day '1'), end is (month 'current + day 'today')
-            // Index 0 is 'Current' menu index
 
+            // 1. default month => dateRange.start is undefined or dateRange.end is undefined
+            // Index 0 is 'Current' menu index
             if (!props.dateRange?.start
                 || !props.dateRange?.end
-                || (_start.isSame(_current, 'month')
-                && _end.isSame(_current, 'month'))
             ) {
                 return 0;
             }
