@@ -190,7 +190,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             width: 100%;
             min-height: 2rem;
             .placeholder {
-                @apply text-gray-500;
+                @apply text-gray-600;
             }
             .selection-wrapper {
                 @apply flex flex-grow items-center text-gray-800;
