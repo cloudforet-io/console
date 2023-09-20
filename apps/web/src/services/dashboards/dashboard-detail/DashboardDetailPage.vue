@@ -81,8 +81,7 @@
 
 <script setup lang="ts">
 import {
-    computed, onMounted, onUnmounted,
-    reactive, ref, watch,
+    onUnmounted, reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -96,20 +95,12 @@ import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
-import type { RouteQueryString } from '@/lib/router-query-string';
-import {
-    objectToQueryString, primitiveToQueryString,
-    queryStringToObject, queryStringToString,
-    replaceUrlQuery,
-} from '@/lib/router-query-string';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { gray } from '@/styles/colors';
 
-import type { RefreshIntervalOption } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
@@ -141,29 +132,11 @@ const state = reactive({
     cloneModalVisible: false,
 });
 
-const queryState = reactive({
-    variables: computed(() => dashboardDetailState.variables),
-    settings: computed(() => dashboardDetailState.settings),
-    urlQueryString: computed(() => {
-        const result = { variables: objectToQueryString(queryState.variables) } as Record<string, RouteQueryString>;
-        if (queryState.settings.date_range.enabled) {
-            result.dateRange = objectToQueryString({
-                start: queryState.settings.date_range.start,
-                end: queryState.settings.date_range.end,
-            });
-        }
-        if (queryState.settings.refresh_interval_option) {
-            result.refresh_interval_option = primitiveToQueryString(queryState.settings.refresh_interval_option);
-        }
-        return result;
-    }),
-});
-
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
-const getDashboardData = async (dashboardId: string, force = false) => {
+const getDashboardData = async (dashboardId: string) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId, force);
+        await dashboardDetailStore.getDashboardInfo(dashboardId, true);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -213,71 +186,25 @@ const handleUpdateLabels = async (labels: string[]) => {
     }
 };
 
-/* init */
-let urlQueryStringWatcherStop;
-const init = async () => {
-    const currentQuery = SpaceRouter.router.currentRoute.query;
-    const useQueryValue = {
-        variables: queryStringToObject(currentQuery.variables),
-        dateRange: queryStringToObject(currentQuery.dateRange),
-        refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
-    };
 
-    if (useQueryValue.variables) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.variables = useQueryValue.variables;
-        });
+watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
+    /* NOTE: The dashboard data is reset in three cases.
+        1. the dashboard is changed from project dashboard to domain dashboard
+        2. vice versa
+        3. first entering case
+    * This is because in case of project dashboard, there are some different variables settings, so it is not safe to reuse dashboard store data with domain dashboard.
+    * But in case of the same type of dashboard, the dashboard store must be reused to smoothly update the dashboard data without blinking.
+     */
+    if (dashboardId && !prevDashboardId) { // this includes all three cases
+        dashboardDetailStore.$reset();
     }
-    if (useQueryValue.dateRange) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.settings = {
-                ..._state.settings,
-                date_range: {
-                    enabled: true,
-                    ...useQueryValue.dateRange,
-                },
-            };
-        });
-    }
-    if (useQueryValue.refresh_interval_option) {
-        dashboardDetailStore.$patch((_state) => {
-            _state.settings = {
-                ..._state.settings,
-                refresh_interval_option: useQueryValue.refresh_interval_option,
-            };
-        });
-    }
-
-    urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
-        replaceUrlQuery(urlQueryString);
-    }, { immediate: true });
-};
-
-(async () => {
-    await getDashboardData(props.dashboardId, true);
-    await init();
-})();
-
-onUnmounted(() => {
-    if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
-});
-
-watch(() => props.dashboardId, (_dashboardId) => {
-    getDashboardData(_dashboardId);
-});
+    await getDashboardData(dashboardId);
+}, { immediate: true });
 
 onUnmounted(() => {
     dashboardDetailStore.revertDashboardData();
 });
 
-onMounted(() => {
-    /*
-    Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
-     */
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap = {};
-    });
-});
 </script>
 
 <style lang="postcss" scoped>
