@@ -299,7 +299,6 @@ onMounted(() => {
     .select-options-dropdown {
         .selected-wrapper {
             @apply flex items-center;
-            width: calc(100% - 1.8rem);
             .left-icon {
                 margin-right: 0.25rem;
                 flex-shrink: 0;

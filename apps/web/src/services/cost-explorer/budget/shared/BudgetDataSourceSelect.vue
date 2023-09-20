@@ -110,7 +110,6 @@ const fetchDataSource = async () => {
         width: 100%;
         .selected-input {
             @apply flex items-center gap-1;
-            flex: 1;
         }
         .selected-item-postfix {
             @apply text-gray-400;

@@ -105,52 +105,54 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
              @keyup.enter.capture.stop="emit('click-dropdown-button')"
              @click="emit('click-dropdown-button')"
         >
-            <span v-if="props.showAlertDot"
-                  class="show-alert-dot"
-            />
-            <slot name="input-left-area" />
-            <slot name="button"
-                  v-bind="props.selectedItems"
-            >
-                <div class="selection-display-wrapper">
-                    <span v-if="displayValueOnDropdownButton === undefined"
-                          class="placeholder"
-                    >
-                        {{ props.selectionLabel
-                            ? props.selectionLabel
-                            : props.placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}
-                    </span>
-                    <span v-else
-                          class="selection-wrapper"
-                    >
-                        <b v-if="props.selectionLabel">
-                            {{ props.selectionLabel }}:
-                        </b>
-                        <span v-if="displayValueOnDropdownButton"
-                              class="selected-item"
+            <div class="selection-display-container">
+                <span v-if="props.showAlertDot"
+                      class="show-alert-dot"
+                />
+                <slot name="input-left-area" />
+                <slot name="button"
+                      v-bind="props.selectedItems"
+                >
+                    <div class="selection-display-wrapper">
+                        <span v-if="displayValueOnDropdownButton === undefined"
+                              class="placeholder"
                         >
-                            <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
-                            <p-badge v-if="displayBadgeValueOnDropdownButton"
-                                     :style-type="props.disabled ? 'gray200' : 'blue200'"
-                                     :badge-type="props.disabled ? 'solid' : 'subtle'"
-                            >
-                                {{ displayBadgeValueOnDropdownButton }}
-                            </p-badge>
+                            {{ props.selectionLabel
+                                ? props.selectionLabel
+                                : props.placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}
                         </span>
-                        <div v-else-if="showTagsOnDropdownButton"
-                             class="tags-wrapper"
+                        <span v-else
+                              class="selection-wrapper"
                         >
-                            <p-tag v-for="(item, idx) in props.selectedItems"
-                                   :key="item.name"
-                                   class="selected-tag"
-                                   @delete="handleTagDelete(item, idx)"
+                            <b v-if="props.selectionLabel">
+                                {{ props.selectionLabel }}:
+                            </b>
+                            <span v-if="displayValueOnDropdownButton"
+                                  class="selected-item"
                             >
-                                {{ item.label || item.name }}
-                            </p-tag>
-                        </div>
-                    </span>
-                </div>
-            </slot>
+                                <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
+                                <p-badge v-if="displayBadgeValueOnDropdownButton"
+                                         :style-type="props.disabled ? 'gray200' : 'blue200'"
+                                         :badge-type="props.disabled ? 'solid' : 'subtle'"
+                                >
+                                    {{ displayBadgeValueOnDropdownButton }}
+                                </p-badge>
+                            </span>
+                            <div v-else-if="showTagsOnDropdownButton"
+                                 class="tags-wrapper"
+                            >
+                                <p-tag v-for="(item, idx) in props.selectedItems"
+                                       :key="item.name"
+                                       class="selected-tag"
+                                       @delete="handleTagDelete(item, idx)"
+                                >
+                                    {{ item.label || item.name }}
+                                </p-tag>
+                            </div>
+                        </span>
+                    </div>
+                </slot>
+            </div>
             <div class="extra-button-wrapper">
                 <span v-if="props.showDeleteAllButton && props.selectedItems.length > 0"
                       class="delete-all-button"
@@ -180,7 +182,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
 .dropdown-button-component {
     /* style type - default */
     .dropdown-button {
-        @apply flex items-center bg-white text-label-md font-normal border rounded border-gray-300 cursor-pointer;
+        @apply flex justify-between items-center bg-white text-label-md font-normal border rounded border-gray-300 cursor-pointer;
         width: 100%;
         min-height: 2rem;
         gap: 0.25rem;
@@ -403,20 +405,22 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
 
     &.is-fixed-width {
         .dropdown-button {
-            .selection-display-wrapper {
+            .selection-display-container {
                 @apply truncate;
                 flex: 1;
-                .placeholder, .selected-item-text {
-                    @apply truncate;
-                }
-                .selection-wrapper {
-                    width: 100%;
-                }
-                .selected-item-text {
-                    @apply absolute;
-                    top: 25%;
-                    left: 0.5rem;
-                    width: calc(100% - 2.5rem);
+                .selection-display-wrapper {
+                    .placeholder, .selected-item-text {
+                        @apply truncate;
+                    }
+                    .selection-wrapper {
+                        width: 100%;
+                    }
+                    .selected-item-text {
+                        @apply absolute;
+                        top: 25%;
+                        left: 0.5rem;
+                        width: calc(100% - 2.5rem);
+                    }
                 }
             }
         }
