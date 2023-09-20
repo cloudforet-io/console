@@ -5,7 +5,7 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PIconButton, PHeading, PLazyImg,
+    PIconButton, PHeading, PLazyImg, PDivider, PI,
 } from '@spaceone/design-system';
 
 
@@ -21,6 +21,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
+import { gray } from '@/styles/colors';
 
 import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
@@ -79,25 +81,37 @@ const handleDeleteQueryConfirm = async () => {
         <section class="title-section">
             <p-heading :title="costAnalysisPageStore.selectedQueryId ? state.title : state.defaultTitle">
                 <template #title-left-extra>
-                    <p-lazy-img :src="state.dataSourceImage"
-                                width="2rem"
-                                height="2rem"
-                    />
+                    <div class="title-left-extra">
+                        <p-lazy-img :src="state.dataSourceImage"
+                                    width="2rem"
+                                    height="2rem"
+                        />
+                        <p-i v-if="managedCostQuerySetIdList.includes(state.title || '')"
+                             name="ic_main-filled"
+                             width="1rem"
+                             height="1rem"
+                             :color="gray[500]"
+                        />
+                    </div>
                 </template>
                 <template #title-right-extra>
                     <div v-if="costAnalysisPageStore.selectedQueryId"
-                         class="title-right-extra"
+                         class="title-right-extra icon-wrapper"
                     >
-                        <favorite-button :item-id="costAnalysisPageStore.selectedQueryId"
-                                         :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
-                                         scale="0.8"
-                        />
+                        <div class="favorite-button-wrapper">
+                            <favorite-button :item-id="costAnalysisPageStore.selectedQueryId"
+                                             :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
+                                             scale="0.8"
+                            />
+                        </div>
                         <p-icon-button v-if="!state.isManagedCostQuerySet"
                                        name="ic_edit-text"
+                                       size="md"
                                        @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
                         />
                         <p-icon-button v-if="!state.isManagedCostQuerySet"
                                        name="ic_delete"
+                                       size="md"
                                        @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
                         />
                     </div>
@@ -108,6 +122,7 @@ const handleDeleteQueryConfirm = async () => {
                 </template>
             </p-heading>
         </section>
+        <p-divider class="heading-divider" />
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
                                         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_COST_ANALYSIS')"
                                         :request-type="REQUEST_TYPE.EDIT"
@@ -123,15 +138,33 @@ const handleDeleteQueryConfirm = async () => {
 
 <style lang="postcss" scoped>
 .cost-analysis-header {
+    .heading-divider {
+        margin-top: -0.375rem;
+    }
     .title-section {
         @apply relative;
         display: flex;
     }
 
+    .title-left-extra {
+        @apply inline-flex items-center;
+        margin-bottom: -0.25rem;
+        gap: 0.5rem;
+    }
+
     .title-right-extra {
         @apply flex-shrink-0 inline-flex items-center;
+        margin-bottom: -0.25rem;
+        &.icon-wrapper {
+            gap: 0.5rem;
+            .favorite-button-wrapper {
+                @apply flex items-center justify-center;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+        }
         &.currency-wrapper {
-            @apply justify-end;
+            @apply justify-end text-gray-800;
             font-size: 0.875rem;
             float: right;
             .label {

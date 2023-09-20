@@ -229,7 +229,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
     }
 
     @screen mobile {
-        @apply flex flex-wrap justify-end items-center;
+        @apply flex flex-wrap items-center;
         width: 100%;
     }
 }

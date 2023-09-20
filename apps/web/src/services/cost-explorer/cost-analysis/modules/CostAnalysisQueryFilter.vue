@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { onClickOutside, useElementSize } from '@vueuse/core';
-import { computed, reactive, ref } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 
 import {
     PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover,
@@ -32,6 +34,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const filtersPopperRef = ref<any|null>(null);
+const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -76,12 +79,12 @@ const {
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
-    useFixedStyle: true,
+    useFixedStyle: false,
     targetRef,
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
 });
-onClickOutside(contextMenuRef, hideContextMenu);
+onClickOutside(containerRef, hideContextMenu);
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -120,10 +123,18 @@ const handleUpdateQuery = (updatedQueryId: string) => {
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
+
+watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
+    if (updatedQueryId !== '') {
+        state.filtersPopoverVisible = false;
+    }
+}, { immediate: true });
 </script>
 
 <template>
-    <div class="cost-analysis-query-filter">
+    <div ref="containerRef"
+         class="cost-analysis-query-filter"
+    >
         <div class="filter-wrapper"
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
         >
@@ -135,13 +146,16 @@ const handleClickFilter = () => {
                                    @select="handleSelectGranularity"
                 />
                 <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
-                <p-popover :is-visible="state.filtersPopoverVisible"
+                <p-popover :is-visible.sync="state.filtersPopoverVisible"
+                           :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
                            relative-style
                            position="bottom-start"
+                           class="filters-popover"
                 >
                     <p-button style-type="tertiary"
+                              class="filters-button"
                               icon-left="ic_filter"
                               @click="handleClickFilter"
                     >
@@ -205,6 +219,7 @@ const handleClickFilter = () => {
 
 <style lang="postcss" scoped>
 .cost-analysis-query-filter {
+    margin-top: 1.5rem;
     .filter-wrapper {
         position: relative;
         display: flex;
@@ -216,6 +231,7 @@ const handleClickFilter = () => {
             gap: 0.5rem;
         }
         .right-part {
+            @apply relative;
             display: flex;
             align-items: flex-start;
 
@@ -231,7 +247,9 @@ const handleClickFilter = () => {
 
             /* custom design-system component - p-context-menu */
             :deep(.p-context-menu) {
-                right: 1.5rem;
+                @apply absolute;
+                top: 2.125rem;
+                right: 0;
                 margin-top: -0.15rem;
                 .p-context-menu-item {
                     min-width: 9rem;
@@ -241,6 +259,11 @@ const handleClickFilter = () => {
 
         /* custom design-system component - p-popover */
         :deep(.p-popover) {
+            &.open {
+                .p-button.filters-button {
+                    @apply bg-gray-200;
+                }
+            }
             .popper {
                 width: 100%;
                 max-width: 100%;
@@ -255,6 +278,20 @@ const handleClickFilter = () => {
     .invalid-text {
         @apply text-red-400 text-label-md;
         margin-top: 0.5rem;
+    }
+
+    @screen mobile {
+        .filter-wrapper, .left-part {
+            @apply flex-col;
+        }
+
+        .filters-popover {
+            margin-top: 0.5rem;
+        }
+
+        .right-part {
+            margin-top: 1.5rem;
+        }
     }
 }
 </style>

@@ -166,7 +166,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
         /* custom design-system component - p-filterable-dropdown */
         :deep(.p-filterable-dropdown) {
             .dropdown-button {
-                height: 1.25rem;
+                height: 1.375rem;
                 min-height: 1.5rem;
                 .placeholder {
                     font-size: 0.75rem;
@@ -177,6 +177,17 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             }
             .p-context-menu {
                 min-width: 9rem;
+            }
+            &.selected {
+                .dropdown-button {
+                    @apply bg-secondary border-secondary text-white;
+                    .p-badge {
+                        @apply bg-white text-gray-800;
+                    }
+                    .selection-wrapper, .arrow-button {
+                        @apply text-white;
+                    }
+                }
             }
         }
     }
