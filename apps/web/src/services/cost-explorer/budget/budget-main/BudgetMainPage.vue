@@ -58,7 +58,7 @@ const handleUpdateFilters = (filters: ConsoleFilter[]) => {
                 <!--                    type="outline-button"-->
                 <!--                    @select="handleCreateBudgetSelect"-->
                 <!--                />-->
-                <p-button style-type="secondary"
+                <p-button style-type="primary"
                           icon-left="ic_plus_bold"
                           :disabled="!state.hasManagePermission"
                           @click="handleCreateBudgetSelect(state.createButtonItemList[0].name)"

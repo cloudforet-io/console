@@ -97,7 +97,7 @@ const getIconName = (icon: LNBIcon): string => {
 
 <style lang="postcss" scoped>
 .l-n-b-router-menu-item {
-    @apply border border-transparent inline-flex w-full h-full justify-between;
+    @apply border border-transparent inline-flex items-center w-full h-full justify-between;
     font-size: 0.875rem;
     line-height: 125%;
     border-radius: 4px;
@@ -132,7 +132,7 @@ const getIconName = (icon: LNBIcon): string => {
         }
         .mark-wrapper {
             height: 100%;
-            padding-top: 0.125rem;
+            margin-top: -0.25rem;
         }
     }
     .favorite-button {

@@ -14,3 +14,8 @@ export interface BudgetUsageRange {
 	max?: number;
 	condition?: 'or'|'and'; // default: 'and'
 }
+
+export interface BudgetTargetLabel {
+	group?: string;
+	name: string;
+}
