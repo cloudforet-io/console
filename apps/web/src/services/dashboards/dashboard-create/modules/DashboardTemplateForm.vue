@@ -39,19 +39,14 @@
                             </div>
                         </template>
                         <template #item-overlay-content="{board}">
-                            <router-link
-                                v-if="board.description?.preview_image"
-                                :to="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
-                                target="_blank"
-                            >
-                                <div class="dashboard-template-overlay-content">
-                                    <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
-                                    <p-i name="ic_external-link"
-                                         height="1em"
-                                         width="1em"
-                                    />
-                                </div>
-                            </router-link>
+                            <p-link v-if="board.description?.preview_image"
+                                    action-icon="internal-link"
+                                    size="md"
+                                    highlight
+                                    new-tab
+                                    :text="$t('DASHBOARDS.CREATE.PREVIEW')"
+                                    :href="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
+                            />
                         </template>
                     </p-board>
                     <p-text-pagination
@@ -129,7 +124,7 @@ import {
 } from 'vue';
 
 import {
-    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
+    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
