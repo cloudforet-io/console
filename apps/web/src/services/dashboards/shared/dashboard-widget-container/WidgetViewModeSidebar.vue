@@ -62,12 +62,12 @@ const updateWidgetInfo = async () => {
         if (dashboardDetailStore.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                 project_dashboard_id: dashboardDetailState.dashboardId,
-                layouts: dashboardDetailState.dashboardWidgetInfoList,
+                layouts: [dashboardDetailState.dashboardWidgetInfoList],
             });
         } else {
             await SpaceConnector.clientV2.dashboard.domainDashboard.update({
                 domain_dashboard_id: dashboardDetailState.dashboardId,
-                layouts: dashboardDetailState.dashboardWidgetInfoList,
+                layouts: [dashboardDetailState.dashboardWidgetInfoList],
             });
         }
     } catch (e) {
