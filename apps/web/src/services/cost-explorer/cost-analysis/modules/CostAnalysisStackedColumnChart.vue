@@ -25,6 +25,7 @@ import type {
     Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getPeriodByGranularity } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
@@ -63,12 +64,15 @@ const drawChart = () => {
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
     else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
 
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
+    const _period = getPeriodByGranularity(costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
+    const _dateAxisSettings = costAnalysisPageState.granularity === GRANULARITY.DAILY ? {
+        min: dayjs.utc(_period.start).valueOf(),
+        max: dayjs.utc(_period.end).valueOf(),
+    } : {};
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = timeUnit;
-    // set distance of xAxis
-    xAxis.get('renderer').set('minGridDistance', 30);
     // set label adapter of yAxis
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
