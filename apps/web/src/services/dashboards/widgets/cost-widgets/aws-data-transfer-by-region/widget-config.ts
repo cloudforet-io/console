@@ -50,6 +50,8 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         ...getWidgetInheritOptionsForFilter(
             'project',
             'service_account',
+            'project_group',
+            'region',
         ),
     },
     options_schema: {

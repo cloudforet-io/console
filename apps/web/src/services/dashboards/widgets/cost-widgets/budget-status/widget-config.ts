@@ -41,6 +41,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
             'cost_data_source',
             ...getWidgetFilterSchemaPropertyNames(
                 'project',
+                'service_account',
             ),
         ],
         fixed_properties: ['cost_data_source'],
