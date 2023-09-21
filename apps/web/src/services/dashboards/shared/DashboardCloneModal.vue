@@ -166,10 +166,10 @@ export default defineComponent<Props>({
                 }
                 return store.state.dashboard.domainItems.map((item) => item.name);
             }),
-            layouts: computed<DashboardLayoutWidgetInfo[]|DashboardLayoutWidgetInfo[][]>(() => {
+            layouts: computed<DashboardLayoutWidgetInfo[][]>(() => {
                 if (props.dashboard?.layouts) return props.dashboard?.layouts;
                 if ((props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList) {
-                    return (props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList;
+                    return [(props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList];
                 }
                 return [];
             }),
