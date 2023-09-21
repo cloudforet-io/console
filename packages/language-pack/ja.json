@@ -516,6 +516,7 @@
 				"ADD_MORE": "",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "累積データではなく、月別データでファイルがダウンロードされます。",
 				"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
+				"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
 				"ALT_E_DELETE_QUERY": "クエリの削除に失敗しました",
 				"ALT_E_EDITED_QUERY": "クエリの編集に失敗しました",
 				"ALT_E_SAVED_QUERY": "クエリの保存に失敗しました",
