@@ -284,7 +284,8 @@ const {
     }
 
     .dropdown-box {
-        @apply flex items-center border border-solid border-gray-300 bg-white rounded-md w-full;
+        @apply flex items-center border border-solid border-gray-300 bg-white w-full;
+        border-radius: 0.75rem;
         height: 2rem;
         padding: 0 0.25rem 0 0.75rem;
 
@@ -340,10 +341,10 @@ const {
         }
 
         &.filled-value:not([disabled=disabled]) {
-            @apply border-blue-400 bg-blue-200;
+            @apply border-blue-300 bg-blue-100;
 
             &.is-visible {
-                @apply border-blue-600;
+                @apply border-blue-600 bg-blue-200;
             }
         }
     }
