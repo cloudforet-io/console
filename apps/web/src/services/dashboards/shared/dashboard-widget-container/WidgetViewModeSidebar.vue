@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     widgetConfigId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'refresh'): void;
+    (e: 'close'): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -85,7 +85,7 @@ const handleClickSaveButton = async () => {
 };
 const handleCloseSidebar = () => {
     state.proxyVisible = false;
-    emit('refresh');
+    emit('close');
 };
 </script>
 
