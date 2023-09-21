@@ -79,7 +79,6 @@ const handleConfirmDelete = () => {
         <section class="page-title-wrapper">
             <p-heading :show-back-button="!state.loading"
                        :title="state.loading ? '' : state.budgetData?.name"
-                       class="header-container"
                        @click-back-button="$router.go(-1)"
             >
                 <template v-if="!state.loading"
@@ -128,30 +127,23 @@ const handleConfirmDelete = () => {
 
 <style lang="postcss" scoped>
 .page-title-wrapper {
-
-    .header-container {
-        /* custom design-system component - p-header */
-        &:deep(.heading-wrapper) {
-            @apply flex items-center;
+    .title-right-extra {
+        @apply inline-flex items-center justify-end;
+        flex-grow: 1;
+        line-height: 1.09375rem;
+        float: right;
+        min-height: 2.5rem;
+        .divider {
+            height: 0.875rem;
+            margin: 0 0.5rem;
         }
 
-        .title-right-extra {
-            @apply inline-flex items-center justify-end;
-            flex-grow: 1;
-            line-height: 1.09375rem;
-            float: right;
-            .divider {
-                height: 0.875rem;
-                margin: 0 0.5rem;
-            }
-
-            .right-item {
-                @apply text-gray-800;
-                font-size: 0.875rem;
-                .label {
-                    font-weight: 700;
-                    padding-right: 0.25rem;
-                }
+        .right-item {
+            @apply text-gray-800;
+            font-size: 0.875rem;
+            .label {
+                font-weight: 700;
+                padding-right: 0.25rem;
             }
         }
     }
