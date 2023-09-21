@@ -52,7 +52,7 @@ const SHOW_MORE_MENU_ID = 'show-more';
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
-const costExplorerSettinsState = costExplorerSettingsStore.$state;
+const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const allReferenceStore = useAllReferenceStore();
 
 const router = useRouter();
@@ -211,7 +211,7 @@ const handleLearnMoreRelocateNotification = () => {
 
 const handleDismissRelocateNotification = () => {
     costExplorerSettingsStore.setRelocateDashboardState({
-        ...costExplorerSettinsState.relocateDashboardStatus,
+        ...costExplorerSettingsState.relocateDashboardStatus,
         hideBanner: true,
     });
     relocateNotificationState.isBannerVisible = false;
