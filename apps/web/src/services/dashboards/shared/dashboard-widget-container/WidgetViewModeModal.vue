@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AsyncComponent, ComponentPublicInstance } from 'vue';
 import {
-    computed, reactive, toRef, watch,
+    computed, nextTick, reactive, toRef, watch,
 } from 'vue';
 
 import {
@@ -25,20 +25,33 @@ import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widge
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
+    WidgetSize,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 interface WidgetViewModeModalProps {
     visible: boolean;
+    /*
+    NOTE: widgetInfo's type is to prevent vue2 bundling error when using extended interface from other file as a prop's type
+    This type is exactly the same with ReformedWidgetInfo in use-widget-reformer.ts
+    */
+    widgetInfo?: DashboardLayoutWidgetInfo & {
+        size: WidgetSize;
+        theme?: WidgetTheme;
+        width: number;
+        component: AsyncComponent|null;
+    }; // = ReformedWidgetInfo
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
     visible: false,
+    widgetInfo: undefined,
 });
-const emit = defineEmits<{(e: 'refresh-widget', widgetKey: string): void}>();
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
+}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -56,7 +69,7 @@ const state = reactive({
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
-        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState?.widgetInfo?.inherit_options);
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState.inheritOptions);
         return nonInheritedWidgetOptions.length > 0;
     }),
 });
@@ -68,23 +81,14 @@ const initSnapshot = () => {
     state.variableSchemaSnapshot = cloneDeep(dashboardDetailState.variablesSchema);
     state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
-const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
-    let component: AsyncComponent|null = null;
-    try {
-        component = getWidgetComponent(widget.widget_name);
-    } catch (e) {
-        console.error(e);
-    }
-    state.component = component;
-};
 
 const handleCloseModal = () => {
     dashboardDetailStore.$patch((_state) => {
         _state.variables = state.variablesSnapshot;
         _state.variablesSchema = state.variableSchemaSnapshot;
         _state.settings = state.settingsSnapshot;
-        _state.widgetViewModeModalVisible = false;
     });
+    emit('update:visible', false);
 };
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
@@ -107,22 +111,25 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
 };
 
 watch(() => props.visible, async (visible) => {
+    if (!props.widgetInfo) return;
     if (visible) {
         initSnapshot();
-        await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string, widgetFormState.widgetConfigId as string);
-        await initWidgetComponent(widgetFormStore.mergedWidgetInfo as DashboardLayoutWidgetInfo);
+        widgetFormStore.initWidgetForm(props.widgetInfo.widget_key, props.widgetInfo.widget_name);
+        state.component = props.widgetInfo.component;
+        await nextTick();
         state.widgetRef?.initWidget();
         state.initiated = true;
     } else {
         state.sidebarVisible = false;
-        emit('refresh-widget', widgetFormState.widgetKey as string);
+        state.component = null;
+        emit('update:visible', false);
     }
 });
 watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions], async (after, before) => {
     if (!state.initiated) return;
     if (isEqual(after[0], before[0]) && isEqual(after[1], before[1])) return;
     await state.widgetRef?.refreshWidget();
-}, { immediate: false });
+});
 </script>
 
 <template>
@@ -178,36 +185,36 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                         <dashboard-toolset />
                     </div>
                 </div>
-                <div v-if="state.component"
+                <div v-if="props.widgetInfo && state.component"
                      class="widget-wrapper"
                 >
                     <component :is="state.component"
                                ref="widgetRef"
-                               :widget-key="widgetFormState.widgetKey"
-                               :widget-config-id="widgetFormStore.mergedWidgetInfo?.widget_name"
-                               :title="widgetFormState.widgetTitle"
-                               :options="widgetFormState.widgetOptions"
-                               :inherit-options="widgetFormState.inheritOptions"
-                               :schema-properties="widgetFormState.schemaProperties"
+                               :widget-key="props.widgetInfo.widget_key"
+                               :widget-config-id="props.widgetInfo.widget_name"
+                               :title="props.widgetInfo.title"
+                               :options="props.widgetInfo.widget_options"
+                               :inherit-options="props.widgetInfo.inherit_options"
+                               :schema-properties="props.widgetInfo.schema_properties"
                                size="full"
-                               :theme="widgetFormState.theme"
-                               :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetKey] === false"
+                               :theme="props.widgetInfo.theme"
+                               :error-mode="dashboardDetailState.widgetValidMap[props.widgetInfo.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"
                                :initiated="state.initiated"
                                :dashboard-settings="dashboardDetailState.settings"
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
-                               @update-data="handleUpdateData(widgetFormState.widgetKey, $event)"
-                               @update-widget-info="handleUpdateWidgetInfo(widgetFormState.widgetKey, $event)"
-                               @update-widget-validation="handleUpdateValidation(widgetFormState.widgetKey, $event)"
+                               @update-data="handleUpdateData(props.widgetInfo.widget_key, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(props.widgetInfo.widget_key, $event)"
+                               @update-widget-validation="handleUpdateValidation(props.widgetInfo.widget_key, $event)"
                     />
                 </div>
             </div>
             <transition name="slide-left">
-                <widget-view-mode-sidebar v-if="state.sidebarVisible"
-                                          :widget-config-id="widgetFormState.widgetConfigId"
-                                          :widget-key="widgetFormState.widgetKey"
+                <widget-view-mode-sidebar v-if="props.widgetInfo && state.sidebarVisible"
+                                          :widget-config-id="props.widgetInfo.widget_name"
+                                          :widget-key="props.widgetInfo.widget_key"
                                           :visible.sync="state.sidebarVisible"
                                           @refresh="handleRefreshWidget"
                 />
