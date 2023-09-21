@@ -73,6 +73,11 @@ const drawChart = () => {
 
     // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = timeUnit;
+    xAxis.setAll({
+        dateFormats: {
+            day: 'd',
+        },
+    });
     // set label adapter of yAxis
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
@@ -156,7 +161,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 </script>
 
 <template>
-    <p-data-loader :loading="loading"
+    <p-data-loader :loading="props.loading"
                    class="cost-analysis-stacked-column-chart"
     >
         <template #loader>

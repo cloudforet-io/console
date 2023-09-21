@@ -74,7 +74,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         },
         renderer: xRenderer,
         dateFormats: {
-            day: 'd',
+            day: 'M/d',
             month: 'MMM',
             year: 'yyyy',
         },
