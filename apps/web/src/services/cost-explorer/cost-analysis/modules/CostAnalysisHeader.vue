@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import {
-    computed, reactive,
-} from 'vue';
+import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -37,7 +35,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 
 const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-    title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? 'Cost Analysis'),
+    title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? state.defaultTitle),
     dataSourceImage: computed(() => costAnalysisPageStore.dataSourceImageUrl),
     isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId ? managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId) : false)),
     itemIdForDeleteQuery: '',
@@ -79,7 +77,7 @@ const handleDeleteQueryConfirm = async () => {
 <template>
     <div class="cost-analysis-header">
         <section class="title-section">
-            <p-heading :title="costAnalysisPageStore.selectedQueryId ? state.title : state.defaultTitle">
+            <p-heading :title="state.title">
                 <template #title-left-extra>
                     <div class="title-left-extra">
                         <p-lazy-img :src="state.dataSourceImage"
