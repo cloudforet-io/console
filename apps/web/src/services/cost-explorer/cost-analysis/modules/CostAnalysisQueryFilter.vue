@@ -111,6 +111,7 @@ const {
     menu: state.saveDropdownMenuItems,
 });
 onClickOutside(containerRef, hideContextMenu);
+onClickOutside(contextMenuRef, hideContextMenu);
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -292,7 +293,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 top: 2.125rem;
                 right: 0;
                 margin-top: -0.15rem;
-                z-index: 10;
+                z-index: 100;
                 .p-context-menu-item {
                     min-width: 10rem;
                 }
