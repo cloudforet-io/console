@@ -1,4 +1,6 @@
-import { cloneDeep, flattenDeep } from 'lodash';
+import {
+    cloneDeep, flattenDeep,
+} from 'lodash';
 import { defineStore } from 'pinia';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
@@ -6,6 +8,7 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 import {
     getVariableKeyFromWidgetSchemaProperty,
 } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
+import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo,
@@ -65,6 +68,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 dashboardVariablesSchema: dashboardDetailState.variablesSchema,
                 dashboardVariables: dashboardDetailState.variables,
                 title: widgetInfo?.title,
+                schemaProperties: widgetInfo?.schema_properties,
             });
 
             // refine inheritOptions to make inherit project variable from dashboard if it is project dashboard.
@@ -81,6 +85,21 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 widget_options: mergedWidgetState.options,
                 schema_properties: mergedWidgetState.schemaProperties,
             };
+        },
+        updatedWidgetInfo(): DashboardLayoutWidgetInfo {
+            if (!this.widgetConfig || !this.widgetConfigId) {
+                throw new Error('widgetConfig does not exist');
+            }
+
+            return getUpdatedWidgetInfo(this.widgetConfig, {
+                widget_key: this.widgetKey,
+                widget_name: this.widgetConfigId,
+                title: this.widgetTitle,
+                inherit_options: this.inheritOptions,
+                widget_options: this.widgetOptions,
+                schema_properties: this.schemaProperties,
+                version: '1',
+            });
         },
     },
     actions: {
