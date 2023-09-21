@@ -72,6 +72,7 @@ const state = reactive({
     ])),
     selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
     isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
+    isDynamicQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
@@ -209,7 +210,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 </p-popover>
             </div>
             <div class="right-part">
-                <template v-if="!state.isManagedQuerySet">
+                <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
                     <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
