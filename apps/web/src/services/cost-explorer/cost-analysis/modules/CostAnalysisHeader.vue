@@ -24,7 +24,9 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 
 import { gray } from '@/styles/colors';
 
-import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import {
+    DYNAMIC_COST_QUERY_SET_PARAMS, managedCostQuerySetIdList,
+} from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
@@ -44,6 +46,7 @@ const state = reactive({
     selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
+    isEditableQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
 });
 
 /* Event Handlers */
@@ -104,16 +107,16 @@ const handleDeleteQueryConfirm = async () => {
                                              scale="0.8"
                             />
                         </div>
-                        <p-icon-button v-if="!state.isManagedCostQuerySet"
-                                       name="ic_edit-text"
-                                       size="md"
-                                       @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
-                        />
-                        <p-icon-button v-if="!state.isManagedCostQuerySet"
-                                       name="ic_delete"
-                                       size="md"
-                                       @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
-                        />
+                        <template v-if="state.isEditableQuerySet && !state.isManagedCostQuerySet">
+                            <p-icon-button name="ic_edit-text"
+                                           size="md"
+                                           @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
+                            />
+                            <p-icon-button name="ic_delete"
+                                           size="md"
+                                           @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
+                            />
+                        </template>
                     </div>
                     <div class="title-right-extra currency-wrapper">
                         <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
@@ -149,6 +152,7 @@ const handleDeleteQueryConfirm = async () => {
     .title-left-extra {
         @apply inline-flex items-center;
         margin-bottom: -0.25rem;
+        margin-right: 0.5rem;
         gap: 0.5rem;
     }
 
