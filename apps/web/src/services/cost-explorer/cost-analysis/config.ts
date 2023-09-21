@@ -53,8 +53,8 @@ export const managedCostQuerySets: CostQuerySetModel[] = [
         },
     },
     {
-        cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
-        name: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
+        cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
+        name: MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
         options: {
             group_by: [GROUP_BY.PRODUCT],
             granularity: GRANULARITY.DAILY,
