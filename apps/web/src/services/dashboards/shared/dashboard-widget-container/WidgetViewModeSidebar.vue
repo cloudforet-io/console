@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
     PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
+import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -32,6 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'close'): void;
+    (e: 'update:widget-info'): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -87,6 +89,11 @@ const handleCloseSidebar = () => {
     state.proxyVisible = false;
     emit('close');
 };
+
+watch(() => widgetFormStore.mergedWidgetInfo, async (after, before) => {
+    if (before === undefined || isEqual(after, before)) return;
+    emit('update:widget-info');
+});
 </script>
 
 <template>

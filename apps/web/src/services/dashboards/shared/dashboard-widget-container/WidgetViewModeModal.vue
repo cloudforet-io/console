@@ -7,7 +7,7 @@ import {
 import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -96,6 +96,9 @@ const handleClickEditOption = () => {
 const handleCloseSidebar = () => {
     state.widgetRef?.refreshWidget();
 };
+const handleUpdateSidebarWidgetInfo = () => {
+    state.widgetRef?.refreshWidget();
+};
 
 const handleUpdateData = (widgetKey: string, data: any) => {
     dashboardDetailStore.$patch((_state) => {
@@ -123,11 +126,7 @@ watch(() => props.visible, async (visible) => {
         emit('update:visible', false);
     }
 });
-watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions], async (after, before) => {
-    if (!state.initiated) return;
-    if (isEqual(after[0], before[0]) && isEqual(after[1], before[1])) return;
-    await state.widgetRef?.refreshWidget();
-});
+
 </script>
 
 <template>
@@ -215,6 +214,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                           :widget-key="props.widgetInfo.widget_key"
                                           :visible.sync="state.sidebarVisible"
                                           @close="handleCloseSidebar"
+                                          @update:widget-info="handleUpdateSidebarWidgetInfo"
                 />
             </transition>
         </div>
