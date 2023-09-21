@@ -38,7 +38,7 @@ const allReferenceStore = useAllReferenceStore();
 const costQuerySetStore = () => useCostQuerySetStore();
 const costQuerySetState = () => costQuerySetStore().$state;
 
-const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, string[]> => {
+const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): CostAnalysisPageState['filters'] => {
     if (!consoleFilters || isEmpty(consoleFilters)) return {};
     const result: Record<string, string[]> = {};
     consoleFilters.forEach((d) => {
