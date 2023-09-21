@@ -96,7 +96,7 @@ export const getRefinedWidgetOptionsSchema = (
     schemaProperties: string[],
     projectId?: string,
 ): JsonSchema => {
-    const schema = widgetOptionsSchema?.schema;
+    const schema = widgetOptionsSchema.schema;
 
     // init schema
     const refinedJsonSchema: JsonSchema = {
@@ -105,7 +105,7 @@ export const getRefinedWidgetOptionsSchema = (
         required: [] as WidgetOptionsSchemaProperty[],
         order: schema?.order ?? schemaProperties as WidgetOptionsSchemaProperty[],
     };
-    if (!schema?.properties) return refinedJsonSchema;
+    if (!schema.properties) return refinedJsonSchema;
 
     // refine each property schema
     Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {

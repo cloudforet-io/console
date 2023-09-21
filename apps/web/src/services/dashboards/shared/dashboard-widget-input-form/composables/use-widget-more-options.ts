@@ -11,12 +11,10 @@ import {
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
 interface UseWidgetMoreOptionsState {
     schemaFormData: Ref<Record<string, any>>;
     widgetOptionsJsonSchema: Ref<JsonSchema>;
-    widgetConfig: Ref<WidgetConfig|undefined>;
 }
 export const useWidgetMoreOptions = (state: UnwrapRef<UseWidgetMoreOptionsState>) => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -40,6 +38,7 @@ export const useWidgetMoreOptions = (state: UnwrapRef<UseWidgetMoreOptionsState>
             });
         }
         state.schemaFormData = { ...state.schemaFormData };
+        widgetFormStore.updateInheritOptionsAndWidgetOptionsByFormData(state.schemaFormData);
     };
 
     const updateSchemaProperties = (properties: string[]) => {
@@ -61,7 +60,7 @@ export const useWidgetMoreOptions = (state: UnwrapRef<UseWidgetMoreOptionsState>
         // update schema
         state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
             referenceStoreState,
-            state.widgetConfig?.options_schema ?? { schema: {} },
+            widgetFormStore.widgetConfig?.options_schema ?? { schema: {} },
             dashboardDetailState.variablesSchema,
             widgetFormState.inheritOptions ?? {},
             properties,
