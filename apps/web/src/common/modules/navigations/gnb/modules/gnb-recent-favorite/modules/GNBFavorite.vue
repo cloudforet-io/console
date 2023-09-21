@@ -111,6 +111,7 @@ import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSugge
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
@@ -207,7 +208,7 @@ export default {
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            costQuerySets: [],
+            costQuerySets: [] as CostQuerySetModel[],
             domainDashboardItems: computed<DashboardModel[]>(() => {
                 const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_WORKSPACE, store.getters['user/pagePermissionList']);
                 return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
