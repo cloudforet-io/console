@@ -58,7 +58,7 @@ export const useWidgetLifecycle = ({
     }, { deep: true });
 
     watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!props.editMode || !widgetState.inheritOptions || !props.schemaProperties || !widgetState.options
+        if (!props.editMode || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
             || isEqual(after, before) || props.disableRefreshOnVariableChange) return;
 
         const { isWidgetUpdated, isValid, updatedWidgetInfo } = validateWidgetByVariablesSchemaUpdate({
@@ -67,7 +67,7 @@ export const useWidgetLifecycle = ({
             widgetConfig: widgetState.widgetConfig,
             widgetInfo: {
                 inherit_options: widgetState.inheritOptions,
-                schema_properties: props.schemaProperties,
+                schema_properties: widgetState.schemaProperties,
                 widget_options: widgetState.options,
             },
         });

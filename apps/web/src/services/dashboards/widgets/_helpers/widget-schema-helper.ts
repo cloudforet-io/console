@@ -8,6 +8,7 @@ import type {
     WidgetOptionsSchemaProperty,
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/config';
 import {
     ASSET_GROUP_BY_SCHEMA, ASSET_REFERENCE_SCHEMA,
     COST_REFERENCE_SCHEMA, COST_GROUP_BY_SCHEMA,
@@ -49,6 +50,11 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
 export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetFiltersSchemaProperty => `filters.${key}`;
+export const getWidgetOptionName = (key: string): string => {
+    if (WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey)) return `filters.${key}`;
+    return key;
+};
+export const isWidgetFilterKey = (key: string): boolean => WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
 
 /** @function
  * @name getWidgetOptionsSchemaPropertyName

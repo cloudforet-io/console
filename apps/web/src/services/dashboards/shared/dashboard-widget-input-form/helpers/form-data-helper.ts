@@ -1,6 +1,9 @@
 import { cloneDeep } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import {
+    getVariableKeyFromWidgetSchemaProperty,
+} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import type { PartialDashboardLayoutWidgetInfo } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import type { InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
 
@@ -25,11 +28,18 @@ export const getInitialFormData = (widgetInfo: PartialDashboardLayoutWidgetInfo|
 };
 
 const getOptionValueFromVariableSchema = (optionKey: string, inheritOption: InheritOptions['string'], variablesSchema: DashboardVariablesSchema) => {
-    const variableKey = optionKey.replace('filters.', '');
-    // check if variable is available
-    if (inheritOption.variable_info?.key === variableKey && variablesSchema.properties[variableKey]?.use) {
+    if (!inheritOption.enabled) return undefined;
+
+    if (inheritOption.variable_info?.key && variablesSchema.properties[inheritOption.variable_info.key]?.use) {
+        return inheritOption.variable_info.key;
+    }
+
+    // if variable key is not defined in inherit option, get variable key from dashboard variable schema
+    const variableKey = getVariableKeyFromWidgetSchemaProperty(optionKey);
+    if (variablesSchema.properties[variableKey]?.use) {
         return variableKey;
     }
+
     return undefined;
 };
 const getOptionKeyAndValueFromWidgetInfoOptions = (optionKey: string, widgetOptions: WidgetOptions) => {

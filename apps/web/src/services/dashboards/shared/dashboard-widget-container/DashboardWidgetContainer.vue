@@ -82,9 +82,8 @@ const handleWidgetRefreshed = (widgetKey: string, data: any) => {
         _state.widgetDataMap[widgetKey] = data;
     });
 };
-const handleUpdateWidgetInfo = (widget: ReformedWidgetInfo, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
-    const originWidgetInfo = widget;
-    dashboardDetailStore.updateWidgetInfo(originWidgetInfo.widget_key, { ...originWidgetInfo, ...widgetInfo });
+const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
     dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
@@ -236,7 +235,7 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
                            :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                            :dashboard-variables="dashboardDetailState.variables"
                            @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
-                           @update-widget-info="handleUpdateWidgetInfo(widget, $event)"
+                           @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
                            @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                            @click-edit="handleClickWidgetEdit(widget)"
                            @click-delete="handleClickDeleteWidget(widget)"

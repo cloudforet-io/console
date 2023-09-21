@@ -67,7 +67,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 title: widgetInfo?.title,
             });
 
-            // refine inheritOptions
+            // refine inheritOptions to make inherit project variable from dashboard if it is project dashboard.
             const projectId = dashboardDetailState.projectId;
             const refinedInheritOptions = projectId ? getProjectCaseInheritOptions(mergedWidgetState.inheritOptions) : mergedWidgetState.inheritOptions;
 

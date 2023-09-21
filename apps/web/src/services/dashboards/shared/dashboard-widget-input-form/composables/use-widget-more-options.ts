@@ -1,7 +1,7 @@
 import type { Ref, UnwrapRef } from 'vue';
 
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { xor } from 'lodash';
+import { cloneDeep, xor } from 'lodash';
 
 import {
     useReferenceStore,
@@ -50,11 +50,9 @@ export const useWidgetMoreOptions = (state: UnwrapRef<UseWidgetMoreOptionsState>
         });
 
         // update inherit options
-        const inheritOptions = {};
-        const origin = widgetFormState.inheritOptions ?? {};
-        Object.keys(origin).forEach((name) => {
-            if (properties.includes(name)) inheritOptions[name] = origin[name];
-            else inheritOptions[name] = { enabled: false };
+        const inheritOptions = cloneDeep(widgetFormState.inheritOptions) ?? {};
+        Object.keys(inheritOptions).forEach((name) => {
+            if (!properties.includes(name)) delete inheritOptions[name];
         });
         widgetFormStore.$patch((_state) => {
             _state.inheritOptions = inheritOptions;
