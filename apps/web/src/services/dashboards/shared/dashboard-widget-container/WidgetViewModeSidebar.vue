@@ -194,7 +194,7 @@ $footer-height: 57px;
         padding-top: 0;
         padding-bottom: $footer-height;
         .inner {
-            padding-top: 1rem;
+            padding-top: 2rem;
             padding-bottom: 1rem;
         }
     }

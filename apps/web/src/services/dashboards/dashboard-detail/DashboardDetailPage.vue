@@ -8,36 +8,37 @@
             <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
-                <p-i name="ic_globe-filled"
-                     width="1rem"
-                     height="1rem"
-                     :color="PUBLIC_ICON_COLOR"
-                />
+                <div class="title-left-extra">
+                    <p-i name="ic_globe-filled"
+                         width="1rem"
+                         height="1rem"
+                         :color="PUBLIC_ICON_COLOR"
+                    />
+                </div>
             </template>
             <template v-if="dashboardDetailState.name"
                       #title-right-extra
             >
-                <span class="dashboard-title-icon-buttons-wrapper">
-                    <div class="favorite-wrapper">
+                <div class="title-right-extra">
+                    <div class="favorite-button-wrapper">
                         <favorite-button :item-id="props.dashboardId"
                                          :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                          scale="0.8"
                         />
                     </div>
                     <p-icon-button name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
+                                   size="md"
                                    :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
+                                   size="md"
+
                                    :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    class="delete-button"
                                    @click="handleVisibleDeleteModal"
                     />
-                </span>
+                </div>
             </template>
             <template #extra>
                 <dashboard-control-buttons v-if="state.hasManagePermission"
@@ -211,31 +212,37 @@ onUnmounted(() => {
 .p-heading {
     margin-bottom: 0.75rem;
 }
-.dashboard-title-icon-buttons-wrapper {
-    display: inline-flex;
-    gap: 0.5rem;
-    align-items: center;
-    .favorite-wrapper {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 2rem;
+.dashboard-detail-page {
+    .title-left-extra {
+        @apply inline-block;
+        height: 2rem;
+        margin-top: 0.075rem;
     }
-}
-.divider {
-    @apply mb-6;
-}
-.filter-box {
-    @apply flex justify-between items-start mb-4;
-}
-.dashboard-selectors {
-    @apply relative flex justify-between items-start z-10;
-    padding-bottom: 1.25rem;
-
-    .variable-selector-wrapper {
-        @apply relative flex items-center flex-wrap;
+    .title-right-extra {
+        @apply flex-shrink-0 inline-flex items-center;
+        margin-bottom: -0.25rem;
         gap: 0.5rem;
-        padding-right: 1rem;
+        .favorite-button-wrapper {
+            @apply flex items-center justify-center;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+    }
+    .divider {
+        @apply mb-6;
+    }
+    .filter-box {
+        @apply flex justify-between items-start mb-4;
+    }
+    .dashboard-selectors {
+        @apply relative flex justify-between items-start z-10;
+        padding-bottom: 1.25rem;
+
+        .variable-selector-wrapper {
+            @apply relative flex items-center flex-wrap;
+            gap: 0.5rem;
+            padding-right: 1rem;
+        }
     }
 }
 </style>
