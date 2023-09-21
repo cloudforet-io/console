@@ -9,7 +9,7 @@ import type {
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { getMergedWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
+import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {
     getRefinedWidgetOptions,
 } from '@/services/dashboards/widgets/_helpers/widget-options-helper';
@@ -68,7 +68,7 @@ export function useMergedWidgetState(
             optionState.dashboardVariables,
             optionsErrorMap.value,
         )),
-        inheritOptions: computed<InheritOptions>(() => getMergedWidgetInheritOptions(state.widgetConfig, optionState.inheritOptions)),
+        inheritOptions: computed<InheritOptions>(() => getInitialWidgetInheritOptions(state.widgetConfig, optionState.inheritOptions, optionState.dashboardVariablesSchema)),
         settings: computed<DashboardSettings|undefined>(() => {
             if (!optionState.dashboardSettings) return undefined;
             const dateRange = optionState.dashboardSettings.date_range;
