@@ -78,7 +78,7 @@ export default defineComponent({
                     },
                 ];
             }),
-            selectedMonthMenu: {} as MenuItem,
+            selectedMonthMenu: null,
             selectedMonthLabel: computed(() => {
                 if (state.selectedMonthMenu?.name === 'custom' && (state.selectedDateRange?.start || state.selectedDateRange?.end)) {
                     return i18nDayjs.value.utc(dayjs.utc(state.selectedDateRange?.start).format('YYYY-MM')).format('MMMM YYYY');
