@@ -35,7 +35,7 @@ export interface CostQuerySetOptionForPeriod {
 
 export interface CostQuerySetModel {
     cost_query_set_id: string;
-    data_source_id: string;
+    data_source_id?: string; // This isn't using in cost-analysis now. Just used in GNB favorite.
     name: string;
     options?: CostQuerySetOption;
 }

@@ -347,8 +347,6 @@ export default {
                 });
                 if (status === 'succeed' && response?.results) {
                     state.costQuerySets = response.results;
-                } else {
-                    state.costQuerySets = [];
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -367,7 +365,7 @@ export default {
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
                 store.dispatch('favorite/load', FAVORITE_TYPE.COST_ANALYSIS),
                 getAllCostQuerySetList(),
-                // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
+                // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
             ]);
             state.loading = false;
         })();
