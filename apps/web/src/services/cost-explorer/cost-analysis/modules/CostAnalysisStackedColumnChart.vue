@@ -26,6 +26,7 @@ import type {
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { Granularity } from '@/services/cost-explorer/type';
 
 
 interface Props {
@@ -52,6 +53,11 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const getTooltipDateFormatByGranularity = (granularity: Granularity) => {
+    if (granularity === GRANULARITY.MONTHLY) return 'MMM, YYYY';
+    if (granularity === GRANULARITY.YEARLY) return 'YYYY';
+    return 'MMM D, YYYY';
+};
 const drawChart = () => {
     let timeUnit: TimeUnit = 'month';
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
@@ -78,6 +84,7 @@ const drawChart = () => {
         _chartData = getStackedChartData(props.chartData, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     }
 
+    const _tooltipDateFormat = getTooltipDateFormatByGranularity(costAnalysisPageState.granularity);
     props.legends.forEach((legend) => {
         // create series
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
@@ -112,9 +119,10 @@ const drawChart = () => {
         tooltip.label.adapters.add('text', (text, target) => {
             const dataContext = target?.dataItem?.dataContext;
             if (dataContext) {
+                const date = dayjs.utc(dataContext.date).format(_tooltipDateFormat);
                 let value = dataContext[legend.name];
                 value = currencyMoneyFormatter(value, costAnalysisPageStore.currency, undefined, true);
-                return `[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
+                return `${date}\n[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
             return text;
         });
