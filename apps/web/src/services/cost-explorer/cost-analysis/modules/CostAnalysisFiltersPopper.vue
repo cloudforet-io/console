@@ -11,6 +11,7 @@ import type {
     AutocompleteHandler, FilterableDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -120,8 +121,15 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
     }
 };
 const handleClickResetFilters = () => {
+    const _originConsoleFilters: ConsoleFilter[]|undefined = costAnalysisPageStore.selectedQuerySet?.options?.filters;
+    const _originFilters: Record<string, string[]> = {};
+    if (_originConsoleFilters?.length) {
+        _originConsoleFilters.forEach((d) => {
+            _originFilters[d.k as string] = d.v as string[];
+        });
+    }
     costAnalysisPageStore.$patch((_state) => {
-        _state.filters = {};
+        _state.filters = _originFilters;
     });
 };
 
