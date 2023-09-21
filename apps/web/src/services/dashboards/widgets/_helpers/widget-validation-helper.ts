@@ -1,5 +1,5 @@
 import {
-    cloneDeep, get, isEmpty, isEqual, set, union,
+    cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
@@ -172,15 +172,17 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
     const _widgetOptions = cloneDeep(widgetInfo.widget_options) ?? {};
     const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
     const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
+
     // delete or update options using deleted variables
     dashboardVariables.forEach((variableKey) => {
         const property = getWidgetOptionName(variableKey);
         const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(property) ?? false;
 
-        if (isFixedProperty) { /* fixed property case */
-            set(_widgetOptions, property, get(widgetConfig.options, property, undefined)); // set default value to fixed option
-            _inheritOptions[property] = { enabled: false, variable_info: undefined }; // disable inherit option
-        } else { /* non-fixed property case */
+        // do nothing if inherit option is already disabled
+        if (!_inheritOptions[property]?.enabled) return;
+
+        // remove option from schemaProperties and revert inherit option if the option is not fixed property
+        if (!isFixedProperty) {
             const propertyIdx = _schemaProperties.indexOf(property);
             if (propertyIdx === -1) return; // already deleted property
             _schemaProperties.splice(_schemaProperties.indexOf(property), 1); // delete property from schemaProperties
