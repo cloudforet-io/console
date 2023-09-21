@@ -31,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     widgetConfigId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'refresh'): void;
+    (e: 'close'): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -51,9 +51,6 @@ const state = reactive({
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
-
-    // update widget info in widget form store
-    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
 };
 
 /* Api */
@@ -87,9 +84,8 @@ const handleClickSaveButton = async () => {
     state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
-    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
     state.proxyVisible = false;
-    emit('refresh');
+    emit('close');
 };
 </script>
 
