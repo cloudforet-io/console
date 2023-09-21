@@ -93,7 +93,7 @@ const handleCloseModal = () => {
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
 };
-const handleRefreshWidget = () => {
+const handleCloseSidebar = () => {
     state.widgetRef?.refreshWidget();
 };
 
@@ -113,7 +113,6 @@ watch(() => props.visible, async (visible) => {
     if (!props.widgetInfo) return;
     if (visible) {
         initSnapshot();
-        widgetFormStore.initWidgetForm(props.widgetInfo.widget_key, props.widgetInfo.widget_name);
         state.component = props.widgetInfo.component;
         await nextTick();
         state.widgetRef?.initWidget();
@@ -215,7 +214,7 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                                           :widget-config-id="props.widgetInfo.widget_name"
                                           :widget-key="props.widgetInfo.widget_key"
                                           :visible.sync="state.sidebarVisible"
-                                          @refresh="handleRefreshWidget"
+                                          @close="handleCloseSidebar"
                 />
             </transition>
         </div>
