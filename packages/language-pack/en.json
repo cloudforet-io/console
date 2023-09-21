@@ -899,6 +899,8 @@
 			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "All Cloud Services",
+				"ALL_COST_ANALYSIS": "All Cost Analysis",
+				"ALL_DASHBOARD": "All Dashboards",
 				"ALL_MENU": "All Menu",
 				"ALL_PROJECTS": "All Projects",
 				"FAVORITES": "Favorites",

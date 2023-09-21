@@ -899,6 +899,8 @@
 			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "모든 클라우드 서비스",
+				"ALL_COST_ANALYSIS": "모든 비용 분석",
+				"ALL_DASHBOARD": "모든 대시보드",
 				"ALL_MENU": "모든 메뉴",
 				"ALL_PROJECTS": "모든 프로젝트",
 				"FAVORITES": "즐겨찾기",
