@@ -135,8 +135,9 @@ const tableState = reactive({
             };
         }
         return {
-            name: d.split('.')[1], // tags.Name -> Name
+            name: d.split('.')[1],
             label: d.split('.')[1], // tags.Name -> Name
+            isTagField: true,
             sortable: false,
         };
     })),
@@ -423,10 +424,13 @@ watch(
                     {{ state.serviceAccounts[value] ? state.serviceAccounts[value].name : value }}
                 </span>
                 <span v-else-if="field.name === 'Instance Type'">
-                    {{ value ?? 'unknown' }}
+                    {{ value ?? 'Unknown' }}
                 </span>
                 <span v-else-if="field.name === 'totalCost'">
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
+                </span>
+                <span v-else-if="field.isTagField">
+                    {{ value ?? 'Unknown' }}
                 </span>
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"
