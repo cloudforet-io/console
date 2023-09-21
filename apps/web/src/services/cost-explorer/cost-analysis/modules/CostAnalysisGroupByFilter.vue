@@ -13,7 +13,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import { i18n } from '@/translations';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -73,7 +73,7 @@ const setSelectedTagsMenu = (groupBy?: string[]) => {
 /* event */
 const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
     if (isSelected && state.selectedGroupByItems.length >= 3) {
-        showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
+        showInfoMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'), i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY_DESC'));
         return;
     }
     if (isSelected) {
@@ -91,7 +91,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
 const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected) {
         if (state.selectedGroupByItems.length + 1 > 3) {
-            showErrorMessage('', i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
+            showInfoMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'), i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY_DESC'));
             state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
             return;
         }
