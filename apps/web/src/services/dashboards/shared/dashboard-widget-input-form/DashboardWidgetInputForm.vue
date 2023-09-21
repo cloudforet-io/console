@@ -35,13 +35,11 @@ import {
 import {
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
-    WidgetConfig,
     InheritOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import {
     getWidgetFilterSchemaPropertyName,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
@@ -65,11 +63,10 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    widgetConfig: computed<WidgetConfig|undefined>(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
     widgetOptionsJsonSchema: {} as JsonSchema,
     schemaFormData: {},
     fixedProperties: computed<string[]>(() => {
-        const fixedProperties = state.widgetConfig?.options_schema?.fixed_properties ?? [];
+        const fixedProperties = widgetFormStore.widgetConfig?.options_schema?.fixed_properties ?? [];
         if (dashboardDetailState.projectId) {
             fixedProperties.push(getWidgetFilterSchemaPropertyName('project'));
         }
@@ -80,7 +77,7 @@ const state = reactive({
         .map(([propertyName]) => propertyName)),
     inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
         widgetFormState.inheritOptions,
-        state.widgetConfig?.options_schema?.schema,
+        widgetFormStore.widgetConfig?.options_schema?.schema,
         dashboardDetailState.variablesSchema,
     )),
     isFocused: false,
@@ -112,7 +109,7 @@ const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMen
 };
 const isInheritDisabled = (propertyName: string): boolean => {
     const inputDisabled = !!state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled;
-    const nonInheritable = !!state.widgetConfig?.options_schema?.non_inheritable_properties?.includes(propertyName);
+    const nonInheritable = !!widgetFormStore.widgetConfig?.options_schema?.non_inheritable_properties?.includes(propertyName);
     return inputDisabled || nonInheritable;
 };
 
@@ -135,7 +132,7 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
     });
 
     // update widget option schema
-    const originPropertySchema = state.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
+    const originPropertySchema = widgetFormStore.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
     const newPropertySchema = getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, isInherit, dashboardDetailState.projectId);
     state.widgetOptionsJsonSchema = {
         ...state.widgetOptionsJsonSchema,
@@ -153,10 +150,6 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
 const resetStates = () => {
     // reset widget form store states
     widgetFormStore.$reset();
-    widgetFormStore.$patch((_state) => {
-        _state.schemaProperties = [];
-        _state.inheritOptions = {};
-    });
     // reset states
     state.widgetOptionsJsonSchema = {
         type: 'object',
@@ -170,16 +163,16 @@ const resetStates = () => {
 
 const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     // init widgetInfo - refined widget info
-    const widgetInfo = widgetFormStore.initWidgetForm(widgetKey, widgetConfigId, dashboardDetailState.projectId);
+    widgetFormStore.initWidgetForm(widgetKey, widgetConfigId);
 
     // init title
-    updateTitle(widgetInfo.title);
+    updateTitle(widgetFormStore.mergedWidgetInfo?.title);
 
 
     // init schema
     state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
         referenceStoreState,
-        state.widgetConfig?.options_schema ?? {},
+        widgetFormStore.widgetConfig?.options_schema ?? { schema: {} },
         dashboardDetailState.variablesSchema,
         widgetFormState.inheritOptions ?? {},
         widgetFormState.schemaProperties ?? [],
@@ -187,7 +180,7 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     );
 
     // initiate form data
-    state.schemaFormData = getInitialFormData(widgetInfo, dashboardDetailState.variablesSchema);
+    state.schemaFormData = getInitialFormData(widgetFormStore.mergedWidgetInfo, dashboardDetailState.variablesSchema);
 };
 
 watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
@@ -218,7 +211,7 @@ watch(() => state.schemaFormData, (schemaFormData, before) => {
     if (isEmpty(state.widgetOptionsJsonSchema)) return;
     if (state.widgetOptionsJsonSchema.properties?.cost_group_by && !schemaFormData?.cost_group_by) return;
     if (state.widgetOptionsJsonSchema.properties?.asset_group_by && !before?.asset_group_by) return;
-    widgetFormStore.setFormData(schemaFormData);
+    widgetFormStore.updateInheritOptionsAndWidgetOptionsByFormData(schemaFormData);
 }, { immediate: true });
 watch(() => state.isAllValid, (_isAllValid) => {
     widgetFormStore.$patch({ isValid: _isAllValid });
@@ -242,10 +235,10 @@ watch(() => state.isAllValid, (_isAllValid) => {
                           @update:value="updateTitle"
             />
         </p-field-group>
-        <div v-if="state.widgetConfig?.description?.translation_id"
+        <div v-if="widgetFormStore.widgetConfig?.description?.translation_id"
              class="description-text"
         >
-            {{ $t(state.widgetConfig.description.translation_id) }}
+            {{ $t(widgetFormStore.widgetConfig.description.translation_id) }}
         </div>
         <p-data-loader :loading="referenceStoreState.loading"
                        class="widget-options-form-wrapper"

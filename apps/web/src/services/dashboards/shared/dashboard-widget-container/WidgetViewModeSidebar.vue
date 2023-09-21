@@ -15,8 +15,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -52,7 +52,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    const widgetInfo = cloneDeep(widgetFormState.widgetInfo) as DashboardLayoutWidgetInfo;
+    const widgetInfo = cloneDeep(widgetFormStore.mergedWidgetInfo) as DashboardLayoutWidgetInfo;
     widgetInfo.title = widgetFormState.widgetTitle ?? '';
     widgetInfo.widget_options = widgetFormState.widgetOptions ?? {};
     widgetInfo.schema_properties = widgetFormState.schemaProperties ?? [];

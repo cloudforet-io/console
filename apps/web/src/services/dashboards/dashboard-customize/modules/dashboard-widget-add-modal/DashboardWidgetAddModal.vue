@@ -32,7 +32,7 @@ import { i18n } from '@/translations';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardDefaultWidgetTab.vue';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
