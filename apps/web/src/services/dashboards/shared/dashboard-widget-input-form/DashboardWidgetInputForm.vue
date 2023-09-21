@@ -13,6 +13,7 @@ import {
     isEmpty, isEqual,
 } from 'lodash';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import {
@@ -242,6 +243,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
                                 :validation-mode="widgetKey ? 'all' : 'input'"
                                 use-fixed-menu-style
                                 uniform-width
+                                :language="store.state.user.language"
                                 :reference-handler="referenceHandler"
                                 class="widget-options-form"
                                 @validate="handleFormValidate"
