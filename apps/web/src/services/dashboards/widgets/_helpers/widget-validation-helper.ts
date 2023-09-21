@@ -1,5 +1,5 @@
 import {
-    cloneDeep, isEmpty, isEqual, union,
+    cloneDeep, get, isEmpty, isEqual, set, union,
 } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
@@ -8,7 +8,6 @@ import type {
     InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
 } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterSchemaPropertyName,
     getWidgetOptionName,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -170,28 +169,24 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
-    // check whether the deleted variable exists in inherit options
-    const enabledInheritOptions = Object.entries(widgetInfo.inherit_options ?? {})
-        .filter(([, v]) => v.enabled)
-        .map(([, v]) => getWidgetOptionName(v.variable_info?.key as string));
-    if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d as WidgetFilterKey))) {
-        return undefined;
-    }
-
     const _widgetOptions = cloneDeep(widgetInfo.widget_options) ?? {};
     const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
-    let _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
+    const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
     // delete or update options using deleted variables
     dashboardVariables.forEach((variableKey) => {
-        const property = getWidgetFilterSchemaPropertyName(variableKey);
+        const property = getWidgetOptionName(variableKey);
         const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(property) ?? false;
 
         if (isFixedProperty) { /* fixed property case */
-            _widgetOptions[property] = widgetConfig.options?.[property] ?? undefined; // set default value to fixed option
+            set(_widgetOptions, property, get(widgetConfig.options, property, undefined)); // set default value to fixed option
+            _inheritOptions[property] = { enabled: false, variable_info: undefined }; // disable inherit option
         } else { /* non-fixed property case */
-            _schemaProperties = _schemaProperties.filter((d) => d !== property);
+            const propertyIdx = _schemaProperties.indexOf(property);
+            if (propertyIdx === -1) return; // already deleted property
+            _schemaProperties.splice(_schemaProperties.indexOf(property), 1); // delete property from schemaProperties
+            // just initiate inherit option since the option is deleted from schemaProperties
+            _inheritOptions[property] = widgetConfig.inherit_options?.[property] as InheritOptions['string'];
         }
-        _inheritOptions[property] = { enabled: false };
     });
 
     return {

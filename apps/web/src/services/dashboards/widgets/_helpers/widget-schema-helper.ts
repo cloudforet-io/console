@@ -54,6 +54,7 @@ export const getWidgetOptionName = (key: string): string => {
     if (WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey)) return `filters.${key}`;
     return key;
 };
+export const isWidgetFilterKey = (key: string): boolean => WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
 
 /** @function
  * @name getWidgetOptionsSchemaPropertyName
