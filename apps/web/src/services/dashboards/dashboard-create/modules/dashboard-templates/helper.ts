@@ -71,6 +71,8 @@ export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVa
                 _managedVariablesSchema.properties[key] = { ...value, use: true }; // set Cost variables to use
             }
         });
+    } else if (label === DASHBOARD_LABEL.BLANK) {
+        _managedVariablesSchema.properties[COST_VARIABLE_TYPE_INFO.cost_data_source.type].required = false;
     }
     return _managedVariablesSchema;
 };
