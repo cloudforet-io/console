@@ -422,6 +422,9 @@ watch(
                 <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
                     {{ state.serviceAccounts[value] ? state.serviceAccounts[value].name : value }}
                 </span>
+                <span v-else-if="field.name === 'Instance Type'">
+                    {{ value ?? 'unknown' }}
+                </span>
                 <span v-else-if="field.name === 'totalCost'">
                     {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
                 </span>
