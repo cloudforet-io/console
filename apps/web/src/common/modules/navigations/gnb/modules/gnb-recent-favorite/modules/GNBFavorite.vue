@@ -93,7 +93,7 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
     convertCloudServiceConfigToReferenceData,
-    convertCodyAnalysisConfigToReferenceData,
+    convertCostAnalysisConfigToReferenceData,
     convertDashboardConfigToReferenceData,
     convertMenuConfigToReferenceData,
     convertProjectConfigToReferenceData,
@@ -110,8 +110,10 @@ import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-se
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 
@@ -221,7 +223,7 @@ export default {
             )),
             favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_COST_ANALYSIS, store.getters['user/pagePermissionList']);
-                return isUserAccessible ? convertCodyAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets) : [];
+                return isUserAccessible ? convertCostAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets) : [];
             }),
             favoriteDashboardItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
@@ -297,6 +299,14 @@ export default {
                 if (menuInfo && SpaceRouter.router.currentRoute.name !== itemName) {
                     SpaceRouter.router.push({ name: itemName }).catch(() => {});
                 }
+            } else if (item.itemType === SUGGESTION_TYPE.DASHBOARD) {
+                const dashboardRouteName = item.name?.startsWith('domain') ? DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME;
+                SpaceRouter.router.push({
+                    name: dashboardRouteName,
+                    params: {
+                        dashboardId: itemName,
+                    },
+                }).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
                 SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
@@ -311,6 +321,15 @@ export default {
                         name: itemInfo[2],
                     },
                 }).catch(() => {});
+            } else if (item.itemType === SUGGESTION_TYPE.COST_ANALYSIS) {
+                const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName).dataSourceId;
+                SpaceRouter.router.push({
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    params: {
+                        dataSourceId,
+                        costQuerySetId: itemName,
+                    },
+                }).catch(() => {});
             }
             emit('close');
         };
@@ -322,7 +341,7 @@ export default {
                 const { status, response } = await costQuerySetFetcher({
                     query: {
                         filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
-                        only: ['cost_query_set_id', 'name'],
+                        only: ['cost_query_set_id', 'data_source_id', 'name'],
                     },
                 });
                 if (status === 'succeed' && response?.results) {

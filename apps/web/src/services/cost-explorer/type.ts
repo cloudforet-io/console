@@ -35,6 +35,7 @@ export interface CostQuerySetOptionForPeriod {
 
 export interface CostQuerySetModel {
     cost_query_set_id: string;
+    data_source_id: string;
     name: string;
     options?: CostQuerySetOption;
 }

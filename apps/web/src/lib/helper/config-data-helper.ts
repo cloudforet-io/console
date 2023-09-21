@@ -15,10 +15,15 @@ import type { DashboardScope } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';
 
-interface ConfigData extends FavoriteConfig, RecentConfig {
+type Config = FavoriteConfig & RecentConfig;
+
+interface ConfigData extends Config {
     [key: string]: any;
 }
-interface ReferenceData extends FavoriteItem, RecentItem {
+
+type ReferenceItem = FavoriteItem & RecentItem;
+
+interface ReferenceData extends ReferenceItem {
     [key: string]: any;
 }
 
@@ -121,7 +126,7 @@ export const convertCloudServiceConfigToReferenceData = (config: ConfigData[]|nu
     return results;
 };
 
-export const convertCodyAnalysisConfigToReferenceData = (config: ConfigData[]|null, costQuerySetList: CostQuerySetModel[]) => {
+export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|null, costQuerySetList: CostQuerySetModel[]) => {
     const results: ReferenceData[] = [];
     if (config) {
         config.forEach((d) => {
@@ -132,6 +137,8 @@ export const convertCodyAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     name: resource.cost_query_set_id,
                     label: resource.name,
                     updatedAt: d.updatedAt,
+                    icon: 'ic_service_cost-explorer',
+                    dataSourceId: resource.data_source_id,
                 });
             }
         });
@@ -151,7 +158,7 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
                     name: resource[dashboardId],
                     label: resource.name,
                     updatedAt: d.updatedAt,
-                    type,
+                    icon: 'ic_service_dashboard',
                 });
             }
         });
