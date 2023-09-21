@@ -9,6 +9,7 @@ import {
     useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -18,7 +19,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import {
+    DYNAMIC_COST_QUERY_SET_PARAMS,
+    managedCostQuerySetIdList,
+} from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
 import CostAnalysisPeriodSelectDropdown
@@ -26,6 +30,7 @@ import CostAnalysisPeriodSelectDropdown
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
+
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFormModal.vue');
 
@@ -77,6 +82,19 @@ const state = reactive({
             count += filterItems.length;
         });
         return count;
+    }),
+    showPeriodBadge: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
+    periodBadgeText: computed<string>(() => {
+        if (!costAnalysisPageState.period) return '';
+        let startDateFormat = 'MMM D';
+        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) startDateFormat = 'MMM YYYY';
+        else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) startDateFormat = 'YYYY';
+        const endDateFormat = costAnalysisPageState.granularity === GRANULARITY.DAILY ? 'MMM D, YYYY' : startDateFormat;
+        //
+        const start = dayjs.utc(costAnalysisPageState.period.start);
+        let end = dayjs.utc(costAnalysisPageState.period.end);
+        if (costAnalysisPageState.granularity === GRANULARITY.DAILY) end = dayjs.utc(costAnalysisPageState.period.end).endOf('month');
+        return `${start.format(startDateFormat)} ~ ${end.format(endDateFormat)}`;
     }),
 });
 
@@ -153,6 +171,14 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                                    @select="handleSelectGranularity"
                 />
                 <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
+                <div>
+                    <p-badge v-if="state.showPeriodBadge"
+                             badge-type="subtle"
+                             style-type="gray200"
+                    >
+                        {{ state.periodBadgeText }}
+                    </p-badge>
+                </div>
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -241,7 +267,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
         font-size: 0.875rem;
         .left-part {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.5rem;
         }
         .right-part {
@@ -265,8 +291,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 top: 2.125rem;
                 right: 0;
                 margin-top: -0.15rem;
+                z-index: 10;
                 .p-context-menu-item {
-                    min-width: 9rem;
+                    min-width: 10rem;
                 }
             }
         }
