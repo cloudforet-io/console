@@ -33,7 +33,7 @@ interface UseMergedWidgetStateOptions {
     dashboardVariablesSchema: DashboardVariablesSchema|undefined|Ref<DashboardVariablesSchema|undefined>; // dashboard variables schema
     dashboardVariables: DashboardVariables|undefined|Ref<DashboardVariables|undefined>; // dashboard variables
     title?: string|Ref<string|undefined>; // widget title from the dashboard widget layout info.
-    schemaProperties?: string[]|Ref<string[]>; // widget schema properties from the dashboard widget layout info.
+    schemaProperties?: string[]|Ref<string[]|undefined>; // widget schema properties from the dashboard widget layout info.
 }
 export function useMergedWidgetState(
     {
@@ -51,6 +51,7 @@ export function useMergedWidgetState(
         schemaProperties,
     });
     const optionsErrorMap = computed(() => getWidgetInheritOptionsErrorMap(
+        optionState.schemaProperties ?? [],
         optionState.inheritOptions,
         state.widgetConfig?.options_schema?.schema,
         optionState.dashboardVariablesSchema,

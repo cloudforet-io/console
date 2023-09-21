@@ -103,8 +103,7 @@ const handleUpdateData = (widgetKey: string, data: any) => {
     });
 };
 const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
-    const originWidgetInfo = dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
-    dashboardDetailStore.updateWidgetInfo(widgetKey, { ...originWidgetInfo, ...widgetInfo });
+    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
     dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
