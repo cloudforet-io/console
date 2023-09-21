@@ -51,9 +51,6 @@ const state = reactive({
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
     dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
-
-    // update widget info in widget form store
-    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
 };
 
 /* Api */
@@ -87,7 +84,6 @@ const handleClickSaveButton = async () => {
     state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
-    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
     state.proxyVisible = false;
     emit('refresh');
 };
