@@ -183,6 +183,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
                     @apply bg-secondary border-secondary text-white;
                     .p-badge {
                         @apply bg-white text-gray-800;
+                        margin-left: 0.125rem;
                     }
                     .selection-wrapper, .arrow-button {
                         @apply text-white;

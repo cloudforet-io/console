@@ -265,8 +265,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 top: 2.125rem;
                 right: 0;
                 margin-top: -0.15rem;
+                z-index: 10;
                 .p-context-menu-item {
-                    min-width: 9rem;
+                    min-width: 10rem;
                 }
             }
         }
