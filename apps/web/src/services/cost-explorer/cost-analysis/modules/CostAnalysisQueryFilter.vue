@@ -193,9 +193,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                               @click="handleClickFilter"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}
-                        <p-badge v-if="!state.filtersPopoverVisible && state.selectedFiltersCount"
+                        <p-badge v-if="state.selectedFiltersCount"
                                  badge-type="subtle"
-                                 style-type="gray200"
+                                 :style-type="state.filtersPopoverVisible ? 'gray100' : 'gray200'"
                                  class="filters-badge"
                         >
                             {{ state.selectedFiltersCount }}
