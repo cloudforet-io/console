@@ -322,7 +322,7 @@ export default {
                     },
                 }).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.COST_ANALYSIS) {
-                const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName).dataSourceId;
+                const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
                 SpaceRouter.router.push({
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
