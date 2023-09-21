@@ -72,6 +72,7 @@ const state = reactive({
     ])),
     selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
     isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
+    isDynamicQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
@@ -110,6 +111,7 @@ const {
     menu: state.saveDropdownMenuItems,
 });
 onClickOutside(containerRef, hideContextMenu);
+onClickOutside(contextMenuRef, hideContextMenu);
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -193,9 +195,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                               @click="handleClickFilter"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}
-                        <p-badge v-if="!state.filtersPopoverVisible && state.selectedFiltersCount"
+                        <p-badge v-if="state.selectedFiltersCount"
                                  badge-type="subtle"
-                                 style-type="gray200"
+                                 :style-type="state.filtersPopoverVisible ? 'gray100' : 'gray200'"
                                  class="filters-badge"
                         >
                             {{ state.selectedFiltersCount }}
@@ -209,7 +211,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 </p-popover>
             </div>
             <div class="right-part">
-                <template v-if="!state.isManagedQuerySet">
+                <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
                     <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
@@ -291,7 +293,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 top: 2.125rem;
                 right: 0;
                 margin-top: -0.15rem;
-                z-index: 10;
+                z-index: 100;
                 .p-context-menu-item {
                     min-width: 10rem;
                 }
