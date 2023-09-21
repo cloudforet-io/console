@@ -4,14 +4,10 @@
             :menu="monthMenuItems"
             :selection-label="$t('DASHBOARDS.DETAIL.PERIOD')"
             style-type="rounded"
-            :selected="selectedMonthMenuIndex"
-            index-mode
+            :selected="selectedMonthLabel"
             menu-position="right"
             @select="handleSelectMonthMenuItem"
         >
-            <template #dropdown-button>
-                <span>{{ selectedMonthLabel }}</span>
-            </template>
             <template #menu-item--format="{ item }">
                 <span>{{ item.label }}</span>
             </template>
@@ -82,14 +78,14 @@ export default defineComponent({
                     },
                 ];
             }),
+            selectedMonthMenu: {} as MenuItem,
             selectedMonthLabel: computed(() => {
-                if (state.monthMenuItems[state.selectedMonthMenuIndex]?.name === 'custom' && (state.selectedDateRange?.start || state.selectedDateRange?.end)) {
+                if (state.selectedMonthMenu?.name === 'custom' && (state.selectedDateRange?.start || state.selectedDateRange?.end)) {
                     return i18nDayjs.value.utc(dayjs.utc(state.selectedDateRange?.start).format('YYYY-MM')).format('MMMM YYYY');
                 }
-                return state.monthMenuItems[state.selectedMonthMenuIndex]?.label;
+                return state.selectedMonthMenu?.name;
             }),
             selectedDateRange: {},
-            selectedMonthMenuIndex: 0,
             customRangeModalVisible: false,
         });
 
@@ -99,24 +95,22 @@ export default defineComponent({
             state.selectedDateRange = { start: _start, end: _end };
         };
 
-        const handleSelectMonthMenuItem = (selectedIndex: number) => {
-            if (state.monthMenuItems[selectedIndex].name === 'current') {
+        const handleSelectMonthMenuItem = (selected: string) => {
+            state.selectedMonthMenu = state.monthMenuItems.find((d) => d.name === selected);
+            if (state.selectedMonthMenu.name === 'current') {
                 state.selectedDateRange = { start: undefined, end: undefined };
                 emit('update:date-range', state.selectedDateRange);
-            } else if (state.monthMenuItems[selectedIndex].name === 'custom') state.customRangeModalVisible = true;
+            } else if (state.selectedMonthMenu.name === 'custom') state.customRangeModalVisible = true;
             else {
-                setSelectedDateRange(state.monthMenuItems[selectedIndex].name, state.monthMenuItems[selectedIndex].name);
+                setSelectedDateRange(state.selectedMonthMenu.name, state.selectedMonthMenu.name);
                 emit('update:date-range', state.selectedDateRange);
             }
-
-            const customItemIndex = state.monthMenuItems.findIndex((d) => d.name === 'custom');
-            if (selectedIndex !== customItemIndex) state.selectedMonthMenuIndex = selectedIndex;
         };
         const handleCustomRangeModalConfirm = (dateRange: DateRange) => {
             const { start, end } = dateRange;
             setSelectedDateRange(start, end);
             emit('update:date-range', state.selectedDateRange);
-            state.selectedMonthMenuIndex = state.monthMenuItems.findIndex((d) => d.name === 'custom');
+            state.selectedMonthMenu = state.monthMenuItems[state.monthMenuItems.length - 1];
             state.customRangeModalVisible = false;
         };
 
@@ -148,7 +142,7 @@ export default defineComponent({
         };
 
         watch(() => props.dateRange, () => {
-            state.selectedMonthMenuIndex = setInitialDateRange();
+            state.selectedMonthMenu = state.monthMenuItems[setInitialDateRange()];
         }, { immediate: true });
 
         return {
