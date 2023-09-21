@@ -19,27 +19,26 @@
             <template v-if="dashboardDetailState.name"
                       #title-right-extra
             >
-                <span class="dashboard-title-icon-buttons-wrapper">
-                    <div class="favorite-wrapper">
+                <div class="title-right-extra">
+                    <div class="favorite-button-wrapper">
                         <favorite-button :item-id="props.dashboardId"
                                          :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                          scale="0.8"
                         />
                     </div>
                     <p-icon-button name="ic_edit-text"
-                                   width="1.5rem"
-                                   height="1.5rem"
+                                   size="md"
                                    :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_delete"
-                                   width="1.5rem"
-                                   height="1.5rem"
+                                   size="md"
+
                                    :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    class="delete-button"
                                    @click="handleVisibleDeleteModal"
                     />
-                </span>
+                </div>
             </template>
             <template #extra>
                 <dashboard-control-buttons v-if="state.hasManagePermission"
@@ -218,6 +217,16 @@ onUnmounted(() => {
         @apply inline-block;
         height: 2rem;
         margin-top: 0.075rem;
+    }
+    .title-right-extra {
+        @apply flex-shrink-0 inline-flex items-center;
+        margin-bottom: -0.25rem;
+        gap: 0.5rem;
+        .favorite-button-wrapper {
+            @apply flex items-center justify-center;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
     }
     .divider {
         @apply mb-6;
