@@ -516,6 +516,7 @@
 				"ADD_MORE": "",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "누적 데이터가 아닌 월별 데이터로 파일이 다운로드 됩니다.",
 				"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
+				"ALT_E_ADD_GROUP_BY_DESC": "이전 Group-by 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
 				"ALT_E_DELETE_QUERY": "쿼리 삭제 실패",
 				"ALT_E_EDITED_QUERY": "쿼리 편집 실패",
 				"ALT_E_SAVED_QUERY": "쿼리 저장 실패",
