@@ -127,11 +127,12 @@ const handleConfirmDelete = () => {
 
 <style lang="postcss" scoped>
 .page-title-wrapper {
-
     .title-right-extra {
-        @apply inline-flex items-center;
+        @apply inline-flex items-center justify-end;
+        flex-grow: 1;
         line-height: 1.09375rem;
         float: right;
+        min-height: 2.5rem;
         .divider {
             height: 0.875rem;
             margin: 0 0.5rem;
