@@ -76,3 +76,16 @@ export const hideLoadingMessage = () => {
         });
     }
 };
+
+export const showInfoMessage = (infoTitle, infoText) => {
+    if (Vue) {
+        Vue.notify({
+            group: 'toastTopCenter',
+            type: 'info',
+            title: infoTitle,
+            text: infoText,
+            duration: 5000,
+            speed: 1000,
+        });
+    }
+};
