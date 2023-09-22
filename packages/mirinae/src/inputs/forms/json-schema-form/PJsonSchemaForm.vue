@@ -163,7 +163,7 @@ import {
 } from '@/inputs/forms/json-schema-form/helpers/form-data-refine-helper';
 import { getSchemaProperties } from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
 import { initJsonInputDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/json-input-helper';
-import { initRawFormDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/raw-form-data-helper';
+import { initRawFormDataWithSchema, updateRawFormDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/raw-form-data-helper';
 import type {
     InnerJsonSchema,
     JsonSchema,
@@ -292,6 +292,21 @@ export default defineComponent<JsonSchemaFormProps>({
             if (rawFormData !== undefined) state.rawFormData = rawFormData;
             if (refined !== undefined) state.refinedFormData = refined;
         };
+        const updateFormData = async (schema: JsonSchema, prevSchema: JsonSchema) => {
+            const [rawFormData, newInputOccurredMap] = await updateRawFormDataWithSchema(schema, prevSchema, state.rawFormData, inputOccurredMap.value, props.referenceHandler);
+
+            let refined: any;
+            if (props.isRoot) {
+                refined = initRefinedFormData(schema, rawFormData, props.isRoot);
+            }
+
+            // CAUTION: states should be updated together after all async operations are done.
+            state.schemaProperties = getSchemaProperties(schema, props.referenceHandler);
+            state.rawFormData = rawFormData;
+            inputOccurredMap.value = newInputOccurredMap;
+            if (refined !== undefined) state.refinedFormData = refined;
+        };
+
         const reset = async () => {
             await initSchemaAndData();
             validatorErrors.value = null;
@@ -359,7 +374,7 @@ export default defineComponent<JsonSchemaFormProps>({
                 return;
             }
 
-            await initSchemaAndData();
+            await updateFormData(schema, prevSchema);
         });
         watch(() => state.refinedFormData, (refinedFormData) => {
             emit('update:form-data', refinedFormData);

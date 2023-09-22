@@ -1,4 +1,5 @@
 /* eslint-disable no-restricted-syntax,no-await-in-loop */
+import { isEqual } from 'lodash';
 
 import { getComponentNameBySchemaProperty } from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
 import type { JsonSchema, ReferenceHandler } from '@/inputs/forms/json-schema-form/type';
@@ -70,4 +71,39 @@ export const initRawFormDataWithSchema = async (schema?: JsonSchema, formData?: 
     }
 
     return result;
+};
+
+
+const isPropertyUpdated = (key: string, property: JsonSchema, prevProperties?: Record<string, JsonSchema>): boolean => !isEqual(property, prevProperties?.[key]);
+
+export const updateRawFormDataWithSchema = async (
+    schema?: JsonSchema,
+    prevSchema?: JsonSchema,
+    formData?: object,
+    inputOccurredMap?: Record<string, boolean>,
+    referenceHandler?: ReferenceHandler,
+): Promise<[object, Record<string, boolean>]> => {
+    const { properties } = schema ?? {};
+    const { properties: prevProperties } = prevSchema ?? {};
+
+    const result = { ...formData };
+    const newInputOccurredMap = { ...inputOccurredMap };
+
+    for (const key of Object.keys(properties)) {
+        const property = properties[key];
+        if (isPropertyUpdated(key, property, prevProperties)) {
+            result[key] = await getRawValueForFormInput(key, property, undefined, referenceHandler);
+            newInputOccurredMap[key] = false;
+        }
+    }
+
+    // remove properties that are not in the new schema
+    Object.keys(result).forEach((key) => {
+        if (!properties[key]) {
+            delete result[key];
+            delete newInputOccurredMap[key];
+        }
+    });
+
+    return [result, newInputOccurredMap];
 };
