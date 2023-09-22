@@ -125,7 +125,7 @@ const state = reactive({
     dataSourceId: computed(() => {
         const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
         const dataSourceKeys: string[] = Object.keys(dataSourceMap);
-        return dataSourceKeys.length > 0 ? dataSourceKeys[1] : '';
+        return dataSourceKeys.length > 0 ? dataSourceKeys[0] : '';
     }),
 });
 const chartState = reactive({
