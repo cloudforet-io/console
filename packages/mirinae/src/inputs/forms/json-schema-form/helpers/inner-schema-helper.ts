@@ -1,8 +1,11 @@
+import { isEmpty } from 'lodash';
+
 import type { AutocompleteHandler } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import { NUMERIC_TYPES } from '@/inputs/forms/json-schema-form/helpers/form-data-refine-helper';
 import type {
-    ComponentName, JsonSchema, TextInputType, JsonSchemaFormProps,
+    ComponentName, JsonSchema, ReferenceHandler, TextInputType,
+    InnerJsonSchema,
 } from '@/inputs/forms/json-schema-form/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 
@@ -47,16 +50,16 @@ export const getComponentNameBySchemaProperty = (schemaProperty: JsonSchema): Co
     return 'PTextInput';
 };
 
-export const getInputTypeBySchemaProperty = (schemaProperty: JsonSchema): TextInputType => {
+const getInputTypeBySchemaProperty = (schemaProperty: JsonSchema): TextInputType => {
     if (schemaProperty.format === 'password') return 'password';
     if (schemaProperty.type === 'string') return 'text';
     if (NUMERIC_TYPES.includes(schemaProperty.type)) return 'number';
     return 'text';
 };
 
-export const getInputPlaceholderBySchemaProperty = (schemaProperty: JsonSchema) => schemaProperty.examples?.[0] ?? '';
+const getInputPlaceholderBySchemaProperty = (schemaProperty: JsonSchema) => schemaProperty.examples?.[0] ?? '';
 
-export const getMenuItemsBySchemaProperty = (schemaProperty: JsonSchema): SelectDropdownMenuItem[]|undefined => {
+const getMenuItemsBySchemaProperty = (schemaProperty: JsonSchema): SelectDropdownMenuItem[]|undefined => {
     if (schemaProperty.reference) return undefined;
     // get menu items from menuItems
     if (Array.isArray(schemaProperty.menuItems) && schemaProperty.menuItems.length) {
@@ -70,14 +73,14 @@ export const getMenuItemsBySchemaProperty = (schemaProperty: JsonSchema): Select
     return undefined;
 };
 
-export const getMultiInputMode = (schemaProperty: JsonSchema): boolean => {
+const getMultiInputMode = (schemaProperty: JsonSchema): boolean => {
     if (schemaProperty.type !== 'array') return false;
     return schemaProperty?.maxItems !== 1;
 };
 
-export const getUseAutoComplete = (schemaProperty: JsonSchema): boolean => schemaProperty.type === 'array';
+const getUseAutoComplete = (schemaProperty: JsonSchema): boolean => schemaProperty.type === 'array';
 
-export const getAppearanceType = (schemaProperty: JsonSchema): InputAppearanceType|undefined => {
+const getAppearanceType = (schemaProperty: JsonSchema): InputAppearanceType|undefined => {
     if (getInputTypeBySchemaProperty(schemaProperty) === 'password') return 'masking';
     if (getComponentNameBySchemaProperty(schemaProperty) === 'PTextInput') {
         if (schemaProperty.type === 'array') return 'badge';
@@ -90,13 +93,53 @@ export const getAppearanceType = (schemaProperty: JsonSchema): InputAppearanceTy
     return undefined;
 };
 
-export const getReferenceHandler = (propertyName: string, schemaProperty: JsonSchema, props: JsonSchemaFormProps): AutocompleteHandler|undefined => {
+const getReferenceHandler = (propertyName: string, schemaProperty: JsonSchema, referenceHandler: ReferenceHandler): AutocompleteHandler|undefined => {
     if (!schemaProperty.reference) return undefined;
 
-    const handler = props.referenceHandler;
+    const handler = referenceHandler;
     if (!handler) return undefined;
 
     return (inputText, pageStart, pageSize, filters) => handler(inputText, {
         propertyName, schemaProperty, pageStart, pageSize, filters,
     });
+};
+
+export const getSchemaProperties = (schema?: JsonSchema, referenceHandler?: ReferenceHandler): InnerJsonSchema[] => {
+    const properties: object|undefined = schema?.properties;
+    const order: string[] = schema?.order ?? [];
+    if (properties && !isEmpty(properties)) {
+        return Object.entries(properties).map(([k, schemaProperty]) => {
+            const refined: InnerJsonSchema = {
+                ...schemaProperty,
+                propertyName: k,
+                componentName: getComponentNameBySchemaProperty(schemaProperty),
+                inputType: getInputTypeBySchemaProperty(schemaProperty),
+                inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
+                menuItems: getMenuItemsBySchemaProperty(schemaProperty),
+                multiInputMode: getMultiInputMode(schemaProperty),
+                useAutoComplete: getUseAutoComplete(schemaProperty),
+                appearanceType: getAppearanceType(schemaProperty),
+                referenceHandler: getReferenceHandler(k, schemaProperty, referenceHandler),
+            };
+            return refined;
+        }).sort((a, b) => {
+            const orderA = order.findIndex((propertyName) => propertyName === a.propertyName);
+            const orderB = order.findIndex((propertyName) => propertyName === b.propertyName);
+
+            // If both do not have order information, they are sorted based on title or property name.
+            if (orderA === -1 && orderB === -1) {
+                const textA = a.title ?? a.propertyName;
+                const textB = b.title ?? b.propertyName;
+                return textA.localeCompare(textB);
+            }
+
+            // If only one of them does not have order information, the item without order information is placed at the back.
+            if (orderA === -1) return 1;
+            if (orderB === -1) return -1;
+
+            // If both have order information, sort based on the order information.
+            return orderA - orderB;
+        });
+    }
+    return [];
 };

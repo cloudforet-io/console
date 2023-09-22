@@ -147,7 +147,6 @@ import {
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { isEmpty } from 'lodash';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import PFilterableDropdown from '@/inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
@@ -161,17 +160,9 @@ import {
     initRefinedFormData, refineObjectByProperties,
     refineValueByProperty,
 } from '@/inputs/forms/json-schema-form/helpers/form-data-refine-helper';
-import {
-    getAppearanceType,
-    getComponentNameBySchemaProperty,
-    getInputPlaceholderBySchemaProperty,
-    getInputTypeBySchemaProperty,
-    getMenuItemsBySchemaProperty,
-    getMultiInputMode, getReferenceHandler,
-    getUseAutoComplete,
-} from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
+import { getSchemaProperties } from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
 import { initJsonInputDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/json-input-helper';
-import { initFormDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/raw-form-data-helper';
+import { initRawFormDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/raw-form-data-helper';
 import type {
     InnerJsonSchema,
     JsonSchema,
@@ -259,48 +250,10 @@ export default defineComponent<JsonSchemaFormProps>({
 
         const state = reactive({
             isJsonInputMode: computed(() => props.schema?.json),
-            schemaProperties: computed<InnerJsonSchema[]>(() => {
-                const properties: object|undefined = props.schema?.properties;
-                const order: string[] = props.schema?.order ?? [];
-                if (properties && !isEmpty(properties)) {
-                    return Object.entries(properties).map(([k, schemaProperty]) => {
-                        const refined: InnerJsonSchema = {
-                            ...schemaProperty,
-                            propertyName: k,
-                            componentName: getComponentNameBySchemaProperty(schemaProperty),
-                            inputType: getInputTypeBySchemaProperty(schemaProperty),
-                            inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
-                            menuItems: getMenuItemsBySchemaProperty(schemaProperty),
-                            multiInputMode: getMultiInputMode(schemaProperty),
-                            useAutoComplete: getUseAutoComplete(schemaProperty),
-                            appearanceType: getAppearanceType(schemaProperty),
-                            referenceHandler: getReferenceHandler(k, schemaProperty, props),
-                        };
-                        return refined;
-                    }).sort((a, b) => {
-                        const orderA = order.findIndex((propertyName) => propertyName === a.propertyName);
-                        const orderB = order.findIndex((propertyName) => propertyName === b.propertyName);
-
-                        // If both do not have order information, they are sorted based on title or property name.
-                        if (orderA === -1 && orderB === -1) {
-                            const textA = a.title ?? a.propertyName;
-                            const textB = b.title ?? b.propertyName;
-                            return textA.localeCompare(textB);
-                        }
-
-                        // If only one of them does not have order information, the item without order information is placed at the back.
-                        if (orderA === -1) return 1;
-                        if (orderB === -1) return -1;
-
-                        // If both have order information, sort based on the order information.
-                        return orderA - orderB;
-                    });
-                }
-                return [];
-            }),
+            schemaProperties: computed<InnerJsonSchema[]>(() => getSchemaProperties(props.schema, props.referenceHandler)),
             requiredList: computed<string[]>(() => props.schema?.required ?? []),
             // For form input case
-            rawFormData: initFormDataWithSchema(props.schema, props.formData) as object,
+            rawFormData: initRawFormDataWithSchema(props.schema, props.formData) as object,
             // For json input case
             jsonInputData: initJsonInputDataWithSchema(props.schema, props.formData) as string|undefined,
             // For all cases. In root case, it can be only an object.
@@ -320,7 +273,7 @@ export default defineComponent<JsonSchemaFormProps>({
 
         const initFormData = () => {
             if (state.isJsonInputMode) state.jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
-            else state.rawFormData = initFormDataWithSchema(props.schema, props.formData);
+            else state.rawFormData = initRawFormDataWithSchema(props.schema, props.formData);
             if (props.isRoot) state.refinedFormData = initRefinedFormData(props.schema, props.formData);
         };
         const reset = () => {
