@@ -556,6 +556,7 @@
 				"LABEL_TAG": "태그",
 				"LABEL_VISIBILITY": "공개 여부",
 				"LINE": "라인",
+				"MODAL_VALIDATION_DUPLICATED": "동일한 이름의 분석 페이지가 이미 존재합니다.",
 				"MODAL_VALIDATION_LENGTH": "40자 이하로 입력해주세요. ",
 				"MODAL_VALIDATION_REQUIRED": "필수 입력 항목입니다.",
 				"MONTHLY": "월별 데이터",

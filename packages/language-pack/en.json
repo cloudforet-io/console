@@ -556,6 +556,7 @@
 				"LABEL_TAG": "Tag",
 				"LABEL_VISIBILITY": "Visibility",
 				"LINE": "Line",
+				"MODAL_VALIDATION_DUPLICATED": "An analysis with this name already exists.",
 				"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"MONTHLY": "Monthly",
