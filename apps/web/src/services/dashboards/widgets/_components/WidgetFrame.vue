@@ -193,7 +193,7 @@ const handleClickViewModeButton = () => {
                     <p-divider v-if="state.isDivided"
                                :vertical="true"
                     />
-                    <label class="widget-footer-label">{{ state.currencyLabel }}</label>
+                    <label class="widget-footer-label currency">{{ state.currencyLabel }}</label>
                     <p-divider v-if="props.nonInheritOptionsTooltipText"
                                :vertical="true"
                     />
@@ -328,6 +328,10 @@ const handleClickViewModeButton = () => {
                     color: theme('colors.gray.700');
                     line-height: 1.25;
                     margin: 0;
+
+                    &.currency {
+                        @apply text-gray-500;
+                    }
                 }
                 .p-divider {
                     &.vertical {
