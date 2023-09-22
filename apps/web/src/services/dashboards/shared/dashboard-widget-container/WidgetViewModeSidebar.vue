@@ -164,6 +164,10 @@ watch(() => widgetFormStore.mergedWidgetInfo, async (after, before) => {
     right: 0;
     z-index: 10;
 
+    .sidebar-title {
+        @apply text-label-xl;
+    }
+
     .sidebar-contents {
         position: relative;
         gap: 1.5rem;

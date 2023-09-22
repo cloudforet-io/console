@@ -223,6 +223,8 @@ const drawChart = (chartData: XYChartData[]) => {
     xAxis.get('baseInterval').timeUnit = 'month';
     chartHelper.setChartColors(chart, colorSet.value);
 
+    chart.zoomOutButton.set('forceHidden', true);
+
     if (widgetState.chartType === CHART_TYPE.LINE) {
         chart.get('cursor')?.lineX.setAll({
             visible: true,
