@@ -32,6 +32,7 @@ const budgetUsageSummaryConfig: WidgetConfig = {
         ...getWidgetInheritOptions('cost_data_source'),
         ...getWidgetInheritOptionsForFilter(
             'project',
+            'service_account',
         ),
     },
     options_schema: {

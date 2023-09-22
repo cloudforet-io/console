@@ -40,7 +40,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
             'cost_data_source',
             ...getWidgetFilterSchemaPropertyNames(
                 'project',
-                'cost_product',
+                'service_account',
             ),
         ],
         fixed_properties: ['cost_data_source'],

@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptionsForFilter,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
@@ -24,6 +24,15 @@ const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
     sizes: ['lg'],
     options: {
         granularity: GRANULARITY.MONTHLY,
+    },
+    inherit_options: {
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'provider',
+            'region',
+            'asset_compliance_type',
+            'asset_account',
+        ),
     },
     options_schema: {
         default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account'),
