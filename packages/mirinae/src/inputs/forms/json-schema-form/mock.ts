@@ -180,7 +180,7 @@ export const getMenuItems = (min = 10, max = 30): FilterableDropdownMenuItem[] =
 
 export const getReferenceHandler = (pageSize = 10): ReferenceHandler => {
     const allItems: FilterableDropdownMenuItem[] = getMenuItems(pageSize * 3, pageSize * 4);
-    return async (inputText, schema, pageStart, pageLimit) => {
+    return async (inputText, { pageStart, pageSize: pageLimit }) => {
         const allResults = await new Promise<FilterableDropdownMenuItem[]>((resolve) => {
             setTimeout(() => {
                 let filtered;

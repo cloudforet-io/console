@@ -1,14 +1,46 @@
-import { getComponentNameBySchemaProperty } from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
-import type { JsonSchema } from '@/inputs/forms/json-schema-form/type';
+/* eslint-disable no-restricted-syntax,no-await-in-loop */
 
-const getDefaultRawValueForFormInput = async (property: JsonSchema, currentValue?: any) => currentValue ?? property.default ?? undefined;
-const getRawValueForFormInput = async (key: string, property: JsonSchema, currentValue?: any) => {
+import { getComponentNameBySchemaProperty } from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
+import type { JsonSchema, ReferenceHandler } from '@/inputs/forms/json-schema-form/type';
+
+const getDefaultRawValueForFormInput = async (key: string, property: JsonSchema, componentName: string, currentValue?: any, referenceHandler?: ReferenceHandler) => {
+    let value;
+
+    // set value with default value or undefined
+    value = currentValue ?? property.default ?? undefined;
+
+    // set value with reference handler result if reference is defined
+    if (property.reference?.default_path !== undefined && referenceHandler) {
+        // eslint-disable-next-line no-await-in-loop
+        const handlerRes = await referenceHandler('', {
+            propertyName: key,
+            schemaProperty: property,
+            filters: value === undefined ? undefined : [{ name: value, label: value }], // set filter with current value if it exists
+        });
+        if (handlerRes?.results?.length) {
+            const data = handlerRes.results[property.reference.default_path];
+            if (data) {
+                if (componentName === 'PFilterableDropdown' || componentName === 'PTextInput') {
+                    value = [data];
+                } else if (componentName === 'PSelectDropdown') {
+                    if (property.type === 'array') value = [data];
+                } else {
+                    value = data.name;
+                }
+            }
+        }
+    }
+
+    return value;
+};
+
+const getRawValueForFormInput = async (key: string, property: JsonSchema, currentValue?: any, referenceHandler?: ReferenceHandler) => {
     let value: any;
 
     const componentName = getComponentNameBySchemaProperty(property);
 
     // set value with default value or undefined
-    value = await getDefaultRawValueForFormInput(property, currentValue);
+    value = await getDefaultRawValueForFormInput(key, property, componentName, currentValue, referenceHandler);
 
     // convert array type value for component spec
     if (property.type === 'array' && Array.isArray(value)) {
@@ -27,15 +59,15 @@ const getRawValueForFormInput = async (key: string, property: JsonSchema, curren
     return value;
 };
 
-export const initRawFormDataWithSchema = (schema?: JsonSchema, formData?: object): object => {
+export const initRawFormDataWithSchema = async (schema?: JsonSchema, formData?: object, referenceHandler?: ReferenceHandler): Promise<object> => {
     const { properties } = schema ?? {} as JsonSchema;
 
     const result = {};
     if (!properties) return {};
 
-    Object.keys(properties).forEach((key) => {
-        result[key] = getRawValueForFormInput(key, properties[key], formData?.[key]);
-    });
+    for (const key of Object.keys(properties)) {
+        result[key] = await getRawValueForFormInput(key, properties[key], formData?.[key], referenceHandler);
+    }
 
     return result;
 };

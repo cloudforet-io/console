@@ -253,11 +253,11 @@ export default defineComponent<JsonSchemaFormProps>({
             schemaProperties: computed<InnerJsonSchema[]>(() => getSchemaProperties(props.schema, props.referenceHandler)),
             requiredList: computed<string[]>(() => props.schema?.required ?? []),
             // For form input case
-            rawFormData: initRawFormDataWithSchema(props.schema, props.formData) as object,
+            rawFormData: {} as object,
             // For json input case
-            jsonInputData: initJsonInputDataWithSchema(props.schema, props.formData) as string|undefined,
+            jsonInputData: undefined as string|undefined,
             // For all cases. In root case, it can be only an object.
-            refinedFormData: initRefinedFormData(props.schema, props.formData, props.isRoot) as any,
+            refinedFormData: {} as any,
         });
 
         const { localize } = useLocalize(props);
@@ -271,13 +271,13 @@ export default defineComponent<JsonSchemaFormProps>({
             customErrorMap: computed(() => props.customErrorMap),
         });
 
-        const initFormData = () => {
+        const initFormData = async () => {
             if (state.isJsonInputMode) state.jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
-            else state.rawFormData = initRawFormDataWithSchema(props.schema, props.formData);
+            else state.rawFormData = await initRawFormDataWithSchema(props.schema, props.formData, props.referenceHandler);
             if (props.isRoot) state.refinedFormData = initRefinedFormData(props.schema, props.formData);
         };
-        const reset = () => {
-            initFormData();
+        const reset = async () => {
+            await initFormData();
             validatorErrors.value = null;
             inputOccurredMap.value = {};
             jsonInputOccurred.value = false;
@@ -329,13 +329,17 @@ export default defineComponent<JsonSchemaFormProps>({
             if (props.isRoot) setJsonInputParsingError(jsonParsingError);
         };
 
+        (async () => {
+            await initFormData();
+        })();
+
         /* Watchers */
-        watch(() => props.schema, () => {
-            if (props.resetOnSchemaChange) reset();
+        watch(() => props.schema, async () => {
+            if (props.resetOnSchemaChange) await reset();
         });
-        watch(() => props.formData, (formData) => {
+        watch(() => props.formData, async (formData) => {
             if (formData === state.refinedFormData) return;
-            initFormData();
+            await initFormData();
         });
         watch(() => state.refinedFormData, (refinedFormData) => {
             emit('update:form-data', refinedFormData);
