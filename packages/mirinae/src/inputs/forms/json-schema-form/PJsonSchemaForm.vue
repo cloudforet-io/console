@@ -147,6 +147,7 @@ import {
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
+import { isEqual } from 'lodash';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import PFilterableDropdown from '@/inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
@@ -334,11 +335,15 @@ export default defineComponent<JsonSchemaFormProps>({
         })();
 
         /* Watchers */
-        watch(() => props.schema, async () => {
-            if (props.resetOnSchemaChange) await reset();
-        });
-        watch(() => props.formData, async (formData) => {
-            if (formData === state.refinedFormData) return;
+        watch([() => props.schema, () => props.formData], async ([schema, formData], [prevSchema, prevFormData]) => {
+            if (isEqual(schema, prevSchema)) {
+                if (isEqual(formData, prevFormData)) return;
+                if (isEqual(formData, state.refinedFormData)) return;
+            } else if (props.resetOnSchemaChange || state.isJsonInputMode) {
+                await reset();
+                return;
+            }
+
             await initFormData();
         });
         watch(() => state.refinedFormData, (refinedFormData) => {
