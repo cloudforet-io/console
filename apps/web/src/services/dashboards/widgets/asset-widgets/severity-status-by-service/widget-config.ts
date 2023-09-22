@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptionsForFilter,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const severityStatusByServiceWidgetConfig: WidgetConfig = {
@@ -27,6 +27,15 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
             enabled: true,
             show_at: 'chart',
         },
+    },
+    inherit_options: {
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'provider',
+            'region',
+            'asset_compliance_type',
+            'asset_account',
+        ),
     },
     options_schema: {
         default_properties: getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_compliance_type', 'asset_account'),
