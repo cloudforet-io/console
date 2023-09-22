@@ -34,8 +34,9 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
             return originManagedCostQuerySets.map((item) => ({
                 ...item,
                 // manged cost query set id: managed-<data source id>-<cost query set id>
-                cost_query_set_id: `managed-${state.selectedDataSourceId}-${item.cost_query_set_id}`,
-            }));
+                cost_query_set_id: `managed_${state.selectedDataSourceId}_${item.cost_query_set_id}`,
+                data_source_id: state.selectedDataSourceId,
+            })) as CostQuerySetModel[];
         },
     },
     actions: {

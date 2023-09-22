@@ -43,7 +43,7 @@ const costExplorerRoutes: RouteConfig = {
                                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                                 params: {
                                     dataSourceId: results[0].data_source_id,
-                                    costQuerySetId: `managed-${results[0].data_source_id}-${ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT}`,
+                                    costQuerySetId: `managed_${results[0].data_source_id}_${ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT}`,
                                 },
                             });
                         }

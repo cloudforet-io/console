@@ -9,7 +9,8 @@ export const ORIGIN_MANAGED_COST_QUERY_SET_IDS = {
     DAILY_PRODUCT: 'Daily cost by product',
 } as const;
 
-export const originManagedCostQuerySets: CostQuerySetModel[] = [
+// This is origin managed cost query set list. For actual use, 'cost_query_set_id' must be converted with 'dataSourceId'.
+export const originManagedCostQuerySets: Omit<CostQuerySetModel, 'data_source_id'>[] = [
     {
         cost_query_set_id: ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
         name: ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
