@@ -158,20 +158,20 @@ import { useLocalize } from '@/inputs/forms/json-schema-form/composables/localiz
 import { useValidation } from '@/inputs/forms/json-schema-form/composables/validation';
 import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/json-schema-form/custom-schema';
 import {
+    initRefinedFormData, refineObjectByProperties,
+    refineValueByProperty,
+} from '@/inputs/forms/json-schema-form/helpers/form-data-refine-helper';
+import {
     getAppearanceType,
     getComponentNameBySchemaProperty,
     getInputPlaceholderBySchemaProperty,
     getInputTypeBySchemaProperty,
     getMenuItemsBySchemaProperty,
-    getMultiInputMode,
-    getReferenceHandler,
+    getMultiInputMode, getReferenceHandler,
     getUseAutoComplete,
-    initFormDataWithSchema,
-    initJsonInputDataWithSchema,
-    initRefinedFormData,
-    refineObjectByProperties,
-    refineValueByProperty,
-} from '@/inputs/forms/json-schema-form/helper';
+} from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
+import { initJsonInputDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/json-input-helper';
+import { initFormDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/raw-form-data-helper';
 import type {
     InnerJsonSchema,
     JsonSchema,
