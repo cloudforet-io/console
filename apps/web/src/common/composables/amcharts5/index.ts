@@ -1,6 +1,6 @@
 import type { Ref } from 'vue';
 import {
-    reactive, toRef, watch,
+    onUnmounted, reactive, toRef, watch,
 } from 'vue';
 
 import * as am5 from '@amcharts/amcharts5';
@@ -82,6 +82,10 @@ export const useAmcharts5 = (
             state.root = am5.Root.new(ctx);
             initRoot(state.root as Root);
         }
+    });
+
+    onUnmounted(() => {
+        disposeRoot();
     });
 
     return {
