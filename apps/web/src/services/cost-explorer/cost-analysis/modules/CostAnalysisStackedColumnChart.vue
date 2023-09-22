@@ -60,24 +60,40 @@ const getTooltipDateFormatByGranularity = (granularity: Granularity) => {
     return 'MMM D, YYYY';
 };
 const drawChart = () => {
-    let timeUnit: TimeUnit = 'month';
-    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
-    else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
+    // set date formatter for tooltip text
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
+        chartHelper.root.value?.dateFormatter.setAll({
+            dateFormat: 'd MMM, yyyy',
+        });
+    } else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) {
+        chartHelper.root.value?.dateFormatter.setAll({
+            dateFormat: 'yyyy',
+        });
+    }
 
+    // set min, max date of xAxis (for daily chart)
     const _period = getPeriodByGranularity(costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     const _dateAxisSettings = costAnalysisPageState.granularity === GRANULARITY.DAILY ? {
         min: dayjs.utc(_period.start).valueOf(),
-        max: dayjs.utc(_period.end).valueOf(),
+        max: dayjs.utc(_period.end).add(1, 'day').valueOf(),
     } : {};
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
 
     // set base interval of xAxis
+    let timeUnit: TimeUnit = 'month';
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
+    else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
     xAxis.get('baseInterval').timeUnit = timeUnit;
-    xAxis.setAll({
-        dateFormats: {
-            day: 'd',
-        },
-    });
+
+    // set date format for daily chart
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
+        xAxis.setAll({
+            dateFormats: {
+                day: 'd',
+            },
+        });
+    }
+
     // set label adapter of yAxis
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
@@ -107,9 +123,9 @@ const drawChart = () => {
         chart.series.push(series);
 
         // set data processor
-        let dateFormat = 'yyyy-MM-dd';
-        if (timeUnit === 'month') dateFormat = 'YYYY-MM';
-        else if (timeUnit === 'year') dateFormat = 'YYYY';
+        let dateFormat = 'yyyy-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.DAILY) dateFormat = 'yyyy-MM-dd';
+        else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'yyyy';
         series.data.processor = chartHelper.createDataProcessor({
             dateFormat,
             dateFields: [DATE_FIELD_NAME],
