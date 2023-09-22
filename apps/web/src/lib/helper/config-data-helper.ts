@@ -150,7 +150,7 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
             const [, dataSourceId, costQuerySetId] = d.itemId.split('_');
             results.push({
                 ...d,
-                name: costQuerySetId,
+                name: d.itemId,
                 label: costQuerySetId,
                 updatedAt: d.updatedAt,
                 icon: 'ic_service_cost-explorer',
