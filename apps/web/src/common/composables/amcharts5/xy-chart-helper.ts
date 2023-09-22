@@ -66,6 +66,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         paddingTop: 6,
     });
     const xAxis = chart.xAxes.push(am5xy.DateAxis.new(root, {
+        extraMin: 0.01,
         extraMax: 0.01,
         baseInterval: {
             timeUnit: 'month',
