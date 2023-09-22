@@ -58,7 +58,7 @@ const state = reactive({
         if (formState.queryName.length > 40) {
             return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_LENGTH');
         }
-        if (state.existingCostQuerySetNameList.includes(formState.queryName)) {
+        if (state.mergedCostQuerySetNameList.includes(formState.queryName)) {
             return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_DUPLICATED');
         }
         return undefined;
@@ -66,7 +66,9 @@ const state = reactive({
     isQueryNameValid: computed(() => !state.queryNameInvalidText),
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
+    managedCostQuerySetIdList: [...managedCostQuerySetIdList],
     existingCostQuerySetNameList: [] as string[],
+    mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
 });
 
 const saveQuery = async () => {
@@ -128,11 +130,11 @@ onMounted(async () => {
             },
         });
         if (status === 'succeed' && response?.results) {
-            state.existingCostQuerySetNameList = [...managedCostQuerySetIdList, ...response.results.map((query) => query.name)];
+            state.existingCostQuerySetNameList = [...response.results.map((query) => query.name)];
         }
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.existingCostQuerySetNameList = [...managedCostQuerySetIdList];
+        state.existingCostQuerySetNameList = [];
     }
 });
 </script>
