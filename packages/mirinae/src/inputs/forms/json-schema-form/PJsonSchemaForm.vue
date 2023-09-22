@@ -142,7 +142,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, onBeforeUnmount, reactive, toRefs, watch,
 } from 'vue';
 
 import Ajv from 'ajv';
@@ -260,6 +260,7 @@ export default defineComponent<JsonSchemaFormProps>({
             jsonInputData: undefined as string|undefined,
             // For all cases. In root case, it can be only an object.
             refinedFormData: {} as any,
+            unmounting: false,
         });
 
         const { localize } = useLocalize(props);
@@ -317,6 +318,8 @@ export default defineComponent<JsonSchemaFormProps>({
         /* Event Handlers */
         // form input case
         const handleUpdateFormValue = (property: InnerJsonSchema, propertyIdx: number, val?: any) => {
+            if (state.unmounting) return;
+
             const { propertyName, componentName } = property;
 
             /*
@@ -376,7 +379,7 @@ export default defineComponent<JsonSchemaFormProps>({
 
             await updateFormData(schema, prevSchema);
         });
-        watch(() => state.refinedFormData, (refinedFormData) => {
+        const stopWatch = watch(() => state.refinedFormData, (refinedFormData) => {
             emit('update:form-data', refinedFormData);
             if (props.isRoot) {
                 const isValid = validateFormData();
@@ -384,6 +387,11 @@ export default defineComponent<JsonSchemaFormProps>({
                 emit('change', isValid, refinedFormData);
             }
         }, { immediate: !state.isJsonInputMode });
+
+        onBeforeUnmount(() => {
+            stopWatch();
+            state.unmounting = true;
+        });
 
         return {
             ...toRefs(state),
