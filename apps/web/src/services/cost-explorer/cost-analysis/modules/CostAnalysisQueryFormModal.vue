@@ -66,7 +66,7 @@ const state = reactive({
     isQueryNameValid: computed(() => !state.queryNameInvalidText),
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
-    existingCostQuerySetNameList: [...managedCostQuerySetIdList] as string[],
+    existingCostQuerySetNameList: [] as string[],
 });
 
 const saveQuery = async () => {
@@ -128,10 +128,11 @@ onMounted(async () => {
             },
         });
         if (status === 'succeed' && response?.results) {
-            state.existingCostQuerySetNameList = [...state.existingCostQuerySetNameList, ...response.results.map((query) => query.name)];
+            state.existingCostQuerySetNameList = [...managedCostQuerySetIdList, ...response.results.map((query) => query.name)];
         }
     } catch (e) {
-        state.existingCostQuerySetNameList = [...state.existingCostQuerySetNameList];
+        ErrorHandler.handleError(e);
+        state.existingCostQuerySetNameList = [...managedCostQuerySetIdList];
     }
 });
 </script>
