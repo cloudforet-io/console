@@ -89,6 +89,8 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
@@ -132,6 +134,9 @@ export default {
     },
     props: {},
     setup(props, { emit }: SetupContext) {
+        const allReferenceStore = useAllReferenceStore();
+
+
         const state = reactive({
             loading: true,
             showAll: false,
@@ -224,7 +229,7 @@ export default {
             )),
             favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_COST_ANALYSIS, store.getters['user/pagePermissionList']);
-                return isUserAccessible ? convertCostAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets) : [];
+                return isUserAccessible ? convertCostAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets, state.dataSourceMap) : [];
             }),
             favoriteDashboardItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
@@ -255,6 +260,7 @@ export default {
                 const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(store.state.favorite.projectGroupItems, state.projectGroups);
                 return [...favoriteProjectGroupItems, ...favoriteProjectItems];
             }),
+            dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
         });
 
         /* Util */
