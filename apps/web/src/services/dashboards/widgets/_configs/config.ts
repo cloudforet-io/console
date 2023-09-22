@@ -128,7 +128,6 @@ export const WIDGET_FILTER_KEYS = [
     REFERENCE_TYPE_INFO.cloud_service_type.type,
     REFERENCE_TYPE_INFO.region.type,
     // cost reference
-    COST_VARIABLE_TYPE_INFO.cost_data_source.type,
     COST_VARIABLE_TYPE_INFO.cost_product.type,
     COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
     // asset reference
