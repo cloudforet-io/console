@@ -117,7 +117,7 @@ watch(() => state.groupByMenuItems, (after) => {
                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOO_MANY_ITEMS') }}
             </p>
             <div v-for="(legend, idx) in legends"
-                 :key="`legend-${legend.name}`"
+                 :key="`legend-${legend.name}-${idx}`"
                  class="legend"
                  @click="handleToggleSeries(idx)"
             >
