@@ -1,36 +1,41 @@
 import { getComponentNameBySchemaProperty } from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
 import type { JsonSchema } from '@/inputs/forms/json-schema-form/type';
 
-export const initFormDataWithSchema = (schema?: JsonSchema, formData?: object): object => {
+const getDefaultRawValueForFormInput = async (property: JsonSchema, currentValue?: any) => currentValue ?? property.default ?? undefined;
+const getRawValueForFormInput = async (key: string, property: JsonSchema, currentValue?: any) => {
+    let value: any;
+
+    const componentName = getComponentNameBySchemaProperty(property);
+
+    // set value with default value or undefined
+    value = await getDefaultRawValueForFormInput(property, currentValue);
+
+    // convert array type value for component spec
+    if (property.type === 'array' && Array.isArray(value)) {
+        const menuMap = {};
+        if (Array.isArray(property.menuItems)) {
+            property.menuItems.forEach((d) => {
+                if (d.name) menuMap[d.name] = d;
+            });
+        }
+        value = value.map((d) => ({ name: d, label: menuMap[d]?.label ?? d }));
+        // refine value for component spec
+    } else if (componentName === 'PFilterableDropdown' && typeof value === 'string') {
+        value = [{ name: value, label: value }];
+    }
+
+    return value;
+};
+
+export const initRawFormDataWithSchema = (schema?: JsonSchema, formData?: object): object => {
     const { properties } = schema ?? {} as JsonSchema;
 
     const result = {};
     if (!properties) return {};
+
     Object.keys(properties).forEach((key) => {
-        const property = properties[key];
-        const componentName = getComponentNameBySchemaProperty(property);
-
-        // set value with default value or undefined
-        result[key] = formData?.[key] ?? property.default ?? undefined;
-
-        // refine value for component spec
-        if (componentName === 'PFilterableDropdown' && typeof result[key] === 'string') {
-            result[key] = [{ name: result[key], label: result[key] }];
-        }
-
-        if (property.type === 'array' && result[key]) { // array type needs conversion for component.
-            if (!Array.isArray(result[key])) {
-                result[key] = undefined;
-            } else {
-                const menuMap = {};
-                if (Array.isArray(property.menuItems)) {
-                    property.menuItems.forEach((d) => {
-                        if (d.name) menuMap[d.name] = d;
-                    });
-                }
-                result[key] = result[key].map((d) => ({ name: d, label: menuMap[d]?.label ?? d }));
-            }
-        }
+        result[key] = getRawValueForFormInput(key, properties[key], formData?.[key]);
     });
+
     return result;
 };
