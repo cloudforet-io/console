@@ -3,7 +3,8 @@ import type { Location } from 'vue-router';
 
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import type { FavoriteType } from '@/store/modules/favorite/type';
+
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
 
 import type { MenuId } from '@/lib/menu/config';
 
@@ -34,7 +35,7 @@ export interface LNBItem {
     to?: Location;
     hightlightTag?: hightlightTagType;
     hideFavorite?: boolean;
-    favoriteType?: FavoriteType;
+    favoriteOptions?: FavoriteOptions;
     icon?: LNBIcon;
     selectOptions?: SelectOptions;
 }
