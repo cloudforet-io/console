@@ -130,7 +130,7 @@ onMounted(async () => {
             },
         });
         if (status === 'succeed' && response?.results) {
-            state.existingCostQuerySetNameList = [...response.results.map((query) => query.name)];
+            state.existingCostQuerySetNameList = response.results.map((query) => query.name);
         }
     } catch (e) {
         ErrorHandler.handleError(e);
