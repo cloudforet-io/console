@@ -7,7 +7,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { originManagedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
+import { ManagedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
@@ -31,10 +31,8 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
         },
         managedCostQuerySets: (state): CostQuerySetModel[] => {
             if (!state.selectedDataSourceId) return [];
-            return originManagedCostQuerySets.map((item) => ({
+            return ManagedCostQuerySets.map((item) => ({
                 ...item,
-                // manged cost query set id: managed_<data source id>_<cost query set id>
-                cost_query_set_id: `managed_${state.selectedDataSourceId}_${item.cost_query_set_id}`,
                 data_source_id: state.selectedDataSourceId,
             })) as CostQuerySetModel[];
         },
