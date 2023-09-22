@@ -58,6 +58,7 @@ interface FilterableDropdownProps {
     // eslint-disable-next-line vue/require-default-prop
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
+    initSelectedWithHandler?: boolean;
 }
 
 const props = withDefaults(defineProps<FilterableDropdownProps>(), {
@@ -75,6 +76,7 @@ const props = withDefaults(defineProps<FilterableDropdownProps>(), {
     searchText: '',
     /* others */
     resetSelectedOnUnmounted: true,
+    initSelectedWithHandler: false,
 });
 
 /* event emits */
@@ -215,7 +217,7 @@ watch(() => props.disabled, (disabled) => {
 
 /* Init */
 (async () => {
-    if (props.handler && !props.disableHandler) {
+    if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
         // this is to refine selected items by handler's results whose label is fully set.
         const { results } = await props.handler('', undefined, undefined, state.proxySelectedItem);
         const refinedSelected = state.proxySelectedItem.map((item) => {
