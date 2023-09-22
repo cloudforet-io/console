@@ -23,7 +23,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { gray } from '@/styles/colors';
 
 import {
-    DYNAMIC_COST_QUERY_SET_PARAMS, managedCostQuerySetIdList,
+    DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -39,7 +39,10 @@ const state = reactive({
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
     title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? state.defaultTitle),
     dataSourceImage: computed(() => costAnalysisPageStore.dataSourceImageUrl),
-    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId ? managedCostQuerySetIdList.includes(costAnalysisPageStore.selectedQueryId) : false)),
+    managedCostQuerySetList: computed(() => costAnalysisPageStore.managedCostQuerySetList),
+    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId
+        ? state.managedCostQuerySetList.some((item) => item.cost_query_set_id === costAnalysisPageStore.selectedQueryId)
+        : false)),
     itemIdForDeleteQuery: '',
     selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
@@ -87,7 +90,7 @@ const handleDeleteQueryConfirm = async () => {
                                     width="2rem"
                                     height="2rem"
                         />
-                        <p-i v-if="managedCostQuerySetIdList.includes(state.title || '')"
+                        <p-i v-if="state.managedCostQuerySetList.some((item) => item.name === (state.title || ''))"
                              name="ic_main-filled"
                              width="1rem"
                              height="1rem"

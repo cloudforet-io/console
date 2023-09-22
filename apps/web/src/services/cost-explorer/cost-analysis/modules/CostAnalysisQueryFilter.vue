@@ -21,7 +21,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
-    managedCostQuerySetIdList,
 } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
@@ -71,7 +70,7 @@ const state = reactive({
         },
     ])),
     selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
-    isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
+    isManagedQuerySet: computed(() => costAnalysisPageStore.managedCostQuerySetList.map((d) => d.cost_query_set_id).includes(state.selectedQuerySetId)),
     isDynamicQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
