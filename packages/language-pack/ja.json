@@ -556,6 +556,7 @@
 				"LABEL_TAG": "タグ",
 				"LABEL_VISIBILITY": "公開の可否",
 				"LINE": "ライン",
+				"MODAL_VALIDATION_DUPLICATED": "この名前の分析はすでに存在しています。",
 				"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 				"MONTHLY": "月別データ",
