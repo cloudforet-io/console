@@ -139,6 +139,14 @@ const drawChart = () => {
     // refresh root for deleting previous chart
     chartHelper.refreshRoot();
 
+    // set date formatter for tooltip text
+    if (state.selectedDateType === 'DAILY') {
+        chartHelper.root.value?.dateFormatter.setAll({
+            dateFormat: 'd MMM, yyyy',
+            dateFields: ['valueX'],
+        });
+    }
+
     let timeUnit: TimeUnit = 'day';
     if (state.selectedDateType === 'MONTHLY') timeUnit = 'month';
 
@@ -194,6 +202,11 @@ const drawChart = () => {
     // set series to chart and set data
     columnSeries.data.setAll(cloneDeep(chartState.data));
     chart.series.push(columnSeries);
+
+    // create tooltip
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setXYSingleTooltipText(chart, tooltip);
+    columnSeries.set('tooltip', tooltip);
 
     state.chart = chart;
 };
@@ -386,15 +399,7 @@ const init = async () => {
     ]);
     state.loading = false;
 };
-// const chartInit = async () => {
-//     await getTrend(DATA_TYPE.SERVER);
-//     setTimeout(() => {
-//         chartState.loading = false;
-//     }, 300);
-// };
 init();
-// chartInit();
-
 
 /* Watcher */
 watch([() => chartState.loading, () => chartContext.value], async ([loading, _chartContext]) => {
@@ -414,10 +419,6 @@ watch(() => state.selectedDateType, async () => {
 watch(() => state.dataSourceId, (dataSourceId) => {
     if (dataSourceId) getBillingCount();
 }, { immediate: true });
-
-// onUnmounted(() => {
-//     if (state.chart) state.chart.dispose();
-// });
 </script>
 
 <template>
