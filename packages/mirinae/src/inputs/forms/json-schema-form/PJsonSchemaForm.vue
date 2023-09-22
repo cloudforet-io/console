@@ -251,8 +251,9 @@ export default defineComponent<JsonSchemaFormProps>({
 
         const state = reactive({
             isJsonInputMode: computed(() => props.schema?.json),
-            schemaProperties: computed<InnerJsonSchema[]>(() => getSchemaProperties(props.schema, props.referenceHandler)),
             requiredList: computed<string[]>(() => props.schema?.required ?? []),
+            // refined schema properties to bind props to components
+            schemaProperties: [] as InnerJsonSchema[],
             // For form input case
             rawFormData: {} as object,
             // For json input case
@@ -272,13 +273,27 @@ export default defineComponent<JsonSchemaFormProps>({
             customErrorMap: computed(() => props.customErrorMap),
         });
 
-        const initFormData = async () => {
-            if (state.isJsonInputMode) state.jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
-            else state.rawFormData = await initRawFormDataWithSchema(props.schema, props.formData, props.referenceHandler);
-            if (props.isRoot) state.refinedFormData = initRefinedFormData(props.schema, props.formData);
+        const initSchemaAndData = async () => {
+            let jsonInputData: string|undefined;
+            let rawFormData: object|undefined;
+            let refined: any;
+
+            if (state.isJsonInputMode) {
+                jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
+                if (props.isRoot) refined = initRefinedFormData(props.schema, props.formData, props.isRoot);
+            } else {
+                rawFormData = await initRawFormDataWithSchema(props.schema, props.formData, props.referenceHandler);
+                refined = initRefinedFormData(props.schema, rawFormData, props.isRoot);
+            }
+
+            // CAUTION: states should be updated together after all async operations are done.
+            state.schemaProperties = getSchemaProperties(props.schema, props.referenceHandler);
+            if (jsonInputData !== undefined) state.jsonInputData = jsonInputData;
+            if (rawFormData !== undefined) state.rawFormData = rawFormData;
+            if (refined !== undefined) state.refinedFormData = refined;
         };
         const reset = async () => {
-            await initFormData();
+            await initSchemaAndData();
             validatorErrors.value = null;
             inputOccurredMap.value = {};
             jsonInputOccurred.value = false;
@@ -331,7 +346,7 @@ export default defineComponent<JsonSchemaFormProps>({
         };
 
         (async () => {
-            await initFormData();
+            await initSchemaAndData();
         })();
 
         /* Watchers */
@@ -344,7 +359,7 @@ export default defineComponent<JsonSchemaFormProps>({
                 return;
             }
 
-            await initFormData();
+            await initSchemaAndData();
         });
         watch(() => state.refinedFormData, (refinedFormData) => {
             emit('update:form-data', refinedFormData);
