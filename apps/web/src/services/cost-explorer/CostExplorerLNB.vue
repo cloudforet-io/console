@@ -33,7 +33,6 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 import { gray } from '@/styles/colors';
 
-import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import RelocateDashboardModal from '@/services/cost-explorer/modules/RelocateDashboardModal.vue';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -91,7 +90,7 @@ const state = reactive({
             type: 'item',
             id: d.cost_query_set_id,
             label: d.name,
-            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? {
+            icon: costQuerySetStore.managedCostQuerySets.map((item) => item.cost_query_set_id).includes(d.cost_query_set_id) ? {
                 name: 'ic_main-filled',
                 color: gray[500],
             } : undefined,
@@ -200,7 +199,7 @@ const handleSelectDataSource = (selected: string) => {
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
-            costQuerySetId: managedCostQuerySetIdList[0],
+            costQuerySetId: costQuerySetStore.managedCostQuerySets[0].cost_query_set_id,
         },
     }).catch(() => {});
 };

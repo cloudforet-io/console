@@ -7,7 +7,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { managedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
+import { originManagedCostQuerySets } from '@/services/cost-explorer/cost-analysis/config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
@@ -29,11 +29,19 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
             if (!state.selectedQuerySetId) return undefined;
             return state.costQuerySetList.find((item) => item.cost_query_set_id === state.selectedQuerySetId);
         },
+        managedCostQuerySets: (state): CostQuerySetModel[] => {
+            if (!state.selectedDataSourceId) return [];
+            return originManagedCostQuerySets.map((item) => ({
+                ...item,
+                // manged cost query set id: managed-<data source id>-<cost query set id>
+                cost_query_set_id: `managed-${state.selectedDataSourceId}-${item.cost_query_set_id}`,
+            }));
+        },
     },
     actions: {
         async listCostQuerySets(): Promise<void> {
             if (!this.selectedDataSourceId) {
-                this.costQuerySetList = [...managedCostQuerySets];
+                this.costQuerySetList = [...this.managedCostQuerySets];
                 return;
             }
             try {
@@ -44,13 +52,13 @@ export const useCostQuerySetStore = defineStore('cost-query-set', {
                     },
                 });
                 if (status === 'succeed' && response?.results) {
-                    this.costQuerySetList = [...managedCostQuerySets, ...response.results];
+                    this.costQuerySetList = [...this.managedCostQuerySets, ...response.results];
                 } else {
-                    this.costQuerySetList = [...managedCostQuerySets];
+                    this.costQuerySetList = [...this.managedCostQuerySets];
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.costQuerySetList = [...managedCostQuerySets];
+                this.costQuerySetList = [...this.managedCostQuerySets];
             }
         },
     },

@@ -62,6 +62,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
         costQueryList: () => costQuerySetState().costQuerySetList,
         selectedQuerySet: () => costQuerySetStore().selectedQuerySet,
         selectedDataSourceId: () => costQuerySetState().selectedDataSourceId,
+        managedCostQuerySetList: () => costQuerySetStore().managedCostQuerySets,
         currency: (): Currency => {
             if (costQuerySetState().selectedDataSourceId) {
                 const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState().selectedDataSourceId ?? ''];
