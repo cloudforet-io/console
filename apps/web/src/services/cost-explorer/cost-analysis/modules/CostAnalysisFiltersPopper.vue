@@ -84,9 +84,9 @@ const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue:
     const refinedMenuItems = getRefinedMenuItems(groupBy, inputValue, results?.map((d) => ({ name: d.key, label: d.name })));
     return { results: refinedMenuItems };
 };
-const getRefinedMenuItems = (groupBy: string, inputValue: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
+const getRefinedMenuItems = (groupBy: string, inputValue?: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
     if (!results) return [];
-    return results.map((d) => {
+    const refinedResults = results.map((d) => {
         if (groupBy === GROUP_BY.PROJECT) {
             return { name: d.name, label: storeState.projects[d.name].label };
         } if (groupBy === GROUP_BY.PROJECT_GROUP) {
@@ -97,7 +97,9 @@ const getRefinedMenuItems = (groupBy: string, inputValue: string, results?: Arra
             return { name: d.name, label: storeState.serviceAccounts[d.name].label };
         }
         return { name: d.name, label: d.label };
-    }).filter((d) => d.label.toLowerCase().includes(inputValue.toLowerCase()));
+    });
+    if (!inputValue) return refinedResults;
+    return refinedResults.filter((d) => d.label.toLowerCase().includes(inputValue.toLowerCase()));
 };
 
 const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
