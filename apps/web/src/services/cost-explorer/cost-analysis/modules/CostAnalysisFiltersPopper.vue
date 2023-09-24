@@ -78,7 +78,9 @@ const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue:
     if (!groupBy) return { results: [] };
 
     state.loading = true;
-    const results = await getResources('', groupBy); // Get all resources without inputValue.
+    const results = await getResources('', groupBy);
+    /* Get all resources without inputValue.
+    * Because, results has no label to be filtered by inputValue. */
     state.loading = false;
 
     const refinedMenuItems = getRefinedMenuItems(groupBy, results?.map((d) => ({ name: d.key, label: d.name })));
