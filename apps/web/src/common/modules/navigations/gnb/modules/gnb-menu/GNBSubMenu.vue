@@ -144,6 +144,10 @@ export default defineComponent<Props>({
             @apply bg-white;
         }
 
+        .contents-right {
+            @apply flex items-center;
+        }
+
         .contents-left {
             @apply flex items-center;
             width: 100%;
