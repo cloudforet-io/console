@@ -81,12 +81,13 @@ const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue:
     const results = await getResources('', groupBy);
     state.loading = false;
 
-    const refinedMenuItems = getRefinedMenuItems(groupBy, inputValue, results?.map((d) => ({ name: d.key, label: d.name })));
-    return { results: refinedMenuItems };
+    const refinedMenuItems = getRefinedMenuItems(groupBy, results?.map((d) => ({ name: d.key, label: d.name })));
+    const refinedMenuItemsFilteredByInputValue = refinedMenuItems.filter((d) => (d.label as string).toLowerCase().includes(inputValue.toLowerCase()));
+    return { results: refinedMenuItemsFilteredByInputValue };
 };
-const getRefinedMenuItems = (groupBy: string, inputValue?: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
+const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
     if (!results) return [];
-    const refinedResults = results.map((d) => {
+    return results.map((d) => {
         if (groupBy === GROUP_BY.PROJECT) {
             return { name: d.name, label: storeState.projects[d.name].label };
         } if (groupBy === GROUP_BY.PROJECT_GROUP) {
@@ -98,8 +99,6 @@ const getRefinedMenuItems = (groupBy: string, inputValue?: string, results?: Arr
         }
         return { name: d.name, label: d.label };
     });
-    if (!inputValue) return refinedResults;
-    return refinedResults.filter((d) => d.label.toLowerCase().includes(inputValue.toLowerCase()));
 };
 
 const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
