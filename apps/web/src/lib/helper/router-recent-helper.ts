@@ -47,6 +47,7 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     if (to.name === COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) {
         const dataSourceId = to?.params?.dataSourceId;
         const costQuerySetId = to?.params?.costQuerySetId;
+        if (!dataSourceId || !costQuerySetId) return undefined;
         if (MANAGED_COST_QUERY_SET_ID_LIST.includes(costQuerySetId)) {
             return { itemType: RECENT_TYPE.COST_ANALYSIS, itemId: getCompoundKeyWithManagedCostQuerySetFavoriteKey(dataSourceId, costQuerySetId) };
         }
