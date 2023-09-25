@@ -3,17 +3,22 @@ import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 
 export const DYNAMIC_COST_QUERY_SET_PARAMS = 'dynamic';
 
-export const ORIGIN_MANAGED_COST_QUERY_SET_IDS = {
+export const MANAGED_COST_QUERY_SET_IDS = {
     MONTHLY_PROJECT: 'Monthly cost by project',
     MONTHLY_PRODUCT: 'Monthly cost by product',
     DAILY_PRODUCT: 'Daily cost by product',
 } as const;
 
-// This is origin managed cost query set list. For actual use, 'cost_query_set_id' must be converted with 'dataSourceId'.
-export const originManagedCostQuerySets: Omit<CostQuerySetModel, 'data_source_id'>[] = [
+export const MANAGED_COST_QUERY_SET_ID_LIST: string[] = [
+    MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
+    MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
+    MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
+];
+
+export const ManagedCostQuerySets: Omit<CostQuerySetModel, 'data_source_id'>[] = [
     {
-        cost_query_set_id: ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
-        name: ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
+        cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
+        name: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
         options: {
             group_by: [GROUP_BY.PROJECT],
             granularity: GRANULARITY.MONTHLY,
@@ -30,8 +35,8 @@ export const originManagedCostQuerySets: Omit<CostQuerySetModel, 'data_source_id
         },
     },
     {
-        cost_query_set_id: ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
-        name: ORIGIN_MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
+        cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
+        name: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
         options: {
             group_by: [GROUP_BY.PRODUCT],
             granularity: GRANULARITY.MONTHLY,
@@ -48,8 +53,8 @@ export const originManagedCostQuerySets: Omit<CostQuerySetModel, 'data_source_id
         },
     },
     {
-        cost_query_set_id: ORIGIN_MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
-        name: ORIGIN_MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
+        cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
+        name: MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
         options: {
             group_by: [GROUP_BY.PRODUCT],
             granularity: GRANULARITY.DAILY,

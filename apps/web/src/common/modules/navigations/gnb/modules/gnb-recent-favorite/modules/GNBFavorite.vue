@@ -99,7 +99,7 @@ import {
     convertDashboardConfigToReferenceData,
     convertMenuConfigToReferenceData,
     convertProjectConfigToReferenceData,
-    convertProjectGroupConfigToReferenceData,
+    convertProjectGroupConfigToReferenceData, getParsedKeysWithManagedCostQueryFavoriteKey,
 } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -330,11 +330,12 @@ export default {
                 }).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.COST_ANALYSIS) {
                 const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
+                const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
                 SpaceRouter.router.push({
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
                         dataSourceId,
-                        costQuerySetId: itemName,
+                        costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
                     },
                 }).catch(() => {});
             }
