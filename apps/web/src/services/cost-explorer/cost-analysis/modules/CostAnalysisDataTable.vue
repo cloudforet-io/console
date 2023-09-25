@@ -312,10 +312,29 @@ const handleChange = async (options: any = {}) => {
     tableState.more = more;
 };
 const costAnalyzeExportQueryHelper = new QueryHelper();
-const handleExcelDownload = async () => {
+const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
     try {
         costAnalyzeExportQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        const { status, response } = await fetchCostAnalyze({
+            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            query: {
+                ...state.analyzeQuery,
+                filter: costAnalyzeExportQueryHelper.apiQuery.filter,
+            },
+        });
+        if (status === 'succeed') return response.results;
+        return [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
+const handleExcelDownload = async () => {
+    try {
+        const results = await listCostAnalysisExcelData();
+        const refinedData = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
         await store.dispatch('file/downloadExcel', {
+            // HACK: delete `url` and `param` after console-api 1.12.dev20 release
             url: '/cost-analysis/cost/analyze',
             param: {
                 data_source_id: costAnalysisPageStore.selectedDataSourceId,
@@ -324,6 +343,7 @@ const handleExcelDownload = async () => {
                     filter: costAnalyzeExportQueryHelper.apiQuery.filter,
                 },
             },
+            data: refinedData,
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,
             version: 'v2',
