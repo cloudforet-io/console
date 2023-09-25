@@ -74,15 +74,19 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
         return undefined;
     }
 };
-const menuHandler = (groupBy: string): AutocompleteHandler => async (value: string) => {
+const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue: string) => {
     if (!groupBy) return { results: [] };
 
     state.loading = true;
-    const results = await getResources(value, groupBy);
+    const results = await getResources('', groupBy);
+    /* Get all resources without inputValue.
+    * Because, results has no label to be filtered by inputValue. */
     state.loading = false;
 
     const refinedMenuItems = getRefinedMenuItems(groupBy, results?.map((d) => ({ name: d.key, label: d.name })));
-    return { results: refinedMenuItems };
+    // filter by inputValue here.
+    const refinedMenuItemsFilteredByInputValue = refinedMenuItems.filter((d) => (d.label as string).toLowerCase().includes(inputValue.toLowerCase()));
+    return { results: refinedMenuItemsFilteredByInputValue };
 };
 const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
     if (!results) return [];
