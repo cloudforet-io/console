@@ -6,7 +6,7 @@
                                  class="name-form"
                                  @update:isValid="handleUpdateIsValid"
             />
-            <multiple-provider-form v-if="state.supportedProviders.length"
+            <multiple-provider-form v-if="state.providerFormVisible"
                                     class="multiple-provider-form"
                                     @update:isProviderValid="handleChangeIsProviderValid"
             />
@@ -91,8 +91,9 @@ const state = reactive({
     isTagsValid: true,
     isProviderValid: false,
     isVersionValid: false,
+    providerFormVisible: computed(() => !!state.supportedProviders.length),
     deleteModalVisible: false,
-    isAllFormValid: computed(() => state.isProviderValid && state.isNameValid && state.isVersionValid && state.isTagsValid),
+    isAllFormValid: computed(() => (state.isProviderValid || !state.providerFormVisible) && state.isNameValid && state.isVersionValid && state.isTagsValid),
     pluginName: computed(() => collectorFormState.repositoryPlugin?.name),
     supportedProviders: computed<string[]>(() => collectorFormState.repositoryPlugin?.capability?.supported_providers ?? []),
 });
