@@ -123,9 +123,9 @@ const state = reactive({
     complianceCountComparingMessage: computed<string|undefined>(() => {
         if (state.complianceCount === state.prevComplianceCount) return undefined;
         if (state.prevComplianceCount < state.complianceCount) {
-            return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTH') as string;
+            return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.MORE_THAN_PREV_MONTH') as string;
         }
-        return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.LESS_THAN_PREV_MONTH') as string;
+        return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.LESS_THAN_PREV_MONTH') as string;
     }),
     checkCount: computed<Record<string, number>>(() => {
         if (!state.data) return {} as Record<string, number>;
@@ -247,7 +247,7 @@ const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartD
     innerSeries.data.setAll(innerChartData);
 
     if (!state.noData) {
-        chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
+        chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]Compliance Score[/]:\n[fontSize:32px]${state.score}[/]` });
     }
 };
 
@@ -308,18 +308,9 @@ defineExpose<WidgetExpose<Data[]>>({
         <div class="compliance-check-status">
             <div class="data-container">
                 <div class="summary-wrapper">
-                    <!--                    <div class="left-wrapper">-->
-                    <!--                        <p class="title">-->
-                    <!--                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}-->
-                    <!--                        </p>-->
-                    <!--                        <p class="value">-->
-                    <!--                            {{ state.accountCount }}-->
-                    <!--                        </p>-->
-                    <!--                    </div>-->
-                    <!--                    <p-divider :vertical="true" />-->
                     <div class="right-wrapper">
                         <p class="title">
-                            {{ $t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
+                            Total number of requirements
                         </p>
                         <p class="value">
                             {{ commaFormatter(state.complianceCount) }}
