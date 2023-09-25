@@ -30,8 +30,8 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
     return null;
 };
 
-export const numberFormatter = (num, digits = 1) => {
-    if (Math.abs(num) < 10000) {
+export const numberFormatter = (num, digits = 1, targetMin = 10000) => {
+    if (Math.abs(num) < targetMin) {
         return Math.round(num * 100) / 100;
     }
 
