@@ -353,7 +353,7 @@ watch(() => props.disabled, (disabled) => {
         width: 100%;
     }
 
-    &.icon-button {
+    &.icon-button, &.transparent {
         min-width: unset;
     }
 }

@@ -1,6 +1,6 @@
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import type { defineAsyncComponent } from 'vue';
+import type { Component } from 'vue';
 
 import type { Tags } from '@/models';
 
@@ -12,7 +12,6 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-
 
 export const WIDGET_SIZE = {
     sm: 'sm',
@@ -75,7 +74,7 @@ export interface BaseConfigInfo {
 }
 export interface BaseWidgetConfig {
     widget_config_id: string;
-    widget_component?: ReturnType<typeof defineAsyncComponent>;
+    widget_component?: Component;
     base_configs?: BaseConfigInfo[];
     title?: string;
 
@@ -116,7 +115,7 @@ export interface WidgetFilter {
     v: null|string|boolean|number|Array<null|string|boolean|number>;
     o?: ConsoleFilterOperator;
 }
-const WIDGET_FILTER_KEYS = [
+export const WIDGET_FILTER_KEYS = [
     // resource reference type
     REFERENCE_TYPE_INFO.provider.type,
     REFERENCE_TYPE_INFO.project.type,
@@ -152,8 +151,8 @@ export interface BaseWidgetOptionsSchema<T extends string> {
     schema: JsonSchema;
 }
 export type WidgetOptionsSchema =
-     | BaseWidgetOptionsSchema<CostWidgetOptionsSchemaProperty>
-     | BaseWidgetOptionsSchema<AssetWidgetOptionsSchemaProperty>;
+    | BaseWidgetOptionsSchema<CostWidgetOptionsSchemaProperty>
+    | BaseWidgetOptionsSchema<AssetWidgetOptionsSchemaProperty>;
 
 /* widget options */
 export interface BaseWidgetOptions {

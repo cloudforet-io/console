@@ -213,7 +213,6 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
                            @select="handleSelectPeriod"
         />
         <custom-date-range-modal v-model:visible="state.customRangeModalVisible"
-                                 :granularity="costAnalysisPageState.granularity"
                                  :selected-date-range="state.period"
                                  @confirm="handleCustomRangeModalConfirm"
         />
@@ -230,7 +229,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
     }
 
     @screen mobile {
-        @apply flex flex-wrap justify-end items-center;
+        @apply flex flex-wrap items-center;
         width: 100%;
     }
 }

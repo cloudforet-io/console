@@ -18,7 +18,7 @@ interface UseWidgetReformerOptions {
     containerWidth: Ref<number>;
 }
 
-interface ReformedWidgetInfo extends DashboardLayoutWidgetInfo {
+export interface ReformedWidgetInfo extends DashboardLayoutWidgetInfo {
     size: WidgetSize;
     theme?: WidgetTheme;
     width: number;

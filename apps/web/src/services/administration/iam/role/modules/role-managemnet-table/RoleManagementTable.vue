@@ -230,6 +230,7 @@ watch(() => rolePageState.selectedIndices, (after) => {
 
 <style lang="postcss" scoped>
 .left-toolbox-item-select-dropdown {
+    min-width: 6.5rem;
     margin-left: 1rem;
 }
 .description {

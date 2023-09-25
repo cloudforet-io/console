@@ -35,9 +35,10 @@ const handleSelectViewer = (viewerType: DashboardViewer) => {
                 <p class="viewer-description">
                     {{ t('DASHBOARDS.CREATE.PUBLIC_DESC') }}
                 </p>
-                <div>
-                    <p-radio :selected="!state.isPublicViewer"
-                             @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
+                <div class="dashboard-viewers-private">
+                    <p-radio
+                        :selected="!state.isPublicViewer"
+                        @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
                     >
                         <p-i name="ic_lock-filled"
                              width="0.875rem"
@@ -57,12 +58,16 @@ const handleSelectViewer = (viewerType: DashboardViewer) => {
 
 <style lang="postcss" scoped>
 .dashboard-viewers-form {
-    @apply mt-6;
+    @apply flex flex-col mt-6;
+    gap: 0.5rem;
     .dashboard-viewers-wrapper {
         .viewer-description {
             @apply text-xs text-gray-500;
             font-weight: 400;
-            margin: 0.25rem 0 0 1.5rem;
+            margin-left: 1.5rem;
+        }
+        .dashboard-viewers-private {
+            margin-top: 0.25rem;
         }
     }
 }

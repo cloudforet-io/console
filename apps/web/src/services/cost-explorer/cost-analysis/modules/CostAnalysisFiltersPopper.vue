@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PFilterableDropdown,
+    PFilterableDropdown, PTextButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type {
@@ -12,6 +13,7 @@ import type {
 import {
     computed, reactive,
 } from 'vue';
+import { useI18n } from 'vue-i18n';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -22,6 +24,7 @@ import CostAnalysisFiltersAddMoreButton
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
+const { t } = useI18n();
 
 const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -117,6 +120,18 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
         });
     }
 };
+const handleClickResetFilters = () => {
+    const _originConsoleFilters: ConsoleFilter[]|undefined = costAnalysisPageStore.selectedQuerySet?.options?.filters;
+    const _originFilters: Record<string, string[]> = {};
+    if (_originConsoleFilters?.length) {
+        _originConsoleFilters.forEach((d) => {
+            _originFilters[d.k as string] = d.v as string[];
+        });
+    }
+    costAnalysisPageStore.$patch((_state) => {
+        _state.filters = _originFilters;
+    });
+};
 
 (async () => {
     await Promise.allSettled([
@@ -149,6 +164,13 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
         <cost-analysis-filters-add-more-button @disable-filter="handleDisabledFilters(false, $event)"
                                                @disable-all-filters="handleDisabledFilters(true, $event)"
         />
+        <p-text-button icon-left="ic_refresh"
+                       style-type="highlight"
+                       class="reset-button"
+                       @click="handleClickResetFilters"
+        >
+            {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RESET') }}
+        </p-text-button>
     </div>
 </template>
 
@@ -166,6 +188,12 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
         .dropdown-context-menu {
             min-width: 12rem;
         }
+    }
+
+    .reset-button {
+        display: inline-block;
+        vertical-align: middle;
+        padding: 0.5rem 0;
     }
 }
 </style>

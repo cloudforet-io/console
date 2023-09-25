@@ -1,5 +1,3 @@
-import { defineAsyncComponent } from 'vue';
-
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
@@ -13,7 +11,9 @@ import {
 
 const budgetStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetStatus',
-    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/cost-widgets/budget-status/BudgetStatusWidget.vue')),
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/cost-widgets/budget-status/BudgetStatusWidget.vue'),
+    }),
     title: 'Budget Status',
     labels: ['Cost'],
     description: {
@@ -34,8 +34,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
         ...getWidgetInheritOptions('cost_data_source'),
         ...getWidgetInheritOptionsForFilter(
             'project',
-            'region',
-            'cost_product',
         ),
     },
     options_schema: {
@@ -43,8 +41,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
             'cost_data_source',
             ...getWidgetFilterSchemaPropertyNames(
                 'project',
-                'region',
-                'cost_product',
+                'service_account',
             ),
         ],
         fixed_properties: ['cost_data_source'],
@@ -55,8 +52,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
                 ...getWidgetFilterOptionsSchema(
                     'project',
                     'service_account',
-                    'cost_product',
-                    'region',
                 ),
             },
             order: [
@@ -64,8 +59,6 @@ const budgetStatusWidgetConfig: WidgetConfig = {
                 ...getWidgetFilterSchemaPropertyNames(
                     'project',
                     'service_account',
-                    'cost_product',
-                    'region',
                 ),
             ],
         },

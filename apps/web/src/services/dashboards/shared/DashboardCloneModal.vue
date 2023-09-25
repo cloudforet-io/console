@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PRadio, PTextInput,
+    PButtonModal, PFieldGroup, PRadio, PTextInput, PI,
 } from '@spaceone/design-system';
 import {
     computed,
@@ -14,6 +13,8 @@ import { useStore } from 'vuex';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+
+import { gray } from '@/styles/colors';
 
 import type { DashboardViewer, DashboardConfig, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
@@ -67,7 +68,7 @@ const currentRouteName = router.currentRoute.value.name;
 const state = reactive({
     proxyVisible: props.visible,
     filteredVisibilityList: computed(() => [
-        { name: DASHBOARD_VIEWER.PRIVATE, label: t('DASHBOARDS.FORM.LABEL_PRIVATE') },
+        { name: DASHBOARD_VIEWER.PRIVATE, label: t('DASHBOARDS.FORM.LABEL_PRIVATE'), icon: 'ic_lock-filled' },
         { name: DASHBOARD_VIEWER.PUBLIC, label: t('DASHBOARDS.FORM.LABEL_PUBLIC') },
     ]),
     projectId: computed(() => {
@@ -87,10 +88,10 @@ const state = reactive({
         }
         return store.state.dashboard.domainItems.map((item) => item.name);
     }),
-    layouts: computed<DashboardLayoutWidgetInfo[]|DashboardLayoutWidgetInfo[][]>(() => {
+    layouts: computed<DashboardLayoutWidgetInfo[][]>(() => {
         if (props.dashboard?.layouts) return props.dashboard?.layouts;
         if ((props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList) {
-            return (props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList;
+            return [(props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList];
         }
         return [];
     }),
@@ -197,13 +198,20 @@ watch(() => props.visible, (visible) => {
                            required
                            class="mt-6"
             >
-                <p-radio v-for="{ name: visibilityName, label } in state.filteredVisibilityList"
+                <p-radio v-for="{ name: visibilityName, label, icon } in state.filteredVisibilityList"
                          :key="visibilityName"
                          :value="visibilityName"
                          :selected="viewers"
                          class="radio-group"
                          @change="setForm('viewers', $event)"
                 >
+                    <p-i v-if="icon"
+                         :name="icon"
+                         width="0.875rem"
+                         height="0.875rem"
+                         :color="gray[500]"
+                         class="ml-1"
+                    />
                     <span class="ml-1">{{ label }}</span>
                 </p-radio>
             </p-field-group>

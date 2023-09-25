@@ -10,7 +10,7 @@ import { xor } from 'lodash';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -72,7 +72,7 @@ const setSelectedTagsMenu = (groupBy?: string[]) => {
 /* event */
 const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem[], isSelected: boolean) => {
     if (isSelected && state.selectedGroupByItems.length >= 3) {
-        showErrorMessage('', t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
+        showInfoMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'), t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY_DESC'));
         return;
     }
     if (isSelected) {
@@ -90,7 +90,7 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
 const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
     if (isSelected) {
         if (state.selectedGroupByItems.length + 1 > 3) {
-            showErrorMessage('', t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'));
+            showInfoMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY'), t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_ADD_GROUP_BY_DESC'));
             state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
             return;
         }
@@ -165,7 +165,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
         /* custom design-system component - p-filterable-dropdown */
         :deep(.p-filterable-dropdown) {
             .dropdown-button {
-                height: 1.25rem;
+                height: 1.375rem;
                 min-height: 1.5rem;
                 .placeholder {
                     font-size: 0.75rem;
@@ -176,6 +176,18 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             }
             .p-context-menu {
                 min-width: 9rem;
+            }
+            &.selected {
+                .dropdown-button {
+                    @apply bg-secondary border-secondary text-white;
+                    .p-badge {
+                        @apply bg-white text-gray-800;
+                        margin-left: 0.125rem;
+                    }
+                    .selection-wrapper, .arrow-button {
+                        @apply text-white;
+                    }
+                }
             }
         }
     }

@@ -1,17 +1,18 @@
-import { merge, union } from 'lodash';
+import { merge } from 'lodash';
 import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
     computed, reactive,
 } from 'vue';
 
+
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     WidgetConfig, WidgetOptions,
     InheritOptions,
-    WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getInitialSchemaProperties } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 
@@ -31,8 +32,8 @@ interface UseMergedWidgetStateOptions {
     dashboardSettings: DashboardSettings|undefined|Ref<DashboardSettings|undefined>; // dashboard settings
     dashboardVariablesSchema: DashboardVariablesSchema|undefined|Ref<DashboardVariablesSchema|undefined>; // dashboard variables schema
     dashboardVariables: DashboardVariables|undefined|Ref<DashboardVariables|undefined>; // dashboard variables
-    title?: string|Ref<string>; // widget title from the dashboard widget layout info.
-    schemaProperties?: string[]|Ref<string[]>; // widget schema properties from the dashboard widget layout info.
+    title?: string|Ref<string|undefined>; // widget title from the dashboard widget layout info.
+    schemaProperties?: string[]|Ref<string[]|undefined>; // widget schema properties from the dashboard widget layout info.
 }
 export function useMergedWidgetState(
     {
@@ -50,6 +51,7 @@ export function useMergedWidgetState(
         schemaProperties,
     });
     const optionsErrorMap = computed(() => getWidgetInheritOptionsErrorMap(
+        optionState.schemaProperties ?? [],
         optionState.inheritOptions,
         state.widgetConfig?.options_schema?.schema,
         optionState.dashboardVariablesSchema,
@@ -77,8 +79,8 @@ export function useMergedWidgetState(
                 refresh_interval_option: optionState.dashboardSettings.refresh_interval_option ?? 'off',
             };
         }),
-        title: computed<string>(() => optionState.title ?? state.widgetConfig.title ?? ''),
-        schemaProperties: computed<string[]>(() => optionState.schemaProperties ?? getRefinedSchemaProperties(state.widgetConfig)),
+        title: computed<string>(() => optionState.title ?? state.widgetConfig?.title ?? ''),
+        schemaProperties: computed<string[]>(() => optionState.schemaProperties ?? getInitialSchemaProperties(state.widgetConfig, optionState.dashboardVariablesSchema)),
     }) as UnwrapRef<MergedWidgetState>;
 
     return state;
@@ -141,31 +143,4 @@ const getRefinedParentOptions = (
         }
     });
     return result;
-};
-
-
-const getRefinedSchemaProperties = (widgetConfig: WidgetConfig): string[] => {
-    const widgetOptionsSchema = widgetConfig?.options_schema ?? {} as WidgetOptionsSchema;
-    const fixedProperties: string[] = widgetOptionsSchema.fixed_properties ?? [];
-    const defaultProperties: string[] = widgetOptionsSchema.default_properties ?? [];
-    const allProperties = union(fixedProperties, defaultProperties);
-
-    const fixedIdxMap: Record<string, number> = {};
-    fixedProperties.forEach((name, idx) => { fixedIdxMap[name] = idx; });
-    const defaultIdxMap = {};
-    defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
-
-    return allProperties.sort((a, b) => {
-        if (fixedIdxMap[a] !== undefined) {
-            // if both are fixed, follow required index order
-            if (fixedIdxMap[b] !== undefined) return fixedIdxMap[a] > fixedIdxMap[b] ? 1 : -1;
-            // otherwise, fixed item comes before
-            return -1;
-        }
-        // if one is default and one is fixed, fixed one comes before
-        if (fixedIdxMap[b] !== undefined) return 1;
-
-        // if both are default, follow default index order
-        return defaultIdxMap[a] > defaultIdxMap[b] ? 1 : -1;
-    });
 };

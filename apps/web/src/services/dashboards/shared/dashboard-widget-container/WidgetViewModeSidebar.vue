@@ -3,9 +3,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { isEqual } from 'lodash';
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -15,9 +15,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 interface Props {
@@ -34,7 +33,8 @@ const props = withDefaults(defineProps<Props>(), {
     widgetConfigId: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'refresh'): void;
+    (e: 'close'): void;
+    (e: 'update:widget-info'): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -53,15 +53,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    const widgetInfo = cloneDeep(widgetFormState.widgetInfo) as DashboardLayoutWidgetInfo;
-    widgetInfo.title = widgetFormState.widgetTitle ?? '';
-    widgetInfo.widget_options = widgetFormState.widgetOptions ?? {};
-    widgetInfo.schema_properties = widgetFormState.schemaProperties ?? [];
-    widgetInfo.inherit_options = widgetFormState.inheritOptions ?? {};
-    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
-
-    // update widget info in widget form store
-    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
+    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
 };
 
 /* Api */
@@ -70,12 +62,12 @@ const updateWidgetInfo = async () => {
         if (dashboardDetailStore.isProjectDashboard) {
             await SpaceConnector.clientV2.dashboard.projectDashboard.update({
                 project_dashboard_id: dashboardDetailState.dashboardId,
-                layouts: dashboardDetailState.dashboardWidgetInfoList,
+                layouts: [dashboardDetailState.dashboardWidgetInfoList],
             });
         } else {
             await SpaceConnector.clientV2.dashboard.domainDashboard.update({
                 domain_dashboard_id: dashboardDetailState.dashboardId,
-                layouts: dashboardDetailState.dashboardWidgetInfoList,
+                layouts: [dashboardDetailState.dashboardWidgetInfoList],
             });
         }
     } catch (e) {
@@ -95,10 +87,13 @@ const handleClickSaveButton = async () => {
     state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
-    widgetFormStore.initWidgetForm(props.widgetKey, props.widgetConfigId);
     state.proxyVisible = false;
-    emit('refresh');
+    emit('close');
 };
+watch(() => widgetFormStore.mergedWidgetInfo, async (after, before) => {
+    if (before === undefined || isEqual(after, before)) return;
+    emit('update:widget-info');
+});
 </script>
 
 <template>
@@ -169,6 +164,10 @@ const handleCloseSidebar = () => {
     right: 0;
     z-index: 10;
 
+    .sidebar-title {
+        @apply text-label-xl;
+    }
+
     .sidebar-contents {
         position: relative;
         gap: 1.5rem;
@@ -202,7 +201,7 @@ $footer-height: 57px;
         padding-top: 0;
         padding-bottom: $footer-height;
         .inner {
-            padding-top: 1rem;
+            padding-top: 2rem;
             padding-bottom: 1rem;
         }
     }

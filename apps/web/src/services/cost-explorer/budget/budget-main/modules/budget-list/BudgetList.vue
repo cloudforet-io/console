@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -20,8 +21,6 @@ import {
 import BudgetListCard from '@/services/cost-explorer/budget/budget-main/modules/budget-list/BudgetListCard.vue';
 import BudgetToolbox from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolbox.vue';
 import type { Period } from '@/services/cost-explorer/type';
-
-
 
 interface Props {
     filters: ConsoleFilter[];
@@ -56,7 +55,10 @@ const state = reactive({
             .setPage(state.pageStart, state.pageLimit);
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
         return {
-            query: { ..._query, ...budgetUsageApiQueryHelper.data },
+            query: {
+                ...budgetUsageApiQueryHelper.data,
+                ..._query,
+            },
         };
     }),
 });
@@ -102,6 +104,7 @@ const handleRefresh = () => {
     listBudgets();
 };
 
+const budgetUsageExportQueryHelper = new QueryHelper();
 const handleExport = async () => {
     const excelFields = [
         { key: 'budget_id', name: 'Budget ID' },
@@ -114,14 +117,19 @@ const handleExport = async () => {
         { key: 'total_budget', name: 'Total Budget' },
         { key: 'budget_usage', name: 'Usage (%)' },
     ];
+    budgetUsageExportQueryHelper.setFilters(state.queryStoreFilters);
+    const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
     await store.dispatch('file/downloadExcel', {
         url: '/cost-analysis/budget-usage/analyze',
         param: {
-            ...state.budgetUsageParams,
-            query: budgetUsageApiQueryHelper.data,
+            query: {
+                ..._query,
+                filter: budgetUsageExportQueryHelper.apiQuery.filter,
+            },
         },
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.budget,
+        version: 'v2',
     });
 };
 

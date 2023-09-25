@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import {
     PI, PCollapsibleToggle, PSelectDropdown, PLazyImg,
@@ -35,6 +34,10 @@ import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysi
 import RelocateDashboardModal from '@/services/cost-explorer/modules/RelocateDashboardModal.vue';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import type { RelocateDashboardStatus } from '@/services/cost-explorer/store/cost-explorer-settings-store';
+import {
+    useCostExplorerSettingsStore,
+} from '@/services/cost-explorer/store/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
@@ -45,6 +48,8 @@ const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
 const costQuerySetState = costQuerySetStore.$state;
+const costExplorerSettingsStore = useCostExplorerSettingsStore();
+const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const allReferenceStore = useAllReferenceStore();
 
 const router = useRouter();
@@ -137,7 +142,8 @@ const dataSourceState = reactive({
     selected: computed(() => costQuerySetState.selectedDataSourceId ?? Object.keys(dataSourceState.dataSourceMap)[0]),
 });
 const relocateNotificationState = reactive({
-    isShow: false,
+    isBannerVisible: false,
+    isModalVisible: false,
     data: computed<LNBItem>(() => {
         const dashboardQuery = new QueryHelper().setFilters([{
             k: 'label',
@@ -159,7 +165,6 @@ const relocateNotificationState = reactive({
             hideFavorite: true,
         });
     }),
-    isModalVisible: false,
     userId: computed(() => store.state.user.userId),
 });
 
@@ -203,26 +208,19 @@ const handleLearnMoreRelocateNotification = () => {
 };
 
 const handleDismissRelocateNotification = () => {
-    const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
-    settings.costExplorer = {
-        ...settings.costExplorer,
-        hideRelocateDashboardNotification: true,
-    };
-    LocalStorageAccessor.setItem(relocateNotificationState.userId, settings);
-    relocateNotificationState.isShow = false;
+    costExplorerSettingsStore.setRelocateDashboardState({
+        ...costExplorerSettingsState.relocateDashboardStatus,
+        hideBanner: true,
+    });
+    relocateNotificationState.isBannerVisible = false;
 };
-
-
 
 onMounted(() => {
     // Relocate dashboard notification
-    const settings = LocalStorageAccessor.getItem(relocateNotificationState.userId);
-    if (!settings.costExplorer?.hideRelocateDashboardNotification) {
-        relocateNotificationState.isModalVisible = true;
-        relocateNotificationState.isShow = true;
-    }
+    const relocateDashboardStatus: RelocateDashboardStatus|undefined = costExplorerSettingsStore.getRelocateDashboardStatus;
+    relocateNotificationState.isBannerVisible = !relocateDashboardStatus?.hideBanner;
+    relocateNotificationState.isModalVisible = !relocateDashboardStatus?.hideModal;
 });
-
 </script>
 
 <template>
@@ -243,7 +241,7 @@ onMounted(() => {
                         />
                     </template>
                 </l-n-b-router-menu-item>
-                <relocate-dashboard-notification v-if="relocateNotificationState.isShow"
+                <relocate-dashboard-notification v-if="relocateNotificationState.isBannerVisible"
                                                  @click-dismiss="handleDismissRelocateNotification"
                                                  @click-learn-more="handleLearnMoreRelocateNotification"
                 />
@@ -296,7 +294,6 @@ onMounted(() => {
     .select-options-dropdown {
         .selected-wrapper {
             @apply flex items-center;
-            width: calc(100% - 1.8rem);
             .left-icon {
                 margin-right: 0.25rem;
                 flex-shrink: 0;

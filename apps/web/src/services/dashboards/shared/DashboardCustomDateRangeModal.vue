@@ -28,12 +28,12 @@ const emit = defineEmits<{(event: 'update:visible', visible: boolean): void;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    dateType: DATA_TYPE.yearToDate,
+    dateType: DATA_TYPE.yearToMonth,
     invalid: computed(() => !state.selectedDates.length),
     selectedDates: [] as string[],
     dateLimitSetting: computed<DateOption>(() => {
-        const minDate = dayjs.utc().subtract(3, 'year').format('YYYY-MM-DD');
-        const maxDate = dayjs.utc().format('YYYY-MM-DD');
+        const minDate = dayjs.utc().subtract(3, 'year').format('YYYY-MM');
+        const maxDate = dayjs.utc().format('YYYY-MM');
         return { minDate, maxDate };
     }),
 });
@@ -45,14 +45,14 @@ const handleUpdateSelectedDates = (selectedDates: string[]) => {
     if (!selectedDates.length) return;
     const originDates = state.selectedDates;
 
-    if (dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'day')) return;
+    if (dayjs.utc(originDates[0]).isSame(dayjs.utc(selectedDates[0]), 'month')) return;
     state.selectedDates = selectedDates;
 };
 const handleConfirm = () => {
     state.proxyVisible = false;
     const period: Period = {};
-    period.start = dayjs.utc(state.selectedDates[0]).format('YYYY-MM-01');
-    period.end = dayjs.utc(state.selectedDates[0]).endOf('month').format('YYYY-MM-DD');
+    period.start = dayjs.utc(state.selectedDates[0]).format('YYYY-MM');
+    period.end = dayjs.utc(state.selectedDates[0]).endOf('month').format('YYYY-MM');
     emit('confirm', period);
 };
 
@@ -61,7 +61,7 @@ watch(() => props.visible, (visible) => {
         if (props.selectedDateRange?.start) {
             state.selectedDates = [props.selectedDateRange?.start];
         } else {
-            state.selectedDates = [];
+            state.selectedDates = [dayjs.utc().format('YYYY-MM')];
         }
     } else {
         state.selectedDates = [];

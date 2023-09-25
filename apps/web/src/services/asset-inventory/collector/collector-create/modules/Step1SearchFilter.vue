@@ -258,13 +258,6 @@ watch(() => state.selectedRepository, (repository) => {
         .dropdown-container {
             @apply grid grid-cols-2 gap-4;
             width: 100%;
-
-            /* custom design-system component - p-select-dropdown */
-            &:deep(.p-select-dropdown) {
-                .text {
-                    width: calc(100% - 1.25rem);
-                }
-            }
         }
     }
 }

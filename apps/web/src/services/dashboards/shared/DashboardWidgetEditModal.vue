@@ -8,9 +8,8 @@ import { useI18n } from 'vue-i18n';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
     visible: boolean;
@@ -26,7 +25,6 @@ interface EmitFn {
 const emit = defineEmits<EmitFn>();
 const props = defineProps<Props>();
 const { t } = useI18n();
-
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
@@ -35,14 +33,9 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const handleEditModalConfirm = () => {
-    const widgetInfo: Partial<DashboardLayoutWidgetInfo> = {
-        widget_name: widgetFormState.widgetConfigId ?? '',
-        title: widgetFormState.widgetTitle ?? '',
-        inherit_options: widgetFormState.inheritOptions ?? {},
-        widget_options: widgetFormState.widgetOptions ?? {},
-        schema_properties: widgetFormState.schemaProperties ?? [],
-    };
-    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetInfo);
+    const widgetInfo = widgetFormStore.updatedWidgetInfo;
+    if (!widgetInfo) return;
+    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
     dashboardDetailStore.updateWidgetValidation(true, props.widgetKey);
     state.proxyVisible = false;
     emit('confirm');

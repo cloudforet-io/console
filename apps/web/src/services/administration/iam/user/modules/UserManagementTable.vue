@@ -387,6 +387,7 @@ const handleUserStatusModalConfirm = () => {
 
 <style lang="postcss" scoped>
 .left-toolbox-item {
+    min-width: 6.5rem;
     margin-left: 1rem;
     &:last-child {
         flex-grow: 1;

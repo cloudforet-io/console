@@ -3,8 +3,6 @@
 import {
     PFieldGroup, PHeading, PSkeleton, PTextInput,
 } from '@spaceone/design-system';
-import { useFocus, onClickOutside } from '@vueuse/core';
-import type { MaybeRef } from 'vue';
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
@@ -28,8 +26,11 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
+    loading: computed<boolean>(() => {
+        if (!props.dashboardId) return false;
+        return !dashboardDetailState.name;
+    }),
     placeHolder: dashboardDetailState.placeholder,
-    editMode: false,
     dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
 });
 const {
@@ -50,34 +51,15 @@ const {
     },
 });
 
-const inputRef = ref<HTMLElement|null>(null);
-useFocus(inputRef as MaybeRef, { initialValue: true });
-const isTextInputFocused = ref(true);
+const isTextInputFocused = ref(false);
 
 const updateName = (name: string) => {
     setForm('nameInput', name);
     emit('update:name', name);
 };
 
-// handlers for <p-text-input /> (creating feature)
-const handlePTextInput = (text: string) => {
-    updateName(text);
-};
-
-// handlers for <input /> (customizing feature)
-const handleInput = (e: InputEvent): void => {
-    updateName((e.target as HTMLInputElement).value);
-};
-const handleEscape = () => {
-    if (!state.editMode) return;
-    state.editMode = false;
-    updateName(props.name);
-};
-const handleEnter = () => {
-    state.editMode = false;
-    if (invalidState.nameInput) {
-        updateName(props.name);
-    }
+const handleInput = (string: string) => {
+    updateName(string);
 };
 const handleClickBackButton = () => {
     emit('click-back-button');
@@ -98,8 +80,6 @@ onMounted(() => {
     else dashboardDetailStore.$patch({ isNameValid: false });
 });
 
-onClickOutside(inputRef as MaybeRef, handleEnter);
-
 (async () => {
     await store.dispatch('dashboard/loadProjectDashboard');
 })();
@@ -109,42 +89,23 @@ onClickOutside(inputRef as MaybeRef, handleEnter);
     <p-heading show-back-button
                @click-back-button="handleClickBackButton"
     >
-        <template v-if="props.dashboardId">
-            <p-field-group v-if="dashboardDetailState.name"
-                           :invalid="invalidState.nameInput"
-                           :invalid-text="invalidTexts.nameInput"
-            >
-                <template #default>
-                    <input ref="inputRef"
-                           class="name-input"
-                           :value="nameInput"
-                           @input="handleInput"
-                           @keydown.esc="handleEscape"
-                           @keydown.enter="handleEnter"
-                    >
-                </template>
-            </p-field-group>
-            <p-skeleton v-else
-                        width="20rem"
-                        height="1.5rem"
-            />
-        </template>
-        <template v-else>
-            <p-field-group
-                :invalid="invalidState.nameInput"
-                :invalid-text="invalidTexts.nameInput"
-            >
-                <template #default="{invalid}">
-                    <p-text-input
-                        v-model:is-focused="isTextInputFocused"
-                        :invalid="invalid"
-                        :placeholder="state.placeHolder"
-                        :value="nameInput"
-                        @update:value="handlePTextInput"
-                    />
-                </template>
-            </p-field-group>
-        </template>
+        <p-skeleton v-if="state.loading"
+                    width="20rem"
+                    height="1.5rem"
+        />
+        <p-field-group v-else
+                       :invalid="invalidState.nameInput"
+                       :invalid-text="invalidTexts.nameInput"
+        >
+            <template #default="{invalid}">
+                <p-text-input v-model:is-focused="isTextInputFocused"
+                              :value="nameInput"
+                              :invalid="invalid"
+                              :placeholder="state.placeHolder"
+                              @update:value="handleInput"
+                />
+            </template>
+        </p-field-group>
     </p-heading>
 </template>
 
@@ -153,11 +114,6 @@ onClickOutside(inputRef as MaybeRef, handleEnter);
     cursor: pointer;
 }
 .title-area:hover {
-    text-decoration: underline;
-}
-.name-input {
-    width: 60%;
-    max-width: 60%;
     text-decoration: underline;
 }
 .p-text-input {

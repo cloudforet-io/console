@@ -18,6 +18,14 @@ type UsageRange = typeof USAGE_RANGE[keyof typeof USAGE_RANGE];
 
 type SelectedMap = Partial<Record<UsageRange, boolean>>;
 
+interface Props {
+    readonly: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    readonly: false,
+});
+
 const { t } = useI18n();
 const emit = defineEmits<{(e: 'update', value: BudgetUsageRange): void}>();
 
@@ -71,12 +79,12 @@ const state = reactive({
 });
 
 const handleClick = (name: UsageRange) => {
+    if (props.readonly) return;
     const index = state.selected.findIndex((d) => d === name);
     if (index !== -1) state.selected.splice(index, 1);
     else state.selected.push(name);
     emit('update', state.range);
 };
-
 </script>
 
 <template>
@@ -84,6 +92,7 @@ const handleClick = (name: UsageRange) => {
         <div v-for="({name, label, color}) in state.items"
              :key="name"
              class="range"
+             :style="{ cursor: props.readonly ? 'unset' : 'pointer' }"
              :class="{disabled: !state.selectedMap[name]}"
              @click="handleClick(name)"
         >

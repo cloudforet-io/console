@@ -3,6 +3,7 @@ import {
     PButtonModal, PTextInput, PLink, PButton, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import { cloneDeep } from 'lodash';
 import { computed, reactive } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -33,7 +34,7 @@ const budgetPageState = budgetPageStore.$state;
 const state = reactive({
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
-    notifications: (budgetPageState.budgetData?.notifications ?? []) as BudgetNotification[],
+    notifications: (cloneDeep(budgetPageState.budgetData?.notifications) ?? []) as BudgetNotification[],
     units: computed(() => ([
         {
             name: BUDGET_NOTIFICATIONS_UNIT.ACTUAL_COST,
