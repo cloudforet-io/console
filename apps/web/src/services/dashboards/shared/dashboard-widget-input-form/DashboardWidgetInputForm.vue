@@ -137,19 +137,21 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
         };
     });
 
-    // update widget option schema
+    // update widget option schema and form data
     const originPropertySchema = widgetFormStore.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
     const newPropertySchema = getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, isInherit, dashboardDetailState.projectId);
-    state.widgetOptionsJsonSchema = {
+    const schema = {
         ...state.widgetOptionsJsonSchema,
         properties: {
             ...state.widgetOptionsJsonSchema.properties,
             [propertyName]: newPropertySchema,
         },
     };
+    const formData = { ...state.schemaFormData, [propertyName]: undefined };
 
-    // update form data
-    state.schemaFormData = { ...state.schemaFormData, [propertyName]: undefined };
+    // set schema and form data
+    state.widgetOptionsJsonSchema = schema;
+    state.schemaFormData = formData;
 };
 const handleUpdateFormData = (formData: Record<string, any>) => {
     state.schemaFormData = formData;
@@ -172,8 +174,8 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     // init title
     updateTitle(widgetFormStore.mergedWidgetInfo?.title);
 
-    // init schema and form data
-    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
+    // get schema and form data
+    const schema = getRefinedWidgetOptionsSchema(
         referenceStoreState,
         widgetFormStore.widgetConfig?.options_schema ?? { schema: {} },
         dashboardDetailState.variablesSchema,
@@ -181,9 +183,12 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
         widgetFormState.schemaProperties ?? [],
         dashboardDetailState.projectId,
     );
+    const formData = getInitialFormData(widgetFormStore.mergedWidgetInfo, dashboardDetailState.variablesSchema);
 
-    // initiate form data
-    state.schemaFormData = getInitialFormData(widgetFormStore.mergedWidgetInfo, dashboardDetailState.variablesSchema);
+    // set schema and form data
+    // CAUTION: those two states must be set at the same time not to cause re-rendering of p-json-schema-form
+    state.widgetOptionsJsonSchema = schema;
+    state.schemaFormData = formData;
 };
 watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
     // do nothing if still loading

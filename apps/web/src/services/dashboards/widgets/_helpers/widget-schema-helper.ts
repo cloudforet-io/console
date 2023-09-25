@@ -57,7 +57,11 @@ export const getWidgetOptionName = (key: string): string => {
     if (WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey)) return `filters.${key}`;
     return key;
 };
-export const isWidgetFilterKey = (key: string): boolean => WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
+export const isWidgetFilterKey = (key: string): boolean => {
+    if (key.startsWith('filters.')) return WIDGET_FILTER_KEYS.includes(getWidgetFilterKey(key));
+    return WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
+};
+export const getWidgetFilterKey = (key: string): WidgetFilterKey => key.replace('filters.', '') as WidgetFilterKey;
 
 /** @function
  * @name getWidgetOptionsSchemaPropertyName
