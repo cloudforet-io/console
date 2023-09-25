@@ -26,7 +26,7 @@ export const refineValueByProperty = (schema: JsonSchema, val?: any): any => {
     if (type === 'array') return refineArrayTypeValue(schema, val);
     if (NUMERIC_TYPES.includes(type)) return refineNumberTypeValue(val);
     if (type === 'string') {
-        // PSelectDropdown case (string, single select)
+        // PFilterableDropdown, PSelectDropdown case (string, single select)
         if (Array.isArray(val)) {
             return val[0]?.name;
         } if (typeof val === 'object') {
@@ -49,21 +49,21 @@ export const refineObjectByProperties = (schema: JsonSchema, formData: object): 
     return result;
 };
 
-export const initRefinedFormData = (schema?: JsonSchema, formData?: any, isRoot?: boolean): any => {
-    if (typeof formData !== 'object' || Array.isArray(formData)) {
+export const initRefinedFormData = (schema?: JsonSchema, rawFormData?: any, isRoot?: boolean): any => {
+    if (typeof rawFormData !== 'object' || Array.isArray(rawFormData)) {
         if (isRoot) {
             console.error(new Error('[JsonSchemaForm] Only object is available for formData prop'));
             return {};
         }
-        return formData;
+        return rawFormData;
     }
 
     const { properties } = schema ?? {};
     const result = {};
-    if (!properties) return formData;
+    if (!properties) return rawFormData;
     Object.keys(properties).forEach((key) => {
         const property = properties[key];
-        result[key] = refineValueByProperty(property, formData?.[key] ?? property.default);
+        result[key] = refineValueByProperty(property, rawFormData?.[key] ?? property.default);
     });
     return result;
 };

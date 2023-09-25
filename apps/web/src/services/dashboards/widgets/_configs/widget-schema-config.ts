@@ -89,5 +89,6 @@ export const COST_DATA_SOURCE_SCHEMA = {
     type: 'string',
     reference: {
         resource_type: 'cost_analysis.DataSource',
+        default_path: 0,
     },
 };

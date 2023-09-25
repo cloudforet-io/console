@@ -12,6 +12,7 @@ export type ComponentName = typeof COMPONENTS[number];
 interface Reference {
     resource_type: string; // 'identity.ServiceAccount'
     reference_key?: string; // 'service_account_id' (auto-complete/resource api, must not given) // 'project_id' (auto-complete/distinct api, must given)
+    default_path?: number // if it is given, it will be used as the path to get the default value from the result array
 }
 export interface JsonSchema {
     type?: string;
