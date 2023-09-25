@@ -1,44 +1,3 @@
-<template>
-    <p-button-modal v-model:visible="state.proxyVisible"
-                    class="delete-modal"
-                    :header-title="headerTitle"
-                    :size="size"
-                    :fade="true"
-                    :backdrop="true"
-                    :disabled="disabled"
-                    :hide-footer="hideFooter"
-                    theme-color="alert"
-                    :loading="loading"
-                    @confirm="handleConfirm"
-                    @close="handleClose"
-                    @cancel="handleCancel"
-    >
-        <template #body>
-            <p
-                v-if="contents || slots.default"
-                :class="{'delete-modal-content': true, 'enable-scroll': enableScroll}"
-            >
-                <slot>{{ contents }}</slot>
-            </p>
-            <slot name="delete-modal-body" />
-            <div class="content-footer">
-                <p-button v-if="hideFooter"
-                          class="close-button"
-                          style-type="tertiary"
-                          @click="handleClickClose"
-                >
-                    {{ t('APP.MAIN.CLOSE') }}
-                </p-button>
-            </div>
-        </template>
-        <template v-if="confirmText"
-                  #confirm-button
-        >
-            {{ confirmText }}
-        </template>
-    </p-button-modal>
-</template>
-
 <script lang="ts" setup>
 import { PButtonModal, PButton } from '@spaceone/design-system';
 import { reactive, useSlots } from 'vue';
@@ -92,6 +51,47 @@ const handleClose = () => { emit('close'); };
 const handleCancel = () => { emit('cancel'); };
 
 </script>
+
+<template>
+    <p-button-modal v-model:visible="state.proxyVisible"
+                    class="delete-modal"
+                    :header-title="headerTitle"
+                    :size="props.size"
+                    :fade="true"
+                    :backdrop="true"
+                    :disabled="props.disabled"
+                    :hide-footer="props.hideFooter"
+                    theme-color="alert"
+                    :loading="props.loading"
+                    @confirm="handleConfirm"
+                    @close="handleClose"
+                    @cancel="handleCancel"
+    >
+        <template #body>
+            <p
+                v-if="contents || slots.default"
+                :class="{'delete-modal-content': true, 'enable-scroll': enableScroll}"
+            >
+                <slot>{{ contents }}</slot>
+            </p>
+            <slot name="delete-modal-body" />
+            <div class="content-footer">
+                <p-button v-if="hideFooter"
+                          class="close-button"
+                          style-type="tertiary"
+                          @click="handleClickClose"
+                >
+                    {{ t('APP.MAIN.CLOSE') }}
+                </p-button>
+            </div>
+        </template>
+        <template v-if="confirmText"
+                  #confirm-button
+        >
+            {{ confirmText }}
+        </template>
+    </p-button-modal>
+</template>
 
 <style lang="postcss" scoped>
 .delete-modal-content {

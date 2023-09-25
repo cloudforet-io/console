@@ -129,7 +129,7 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
         <div class="header">
             <div class="header-text-wrapper">
                 <p class="title">
-                    <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
+                    <p-field-title>{{ t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
                 </p>
                 <slot name="last-3-months" />
             </div>

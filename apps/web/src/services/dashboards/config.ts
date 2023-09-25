@@ -1,5 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 
@@ -63,7 +61,7 @@ export interface DashboardConfig {
     description?: {
         preview_image?: string;
         icon?: string;
-        text?: string | TranslateResult;
+        text?: string;
     }
 }
 

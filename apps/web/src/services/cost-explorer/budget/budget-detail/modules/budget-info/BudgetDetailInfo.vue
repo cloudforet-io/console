@@ -163,7 +163,7 @@ watch(() => costTypeRef.value, (costType) => {
                     <p-text-button v-if="state.isTextTruncate"
                                    style-type="highlight"
                     >
-                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.VIEW_ALL') }}
+                        {{ t('BILLING.COST_MANAGEMENT.BUDGET.VIEW_ALL') }}
                     </p-text-button>
                     <template #content>
                         <div class="content-wrapper">

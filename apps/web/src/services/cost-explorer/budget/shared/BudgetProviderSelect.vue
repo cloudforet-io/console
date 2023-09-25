@@ -11,7 +11,6 @@ import { debounce } from 'lodash';
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
@@ -33,7 +32,7 @@ interface Props {
     disableValidation?: boolean;
 }
 
-type BudgetProviderFilter = Record<BudgetCostType, TranslateResult>;
+type BudgetProviderFilter = Record<BudgetCostType, string>;
 interface DistinctResult {
     results?: {name: string; key: string}[];
     total_count?: number;

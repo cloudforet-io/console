@@ -250,6 +250,9 @@ const handleSelect = (item: SuggestionItem) => {
     }
     emit('close');
 };
+const handleClickClose = () => {
+    emit('close');
+};
 
 const costQuerySetFetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
 
@@ -296,7 +299,7 @@ const getAllCostQuerySetList = async () => {
         >
             <g-n-b-suggestion-list :items="state.showAll ? state.allItems : state.items"
                                    use-favorite
-                                   @close="$emit('close')"
+                                   @close="handleClickClose"
                                    @select="handleSelect"
             >
                 <template #header-title="{ item }">
