@@ -38,7 +38,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, nextTick, reactive, watch,
+} from 'vue';
 
 import {
     PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,
@@ -74,9 +76,14 @@ const handleChangeProvider = (provider) => {
 };
 
 
-(() => {
-    collectorFormStore.setProvider(state.providerList[0]?.name);
-})();
+watch(() => state.providerList, (providerList) => {
+    if (providerList.length) {
+        nextTick(() => {
+            collectorFormStore.setProvider(providerList[0]?.name);
+        });
+    }
+}, { immediate: true });
+
 
 </script>
 
