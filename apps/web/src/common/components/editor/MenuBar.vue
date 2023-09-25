@@ -296,7 +296,6 @@ const handleLinkClick = () => {
     }
 
     .menu-dropdown {
-        min-width: unset;
         &.text-style {
             min-width: 7.5rem;
         }

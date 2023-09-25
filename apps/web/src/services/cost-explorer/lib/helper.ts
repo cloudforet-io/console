@@ -57,7 +57,7 @@ export const getDataTableCostFields = (granularity: Granularity, period: Period,
     const costFields: DataTableFieldType[] = [];
     if (!hasGroupBy) {
         costFields.push({
-            name: 'totalCost', label: ' ', textAlign: 'right',
+            name: 'totalCost', label: ' ',
         });
     }
     const dateFields = getDataTableDateFields(granularity, period);

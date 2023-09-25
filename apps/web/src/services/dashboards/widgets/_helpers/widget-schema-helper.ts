@@ -1,13 +1,17 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import { chain } from 'lodash';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
+import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     WidgetFilterKey,
     WidgetFiltersSchemaProperty,
     WidgetOptionsSchemaProperty,
     InheritOptions,
+    WidgetConfig, WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/config';
 import {
     ASSET_GROUP_BY_SCHEMA, ASSET_REFERENCE_SCHEMA,
     COST_REFERENCE_SCHEMA, COST_GROUP_BY_SCHEMA,
@@ -49,6 +53,11 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
 export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetFiltersSchemaProperty => `filters.${key}`;
+export const getWidgetOptionName = (key: string): string => {
+    if (WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey)) return `filters.${key}`;
+    return key;
+};
+export const isWidgetFilterKey = (key: string): boolean => WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
 
 /** @function
  * @name getWidgetOptionsSchemaPropertyName
@@ -93,4 +102,28 @@ export const getNonInheritedWidgetOptions = (widgetInheritOptions?: InheritOptio
         if (!enabledInheritedOptions.includes(property)) nonInheritedOptions.push(property);
     });
     return nonInheritedOptions;
+};
+
+export const getInitialSchemaProperties = (
+    widgetConfig?: WidgetConfig,
+    variablesSchema?: DashboardVariablesSchema,
+): string[] => {
+    const widgetOptionsSchema = widgetConfig?.options_schema ?? {} as WidgetOptionsSchema;
+    const allVariableProperties = Object.keys(variablesSchema?.properties ?? {});
+    const allOptionProperties = Object.keys(widgetOptionsSchema.schema?.properties ?? {});
+    const fixedProperties = widgetOptionsSchema.fixed_properties ?? [];
+    const order: string[] = widgetOptionsSchema.schema?.order ?? [];
+
+    return chain(allVariableProperties) // get all possible properties from variables schema
+        .filter((key) => !!variablesSchema?.properties?.[key]?.use) // get only used variables
+        .map((key) => getWidgetOptionName(key)) // convert variable key to widget option name
+        .intersection(allOptionProperties) // intersect with all possible properties from widget options schema
+        .union(fixedProperties) // union with fixed properties
+        .sortBy((key) => {
+            const idx = order.indexOf(key);
+            if (idx >= 0) return idx;
+            if (fixedProperties.includes(key)) return -1;
+            return 9999;
+        }) // sort by order and fixedProperties
+        .value();
 };

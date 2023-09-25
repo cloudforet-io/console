@@ -24,6 +24,7 @@ export interface ExcelPayload {
     sheet_name?: string;
     header_message?: HeaderMessage;
     file_name_prefix?: string;
+    version?: string;
 }
 
 const getFileName = (contentDisposition) => {
@@ -40,7 +41,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
         if (Array.isArray(payload)) {
             params = payload.map(({
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                url, param, fields, sheet_name, file_name_prefix, header_message,
+                url, param, fields, sheet_name, file_name_prefix, header_message, version,
             }) => ({
                 source: {
                     url,
@@ -56,6 +57,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                     },
                     fields,
                 },
+                version,
             }));
         } else {
             params = {
@@ -73,6 +75,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                     },
                     fields: payload.fields,
                 },
+                version: payload.version,
             };
         }
 

@@ -324,7 +324,6 @@ getData();
 .card {
     @apply border border-gray-200 rounded;
     display: flex;
-    margin-bottom: 0.5rem;
     padding: 0.5rem 1rem;
     .group-name {
         @apply font-bold mb-1 truncate leading-tight;

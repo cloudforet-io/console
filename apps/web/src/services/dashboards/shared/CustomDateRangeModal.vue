@@ -8,14 +8,6 @@ import {
 import { useI18n } from 'vue-i18n';
 
 import type { Period } from '@/services/cost-explorer/type';
-import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-
-interface CustomRangeModalSettings {
-    helpTextFrom?: string;
-    helpTextTo?: string;
-    dateType?: DATA_TYPE;
-}
 
 interface DateOption {
     minDate?: string;
@@ -30,12 +22,10 @@ export interface Period {
 const props = withDefaults(defineProps<{
     visible: boolean;
     datetimePickerDataType?: DATA_TYPE;
-    granularity?: Granularity;
     selectedDateRange?: Period;
 }>(), {
     visible: false,
     datetimePickerDataType: 'yearToDate',
-    granularity: undefined,
     selectedDateRange: () => ({}),
 });
 
@@ -58,34 +48,24 @@ const state = reactive({
     }),
     startDates: [] as string[],
     endDates: [] as string[],
+    startDateSetting: computed<DateOption>(() => {
+        const today = dayjs.utc();
+        const minDate = today.subtract(35, 'month').format('YYYY-MM');
+        const maxDate = today.format('YYYY-MM');
+        return { minDate, maxDate };
+    }),
     endDateSetting: computed<DateOption>(() => {
         let minDate;
         let maxDate;
         if (!state.startDates.length) return { minDate, maxDate };
 
         const startDate = dayjs.utc(state.startDates[0]);
-        if (props.granularity === GRANULARITY.DAILY) {
-            minDate = startDate.format('YYYY-MM-DD');
-            maxDate = startDate.add(1, 'month').subtract(1, 'day').format('YYYY-MM-DD');
-        } else {
-            minDate = startDate.format('YYYY-MM');
-            maxDate = startDate.add(11, 'month').format('YYYY-MM');
-        }
+        minDate = startDate.format('YYYY-MM');
+        const maxRawData = startDate.add(11, 'month');
+        if (maxRawData.isAfter(dayjs.utc())) {
+            maxDate = dayjs.utc().format('YYYY-MM');
+        } else maxDate = maxRawData.format('YYYY-MM');
         return { minDate, maxDate };
-    }),
-    settingsByGranularity: computed<CustomRangeModalSettings>(() => {
-        if (!props.granularity) return {};
-        const customRangeModalSettingsByGranularity = {
-            [GRANULARITY.DAILY]: {
-                helpTextTo: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_31_DAYS'),
-                dateType: 'yearToDate',
-            },
-            [GRANULARITY.MONTHLY]: {
-                helpTextFrom: t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS'),
-                dateType: 'yearToMonth',
-            },
-        };
-        return customRangeModalSettingsByGranularity[props.granularity];
     }),
 });
 
@@ -96,13 +76,8 @@ const handleUpdateVisible = (visible: boolean) => {
 const handleConfirm = () => {
     state.proxyVisible = false;
     const period: Period = {};
-    if (props.granularity === GRANULARITY.DAILY) {
-        period.start = state.startDates[0];
-        period.end = state.endDates[0];
-    } else {
-        period.start = dayjs.utc(state.startDates[0]).format('YYYY-MM-01');
-        period.end = dayjs.utc(state.endDates[0]).endOf('month').format('YYYY-MM-DD');
-    }
+    period.start = dayjs.utc(state.startDates[0]).format('YYYY-MM');
+    period.end = dayjs.utc(state.endDates[0]).endOf('month').format('YYYY-MM');
     emit('confirm', period);
 };
 const handleUpdateSelectedDates = (type: 'start'|'end', selectedDates: string[]) => {
@@ -153,27 +128,28 @@ watch(() => props.visible, (visible) => {
         <template #body>
             <p-field-group class="period-select"
                            :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.FROM')"
-                           :help-text="state.settingsByGranularity.helpTextFrom ?? ''"
+                           :help-text="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HELP_TEXT.UP_TO_LAST_12_MONTHS')"
                            required
             >
                 <p-datetime-picker class="datetime-picker"
-                                   :data-type="props.granularity ? state.settingsByGranularity.dateType : props.datetimePickerDataType"
                                    :selected-dates="state.startDates"
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
+                                   :min-date="state.startDateSetting.minDate"
+                                   :max-date="state.startDateSetting.maxDate"
+                                   data-type="yearToMonth"
                                    @update:selected-dates="handleUpdateSelectedDates('start', $event)"
                 />
             </p-field-group>
             <p-field-group class="period-select"
                            :label="t('BILLING.COST_MANAGEMENT.DASHBOARD.FORM.TO')"
-                           :help-text="state.settingsByGranularity.helpTextTo"
                            required
             >
                 <p-datetime-picker class="datetime-picker"
-                                   :data-type="granularity ? state.settingsByGranularity.dateType : props.datetimePickerDataType"
                                    :selected-dates="state.endDates"
                                    :invalid="!!state.startDates.length && !!state.endDates.length && state.invalid"
                                    :min-date="state.endDateSetting.minDate"
                                    :max-date="state.endDateSetting.maxDate"
+                                   data-type="yearToMonth"
                                    @update:selected-dates="handleUpdateSelectedDates('end', $event)"
                 />
             </p-field-group>

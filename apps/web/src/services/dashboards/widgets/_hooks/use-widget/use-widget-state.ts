@@ -50,6 +50,8 @@ export function useWidgetState(props: WidgetProps) {
         dashboardSettings: toRef(props, 'dashboardSettings'),
         dashboardVariablesSchema: toRef(props, 'dashboardVariablesSchema'),
         dashboardVariables: toRef(props, 'dashboardVariables'),
+        title: toRef(props, 'title'),
+        schemaProperties: toRef(props, 'schemaProperties'),
     });
 
     return reactive<WidgetState>({

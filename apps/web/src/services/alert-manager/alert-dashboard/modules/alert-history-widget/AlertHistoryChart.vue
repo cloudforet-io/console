@@ -209,9 +209,11 @@ watch(() => props.currentDate, async () => {
     state.loading = false;
 });
 watch(() => props.activatedProjects, async (activatedProjects) => {
-    if (activatedProjects.length) {
+    if (activatedProjects) {
         state.loading = true;
         await getDailyAlertHistory();
+        state.loading = false;
+    } else {
         state.loading = false;
     }
 }, { immediate: true });
@@ -221,7 +223,6 @@ onBeforeUnmount(() => {
         if (chart) chart.dispose();
     });
 });
-
 </script>
 
 <template>

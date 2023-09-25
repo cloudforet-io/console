@@ -1,23 +1,21 @@
 <script setup lang="ts">
-import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { PButton, PDivider } from '@spaceone/design-system';
-import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 interface Props {
     visible: boolean;
 }
 
-const store = useStore();
 const router = useRouter();
 withDefaults(defineProps<Props>(), {
     visible: false,
 });
-const userId = computed(() => store.state.user.userId);
+const costExplorerSettingsStore = useCostExplorerSettingsStore();
+const costExplorerSettinsState = costExplorerSettingsStore.$state;
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void}>();
 
 const handleClose = () => {
@@ -25,12 +23,10 @@ const handleClose = () => {
 };
 
 const handleReject = () => {
-    const settings = LocalStorageAccessor.getItem(userId.value);
-    settings.costExplorer = {
-        ...settings.costExplorer,
-        hideRelocateDashboardNotification: true,
-    };
-    LocalStorageAccessor.setItem(userId.value, settings);
+    costExplorerSettingsStore.setRelocateDashboardState({
+        ...costExplorerSettinsState.relocateDashboardStatus,
+        hideModal: true,
+    });
     emit('update:visible', false);
 };
 
@@ -59,7 +55,9 @@ const handleRouteToDashboard = () => {
             <div class="modal-mask">
                 <article class="modal-content">
                     <div class="image-wrapper">
-                        <img src="@/assets/images/CA_db-disappear.png"
+                        <img src="@/assets/images/go_to_dashboard.png"
+                             srcset="@/assets/images/go_to_dashboard@2x.png 2x,
+                                    @/assets/images/go_to_dashboard@3x.png 3x"
                              alt="relocate-dashboard-image"
                         >
                     </div>

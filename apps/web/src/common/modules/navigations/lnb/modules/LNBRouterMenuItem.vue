@@ -73,9 +73,11 @@ const getIconName = (icon: LNBIcon): string => {
             <slot name="after-text"
                   v-bind="{...props, item, index: idx}"
             />
-            <new-mark v-if="item.hightlightTag === 'new'" />
-            <update-mark v-else-if="item.hightlightTag === 'update'" />
-            <beta-mark v-else-if="item.hightlightTag === 'beta'" />
+            <span class="mark-wrapper">
+                <new-mark v-if="item.hightlightTag === 'new'" />
+                <update-mark v-else-if="item.hightlightTag === 'update'" />
+                <beta-mark v-else-if="item.hightlightTag === 'beta'" />
+            </span>
         </div>
         <slot name="right-extra"
               v-bind="{...props, item, index: idx}"
@@ -117,7 +119,7 @@ const getIconName = (icon: LNBIcon): string => {
         @apply bg-blue-100 cursor-pointer;
     }
     .text-wrapper {
-        @apply inline-flex overflow-hidden whitespace-no-wrap;
+        @apply inline-flex items-center overflow-hidden whitespace-no-wrap;
         .text {
             @apply overflow-hidden whitespace-no-wrap;
             text-overflow: ellipsis;
@@ -125,6 +127,10 @@ const getIconName = (icon: LNBIcon): string => {
         .icon {
             flex-shrink: 0;
             margin-right: 0.25rem;
+        }
+        .mark-wrapper {
+            height: 100%;
+            margin-top: -0.25rem;
         }
     }
     .favorite-button {

@@ -23,7 +23,9 @@ import type {
     Legend, XYChartData,
 } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getPeriodByGranularity } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type { Granularity } from '@/services/cost-explorer/type';
 
 
 interface Props {
@@ -50,17 +52,46 @@ const costAnalysisPageState = costAnalysisPageStore.$state;
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const getTooltipDateFormatByGranularity = (granularity: Granularity) => {
+    if (granularity === GRANULARITY.MONTHLY) return 'MMM, YYYY';
+    if (granularity === GRANULARITY.YEARLY) return 'YYYY';
+    return 'MMM D, YYYY';
+};
 const drawChart = () => {
+    // set date formatter for tooltip text
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
+        chartHelper.root.value?.dateFormatter.setAll({
+            dateFormat: 'd MMM, yyyy',
+        });
+    } else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) {
+        chartHelper.root.value?.dateFormatter.setAll({
+            dateFormat: 'yyyy',
+        });
+    }
+
+    // set min, max date of xAxis (for daily chart)
+    const _period = getPeriodByGranularity(costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
+    const _dateAxisSettings = costAnalysisPageState.granularity === GRANULARITY.DAILY ? {
+        min: dayjs.utc(_period.start).valueOf(),
+        max: dayjs.utc(_period.end).add(1, 'day').valueOf(),
+    } : {};
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, _dateAxisSettings);
+
+    // set base interval of xAxis
     let timeUnit: TimeUnit = 'month';
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) timeUnit = 'day';
     else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
-
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart();
-
-    // set base interval of xAxis
     xAxis.get('baseInterval').timeUnit = timeUnit;
-    // set distance of xAxis
-    xAxis.get('renderer').set('minGridDistance', 30);
+
+    // set date format for daily chart
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
+        xAxis.setAll({
+            dateFormats: {
+                day: 'd',
+            },
+        });
+    }
+
     // set label adapter of yAxis
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
@@ -76,6 +107,7 @@ const drawChart = () => {
         _chartData = getStackedChartData(props.chartData, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     }
 
+    const _tooltipDateFormat = getTooltipDateFormatByGranularity(costAnalysisPageState.granularity);
     props.legends.forEach((legend) => {
         // create series
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
@@ -89,9 +121,9 @@ const drawChart = () => {
         chart.series.push(series);
 
         // set data processor
-        let dateFormat = 'yyyy-MM-dd';
-        if (timeUnit === 'month') dateFormat = 'YYYY-MM';
-        else if (timeUnit === 'year') dateFormat = 'YYYY';
+        let dateFormat = 'yyyy-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.DAILY) dateFormat = 'yyyy-MM-dd';
+        else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'yyyy';
         series.data.processor = chartHelper.createDataProcessor({
             dateFormat,
             dateFields: [DATE_FIELD_NAME],
@@ -110,9 +142,10 @@ const drawChart = () => {
         tooltip.label.adapters.add('text', (text, target) => {
             const dataContext = target?.dataItem?.dataContext;
             if (dataContext) {
+                const date = dayjs.utc(dataContext.date).format(_tooltipDateFormat);
                 let value = dataContext[legend.name];
                 value = currencyMoneyFormatter(value, costAnalysisPageStore.currency, undefined, true);
-                return `[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
+                return `${date}\n[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
             return text;
         });
@@ -142,7 +175,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 </script>
 
 <template>
-    <p-data-loader :loading="loading"
+    <p-data-loader :loading="props.loading"
                    class="cost-analysis-stacked-column-chart"
     >
         <template #loader>

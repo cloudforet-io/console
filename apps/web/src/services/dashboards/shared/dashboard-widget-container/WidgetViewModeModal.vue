@@ -2,10 +2,10 @@
 import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
-import { cloneDeep, isEqual } from 'lodash';
-import type { ComponentPublicInstance } from 'vue';
+import { cloneDeep } from 'lodash';
+import type { ComponentPublicInstance, Component } from 'vue';
 import {
-    computed, reactive, toRef, watch,
+    computed, nextTick, reactive, toRef, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -21,17 +21,28 @@ import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/Das
 import DashboardVariablesSelectDropdown
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
 import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
+    WidgetSize,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 interface WidgetViewModeModalProps {
     visible: boolean;
+    /*
+    NOTE: widgetInfo's type is to prevent vue2 bundling error when using extended interface from other file as a prop's type
+    This type is exactly the same with ReformedWidgetInfo in use-widget-reformer.ts
+    */
+    widgetInfo?: DashboardLayoutWidgetInfo & {
+        size: WidgetSize;
+        theme?: WidgetTheme;
+        width: number;
+        component: Component|null;
+    }; // = ReformedWidgetInfo
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
@@ -39,8 +50,10 @@ const { t } = useI18n();
 
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
     visible: false,
+    widgetInfo: undefined,
 });
-const emit = defineEmits<{(e: 'refresh-widget', widgetKey: string): void}>();
+const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
+}>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -51,13 +64,14 @@ const state = reactive({
     widgetRef: null as WidgetComponent|null,
     hasManagePermission: useManagePermissionState(),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
+    component: null as Component|null,
     initiated: false,
     variablesSnapshot: {} as DashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
-        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState?.widgetInfo?.inherit_options);
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState.inheritOptions);
         return nonInheritedWidgetOptions.length > 0;
     }),
 });
@@ -69,28 +83,22 @@ const initSnapshot = () => {
     state.variableSchemaSnapshot = cloneDeep(dashboardDetailState.variablesSchema);
     state.settingsSnapshot = cloneDeep(dashboardDetailState.settings);
 };
-const initWidgetComponent = (widget: DashboardLayoutWidgetInfo) => {
-    let component: ComponentPublicInstance|null = null;
-    try {
-        component = getWidgetComponent(widget.widget_name) as ComponentPublicInstance;
-    } catch (e) {
-        console.error(e);
-    }
-    state.component = component;
-};
 
 const handleCloseModal = () => {
     dashboardDetailStore.$patch((_state) => {
         _state.variables = state.variablesSnapshot;
         _state.variablesSchema = state.variableSchemaSnapshot;
         _state.settings = state.settingsSnapshot;
-        _state.widgetViewModeModalVisible = false;
     });
+    emit('update:visible', false);
 };
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
 };
-const handleRefreshWidget = () => {
+const handleCloseSidebar = () => {
+    state.widgetRef?.refreshWidget();
+};
+const handleUpdateSidebarWidgetInfo = () => {
     state.widgetRef?.refreshWidget();
 };
 
@@ -100,30 +108,26 @@ const handleUpdateData = (widgetKey: string, data: any) => {
     });
 };
 const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
-    const originWidgetInfo = dashboardDetailState.dashboardWidgetInfoList.find((d) => d.widget_key === widgetKey);
-    dashboardDetailStore.updateWidgetInfo(widgetKey, { ...originWidgetInfo, ...widgetInfo });
+    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
-    dashboardDetailStore.updateWidgetValidation(widgetKey, isValid);
+    dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
 };
 
 watch(() => props.visible, async (visible) => {
+    if (!props.widgetInfo) return;
     if (visible) {
         initSnapshot();
-        await widgetFormStore.initWidgetForm(widgetFormState.widgetKey as string, widgetFormState.widgetConfigId as string);
-        await initWidgetComponent(widgetFormState.widgetInfo as DashboardLayoutWidgetInfo);
+        state.component = props.widgetInfo.component;
+        await nextTick();
         state.widgetRef?.initWidget();
         state.initiated = true;
     } else {
         state.sidebarVisible = false;
-        emit('refresh-widget', widgetFormState.widgetKey as string);
+        state.component = null;
+        emit('update:visible', false);
     }
 });
-watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions], async (after, before) => {
-    if (!state.initiated) return;
-    if (isEqual(after[0], before[0]) && isEqual(after[1], before[1])) return;
-    await state.widgetRef?.refreshWidget();
-}, { immediate: false });
 </script>
 
 <template>
@@ -179,38 +183,39 @@ watch([() => widgetFormState.inheritOptions, () => widgetFormState.widgetOptions
                         <dashboard-toolset />
                     </div>
                 </div>
-                <div v-if="state.component"
+                <div v-if="props.widgetInfo && state.component"
                      class="widget-wrapper"
                 >
                     <component :is="state.component"
                                ref="widgetRef"
-                               :widget-key="widgetFormState.widgetInfo.widget_key"
-                               :widget-config-id="widgetFormState.widgetInfo.widget_name"
-                               :title="widgetFormState.widgetTitle"
-                               :options="widgetFormState.widgetOptions"
-                               :inherit-options="widgetFormState.inheritOptions"
-                               :schema-properties="widgetFormState.schemaProperties"
+                               :widget-key="props.widgetInfo.widget_key"
+                               :widget-config-id="props.widgetInfo.widget_name"
+                               :title="props.widgetInfo.title"
+                               :options="props.widgetInfo.widget_options"
+                               :inherit-options="props.widgetInfo.inherit_options"
+                               :schema-properties="props.widgetInfo.schema_properties"
                                size="full"
-                               :theme="widgetFormState.theme"
-                               :error-mode="dashboardDetailState.widgetValidMap[widgetFormState.widgetInfo.widget_key] === false"
+                               :theme="props.widgetInfo.theme"
+                               :error-mode="dashboardDetailState.widgetValidMap[props.widgetInfo.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :disable-view-mode="true"
                                :initiated="state.initiated"
                                :dashboard-settings="dashboardDetailState.settings"
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
-                               @update-data="handleUpdateData(widgetFormState.widgetInfo.widget_key, $event)"
-                               @update-widget-info="handleUpdateWidgetInfo(widgetFormState.widgetInfo.widget_key, $event)"
-                               @update-widget-validation="handleUpdateValidation(widgetFormState.widgetInfo.widget_key, $event)"
+                               @update-data="handleUpdateData(props.widgetInfo.widget_key, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(props.widgetInfo.widget_key, $event)"
+                               @update-widget-validation="handleUpdateValidation(props.widgetInfo.widget_key, $event)"
                     />
                 </div>
             </div>
             <transition name="slide-left">
-                <widget-view-mode-sidebar v-if="state.sidebarVisible"
+                <widget-view-mode-sidebar v-if="props.widgetInfo && state.sidebarVisible"
                                           v-model:visible="state.sidebarVisible"
-                                          :widget-config-id="widgetFormState.widgetConfigId"
-                                          :widget-key="widgetFormState.widgetKey"
-                                          @refresh="handleRefreshWidget"
+                                          :widget-config-id="props.widgetInfo.widget_name"
+                                          :widget-key="props.widgetInfo.widget_key"
+                                          @close="handleCloseSidebar"
+                                          @update:widget-info="handleUpdateSidebarWidgetInfo"
                 />
             </transition>
         </div>

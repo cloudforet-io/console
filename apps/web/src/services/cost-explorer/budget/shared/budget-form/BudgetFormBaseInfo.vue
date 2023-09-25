@@ -10,10 +10,9 @@ import { useI18n } from 'vue-i18n';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { BudgetModel } from '@/services/cost-explorer/budget/model';
-import BudgetCostTypeSelect from '@/services/cost-explorer/budget/shared/BudgetCostTypeSelect.vue';
 import BudgetDataSourceSelect from '@/services/cost-explorer/budget/shared/BudgetDataSourceSelect.vue';
+import BudgetPeriodSelect from '@/services/cost-explorer/budget/shared/BudgetProviderSelect.vue';
 import BudgetTargetSelect from '@/services/cost-explorer/budget/shared/BudgetTargetSelect.vue';
-import type { BudgetBaseInfo } from '@/services/cost-explorer/budget/type';
 
 export type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_group_id'|'project_id'|'data_source_id'>;
 
@@ -97,7 +96,7 @@ watch([() => state.budgetInfo, () => state.isAllValid], ([budgetInfo, isAllValid
 
             <budget-target-select @update="handleUpdateTarget" />
 
-            <budget-cost-type-select @update="handleUpdateProviderFilter" />
+            <budget-period-select @update="handleUpdateProviderFilter" />
         </div>
     </p-pane-layout>
 </template>

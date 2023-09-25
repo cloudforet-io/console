@@ -9,8 +9,7 @@ import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce } from 'lodash';
 import {
-    computed,
-    reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
@@ -48,10 +47,10 @@ const props = withDefaults(defineProps<Props>(), {
     disableValidation: false,
 });
 
-const emit = defineEmits<{(e: 'update', providerFilter: ProviderFilter|undefined, isValid: boolean): void; }>();
-
-const store = useStore();
 const { t } = useI18n();
+const store = useStore();
+
+const emit = defineEmits<{(e: 'update', providerFilter: ProviderFilter|undefined, isValid: boolean): void; }>();
 
 const {
     forms: {
@@ -77,7 +76,7 @@ const state = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     costTypeItems: computed<BudgetProviderFilter>(() => ({
         all: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
-        provider: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
+        provider: t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.SPECIFIC_PROVIDER'),
     })),
     resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => (selectedCostType.value === 'provider' ? getSearchDropdownItems(state.providers) : undefined)),
     resourceMenuLoading: false,
@@ -157,7 +156,7 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
 </script>
 
 <template>
-    <p-field-group :label="t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_COST_TYPE')"
+    <p-field-group :label="t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER')"
                    required
                    :invalid="!props.disableValidation && invalidState.selectedResources"
                    :invalid-text="invalidTexts.selectedResources"

@@ -193,7 +193,9 @@ const onQueryTagsChange = (tags: QueryTag[]) => {
                                        :menu="state.pageMenu"
                                        @select="onChangePageSize"
                     >
-                        {{ proxyState.pageSize }}
+                        <template #dropdown-button>
+                            {{ proxyState.pageSize }}
+                        </template>
                     </p-select-dropdown>
                 </div>
                 <div v-if="sortable"
@@ -204,7 +206,9 @@ const onQueryTagsChange = (tags: QueryTag[]) => {
                                        :menu="sortByOptions"
                                        @select="onChangeSortBy"
                     >
-                        {{ state.selectedSortBy }}
+                        <template #dropdown-button>
+                            {{ state.selectedSortBy }}
+                        </template>
                     </p-select-dropdown>
                 </div>
                 <div class="right-tool-group">

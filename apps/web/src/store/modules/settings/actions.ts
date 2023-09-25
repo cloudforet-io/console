@@ -10,7 +10,7 @@ export const initSettings: Action<SettingsState, any> = ({ commit, rootState }):
     try {
         const settings = LocalStorageAccessor.getItem(userId);
 
-        if (settings) {
+        if (settings?.global) {
             commit('initUserSettings', settings.global);
         }
     } catch (e) {

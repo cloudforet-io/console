@@ -118,7 +118,7 @@ const handleBudgetNotifications = () => {
                                         {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
                                     </p-badge>
                                     <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">
-                                        {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }} > ${{ commaFormatter(item.threshold) }}
+                                        {{ t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ACTUAL_COST') }} > ${{ commaFormatter(item.threshold) }}
                                     </span>
                                     <span v-else>% of budget > {{ item.threshold }}%</span>
                                 </li>

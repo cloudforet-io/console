@@ -1,19 +1,25 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover,
+    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover, PBadge,
     useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { onClickOutside, useElementSize } from '@vueuse/core';
-import { computed, reactive, ref } from 'vue';
+import dayjs from 'dayjs';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 import { useI18n } from 'vue-i18n';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import {
+    DYNAMIC_COST_QUERY_SET_PARAMS,
+    managedCostQuerySetIdList,
+} from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
 import CostAnalysisPeriodSelectDropdown
@@ -30,6 +36,7 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const filtersPopperRef = ref<any|null>(null);
+const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
@@ -62,10 +69,31 @@ const state = reactive({
     ])),
     selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
     isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
+    isDynamicQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
     isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
     invalidPeriodMessage: computed(() => t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.INVALID_PERIOD_TEXT')),
+    selectedFiltersCount: computed(() => {
+        let count = 0;
+        Object.values(costAnalysisPageState.filters ?? {}).forEach((filterItems) => {
+            count += filterItems.length;
+        });
+        return count;
+    }),
+    showPeriodBadge: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
+    periodBadgeText: computed<string>(() => {
+        if (!costAnalysisPageState.period) return '';
+        let startDateFormat = 'MMM D';
+        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) startDateFormat = 'MMM YYYY';
+        else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) startDateFormat = 'YYYY';
+        const endDateFormat = costAnalysisPageState.granularity === GRANULARITY.DAILY ? 'MMM D, YYYY' : startDateFormat;
+        //
+        const start = dayjs.utc(costAnalysisPageState.period.start);
+        let end = dayjs.utc(costAnalysisPageState.period.end);
+        if (costAnalysisPageState.granularity === GRANULARITY.DAILY) end = dayjs.utc(costAnalysisPageState.period.end).endOf('month');
+        return `${start.format(startDateFormat)} ~ ${end.format(endDateFormat)}`;
+    }),
 });
 
 const {
@@ -74,11 +102,12 @@ const {
     showContextMenu,
     hideContextMenu,
 } = useContextMenuController({
-    useFixedStyle: true,
+    useFixedStyle: false,
     targetRef,
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
 });
+onClickOutside(containerRef, hideContextMenu);
 onClickOutside(contextMenuRef, hideContextMenu);
 
 /* event */
@@ -99,7 +128,7 @@ const handleSaveQuerySet = async () => {
                 metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
-        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
+        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
     }
@@ -118,10 +147,18 @@ const handleUpdateQuery = (updatedQueryId: string) => {
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
+
+watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
+    if (updatedQueryId !== '') {
+        state.filtersPopoverVisible = false;
+    }
+}, { immediate: true });
 </script>
 
 <template>
-    <div class="cost-analysis-query-filter">
+    <div ref="containerRef"
+         class="cost-analysis-query-filter"
+    >
         <div class="filter-wrapper"
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
         >
@@ -133,17 +170,35 @@ const handleClickFilter = () => {
                                    @select="handleSelectGranularity"
                 />
                 <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
-                <p-popover :is-visible="state.filtersPopoverVisible"
+                <div>
+                    <p-badge v-if="state.showPeriodBadge"
+                             badge-type="subtle"
+                             style-type="gray200"
+                    >
+                        {{ state.periodBadgeText }}
+                    </p-badge>
+                </div>
+                <p-popover v-model:is-visible="state.filtersPopoverVisible"
+                           :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
                            trigger="click"
                            relative-style
                            position="bottom-start"
+                           class="filters-popover"
                 >
                     <p-button style-type="tertiary"
+                              class="filters-button"
                               icon-left="ic_filter"
                               @click="handleClickFilter"
                     >
                         {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}
+                        <p-badge v-if="state.selectedFiltersCount"
+                                 badge-type="subtle"
+                                 :style-type="state.filtersPopoverVisible ? 'gray100' : 'gray200'"
+                                 class="filters-badge"
+                        >
+                            {{ state.selectedFiltersCount }}
+                        </p-badge>
                     </p-button>
                     <template #content>
                         <cost-analysis-filters-popper ref="filtersPopperRef"
@@ -153,7 +208,7 @@ const handleClickFilter = () => {
                 </p-popover>
             </div>
             <div class="right-part">
-                <template v-if="!state.isManagedQuerySet">
+                <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
                     <p-button class="save-button"
                               style-type="tertiary"
                               icon-left="ic_disk-filled"
@@ -203,6 +258,7 @@ const handleClickFilter = () => {
 
 <style lang="postcss" scoped>
 .cost-analysis-query-filter {
+    margin-top: 1.5rem;
     .filter-wrapper {
         position: relative;
         display: flex;
@@ -210,10 +266,11 @@ const handleClickFilter = () => {
         font-size: 0.875rem;
         .left-part {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 0.5rem;
         }
         .right-part {
+            @apply relative;
             display: flex;
             align-items: flex-start;
 
@@ -229,21 +286,37 @@ const handleClickFilter = () => {
 
             /* custom design-system component - p-context-menu */
             :deep(.p-context-menu) {
-                right: 1.5rem;
+                @apply absolute;
+                top: 2.125rem;
+                right: 0;
                 margin-top: -0.15rem;
+                z-index: 100;
                 .p-context-menu-item {
-                    min-width: 9rem;
+                    min-width: 10rem;
                 }
+            }
+        }
+        .filters-button {
+            .filters-badge {
+                margin-left: 0.25rem;
             }
         }
 
         /* custom design-system component - p-popover */
         :deep(.p-popover) {
+            &.open {
+                .p-button.filters-button {
+                    @apply bg-gray-200;
+                }
+            }
             .popper {
                 width: 100%;
                 max-width: 100%;
                 left: 2rem;
                 transform: translate(0, 3rem) !important;
+                .arrow {
+                    left: 1.25rem !important;
+                }
             }
         }
         .filters-popper {
@@ -253,6 +326,20 @@ const handleClickFilter = () => {
     .invalid-text {
         @apply text-red-400 text-label-md;
         margin-top: 0.5rem;
+    }
+
+    @screen mobile {
+        .filter-wrapper, .left-part {
+            @apply flex-col;
+        }
+
+        .filters-popover {
+            margin-top: 0.5rem;
+        }
+
+        .right-part {
+            margin-top: 1.5rem;
+        }
     }
 }
 </style>

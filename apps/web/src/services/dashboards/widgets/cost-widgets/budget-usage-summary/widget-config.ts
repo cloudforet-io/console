@@ -1,5 +1,3 @@
-import { defineAsyncComponent } from 'vue';
-
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -12,7 +10,9 @@ import {
 
 const budgetUsageSummaryConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageSummary',
-    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/cost-widgets/budget-usage-summary/BudgetUsageSummaryWidget.vue')),
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/cost-widgets/budget-usage-summary/BudgetUsageSummaryWidget.vue'),
+    }),
     title: 'Budget Usage Summary',
     labels: ['Cost'],
     description: {
@@ -31,20 +31,15 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     inherit_options: {
         ...getWidgetInheritOptions('cost_data_source'),
         ...getWidgetInheritOptionsForFilter(
-            'provider',
             'project',
-            'region',
-            'cost_product',
+            'service_account',
         ),
     },
     options_schema: {
         default_properties: [
             'cost_data_source',
             ...getWidgetFilterSchemaPropertyNames(
-                'provider',
                 'project',
-                'region',
-                'cost_product',
             ),
         ],
         fixed_properties: ['cost_data_source'],
@@ -53,21 +48,15 @@ const budgetUsageSummaryConfig: WidgetConfig = {
             properties: {
                 ...getWidgetOptionsSchema('cost_data_source'),
                 ...getWidgetFilterOptionsSchema(
-                    'provider',
                     'project',
                     'service_account',
-                    'cost_product',
-                    'region',
                 ),
             },
             order: [
                 'cost_data_source',
                 ...getWidgetFilterSchemaPropertyNames(
-                    'provider',
                     'project',
                     'service_account',
-                    'cost_product',
-                    'region',
                 ),
             ],
         },

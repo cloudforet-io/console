@@ -3,7 +3,9 @@ import { defineAsyncComponent } from 'vue';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptionsForFilter,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const complianceCheckStatusWidgetConfig: WidgetConfig = {
@@ -22,6 +24,15 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
     sizes: ['md'],
     options: {
         granularity: GRANULARITY.YEARLY,
+    },
+    inherit_options: {
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+            'provider',
+            'region',
+            'asset_compliance_type',
+            'asset_account',
+        ),
     },
     options_schema: {
         default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account'),

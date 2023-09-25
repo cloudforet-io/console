@@ -70,6 +70,7 @@ export const DASHBOARD_LABEL = {
     ASSET: 'Asset',
     COMPLIANCE: 'Compliance',
     SECURITY: 'Security',
+    BLANK: 'blank',
 } as const;
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 
@@ -117,11 +118,9 @@ export interface DashboardVariableSchemaProperty {
     options?: VariableOptions;
     required?: boolean;
 }
-export interface DashboardVariablesSchema {
-    properties: {
-        [key: string]: DashboardVariableSchemaProperty;
-    };
-    order: string[];
+export interface DashboardVariablesSchema<T = Record<string, DashboardVariableSchemaProperty>> {
+    properties: T;
+    order: Array<keyof T>;
 }
 
 export const MANAGE_VARIABLES_HASH_NAME = 'manage-variables';

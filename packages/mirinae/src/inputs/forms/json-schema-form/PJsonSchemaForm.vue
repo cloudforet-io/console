@@ -82,7 +82,7 @@
                                                class="input-form select-dropdown"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, $event)"
                             >
-                                <template #default="{ item }">
+                                <template #dropdown-button="item">
                                     <slot name="dropdown-extra"
                                           v-bind="{...schemaProperty, selectedItem: item }"
                                     />

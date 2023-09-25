@@ -1,6 +1,4 @@
 import { asyncComputed } from '@vueuse/core';
-import { computed, reactive } from 'vue';
-
 import { camelCase } from 'lodash';
 import { defineStore } from 'pinia';
 import { computed, reactive } from 'vue';
@@ -10,8 +8,8 @@ import { store } from '@/store';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';

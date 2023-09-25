@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    PButton, PSelectDropdown, PStatus, PDataLoader,
+    PTextButton, PSelectDropdown, PStatus, PDataLoader,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, sum } from 'lodash';
@@ -119,7 +119,7 @@ watch(() => state.groupByMenuItems, (after) => {
                 {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOO_MANY_ITEMS') }}
             </p>
             <div v-for="(legend, idx) in legends"
-                 :key="`legend-${legend.name}`"
+                 :key="`legend-${legend.name}-${idx}`"
                  class="legend"
                  @click="handleToggleSeries(idx)"
             >
@@ -132,13 +132,11 @@ watch(() => state.groupByMenuItems, (after) => {
                 {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.NO_ITEMS') }}
             </template>
         </p-data-loader>
-        <p-button style-type="transparent"
-                  size="sm"
-                  font-weight="normal"
-                  @click="handleToggleAllLegends"
+        <p-text-button size="md"
+                       @click="handleToggleAllLegends"
         >
             {{ state.showHideAll ? t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') : t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SHOW_ALL') }}
-        </p-button>
+        </p-text-button>
     </div>
 </template>
 

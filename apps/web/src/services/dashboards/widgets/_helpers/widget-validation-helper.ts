@@ -1,44 +1,46 @@
-
 import {
     cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
-import { useI18n } from 'vue-i18n';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
     InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetFilterSchemaPropertyName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import {
+    getWidgetOptionName,
+} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 export interface InheritOptionsErrorMap {
-    [propertyName: string]: string;
+    [propertyName: string]: string|undefined;
 }
 
 export const getWidgetInheritOptionsErrorMap = (
+    schemaProperties: string[],
     inheritOptions?: InheritOptions,
     widgetOptionsSchema?: WidgetOptionsSchema['schema'],
     dashboardVariablesSchema?: DashboardVariablesSchema,
+    errorMessage?: string,
 ): InheritOptionsErrorMap => {
-    const { t } = useI18n();
     if (!inheritOptions || isEmpty(inheritOptions)) {
         return {};
     }
     const errorMap: InheritOptionsErrorMap = {};
-    Object.entries(inheritOptions).forEach(([propertyName, inheritOption]) => {
-        if (!inheritOption?.enabled) return;
+    schemaProperties.forEach((propertyName) => {
+        if (!inheritOptions[propertyName]?.enabled) return;
 
-        const variableKey = inheritOption?.variable_info?.key;
+        const variableKey = inheritOptions[propertyName]?.variable_info?.key;
         if (!variableKey) return;
         if (!dashboardVariablesSchema?.properties?.[variableKey]?.use) {
-            errorMap[propertyName] = t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST');
+            errorMap[propertyName] = errorMessage;
             return;
         }
 
         const variableType = dashboardVariablesSchema.properties[variableKey].selection_type === 'MULTI' ? 'array' : 'string';
         const widgetPropertyType = widgetOptionsSchema?.properties?.[propertyName]?.type;
         if (variableType !== widgetPropertyType) {
-            errorMap[propertyName] = t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST');
+            errorMap[propertyName] = errorMessage;
         }
     });
     return errorMap;
@@ -66,7 +68,11 @@ export const validateWidgetByVariablesSchemaUpdate = ({
     let isWidgetOptionChanged: boolean|undefined;
     let isWidgetOptionAdded: boolean|undefined;
     let isWidgetOptionDeleted: boolean|undefined;
-    const newWidgetInfo: Partial<DashboardLayoutWidgetInfo> = {};
+    const newWidgetInfo: Partial<DashboardLayoutWidgetInfo> = {
+        inherit_options: cloneDeep(widgetInfo.inherit_options),
+        schema_properties: widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [],
+        widget_options: cloneDeep(widgetInfo.widget_options),
+    };
     if (addedVariableSchemaProperties.length) {
         const affected = getAffectedWidgetInfoByAddingVariableSchemaProperty(
             addedVariableSchemaProperties,
@@ -97,14 +103,15 @@ export const validateWidgetByVariablesSchemaUpdate = ({
     }
 
     const isWidgetUpdated = isWidgetOptionAdded || isWidgetOptionDeleted || isWidgetOptionChanged;
-    const isValid = isWidgetUpdated && newWidgetInfo.inherit_options
-        ? validateWidget(newWidgetInfo.inherit_options, widgetConfig, updatedVariablesSchema)
+    const updatedWidgetInfo = getUpdatedWidgetInfo(widgetConfig, newWidgetInfo);
+    const isValid = isWidgetUpdated && updatedWidgetInfo.inherit_options
+        ? validateWidget(newWidgetInfo.schema_properties ?? [], updatedWidgetInfo.inherit_options, widgetConfig, updatedVariablesSchema)
         : undefined;
 
     return {
         isWidgetUpdated,
         isValid,
-        updatedWidgetInfo: isEmpty(newWidgetInfo) ? undefined : newWidgetInfo,
+        updatedWidgetInfo: isEmpty(updatedWidgetInfo) ? undefined : updatedWidgetInfo,
     };
 };
 
@@ -135,14 +142,17 @@ const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'>|undefined => {
-    const _inheritOptions = cloneDeep(widgetInfo.inherit_options);
-    const _schemaProperties = [...widgetInfo.schema_properties];
+    const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
+    const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
     const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.schema.properties ?? {});
     let isAffected = false;
     dashboardVariables.forEach((variableKey) => {
-        const property = getWidgetFilterSchemaPropertyName(variableKey);
+        const property = getWidgetOptionName(variableKey);
+
         const isInWidgetOptionsSchema = optionsSchemaProperties.some((d) => d.includes(property));
-        if (!isInWidgetOptionsSchema) return;
+        if (!isInWidgetOptionsSchema) return; // not exist in widget options schema
+
+        if (_schemaProperties.includes(property)) return; // already added property
 
         // enable widget option that match added variable
         isAffected = true;
@@ -159,28 +169,25 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
-    // check whether the deleted variable exists in inherit options
-    const enabledInheritOptions = Object.entries(widgetInfo.inherit_options)
-        .filter(([, v]) => v.enabled)
-        .map(([, v]) => v.variable_info?.key as WidgetFilterKey);
-    if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) {
-        return undefined;
-    }
-
-    const _widgetOptions = cloneDeep(widgetInfo.widget_options);
-    const _inheritOptions = cloneDeep(widgetInfo.inherit_options);
-    let _schemaProperties = [...widgetInfo.schema_properties];
+    const _widgetOptions = cloneDeep(widgetInfo.widget_options) ?? {};
+    const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
+    const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
     // delete or update options using deleted variables
     dashboardVariables.forEach((variableKey) => {
-        const property = getWidgetFilterSchemaPropertyName(variableKey);
+        const property = getWidgetOptionName(variableKey);
         const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(property) ?? false;
 
-        if (isFixedProperty) { /* fixed property case */
-            _widgetOptions[property] = widgetConfig.options?.[property] ?? undefined; // set default value to fixed option
-        } else { /* non-fixed property case */
-            _schemaProperties = _schemaProperties.filter((d) => d !== property);
+        // do nothing if inherit option is already disabled
+        if (!_inheritOptions[property]?.enabled) return;
+
+        // remove option from schemaProperties and revert inherit option if the option is not fixed property
+        if (!isFixedProperty) {
+            const propertyIdx = _schemaProperties.indexOf(property);
+            if (propertyIdx === -1) return; // already deleted property
+            _schemaProperties.splice(_schemaProperties.indexOf(property), 1); // delete property from schemaProperties
+            // just initiate inherit option since the option is deleted from schemaProperties
+            _inheritOptions[property] = widgetConfig.inherit_options?.[property] as InheritOptions['string'];
         }
-        _inheritOptions[property] = { enabled: false };
     });
 
     return {
@@ -193,17 +200,18 @@ const isAffectedByChangedVariableSchemaProperties = (
     dashboardVariables: string[],
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'>,
 ): boolean => {
-    const enabledInheritOptions = Object.entries(widgetInfo.inherit_options)
+    const enabledInheritOptions = Object.entries(widgetInfo.inherit_options ?? {})
         .filter(([, v]) => v.enabled)
         .map(([, v]) => v.variable_info?.key as WidgetFilterKey);
     if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) return false;
     return true;
 };
 const validateWidget = (
+    schemaProperties: string[],
     inheritOptions: InheritOptions,
     widgetConfig: WidgetConfig,
     dashboardVariableSchema?: DashboardVariablesSchema,
 ): boolean => {
-    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema);
+    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(schemaProperties, inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema, 'Invalid');
     return isEmpty(_widgetSchemaErrorMap);
 };

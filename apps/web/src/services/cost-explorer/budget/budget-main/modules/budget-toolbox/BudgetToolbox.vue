@@ -23,6 +23,8 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import BudgetToolboxUsageRange
+    from '@/services/cost-explorer/budget/budget-main/modules/budget-toolbox/BudgetToolboxUsageRange.vue';
 import type { Period } from '@/services/cost-explorer/type';
 
 type I18nSelectDropdownMenu = SelectDropdownMenuItem | {
@@ -170,6 +172,8 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 <template>
     <div class="budget-toolbox">
         <div class="top">
+            <budget-toolbox-usage-range readonly />
+            <p-divider vertical />
             <div class="period-box">
                 <span class="label">{{ t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in state.periodList"
@@ -238,6 +242,7 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
             &.vertical {
                 height: 1rem;
             }
+            margin-right: 1rem;
         }
         .period-box {
             @apply relative inline-flex gap-4 items-center;

@@ -7,7 +7,7 @@ import * as am5percent from '@amcharts/amcharts5/percent';
 import am5themes_Animated from '@amcharts/amcharts5/themes/Animated';
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import {
-    reactive, toRef, watch,
+    onUnmounted, reactive, toRef, watch,
 } from 'vue';
 import type { Ref } from 'vue';
 
@@ -82,6 +82,10 @@ export const useAmcharts5 = (
             state.root = am5.Root.new(ctx);
             initRoot(state.root as Root);
         }
+    });
+
+    onUnmounted(() => {
+        disposeRoot();
     });
 
     return {

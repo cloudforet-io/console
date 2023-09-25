@@ -209,6 +209,7 @@ const onChange = async (options: any = {}) => {
                         {{ t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
                     </p-button>
                     <p-select-dropdown
+                        class="left-toolbox-dropdown-item"
                         :selected="t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :menu="state.actionItems"
                         :placeholder="t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
@@ -244,6 +245,9 @@ const onChange = async (options: any = {}) => {
 .escalation-policy-page {
     .table-wrapper {
         @apply bg-white border border-gray-200 rounded-lg;
+    }
+    .left-toolbox-dropdown-item {
+        min-width: 6.5rem;
     }
 
     /* custom design-system component - p-toolbox */

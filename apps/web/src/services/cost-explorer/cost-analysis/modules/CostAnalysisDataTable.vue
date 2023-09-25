@@ -85,7 +85,31 @@ const state = reactive({
     })),
     visibleExcelNotiModal: false,
     isIncludedUsageTypeInGroupBy: computed<boolean>(() => costAnalysisPageState.groupBy.includes(GROUP_BY.USAGE_TYPE)),
-
+    analyzeQuery: computed(() => {
+        let dateFormat = 'YYYY-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
+        const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
+        return {
+            granularity: costAnalysisPageState.granularity,
+            group_by: groupBy,
+            start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
+            end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
+            fields: {
+                cost_sum: {
+                    key: 'cost',
+                    operator: 'sum',
+                },
+                ...(state.isIncludedUsageTypeInGroupBy && {
+                    usage_quantity_sum: {
+                        key: 'usage_quantity',
+                        operator: 'sum',
+                    },
+                }),
+            },
+            sort: [{ key: '_total_cost_sum', desc: true }],
+            field_group: ['date'],
+        };
+    }),
 });
 const tableState = reactive({
     loading: true,
@@ -112,8 +136,9 @@ const tableState = reactive({
             };
         }
         return {
-            name: d.split('.')[1], // tags.Name -> Name
+            name: d.split('.')[1],
             label: d.split('.')[1], // tags.Name -> Name
+            isTagField: true,
             sortable: false,
         };
     })),
@@ -253,30 +278,10 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         analyzeApiQueryHelper
             .setFilters(costAnalysisPageStore.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
-        let dateFormat = 'YYYY-MM';
-        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
-        const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const { status, response } = await fetchCostAnalyze({
             data_source_id: costAnalysisPageStore.selectedDataSourceId,
             query: {
-                granularity: costAnalysisPageState.granularity,
-                group_by: groupBy,
-                start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
-                end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
-                fields: {
-                    cost_sum: {
-                        key: 'cost',
-                        operator: 'sum',
-                    },
-                    ...(state.isIncludedUsageTypeInGroupBy && {
-                        usage_quantity_sum: {
-                            key: 'usage_quantity',
-                            operator: 'sum',
-                        },
-                    }),
-                },
-                sort: [{ key: '_total_cost_sum', desc: true }],
-                field_group: ['date'],
+                ...state.analyzeQuery,
                 ...analyzeApiQueryHelper.data,
             },
         });
@@ -293,7 +298,7 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
 const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|string => {
     const dateIndex = Number(fieldName.split('.')[1]);
     const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
-    if (!usageQuantity) return '--';
+    if (!usageQuantity || !item.usage_unit) return '--';
     if (item.usage_unit === 'Bytes') {
         return `${byteFormatter(usageQuantity, { unit: item.usage_unit })}`;
     }
@@ -307,21 +312,18 @@ const handleChange = async (options: any = {}) => {
     if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
     tableState.more = more;
 };
+const costAnalyzeExportQueryHelper = new QueryHelper();
 const handleExcelDownload = async () => {
     try {
-        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
-        const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
-
-
+        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
         await store.dispatch('file/downloadExcel', {
             url: '/cost-analysis/cost/analyze',
             param: {
-                granularity: costAnalysisPageState.granularity,
-                group_by: costAnalysisPageState.groupBy,
-                start: dayjs.utc(costAnalysisPageState?.period?.start).format(dateFormat),
-                end: dayjs.utc(costAnalysisPageState?.period?.end).format(dateFormat),
-                filter: analyzeApiQueryHelper.data.filter,
-                query: analyzeApiQueryHelper.data,
+                data_source_id: costAnalysisPageStore.selectedDataSourceId,
+                query: {
+                    ...state.analyzeQuery,
+                    filter: costAnalyzeExportQueryHelper.apiQuery.filter,
+                },
             },
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,
@@ -422,8 +424,14 @@ watch(
                 <span v-else-if="field.name === GROUP_BY.SERVICE_ACCOUNT">
                     {{ state.serviceAccounts[value] ? state.serviceAccounts[value].name : value }}
                 </span>
+                <span v-else-if="field.name === 'Instance Type'">
+                    {{ value ?? 'Unknown' }}
+                </span>
                 <span v-else-if="field.name === 'totalCost'">
                     {{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.TOTAL_COST') }}
+                </span>
+                <span v-else-if="field.isTagField">
+                    {{ value ?? 'Unknown' }}
                 </span>
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"

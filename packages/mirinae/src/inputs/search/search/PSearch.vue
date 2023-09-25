@@ -1,70 +1,9 @@
-<template>
-    <div ref="containerRef"
-         class="p-search"
-         :class="{ focused }"
-    >
-        <div ref="targetRef"
-             class="input-container"
-             :class="{ focused, invalid, disabled }"
-        >
-            <p-i v-if="!disableIcon && !focused && !value && !readonly"
-                 class="left-icon"
-                 name="ic_search"
-                 color="inherit"
-            />
-            <slot name="left"
-                  v-bind="{ value, placeholder: state.placeholderText }"
-            />
-            <span class="input-wrapper">
-                <slot name="default"
-                      v-bind="{ value, placeholder: state.placeholderText }"
-                >
-                    <input ref="inputRef"
-                           v-bind="attrs"
-                           :value="value"
-                           :placeholder="state.placeholderText"
-                           :disabled="disabled"
-                           :readonly="readonly"
-                           v-on="inputListeners"
-                    >
-                </slot>
-            </span>
-            <slot name="right"
-                  v-bind="{ value, placeholder: state.placeholderText }"
-            >
-                <div class="right">
-                    <span v-if="value"
-                          class="delete-btn"
-                          @click="handleDelete"
-                    >
-                        <p-i class="icon"
-                             name="ic_close"
-                             height="1rem"
-                             width="1rem"
-                        />
-                    </span>
-                </div>
-            </slot>
-        </div>
-        <p-context-menu v-if="useAutoComplete"
-                        v-show="state.proxyVisibleMenu"
-                        ref="menuRef"
-                        :menu="state.bindingMenu"
-                        :highlight-term="state.proxyValue"
-                        :loading="disableHandler ? loading : state.handlerLoading"
-                        :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
-                        @select="handleClickMenuItem"
-                        @focus="handleFocusMenuItem"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 
-import { useFocus, onClickOutside } from '@vueuse/core';
+import { useFocus } from '@vueuse/core';
 import { debounce } from 'lodash';
 import {
-    computed, reactive, toRef, watch, useAttrs, ref, toRefs,
+    computed, reactive, toRef, watch, useAttrs,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -93,22 +32,22 @@ const props = withDefaults(defineProps<SearchProps>(), {
     disableHandler: false,
     useAutoComplete: false,
 });
-const emit = defineEmits([
-    'update:value',
-    'update:visible-menu',
-    'show-menu',
-    'hide-menu',
-    'search',
-    'focus-menu',
-    'delete',
-    'update:is-focused',
-]);
+const emit = defineEmits<{(e: 'update:visible-menu'): void;
+    (e: 'update:value'): void;
+    (e: 'show-menu'): void;
+    (e: 'hide-menu'): void;
+    (e: 'focus-menu', idx: string): void;
+    (e: 'delete', value: string): void;
+    (e: 'search', value: string|undefined): void;
+    (e: 'update:is-focused', focus: boolean): void;
+}>();
+
 const attrs = useAttrs();
 const { t } = useI18n();
 
 const state = reactive({
     proxyVisibleMenu: useProxyValue<boolean | undefined>('visibleMenu', props, emit),
-    inputRef: null as null|HTMLElement,
+    inputRef: null as null | HTMLElement,
     handlerLoading: true,
     placeholderText: computed<string>(() => {
         if (props.placeholder === undefined) return t('COMPONENT.SEARCH.PLACEHOLDER');
@@ -121,9 +60,7 @@ const state = reactive({
     menuRef: null,
 });
 
-const { inputRef, menuRef } = toRefs(state);
 const { focused } = useFocus(toRef(state, 'inputRef'));
-const containerRef = ref<HTMLElement|null>(null);
 
 const {
     targetRef, contextMenuStyle,
@@ -187,7 +124,6 @@ const allFocusOut = () => {
     hideMenu();
 };
 
-
 /* event */
 const listeners = {
     ...attrs,
@@ -195,7 +131,7 @@ const listeners = {
 const inputListeners = {
     ...listeners,
     input(e) {
-        emit('update:value', e.target.value);
+        state.proxyValue = e.target.value;
         showMenu();
         filterMenu(e.target.value);
         makeByPassListeners(listeners, 'input', e.target.value, e);
@@ -222,7 +158,6 @@ const inputListeners = {
         makeByPassListeners(listeners, 'click', e);
     },
 };
-
 const handleFocusMenuItem = (idx: string) => {
     emit('focus-menu', idx);
 };
@@ -234,24 +169,83 @@ const handleClickMenuItem = (item: MenuItem) => {
 };
 const handleDelete = () => {
     if (props.disabled) return;
-    emit('delete', props.value);
-    emit('update:value', '');
+    state.proxyValue = '';
+    emit('delete', state.proxyValue);
 };
 
 watch(() => props.isFocused, (isFocused) => {
-    if (typeof isFocused === 'boolean') focused.value = isFocused;
+    focused.value = isFocused;
 }, { immediate: true });
 watch(focused, (_focused) => {
     emit('update:is-focused', _focused);
 });
-
-onClickOutside(containerRef, hideMenu);
-
 </script>
+
+<template>
+    <div ref="containerRef"
+         class="p-search"
+         :class="{ focused }"
+    >
+        <div ref="targetRef"
+             class="input-container"
+             :class="{ focused, invalid, disabled }"
+        >
+            <p-i v-if="!disableIcon && !focused && !state.proxyValue && !readonly"
+                 class="left-icon"
+                 name="ic_search"
+                 color="inherit"
+            />
+            <slot name="left"
+                  v-bind="{ value: state.proxyValue, placeholder: state.placeholderText }"
+            />
+            <span class="input-wrapper">
+                <slot name="default"
+                      v-bind="{ value: state.proxyValue, placeholder: state.placeholderText }"
+                >
+                    <input ref="inputRef"
+                           v-bind="$attrs"
+                           :value="state.proxyValue"
+                           :placeholder="state.placeholderText"
+                           :disabled="disabled"
+                           :readonly="readonly"
+                           v-on="inputListeners"
+                    >
+                </slot>
+            </span>
+            <slot name="right"
+                  v-bind="{ value: state.proxyValue, placeholder: state.placeholderText }"
+            >
+                <div class="right">
+                    <span v-if="state.proxyValue"
+                          class="delete-btn"
+                          @click="handleDelete"
+                    >
+                        <p-i class="icon"
+                             name="ic_close"
+                             height="1rem"
+                             width="1rem"
+                        />
+                    </span>
+                </div>
+            </slot>
+        </div>
+        <p-context-menu v-if="useAutoComplete"
+                        v-show="state.proxyVisibleMenu"
+                        ref="menuRef"
+                        :menu="state.bindingMenu"
+                        :highlight-term="state.proxyValue"
+                        :loading="disableHandler ? loading : state.handlerLoading"
+                        :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
+                        @select="handleClickMenuItem"
+                        @focus="handleFocusMenuItem"
+        />
+    </div>
+</template>
 
 <style lang="postcss">
 .p-search {
     position: relative;
+
     .input-container {
         @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full rounded;
         height: auto;
@@ -259,21 +253,27 @@ onClickOutside(containerRef, hideMenu);
         min-width: 0;
         line-height: 2rem;
         box-sizing: border-box;
+
         &.invalid {
             @apply border-alert;
         }
+
         &.disabled {
             @apply bg-gray-100;
         }
+
         &.focused, &:focus-within {
             @apply border-secondary bg-blue-100;
         }
+
         &:hover:not(.invalid):not(.disabled) {
             @apply border-secondary;
         }
+
         .input-wrapper {
             @apply flex flex-wrap flex-grow row-gap-2;
         }
+
         input {
             @apply border-0 bg-transparent w-full;
             color: inherit;
@@ -281,38 +281,48 @@ onClickOutside(containerRef, hideMenu);
             appearance: none;
             min-height: 1.125rem;
             line-height: 1.125rem;
+
             &::placeholder {
                 @apply text-gray-300;
             }
+
             &:placeholder-shown {
                 text-overflow: ellipsis;
             }
+
             &:focus {
                 outline: none;
             }
+
             &:read-only {
                 pointer-events: none;
             }
         }
+
         .right {
             @apply inline-flex items-center;
         }
+
         .delete-btn {
             @apply cursor-pointer inline-block flex-shrink-0 rounded-full;
             position: relative;
             height: 1rem;
             width: 1rem;
+
             &:hover {
                 @apply bg-gray-200;
             }
+
             .icon {
                 position: absolute;
             }
         }
+
         .left-icon {
             @apply text-gray-300 mr-1;
         }
     }
+
     .p-context-menu {
         @apply font-normal;
         position: absolute;

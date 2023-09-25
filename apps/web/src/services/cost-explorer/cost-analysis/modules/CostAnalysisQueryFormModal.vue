@@ -1,23 +1,26 @@
 <script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, watch,
+    computed, onMounted, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useStore } from 'vuex';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import {
     REQUEST_TYPE,
 } from '@/services/cost-explorer/cost-analysis/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-
 
 interface Props {
     visible: boolean;
@@ -25,6 +28,8 @@ interface Props {
     requestType: RequestType;
     selectedQuerySetId?: string;
 }
+const costQuerySetFetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
+
 const props = withDefaults(defineProps<Props>(), {
     requestType: REQUEST_TYPE.SAVE,
     selectedQuerySetId: undefined,
@@ -33,6 +38,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
     (e: 'update-query', updatedQueryId: string)
 }>();
 const { t } = useI18n();
+const store = useStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 
 const formState = reactive({
@@ -48,11 +54,17 @@ const state = reactive({
         if (formState.queryName.length > 40) {
             return t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_LENGTH');
         }
+        if (state.mergedCostQuerySetNameList.includes(formState.queryName)) {
+            return t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_DUPLICATED');
+        }
         return undefined;
     }),
     isQueryNameValid: computed(() => !state.queryNameInvalidText),
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
+    managedCostQuerySetIdList: [...managedCostQuerySetIdList],
+    existingCostQuerySetNameList: [] as string[],
+    mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
 });
 
 const saveQuery = async () => {
@@ -60,7 +72,7 @@ const saveQuery = async () => {
     try {
         const updatedQuery = await costAnalysisPageStore.saveQuery(formState.queryName);
         if (!updatedQuery) return;
-        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '');
+        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_AS_QUERY'), '');
         emit('update-query', updatedQuery.cost_query_set_id);
     } catch (e) {
         ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -72,7 +84,7 @@ const editQuery = async () => {
     try {
         const updatedQuery = await costAnalysisPageStore.editQuery(props.selectedQuerySetId, formState.queryName);
         if (!updatedQuery) return;
-        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '');
+        showSuccessMessage(t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
         emit('update-query', updatedQuery.cost_query_set_id);
     } catch (e) {
         ErrorHandler.handleRequestError(e, t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));
@@ -104,6 +116,23 @@ watch(() => state.proxyVisible, (visible) => {
         state.showValidation = false;
     }
 });
+
+onMounted(async () => {
+    try {
+        const { status, response } = await costQuerySetFetcher({
+            query: {
+                filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
+                only: ['name'],
+            },
+        });
+        if (status === 'succeed' && response?.results) {
+            state.existingCostQuerySetNameList = response.results.map((query) => query.name);
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.existingCostQuerySetNameList = [];
+    }
+});
 </script>
 
 <template>
@@ -113,7 +142,7 @@ watch(() => state.proxyVisible, (visible) => {
         size="sm"
         fade
         backdrop
-        :disabled="!state.isAllValid"
+        :disabled="!state.isAllValid || !formState.queryName"
         @confirm="handleFormConfirm"
     >
         <template #body>

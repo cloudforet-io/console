@@ -80,6 +80,7 @@ const handleOverflown = (isOverflown: boolean) => {
 };
 
 (async () => {
+    // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
     await Promise.allSettled([
         store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
         store.dispatch('dashboard/loadAllDashboard'),

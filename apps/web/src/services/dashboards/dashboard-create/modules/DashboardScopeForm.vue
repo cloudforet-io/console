@@ -67,7 +67,9 @@ onMounted(() => {
     <section class="dashboard-scope-form">
         <p-field-title>{{ t('DASHBOARDS.CREATE.LABEL_SCOPE') }}</p-field-title>
         <div class="dashboard-scope-wrapper">
-            <p-radio-group direction="vertical">
+            <p-radio-group direction="vertical"
+                           class="dashboard-scope-radio-group"
+            >
                 <p-radio :selected="state.isDomainScope"
                          :disabled="!state.workspaceManagePermission"
                          @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
@@ -91,8 +93,13 @@ onMounted(() => {
 
 <style lang="postcss" scoped>
 .dashboard-scope-form {
-    @apply mt-8;
+    @apply flex flex-col mt-8;
+    gap: 0.5rem;
     .dashboard-scope-wrapper {
+        .dashboard-scope-radio-group {
+            @apply flex flex-col;
+            gap: 0.5rem;
+        }
         .project-select-dropdown {
             @apply mt-1 ml-6;
         }
