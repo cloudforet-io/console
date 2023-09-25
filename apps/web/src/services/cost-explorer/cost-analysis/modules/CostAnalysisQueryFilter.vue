@@ -172,14 +172,12 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                                    @select="handleSelectGranularity"
                 />
                 <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
-                <div>
-                    <p-badge v-if="state.showPeriodBadge"
-                             badge-type="subtle"
-                             style-type="gray200"
-                    >
-                        {{ state.periodBadgeText }}
-                    </p-badge>
-                </div>
+                <p-badge v-if="state.showPeriodBadge"
+                         badge-type="subtle"
+                         style-type="gray200"
+                >
+                    {{ state.periodBadgeText }}
+                </p-badge>
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -203,9 +201,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                         </p-badge>
                     </p-button>
                     <template #content>
-                        <cost-analysis-filters-popper ref="filtersPopperRef"
-                                                      class="filters-popper"
-                        />
+                        <cost-analysis-filters-popper ref="filtersPopperRef" />
                     </template>
                 </p-popover>
             </div>
@@ -320,9 +316,6 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                     left: 1.25rem !important;
                 }
             }
-        }
-        .filters-popper {
-            width: 100%;
         }
     }
     .invalid-text {
