@@ -291,7 +291,7 @@ onMounted(() => {
                     <template #dropdown-button="item">
                         <div class="selected-wrapper">
                             <p-lazy-img v-if="item && item.imageUrl"
-                                        class="left-icon"
+                                        class="selected-icon"
                                         :src="item.imageUrl"
                                         width="1rem"
                                         height="1rem"
@@ -324,10 +324,13 @@ onMounted(() => {
     .select-options-dropdown {
         .selected-wrapper {
             @apply flex items-center;
-            .left-icon {
+
+            .selected-icon {
                 margin-right: 0.25rem;
+                margin-top: 0.125rem;
                 flex-shrink: 0;
             }
+
             .selected-text {
                 flex-grow: 1;
                 overflow: hidden;
@@ -335,8 +338,18 @@ onMounted(() => {
                 white-space: nowrap;
             }
         }
+
         .selected-item-postfix {
             @apply text-gray-400;
+        }
+    }
+
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
+        .left-icon {
+            margin-right: 0.25rem;
+            margin-top: 0.125rem;
+            flex-shrink: 0;
         }
     }
 }
