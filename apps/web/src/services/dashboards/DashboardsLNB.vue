@@ -54,7 +54,10 @@ const state = reactive({
                 dashboardId: d.domain_dashboard_id,
             },
         },
-        favoriteType: FAVORITE_TYPE.DASHBOARD,
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
+            id: d.domain_dashboard_id,
+        },
         icon: d.viewers === DASHBOARD_VIEWER.PRIVATE ? PRIVATE_ICON : undefined,
     }))),
     projectDashboardList: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
@@ -125,7 +128,10 @@ const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMen
                         dashboardId: board.project_dashboard_id,
                     },
                 },
-                favoriteType: FAVORITE_TYPE.DASHBOARD,
+                favoriteOptions: {
+                    type: FAVORITE_TYPE.DASHBOARD,
+                    id: board.project_dashboard_id,
+                },
                 icon: board.viewers === DASHBOARD_VIEWER.PRIVATE ? PRIVATE_ICON : undefined,
             })),
         ]);
@@ -140,10 +146,10 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
     const result = [] as LNBMenu[];
     menuItems.forEach((d) => {
         if (Array.isArray(d)) {
-            const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
+            const filtered = d.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
             const hasProject = filtered.filter((f) => f.type === 'item').length > 0;
             if (hasProject) result.push(filtered);
-        } else if ((d.id && state.favoriteItemMap[d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
+        } else if ((d.id && state.favoriteItemMap[d.favoriteOptions?.id || d.id]) || d.type !== MENU_ITEM_TYPE.ITEM) result.push(d);
     });
     return result;
 };

@@ -18,7 +18,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/cost-analysis/config';
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import {
     REQUEST_TYPE,
@@ -66,7 +66,7 @@ const state = reactive({
     isQueryNameValid: computed(() => !state.queryNameInvalidText),
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
-    managedCostQuerySetIdList: [...managedCostQuerySetIdList],
+    managedCostQuerySetIdList: [...MANAGED_COST_QUERY_SET_ID_LIST],
     existingCostQuerySetNameList: [] as string[],
     mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
 });

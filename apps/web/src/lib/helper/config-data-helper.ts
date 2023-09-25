@@ -133,6 +133,7 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
 
     config.forEach((d) => {
         const resource: CostQuerySetModel|undefined = find(costQuerySetList, { cost_query_set_id: d.itemId });
+        const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(d.itemId);
         if (resource) {
             results.push({
                 ...d,
@@ -146,8 +147,8 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
                     label: dataSourceMap[resource.data_source_id].label,
                 }],
             });
-        } else if (d.itemId.startsWith('managed_')) { // managed cost query set
-            const [, dataSourceId, costQuerySetId] = d.itemId.split('_');
+        } else if (parsedKeys) { // managed cost query set
+            const [dataSourceId, costQuerySetId] = parsedKeys;
             results.push({
                 ...d,
                 name: d.itemId,
@@ -183,4 +184,11 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
         }
     });
     return results;
+};
+
+export const getCompoundKeyWithManagedCostQuerySetFavoriteKey = (dataSourceId:string, costQuerySetId: string): string => `managed_${dataSourceId}_${costQuerySetId}`;
+export const getParsedKeysWithManagedCostQueryFavoriteKey = (managedCostQuerySetId: string): [string, string]|undefined => {
+    if (!managedCostQuerySetId.startsWith('managed_')) return undefined;
+    const [, dataSourceId, costQuerySetId] = managedCostQuerySetId.split('_');
+    return [dataSourceId, costQuerySetId];
 };
