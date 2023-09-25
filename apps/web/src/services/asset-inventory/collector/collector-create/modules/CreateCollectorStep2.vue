@@ -8,6 +8,7 @@
             />
             <multiple-provider-form v-if="state.supportedProviders.length"
                                     class="multiple-provider-form"
+                                    @update:isProviderValid="handleChangeIsProviderValid"
             />
             <collector-version-form class="version-row"
                                     get-versions-on-plugin-id-change
@@ -88,9 +89,10 @@ const state = reactive({
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
     isNameValid: false,
     isTagsValid: true,
+    isProviderValid: false,
     isVersionValid: false,
     deleteModalVisible: false,
-    isAllFormValid: computed(() => state.isNameValid && state.isVersionValid && state.isTagsValid),
+    isAllFormValid: computed(() => state.isProviderValid && state.isNameValid && state.isVersionValid && state.isTagsValid),
     pluginName: computed(() => collectorFormState.repositoryPlugin?.name),
     supportedProviders: computed<string[]>(() => collectorFormState.repositoryPlugin?.capability?.supported_providers ?? []),
 });
@@ -111,6 +113,10 @@ const handleClose = () => {
 
 const handleUpdateIsValid = (isValid: boolean) => {
     state.isNameValid = isValid;
+};
+
+const handleChangeIsProviderValid = (isValid: boolean) => {
+    state.isProviderValid = isValid;
 };
 
 const handleChangeIsVersionValid = (isValid: boolean) => {
