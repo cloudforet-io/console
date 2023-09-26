@@ -39,7 +39,7 @@
 
 <script lang="ts" setup>
 import {
-    computed, nextTick, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -80,9 +80,7 @@ const handleChangeProvider = (provider) => {
 
 watch(() => state.providerList, (providerList) => {
     if (providerList.length) {
-        nextTick(() => {
-            collectorFormStore.setProvider(providerList[0]?.name);
-        });
+        collectorFormStore.setProvider(providerList[0]?.name);
     }
 }, { immediate: true });
 
