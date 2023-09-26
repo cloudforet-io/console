@@ -166,6 +166,7 @@ const refreshWidget = async (): Promise<Data[]> => {
 
 useWidgetLifecycle({
     disposeWidget: undefined,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -184,7 +185,7 @@ defineExpose<WidgetExpose>({
     >
         <div class="data-container">
             <p-data-loader class="chart-wrapper"
-                           :loading="state.loading"
+                           :loading="props.loading || state.loading"
                            :data="state.refinedData"
                            loader-type="skeleton"
                            :loader-backdrop-opacity="1"

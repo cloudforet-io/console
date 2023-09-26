@@ -280,6 +280,7 @@ const refreshWidget = async (): Promise<Data[]> => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -309,7 +310,7 @@ defineExpose<WidgetExpose<Data[]>>({
                     <strong>({{ formattedCurrentMonth }})</strong>
                 </p>
                 <p-data-loader class="data-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="!state.noData"
                                :loader-backdrop-opacity="1"
                                disable-empty-case
@@ -354,7 +355,7 @@ defineExpose<WidgetExpose<Data[]>>({
                     <strong>({{ formattedPreviousMonth }})</strong>
                 </p>
                 <p-data-loader class="data-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="!state.noData"
                                :loader-backdrop-opacity="1"
                                disable-empty-case
@@ -376,7 +377,7 @@ defineExpose<WidgetExpose<Data[]>>({
             </div>
             <div class="chart-wrapper">
                 <p-data-loader class="data-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="!state.noData"
                                :loader-backdrop-opacity="1"
                                loader-type="skeleton"
