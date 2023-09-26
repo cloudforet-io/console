@@ -7,7 +7,7 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import {
     getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {

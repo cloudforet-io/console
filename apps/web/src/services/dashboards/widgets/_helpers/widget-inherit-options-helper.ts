@@ -3,7 +3,7 @@ import { merge } from 'lodash';
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import {
     getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import type { InheritOptions, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
 export const getInitialWidgetInheritOptions = (widgetConfig?: WidgetConfig, storedInheritOptions?: InheritOptions, variablesSchema?: DashboardVariablesSchema): InheritOptions => {

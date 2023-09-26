@@ -7,7 +7,7 @@ import type { i18n } from '@/translations';
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import {
     getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
     InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
