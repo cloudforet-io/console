@@ -4,18 +4,18 @@
         <div class="input-form">
             <collector-name-form ref="nameInputRef"
                                  class="name-form"
-                                 @update:isValid="handleUpdateIsValid"
+                                 @update:is-valid="handleUpdateIsValid"
             />
             <multiple-provider-form v-if="state.providerFormVisible"
                                     class="multiple-provider-form"
-                                    @update:isProviderValid="handleChangeIsProviderValid"
+                                    @update:is-provider-valid="handleChangeIsProviderValid"
             />
             <collector-version-form class="version-row"
                                     get-versions-on-plugin-id-change
-                                    @update:isVersionValid="handleChangeIsVersionValid"
+                                    @update:is-version-valid="handleChangeIsVersionValid"
             />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
-                                @update:isTagsValid="handleChangeIsTagsValid"
+                                @update:is-tags-valid="handleChangeIsTagsValid"
             />
         </div>
         <div class="step-footer">

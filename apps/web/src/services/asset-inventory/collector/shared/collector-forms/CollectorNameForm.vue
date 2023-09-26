@@ -32,7 +32,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 
-const emits = defineEmits<{(event: 'update:isValid', value: boolean): void;
+const emits = defineEmits<{(event: 'update:is-valid', value: boolean): void;
 }>();
 
 const collectorFormStore = useCollectorFormStore();
@@ -70,7 +70,7 @@ watch(name, (value) => {
 });
 
 watch(isAllValid, (value) => {
-    emits('update:isValid', value);
+    emits('update:is-valid', value);
 }, { immediate: true });
 
 (async () => {

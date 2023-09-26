@@ -32,7 +32,7 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
 
-const emit = defineEmits<{(event: 'update:isTagsValid', value: boolean): void; }>();
+const emit = defineEmits<{(event: 'update:is-tags-valid', value: boolean): void; }>();
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
@@ -51,7 +51,7 @@ const handleUpdateTags = (tags: Tag) => {
 };
 
 watch(() => state.isTagsValid, (isTagsValid) => {
-    emit('update:isTagsValid', isTagsValid);
+    emit('update:is-tags-valid', isTagsValid);
 }, { immediate: true });
 
 
