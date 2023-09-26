@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { onClickOutside, useElementSize } from '@vueuse/core';
+import {
+    onClickOutside, useElementSize,
+} from '@vueuse/core';
 import {
     computed, reactive, ref, watch,
 } from 'vue';
@@ -30,18 +32,18 @@ import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
-
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFormModal.vue');
-
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const filtersPopperRef = ref<any|null>(null);
-const containerRef = ref<HTMLElement|null>(null);
+const rightPartRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
+
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
+
 const state = reactive({
     queryFormModalVisible: false,
     granularityItems: computed<MenuItem[]>(() => ([
@@ -109,8 +111,7 @@ const {
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
 });
-onClickOutside(containerRef, hideContextMenu);
-onClickOutside(contextMenuRef, hideContextMenu);
+onClickOutside(rightPartRef, hideContextMenu);
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -158,9 +159,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
 </script>
 
 <template>
-    <div ref="containerRef"
-         class="cost-analysis-query-filter"
-    >
+    <div class="cost-analysis-query-filter">
         <div class="filter-wrapper"
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
         >
@@ -205,7 +204,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                     </template>
                 </p-popover>
             </div>
-            <div class="right-part">
+            <div ref="rightPartRef"
+                 class="right-part"
+            >
                 <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
                     <p-button class="save-button"
                               style-type="tertiary"
@@ -258,9 +259,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
 .cost-analysis-query-filter {
     margin-top: 1.5rem;
     .filter-wrapper {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
+        @apply relative flex items-center justify-between;
         font-size: 0.875rem;
         .left-part {
             display: flex;
@@ -286,9 +285,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
             :deep(.p-context-menu) {
                 @apply absolute;
                 top: 2.125rem;
-                right: 0;
-                margin-top: -0.15rem;
+                margin-top: -1px;
                 z-index: 100;
+                right: 0;
                 .p-context-menu-item {
                     min-width: 10rem;
                 }
@@ -322,18 +321,12 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
         @apply text-red-400 text-label-md;
         margin-top: 0.5rem;
     }
+}
 
-    @screen mobile {
-        .filter-wrapper, .left-part {
-            @apply flex-col;
-        }
-
-        .filters-popover {
-            margin-top: 0.5rem;
-        }
-
-        .right-part {
-            margin-top: 1.5rem;
+@screen tablet {
+    .cost-analysis-query-filter {
+        .filter-wrapper {
+            min-width: 44.125rem;
         }
     }
 }
