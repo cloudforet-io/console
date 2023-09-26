@@ -47,7 +47,7 @@ const allReferenceStore = useAllReferenceStore();
 
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
-    initiatedWidgetMap: {} as Record<string, any>,
+    initiatedWidgetMap: {} as Record<string, boolean>,
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
 });
 
@@ -61,21 +61,27 @@ const { reformedWidgetInfoList } = useWidgetReformer({
     containerWidth,
 });
 
+/* widget loading */
+const getWidgetLoading = (widgetKey: string) => {
+    if (!dashboardDetailStore.isAllVariablesInitialized) return true;
+    if (!state.initiatedWidgetMap[widgetKey]) return true;
+    if (widgetViewState.targetWidget?.widget_key === widgetKey) return true;
+    if (widgetEditState.targetWidget?.widget_key === widgetKey) return true;
+    return false;
+};
+
 
 /* init widgets */
 const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
     if (state.initiatedWidgetMap[target.id]) return;
     if (isIntersecting) {
-        const targetWidgetRef = widgetRef.value.find((d) => d?.$el?.id === target.id);
-        if (typeof targetWidgetRef?.initWidget === 'function') {
-            const prevData = props.reusePreviousData ? dashboardDetailState.widgetDataMap[target.id] : undefined;
-            const data = await targetWidgetRef.initWidget(prevData);
-            dashboardDetailStore.$patch((_state) => {
-                _state.widgetDataMap[target.id] = data;
-            });
-            state.initiatedWidgetMap[target.id] = data;
-        }
+        state.initiatedWidgetMap[target.id] = true;
     }
+};
+const handleWidgetInitiated = (widgetKey: string, data: any) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap[widgetKey] = data;
+    });
 };
 const handleWidgetRefreshed = (widgetKey: string, data: any) => {
     dashboardDetailStore.$patch((_state) => {
@@ -230,10 +236,13 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
                            :edit-mode="props.editMode"
                            :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                            :all-reference-type-info="state.allReferenceTypeInfo"
-                           :disable-refresh-on-variable-change="widgetViewState.visibleModal || !state.initiatedWidgetMap[widget.widget_key]"
+                           :disable-refresh-on-variable-change="widgetViewState.visibleModal"
                            :dashboard-settings="dashboardDetailState.settings"
                            :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                            :dashboard-variables="dashboardDetailState.variables"
+                           :loading="getWidgetLoading(widget.widget_key)"
+                           :data="dashboardDetailState.widgetDataMap[widget.widget_key]"
+                           @initiated="handleWidgetInitiated(widget.widget_key, $event)"
                            @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
                            @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
                            @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
