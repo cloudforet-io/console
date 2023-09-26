@@ -63,7 +63,6 @@ export const useContextMenuFixedStyle = ({
         }
 
         if (state.useFixedMenuStyle) {
-            console.log(state.useFixedMenuStyle, position, targetRects);
             if (position === 'left') contextMenuStyle.left = `${targetRects.left}px`;
             else if (position === 'right') contextMenuStyle.right = `${window.innerWidth - targetRects.right}px`;
         }
