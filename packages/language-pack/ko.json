@@ -1472,13 +1472,10 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "클라우드 자원의 비용 추이 또는 서버, 데이터베이스, 스토리지 사용 추이를 빠르게 파악할 수 있는 위젯. "
 			},
-			"COMPLIANCE_CHECK_STATUS": {
-				"CHECKED_SERVICE_ACCOUNT": "확인된 서비스 어카운트 ",
-				"COMPLIANCE_SCORE": "컴플라이언스 점수",
+			"COMPLIANCE_STATUS": {
 				"DESC": "조회 기간동안 확인된 컴플라이언스 Pass/Fail 관련 전반적인 상태를 보여주는 위젯. ",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
-				"MORE_THAN_PREV_MONTH": "전월 대비 상승",
-				"TOTAL_COMPLIANCE_NUMBER": "전체 컴플라이언스 개수"
+				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
 			},
 			"COST_BY_REGION": {
 				"DESC": "조회 기간동안 발생한 Region별 총 비용 데이터를 보여주는 위젯. "
@@ -1535,13 +1532,10 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
-			"TOTAL_FAILURE_AND_SEVERITY": {
+			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "조회 기간동안 확인된 컴플라이언스 Failure 개수, 비율과 심각도를 보여주는 위젯. ",
-				"FAILURE_RATE": "Failure 비율 ",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
-				"MORE_THAN_PREV_MONTH": "전월 대비 상승",
-				"SEVERITY": "심각도",
-				"TOTAL_FAILURE_COUNT": "총 failure 개수"
+				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "선택한 'Group By' 옵션을 기준으로 조회 기간 동안의 컴플라이언스 Pass/Fail findings 트렌드를 보여주는 위젯. "

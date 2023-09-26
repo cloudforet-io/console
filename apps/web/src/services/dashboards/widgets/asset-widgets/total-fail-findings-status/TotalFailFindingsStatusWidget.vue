@@ -108,9 +108,9 @@ const state = reactive({
     totalFailureComparingMessage: computed<string|undefined>(() => {
         if (state.totalFailureCount === state.prevTotalFailureCount) return undefined;
         if (state.prevTotalFailureCount < state.totalFailureCount) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH') as string;
+            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.MORE_THAN_PREV_MONTH') as string;
         }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH') as string;
+        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_MONTH') as string;
     }),
     prevFailureRate: computed<number>(() => {
         if (!state.data?.realtimeData?.length) return 0;
@@ -126,9 +126,9 @@ const state = reactive({
     failureRateComparingMessage: computed<string|undefined>(() => {
         if (state.failureRate === state.prevFailureRate) return undefined;
         if (state.prevFailureRate < state.failureRate) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.MORE_THAN_PREV_MONTH') as string;
+            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.MORE_THAN_PREV_MONTH') as string;
         }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.LESS_THAN_PREV_MONTH') as string;
+        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_MONTH') as string;
     }),
 });
 
@@ -278,14 +278,14 @@ defineExpose<WidgetExpose>({
 
 <template>
     <widget-frame v-bind="widgetFrameProps"
-                  class="total-failure-and-severity"
+                  class="total-fail-findings-status"
                   v-on="widgetFrameEventHandlers"
     >
         <div class="data-container">
             <div class="summary-wrapper">
                 <div class="left-wrapper">
                     <p class="title">
-                        {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.TOTAL_FAILURE_COUNT') }}
+                        Total failure count
                     </p>
                     <p class="value">
                         {{ numberFormatter(state.totalFailureCount) }}
@@ -303,7 +303,7 @@ defineExpose<WidgetExpose>({
                 <p-divider :vertical="true" />
                 <div class="right-wrapper">
                     <p class="title">
-                        {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.FAILURE_RATE') }}
+                        Failure rate
                     </p>
                     <p class="value">
                         {{ commaFormatter(state.failureRate) }}%
@@ -333,7 +333,7 @@ defineExpose<WidgetExpose>({
             </div>
             <div class="severity-wrapper">
                 <p class="title">
-                    {{ $t('DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.SEVERITY') }}
+                    Severity
                 </p>
                 <div class="box-wrapper">
                     <div v-for="(data, idx) in state.severityData"
@@ -367,7 +367,7 @@ defineExpose<WidgetExpose>({
 </template>
 
 <style lang="postcss" scoped>
-.total-failure-and-severity {
+.total-fail-findings-status {
     .data-container {
         .summary-wrapper {
             display: flex;
