@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { vIntersectionObserver } from '@vueuse/components';
 import type { ComponentPublicInstance } from 'vue';
 import {
-    reactive, ref, watch, computed, toRef,
+    reactive, ref, watch, computed, toRef, onBeforeUnmount,
 } from 'vue';
 
-import {
-    debounce, isEmpty, isEqual,
-} from 'lodash';
+import { PDataLoader } from '@spaceone/design-system';
+import { debounce } from 'lodash';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -45,9 +43,10 @@ const dashboardDetailState = dashboardDetailStore.$state;
 
 const allReferenceStore = useAllReferenceStore();
 
-const widgetRef = ref<Array<WidgetComponent|null>>([]);
 const state = reactive({
-    initiatedWidgetMap: {} as Record<string, boolean>,
+    mountedWidgetMap: {} as Record<string, boolean>,
+    intersectedWidgetMap: {} as Record<string, boolean>,
+    isAllWidgetsMounted: computed(() => Object.values(state.mountedWidgetMap).every((d) => d)),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
 });
 
@@ -64,19 +63,50 @@ const { reformedWidgetInfoList } = useWidgetReformer({
 /* widget loading */
 const getWidgetLoading = (widgetKey: string) => {
     if (!dashboardDetailStore.isAllVariablesInitialized) return true;
-    if (!state.initiatedWidgetMap[widgetKey]) return true;
+    if (!state.isAllWidgetsMounted) return true;
+    if (!state.intersectedWidgetMap[widgetKey]) return true;
     if (widgetViewState.targetWidget?.widget_key === widgetKey) return true;
     if (widgetEditState.targetWidget?.widget_key === widgetKey) return true;
     return false;
 };
 
 
-/* init widgets */
-const handleIntersectionObserver = async ([{ isIntersecting, target }]) => {
-    if (state.initiatedWidgetMap[target.id]) return;
-    if (isIntersecting) {
-        state.initiatedWidgetMap[target.id] = true;
+/* Widget intersection observer */
+const widgetRef = ref<Array<WidgetComponent|null>>([]);
+let widgetObserverMap: Record<string, IntersectionObserver> = {};
+watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
+    if (widgetObserverMap) {
+        Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
+        widgetObserverMap = {};
     }
+
+    if (!allMounted) return;
+
+    widgetRefs.forEach((widget) => {
+        if (!widget) return;
+        const observer = new IntersectionObserver(handleIntersectionObserver, {
+            threshold: 0.5,
+        });
+        widgetObserverMap[widget.$el.id] = observer;
+        observer.observe(widget.$el);
+    });
+});
+onBeforeUnmount(() => {
+    Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
+});
+// eslint-disable-next-line no-undef
+const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isIntersecting, target }], observer) => {
+    if (isIntersecting) {
+        if (state.isAllWidgetsMounted) {
+            state.intersectedWidgetMap[target.id] = true;
+            observer.unobserve(target);
+        }
+    }
+};
+
+/* Widget event handlers */
+const handleWidgetMounted = (widgetKey: string) => {
+    state.mountedWidgetMap[widgetKey] = true;
 };
 const handleWidgetInitiated = (widgetKey: string, data: any) => {
     dashboardDetailStore.$patch((_state) => {
@@ -111,36 +141,34 @@ const handleClickWidgetExpand = (widget: ReformedWidgetInfo) => {
     }
 };
 
-
+/* init states */
 watch(reformedWidgetInfoList, (widgetInfoList) => {
     if (!Array.isArray(widgetInfoList)) return;
-    const initiatedWidgetMap = {};
+
+    const mountedWidgetMap = {};
+    const intersectedWidgetMap = {};
+    const widgetDataMap = {};
     widgetInfoList.forEach((widget) => {
-        initiatedWidgetMap[widget.widget_key] = state.initiatedWidgetMap[widget.widget_key];
+        mountedWidgetMap[widget.widget_key] = state.mountedWidgetMap[widget.widget_key];
+        intersectedWidgetMap[widget.widget_key] = state.intersectedWidgetMap[widget.widget_key];
+        widgetDataMap[widget.widget_key] = dashboardDetailState.widgetDataMap[widget.widget_key];
     });
-    state.initiatedWidgetMap = initiatedWidgetMap;
+    state.mountedWidgetMap = mountedWidgetMap;
+    state.intersectedWidgetMap = intersectedWidgetMap;
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap = widgetDataMap;
+    });
 }, { immediate: true, deep: true });
 
 
 /* refresh widgets */
-let dashboardChangedTime;
 watch(() => dashboardDetailState.dashboardId, () => {
-    state.initiatedWidgetMap = {};
-    dashboardChangedTime = new Date().getTime();
+    state.mountedWidgetMap = {};
+    state.intersectedWidgetMap = {};
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap = {};
+    });
 });
-watch(() => dashboardDetailState.settings, (dashboardSettings, prevSettings) => {
-    // escape if there is no initiated widget
-    if (isEmpty(state.initiatedWidgetMap)) return;
-
-    // escape if just initiated
-    if (new Date().getTime() - dashboardChangedTime < 300) return;
-
-    // refresh if date range is changed
-    if (!isEqual(dashboardSettings.date_range, prevSettings?.date_range)) {
-        refreshAllWidget();
-    }
-});
-
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.$patch({ loadingWidgets: true });
     const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
@@ -176,10 +204,6 @@ const widgetEditState = reactive({
     targetWidget: null as ReformedWidgetInfo|null,
 });
 const handleConfirmWidgetEditModal = () => {
-    const target = widgetEditState.targetWidget;
-    if (!target) return;
-    const targetWidgetRef = widgetRef.value.find((d) => d?.$el?.id === target.widget_key);
-    targetWidgetRef?.refreshWidget();
     widgetEditState.targetWidget = null;
 };
 
@@ -205,10 +229,6 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
     widgetViewState.visibleModal = visible;
     if (visible) return;
 
-    const target = widgetViewState.targetWidget;
-    if (!target) return;
-    const targetWidgetRef = widgetRef.value.find((d) => d?.$el?.id === target.widget_key);
-    targetWidgetRef?.refreshWidget();
     widgetViewState.targetWidget = null;
 };
 </script>
@@ -217,41 +237,46 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
     <div ref="containerRef"
          class="dashboard-widget-container"
     >
-        <template v-if="!dashboardDetailState.loadingDashboard && dashboardDetailStore.isAllVariablesInitialized">
-            <template v-for="(widget) in reformedWidgetInfoList">
-                <component :is="widget.component"
-                           :id="widget.widget_key"
-                           :key="widget.widget_key"
-                           ref="widgetRef"
-                           v-intersection-observer="handleIntersectionObserver"
-                           :widget-config-id="widget.widget_name"
-                           :widget-key="widget.widget_key"
-                           :title="widget.title"
-                           :options="widget.widget_options"
-                           :inherit-options="widget.inherit_options"
-                           :schema-properties="widget.schema_properties"
-                           :size="widget.size"
-                           :width="widget.width"
-                           :theme="widget.theme"
-                           :edit-mode="props.editMode"
-                           :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
-                           :all-reference-type-info="state.allReferenceTypeInfo"
-                           :disable-refresh-on-variable-change="widgetViewState.visibleModal"
-                           :dashboard-settings="dashboardDetailState.settings"
-                           :dashboard-variables-schema="dashboardDetailState.variablesSchema"
-                           :dashboard-variables="dashboardDetailState.variables"
-                           :loading="getWidgetLoading(widget.widget_key)"
-                           :data="dashboardDetailState.widgetDataMap[widget.widget_key]"
-                           @initiated="handleWidgetInitiated(widget.widget_key, $event)"
-                           @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
-                           @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
-                           @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
-                           @click-edit="handleClickWidgetEdit(widget)"
-                           @click-delete="handleClickDeleteWidget(widget)"
-                           @click-expand="handleClickWidgetExpand(widget)"
-                />
-            </template>
-        </template>
+        <p-data-loader :loading="dashboardDetailState.loadingDashboard && !state.isAllWidgetsMounted"
+                       :data="true"
+                       disable-empty-case
+        >
+            <div class="widgets-wrapper">
+                <template v-for="(widget) in reformedWidgetInfoList">
+                    <component :is="widget.component"
+                               :id="widget.widget_key"
+                               :key="widget.widget_key"
+                               ref="widgetRef"
+                               :widget-config-id="widget.widget_name"
+                               :widget-key="widget.widget_key"
+                               :title="widget.title"
+                               :options="widget.widget_options"
+                               :inherit-options="widget.inherit_options"
+                               :schema-properties="widget.schema_properties"
+                               :size="widget.size"
+                               :width="widget.width"
+                               :theme="widget.theme"
+                               :edit-mode="props.editMode"
+                               :error-mode="props.editMode && dashboardDetailState.widgetValidMap[widget.widget_key] === false"
+                               :all-reference-type-info="state.allReferenceTypeInfo"
+                               :disable-refresh-on-variable-change="widgetViewState.visibleModal"
+                               :dashboard-settings="dashboardDetailState.settings"
+                               :dashboard-variables-schema="dashboardDetailState.variablesSchema"
+                               :dashboard-variables="dashboardDetailState.variables"
+                               :loading="getWidgetLoading(widget.widget_key)"
+                               :data="dashboardDetailState.widgetDataMap[widget.widget_key]"
+                               @mounted="handleWidgetMounted(widget.widget_key)"
+                               @initiated="handleWidgetInitiated(widget.widget_key, $event)"
+                               @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
+                               @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
+                               @click-edit="handleClickWidgetEdit(widget)"
+                               @click-delete="handleClickDeleteWidget(widget)"
+                               @click-expand="handleClickWidgetExpand(widget)"
+                    />
+                </template>
+            </div>
+        </p-data-loader>
         <widget-view-mode-modal :visible="widgetViewState.visibleModal"
                                 :widget-info="widgetViewState.targetWidget"
                                 @update:visible="handleUpdateViewModalVisible"
@@ -279,5 +304,12 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
+    .widgets-wrapper {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 }
 </style>
