@@ -100,7 +100,7 @@ const fetchData = async (): Promise<AnalyzeRawData[]|null> => {
             },
         });
         if (status === 'succeed') return response.results;
-        return [];
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
@@ -134,6 +134,7 @@ const drawChart = (chartData: TreemapChartData[]) => {
 const initWidget = async (data?: AnalyzeRawData[]): Promise<AnalyzeRawData[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
@@ -153,6 +154,7 @@ const refreshWidget = async (): Promise<AnalyzeRawData[]> => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -179,7 +181,7 @@ defineExpose<WidgetExpose<AnalyzeRawData[]>>({
         <div class="cost-map">
             <div class="chart-wrapper">
                 <p-data-loader class="chart-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="state.data"
                                :loader-backdrop-opacity="1"
                                loader-type="skeleton"

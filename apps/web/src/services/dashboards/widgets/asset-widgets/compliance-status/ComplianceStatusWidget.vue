@@ -286,6 +286,7 @@ const redrawChart = () => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -328,7 +329,7 @@ defineExpose<WidgetExpose<Data[]>>({
                 </div>
                 <div class="chart-wrapper">
                     <p-data-loader class="chart-loader"
-                                   :loading="state.loading"
+                                   :loading="props.loading || state.loading"
                                    :data="state.data"
                                    loader-type="skeleton"
                                    :loader-backdrop-opacity="1"

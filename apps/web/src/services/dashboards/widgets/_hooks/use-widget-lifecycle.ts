@@ -1,6 +1,7 @@
 import type { UnwrapRef } from 'vue';
 import {
-    onUnmounted, watch,
+    onBeforeUnmount, onMounted, ref,
+    watch,
 } from 'vue';
 
 import {
@@ -27,6 +28,7 @@ interface UseWidgetLifecycleOptions<T extends WidgetState = WidgetState> {
     props: WidgetProps;
     emit: WidgetEmit;
     widgetState: UnwrapRef<T>;
+    initWidget: (data?: any) => any;
     refreshWidget: () => any;
     disposeWidget?: () => void;
     onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
@@ -37,28 +39,27 @@ export const useWidgetLifecycle = ({
     props,
     emit,
     widgetState,
+    initWidget,
     refreshWidget,
     disposeWidget,
     onCurrencyUpdate,
     onLanguageUpdate,
 }: UseWidgetLifecycleOptions): void => {
+    const initiated = ref(false);
+
     const refreshWidgetAndEmitEvent = () => {
         const newData = refreshWidget();
         emit('refreshed', newData);
     };
 
-    onUnmounted(() => {
-        if (disposeWidget) disposeWidget();
-    });
-
-    watch(() => props.dashboardVariables, (after, before) => {
-        if (props.errorMode || !widgetState.inheritOptions || props.disableRefreshOnVariableChange) return;
+    const stopVariablesWatch = watch(() => props.dashboardVariables, (after, before) => {
+        if (!initiated.value || props.errorMode || !widgetState.inheritOptions || props.disableRefreshOnVariableChange) return;
         const _isRefreshable = checkRefreshableByDashboardVariables(widgetState.inheritOptions, after, before);
         if (_isRefreshable) refreshWidgetAndEmitEvent();
     }, { deep: true });
 
-    watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!props.editMode || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
+    const stopVariablesSchemaWatch = watch(() => props.dashboardVariablesSchema, (after, before) => {
+        if (!initiated.value || props.loading || !props.editMode || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
             || isEqual(after, before) || props.disableRefreshOnVariableChange) return;
 
         const { isWidgetUpdated, isValid, updatedWidgetInfo } = validateWidgetByVariablesSchemaUpdate({
@@ -83,8 +84,20 @@ export const useWidgetLifecycle = ({
         }
     }, { immediate: true, deep: true });
 
+    const stopLoadingWatch = watch(() => props.loading, async (loading) => {
+        if (!loading) {
+            const data = await initWidget(props.data);
+            initiated.value = true;
+            emit('initiated', data);
+        }
+    }, { immediate: true });
+
+    let stopSettingsWatch;
+    let stopCurrencyWatch;
+    let stopLanguageWatch;
+
     if (widgetState.settings) {
-        watch(() => widgetState.settings, (current, previous) => {
+        stopSettingsWatch = watch(() => widgetState.settings, (current, previous) => {
             if (!current || !previous || props.disableRefreshOnVariableChange) return;
             if (current.date_range.start !== previous.date_range.start || current.date_range.end !== previous.date_range.end) {
                 refreshWidgetAndEmitEvent();
@@ -93,7 +106,7 @@ export const useWidgetLifecycle = ({
     }
 
     if (onCurrencyUpdate) {
-        watch(() => widgetState.currency, (current, previous) => {
+        stopCurrencyWatch = watch(() => widgetState.currency, (current, previous) => {
             if (current !== previous) {
                 onCurrencyUpdate(current, previous);
             }
@@ -102,13 +115,27 @@ export const useWidgetLifecycle = ({
 
     if (onLanguageUpdate) {
         try {
-            watch(() => i18n.locale, async () => {
+            stopLanguageWatch = watch(() => i18n.locale, async () => {
                 onLanguageUpdate();
             });
         } catch (e) {
             ErrorHandler.handleError(e);
         }
     }
+
+    onBeforeUnmount(() => {
+        if (disposeWidget) disposeWidget();
+        stopVariablesWatch();
+        stopVariablesSchemaWatch();
+        stopLoadingWatch();
+        if (stopSettingsWatch) stopSettingsWatch();
+        if (stopCurrencyWatch) stopCurrencyWatch();
+        if (stopLanguageWatch) stopLanguageWatch();
+    });
+
+    onMounted(() => {
+        emit('mounted');
+    });
 };
 
 const checkRefreshableByDashboardVariables = (

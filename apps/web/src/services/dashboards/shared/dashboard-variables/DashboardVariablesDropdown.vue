@@ -188,7 +188,7 @@ const initVariable = () => {
         }
     }
     dashboardDetailStore.$patch((_state) => {
-        _state.variablesInitMap[props.propertyName] = true;
+        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: true };
     });
 };
 
@@ -200,7 +200,7 @@ watch(visibleMenu, (_visibleMenu) => {
 
 watch(() => state.variableProperty, async (property) => {
     dashboardDetailStore.$patch((_state) => {
-        _state.variablesInitMap[props.propertyName] = false;
+        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: false };
     });
     if (property.options?.type === 'SEARCH_RESOURCE') await loadSearchResourceOptions();
     initVariable();
