@@ -86,9 +86,9 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 schema_properties: mergedWidgetState.schemaProperties,
             };
         },
-        updatedWidgetInfo(): DashboardLayoutWidgetInfo {
+        updatedWidgetInfo(): DashboardLayoutWidgetInfo|undefined {
             if (!this.widgetConfig || !this.widgetConfigId) {
-                throw new Error('widgetConfig does not exist');
+                return undefined;
             }
 
             return getUpdatedWidgetInfo(this.widgetConfig, {

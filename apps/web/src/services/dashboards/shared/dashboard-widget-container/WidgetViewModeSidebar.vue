@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { debouncedWatch } from '@vueuse/core';
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -17,7 +18,7 @@ import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 interface Props {
@@ -44,7 +45,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     nonInheritedOptionModalVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
-        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState.inheritOptions);
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptionsAmongUsedVariables(dashboardDetailState.variablesSchema, widgetFormState.inheritOptions, widgetFormState.widgetOptions);
         return nonInheritedWidgetOptions.length > 0;
     }),
 });
@@ -52,7 +53,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
+    if (widgetFormStore.updatedWidgetInfo) dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
 };
 
 /* Api */
@@ -90,10 +91,10 @@ const handleCloseSidebar = () => {
     emit('close');
 };
 
-watch(() => widgetFormStore.mergedWidgetInfo, async (after, before) => {
+debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
     emit('update:widget-info');
-});
+}, { debounce: 150 });
 </script>
 
 <template>
