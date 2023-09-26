@@ -2,28 +2,28 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptionsForFilter,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptionsForFilter,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-const complianceCheckStatusWidgetConfig: WidgetConfig = {
-    widget_config_id: 'complianceCheckStatus',
+const totalFailFindingsStatusWidgetConfig: WidgetConfig = {
+    widget_config_id: 'totalFailFindingsStatus',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/compliance-check-status/ComplianceCheckStatusWidget.vue'),
+        component: import('@/services/dashboards/widgets/asset-widgets/total-fail-findings-status/TotalFailFindingsStatusWidget.vue'),
     }),
-    title: 'Compliance Check Status',
+    title: 'Total Fail Findings Status',
     labels: ['Asset'],
     description: {
-        translation_id: 'DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.DESC',
-        preview_image: 'widget-img_complianceCheckStatus--thumbnail.png',
+        translation_id: 'DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.DESC',
+        preview_image: 'widget-img_totalFailFindingsStatus--thumbnail.png',
     },
     scopes: ['WORKSPACE'],
     theme: {
-        inherit: false,
+        inherit: true,
+        inherit_count: 1,
     },
-    sizes: ['md'],
+    sizes: ['lg'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
     },
     inherit_options: {
         ...getWidgetInheritOptionsForFilter(
@@ -60,4 +60,4 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
     },
 };
 
-export default complianceCheckStatusWidgetConfig;
+export default totalFailFindingsStatusWidgetConfig;

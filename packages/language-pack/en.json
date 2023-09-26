@@ -1472,13 +1472,10 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "Displays the cost trend of cloud resources or the status of server, database, storage usage."
 			},
-			"COMPLIANCE_CHECK_STATUS": {
-				"CHECKED_SERVICE_ACCOUNT": "Checked service account",
-				"COMPLIANCE_SCORE": "Compliance score",
+			"COMPLIANCE_STATUS": {
 				"DESC": "Displays an overall status of compliance Pass/Fail during the selected period.",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
-				"MORE_THAN_PREV_MONTH": "more than previous month",
-				"TOTAL_COMPLIANCE_NUMBER": "Total compliance number"
+				"MORE_THAN_PREV_MONTH": "more than previous month"
 			},
 			"COST_BY_REGION": {
 				"DESC": "Displays the total costs by Region for the selected period. "
@@ -1535,13 +1532,10 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
 			},
-			"TOTAL_FAILURE_AND_SEVERITY": {
+			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "Displays the count, rate, and severity of compliance failures observed during the selected period.",
-				"FAILURE_RATE": "Failure rate",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
-				"MORE_THAN_PREV_MONTH": "more than previous month",
-				"SEVERITY": "Severity",
-				"TOTAL_FAILURE_COUNT": "Total failure count"
+				"MORE_THAN_PREV_MONTH": "more than previous month"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group By' option."

@@ -1472,13 +1472,10 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
-			"COMPLIANCE_CHECK_STATUS": {
-				"CHECKED_SERVICE_ACCOUNT": "確認されたサービスアカウント",
-				"COMPLIANCE_SCORE": "コンプライアンススコア",
+			"COMPLIANCE_STATUS": {
 				"DESC": "選択した期間中のコンプライアンスのPass/Failの全体的な状態を表示するウィジェット",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
-				"MORE_THAN_PREV_MONTH": "前月よりも多い",
-				"TOTAL_COMPLIANCE_NUMBER": "総コンプライアンス数"
+				"MORE_THAN_PREV_MONTH": "前月よりも多い"
 			},
 			"COST_BY_REGION": {
 				"DESC": "選択された期間のRegion別コスト合計を表示します。"
@@ -1535,13 +1532,10 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
 			},
-			"TOTAL_FAILURE_AND_SEVERITY": {
+			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット",
-				"FAILURE_RATE": "Failure率",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
-				"MORE_THAN_PREV_MONTH": "前月よりも多い",
-				"SEVERITY": "重要度",
-				"TOTAL_FAILURE_COUNT": "合計の failure 数"
+				"MORE_THAN_PREV_MONTH": "前月よりも多い"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "選択した期間中のコンプライアンスのPass/Fail findingsのトレンドを'Group By'オプションで集計して表示するウィジェット"
