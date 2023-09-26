@@ -1,5 +1,5 @@
 import {
-    computed, nextTick, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, nextTick, onMounted, onUnmounted, reactive, ref, toRefs, watch,
 } from 'vue';
 import type { Ref } from 'vue';
 import type Vue from 'vue';
@@ -12,23 +12,12 @@ interface UseContextMenuFixedStyleOptions {
     useFixedMenuStyle?: Ref<boolean|undefined> | boolean;
     visibleMenu: Ref<boolean|undefined>;
     targetRef?: Ref<Vue|HTMLElement|null>;
+    position?: string;
 }
 
-const isScrollable = (ele: Element) => {
-    const hasScrollableContent = ele.scrollHeight > ele.clientHeight;
-
-    const overflowYStyle = window.getComputedStyle(ele).overflowY;
-    const isOverflowHidden = overflowYStyle.indexOf('hidden') !== -1;
-
-    return hasScrollableContent && !isOverflowHidden;
-};
-
-const getScrollableParent = (ele?: Element|null): Element => {
-    if (!ele || ele === document.body) return document.body;
-    return isScrollable(ele) ? ele : getScrollableParent(ele.parentElement);
-};
-
-export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targetRef }: UseContextMenuFixedStyleOptions) => {
+export const useContextMenuFixedStyle = ({
+    useFixedMenuStyle, visibleMenu, targetRef, position,
+}: UseContextMenuFixedStyleOptions) => {
     const state = reactive({
         useFixedMenuStyle: useFixedMenuStyle ?? false,
         visibleMenu,
@@ -73,6 +62,12 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targe
             else contextMenuStyle.bottom = `${targetRects.height}px`;
         }
 
+        if (state.useFixedMenuStyle) {
+            console.log(state.useFixedMenuStyle, position, targetRects);
+            if (position === 'left') contextMenuStyle.left = `${targetRects.left}px`;
+            else if (position === 'right') contextMenuStyle.right = `${window.innerWidth - targetRects.right}px`;
+        }
+
         contextMenuFixedStyleState.contextMenuStyle = contextMenuStyle;
     };
 
@@ -86,18 +81,6 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targe
             setStyleOfContextMenu(targetElement);
         }
     }, { immediate: true });
-
-    let scrollParent: Element|undefined;
-    watch([() => contextMenuFixedStyleState.targetElement, () => state.useFixedMenuStyle], ([targetElement, _useFixedMenuStyle]) => {
-        if (_useFixedMenuStyle && targetElement) {
-            scrollParent = getScrollableParent(targetElement.parentElement);
-            if (scrollParent) {
-                scrollParent.addEventListener('scroll', hideMenu);
-            }
-        } else if (scrollParent) {
-            scrollParent.removeEventListener('scroll', hideMenu);
-        }
-    });
 
     const handleWindowResize = () => {
         if (state.useFixedMenuStyle) hideMenu();
@@ -118,6 +101,27 @@ export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu, targe
 
     onMounted(() => {
         observer.observe(contextMenuFixedStyleState.targetElement);
+    });
+
+    const prevX = ref(0);
+    const prevY = ref(0);
+    const observeElementChanges = () => {
+        if (!state.useFixedMenuStyle) return;
+
+        const { x, y } = contextMenuFixedStyleState.targetElement.getBoundingClientRect();
+
+        if (x !== prevX.value || y !== prevY.value) {
+            hideMenu();
+        }
+
+        prevX.value = x;
+        prevY.value = y;
+
+        requestAnimationFrame(observeElementChanges);
+    };
+
+    onMounted(() => {
+        observeElementChanges();
     });
 
     return {
