@@ -1,16 +1,12 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -33,7 +29,6 @@ interface Props {
     requestType: RequestType;
     selectedQuerySetId?: string;
 }
-const costQuerySetFetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
 
 const props = withDefaults(defineProps<Props>(), {
     requestType: REQUEST_TYPE.SAVE,
@@ -67,7 +62,7 @@ const state = reactive({
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
     managedCostQuerySetIdList: [...MANAGED_COST_QUERY_SET_ID_LIST],
-    existingCostQuerySetNameList: [] as string[],
+    existingCostQuerySetNameList: computed(() => costAnalysisPageStore.costQueryList.map((query) => query.name)),
     mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
 });
 
@@ -121,22 +116,6 @@ watch(() => state.proxyVisible, (visible) => {
     }
 });
 
-onMounted(async () => {
-    try {
-        const { status, response } = await costQuerySetFetcher({
-            query: {
-                filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
-                only: ['name'],
-            },
-        });
-        if (status === 'succeed' && response?.results) {
-            state.existingCostQuerySetNameList = response.results.map((query) => query.name);
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.existingCostQuerySetNameList = [];
-    }
-});
 </script>
 
 <template>
