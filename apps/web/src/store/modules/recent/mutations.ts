@@ -60,6 +60,18 @@ export const setDashboardItems = (state: RecentState, recent: RecentConfig[]): v
     state.dashboardItems = recent;
 };
 
+/* Cost Analysis Type */
+export const addCostAnalysisItem = (state: RecentState, recent: RecentConfig): void => {
+    const exist = state.costAnalysisItems.find((d) => d.itemId === recent.itemId);
+    if (exist) {
+        state.costAnalysisItems = state.costAnalysisItems.filter((d) => d.itemId !== recent.itemId);
+    }
+    state.costAnalysisItems.unshift(recent);
+};
+export const setCostAnalysisItems = (state: RecentState, recent: RecentConfig[]): void => {
+    state.costAnalysisItems = recent;
+};
+
 /* All Type */
 export const loadAllItem = (state: RecentState, recent: RecentConfig[]): void => {
     state.allItems = recent;
