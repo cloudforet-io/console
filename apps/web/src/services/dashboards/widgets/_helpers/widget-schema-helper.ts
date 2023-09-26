@@ -1,5 +1,5 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { chain, get, isEmpty } from 'lodash';
+import { chain, get, union, isEmpty } from 'lodash';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
@@ -140,4 +140,13 @@ export const getInitialSchemaProperties = (
             return 9999;
         }) // sort by order and fixedProperties
         .value();
+};
+
+export const getRefinedSchemaProperties = (
+    storedProperties: string[],
+    initialProperties: string[],
+    widgetOptions?: WidgetOptions,
+): string[] => {
+    const optionExistProperties = storedProperties.filter((property) => !!get(widgetOptions, property));
+    return union(initialProperties, optionExistProperties);
 };
