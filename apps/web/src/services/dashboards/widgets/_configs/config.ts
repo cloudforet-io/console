@@ -214,7 +214,7 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
 }
 
 // TODO: replace with NewWidgetProps
-export interface WidgetProps {
+export interface WidgetProps<T = any> {
     widgetConfigId: string;
     title?: string;
     options?: WidgetOptions;
@@ -232,6 +232,8 @@ export interface WidgetProps {
     dashboardSettings?: DashboardSettings;
     dashboardVariablesSchema?: DashboardVariablesSchema;
     dashboardVariables?: DashboardVariables;
+    loading?: boolean;
+    data?: T;
 }
 
 // TODO: remove this after replacing WidgetProps with NewWidgetProps
@@ -249,6 +251,8 @@ export interface NewWidgetProps {
 }
 
 export interface WidgetEmit {
+    (e: 'mounted'): void;
+    (e: 'initiated', data: any): void;
     (e: 'refreshed', data: any): void;
     (e: 'update-widget-info', widgetInfo: Partial<DashboardLayoutWidgetInfo>): void;
     (e: 'update-widget-validation', validation: boolean): void;
