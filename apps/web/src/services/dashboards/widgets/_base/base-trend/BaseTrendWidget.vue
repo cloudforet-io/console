@@ -283,6 +283,7 @@ const handleUpdateThisPage = (_thisPage: number) => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -318,7 +319,7 @@ defineExpose<WidgetExpose<Response>>({
         <div class="data-container">
             <div class="chart-wrapper">
                 <p-data-loader class="chart-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="state.chartData"
                                loader-type="skeleton"
                                disable-empty-case
@@ -330,7 +331,7 @@ defineExpose<WidgetExpose<Response>>({
                     />
                 </p-data-loader>
             </div>
-            <widget-data-table :loading="state.loading"
+            <widget-data-table :loading="props.loading || state.loading"
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
                                :currency="widgetState.currency"

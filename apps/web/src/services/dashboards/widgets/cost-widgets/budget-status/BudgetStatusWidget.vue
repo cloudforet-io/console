@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive,
+    computed, defineExpose, defineProps, reactive,
 } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
@@ -91,7 +91,7 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
-const fetchData = async (): Promise<Response> => {
+const fetchData = async (): Promise<Response|undefined> => {
     try {
         apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
@@ -133,21 +133,20 @@ const fetchData = async (): Promise<Response> => {
             },
         });
         if (status === 'succeed') return response;
-        return { more: false, results: [] };
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
         return { more: false, results: [] };
     }
 };
 
-const initWidget = async (data?: Response): Promise<Response> => {
+const initWidget = async (data?: Response): Promise<Response|undefined> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (): Promise<Response> => {
-    await nextTick();
+const refreshWidget = async (): Promise<Response|undefined> => {
     state.loading = true;
     state.data = await fetchData();
     state.loading = false;
@@ -156,13 +155,14 @@ const refreshWidget = async (): Promise<Response> => {
 
 useWidgetLifecycle({
     disposeWidget: undefined,
+    initWidget,
     refreshWidget,
     props,
     emit,
     widgetState,
 });
 
-defineExpose<WidgetExpose<Response>>({
+defineExpose<WidgetExpose<Response|undefined>>({
     initWidget,
     refreshWidget,
 });
@@ -173,7 +173,7 @@ defineExpose<WidgetExpose<Response>>({
                   class="budget-status-widget"
                   v-on="widgetFrameEventHandlers"
     >
-        <p-data-loader :loading="state.loading"
+        <p-data-loader :loading="props.loading || state.loading"
                        class="chart-wrapper"
                        :loader-backdrop-opacity="1"
         >

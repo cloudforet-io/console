@@ -174,6 +174,7 @@ const handleUpdateThisPage = (_thisPage: number) => {
 
 useWidgetLifecycle({
     disposeWidget: undefined,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -191,7 +192,7 @@ defineExpose<WidgetExpose<Response>>({
                   class="budget-usage-by-target"
                   v-on="widgetFrameEventHandlers"
     >
-        <widget-data-table :loading="state.loading"
+        <widget-data-table :loading="props.loading || state.loading"
                            :fields="state.tableFields"
                            :items="state.tableItems"
                            :currency="widgetState.currency"
