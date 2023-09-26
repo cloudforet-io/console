@@ -49,7 +49,7 @@ const props = defineProps<{
     getVersionsOnPluginIdChange?: boolean;
 }>();
 
-const emit = defineEmits<{(event: 'update:isVersionValid', value: boolean): void;
+const emit = defineEmits<{(event: 'update-valid', value: boolean): void;
 }>();
 
 const state = reactive({
@@ -97,7 +97,7 @@ const handleClickAutoUpgrade = () => {
 };
 
 watch(() => state.isVersionValid, (value) => {
-    emit('update:isVersionValid', value);
+    emit('update-valid', value);
 }, { immediate: true });
 
 // get version list when pluginId changed and init selected version

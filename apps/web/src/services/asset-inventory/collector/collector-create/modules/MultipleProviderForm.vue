@@ -38,7 +38,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PFieldTitle, PRadioGroup, PRadio, PSelectDropdown,
@@ -56,6 +58,7 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
+const emit = defineEmits<{(event: 'update-valid', value: boolean): void; }>();
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -67,6 +70,7 @@ const state = reactive({
         }));
     }),
     selectedProvider: computed(() => collectorFormState.provider),
+    isProviderValid: computed(() => !!collectorFormState.provider),
 });
 
 const handleChangeProvider = (provider) => {
@@ -74,9 +78,15 @@ const handleChangeProvider = (provider) => {
 };
 
 
-(() => {
-    collectorFormStore.setProvider(state.providerList[0]?.name);
-})();
+watch(() => state.providerList, (providerList) => {
+    if (providerList.length) {
+        collectorFormStore.setProvider(providerList[0]?.name);
+    }
+}, { immediate: true });
+
+watch(() => state.isProviderValid, (isValid) => {
+    emit('update-valid', isValid);
+}, { immediate: true });
 
 </script>
 
