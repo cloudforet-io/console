@@ -172,7 +172,8 @@ watch(() => props.visible, async (visible) => {
                 </div>
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <dashboard-variables-select-dropdown :is-manageable="false"
+                        <dashboard-variables-select-dropdown :is-manageable="state.hasManagePermission"
+                                                             disable-more-button
                                                              disable-save-button
                                                              :origin-variables="state.variablesSnapshot"
                                                              :origin-variables-schema="state.variableSchemaSnapshot"
