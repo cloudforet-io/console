@@ -58,7 +58,7 @@ import {
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
-const emit = defineEmits<{(event: 'update:is-provider-valid', value: boolean): void; }>();
+const emit = defineEmits<{(event: 'update-valid', value: boolean): void; }>();
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -85,7 +85,7 @@ watch(() => state.providerList, (providerList) => {
 }, { immediate: true });
 
 watch(() => state.isProviderValid, (isValid) => {
-    emit('update:is-provider-valid', isValid);
+    emit('update-valid', isValid);
 }, { immediate: true });
 
 </script>
