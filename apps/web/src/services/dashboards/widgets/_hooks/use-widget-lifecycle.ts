@@ -85,7 +85,7 @@ export const useWidgetLifecycle = ({
     }, { immediate: true, deep: true });
 
     const stopLoadingWatch = watch(() => props.loading, async (loading) => {
-        if (!loading) {
+        if (!initiated.value && !loading) {
             const data = await initWidget(props.data);
             initiated.value = true;
             emit('initiated', data);
