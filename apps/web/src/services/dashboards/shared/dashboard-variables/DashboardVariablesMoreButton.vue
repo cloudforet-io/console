@@ -85,7 +85,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboa
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
-    isManageable: boolean;
+    isManageable?: boolean;
     disabled?: boolean;
 }
 
