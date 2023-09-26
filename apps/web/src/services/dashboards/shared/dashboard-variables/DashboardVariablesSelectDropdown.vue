@@ -14,7 +14,7 @@
                 />
             </div>
         </template>
-        <dashboard-variables-more-button :is-manageable="props.isManageable"
+        <dashboard-variables-more-button v-if="props.isManageable"
                                          :disabled="state.saveLoading"
         />
         <p-text-button style-type="highlight"
