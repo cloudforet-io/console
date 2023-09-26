@@ -61,6 +61,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'cost_analysis.DataSource',
+                default_path: 0,
             },
             required: true,
         },

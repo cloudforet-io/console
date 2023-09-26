@@ -9,7 +9,9 @@ import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep, debounce, flattenDeep } from 'lodash';
+import {
+    cloneDeep, debounce, flattenDeep, get,
+} from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -177,11 +179,12 @@ const loadSearchResourceOptions = async () => {
 };
 
 const initVariable = () => {
-    const variable = dashboardDetailState.variables[props.propertyName];
-    if (state.variableProperty?.required && !variable) {
-        if (state.variableProperty?.options?.type === 'SEARCH_RESOURCE') {
-            const firstOption = state.searchResourceOptions[0];
-            if (firstOption) changeVariables([{ name: firstOption.key, label: firstOption.name }]);
+    const variableSchema = dashboardDetailState.variablesSchema.properties[props.propertyName];
+    if ((variableSchema.options as SearchResourceOptions)?.type === 'SEARCH_RESOURCE') {
+        const path = (variableSchema.options as SearchResourceOptions).default_path;
+        if (path) {
+            const found = get(state.searchResourceOptions, path, undefined);
+            if (found) changeVariables([{ name: found.key, label: found.name }]);
         }
     }
     dashboardDetailStore.$patch((_state) => {
@@ -196,6 +199,9 @@ watch(visibleMenu, (_visibleMenu) => {
 }, { immediate: true });
 
 watch(() => state.variableProperty, async (property) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesInitMap[props.propertyName] = false;
+    });
     if (property.options?.type === 'SEARCH_RESOURCE') await loadSearchResourceOptions();
     initVariable();
 }, { immediate: true });

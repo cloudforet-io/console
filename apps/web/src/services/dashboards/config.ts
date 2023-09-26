@@ -100,6 +100,7 @@ export interface SearchResourceOptions {
     type: 'SEARCH_RESOURCE';
     resource_type: string;
     resource_key?: string;
+    default_path?: string|number;
 }
 export interface ReferenceResourceOptions {
     type: 'REFERENCE_RESOURCE',
