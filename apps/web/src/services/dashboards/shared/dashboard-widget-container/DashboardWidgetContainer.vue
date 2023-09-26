@@ -31,10 +31,8 @@ type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
 const props = withDefaults(defineProps<{
     editMode?: boolean;
-    reusePreviousData?: boolean;
 }>(), {
     editMode: false,
-    reusePreviousData: false,
 });
 
 
@@ -66,7 +64,6 @@ const getWidgetLoading = (widgetKey: string) => {
     if (!state.isAllWidgetsMounted) return true;
     if (!state.intersectedWidgetMap[widgetKey]) return true;
     if (widgetViewState.targetWidget?.widget_key === widgetKey) return true;
-    if (widgetEditState.targetWidget?.widget_key === widgetKey) return true;
     return false;
 };
 
@@ -74,7 +71,7 @@ const getWidgetLoading = (widgetKey: string) => {
 /* Widget intersection observer */
 const widgetRef = ref<Array<WidgetComponent|null>>([]);
 let widgetObserverMap: Record<string, IntersectionObserver> = {};
-watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
+const stopWidgetRefWatch = watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) => {
     if (widgetObserverMap) {
         Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
         widgetObserverMap = {};
@@ -85,13 +82,14 @@ watch([widgetRef, () => state.isAllWidgetsMounted], ([widgetRefs, allMounted]) =
     widgetRefs.forEach((widget) => {
         if (!widget) return;
         const observer = new IntersectionObserver(handleIntersectionObserver, {
-            threshold: 0.5,
+            threshold: 0.25,
         });
         widgetObserverMap[widget.$el.id] = observer;
         observer.observe(widget.$el);
     });
 });
 onBeforeUnmount(() => {
+    stopWidgetRefWatch();
     Object.values(widgetObserverMap).forEach((observer) => observer.disconnect());
 });
 // eslint-disable-next-line no-undef
@@ -107,16 +105,6 @@ const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isInt
 /* Widget event handlers */
 const handleWidgetMounted = (widgetKey: string) => {
     state.mountedWidgetMap[widgetKey] = true;
-};
-const handleWidgetInitiated = (widgetKey: string, data: any) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap[widgetKey] = data;
-    });
-};
-const handleWidgetRefreshed = (widgetKey: string, data: any) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap[widgetKey] = data;
-    });
 };
 const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
@@ -142,56 +130,39 @@ const handleClickWidgetExpand = (widget: ReformedWidgetInfo) => {
 };
 
 /* init states */
-watch(reformedWidgetInfoList, (widgetInfoList) => {
+const stopWidgetInfoWatch = watch(reformedWidgetInfoList, (widgetInfoList) => {
     if (!Array.isArray(widgetInfoList)) return;
 
     const mountedWidgetMap = {};
     const intersectedWidgetMap = {};
-    const widgetDataMap = {};
     widgetInfoList.forEach((widget) => {
         mountedWidgetMap[widget.widget_key] = state.mountedWidgetMap[widget.widget_key];
         intersectedWidgetMap[widget.widget_key] = state.intersectedWidgetMap[widget.widget_key];
-        widgetDataMap[widget.widget_key] = dashboardDetailState.widgetDataMap[widget.widget_key];
     });
     state.mountedWidgetMap = mountedWidgetMap;
     state.intersectedWidgetMap = intersectedWidgetMap;
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap = widgetDataMap;
-    });
-}, { immediate: true, deep: true });
+}, {
+    immediate: true, deep: true,
+});
+onBeforeUnmount(() => {
+    stopWidgetInfoWatch();
+});
 
 
 /* refresh widgets */
-watch(() => dashboardDetailState.dashboardId, () => {
-    state.mountedWidgetMap = {};
-    state.intersectedWidgetMap = {};
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap = {};
-    });
-});
 const refreshAllWidget = debounce(async () => {
     dashboardDetailStore.$patch({ loadingWidgets: true });
     const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
-    const filteredRefs = widgetRef.value.filter((comp) => {
+    widgetRef.value.forEach((comp) => {
         if (!comp || typeof comp.refreshWidget() !== 'function') return false;
         if (!state.initiatedWidgetMap[comp.$el?.id]) return false;
         refreshWidgetPromises.push(comp.refreshWidget);
         return true;
     });
 
-    const results = await Promise.allSettled(refreshWidgetPromises);
+    await Promise.allSettled(refreshWidgetPromises);
 
-    results.forEach((result, idx) => {
-        if (result.status === 'fulfilled') {
-            const widgetKey = filteredRefs[idx]?.$el?.id;
-            if (widgetKey) {
-                dashboardDetailStore.$patch((_state) => {
-                    _state.widgetDataMap[widgetKey] = result.value;
-                });
-            }
-        }
-    });
     dashboardDetailStore.$patch({ loadingWidgets: false });
 }, 150);
 defineExpose({
@@ -203,7 +174,10 @@ const widgetEditState = reactive({
     visibleModal: false,
     targetWidget: null as ReformedWidgetInfo|null,
 });
-const handleConfirmWidgetEditModal = () => {
+const handleUpdateWidgetEditModalVisible = (visible: boolean) => {
+    widgetEditState.visibleModal = visible;
+    if (visible) return;
+
     widgetEditState.targetWidget = null;
 };
 
@@ -264,10 +238,7 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="getWidgetLoading(widget.widget_key)"
-                               :data="dashboardDetailState.widgetDataMap[widget.widget_key]"
                                @mounted="handleWidgetMounted(widget.widget_key)"
-                               @initiated="handleWidgetInitiated(widget.widget_key, $event)"
-                               @refreshed="handleWidgetRefreshed(widget.widget_key, $event)"
                                @update-widget-info="handleUpdateWidgetInfo(widget.widget_key, $event)"
                                @update-widget-validation="handleUpdateValidation(widget.widget_key, $event)"
                                @click-edit="handleClickWidgetEdit(widget)"
@@ -285,8 +256,7 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
                                      :widget-config-id="widgetEditState.targetWidget.widget_name"
                                      :visible="widgetEditState.visibleModal"
                                      :widget-key="widgetEditState.targetWidget.widget_key"
-                                     @update:visible="widgetEditState.visibleModal = $event"
-                                     @confirm="handleConfirmWidgetEditModal"
+                                     @update:visible="handleUpdateWidgetEditModalVisible"
         />
         <delete-modal :visible="widgetDeleteState.visibleModal"
                       :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
