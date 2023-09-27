@@ -24,18 +24,18 @@ import {
 import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-state';
 
 
-interface UseWidgetLifecycleOptions<T extends WidgetState = WidgetState> {
+interface UseWidgetLifecycleOptions<Data> {
     props: WidgetProps;
     emit: WidgetEmit;
-    widgetState: UnwrapRef<T>;
-    initWidget: (data?: any) => any;
-    refreshWidget: () => any;
+    widgetState: UnwrapRef<WidgetState>;
+    initWidget: (data?: Data) => Promise<Data>;
+    refreshWidget: () => Promise<Data>;
     disposeWidget?: () => void;
     onCurrencyUpdate?: (current?: Currency, previous?: Currency) => void|Promise<void>;
     onLanguageUpdate?: () => void;
 }
 
-export const useWidgetLifecycle = ({
+export const useWidgetLifecycle = <Data = any>({
     props,
     emit,
     widgetState,
@@ -44,7 +44,7 @@ export const useWidgetLifecycle = ({
     disposeWidget,
     onCurrencyUpdate,
     onLanguageUpdate,
-}: UseWidgetLifecycleOptions): void => {
+}: UseWidgetLifecycleOptions<Data>): void => {
     const initiated = ref(false);
 
     const refreshWidgetAndEmitEvent = () => {
@@ -85,7 +85,7 @@ export const useWidgetLifecycle = ({
     }, { immediate: true, deep: true });
 
     const stopLoadingWatch = watch(() => props.loading, async (loading) => {
-        if (!loading) {
+        if (!initiated.value && !loading) {
             const data = await initWidget(props.data);
             initiated.value = true;
             emit('initiated', data);

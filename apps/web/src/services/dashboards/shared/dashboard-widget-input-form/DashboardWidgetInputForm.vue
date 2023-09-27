@@ -18,7 +18,6 @@ import { i18n } from '@/translations';
 
 import {
     getDefaultWidgetFormData,
-    getVariableKeyFromWidgetSchemaProperty,
 } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import {
     useReferenceStore,
@@ -39,6 +38,9 @@ import {
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+import {
+    getVariableKeyFromWidgetSchemaProperty,
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     InheritOptions,
@@ -81,10 +83,10 @@ const state = reactive({
         .map(([propertyName]) => propertyName)),
     inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
         widgetFormState.schemaProperties,
-        widgetFormState.inheritOptions,
+        widgetFormStore.updatedWidgetInfo?.inherit_options ?? {}, // use updated inherit options not to show error message when updating widget info
         widgetFormStore.widgetConfig?.options_schema?.schema,
         dashboardDetailState.variablesSchema,
-        i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string,
+        i18n.t,
     )),
     isFocused: false,
     //

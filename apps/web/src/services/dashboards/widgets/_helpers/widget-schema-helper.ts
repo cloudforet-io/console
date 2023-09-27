@@ -1,5 +1,5 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { chain } from 'lodash';
+import { chain, get, isEmpty } from 'lodash';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
@@ -9,7 +9,7 @@ import type {
     WidgetFiltersSchemaProperty,
     WidgetOptionsSchemaProperty,
     InheritOptions,
-    WidgetConfig, WidgetOptionsSchema,
+    WidgetConfig, WidgetOptionsSchema, WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -87,6 +87,7 @@ export const getWidgetInheritOptions = (...properties: WidgetOptionsSchemaProper
     });
     return inheritOptions;
 };
+
 export const getWidgetInheritOptionsForFilter = (...properties: WidgetFilterKey[]): InheritOptions => {
     const inheritOptions: InheritOptions = {};
     properties.forEach((propertyName) => {
@@ -98,13 +99,22 @@ export const getWidgetInheritOptionsForFilter = (...properties: WidgetFilterKey[
     return inheritOptions;
 };
 
-export const getNonInheritedWidgetOptions = (widgetInheritOptions?: InheritOptions): string[] => {
-    if (!widgetInheritOptions) return [];
-    const enabledInheritedOptions: string[] = Object.entries(widgetInheritOptions).filter(([, v]) => v.enabled).map(([k]) => k);
+export const getNonInheritedWidgetOptionsAmongUsedVariables = (
+    variablesSchema: DashboardVariablesSchema,
+    widgetInheritOptions: InheritOptions = {},
+    widgetOptions: WidgetOptions = {},
+): string[] => {
     const nonInheritedOptions: string[] = [];
-    Object.keys(widgetInheritOptions).forEach((property) => {
-        if (!enabledInheritedOptions.includes(property)) nonInheritedOptions.push(property);
-    });
+    const enabledInheritedOptions = Object.entries(widgetInheritOptions).filter(([, inheritOption]) => inheritOption?.enabled).map(([key, inheritOption]) => inheritOption?.variable_info?.key ?? key);
+    if (variablesSchema?.properties) {
+        Object.entries(variablesSchema.properties).forEach(([key, property]) => {
+            const optionName = getWidgetOptionName(key);
+            if (property.use
+                && !enabledInheritedOptions.includes(optionName)
+                && !isEmpty(get(widgetOptions, optionName))
+            ) nonInheritedOptions.push(optionName);
+        });
+    }
     return nonInheritedOptions;
 };
 

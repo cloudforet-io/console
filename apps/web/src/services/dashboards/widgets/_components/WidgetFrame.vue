@@ -364,7 +364,6 @@ const handleClickViewModeButton = () => {
     .edit-mode-cover {
         position: absolute;
         width: 100%;
-        height: 100%;
         padding: 0.75rem;
         .button-group {
             @apply flex gap-2 flex-wrap justify-end;

@@ -1,10 +1,10 @@
 import { cloneDeep } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { PartialDashboardLayoutWidgetInfo } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import {
     getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
-import type { PartialDashboardLayoutWidgetInfo } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import type { InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterKey, isWidgetFilterKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
