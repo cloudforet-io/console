@@ -16,7 +16,7 @@ import {
     getRefinedWidgetOptions,
 } from '@/services/dashboards/widgets/_helpers/widget-options-helper';
 import {
-    getInitialSchemaProperties,
+    getInitialSchemaProperties, getRefinedSchemaProperties,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 
@@ -85,7 +85,11 @@ export function useMergedWidgetState(
             };
         }),
         title: computed<string>(() => optionState.title ?? state.widgetConfig?.title ?? ''),
-        schemaProperties: computed<string[]>(() => optionState.schemaProperties ?? getInitialSchemaProperties(state.widgetConfig, optionState.dashboardVariablesSchema)),
+        schemaProperties: computed<string[]>(() => {
+            const initialSchemaProperties = getInitialSchemaProperties(state.widgetConfig, optionState.dashboardVariablesSchema);
+            if (!optionState.schemaProperties) return initialSchemaProperties;
+            return getRefinedSchemaProperties(optionState.schemaProperties, initialSchemaProperties, optionState.widgetOptions);
+        }),
     }) as UnwrapRef<MergedWidgetState>;
 
     return state;
