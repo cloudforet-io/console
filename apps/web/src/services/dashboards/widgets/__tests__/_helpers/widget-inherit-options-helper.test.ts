@@ -124,4 +124,38 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
             },
         });
     });
+    it('should be disabled if variable is not used even if it is enabled in both widget config and stored data', () => {
+        const widgetConfig = cloneDeep(widgetConfigMock);
+        const variablesSchema = cloneDeep(variablesSchemaMock);
+        if (widgetConfig.inherit_options) {
+            widgetConfig.inherit_options['filters.project'] = {
+                enabled: true,
+                variable_info: {
+                    key: 'project',
+                },
+            };
+        }
+        const storedInheritOptions: InheritOptions = {
+            'filters.project': {
+                enabled: true,
+                variable_info: {
+                    key: 'project',
+                },
+            },
+        };
+        variablesSchema.properties.project.use = false;
+
+        const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
+        expect(refined).toEqual({
+            'filters.provider': {
+                enabled: true,
+                variable_info: {
+                    key: 'provider',
+                },
+            },
+            'filters.project': {
+                enabled: false,
+            },
+        });
+    });
 });

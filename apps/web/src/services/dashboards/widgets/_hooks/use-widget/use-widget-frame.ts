@@ -12,7 +12,7 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { MergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
 
 export interface WidgetFrameOptions {
@@ -31,7 +31,8 @@ export const useWidgetFrame = (
         return widgetState.widgetConfig.sizes[0];
     });
     const nonInheritOptionsTooltipText = computed<string | undefined>(() => {
-        const nonInheritOptions = getNonInheritedWidgetOptions(widgetState.inheritOptions);
+        if (!props.dashboardVariablesSchema) return undefined;
+        const nonInheritOptions = getNonInheritedWidgetOptionsAmongUsedVariables(props.dashboardVariablesSchema, widgetState.inheritOptions, widgetState.options);
         if (!nonInheritOptions.length) return undefined;
 
         // TODO: widget option name must be changed to readable name.
