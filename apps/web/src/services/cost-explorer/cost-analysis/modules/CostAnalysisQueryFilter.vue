@@ -168,6 +168,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                                    :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
                                    style-type="rounded"
                                    :selected="costAnalysisPageState.granularity"
+                                   class="granularity-dropdown"
                                    @select="handleSelectGranularity"
                 />
                 <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
@@ -265,6 +266,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            .granularity-dropdown {
+                min-width: unset;
+            }
         }
         .right-part {
             @apply relative;
