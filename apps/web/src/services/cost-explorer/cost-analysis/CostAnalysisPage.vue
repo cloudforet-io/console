@@ -88,6 +88,10 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
         & + .content-wrapper {
             margin-top: -12.375rem;
         }
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 }
 </style>
