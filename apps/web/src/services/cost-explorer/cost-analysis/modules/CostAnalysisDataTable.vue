@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PSelectDropdown,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
@@ -34,6 +34,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DATE_FORMAT } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
+import type { SpecificFilter } from '@/services/cost-explorer/lib/config';
 import {
     GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, ADDITIONAL_GROUP_BY, ADDITIONAL_GROUP_BY_ITEM_MAP,
 } from '@/services/cost-explorer/lib/config';
@@ -397,6 +398,10 @@ watch(
     { immediate: true, deep: true },
 );
 
+const handleUpdateSpecificFilterSelected = (selected: SpecificFilter) => {
+    state.specificFilterSelected = selected;
+};
+
 // LOAD REFERENCE STORE
 (async () => {
     await Promise.allSettled([
@@ -436,10 +441,8 @@ watch(
             </template>
             <template #toolbox-left>
                 <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
-                <p-select-dropdown v-if="state.isIncludedUsageTypeInGroupBy"
-                                   :selected.sync="state.selected"
-                                   :menu="state.headerMenuItems"
-                                   style-type="transparent"
+                <specific-filter-selector v-if="state.isIncludedUsageTypeInGroupBy"
+                                          @update-specific-filter="handleUpdateSpecificFilterSelected"
                 />
             </template>
             <template #th-format="{field}">
