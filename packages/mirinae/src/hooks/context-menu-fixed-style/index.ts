@@ -12,7 +12,7 @@ interface UseContextMenuFixedStyleOptions {
     useFixedMenuStyle?: Ref<boolean|undefined> | boolean;
     visibleMenu: Ref<boolean|undefined>;
     targetRef?: Ref<Vue|HTMLElement|null>;
-    position?: string;
+    position?: 'left' | 'right';
 }
 
 export const useContextMenuFixedStyle = ({

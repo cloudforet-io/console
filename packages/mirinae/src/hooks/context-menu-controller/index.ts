@@ -39,7 +39,7 @@ export interface UseContextMenuControllerOptions {
     pageSize?: Ref<number|undefined>|number;
 
     /* In the context of 'useFixedStyle,' to adjust the position of the context menu relative to the target, the default value is 'left.'  */
-    position?: string;
+    position?: 'left' | 'right';
 }
 
 
