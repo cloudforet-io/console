@@ -200,5 +200,6 @@ const handleClickResetFilters = () => {
         so it is manually forced to be specified.
     */
     top: initial !important;
+    left: initial !important;
 }
 </style>
