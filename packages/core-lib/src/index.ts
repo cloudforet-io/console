@@ -2,7 +2,9 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { isEmpty, flatten, sortBy } from 'lodash';
+import {
+    isEmpty, flatten, sortBy, isEqualWith, isEqual, union,
+} from 'lodash';
 
 dayjs.extend(tz);
 dayjs.extend(utc);
@@ -64,6 +66,18 @@ export const isNotEmpty = (value): boolean => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
     return !isEmpty(value); // String, Object
+};
+
+export const isObjectEqual = (objValue: object, othValue: object) => {
+    const _isEqual = isEqual(objValue, othValue);
+    if (_isEqual) return true;
+    const keys = union(Object.keys(objValue), Object.keys(othValue));
+    return isEqualWith(objValue, othValue, (a, b) => keys.every((key) => {
+        if (typeof a[key] === 'object' && typeof b[key] === 'object') {
+            return isObjectEqual(a[key], b[key]);
+        }
+        return isEqual(a[key], b[key]);
+    }));
 };
 
 export const tagsToObject = (tags: Array<{ key: string; value: string }>): Record<string, string> => {
