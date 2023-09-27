@@ -1,5 +1,7 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { chain, get, union, isEmpty } from 'lodash';
+import {
+    chain, get, union, isEmpty,
+} from 'lodash';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
