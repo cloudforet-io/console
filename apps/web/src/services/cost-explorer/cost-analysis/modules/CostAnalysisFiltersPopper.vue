@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PFilterableDropdown, PTextButton,
+    PSelectDropdown, PTextButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type {
@@ -149,10 +149,10 @@ const handleClickResetFilters = () => {
 
 <template>
     <div class="cost-analysis-filters-popper">
-        <p-filterable-dropdown
+        <p-select-dropdown
             v-for="groupBy in state.enabledFilters"
             :key="`filters-dropdown-${groupBy.name}`"
-            :group-by="groupBy.name"
+            is-filterable
             :handler="menuHandler(groupBy.name)"
             :selected="state.selectedFilterableItemsMap[groupBy.name] ?? []"
             :loading="state.loading"
@@ -160,6 +160,7 @@ const handleClickResetFilters = () => {
             style-type="rounded"
             appearance-type="badge"
             show-select-marker
+            use-fixed-menu-style
             selection-highlight
             :selection-label="groupBy.label"
             :show-delete-all-button="false"
@@ -180,24 +181,24 @@ const handleClickResetFilters = () => {
 
 <style lang="postcss" scoped>
 .cost-analysis-filters-popper {
-    /* custom design-system component - p-filterable-dropdown */
-    :deep(.p-filterable-dropdown) {
-        display: inline-block;
-        width: auto;
-        max-width: 22.5rem;
-        padding: 0.25rem;
-        .dropdown-button {
-            height: 1.5rem;
-        }
-        .dropdown-context-menu {
-            min-width: 12rem;
-        }
-    }
+    @apply flex items-center flex-wrap;
+    flex: 1;
+    gap: 0.5rem;
 
     .reset-button {
         display: inline-block;
         vertical-align: middle;
         padding: 0.5rem 0;
     }
+}
+
+/* custom design-system component - p-context-menu */
+:deep(.p-context-menu) {
+    /*
+        CAUTION:
+        When the parent has a specific style attribute called 'transform,' 'fixed' behaves like 'absolute,' causing the context-menu's top position not to work correctly,
+        so it is manually forced to be specified.
+    */
+    top: initial !important;
 }
 </style>

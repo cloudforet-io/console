@@ -58,7 +58,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 <template>
     <div class="cost-analysis-page">
         <cost-analysis-header />
-        <cost-analysis-query-filter />
+        <cost-analysis-query-filter class="cost-analysis-query-filter-wrapper" />
         <div class="content-wrapper">
             <div class="overflow-wrapper">
                 <cost-analysis-group-by-filter />
@@ -77,6 +77,16 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
         padding: 0 1rem 2.5rem 1rem;
         .overflow-wrapper {
             min-width: 40rem;
+        }
+    }
+}
+
+@screen tablet {
+    .cost-analysis-query-filter-wrapper {
+        @apply overflow-x-scroll;
+        height: 15.5rem;
+        & + .content-wrapper {
+            margin-top: -12.375rem;
         }
     }
 }

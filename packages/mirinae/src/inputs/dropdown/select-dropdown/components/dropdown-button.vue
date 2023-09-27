@@ -63,7 +63,7 @@ const {
 });
 
 const handleClickDeleteAll = () => {
-    if (props.selectedItems) {
+    if (props.selectedItems.length > 0) {
         emit('click-delete');
     }
 };
@@ -80,9 +80,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         disabled: props.disabled,
         readonly: props.readonly,
         opened: props.isVisibleMenu,
-        selected: props.selectedItems,
+        selected: props.selectedItems.length > 0,
         'is-fixed-width': props.isFixedWidth,
-        'selection-highlight': props.selectionHighlight && props.selectedItems,
+        'selection-highlight': props.selectionHighlight && props.selectedItems.length > 0,
     }"
     >
         <span v-if="props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -132,6 +132,7 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                             >
                                 <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
                                 <p-badge v-if="displayBadgeValueOnDropdownButton"
+                                         class="selected-item-badge"
                                          :style-type="props.disabled ? 'gray200' : 'blue200'"
                                          :badge-type="props.disabled ? 'solid' : 'subtle'"
                                 >
@@ -199,6 +200,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 gap: 0.25rem;
                 .selected-item-text {
                     @apply font-medium;
+                }
+                .selected-item-badge {
+                    margin-left: 0.25rem;
                 }
                 .tags-wrapper {
                     @apply flex flex-wrap;
