@@ -119,7 +119,10 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
 <template>
     <div class="cost-analysis-group-by-filter">
         <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}:</b>
-        <span class="count-text">{{ state.selectedGroupByItems.length }}/3</span>
+        <p class="count-text">
+            <span class="selected-group-by-items-count">{{ state.selectedGroupByItems.length }}</span>
+            <span>/3</span>
+        </p>
         <p-select-button v-for="defaultGroupByItem in costAnalysisPageStore.defaultGroupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
@@ -157,7 +160,10 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     padding: 1rem 0;
 
     .count-text {
-        @apply text-label-lg text-gray-700;
+        @apply text-label-lg text-gray-500;
+        .selected-group-by-items-count {
+            @apply text-gray-900;
+        }
     }
     .tags-button-wrapper {
         position: relative;
