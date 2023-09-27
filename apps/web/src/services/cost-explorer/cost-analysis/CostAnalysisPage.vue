@@ -84,9 +84,9 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 @screen tablet {
     .cost-analysis-query-filter-wrapper {
         @apply overflow-x-scroll;
-        height: 15.5rem;
+        height: 68.75rem;
         & + .content-wrapper {
-            margin-top: -12.375rem;
+            margin-top: -65.625rem;
         }
 
         &::-webkit-scrollbar {
