@@ -17,8 +17,10 @@ import { store } from '@/store';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -35,6 +37,11 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+});
 
 const keyItemSets: KeyItemSet[] = [{
     title: 'Properties',
@@ -72,7 +79,7 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    searchTags: computed(() => searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags),
+    loading: computed(() => collectorPageState.loading.collectorList),
     items: computed<CollectorItemInfo[]|undefined>(() => {
         const plugins = storeState.plugins;
         return collectorPageState.collectors?.map((d) => {
@@ -217,7 +224,7 @@ onMounted(async () => {
             </template>
         </p-toolbox>
         <p-data-loader :data="state.items"
-                       :loading="collectorPageState.loading.collectorList"
+                       :loading="state.loading"
                        class="collector-list-wrapper"
         >
             <div class="collector-lists">
