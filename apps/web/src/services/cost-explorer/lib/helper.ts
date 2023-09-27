@@ -2,7 +2,8 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import type { SpecificFilter } from '@/services/cost-explorer/lib/config';
+import { GRANULARITY, SPECIFIC_FILTER_MAP } from '@/services/cost-explorer/lib/config';
 import type {
     Period, Granularity,
 } from '@/services/cost-explorer/type';
@@ -24,7 +25,7 @@ export const getPeriodByGranularity = (granularity: Granularity, period: Period)
 };
 
 /* data table field */
-const getDataTableDateFields = (granularity: Granularity, period: Period): DataTableFieldType[] => {
+export const getDataTableDateFields = (granularity: Granularity, period: Period, specificFilter?:SpecificFilter): DataTableFieldType[] => {
     const dateFields: DataTableFieldType[] = [];
 
     const timeUnit = getTimeUnitByGranularity(granularity);
@@ -40,10 +41,11 @@ const getDataTableDateFields = (granularity: Granularity, period: Period): DataT
     const today = dayjs.utc();
     let now = dayjs.utc(_period.start);
     let index = 0;
+    const itemName = specificFilter === SPECIFIC_FILTER_MAP.cost ? 'cost_sum' : 'usage_quantity_sum';
     while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
         if (now.isAfter(today, timeUnit)) break;
         dateFields.push({
-            name: `cost_sum.${index}.value`,
+            name: `${itemName}.${index}.value`,
             label: now.locale('en').format(labelDateFormat),
             textAlign: 'right',
             sortable: true,
@@ -60,6 +62,6 @@ export const getDataTableCostFields = (granularity: Granularity, period: Period,
             name: 'totalCost', label: ' ',
         });
     }
-    const dateFields = getDataTableDateFields(granularity, period);
+    const dateFields = getDataTableDateFields(granularity, period, SPECIFIC_FILTER_MAP.cost);
     return costFields.concat(dateFields);
 };
