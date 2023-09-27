@@ -3,13 +3,13 @@ import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PDivider,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -109,6 +109,11 @@ const state = reactive({
             field_group: ['date'],
         };
     }),
+    headerMenuItems: [
+        { type: 'item', name: 'cost', label: 'Cost' },
+        { type: 'item', name: 'usage', label: 'Usage' },
+    ],
+    selected: 'cost',
 });
 const tableState = reactive({
     loading: true,
@@ -142,7 +147,20 @@ const tableState = reactive({
         };
     })),
     costFields: [] as DataTableFieldType[],
-    fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
+    fields: computed<DataTableFieldType[]>(() => {
+        const fields: DataTableFieldType[] = [];
+        if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
+        if (state.isIncludedUsageTypeInGroupBy) {
+            fields.push({
+                name: 'usage_unit',
+                label: 'Usage Unit',
+                textAlign: 'right',
+                sortable: false,
+            });
+        }
+        fields.push(...tableState.costFields);
+        return fields;
+    }),
     items: [] as CostAnalyzeRawData[],
     thisPage: 1,
     pageSize: 15,
@@ -298,9 +316,6 @@ const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|s
     const dateIndex = Number(fieldName.split('.')[1]);
     const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
     if (!usageQuantity || !item.usage_unit) return '--';
-    if (item.usage_unit === 'Bytes') {
-        return `${byteFormatter(usageQuantity, { unit: item.usage_unit })}`;
-    }
     return numberFormatter(usageQuantity);
 };
 
@@ -419,6 +434,14 @@ watch(
                     </template>
                 </p-text-pagination>
             </template>
+            <template #toolbox-left>
+                <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
+                <p-select-dropdown v-if="state.isIncludedUsageTypeInGroupBy"
+                                   :selected.sync="state.selected"
+                                   :menu="state.headerMenuItems"
+                                   style-type="transparent"
+                />
+            </template>
             <template #th-format="{field}">
                 {{ field.label }}
                 <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
@@ -452,6 +475,9 @@ watch(
                 <span v-else-if="field.isTagField">
                     {{ value ?? 'Unknown' }}
                 </span>
+                <span v-else-if="field.name === 'usage_unit'">
+                    {{ value ?? '--' }}
+                </span>
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"
                 >
@@ -466,15 +492,15 @@ watch(
                             />
                         </template>
                         <template v-else>
-                            <span class="usage-wrapper">
+                            <span v-if="state.selected === 'usage' && state.isIncludedUsageTypeInGroupBy"
+                                  class="usage-wrapper"
+                            >
+                                {{ getUsageQuantity(item, field.name) }}
+                            </span>
+                            <span v-else
+                                  class="usage-wrapper"
+                            >
                                 {{ numberFormatter(value) }}
-                                <p-divider v-if="state.isIncludedUsageTypeInGroupBy"
-                                           vertical
-                                           class="divider"
-                                />
-                                <span v-if="state.isIncludedUsageTypeInGroupBy">
-                                    {{ getUsageQuantity(item, field.name) }}
-                                </span>
                             </span>
                         </template>
                     </p-link>
