@@ -1,11 +1,13 @@
 <template>
-    <p-filterable-dropdown class="add-notification-member-group"
-                           :loading="loading"
-                           :menu="allMemberItems"
-                           :selected.sync="selectedMemberItems"
-                           multi-selectable
-                           appearance-type="stack"
-                           use-fixed-menu-style
+    <p-select-dropdown class="add-notification-member-group"
+                       :loading="loading"
+                       :menu="allMemberItems"
+                       :selected.sync="selectedMemberItems"
+                       multi-selectable
+                       appearance-type="stack"
+                       use-fixed-menu-style
+                       is-filterable
+                       show-delete-all-button
     />
 </template>
 
@@ -15,7 +17,7 @@ import {
 } from 'vue';
 
 import {
-    PFilterableDropdown,
+    PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -29,7 +31,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export default {
     name: 'AddNotificationMemberGroup',
     components: {
-        PFilterableDropdown,
+        PSelectDropdown,
     },
     props: {
         projectId: {

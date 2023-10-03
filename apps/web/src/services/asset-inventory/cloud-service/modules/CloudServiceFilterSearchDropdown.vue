@@ -1,14 +1,16 @@
 <template>
     <div>
-        <p-filterable-dropdown :search-text.sync="searchTerm"
-                               :menu="menuItems"
-                               :selected="selectedItems"
-                               multi-selectable
-                               use-fixed-menu-style
-                               appearance-type="stack"
-                               show-select-marker
-                               :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
-                               @update:selected="handleUpdateSelected"
+        <p-select-dropdown :search-text.sync="searchTerm"
+                           :menu="menuItems"
+                           :selected="selectedItems"
+                           multi-selectable
+                           use-fixed-menu-style
+                           appearance-type="stack"
+                           show-select-marker
+                           :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
+                           is-filterable
+                           show-delete-all-button
+                           @update:selected="handleUpdateSelected"
         >
             <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION"
                       #menu-item--format="{item}"
@@ -33,7 +35,7 @@
                     />
                 </div>
             </template>
-        </p-filterable-dropdown>
+        </p-select-dropdown>
     </div>
 </template>
 
@@ -43,7 +45,7 @@ import {
 } from 'vue';
 
 import {
-    PFilterableDropdown, getTextHighlightRegex,
+    PSelectDropdown, getTextHighlightRegex,
 } from '@spaceone/design-system';
 import type {
     FilterableDropdownMenuItem,
@@ -84,7 +86,7 @@ export default defineComponent<Props>({
     name: 'CloudServiceFilterSearchDropdown',
     components: {
         TextHighlighting,
-        PFilterableDropdown,
+        PSelectDropdown,
     },
     props: {
         type: {

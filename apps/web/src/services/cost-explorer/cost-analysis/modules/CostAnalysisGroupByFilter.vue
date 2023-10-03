@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PSelectButton, PFilterableDropdown,
+    PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
@@ -135,16 +135,17 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-filterable-dropdown :handler="tagsMenuHandler"
-                                   :selected.sync="state.selectedTagsMenu"
-                                   selection-label="Tags"
-                                   appearance-type="badge"
-                                   :show-delete-all-button="false"
-                                   multi-selectable
-                                   selection-highlight
-                                   show-select-marker
-                                   @select="handleSelectTagsGroupBy"
-                                   @clear-selection="handleClearTagsGroupBy"
+            <p-select-dropdown :handler="tagsMenuHandler"
+                               :selected.sync="state.selectedTagsMenu"
+                               selection-label="Tags"
+                               appearance-type="badge"
+                               :show-delete-all-button="false"
+                               multi-selectable
+                               selection-highlight
+                               show-select-marker
+                               is-filterable
+                               @select="handleSelectTagsGroupBy"
+                               @clear-selection="handleClearTagsGroupBy"
             />
         </div>
     </div>
@@ -169,13 +170,27 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
         position: relative;
         padding-right: 3.5rem;
 
-        /* custom design-system component - p-filterable-dropdown */
-        :deep(.p-filterable-dropdown) {
-            .dropdown-button {
-                height: 1.375rem;
-                min-height: 1.5rem;
-                .placeholder {
-                    font-size: 0.75rem;
+        /* custom design-system component - p-select-dropdown */
+        :deep(.p-select-dropdown) {
+            .dropdown-button-component {
+                .dropdown-button {
+                    height: 1.375rem;
+                    min-height: 1.5rem;
+                    .placeholder {
+                        font-size: 0.75rem;
+                    }
+                }
+                &.selected {
+                    .dropdown-button {
+                        @apply bg-secondary border-secondary text-white;
+                        .p-badge {
+                            @apply bg-white text-gray-800;
+                            margin-left: 0.375rem;
+                        }
+                        .selection-wrapper, .arrow-button {
+                            @apply text-white;
+                        }
+                    }
                 }
             }
             .selection-wrapper {
@@ -183,18 +198,6 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             }
             .p-context-menu {
                 min-width: 9rem;
-            }
-            &.selected {
-                .dropdown-button {
-                    @apply bg-secondary border-secondary text-white;
-                    .p-badge {
-                        @apply bg-white text-gray-800;
-                        margin-left: 0.125rem;
-                    }
-                    .selection-wrapper, .arrow-button {
-                        @apply text-white;
-                    }
-                }
             }
         }
     }

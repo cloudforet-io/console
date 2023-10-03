@@ -4,7 +4,7 @@ import {
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import { PFieldGroup, PRadio, PFilterableDropdown } from '@spaceone/design-system';
+import { PFieldGroup, PRadio, PSelectDropdown } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
     FilterableDropdownMenuItem,
@@ -173,18 +173,20 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
                 {{ costTypeLabel }}
             </p-radio>
         </div>
-        <p-filterable-dropdown v-if="selectedCostType !== 'all'"
-                               :visible-menu.sync="state.visibleResourceMenu"
-                               :menu="state.resourceMenuItems"
-                               :handler="state.resourceMenuItems ? undefined : resourceMenuHandler"
-                               :loading="state.resourceMenuLoading"
-                               :invalid="!props.disableValidation && invalidState.selectedResources"
-                               :selected="selectedResources"
-                               multi-selectable
-                               show-select-marker
-                               appearance-type="stack"
-                               class="mt-2"
-                               @update:selected="setForm('selectedResources', $event)"
+        <p-select-dropdown v-if="selectedCostType !== 'all'"
+                           :visible-menu.sync="state.visibleResourceMenu"
+                           :menu="state.resourceMenuItems"
+                           :handler="state.resourceMenuItems ? undefined : resourceMenuHandler"
+                           :loading="state.resourceMenuLoading"
+                           :invalid="!props.disableValidation && invalidState.selectedResources"
+                           :selected="selectedResources"
+                           multi-selectable
+                           show-select-marker
+                           appearance-type="stack"
+                           class="mt-2"
+                           is-filterable
+                           show-delete-all-button
+                           @update:selected="setForm('selectedResources', $event)"
         />
     </p-field-group>
 </template>
@@ -192,9 +194,6 @@ watch([() => state.costTypeInfo, () => isAllValid.value], debounce(([costTypeInf
 <style lang="postcss" scoped>
 .budget-cost-type-select-field {
     width: 30rem;
-    .p-filterable-dropdown {
-        margin-top: 0.5rem;
-    }
 }
 
 .cost-type-wrapper {

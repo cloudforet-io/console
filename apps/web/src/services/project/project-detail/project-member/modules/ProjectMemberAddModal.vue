@@ -26,12 +26,14 @@
                                :invalid-text="invalidTexts.selectedInternalUserItems"
                 >
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="internalUserItems"
                             :selected="selectedInternalUserItems"
                             multi-selectable
                             appearance-type="stack"
                             show-select-marker
+                            is-filterable
+                            show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="setForm('selectedInternalUserItems', $event)"
@@ -89,10 +91,12 @@
                         >{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
                             show-select-marker
+                            is-filterable
+                            show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="handleSelectRoleItems"
@@ -127,7 +131,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PBoxTab, PFilterableDropdown, PTooltip, PI, PTextInput,
+    PButtonModal, PFieldGroup, PBoxTab, PSelectDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
 import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
@@ -167,7 +171,7 @@ export default {
         PButtonModal,
         PFieldGroup,
         PBoxTab,
-        PFilterableDropdown,
+        PSelectDropdown,
         PTooltip,
         PI,
         PTextInput,

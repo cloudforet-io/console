@@ -25,9 +25,11 @@
                                :invalid-text="invalidTexts.selectedRoleItems"
                 >
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
+                            is-filterable
+                            show-delete-all-button
                             show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
@@ -67,7 +69,7 @@ import { reactive, ref, toRefs } from 'vue';
 import type { PropType, SetupContext } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PFilterableDropdown, PTextInput,
+    PButtonModal, PFieldGroup, PSelectDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { MenuItem as InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
@@ -91,7 +93,7 @@ export default {
     components: {
         PButtonModal,
         PFieldGroup,
-        PFilterableDropdown,
+        PSelectDropdown,
         PTextInput,
     },
     directives: {
