@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, watch, useSlots, ref, toRef, reactive,
+    computed, reactive, ref, toRef, useSlots, watch,
 } from 'vue';
 
 import { onClickOutside, useFocus } from '@vueuse/core';
@@ -12,10 +12,10 @@ import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import DropdownButton from '@/inputs/dropdown/select-dropdown/components/dropdown-button.vue';
 import type {
     AutocompleteHandler,
+    ContextMenuPosition,
     SelectDropdownAppearanceType,
     SelectDropdownMenuItem,
     SelectDropdownStyleType,
-    ContextMenuPosition,
 } from '@/inputs/dropdown/select-dropdown/type';
 import {
     CONTEXT_MENU_POSITION,
@@ -265,6 +265,7 @@ watch(() => props.disabled, (disabled) => {
              'p-select-dropdown': true,
              [props.styleType]: true,
              'is-fixed-width': props.isFixedWidth,
+             'is-filterable': props.isFilterable,
          }"
     >
         <dropdown-button ref="targetRef"
@@ -365,6 +366,10 @@ watch(() => props.disabled, (disabled) => {
 
     &.is-fixed-width {
         @apply relative inline-block;
+        width: 100%;
+    }
+
+    &.is-filterable {
         width: 100%;
     }
 
