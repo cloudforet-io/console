@@ -80,7 +80,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     /* others */
     handler: undefined,
     pageSize: undefined,
-    resetSelectedOnUnmounted: true,
+    resetSelectedOnUnmounted: false,
     initSelectedWithHandler: false,
 });
 
