@@ -133,7 +133,7 @@ import {
 import {
     PButtonModal, PFieldGroup, PBoxTab, PSelectDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 import { debounce, union } from 'lodash';
 
@@ -162,7 +162,7 @@ interface ExternalItemsError {
     all?: ExternalItemErrorCode;
     [selectedIndex: number]: ExternalItemErrorCode
 }
-interface RoleMenuItem extends FilterableDropdownMenuItem {
+interface RoleMenuItem extends SelectDropdownMenuItem {
     pagePermissions: RawPagePermission[]
 }
 export default {
@@ -226,7 +226,7 @@ export default {
             }),
             activeTab: AUTH_TYPE.INTERNAL_USER,
             roleItems: [] as RoleMenuItem[],
-            internalUserItems: [] as FilterableDropdownMenuItem[],
+            internalUserItems: [] as SelectDropdownMenuItem[],
             externalUserItems: [] as InputItem[],
             invalidUserList: [] as string[],
             existingMemberList: [] as string[],
@@ -258,9 +258,9 @@ export default {
         } = useFormValidator({
             labels: [] as InputItem[],
             selectedRoleItems: [] as RoleMenuItem[],
-            selectedInternalUserItems: [] as FilterableDropdownMenuItem[],
+            selectedInternalUserItems: [] as SelectDropdownMenuItem[],
         }, {
-            selectedInternalUserItems: (val: FilterableDropdownMenuItem[]) => {
+            selectedInternalUserItems: (val: SelectDropdownMenuItem[]) => {
                 if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },

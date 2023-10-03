@@ -72,7 +72,7 @@ import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { map } from 'lodash';
 
 import { store } from '@/store';
@@ -100,11 +100,11 @@ const state = reactive({
     })) as MenuItem[],
     timezones: map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-    })) as FilterableDropdownMenuItem[],
+    })) as SelectDropdownMenuItem[],
 });
 const formState = reactive({
     userName: '' as string | undefined,
-    timezone: [] as FilterableDropdownMenuItem[],
+    timezone: [] as SelectDropdownMenuItem[],
     language: '' as LanguageCode | undefined,
 });
 const validationState = reactive({

@@ -4,8 +4,10 @@ import { computed, reactive, watch } from 'vue';
 import {
     PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { xor } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

@@ -19,8 +19,8 @@ import {
     VALIDATION_MODES
 } from "@/inputs/forms/json-schema-form/type";
 import {
-    getFilterableDropdownMenuWithMultiTypes,
-} from '@/inputs/dropdown/filterable-dropdown/mock';
+    getSelectDropdownMenuWithMultiTypes,
+} from '@/inputs/dropdown/select-dropdown/mock';
 
 
 <Meta title='Inputs/Forms/Json Schema Form' parameters={{
@@ -51,7 +51,7 @@ export const Template = (args, { argTypes }) => ({
         const state = reactive({
             proxyFormData: props.formData,
         });
-        const menu = getFilterableDropdownMenuWithMultiTypes()
+        const menu = getSelectDropdownMenuWithMultiTypes()
         let allResults = [];
         const simpleHandler = async (inputText) => {
             state.loading = true;
@@ -101,7 +101,7 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |string|ajv|[Text Input](?path=/docs/inputs-input--basic)|
 |number|ajv|[Text Input](?path=/docs/inputs-input--basic)|
 |integer|ajv|[Text Input](?path=/docs/inputs-input--basic)|
-|array|ajv|[Text Input](?path=/docs/inputs-input--basic) or [Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)(with enum keyword)||
+|array|ajv|[Text Input](?path=/docs/inputs-input--basic) or [Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)(with enum keyword)||
 
 ### Formats
 **string type only**
@@ -117,9 +117,9 @@ It internally uses [Ajv JSON schema validator](https://ajv.js.org/) and [ajv-for
 |markdown|custom|[Markdown](?path=/docs/data-display-markdown--string-markdown)|-|
 |json|custom|[Text Editor](?path=/docs/inputs-text-editor--basic)|json input mode. works only with `object` type|
 |enum|custom|[Select Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `string` type only|
-|items|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
-|menuItems|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|supports `array` type only|
-|reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-filterable-dropdown--basic)|It represents reference information. supports `{ resource_type: string, reference_key?: string}` type only|
+|items|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `array` type only|
+|menuItems|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|supports `array` type only|
+|reference|custom|[Filterable Dropdown](?path=/docs/inputs-dropdown-select-dropdown--basic)|It represents reference information. supports `{ resource_type: string, reference_key?: string}` type only|
 |order|custom|-|order of properties. string[]|
 |disabled|custom|all|If the input event of the form is disabled, it will still be reflected in the formData if there is a default value.|
 

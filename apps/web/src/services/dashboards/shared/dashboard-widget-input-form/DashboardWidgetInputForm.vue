@@ -6,7 +6,6 @@ import {
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton, PTextButton,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
@@ -111,7 +110,7 @@ const { referenceStoreState } = useReferenceStore();
 const { handleSelectWidgetOptions, handleDeleteProperty } = useWidgetMoreOptions(state);
 
 /* utils */
-const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMenuItem[]): boolean => {
+const isSelected = (selectedItem: SelectDropdownMenuItem): boolean => {
     if (Array.isArray(selectedItem)) return !!selectedItem.length;
     return selectedItem && !isEmpty(selectedItem);
 };

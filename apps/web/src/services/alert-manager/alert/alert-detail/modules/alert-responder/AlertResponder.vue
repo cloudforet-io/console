@@ -71,7 +71,7 @@ import {
     PBadge, PCollapsibleList, PPaneLayout, PHeading, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { differenceBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -223,8 +223,8 @@ export default {
         };
 
         const handleUpdateSelected = (selected) => {
-            const addedItems: FilterableDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
-            const deletedItems: FilterableDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
+            const addedItems: SelectDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
+            const deletedItems: SelectDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
 
             if (addedItems.length) {
                 addedItems.forEach((item) => addResponder(item.name));

@@ -7,8 +7,8 @@ import type { TranslateResult } from 'vue-i18n';
 import { PFieldGroup, PRadio, PSelectDropdown } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
-    FilterableDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
 import { debounce } from 'lodash';
@@ -42,7 +42,7 @@ interface DistinctResult {
     total_count?: number;
 }
 
-const getSearchDropdownItems = (resourceItems: ReferenceMap): FilterableDropdownMenuItem[] => Object.keys(resourceItems).map((k) => ({
+const getSearchDropdownItems = (resourceItems: ReferenceMap): SelectDropdownMenuItem[] => Object.keys(resourceItems).map((k) => ({
     name: k, label: resourceItems[k].label,
 }));
 
@@ -63,7 +63,7 @@ const {
     isAllValid,
 } = useFormValidator({
     selectedCostType: 'all' as BudgetCostType,
-    selectedResources: [] as FilterableDropdownMenuItem[],
+    selectedResources: [] as SelectDropdownMenuItem[],
 }, {
     selectedResources(value: BudgetCostType) {
         if (selectedCostType.value === 'all') return '';
@@ -79,7 +79,7 @@ const state = reactive({
         all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
         provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.SPECIFIC_PROVIDER'),
     })),
-    resourceMenuItems: computed<FilterableDropdownMenuItem[]|undefined>(() => (selectedCostType.value === 'provider' ? getSearchDropdownItems(state.providers) : undefined)),
+    resourceMenuItems: computed<SelectDropdownMenuItem[]|undefined>(() => (selectedCostType.value === 'provider' ? getSearchDropdownItems(state.providers) : undefined)),
     resourceMenuLoading: false,
     visibleResourceMenu: false,
     costTypeInfo: computed<ProviderFilter|undefined>(() => {

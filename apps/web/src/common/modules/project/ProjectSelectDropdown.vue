@@ -83,7 +83,7 @@ import {
 import {
     PCheckbox, PI, PRadio, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -158,7 +158,7 @@ export default {
             selectedProjectItems: [] as ProjectTreeItem[],
             selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map((d) => d.node.data)),
             _selectedProjectIds: [...props.selectedProjectIds] as string[],
-            selectedItems: computed<FilterableDropdownMenuItem[]>({
+            selectedItems: computed<SelectDropdownMenuItem[]>({
                 get() {
                     const items: ReferenceMap = {
                         ...storeState.projects,
