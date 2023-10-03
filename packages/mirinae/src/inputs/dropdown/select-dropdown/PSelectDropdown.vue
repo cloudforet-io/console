@@ -58,6 +58,7 @@ interface SelectDropdownProps {
     disableHandler?: boolean;
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
+    initSelectedWithHandler?: boolean;
 }
 
 const props = withDefaults(defineProps<SelectDropdownProps>(), {
@@ -80,6 +81,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     handler: undefined,
     pageSize: undefined,
     resetSelectedOnUnmounted: true,
+    initSelectedWithHandler: false,
 });
 
 /* event emits */
@@ -243,6 +245,17 @@ watch(() => props.disabled, (disabled) => {
     if (Array.isArray(props.selected)) return;
 
     throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
+})();
+(async () => {
+    if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
+        // this is to refine selected items by handler's results whose label is fully set.
+        const { results } = await props.handler('', undefined, undefined, state.proxySelectedItem);
+        state.proxySelectedItem = state.proxySelectedItem.map((item) => {
+            const found = results.find((d) => d.name === item.name);
+            if (found) return found;
+            return item;
+        });
+    }
 })();
 </script>
 

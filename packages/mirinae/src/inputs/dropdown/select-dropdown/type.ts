@@ -18,6 +18,7 @@ export const SELECT_DROPDOWN_APPEARANCE_TYPE = {
     BASIC: 'basic',
     STACK: 'stack',
     BADGE: 'badge',
+    MASKING: 'masking', // this is for resolving a type error in JsonSchemaForm
 } as const;
 
 
@@ -31,5 +32,10 @@ interface HandlerRes {
     more?: boolean;
 }
 export interface AutocompleteHandler {
-    (inputText: string, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
+    (
+        inputText: string,
+        pageStart?: number,
+        pageLimit?: number,
+        filters?: SelectDropdownMenuItem[] // this is for refining selected items by calling handler on initiation.
+    ): Promise<HandlerRes>|HandlerRes;
 }
