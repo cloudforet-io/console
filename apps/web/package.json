@@ -97,6 +97,7 @@
     "@types/uuid": "^8.3.0",
     "@vitejs/plugin-vue2": "^2.2.0",
     "@vitest/coverage-c8": "^0.24.3",
+    "@vitest/coverage-istanbul": "^0.34.5",
     "@vitest/ui": "^0.26.3",
     "@vue/test-utils": "^1.3.3",
     "axios-mock-adapter": "^1.17.0",
@@ -110,7 +111,7 @@
     "vite": "^4.3.9",
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
-    "vitest": "^0.26.3",
+    "vitest": "^0.34.5",
     "vue-template-compiler": "^2.7.14"
   },
   "browserslist": [
