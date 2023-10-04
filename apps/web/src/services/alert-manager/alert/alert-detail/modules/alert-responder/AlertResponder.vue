@@ -47,13 +47,15 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
                 <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
-            <p-filterable-dropdown :menu="responderState.allMemberItems"
-                                   :selected="responderState.selectedMemberItems"
-                                   :disabled="manageDisabled"
-                                   multi-selectable
-                                   show-select-marker
-                                   appearance-type="stack"
-                                   @update:selected="handleUpdateSelected"
+            <p-select-dropdown :menu="responderState.allMemberItems"
+                               :selected="responderState.selectedMemberItems"
+                               :disabled="manageDisabled"
+                               multi-selectable
+                               show-select-marker
+                               appearance-type="stack"
+                               is-filterable
+                               show-delete-all-button
+                               @update:selected="handleUpdateSelected"
             />
         </article>
     </p-pane-layout>
@@ -66,10 +68,10 @@ import {
 import VueI18n from 'vue-i18n';
 
 import {
-    PBadge, PCollapsibleList, PPaneLayout, PHeading, PFilterableDropdown,
+    PBadge, PCollapsibleList, PPaneLayout, PHeading, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { differenceBy } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -104,7 +106,7 @@ export default {
         PHeading,
         PCollapsibleList,
         PBadge,
-        PFilterableDropdown,
+        PSelectDropdown,
         ProjectChannelList,
     },
     props: {
@@ -221,8 +223,8 @@ export default {
         };
 
         const handleUpdateSelected = (selected) => {
-            const addedItems: FilterableDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
-            const deletedItems: FilterableDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
+            const addedItems: SelectDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
+            const deletedItems: SelectDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
 
             if (addedItems.length) {
                 addedItems.forEach((item) => addResponder(item.name));

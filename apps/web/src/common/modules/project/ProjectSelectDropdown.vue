@@ -1,19 +1,21 @@
 <template>
     <div class="project-select-dropdown">
-        <p-filterable-dropdown :loading="loading"
-                               :visible-menu="visibleMenu"
-                               show-select-marker
-                               :multi-selectable="multiSelectable"
-                               :use-fixed-menu-style="useFixedMenuStyle"
-                               :invalid="invalid"
-                               :disabled="disabled"
-                               :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
-                               :selected.sync="selectedItems"
-                               :readonly="readonly"
-                               disable-handler
-                               appearance-type="stack"
-                               @update:visible-menu="handleUpdateVisibleMenu"
-                               @delete-tag="handleDeleteTag"
+        <p-select-dropdown :loading="loading"
+                           :visible-menu="visibleMenu"
+                           show-select-marker
+                           :multi-selectable="multiSelectable"
+                           :use-fixed-menu-style="useFixedMenuStyle"
+                           :invalid="invalid"
+                           :disabled="disabled"
+                           :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
+                           :selected.sync="selectedItems"
+                           :readonly="readonly"
+                           disable-handler
+                           appearance-type="stack"
+                           is-filterable
+                           show-delete-all-button
+                           @update:visible-menu="handleUpdateVisibleMenu"
+                           @delete-tag="handleDeleteTag"
         >
             <template #menu-no-data-format>
                 <div />
@@ -68,21 +70,20 @@
                     </p-button>
                 </div>
             </template>
-        </p-filterable-dropdown>
+        </p-select-dropdown>
     </div>
 </template>
 
 <script lang="ts">
-
 import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
 
 import {
-    PCheckbox, PI, PRadio, PFilterableDropdown, PSelectDropdown, PTag, PTree, PButton,
+    PCheckbox, PI, PRadio, PSelectDropdown, PTag, PTree, PButton,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -102,7 +103,6 @@ import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/servic
 export default {
     name: 'ProjectSelectDropdown',
     components: {
-        PFilterableDropdown,
         PSelectDropdown,
         PTag,
         PTree,
@@ -158,7 +158,7 @@ export default {
             selectedProjectItems: [] as ProjectTreeItem[],
             selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map((d) => d.node.data)),
             _selectedProjectIds: [...props.selectedProjectIds] as string[],
-            selectedItems: computed<FilterableDropdownMenuItem[]>({
+            selectedItems: computed<SelectDropdownMenuItem[]>({
                 get() {
                     const items: ReferenceMap = {
                         ...storeState.projects,
@@ -361,11 +361,6 @@ export default {
         .toggle-right {
             @apply flex-shrink-0;
         }
-    }
-
-    /* custom design-system component - p-filterable-dropdown */
-    :deep(.no-data) {
-        padding: 0;
     }
 }
 </style>

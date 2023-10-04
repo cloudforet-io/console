@@ -79,7 +79,7 @@
                                                :disabled="schemaProperty.disabled"
                                                :use-fixed-menu-style="useFixedMenuStyle"
                                                is-fixed-width
-                                               class="input-form select-dropdown"
+                                               class="input-form"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
                                 <template #dropdown-button="item">
@@ -88,26 +88,28 @@
                                     />
                                 </template>
                             </p-select-dropdown>
-                            <p-filterable-dropdown v-else-if="schemaProperty.componentName === 'PFilterableDropdown'"
-                                                   :key="`PFilterableDropdown-${schemaProperty.propertyName}`"
-                                                   :menu="schemaProperty.menuItems"
-                                                   :selected="rawFormData[schemaProperty.propertyName]"
-                                                   :multi-selectable="schemaProperty.multiInputMode"
-                                                   :appearance-type="schemaProperty.appearanceType"
-                                                   :page-size="10"
-                                                   show-select-marker
-                                                   :use-fixed-menu-style="useFixedMenuStyle"
-                                                   :invalid="invalid"
-                                                   :handler="schemaProperty.referenceHandler"
-                                                   class="input-form"
-                                                   @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                            <p-select-dropdown v-else-if="schemaProperty.componentName === 'PFilterableDropdown'"
+                                               :key="`PFilterableDropdown-${schemaProperty.propertyName}`"
+                                               :menu="schemaProperty.menuItems"
+                                               :selected="rawFormData[schemaProperty.propertyName]"
+                                               :multi-selectable="schemaProperty.multiInputMode"
+                                               :appearance-type="schemaProperty.appearanceType"
+                                               :page-size="10"
+                                               show-select-marker
+                                               :use-fixed-menu-style="useFixedMenuStyle"
+                                               :invalid="invalid"
+                                               :handler="schemaProperty.referenceHandler"
+                                               is-filterable
+                                               is-fixed-width
+                                               class="input-form"
+                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
                                 <template #selected-extra="{ items }">
                                     <slot name="dropdown-extra"
                                           v-bind="{...schemaProperty, selectedItem: items}"
                                     />
                                 </template>
-                            </p-filterable-dropdown>
+                            </p-select-dropdown>
                             <template v-else>
                                 <p-text-input :key="`PTextInput-${schemaProperty.propertyName}`"
                                               :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
@@ -150,7 +152,6 @@ import addFormats from 'ajv-formats';
 import { isEqual } from 'lodash';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
-import PFilterableDropdown from '@/inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/inputs/forms/json-schema-form/components/GenerateIdFormat.vue';
@@ -183,7 +184,6 @@ const PJsonSchemaForm = () => ({
 export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
-        PFilterableDropdown,
         PJsonSchemaForm,
         PSelectDropdown,
         PTextEditor,
@@ -289,6 +289,7 @@ export default defineComponent<JsonSchemaFormProps>({
 
             // CAUTION: states should be updated together after all async operations are done.
             state.schemaProperties = getSchemaProperties(props.schema, props.referenceHandler);
+
             if (jsonInputData !== undefined) state.jsonInputData = jsonInputData;
             if (rawFormData !== undefined) state.rawFormData = rawFormData;
             if (refined !== undefined) state.refinedFormData = refined;

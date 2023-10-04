@@ -32,14 +32,16 @@
                     <p-field-title class="specific-service-account-dropdown-label"
                                    :label="$t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
                     />
-                    <p-filterable-dropdown class="specific-service-account-dropdown"
-                                           :selected="selectedAttachedServiceAccount"
-                                           multi-selectable
-                                           show-select-marker
-                                           :handler="serviceAccountHandler"
-                                           appearance-type="stack"
-                                           :reset-selected-on-unmounted="false"
-                                           @update:selected="handleSelectAttachedServiceAccount"
+                    <p-select-dropdown class="specific-service-account-dropdown"
+                                       :selected="selectedAttachedServiceAccount"
+                                       multi-selectable
+                                       show-select-marker
+                                       :handler="serviceAccountHandler"
+                                       appearance-type="stack"
+                                       :reset-selected-on-unmounted="false"
+                                       is-filterable
+                                       show-delete-all-button
+                                       @update:selected="handleSelectAttachedServiceAccount"
                     >
                         <template #input-left-area>
                             <p-i v-if="collectorFormState.selectedServiceAccountFilterOption === 'exclude'"
@@ -65,7 +67,7 @@
                                 </select-box>
                             </div>
                         </template>
-                    </p-filterable-dropdown>
+                    </p-select-dropdown>
                 </div>
             </div>
         </p-field-group>
@@ -77,10 +79,10 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PFieldGroup, PRadioGroup, PRadio, PFilterableDropdown, PSelectDropdown, PFieldTitle, PI,
+    PFieldGroup, PRadioGroup, PRadio, PSelectDropdown, PFieldTitle, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -101,8 +103,6 @@ import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
-
-
 
 interface Props {
     title?: TranslateResult;

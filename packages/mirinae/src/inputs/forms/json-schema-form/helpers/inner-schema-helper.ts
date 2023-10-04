@@ -1,7 +1,6 @@
 import { isEmpty } from 'lodash';
 
-import type { AutocompleteHandler } from '@/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
+import type { AutocompleteHandler, SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import { NUMERIC_TYPES } from '@/inputs/forms/json-schema-form/helpers/form-data-refine-helper';
 import type {
     ComponentName, JsonSchema, ReferenceHandler, TextInputType,

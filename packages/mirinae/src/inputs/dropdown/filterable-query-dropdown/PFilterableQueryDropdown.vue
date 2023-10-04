@@ -98,8 +98,8 @@ import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import { useQuerySearch } from '@/hooks/query-search';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
-import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { FilterableQueryDropdownProps } from '@/inputs/dropdown/filterable-query-dropdown/type';
+import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import type { KeyMenuItem, ValueMenuItem, QueryItem } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 
@@ -200,7 +200,7 @@ export default defineComponent<FilterableQueryDropdownProps>({
         };
 
         /* event */
-        const onDeleteTag = (item: FilterableDropdownMenuItem, index: number) => {
+        const onDeleteTag = (item: SelectDropdownMenuItem, index: number) => {
             state.proxySelected.splice(index, 1);
             state.proxySelected = [...state.proxySelected];
         };
