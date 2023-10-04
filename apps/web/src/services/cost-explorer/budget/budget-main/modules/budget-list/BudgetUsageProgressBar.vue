@@ -41,7 +41,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            percentage: props.usageRate,
+            percentage: computed<number>(() => props.usageRate),
             gradient: computed(() => ((props.usageRate >= 90 && props.usageRate < 100)
                 ? budgetGradient : undefined)),
             color: computed(() => getColor(props.usageRate)),
