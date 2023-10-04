@@ -31,10 +31,10 @@ import type {
     WidgetProps, WidgetExpose, SelectorType, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, COST_GROUP_BY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import {
     getDateAxisSettings,
     getXYChartLegends,
-    getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
