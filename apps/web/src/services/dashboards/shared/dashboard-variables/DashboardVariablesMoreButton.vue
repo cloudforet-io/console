@@ -67,14 +67,13 @@ import {
     computed,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
     cloneDeep, debounce, merge, union,
 } from 'lodash';
-
-import { SpaceRouter } from '@/router';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
@@ -93,6 +92,9 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+
+const route = useRoute();
+const router = useRouter();
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
@@ -229,11 +231,18 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 // event
 const handleOpenOverlay = () => {
     hideContextMenu();
-    SpaceRouter.router.push({
-        name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
-        hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-    });
+    if (route.name === DASHBOARDS_ROUTE.CREATE._NAME) {
+        router.push({
+            name: DASHBOARDS_ROUTE.CREATE._NAME,
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        });
+    } else {
+        router.push({
+            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        });
+    }
 };
 const handleClickButton = () => {
     if (visibleMenu.value) {
