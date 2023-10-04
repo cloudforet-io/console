@@ -18,7 +18,8 @@
             </template>
             <template #default="{invalid}">
                 <div v-if="props.activeTab === 'external' && state.supportFind">
-                    <p-filterable-dropdown
+                    <p-select-dropdown
+                        class="external-select-dropdown"
                         :search-text.sync="state.searchText"
                         :class="{invalid}"
                         show-select-marker
@@ -26,8 +27,9 @@
                         :selected.sync="state.selectedItems"
                         :loading="state.loading"
                         disable-handler
-                        :exact-mode="false"
                         use-fixed-menu-style
+                        is-filterable
+                        show-delete-all-button
                         @select="handleSelectExternalUser"
                         @delete-tag="handleDeleteSelectedExternalUser"
                     />
@@ -69,7 +71,7 @@ import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PFieldGroup, PTextInput, PButton, PFilterableDropdown,
+    PFieldGroup, PTextInput, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { debounce } from 'lodash';
@@ -260,7 +262,7 @@ watch(() => state.searchText, (searchText) => {
         line-height: 1.3;
         padding: 0.25rem 0;
     }
-    .p-filterable-dropdown {
+    .external-select-dropdown {
         &.invalid {
             .p-search {
                 @apply border-alert;

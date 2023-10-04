@@ -36,11 +36,13 @@
                        :invalid-text="validationState.timezoneInvalidText"
         >
             <template #default="{invalid}">
-                <p-filterable-dropdown :menu="state.timezones"
-                                       :selected.sync="formState.timezone"
-                                       :invalid="invalid"
-                                       :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
-                                       :page-size="10"
+                <p-select-dropdown :menu="state.timezones"
+                                   :selected.sync="formState.timezone"
+                                   :invalid="invalid"
+                                   :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
+                                   :page-size="10"
+                                   is-filterable
+                                   show-delete-all-button
                 />
             </template>
         </p-field-group>
@@ -67,10 +69,10 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PButton, PFieldGroup, PSelectDropdown, PTextInput, PFilterableDropdown,
+    PButton, PFieldGroup, PSelectDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { map } from 'lodash';
 
 import { store } from '@/store';
@@ -98,11 +100,11 @@ const state = reactive({
     })) as MenuItem[],
     timezones: map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-    })) as FilterableDropdownMenuItem[],
+    })) as SelectDropdownMenuItem[],
 });
 const formState = reactive({
     userName: '' as string | undefined,
-    timezone: [] as FilterableDropdownMenuItem[],
+    timezone: [] as SelectDropdownMenuItem[],
     language: '' as LanguageCode | undefined,
 });
 const validationState = reactive({
@@ -172,8 +174,7 @@ watch(() => store.state.user.language, (language) => {
         }
     }
     .p-text-input,
-    .p-select-dropdown,
-    .p-filterable-dropdown {
+    .p-select-dropdown, {
         width: 100%;
         max-width: 25rem;
         flex-shrink: 0;
@@ -187,8 +188,7 @@ watch(() => store.state.user.language, (language) => {
 
 @screen mobile {
     .p-text-input,
-    .p-select-dropdown,
-    .p-filterable-dropdown {
+    .p-select-dropdown, {
         max-width: unset;
     }
 }

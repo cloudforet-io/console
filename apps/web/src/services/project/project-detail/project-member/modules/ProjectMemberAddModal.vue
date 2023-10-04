@@ -26,12 +26,14 @@
                                :invalid-text="invalidTexts.selectedInternalUserItems"
                 >
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="internalUserItems"
                             :selected="selectedInternalUserItems"
                             multi-selectable
                             appearance-type="stack"
                             show-select-marker
+                            is-filterable
+                            show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="setForm('selectedInternalUserItems', $event)"
@@ -89,10 +91,12 @@
                         >{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="roleItems"
                             :selected="selectedRoleItems"
                             show-select-marker
+                            is-filterable
+                            show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="handleSelectRoleItems"
@@ -127,9 +131,9 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PBoxTab, PFilterableDropdown, PTooltip, PI, PTextInput,
+    PButtonModal, PFieldGroup, PBoxTab, PSelectDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 import { debounce, union } from 'lodash';
 
@@ -158,7 +162,7 @@ interface ExternalItemsError {
     all?: ExternalItemErrorCode;
     [selectedIndex: number]: ExternalItemErrorCode
 }
-interface RoleMenuItem extends FilterableDropdownMenuItem {
+interface RoleMenuItem extends SelectDropdownMenuItem {
     pagePermissions: RawPagePermission[]
 }
 export default {
@@ -167,7 +171,7 @@ export default {
         PButtonModal,
         PFieldGroup,
         PBoxTab,
-        PFilterableDropdown,
+        PSelectDropdown,
         PTooltip,
         PI,
         PTextInput,
@@ -222,7 +226,7 @@ export default {
             }),
             activeTab: AUTH_TYPE.INTERNAL_USER,
             roleItems: [] as RoleMenuItem[],
-            internalUserItems: [] as FilterableDropdownMenuItem[],
+            internalUserItems: [] as SelectDropdownMenuItem[],
             externalUserItems: [] as InputItem[],
             invalidUserList: [] as string[],
             existingMemberList: [] as string[],
@@ -254,9 +258,9 @@ export default {
         } = useFormValidator({
             labels: [] as InputItem[],
             selectedRoleItems: [] as RoleMenuItem[],
-            selectedInternalUserItems: [] as FilterableDropdownMenuItem[],
+            selectedInternalUserItems: [] as SelectDropdownMenuItem[],
         }, {
-            selectedInternalUserItems: (val: FilterableDropdownMenuItem[]) => {
+            selectedInternalUserItems: (val: SelectDropdownMenuItem[]) => {
                 if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
                 return true;
             },

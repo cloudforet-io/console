@@ -7,9 +7,7 @@ import {
     PSelectDropdown, PTextButton,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type {
-    AutocompleteHandler, FilterableDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -39,8 +37,8 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     enabledFilters: computed<MenuItem[]>(() => costAnalysisPageStore.defaultGroupByItems.filter((d) => costAnalysisPageState.enabledFiltersProperties?.includes(d.name))),
-    selectedFilterableItemsMap: computed<Record<string, FilterableDropdownMenuItem[]>>(() => {
-        const _selectedItems = {} as Record<string, FilterableDropdownMenuItem[]>;
+    selectedFilterableItemsMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => {
+        const _selectedItems = {} as Record<string, SelectDropdownMenuItem[]>;
         Object.entries(costAnalysisPageState.filters ?? {}).forEach(([groupBy, items]) => {
             _selectedItems[groupBy] = getRefinedMenuItems(groupBy, items.map((d) => ({ name: d, label: d })));
         });
@@ -104,7 +102,7 @@ const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; lab
     });
 };
 
-const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
+const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
     costAnalysisPageStore.$patch((_state) => {
         _state.filters = {
             ..._state.filters,

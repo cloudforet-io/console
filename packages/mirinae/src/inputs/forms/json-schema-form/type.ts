@@ -1,5 +1,4 @@
-import type { AutocompleteHandler, FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@/inputs/dropdown/select-dropdown/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 import type { SupportLanguage } from '@/translations';
 
@@ -50,7 +49,7 @@ export type InnerJsonSchema = JsonSchema & {
 export type CustomErrorMap = Record<string, string>;
 
 export interface HandlerRes {
-    results: FilterableDropdownMenuItem[];
+    results: SelectDropdownMenuItem[];
     more?: boolean;
 }
 
@@ -59,7 +58,7 @@ interface ReferenceHandlerOptions {
     schemaProperty: JsonSchema;
     pageStart?: number;
     pageSize?: number;
-    filters?: FilterableDropdownMenuItem[]
+    filters?: SelectDropdownMenuItem[]
 }
 export interface ReferenceHandler {
     (inputText: string, referenceOptions: ReferenceHandlerOptions): Promise<HandlerRes>|HandlerRes;
