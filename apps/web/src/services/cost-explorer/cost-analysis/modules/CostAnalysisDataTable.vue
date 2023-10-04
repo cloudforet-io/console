@@ -46,7 +46,6 @@ import {
 } from '@/services/cost-explorer/lib/config';
 import {
     getDataTableCostFields,
-    getDataTableDateFields,
     getTimeUnitByGranularity,
 } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
@@ -124,7 +123,7 @@ const state = reactive({
         { type: 'item', name: 'cost', label: 'Cost' },
         { type: 'item', name: 'usage', label: 'Usage' },
     ],
-    usageTypeAdditionalFilterSelected: USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost,
+    usageTypeAdditionalFilterSelected: USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost as UsageTypeAdditionalFilter,
 });
 const tableState = reactive({
     loading: true,
@@ -416,11 +415,9 @@ watch(
         if (costAnalysisPageState.period) {
             tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
             tableState.more = more ?? false;
-            if (usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage && state.isIncludedUsageTypeInGroupBy) {
-                tableState.costFields = getDataTableDateFields(costAnalysisPageState.granularity, costAnalysisPageState.period, usageTypeAdditionalFilterSelected);
-            } else {
-                tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
-            }
+            const isUsageSelected = usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage;
+            const additionalFilter = (isUsageSelected && state.isIncludedUsageTypeInGroupBy) ? USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage : USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost;
+            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length, additionalFilter);
         }
     },
     { immediate: true, deep: true },

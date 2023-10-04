@@ -25,7 +25,7 @@ export const getPeriodByGranularity = (granularity: Granularity, period: Period)
 };
 
 /* data table field */
-export const getDataTableDateFields = (granularity: Granularity, period: Period, specificFilter?:UsageTypeAdditionalFilter): DataTableFieldType[] => {
+const getDataTableDateFields = (granularity: Granularity, period: Period, additionalFilter:UsageTypeAdditionalFilter): DataTableFieldType[] => {
     const dateFields: DataTableFieldType[] = [];
 
     const timeUnit = getTimeUnitByGranularity(granularity);
@@ -41,7 +41,9 @@ export const getDataTableDateFields = (granularity: Granularity, period: Period,
     const today = dayjs.utc();
     let now = dayjs.utc(_period.start);
     let index = 0;
-    const itemName = specificFilter === USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost ? 'cost_sum' : 'usage_quantity_sum';
+    // TODO: We don't know exactly what filter it is, not yet.
+    // so the state name is not clear. (To be updated later)
+    const itemName = additionalFilter === USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost ? 'cost_sum' : 'usage_quantity_sum';
     while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
         if (now.isAfter(today, timeUnit)) break;
         dateFields.push({
@@ -55,13 +57,13 @@ export const getDataTableDateFields = (granularity: Granularity, period: Period,
     }
     return dateFields;
 };
-export const getDataTableCostFields = (granularity: Granularity, period: Period, hasGroupBy: boolean): DataTableFieldType[] => {
+export const getDataTableCostFields = (granularity: Granularity, period: Period, hasGroupBy: boolean, additionalFilter: UsageTypeAdditionalFilter): DataTableFieldType[] => {
     const costFields: DataTableFieldType[] = [];
     if (!hasGroupBy) {
         costFields.push({
             name: 'totalCost', label: ' ',
         });
     }
-    const dateFields = getDataTableDateFields(granularity, period, USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost);
+    const dateFields = getDataTableDateFields(granularity, period, additionalFilter);
     return costFields.concat(dateFields);
 };
