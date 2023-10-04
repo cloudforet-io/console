@@ -326,12 +326,4 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
         margin-top: 0.5rem;
     }
 }
-
-@screen tablet {
-    .cost-analysis-query-filter {
-        .filter-wrapper {
-            min-width: 44.125rem;
-        }
-    }
-}
 </style>
