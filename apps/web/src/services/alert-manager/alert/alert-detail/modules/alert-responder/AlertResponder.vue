@@ -1,69 +1,6 @@
-<template>
-    <p-pane-layout class="alert-responder">
-        <article class="responder-wrapper">
-            <p-heading heading-type="sub"
-                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER')"
-                       class="panel-title"
-            >
-                <template #extra>
-                    <div class="w-full text-right">
-                        <p-badge v-if="alertData.escalation_ttl === 0"
-                                 badge-type="solid-outline"
-                                 style-type="indigo500"
-                        >
-                            {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.COMPLETED') }}
-                        </p-badge>
-                    </div>
-                </template>
-            </p-heading>
-            <p-collapsible-list :items="escalationRuleItems"
-                                theme="card"
-                                multi-unfoldable
-                                :unfolded-indices="[alertData.escalation_step - 1]"
-            >
-                <template #title="{data, index}">
-                    <p class="responder-info"
-                       :class="{'current': data.notification_level === `LV${alertData.escalation_step}` }"
-                    >
-                        <span class="step">[{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
-                        <span class="level">{{ data.notification_level }}</span>
-                        <p-badge v-if="data.notification_level === `LV${alertData.escalation_step}`"
-                                 badge-type="subtle"
-                                 style-type="primary3"
-                        >
-                            {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
-                        </p-badge>
-                    </p>
-                </template>
-                <template #default="{ data }">
-                    <p class="data-wrapper">
-                        <project-channel-list :project-channels="projectChannels"
-                                              :notification-level="data.notification_level"
-                        />
-                    </p>
-                </template>
-            </p-collapsible-list>
-            <p class="search-title">
-                {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
-                <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
-            </p>
-            <p-select-dropdown :menu="responderState.allMemberItems"
-                               :selected="responderState.selectedMemberItems"
-                               :disabled="manageDisabled"
-                               multi-selectable
-                               show-select-marker
-                               appearance-type="stack"
-                               is-filterable
-                               show-delete-all-button
-                               @update:selected="handleUpdateSelected"
-            />
-        </article>
-    </p-pane-layout>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 import VueI18n from 'vue-i18n';
 
@@ -91,172 +28,202 @@ import type {
 
 import TranslateResult = VueI18n.TranslateResult;
 
-interface PropsType {
+interface Props {
     id?: string;
-    alertData: AlertDataModel;
+    alertData?: AlertDataModel;
+    manageDisabled?: boolean;
 }
 interface Rule {
     title: TranslateResult;
     data: Record<string, string | number>;
 }
-export default {
-    name: 'AlertResponder',
-    components: {
-        PPaneLayout,
-        PHeading,
-        PCollapsibleList,
-        PBadge,
-        PSelectDropdown,
-        ProjectChannelList,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        alertData: {
-            type: Object,
-            default: () => ({}),
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: PropsType) {
-        const state = reactive({
-            items: computed(() => [
-                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
-                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
-                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
-            ]),
-            escalationRuleItems: [] as Rule[],
-            loading: true,
-            projectChannels: [],
-        });
 
-        const responderState = reactive({
-            loading: true,
-            allMember: [] as any[],
-            allMemberItems: computed(() => responderState.allMember.map((d) => {
-                const userName = responderState.users[d.user_id]?.name;
-                return {
-                    name: d.user_id,
-                    label: userName ? `${d.user_id} (${userName})` : d.user_id,
-                    type: 'item',
-                };
-            })),
-            prevSelectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
-            selectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
-            selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map((d) => d.name)),
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-        });
+const props = withDefaults(defineProps<Props>(), {
+    id: undefined,
+    alertData: undefined,
+    manageDisabled: false,
+});
 
-        const responderNameFormatter = (resourceId) => {
-            const target = responderState.allMemberItems.find((d) => d.name === resourceId);
-            if (target?.label) return target.label;
-            return resourceId;
-        };
+const state = reactive({
+    items: computed(() => [
+        { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
+        { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
+        { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
+    ]),
+    escalationRuleItems: [] as Rule[],
+    loading: true,
+    projectChannels: [],
+});
 
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery
-                .setFilters([{ k: 'project_id', v: props.alertData.project_id, o: '=' }]);
-            return apiQuery.data;
-        };
-        const listProjectChannel = async () => {
-            try {
-                const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
-                state.projectChannels = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.projectChannels = [];
-            }
-        };
-
-        const listMember = async () => {
-            responderState.loading = true;
-            try {
-                const res = await SpaceConnector.client.identity.user.list();
-                responderState.allMember = res.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                responderState.allMember = [];
-            } finally {
-                responderState.loading = false;
-            }
-        };
-
-        const addResponder = async (userId: string) => {
-            try {
-                await SpaceConnector.client.monitoring.alert.addResponder({
-                    alert_id: props.id,
-                    resource_type: 'identity.User',
-                    resource_id: userId,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        const removeResponder = async (userID: string) => {
-            try {
-                await SpaceConnector.client.monitoring.alert.removeResponder({
-                    alert_id: props.id,
-                    resource_type: 'identity.User',
-                    resource_id: userID,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        const listEscalationPolicy = async () => {
-            const { rules } = await SpaceConnector.client.monitoring.escalationPolicy.get({
-                // eslint-disable-next-line camelcase
-                escalation_policy_id: props.alertData.escalation_policy_id,
-            });
-            state.escalationRuleItems = rules.map((d) => ({
-                title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'),
-                data: d,
-            }));
-        };
-
-        const handleUpdateSelected = (selected) => {
-            const addedItems: SelectDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
-            const deletedItems: SelectDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
-
-            if (addedItems.length) {
-                addedItems.forEach((item) => addResponder(item.name));
-            }
-            if (deletedItems.length) {
-                deletedItems.forEach((item) => removeResponder(item.name));
-            }
-
-            responderState.prevSelectedMemberItems = [...selected];
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/protocol/load'),
-                store.dispatch('reference/user/load'),
-            ]);
-            await Promise.allSettled([
-                listProjectChannel(), listMember(), listEscalationPolicy(),
-            ]);
-        })();
-
+const responderState = reactive({
+    loading: true,
+    allMember: [] as any[],
+    allMemberItems: computed(() => responderState.allMember.map((d) => {
+        const userName = responderState.users[d.user_id]?.name;
         return {
-            ...toRefs(state),
-            responderState,
-            responderNameFormatter,
-            handleUpdateSelected,
+            name: d.user_id,
+            label: userName ? `${d.user_id} (${userName})` : d.user_id,
+            type: 'item',
         };
-    },
+    })),
+    prevSelectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
+    selectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
+    selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map((d) => d.name)),
+    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+});
+
+const apiQuery = new ApiQueryHelper();
+const getQuery = () => {
+    apiQuery
+        .setFilters([{ k: 'project_id', v: props.alertData.project_id, o: '=' }]);
+    return apiQuery.data;
+};
+const listProjectChannel = async () => {
+    try {
+        const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
+        state.projectChannels = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.projectChannels = [];
+    }
 };
 
+const listMember = async () => {
+    responderState.loading = true;
+    try {
+        const res = await SpaceConnector.client.identity.user.list();
+        responderState.allMember = res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        responderState.allMember = [];
+    } finally {
+        responderState.loading = false;
+    }
+};
+
+const addResponder = async (userId: string) => {
+    try {
+        await SpaceConnector.client.monitoring.alert.addResponder({
+            alert_id: props.id,
+            resource_type: 'identity.User',
+            resource_id: userId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const removeResponder = async (userID: string) => {
+    try {
+        await SpaceConnector.client.monitoring.alert.removeResponder({
+            alert_id: props.id,
+            resource_type: 'identity.User',
+            resource_id: userID,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const listEscalationPolicy = async () => {
+    const { rules } = await SpaceConnector.client.monitoring.escalationPolicy.get({
+        // eslint-disable-next-line camelcase
+        escalation_policy_id: props.alertData.escalation_policy_id,
+    });
+    state.escalationRuleItems = rules.map((d) => ({
+        title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'),
+        data: d,
+    }));
+};
+
+const handleUpdateSelected = (selected) => {
+    const addedItems: SelectDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
+    const deletedItems: SelectDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
+
+    if (addedItems.length) {
+        addedItems.forEach((item) => addResponder(item.name));
+    }
+    if (deletedItems.length) {
+        deletedItems.forEach((item) => removeResponder(item.name));
+    }
+
+    responderState.prevSelectedMemberItems = [...selected];
+};
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/protocol/load'),
+        store.dispatch('reference/user/load'),
+    ]);
+    await Promise.allSettled([
+        listProjectChannel(), listMember(), listEscalationPolicy(),
+    ]);
+})();
 </script>
+
+<template>
+    <p-pane-layout class="alert-responder">
+        <article class="responder-wrapper">
+            <p-heading heading-type="sub"
+                       :title="$t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER')"
+                       class="panel-title"
+            >
+                <template #extra>
+                    <div class="w-full text-right">
+                        <p-badge v-if="props.alertData.escalation_ttl === 0"
+                                 badge-type="solid-outline"
+                                 style-type="indigo500"
+                        >
+                            {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.COMPLETED') }}
+                        </p-badge>
+                    </div>
+                </template>
+            </p-heading>
+            <p-collapsible-list :items="state.escalationRuleItems"
+                                theme="card"
+                                multi-unfoldable
+                                :unfolded-indices="[alertData.escalation_step - 1]"
+            >
+                <template #title="{data, index}">
+                    <p class="responder-info"
+                       :class="{'current': data.notification_level === `LV${props.alertData.escalation_step}` }"
+                    >
+                        <span class="step">[{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
+                        <span class="level">{{ data.notification_level }}</span>
+                        <p-badge v-if="data.notification_level === `LV${props.alertData.escalation_step}`"
+                                 badge-type="subtle"
+                                 style-type="primary3"
+                        >
+                            {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
+                        </p-badge>
+                    </p>
+                </template>
+                <template #default="{ data }">
+                    <p class="data-wrapper">
+                        <project-channel-list :project-channels="state.projectChannels"
+                                              :notification-level="data.notification_level"
+                        />
+                    </p>
+                </template>
+            </p-collapsible-list>
+            <p class="search-title">
+                {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
+                <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
+            </p>
+            <p-select-dropdown :menu="responderState.allMemberItems"
+                               :selected="responderState.selectedMemberItems"
+                               :disabled="props.manageDisabled"
+                               multi-selectable
+                               show-select-marker
+                               appearance-type="stack"
+                               is-filterable
+                               show-delete-all-button
+                               @update:selected="handleUpdateSelected"
+            />
+        </article>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .alert-responder {
