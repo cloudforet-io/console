@@ -50,7 +50,8 @@ const fields: DataTableField[] = [
     { label: 'Collector', name: 'collector_info.label', sortable: false },
     { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
     { label: 'Status', name: 'status', sortable: false },
-    { label: 'Job Progress', name: 'progress' },
+    { label: 'Job Progress', name: 'progress', sortable: false },
+    { label: 'Total Task', name: 'total_tasks' },
     { label: 'Created', name: 'created_at' },
     { label: 'Duration', name: 'duration', sortable: false },
 ];
@@ -94,6 +95,7 @@ const state = reactive({
     isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
     selectedStatus: 'ALL',
     items: [] as any[],
+    sortBy: 'created_at',
 });
 
 const queryTagsHelper = useQueryTags({
@@ -105,11 +107,9 @@ const queryTagsHelper = useQueryTags({
 const { queryTags, filters: searchFilters } = queryTagsHelper;
 
 const apiQueryHelper = new ApiQueryHelper();
+
 const getQuery = () => {
-    apiQueryHelper
-        .setPage(state.pageStart, state.pageSize)
-        .setSort('created_at', true)
-        .setFilters(searchFilters.value);
+    apiQueryHelper.setFilters(searchFilters.value);
 
     let statusValues: string[] = [];
     if (state.selectedStatus === JOB_SELECTED_STATUS.PROGRESS) {
@@ -137,7 +137,7 @@ const handleSelect = (item) => {
     }).catch(() => {});
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
-    setApiQueryWithToolboxOptions(apiQueryHelper, options, { queryTags: true });
+    setApiQueryWithToolboxOptions(apiQueryHelper, options);
     if (options.queryTags) {
         queryTagsHelper.setQueryTags(options.queryTags);
         await replaceUrlQuery('filters', queryTagsHelper.getURLQueryStringFilters());
@@ -206,6 +206,9 @@ watch(() => state.selectedStatus, (selectedStatus) => {
 
     const currentQuery = SpaceRouter.router.currentRoute.query;
     queryTagsHelper.setURLQueryStringFilters(currentQuery.filters);
+    apiQueryHelper.setPage(state.pageStart, state.pageSize)
+        .setSort(state.sortBy, true)
+        .setFilters(searchFilters.value);
 
     await getJobs();
     if (state.totalCount === 0) state.modalVisible = true;
@@ -239,6 +242,7 @@ watch(() => state.selectedStatus, (selectedStatus) => {
                              :page-size.sync="state.pageSize"
                              row-cursor-pointer
                              sortable
+                             :sort-by="state.sortBy"
                              :selectable="false"
                              :exportable="false"
                              :class="state.items.length === 0 ? 'no-data' : ''"
