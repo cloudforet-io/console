@@ -149,8 +149,8 @@ const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHe
     filtersHelper.setFilters([]);
 
     // NOTE: Some variables(asset) require specific API filters.
-    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name) {
-        filtersHelper.addFilter({ k: 'labels', o: '=', v: 'Compliance' });
+    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.name) {
+        filtersHelper.addFilter({ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' });
     } else if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
         filtersHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
     }
