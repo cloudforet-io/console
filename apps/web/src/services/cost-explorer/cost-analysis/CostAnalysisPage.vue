@@ -58,12 +58,14 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 <template>
     <div class="cost-analysis-page">
         <cost-analysis-header />
-        <cost-analysis-query-filter class="cost-analysis-query-filter-wrapper" />
         <div class="content-wrapper">
             <div class="overflow-wrapper">
-                <cost-analysis-group-by-filter />
-                <cost-analysis-chart />
-                <cost-analysis-data-table />
+                <cost-analysis-query-filter />
+                <div class="contents-wrapper">
+                    <cost-analysis-group-by-filter />
+                    <cost-analysis-chart />
+                    <cost-analysis-data-table />
+                </div>
             </div>
         </div>
     </div>
@@ -72,25 +74,13 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 <style lang="postcss" scoped>
 .cost-analysis-page {
     .content-wrapper {
-        @apply bg-white rounded-md border border-gray-200;
         overflow-x: auto;
-        padding: 0 1rem 2.5rem 1rem;
         .overflow-wrapper {
             min-width: 40rem;
-        }
-    }
-}
-
-@screen tablet {
-    .cost-analysis-query-filter-wrapper {
-        @apply overflow-x-scroll;
-        height: 68.75rem;
-        & + .content-wrapper {
-            margin-top: -65.625rem;
-        }
-
-        &::-webkit-scrollbar {
-            display: none;
+            .contents-wrapper {
+                @apply bg-white rounded-md border border-gray-200;
+                padding: 0 1rem 2.5rem 1rem;
+            }
         }
     }
 }
