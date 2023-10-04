@@ -160,9 +160,9 @@ const handleConfirm = async () => {
     emit('confirm');
     state.proxyVisible = false;
 };
-const handleSelectRoleItem = (roleItems: string) => {
-    if (!roleItems.length) return;
-    const roleItem = state.roleItems.filter((d) => d.name === roleItems);
+const handleSelectRoleItem = (roleItemName: string) => {
+    if (!roleItemName) return;
+    const roleItem = state.roleItems.filter((d) => d.name === roleItemName);
     const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
     setForm('selectedRoleItems', roleItem);
     state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
