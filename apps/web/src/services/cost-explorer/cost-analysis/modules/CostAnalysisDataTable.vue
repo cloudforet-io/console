@@ -34,15 +34,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DATE_FORMAT } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
-import SpecificFilterSelector from '@/services/cost-explorer/cost-analysis/modules/SpecificFilterSelector.vue';
-import type { SpecificFilter } from '@/services/cost-explorer/lib/config';
+import UsageTypeAdditionalFilterSelector from '@/services/cost-explorer/cost-analysis/modules/UsageTypeAdditionalFilterSelector.vue';
+import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/lib/config';
 import {
     GRANULARITY,
     GROUP_BY,
     GROUP_BY_ITEM_MAP,
     ADDITIONAL_GROUP_BY,
     ADDITIONAL_GROUP_BY_ITEM_MAP,
-    SPECIFIC_FILTER_MAP,
+    USAGE_TYPE_ADDITIONAL_FILTER_MAP,
 } from '@/services/cost-explorer/lib/config';
 import {
     getDataTableCostFields,
@@ -124,14 +124,14 @@ const state = reactive({
         { type: 'item', name: 'cost', label: 'Cost' },
         { type: 'item', name: 'usage', label: 'Usage' },
     ],
-    specificFilterSelected: SPECIFIC_FILTER_MAP.cost, // TODO: I don't know exactly what filter it is, so the state name is not clear. (To be updated later)
+    usageTypeAdditionalFilterSelected: USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost,
 });
 const tableState = reactive({
     loading: true,
     excelFields: computed<ExcelDataField[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (state.isIncludedUsageTypeInGroupBy && state.specificFilterSelected === SPECIFIC_FILTER_MAP.usage) {
+        if (state.isIncludedUsageTypeInGroupBy && state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage) {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -174,7 +174,7 @@ const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (state.isIncludedUsageTypeInGroupBy && state.specificFilterSelected === SPECIFIC_FILTER_MAP.usage) {
+        if (state.isIncludedUsageTypeInGroupBy && state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage) {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -407,17 +407,17 @@ watch(
         () => costAnalysisPageState,
         () => costAnalysisPageStore.selectedDataSourceId,
         () => costAnalysisPageStore.selectedQueryId,
-        () => state.specificFilterSelected,
+        () => state.usageTypeAdditionalFilterSelected,
     ],
-    async ([, selectedDataSourceId, , specificFilterSelected]) => {
+    async ([, selectedDataSourceId, , usageTypeAdditionalFilterSelected]) => {
         if (!selectedDataSourceId) return;
         tableState.thisPage = 1;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
             tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
             tableState.more = more ?? false;
-            if (specificFilterSelected === SPECIFIC_FILTER_MAP.usage && state.isIncludedUsageTypeInGroupBy) {
-                tableState.costFields = getDataTableDateFields(costAnalysisPageState.granularity, costAnalysisPageState.period, specificFilterSelected);
+            if (usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage && state.isIncludedUsageTypeInGroupBy) {
+                tableState.costFields = getDataTableDateFields(costAnalysisPageState.granularity, costAnalysisPageState.period, usageTypeAdditionalFilterSelected);
             } else {
                 tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
             }
@@ -426,8 +426,8 @@ watch(
     { immediate: true, deep: true },
 );
 
-const handleUpdateSpecificFilterSelected = (selected: SpecificFilter) => {
-    state.specificFilterSelected = selected;
+const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditionalFilter) => {
+    state.usageTypeAdditionalFilterSelected = selected;
 };
 
 // LOAD REFERENCE STORE
@@ -469,8 +469,8 @@ const handleUpdateSpecificFilterSelected = (selected: SpecificFilter) => {
             </template>
             <template #toolbox-left>
                 <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
-                <specific-filter-selector v-if="state.isIncludedUsageTypeInGroupBy"
-                                          @update-specific-filter="handleUpdateSpecificFilterSelected"
+                <usage-type-additional-filter-selector v-if="state.isIncludedUsageTypeInGroupBy"
+                                                       @update-filter="handleUpdateUsageTypeAdditionalFilterSelected"
                 />
             </template>
             <template #th-format="{field}">
@@ -523,7 +523,7 @@ const handleUpdateSpecificFilterSelected = (selected: SpecificFilter) => {
                             />
                         </template>
                         <template v-else>
-                            <span v-if="state.specificFilterSelected === 'usage' && state.isIncludedUsageTypeInGroupBy"
+                            <span v-if="state.usageTypeAdditionalFilterSelected === 'usage' && state.isIncludedUsageTypeInGroupBy"
                                   class="usage-wrapper"
                             >
                                 {{ getUsageQuantity(item, field.name) }}

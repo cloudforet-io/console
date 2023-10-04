@@ -43,8 +43,8 @@ export const FILTER = {
     ...ADDITIONAL_FILTER,
 } as const;
 
-export const SPECIFIC_FILTER_MAP = {
+export const USAGE_TYPE_ADDITIONAL_FILTER_MAP = {
     cost: 'cost',
     usage: 'usage',
 } as const;
-export type SpecificFilter = typeof SPECIFIC_FILTER_MAP[keyof typeof SPECIFIC_FILTER_MAP];
+export type UsageTypeAdditionalFilter = typeof USAGE_TYPE_ADDITIONAL_FILTER_MAP[keyof typeof USAGE_TYPE_ADDITIONAL_FILTER_MAP];
