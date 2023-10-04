@@ -160,7 +160,7 @@ const handleConfirm = async () => {
     emit('confirm');
     state.proxyVisible = false;
 };
-const handleSelectRoleItems = (roleItems: string) => {
+const handleSelectRoleItem = (roleItems: string) => {
     if (!roleItems.length) return;
     const roleItem = state.roleItems.filter((d) => d.name === roleItems);
     const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
@@ -217,7 +217,7 @@ const initForm = () => {
                             show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @update:selected="handleSelectRoleItems"
+                            @update:selected="handleSelectRoleItem"
                         />
                     </template>
                     <template #label-extra>

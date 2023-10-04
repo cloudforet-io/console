@@ -295,7 +295,7 @@ const handleUpdateExternalUser = async (inputUserItems: InputItem[], isValid: bo
     selectedExternalUserItems.value = [...selectedExternalUserItems.value, _addedUserItem];
     externalItemsErrors.value = errors;
 };
-const handleSelectRoleItems = (roleItems: string) => {
+const handleSelectRoleItem = (roleItems: string) => {
     if (!roleItems.length) return;
     const roleItem = state.roleItems.filter((d) => d.name === roleItems);
     const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
@@ -422,7 +422,7 @@ watch(() => state.activeTab, () => {
                             show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @update:selected="handleSelectRoleItems"
+                            @update:selected="handleSelectRoleItem"
                         />
                     </template>
                 </p-field-group>
