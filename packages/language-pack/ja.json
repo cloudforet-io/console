@@ -1327,7 +1327,7 @@
 				"DELETE_TITLE": "この変数を削除しますか？",
 				"DESCRIPTION_ACCOUNT": "AWS アカウント作成時に割り当てられるアカウントID",
 				"DESCRIPTION_ASSET_ACCOUNT": "AWS アカウント作成時に割り当てられるアカウントID",
-				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "クラウドセキュリティと規制コンプライアンスのためのコンプライアンスフレームワークのリスト",
+				"DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK": "クラウドセキュリティと規制コンプライアンスのためのコンプライアンスフレームワークのリスト",
 				"DESCRIPTION_DATA_SOURCE": "クラウド環境内でのデータと情報の中心的なソースで、AWS、Google、Azureなどのクラウドプロバイダからのデータだけでなく、特定の企業やサービスからの統合請求データを含むさまざまなデータソースです。",
 				"DESCRIPTION_GROUP_BY": "特定のオプションに基づいてデータをグループ化し、そのグループのトレンドやパターンを把握することができます。",
 				"DESCRIPTION_PRODUCT": "各クラウドプロバイダーが提供するクラウドコンピューティング製品やサービス",

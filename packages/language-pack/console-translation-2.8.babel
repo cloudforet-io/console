@@ -23633,7 +23633,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>DESCRIPTION_ASSET_COMPLIANCE_TYPE</name>
+                                        <name>DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
