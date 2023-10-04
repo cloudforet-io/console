@@ -1,79 +1,3 @@
-<template>
-    <div class="attached-service-account-form">
-        <p-field-group :invalid="invalidState.selectedAttachedServiceAccount"
-                       :invalid-text="invalidTexts.selectedAttachedServiceAccount"
-                       :valid="state.isAttachedServiceAccountValid"
-                       :required="true"
-                       :class="{'margin-on-specific': props.marginOnSpecific && collectorFormState.attachedServiceAccountType === 'specific'}"
-        >
-            <p-field-title :label="props.title || $t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT')"
-                           size="lg"
-                           class="mb-2"
-            />
-            <!-- NOTE: screen desktop size-->
-            <div class="contents-container">
-                <p-radio-group class="attached-service-account-radio-group">
-                    <p-radio v-for="(item) in attachedServiceAccountList"
-                             :key="`${item.name}`"
-                             :value="item.name"
-                             :selected="collectorFormState.attachedServiceAccountType"
-                             @change="handleChangeAttachedServiceAccountType"
-                    >
-                        {{ item.label }}
-                    </p-radio>
-                </p-radio-group>
-                <!-- NOTE: screen mobile size-->
-                <p-select-dropdown class="attached-service-account-dropdown"
-                                   :selected="collectorFormState.attachedServiceAccountType"
-                                   :menu="attachedServiceAccountList"
-                                   @update:selected="handleChangeAttachedServiceAccountType"
-                />
-                <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">
-                    <p-field-title class="specific-service-account-dropdown-label"
-                                   :label="$t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
-                    />
-                    <p-select-dropdown class="specific-service-account-dropdown"
-                                       :selected="selectedAttachedServiceAccount"
-                                       multi-selectable
-                                       show-select-marker
-                                       :handler="serviceAccountHandler"
-                                       appearance-type="stack"
-                                       :reset-selected-on-unmounted="false"
-                                       is-filterable
-                                       show-delete-all-button
-                                       @update:selected="handleSelectAttachedServiceAccount"
-                    >
-                        <template #input-left-area>
-                            <p-i v-if="collectorFormState.selectedServiceAccountFilterOption === 'exclude'"
-                                 name="ic_minus_circle"
-                                 class="ml-2"
-                                 width="1.25rem"
-                                 heigth="1.25rem"
-                                 :color="red[300]"
-                            />
-                        </template>
-                        <template #context-menu-header>
-                            <div class="include-exclude-selector">
-                                <select-box v-for="item in state.includeExcludeOptionList"
-                                            :key="item.name"
-                                            :selected="collectorFormState.selectedServiceAccountFilterOption"
-                                            :value="item.name"
-                                            :icon="item.icon"
-                                            :icon-color="item.iconColor"
-                                            :multi-selectable="true"
-                                            @change="handleSelectIncludeExcludeOption"
-                                >
-                                    {{ item.label }}
-                                </select-box>
-                            </div>
-                        </template>
-                    </p-select-dropdown>
-                </div>
-            </div>
-        </p-field-group>
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
@@ -253,6 +177,82 @@ watch(() => collectorFormState.attachedServiceAccount, (value) => {
 });
 
 </script>
+
+<template>
+    <div class="attached-service-account-form">
+        <p-field-group :invalid="invalidState.selectedAttachedServiceAccount"
+                       :invalid-text="invalidTexts.selectedAttachedServiceAccount"
+                       :valid="state.isAttachedServiceAccountValid"
+                       :required="true"
+                       :class="{'margin-on-specific': props.marginOnSpecific && collectorFormState.attachedServiceAccountType === 'specific'}"
+        >
+            <p-field-title :label="props.title || $t('INVENTORY.COLLECTOR.CREATE.ATTACHED_SERVICE_ACCOUNT')"
+                           size="lg"
+                           class="mb-2"
+            />
+            <!-- NOTE: screen desktop size-->
+            <div class="contents-container">
+                <p-radio-group class="attached-service-account-radio-group">
+                    <p-radio v-for="(item) in attachedServiceAccountList"
+                             :key="`${item.name}`"
+                             :value="item.name"
+                             :selected="collectorFormState.attachedServiceAccountType"
+                             @change="handleChangeAttachedServiceAccountType"
+                    >
+                        {{ item.label }}
+                    </p-radio>
+                </p-radio-group>
+                <!-- NOTE: screen mobile size-->
+                <p-select-dropdown class="attached-service-account-dropdown"
+                                   :selected="collectorFormState.attachedServiceAccountType"
+                                   :menu="attachedServiceAccountList"
+                                   @update:selected="handleChangeAttachedServiceAccountType"
+                />
+                <div v-if="collectorFormState.attachedServiceAccountType !== 'all'">
+                    <p-field-title class="specific-service-account-dropdown-label"
+                                   :label="$t('INVENTORY.COLLECTOR.CREATE.SPECIFIC_SERVICE_ACCOUNT')"
+                    />
+                    <p-select-dropdown class="specific-service-account-dropdown"
+                                       :selected="selectedAttachedServiceAccount"
+                                       multi-selectable
+                                       show-select-marker
+                                       :handler="serviceAccountHandler"
+                                       appearance-type="stack"
+                                       :reset-selected-on-unmounted="false"
+                                       is-filterable
+                                       show-delete-all-button
+                                       @update:selected="handleSelectAttachedServiceAccount"
+                    >
+                        <template #input-left-area>
+                            <p-i v-if="collectorFormState.selectedServiceAccountFilterOption === 'exclude'"
+                                 name="ic_minus_circle"
+                                 class="ml-2"
+                                 width="1.25rem"
+                                 heigth="1.25rem"
+                                 :color="red[300]"
+                            />
+                        </template>
+                        <template #context-menu-header>
+                            <div class="include-exclude-selector">
+                                <select-box v-for="item in state.includeExcludeOptionList"
+                                            :key="item.name"
+                                            :selected="collectorFormState.selectedServiceAccountFilterOption"
+                                            :value="item.name"
+                                            :icon="item.icon"
+                                            :icon-color="item.iconColor"
+                                            :multi-selectable="true"
+                                            @change="handleSelectIncludeExcludeOption"
+                                >
+                                    {{ item.label }}
+                                </select-box>
+                            </div>
+                        </template>
+                    </p-select-dropdown>
+                </div>
+            </div>
+        </p-field-group>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .attached-service-account-form {
