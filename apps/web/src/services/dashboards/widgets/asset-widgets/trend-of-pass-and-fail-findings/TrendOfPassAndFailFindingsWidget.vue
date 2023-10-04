@@ -307,6 +307,7 @@ const handleUpdateThisPage = async (_thisPage: number) => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -328,7 +329,7 @@ defineExpose<WidgetExpose<FullData>>({
         <div class="data-container">
             <div class="chart-wrapper">
                 <p-data-loader class="chart-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="state.chartData"
                                loader-type="skeleton"
                                disable-empty-case

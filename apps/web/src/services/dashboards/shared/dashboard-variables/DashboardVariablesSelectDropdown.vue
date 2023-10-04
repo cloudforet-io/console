@@ -15,7 +15,8 @@
                 />
             </div>
         </template>
-        <dashboard-variables-more-button :is-manageable="props.isManageable"
+        <dashboard-variables-more-button v-if="!props.disableMoreButton"
+                                         :is-manageable="props.isManageable"
                                          :disabled="state.saveLoading"
         />
         <p-text-button style-type="highlight"
@@ -73,6 +74,7 @@ interface Props {
     originVariables?: DashboardVariables;
     originVariablesSchema?: DashboardVariablesSchema;
     dashboardId?: string;
+    disableMoreButton?: boolean;
 }
 
 const props = defineProps<Props>();

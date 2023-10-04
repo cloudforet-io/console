@@ -9,13 +9,13 @@ export const MANAGED_COST_QUERY_SET_IDS = {
     DAILY_PRODUCT: 'Daily cost by product',
 } as const;
 
-export const managedCostQuerySetIdList: string[] = [
+export const MANAGED_COST_QUERY_SET_ID_LIST: string[] = [
     MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
     MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
     MANAGED_COST_QUERY_SET_IDS.DAILY_PRODUCT,
 ];
 
-export const managedCostQuerySets: CostQuerySetModel[] = [
+export const ManagedCostQuerySets: Omit<CostQuerySetModel, 'data_source_id'>[] = [
     {
         cost_query_set_id: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
         name: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,

@@ -2,9 +2,9 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PBadge, PCollapsibleList, PPaneLayout, PHeading, PFilterableDropdown,
+    PBadge, PCollapsibleList, PPaneLayout, PHeading, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { differenceBy } from 'lodash';
 import {
     computed, reactive,
@@ -62,8 +62,8 @@ const responderState = reactive({
             type: 'item',
         };
     })),
-    prevSelectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as FilterableDropdownMenuItem[],
-    selectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as FilterableDropdownMenuItem[],
+    prevSelectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as SelectDropdownMenuItem[],
+    selectedMemberItems: props.alertData.responders.map((d) => ({ name: d.resource_id, label: d.resource_id })) as SelectDropdownMenuItem[],
     selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map((d) => d.name)),
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
 });
@@ -132,9 +132,9 @@ const listEscalationPolicy = async () => {
     }));
 };
 
-const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
-    const addedItems: FilterableDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
-    const deletedItems: FilterableDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
+const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
+    const addedItems: SelectDropdownMenuItem[] = differenceBy(selected, responderState.prevSelectedMemberItems, 'name');
+    const deletedItems: SelectDropdownMenuItem[] = differenceBy(responderState.prevSelectedMemberItems, selected, 'name');
 
     if (addedItems.length) {
         addedItems.forEach((item) => addResponder(item.name || ''));
@@ -168,7 +168,7 @@ const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
             >
                 <template #extra>
                     <div class="w-full text-right">
-                        <p-badge v-if="alertData.escalation_ttl === 0"
+                        <p-badge v-if="props.alertData.escalation_ttl === 0"
                                  badge-type="solid-outline"
                                  style-type="indigo500"
                         >
@@ -184,11 +184,11 @@ const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
             >
                 <template #title="{data, index}">
                     <p class="responder-info"
-                       :class="{'current': data.notification_level === `LV${alertData.escalation_step}` }"
+                       :class="{'current': data.notification_level === `LV${props.alertData.escalation_step}` }"
                     >
                         <span class="step">[{{ t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
                         <span class="level">{{ data.notification_level }}</span>
-                        <p-badge v-if="data.notification_level === `LV${alertData.escalation_step}`"
+                        <p-badge v-if="data.notification_level === `LV${props.alertData.escalation_step}`"
                                  badge-type="subtle"
                                  style-type="primary3"
                         >
@@ -208,13 +208,15 @@ const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
                 {{ t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
                 <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
-            <p-filterable-dropdown :menu="responderState.allMemberItems"
-                                   :selected="responderState.selectedMemberItems"
-                                   :disabled="manageDisabled"
-                                   multi-selectable
-                                   show-select-marker
-                                   appearance-type="stack"
-                                   @update:selected="handleUpdateSelected"
+            <p-select-dropdown :menu="responderState.allMemberItems"
+                               :selected="responderState.selectedMemberItems"
+                               :disabled="props.manageDisabled"
+                               multi-selectable
+                               show-select-marker
+                               appearance-type="stack"
+                               is-filterable
+                               show-delete-all-button
+                               @update:selected="handleUpdateSelected"
             />
         </article>
     </p-pane-layout>

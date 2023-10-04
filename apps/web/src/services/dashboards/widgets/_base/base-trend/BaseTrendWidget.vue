@@ -35,10 +35,10 @@ import type {
     SelectorType,
 } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import {
     getDateAxisSettings,
     getXYChartLegends,
-    getRefinedXYChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
@@ -52,12 +52,16 @@ import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-w
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-import type { CostAnalyzeResponse, Legend, XYChartData } from '@/services/dashboards/widgets/type';
+import type { CostAnalyzeResponse, Legend } from '@/services/dashboards/widgets/type';
 
 interface Data {
     cost_sum: { date: string; value: number }[];
     _total_cost_sum: number;
     [groupBy: string]: any;
+}
+interface ChartData {
+    date?: string;
+    [groupBy: string]: number | any; // aws: 12333
 }
 type Response = CostAnalyzeResponse<Data>;
 
@@ -106,8 +110,8 @@ const state = reactive({
     loading: true,
     data: null as Response | null,
     chart: null as null | XYChart,
-    chartData: computed<XYChartData[]>(() => {
-        const data = getRefinedXYChartData(state.data?.results, {
+    chartData: computed<ChartData[]>(() => {
+        const data = getRefinedXYChartData<Data, ChartData>(state.data?.results, {
             groupBy: widgetState.groupBy,
             arrayDataKey: 'cost_sum',
             categoryKey: DATE_FIELD_NAME,
@@ -185,7 +189,7 @@ const fetchData = async (): Promise<Response> => {
 };
 
 /* Util */
-const drawChart = (chartData: XYChartData[]) => {
+const drawChart = (chartData: ChartData[]) => {
     const isLineChart = widgetState.chartType === CHART_TYPE.LINE;
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
 
@@ -280,6 +284,7 @@ const handleUpdateThisPage = (_thisPage: number) => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -315,7 +320,7 @@ defineExpose<WidgetExpose<Response>>({
         <div class="data-container">
             <div class="chart-wrapper">
                 <p-data-loader class="chart-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="state.chartData"
                                loader-type="skeleton"
                                disable-empty-case
@@ -327,7 +332,7 @@ defineExpose<WidgetExpose<Response>>({
                     />
                 </p-data-loader>
             </div>
-            <widget-data-table :loading="state.loading"
+            <widget-data-table :loading="props.loading || state.loading"
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results : []"
                                :currency="widgetState.currency"

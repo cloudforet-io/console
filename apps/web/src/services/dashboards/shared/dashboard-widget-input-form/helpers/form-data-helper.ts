@@ -1,11 +1,12 @@
 import { cloneDeep } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { PartialDashboardLayoutWidgetInfo } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import {
     getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
-import type { PartialDashboardLayoutWidgetInfo } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import type { InheritOptions, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetFilterKey, isWidgetFilterKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 export const getInitialFormData = (widgetInfo: PartialDashboardLayoutWidgetInfo|undefined, variableSchema: DashboardVariablesSchema): Record<string, any> => {
@@ -20,7 +21,7 @@ export const getInitialFormData = (widgetInfo: PartialDashboardLayoutWidgetInfo|
             formData[propertyName] = getOptionValueFromVariableSchema(propertyName, inheritOption, variableSchema);
         } else {
             // other case
-            formData[propertyName] = getOptionKeyAndValueFromWidgetInfoOptions(propertyName, widgetInfo.widget_options ?? {});
+            formData[propertyName] = getOptionValueFromWidgetInfoOptions(propertyName, widgetInfo.widget_options ?? {});
         }
     });
 
@@ -42,14 +43,15 @@ const getOptionValueFromVariableSchema = (optionKey: string, inheritOption: Inhe
 
     return undefined;
 };
-const getOptionKeyAndValueFromWidgetInfoOptions = (optionKey: string, widgetOptions: WidgetOptions) => {
-    if (optionKey.startsWith('filters')) {
-        const filterKey = optionKey.replace('filters.', '');
+const getOptionValueFromWidgetInfoOptions = (optionKey: string, widgetOptions: WidgetOptions) => {
+    if (isWidgetFilterKey(optionKey)) {
+        const filterKey = getWidgetFilterKey(optionKey);
         const filterValues = widgetOptions.filters?.[filterKey] ?? [];
-        if (Array.isArray(filterValues)) {
+        if (Array.isArray(filterValues) && filterValues.length > 0) {
             return filterValues.map((filter) => filter.v).flat();
         }
         return undefined;
     }
+
     return cloneDeep(widgetOptions[optionKey]);
 };

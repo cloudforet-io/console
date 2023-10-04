@@ -24,7 +24,6 @@ import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
-
 export interface WidgetFrameProps {
     title: string;
     size: WidgetSize;
@@ -361,8 +360,7 @@ const handleClickViewModeButton = () => {
     }
     .edit-mode-cover {
         position: absolute;
-        width: 100%;
-        height: 100%;
+        right: 0;
         padding: 0.75rem;
         .button-group {
             @apply flex gap-2 flex-wrap justify-end;

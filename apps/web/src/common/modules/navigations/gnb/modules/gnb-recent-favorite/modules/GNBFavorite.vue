@@ -14,7 +14,8 @@ import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
@@ -24,6 +25,7 @@ import {
     convertMenuConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
+    getParsedKeysWithManagedCostQueryFavoriteKey,
 } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -43,14 +45,15 @@ import type { DashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
-
-
 const FAVORITE_LIMIT = 5;
 
-const emit = defineEmits<{(e: 'close'): void}>();
+const allReferenceStore = useAllReferenceStore();
+
 const store = useStore();
 const { t } = useI18n();
 const router = useRouter();
+
+const emit = defineEmits<{(e: 'close'): void}>();
 
 const state = reactive({
     loading: true,
@@ -144,7 +147,7 @@ const state = reactive({
     )),
     favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
         const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_COST_ANALYSIS, store.getters['user/pagePermissionList']);
-        return isUserAccessible ? convertCostAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets) : [];
+        return isUserAccessible ? convertCostAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets, state.dataSourceMap) : [];
     }),
     favoriteDashboardItems: computed<FavoriteItem[]>(() => {
         const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
@@ -175,6 +178,7 @@ const state = reactive({
         const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(store.state.favorite.projectGroupItems, state.projectGroups);
         return [...favoriteProjectGroupItems, ...favoriteProjectItems];
     }),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
 });
 
 /* Util */
@@ -240,11 +244,12 @@ const handleSelect = (item: SuggestionItem) => {
         }).catch(() => {});
     } else if (item.itemType === SUGGESTION_TYPE.COST_ANALYSIS) {
         const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
+        const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
         router.push({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
                 dataSourceId,
-                costQuerySetId: itemName,
+                costQuerySetId: parsedKeys ? parsedKeys[1] : itemName,
             },
         }).catch(() => {});
     }

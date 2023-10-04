@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFilterableDropdown,
+    PSelectDropdown,
 } from '@spaceone/design-system';
 import {
     computed, reactive, watch,
@@ -80,13 +80,15 @@ watch(() => state.selectedMemberItems, () => {
 </script>
 
 <template>
-    <p-filterable-dropdown v-model:selected="state.selectedMemberItems"
-                           class="add-notification-member-group"
-                           :loading="state.loading"
-                           :menu="state.allMemberItems"
-                           multi-selectable
-                           appearance-type="stack"
-                           use-fixed-menu-style
+    <p-select-dropdown v-model:selected="state.selectedMemberItems"
+                       class="add-notification-member-group"
+                       :loading="state.loading"
+                       :menu="state.allMemberItems"
+                       multi-selectable
+                       appearance-type="stack"
+                       use-fixed-menu-style
+                       is-filterable
+                       show-delete-all-button
     />
 </template>
 

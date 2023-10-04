@@ -3,9 +3,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
     PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
+import { debouncedWatch } from '@vueuse/core';
 import { isEqual } from 'lodash';
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -17,7 +18,7 @@ import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 interface Props {
     visible: boolean;
@@ -45,7 +46,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     nonInheritedOptionModalVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
-        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState.inheritOptions);
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptionsAmongUsedVariables(dashboardDetailState.variablesSchema, widgetFormState.inheritOptions, widgetFormState.widgetOptions);
         return nonInheritedWidgetOptions.length > 0;
     }),
 });
@@ -53,7 +54,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
+    if (widgetFormStore.updatedWidgetInfo) dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
 };
 
 /* Api */
@@ -90,10 +91,10 @@ const handleCloseSidebar = () => {
     state.proxyVisible = false;
     emit('close');
 };
-watch(() => widgetFormStore.mergedWidgetInfo, async (after, before) => {
+debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
     emit('update:widget-info');
-});
+}, { debounce: 150 });
 </script>
 
 <template>

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { h } from 'vue';
 
 import PBadge from '@/data-display/badge/PBadge.vue';
@@ -40,7 +39,7 @@ badgeEl = `${options.prefix ?? ''}${badgeEl}${options.postfix ?? ''}`;
 
 if (options.link) {
     badgeEl = [h(PLink, {
-        href: options.link, target: '_blank',
+        attrs: { href: options.link, newTab: true },
     }, badgeEl)];
 }
 

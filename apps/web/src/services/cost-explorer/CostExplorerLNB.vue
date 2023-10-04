@@ -19,6 +19,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -30,7 +31,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 import { gray } from '@/styles/colors';
 
-import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/cost-analysis/config';
 import RelocateDashboardModal from '@/services/cost-explorer/modules/RelocateDashboardModal.vue';
 import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
@@ -40,7 +41,6 @@ import {
 } from '@/services/cost-explorer/store/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-
 
 const FOLDING_COUNT_BY_SHOW_MORE = 7;
 const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
@@ -86,22 +86,45 @@ const state = reactive({
         },
     ]),
     queryMenuSet: computed<LNBMenu>(() => {
-        const currentQueryMenuList: LNBMenu = costQuerySetState.costQuerySetList.map((d) => ({
-            type: 'item',
-            id: d.cost_query_set_id,
-            label: d.name,
-            icon: managedCostQuerySetIdList.includes(d.cost_query_set_id) ? {
-                name: 'ic_main-filled',
-                color: gray[500],
-            } : undefined,
-            to: {
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                params: {
-                    dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
-                    costQuerySetId: d.cost_query_set_id,
+        const currentQueryMenuList: LNBMenu = costQuerySetState.costQuerySetList.map((d) => {
+            if (MANAGED_COST_QUERY_SET_ID_LIST.includes(d.cost_query_set_id)) {
+                return {
+                    type: 'item',
+                    id: d.cost_query_set_id,
+                    label: d.name,
+                    icon: {
+                        name: 'ic_main-filled',
+                        color: gray[500],
+                    },
+                    to: {
+                        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                        params: {
+                            dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
+                            costQuerySetId: d.cost_query_set_id,
+                        },
+                    },
+                    favoriteOptions: {
+                        type: FAVORITE_TYPE.COST_ANALYSIS,
+                        id: getCompoundKeyWithManagedCostQuerySetFavoriteKey(d.data_source_id, d.cost_query_set_id),
+                    },
+                };
+            }
+            return {
+                type: 'item',
+                id: d.cost_query_set_id,
+                label: d.name,
+                to: {
+                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    params: {
+                        dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
+                        costQuerySetId: d.cost_query_set_id,
+                    },
                 },
-            },
-        }));
+                favoriteOptions: {
+                    type: FAVORITE_TYPE.COST_ANALYSIS,
+                },
+            };
+        });
 
         const showMoreMenuSet: LNBMenu = [{
             type: 'slot',
@@ -170,7 +193,7 @@ const relocateNotificationState = reactive({
 
 const filterFavoriteItems = (menuItems: LNBItem[] = []): LNBItem[] => {
     if (!state.showFavoriteOnly) return menuItems;
-    return menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
+    return menuItems.filter((menu) => (menu.id && state.favoriteItemMap[menu.favoriteOptions?.id || menu.id]) || menu.type !== MENU_ITEM_TYPE.ITEM);
 };
 
 const getCurrentCurrencySet = (dataSourceKey: string): string => {
@@ -198,7 +221,7 @@ const handleSelectDataSource = (selected: string) => {
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
-            costQuerySetId: managedCostQuerySetIdList[0],
+            costQuerySetId: costQuerySetStore.managedCostQuerySets[0].cost_query_set_id,
         },
     }).catch(() => {});
 };
@@ -261,7 +284,7 @@ onMounted(() => {
                     <template #dropdown-button="item">
                         <div class="selected-wrapper">
                             <p-lazy-img v-if="item && item.imageUrl"
-                                        class="left-icon"
+                                        class="selected-icon"
                                         :src="item.imageUrl"
                                         width="1rem"
                                         height="1rem"
@@ -294,10 +317,13 @@ onMounted(() => {
     .select-options-dropdown {
         .selected-wrapper {
             @apply flex items-center;
-            .left-icon {
+
+            .selected-icon {
                 margin-right: 0.25rem;
+                margin-top: 0.125rem;
                 flex-shrink: 0;
             }
+
             .selected-text {
                 flex-grow: 1;
                 overflow: hidden;
@@ -305,8 +331,18 @@ onMounted(() => {
                 white-space: nowrap;
             }
         }
+
         .selected-item-postfix {
             @apply text-gray-400;
+        }
+    }
+
+    /* custom design-system component - p-select-dropdown */
+    :deep(.p-select-dropdown) {
+        .left-icon {
+            margin-right: 0.25rem;
+            margin-top: 0.125rem;
+            flex-shrink: 0;
         }
     }
 }

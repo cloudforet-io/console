@@ -52,7 +52,7 @@ test.describe('Create Compliance Overview Dashboard', () => {
                 labelList.push(variableName);
             }
             expect(labelList).toEqual([
-                'Project', 'Provider', 'Region', 'Compliance Type', 'AWS Account ID (Asset)',
+                'Project', 'Provider', 'Region', 'Compliance Framework', 'AWS Account ID (Asset)',
             ]);
         });
 
@@ -66,8 +66,8 @@ test.describe('Create Compliance Overview Dashboard', () => {
                 widgetNameList.push(widgetName);
             }
             expect(widgetNameList).toEqual([
-                'Compliance Check Status',
-                'Total Failure and Severity',
+                'Compliance Status',
+                'Total Fail Findings Status',
                 'Count of Pass and Fail Findings by Region',
                 'Count of Fail Findings by Service',
                 'Trend of Pass and Fail Findings by Service',

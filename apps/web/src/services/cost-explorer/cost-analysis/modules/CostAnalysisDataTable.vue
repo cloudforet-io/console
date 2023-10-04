@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -8,7 +8,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PDivider,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
@@ -31,11 +31,21 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { getDataTableCostFields } from '@/services/cost-explorer/cost-analysis/lib/data-table-helper';
 import { DATE_FORMAT } from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
+import UsageTypeAdditionalFilterSelector from '@/services/cost-explorer/cost-analysis/modules/UsageTypeAdditionalFilterSelector.vue';
+import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/lib/config';
 import {
-    GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP, ADDITIONAL_GROUP_BY, ADDITIONAL_GROUP_BY_ITEM_MAP,
+    GRANULARITY,
+    GROUP_BY,
+    GROUP_BY_ITEM_MAP,
+    ADDITIONAL_GROUP_BY,
+    ADDITIONAL_GROUP_BY_ITEM_MAP,
+    USAGE_TYPE_ADDITIONAL_FILTER_MAP,
 } from '@/services/cost-explorer/lib/config';
-import { getDataTableCostFields, getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
+import {
+    getTimeUnitByGranularity,
+} from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { CostAnalyzeResponse, Granularity, Period } from '@/services/cost-explorer/type';
 
@@ -110,24 +120,43 @@ const state = reactive({
             field_group: ['date'],
         };
     }),
+    headerMenuItems: [
+        { type: 'item', name: 'cost', label: 'Cost' },
+        { type: 'item', name: 'usage', label: 'Usage' },
+    ],
+    selected: 'cost',
+    usageTypeAdditionalFilterSelected: USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost as UsageTypeAdditionalFilter,
 });
 const tableState = reactive({
     loading: true,
-    excelFields: computed<ExcelDataField[]>(() => tableState.groupByFields.concat(tableState.costFields).map((d) => {
-        const field: ExcelDataField = { key: d.name, name: d.label };
-        if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
-        if (d.name === GROUP_BY.PROJECT_GROUP) field.reference = { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' };
-        if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
-        if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
-        if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
-        if (d.name.startsWith('cost')) {
-            field.type = 'currency';
-            field.options = {
-                currency: costAnalysisPageStore.currency,
-            };
+    excelFields: computed<ExcelDataField[]>(() => {
+        const fields: DataTableFieldType[] = [];
+        if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
+        if (state.isIncludedUsageTypeInGroupBy && state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage) {
+            fields.push({
+                name: 'usage_unit',
+                label: 'Usage Unit',
+                textAlign: 'right',
+                sortable: false,
+            });
         }
-        return field;
-    })),
+        fields.push(...tableState.costFields);
+        return fields.map((d) => {
+            const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
+            if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
+            if (d.name === GROUP_BY.PROJECT_GROUP) field.reference = { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' };
+            if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
+            if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
+            if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
+            if (d.name.startsWith('cost')) {
+                field.type = 'currency';
+                field.options = {
+                    currency: costAnalysisPageStore.currency,
+                };
+            }
+            return field;
+        });
+    }),
     groupByFields: computed<DataTableFieldType[]>(() => costAnalysisPageState.groupBy.map((d) => {
         if (GROUP_BY_ITEM_MAP[d]) {
             return {
@@ -143,7 +172,20 @@ const tableState = reactive({
         };
     })),
     costFields: [] as DataTableFieldType[],
-    fields: computed<DataTableFieldType[]>(() => tableState.groupByFields.concat(tableState.costFields)),
+    fields: computed<DataTableFieldType[]>(() => {
+        const fields: DataTableFieldType[] = [];
+        if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
+        if (state.isIncludedUsageTypeInGroupBy && state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage) {
+            fields.push({
+                name: 'usage_unit',
+                label: 'Usage Unit',
+                textAlign: 'right',
+                sortable: false,
+            });
+        }
+        fields.push(...tableState.costFields);
+        return fields;
+    }),
     items: [] as CostAnalyzeRawData[],
     thisPage: 1,
     pageSize: 15,
@@ -262,7 +304,7 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
         refinedTableData.push({
             ...d,
             cost_sum: _costSum,
-            ...(state.isIncludedUsageTypeInGroupBy && { usage_quantity_sum: _usageQuantitySum }),
+            ...((state.isIncludedUsageTypeInGroupBy) && { usage_quantity_sum: d.usage_unit ? _usageQuantitySum : '' }),
         });
     });
     return refinedTableData;
@@ -299,9 +341,6 @@ const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|s
     const dateIndex = Number(fieldName.split('.')[1]);
     const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
     if (!usageQuantity || !item.usage_unit) return '--';
-    if (item.usage_unit === 'Bytes') {
-        return `${byteFormatter(usageQuantity, { unit: item.usage_unit })}`;
-    }
     return numberFormatter(usageQuantity);
 };
 
@@ -310,13 +349,32 @@ const handleChange = async (options: any = {}) => {
     setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
     const { results, more } = await listCostAnalysisTableData();
     if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
-    tableState.more = more;
+    tableState.more = more ?? false;
 };
 const costAnalyzeExportQueryHelper = new QueryHelper();
-const handleExcelDownload = async () => {
+const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
     try {
         costAnalyzeExportQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        const { status, response } = await fetchCostAnalyze({
+            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            query: {
+                ...state.analyzeQuery,
+                filter: costAnalyzeExportQueryHelper.apiQuery.filter,
+            },
+        });
+        if (status === 'succeed') return response.results;
+        return [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return [];
+    }
+};
+const handleExcelDownload = async () => {
+    try {
+        const results = await listCostAnalysisExcelData();
+        const refinedData = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
         await store.dispatch('file/downloadExcel', {
+            // HACK: delete `url` and `param` after console-api 1.12.dev20 release
             url: '/cost-analysis/cost/analyze',
             param: {
                 data_source_id: costAnalysisPageStore.selectedDataSourceId,
@@ -325,6 +383,7 @@ const handleExcelDownload = async () => {
                     filter: costAnalyzeExportQueryHelper.apiQuery.filter,
                 },
             },
+            data: refinedData,
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,
             version: 'v2',
@@ -341,7 +400,7 @@ const handleExport = async () => {
 const handleUpdateThisPage = async () => {
     const { results, more } = await listCostAnalysisTableData();
     tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
-    tableState.more = more;
+    tableState.more = more ?? false;
 };
 
 watch(
@@ -349,19 +408,26 @@ watch(
         () => costAnalysisPageState,
         () => costAnalysisPageStore.selectedDataSourceId,
         () => costAnalysisPageStore.selectedQueryId,
+        () => state.usageTypeAdditionalFilterSelected,
     ],
-    async ([, selectedDataSourceId]) => {
+    async ([, selectedDataSourceId, , usageTypeAdditionalFilterSelected]) => {
         if (!selectedDataSourceId) return;
         tableState.thisPage = 1;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
             tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
-            tableState.more = more;
-            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
+            tableState.more = more ?? false;
+            const isUsageSelected = usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage;
+            const additionalFilter = (isUsageSelected && state.isIncludedUsageTypeInGroupBy) ? USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage : USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost;
+            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length, additionalFilter);
         }
     },
     { immediate: true, deep: true },
 );
+
+const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditionalFilter) => {
+    state.usageTypeAdditionalFilterSelected = selected;
+};
 
 // LOAD REFERENCE STORE
 (async () => {
@@ -400,6 +466,12 @@ watch(
                     </template>
                 </p-text-pagination>
             </template>
+            <template #toolbox-left>
+                <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
+                <usage-type-additional-filter-selector v-if="state.isIncludedUsageTypeInGroupBy"
+                                                       @update-filter="handleUpdateUsageTypeAdditionalFilterSelected"
+                />
+            </template>
             <template #th-format="{field}">
                 {{ field.label }}
                 <span class="field-description">{{ fieldDescriptionFormatter(field) }}</span>
@@ -433,6 +505,9 @@ watch(
                 <span v-else-if="field.isTagField">
                     {{ value ?? 'Unknown' }}
                 </span>
+                <span v-else-if="field.name === 'usage_unit'">
+                    {{ value ?? '--' }}
+                </span>
                 <span v-else-if="typeof value !== 'string'"
                       class="text-center"
                 >
@@ -447,15 +522,15 @@ watch(
                             />
                         </template>
                         <template v-else>
-                            <span class="usage-wrapper">
+                            <span v-if="state.usageTypeAdditionalFilterSelected === 'usage' && state.isIncludedUsageTypeInGroupBy"
+                                  class="usage-wrapper"
+                            >
+                                {{ getUsageQuantity(item, field.name) }}
+                            </span>
+                            <span v-else
+                                  class="usage-wrapper"
+                            >
                                 {{ numberFormatter(value) }}
-                                <p-divider v-if="state.isIncludedUsageTypeInGroupBy"
-                                           vertical
-                                           class="divider"
-                                />
-                                <span v-if="state.isIncludedUsageTypeInGroupBy">
-                                    {{ getUsageQuantity(item, field.name) }}
-                                </span>
                             </span>
                         </template>
                     </p-link>

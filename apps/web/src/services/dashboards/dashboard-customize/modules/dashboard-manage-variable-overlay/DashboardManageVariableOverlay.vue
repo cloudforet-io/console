@@ -7,7 +7,7 @@ import {
     computed, reactive, toRefs,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { getUUID } from '@/lib/component-util/getUUID';
 
@@ -32,6 +32,7 @@ interface Props {
 const props = defineProps<Props>();
 const { t } = useI18n();
 const router = useRouter();
+const route = useRoute();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -132,10 +133,16 @@ const handleClickGoBackButton = () => {
         deleteModalState.visible = true;
         return;
     }
-    router.replace({
-        name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
-    });
+    if (route.name === DASHBOARDS_ROUTE.CREATE._NAME) {
+        router.replace({
+            name: DASHBOARDS_ROUTE.CREATE._NAME,
+        });
+    } else {
+        router.replace({
+            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+        });
+    }
 };
 const handleClickCancel = () => {
     deleteModalState.type = 'CANCEL';

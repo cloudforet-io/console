@@ -6,10 +6,10 @@ import {
     computed, reactive, toRef, toRefs,
 } from 'vue';
 
+
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
-import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { DateRange } from '@/services/dashboards/config';
@@ -30,6 +30,7 @@ import {
     useMergedWidgetState,
 } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
 import type { ChartType } from '@/services/dashboards/widgets/type';
+
 
 export interface WidgetState extends MergedWidgetState {
     granularity: ComputedRef<Granularity|undefined>;
@@ -118,23 +119,29 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
 
 const getConvertedCloudServiceStatsConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): ConsoleFilter[] => {
     const results: ConsoleFilter[] = [];
-    Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
-        if (!filterItems?.length) return;
-        // HACK: This is temporary code for cloud_service_type filter
-        if ((filterKey === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type)) {
-            filterItems.forEach((d) => {
-                const key = 'cloud_service_type';
-                results.push({
-                    k: key,
-                    v: d.v,
-                    o: d.o,
-                });
-            });
-        } else {
-            filterItems.forEach((d) => {
-                results.push(d);
-            });
-        }
+    Object.values(widgetFiltersMap).forEach((filterItems) => {
+        filterItems.forEach((d) => {
+            results.push(d);
+        });
     });
+    // TODO: will be removed after compliance_framework filter is implemented
+    // Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
+    //     if (!filterItems?.length) return;
+    //     // HACK: This is temporary code for cloud_service_type filter
+    //     if ((filterKey === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type)) {
+    //         filterItems.forEach((d) => {
+    //             const key = 'cloud_service_type';
+    //             results.push({
+    //                 k: key,
+    //                 v: d.v,
+    //                 o: d.o,
+    //             });
+    //         });
+    //     } else {
+    //         filterItems.forEach((d) => {
+    //             results.push(d);
+    //         });
+    //     }
+    // });
     return results;
 };

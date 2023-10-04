@@ -1,11 +1,8 @@
 <script lang="ts" setup>
-
 import {
-    PFilterableDropdown, getTextHighlightRegex,
+    PSelectDropdown, getTextHighlightRegex,
 } from '@spaceone/design-system';
-import type {
-    FilterableDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import {
     computed, reactive,
 } from 'vue';
@@ -51,7 +48,7 @@ const cloudServicePageState = cloudServicePageStore.$state;
 
 const state = reactive({
     searchTerm: '',
-    selectedItems: computed<FilterableDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
+    selectedItems: computed<SelectDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
         name: selectedName,
         label: state.menuItems.find((d) => d.name === selectedName)?.label || selectedName,
     }))),
@@ -63,7 +60,7 @@ const state = reactive({
     }),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
-    menuItems: computed<FilterableDropdownMenuItem[]|RegionMenuItem[]>(() => {
+    menuItems: computed<SelectDropdownMenuItem[]|RegionMenuItem[]>(() => {
         if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
             return categoryItems;
         } if (props.type === CLOUD_SERVICE_FILTER_KEY.REGION) {
@@ -89,7 +86,7 @@ const regionMenuHandler = (inputText: string) => {
 };
 
 /* event */
-const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
+const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     emit('update:selected', selected.map((d) => d.name));
 };
 
@@ -105,15 +102,17 @@ const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
 
 <template>
     <div>
-        <p-filterable-dropdown v-model:search-text="state.searchTerm"
-                               :menu="state.menuItems"
-                               :selected="state.selectedItems"
-                               multi-selectable
-                               use-fixed-menu-style
-                               appearance-type="stack"
-                               show-select-marker
-                               :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
-                               @update:selected="handleUpdateSelected"
+        <p-select-dropdown v-model:search-text="state.searchTerm"
+                           :menu="state.menuItems"
+                           :selected="state.selectedItems"
+                           multi-selectable
+                           use-fixed-menu-style
+                           appearance-type="stack"
+                           show-select-marker
+                           :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
+                           is-filterable
+                           show-delete-all-button
+                           @update:selected="handleUpdateSelected"
         >
             <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION"
                       #menu-item--format="{item}"
@@ -138,7 +137,7 @@ const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
                     />
                 </div>
             </template>
-        </p-filterable-dropdown>
+        </p-select-dropdown>
     </div>
 </template>
 

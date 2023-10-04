@@ -18,7 +18,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
-    managedCostQuerySetIdList,
 } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
@@ -36,10 +35,12 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const filtersPopperRef = ref<any|null>(null);
-const containerRef = ref<HTMLElement|null>(null);
+const rightPartRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
+
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
+
 const state = reactive({
     queryFormModalVisible: false,
     granularityItems: computed<MenuItem[]>(() => ([
@@ -68,7 +69,7 @@ const state = reactive({
         },
     ])),
     selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
-    isManagedQuerySet: computed(() => managedCostQuerySetIdList.includes(state.selectedQuerySetId)),
+    isManagedQuerySet: computed(() => costAnalysisPageStore.managedCostQuerySetList.map((d) => d.cost_query_set_id).includes(state.selectedQuerySetId)),
     isDynamicQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
@@ -107,8 +108,7 @@ const {
     contextMenuRef,
     menu: state.saveDropdownMenuItems,
 });
-onClickOutside(containerRef, hideContextMenu);
-onClickOutside(contextMenuRef, hideContextMenu);
+onClickOutside(rightPartRef, hideContextMenu);
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
@@ -156,9 +156,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
 </script>
 
 <template>
-    <div ref="containerRef"
-         class="cost-analysis-query-filter"
-    >
+    <div class="cost-analysis-query-filter">
         <div class="filter-wrapper"
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
         >
@@ -167,17 +165,16 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                                    :selection-label="t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
                                    style-type="rounded"
                                    :selected="costAnalysisPageState.granularity"
+                                   class="granularity-dropdown"
                                    @select="handleSelectGranularity"
                 />
                 <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
-                <div>
-                    <p-badge v-if="state.showPeriodBadge"
-                             badge-type="subtle"
-                             style-type="gray200"
-                    >
-                        {{ state.periodBadgeText }}
-                    </p-badge>
-                </div>
+                <p-badge v-if="state.showPeriodBadge"
+                         badge-type="subtle"
+                         style-type="gray200"
+                >
+                    {{ state.periodBadgeText }}
+                </p-badge>
                 <p-popover v-model:is-visible="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
@@ -201,13 +198,13 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                         </p-badge>
                     </p-button>
                     <template #content>
-                        <cost-analysis-filters-popper ref="filtersPopperRef"
-                                                      class="filters-popper"
-                        />
+                        <cost-analysis-filters-popper ref="filtersPopperRef" />
                     </template>
                 </p-popover>
             </div>
-            <div class="right-part">
+            <div ref="rightPartRef"
+                 class="right-part"
+            >
                 <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
                     <p-button class="save-button"
                               style-type="tertiary"
@@ -260,14 +257,15 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
 .cost-analysis-query-filter {
     margin-top: 1.5rem;
     .filter-wrapper {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
+        @apply relative flex items-center justify-between;
         font-size: 0.875rem;
         .left-part {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            .granularity-dropdown {
+                min-width: unset;
+            }
         }
         .right-part {
             @apply relative;
@@ -288,9 +286,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
             :deep(.p-context-menu) {
                 @apply absolute;
                 top: 2.125rem;
-                right: 0;
-                margin-top: -0.15rem;
+                margin-top: -1px;
                 z-index: 100;
+                right: 0;
                 .p-context-menu-item {
                     min-width: 10rem;
                 }
@@ -319,27 +317,10 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                 }
             }
         }
-        .filters-popper {
-            width: 100%;
-        }
     }
     .invalid-text {
         @apply text-red-400 text-label-md;
         margin-top: 0.5rem;
-    }
-
-    @screen mobile {
-        .filter-wrapper, .left-part {
-            @apply flex-col;
-        }
-
-        .filters-popover {
-            margin-top: 0.5rem;
-        }
-
-        .right-part {
-            margin-top: 1.5rem;
-        }
     }
 }
 </style>

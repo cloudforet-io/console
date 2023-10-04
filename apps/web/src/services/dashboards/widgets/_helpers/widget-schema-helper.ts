@@ -1,5 +1,7 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { chain } from 'lodash';
+import {
+    chain, get, isEmpty, union,
+} from 'lodash';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
@@ -9,7 +11,7 @@ import type {
     WidgetFiltersSchemaProperty,
     WidgetOptionsSchemaProperty,
     InheritOptions,
-    WidgetConfig, WidgetOptionsSchema,
+    WidgetConfig, WidgetOptionsSchema, WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -57,7 +59,11 @@ export const getWidgetOptionName = (key: string): string => {
     if (WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey)) return `filters.${key}`;
     return key;
 };
-export const isWidgetFilterKey = (key: string): boolean => WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
+export const isWidgetFilterKey = (key: string): boolean => {
+    if (key.startsWith('filters.')) return WIDGET_FILTER_KEYS.includes(getWidgetFilterKey(key));
+    return WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
+};
+export const getWidgetFilterKey = (key: string): WidgetFilterKey => key.replace('filters.', '') as WidgetFilterKey;
 
 /** @function
  * @name getWidgetOptionsSchemaPropertyName
@@ -83,6 +89,7 @@ export const getWidgetInheritOptions = (...properties: WidgetOptionsSchemaProper
     });
     return inheritOptions;
 };
+
 export const getWidgetInheritOptionsForFilter = (...properties: WidgetFilterKey[]): InheritOptions => {
     const inheritOptions: InheritOptions = {};
     properties.forEach((propertyName) => {
@@ -94,13 +101,22 @@ export const getWidgetInheritOptionsForFilter = (...properties: WidgetFilterKey[
     return inheritOptions;
 };
 
-export const getNonInheritedWidgetOptions = (widgetInheritOptions?: InheritOptions): string[] => {
-    if (!widgetInheritOptions) return [];
-    const enabledInheritedOptions: string[] = Object.entries(widgetInheritOptions).filter(([, v]) => v.enabled).map(([k]) => k);
+export const getNonInheritedWidgetOptionsAmongUsedVariables = (
+    variablesSchema: DashboardVariablesSchema,
+    widgetInheritOptions: InheritOptions = {},
+    widgetOptions: WidgetOptions = {},
+): string[] => {
     const nonInheritedOptions: string[] = [];
-    Object.keys(widgetInheritOptions).forEach((property) => {
-        if (!enabledInheritedOptions.includes(property)) nonInheritedOptions.push(property);
-    });
+    const enabledInheritedOptions = Object.entries(widgetInheritOptions).filter(([, inheritOption]) => inheritOption?.enabled).map(([key, inheritOption]) => inheritOption?.variable_info?.key ?? key);
+    if (variablesSchema?.properties) {
+        Object.entries(variablesSchema.properties).forEach(([key, property]) => {
+            const optionName = getWidgetOptionName(key);
+            if (property.use
+                && !enabledInheritedOptions.includes(optionName)
+                && !isEmpty(get(widgetOptions, optionName))
+            ) nonInheritedOptions.push(optionName);
+        });
+    }
     return nonInheritedOptions;
 };
 
@@ -126,4 +142,13 @@ export const getInitialSchemaProperties = (
             return 9999;
         }) // sort by order and fixedProperties
         .value();
+};
+
+export const getRefinedSchemaProperties = (
+    storedProperties: string[],
+    initialProperties: string[],
+    widgetOptions?: WidgetOptions,
+): string[] => {
+    const optionExistProperties = storedProperties.filter((property) => !!get(widgetOptions, property));
+    return union(initialProperties, optionExistProperties);
 };

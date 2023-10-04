@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PRadio, PFilterableDropdown, PCheckbox, PButton,
+    PPaneLayout, PFieldGroup, PTextInput, PRadio, PSelectDropdown, PCheckbox, PButton,
 } from '@spaceone/design-system';
 import type { ComputedRef } from 'vue';
 import {
@@ -23,7 +23,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
-
 
 interface DomainItem {
     name: string;
@@ -239,12 +238,14 @@ watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
                     <span>{{ t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
                 </p-radio>
                 <br>
-                <p-filterable-dropdown class="mt-2 w-1/2"
-                                       :menu="state.domainList"
-                                       :selected="state.selectedDomain"
-                                       :disabled="state.isAllDomainSelected || type === 'EDIT'"
-                                       :placeholder="state.isAllDomainSelected ? t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
-                                       @update:selected="handleSelectDomain"
+                <p-select-dropdown class="mt-2 w-1/2"
+                                   :menu="state.domainList"
+                                   :selected="state.selectedDomain"
+                                   :disabled="state.isAllDomainSelected || type === 'EDIT'"
+                                   :placeholder="state.isAllDomainSelected ? t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
+                                   is-filterable
+                                   show-delete-all-button
+                                   @update:selected="handleSelectDomain"
                 />
             </p-field-group>
             <p-field-group class="notice-label-wrapper"

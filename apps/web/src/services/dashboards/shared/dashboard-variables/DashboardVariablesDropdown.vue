@@ -7,7 +7,9 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { onClickOutside } from '@vueuse/core';
-import { cloneDeep, debounce, flattenDeep } from 'lodash';
+import {
+    cloneDeep, debounce, flattenDeep, get,
+} from 'lodash';
 import type { MaybeRef } from 'vue';
 import {
     computed,
@@ -146,8 +148,8 @@ const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHe
     filtersHelper.setFilters([]);
 
     // NOTE: Some variables(asset) require specific API filters.
-    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.name) {
-        filtersHelper.addFilter({ k: 'labels', o: '=', v: 'Compliance' });
+    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.name) {
+        filtersHelper.addFilter({ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' });
     } else if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
         filtersHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
     }
@@ -176,15 +178,16 @@ const loadSearchResourceOptions = async () => {
 };
 
 const initVariable = () => {
-    const variable = dashboardDetailState.variables[props.propertyName];
-    if (state.variableProperty?.required && !variable) {
-        if (state.variableProperty?.options?.type === 'SEARCH_RESOURCE') {
-            const firstOption = state.searchResourceOptions[0];
-            if (firstOption) changeVariables([{ name: firstOption.key, label: firstOption.name }]);
+    const variableSchema = dashboardDetailState.variablesSchema.properties[props.propertyName];
+    if ((variableSchema.options as SearchResourceOptions)?.type === 'SEARCH_RESOURCE') {
+        const path = (variableSchema.options as SearchResourceOptions).default_path;
+        if (path !== undefined) {
+            const found = get(state.searchResourceOptions, path, undefined);
+            if (found) changeVariables([{ name: found.key, label: found.name }]);
         }
     }
     dashboardDetailStore.$patch((_state) => {
-        _state.variablesInitMap[props.propertyName] = true;
+        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: true };
     });
 };
 
@@ -195,6 +198,9 @@ watch(visibleMenu, (_visibleMenu) => {
 }, { immediate: true });
 
 watch(() => state.variableProperty, async (property) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: false };
+    });
     if (property.options?.type === 'SEARCH_RESOURCE') await loadSearchResourceOptions();
     initVariable();
 }, { immediate: true });

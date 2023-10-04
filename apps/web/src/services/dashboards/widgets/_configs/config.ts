@@ -47,7 +47,7 @@ export const ASSET_GROUP_BY = {
     // asset reference
     // REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
     SERVICE: ASSET_VARIABLE_TYPE_INFO.asset_service.key,
-    COMPLIANCE_TYPE: 'cloud_service_type',
+    COMPLIANCE_FRAMEWORK: 'cloud_service_type',
     ACCOUNT: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
 };
 
@@ -125,11 +125,10 @@ export const WIDGET_FILTER_KEYS = [
     REFERENCE_TYPE_INFO.cloud_service_type.type,
     REFERENCE_TYPE_INFO.region.type,
     // cost reference
-    COST_VARIABLE_TYPE_INFO.cost_data_source.type,
     COST_VARIABLE_TYPE_INFO.cost_product.type,
     COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
     // asset reference
-    ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type,
+    ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.type,
     ASSET_VARIABLE_TYPE_INFO.asset_account.type,
 ] as const;
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
@@ -212,7 +211,7 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
 }
 
 // TODO: replace with NewWidgetProps
-export interface WidgetProps {
+export interface WidgetProps<T = any> {
     widgetConfigId: string;
     title?: string;
     options?: WidgetOptions;
@@ -230,6 +229,8 @@ export interface WidgetProps {
     dashboardSettings?: DashboardSettings;
     dashboardVariablesSchema?: DashboardVariablesSchema;
     dashboardVariables?: DashboardVariables;
+    loading?: boolean;
+    data?: T;
 }
 
 // TODO: remove this after replacing WidgetProps with NewWidgetProps
@@ -247,6 +248,8 @@ export interface NewWidgetProps {
 }
 
 export interface WidgetEmit {
+    (e: 'mounted'): void;
+    (e: 'initiated', data: any): void;
     (e: 'refreshed', data: any): void;
     (e: 'update-widget-info', widgetInfo: Partial<DashboardLayoutWidgetInfo>): void;
     (e: 'update-widget-validation', validation: boolean): void;

@@ -10,9 +10,9 @@ import {
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { useStore } from 'vuex';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
@@ -28,16 +28,15 @@ import type {
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
-
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+const allReferenceStore = useAllReferenceStore();
 
-const store = useStore();
 const router = useRouter();
 const { t } = useI18n();
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
 });
 const state = reactive({
     initLoading: true,
@@ -90,30 +89,24 @@ const handleSelectedProvider = (providerName: string) => {
 
 /* API */
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
-const fetchCollectorCount = async (): Promise<number> => {
+const fetchCollectorCount = async () => {
     try {
         const { total_count } = await SpaceConnector.client.inventory.collector.list({
             query: collectorCountApiQueryHelper.data,
         });
-        return total_count;
+        state.hasCollectorList = total_count > 0;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return 0;
+    } finally {
+        state.initLoading = false;
     }
 };
 
 /* INIT */
 onMounted(async () => {
-    state.initLoading = true;
-    await Promise.allSettled([
-        store.dispatch('reference/plugin/load'),
-        store.dispatch('reference/provider/load'),
-    ]);
     await collectorPageStore.$reset();
     setValuesFromUrlQueryString();
-    const count = await fetchCollectorCount();
-    state.hasCollectorList = count > 0;
-    state.initLoading = false;
+    await fetchCollectorCount();
 });
 </script>
 
@@ -144,7 +137,7 @@ onMounted(async () => {
             loader-backdrop-color="gray.100"
             class="collector-loader-wrapper"
         >
-            <div v-if="state.hasCollectorList"
+            <div v-if="state.hasCollectorList && state.providerList.length > 1"
                  class="collector-contents-wrapper"
             >
                 <provider-list

@@ -37,7 +37,7 @@ const linkProps = computed(() => {
     if (props.options.link) {
         return {
             href: props.options?.link,
-            target: '_blank',
+            newTab: true,
             text: text.value.toString(),
             showIcon: !!text.value,
         };

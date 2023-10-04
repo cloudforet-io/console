@@ -2,7 +2,6 @@
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton, PTextButton,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
@@ -15,7 +14,7 @@ import { useI18n } from 'vue-i18n';
 import { useStore } from 'vuex';
 
 import {
-    getDefaultWidgetFormData, getVariableKeyFromWidgetSchemaProperty,
+    getDefaultWidgetFormData,
 } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import {
     useReferenceStore,
@@ -36,6 +35,9 @@ import {
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+import {
+    getVariableKeyFromWidgetSchemaProperty,
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     InheritOptions,
@@ -77,10 +79,10 @@ const state = reactive({
         .map(([propertyName]) => propertyName)),
     inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
         widgetFormState.schemaProperties,
-        widgetFormState.inheritOptions,
+        widgetFormStore.updatedWidgetInfo?.inherit_options ?? {}, // use updated inherit options not to show error message when updating widget info
         widgetFormStore.widgetConfig?.options_schema?.schema,
         dashboardDetailState.variablesSchema,
-        t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string,
+        t,
     )),
     isFocused: false,
     //
@@ -105,7 +107,7 @@ const { referenceStoreState } = useReferenceStore();
 const { handleSelectWidgetOptions, handleDeleteProperty } = useWidgetMoreOptions(state);
 
 /* utils */
-const isSelected = (selectedItem: SelectDropdownMenuItem | FilterableDropdownMenuItem[]): boolean => {
+const isSelected = (selectedItem: SelectDropdownMenuItem): boolean => {
     if (Array.isArray(selectedItem)) return !!selectedItem.length;
     return selectedItem && !isEmpty(selectedItem);
 };
@@ -133,19 +135,21 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
         };
     });
 
-    // update widget option schema
+    // update widget option schema and form data
     const originPropertySchema = widgetFormStore.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
     const newPropertySchema = getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, isInherit, dashboardDetailState.projectId);
-    state.widgetOptionsJsonSchema = {
+    const schema = {
         ...state.widgetOptionsJsonSchema,
         properties: {
             ...state.widgetOptionsJsonSchema.properties,
             [propertyName]: newPropertySchema,
         },
     };
+    const formData = { ...state.schemaFormData, [propertyName]: undefined };
 
-    // update form data
-    state.schemaFormData = { ...state.schemaFormData, [propertyName]: undefined };
+    // set schema and form data
+    state.widgetOptionsJsonSchema = schema;
+    state.schemaFormData = formData;
 };
 const handleUpdateFormData = (formData: Record<string, any>) => {
     state.schemaFormData = formData;
@@ -167,8 +171,8 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     // init title
     updateTitle(widgetFormStore.mergedWidgetInfo?.title);
 
-    // init schema and form data
-    state.widgetOptionsJsonSchema = getRefinedWidgetOptionsSchema(
+    // get schema and form data
+    const schema = getRefinedWidgetOptionsSchema(
         referenceStoreState,
         widgetFormStore.widgetConfig?.options_schema ?? { schema: {} },
         dashboardDetailState.variablesSchema,
@@ -176,9 +180,12 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
         widgetFormState.schemaProperties ?? [],
         dashboardDetailState.projectId,
     );
+    const formData = getInitialFormData(widgetFormStore.mergedWidgetInfo, dashboardDetailState.variablesSchema);
 
-    // initiate form data
-    state.schemaFormData = getInitialFormData(widgetFormStore.mergedWidgetInfo, dashboardDetailState.variablesSchema);
+    // set schema and form data
+    // CAUTION: those two states must be set at the same time not to cause re-rendering of p-json-schema-form
+    state.widgetOptionsJsonSchema = schema;
+    state.schemaFormData = formData;
 };
 
 watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {

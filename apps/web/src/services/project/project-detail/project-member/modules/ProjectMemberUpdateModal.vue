@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PFilterableDropdown, PTextInput,
+    PButtonModal, PFieldGroup, PSelectDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { reactive, ref } from 'vue';
@@ -16,7 +15,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { MemberItem } from '@/services/project/project-detail/project-member/type';
+import type { MemberItem, RoleMenuItem } from '@/services/project/project-detail/project-member/type';
 
 interface Props {
     visible: boolean;
@@ -41,7 +40,7 @@ const { t } = useI18n();
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    roleItems: [] as MenuItem[],
+    roleItems: [] as RoleMenuItem[],
     labelText: '',
     userId: '',
     showRoleWarning: false,
@@ -158,11 +157,11 @@ const handleConfirm = async () => {
     emit('confirm');
     state.proxyVisible = false;
 };
-const handleSelectRoleItems = (roleItems) => {
-    if (!roleItems.length) return;
-    const roleItem: any = state.roleItems.find((d) => d?.name === roleItems[0]?.name);
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
-    setForm('selectedRoleItems', [roleItem]);
+const handleSelectRoleItem = (roleItemName: string) => {
+    if (!roleItemName) return;
+    const roleItem = state.roleItems.filter((d) => d.name === roleItemName);
+    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
+    setForm('selectedRoleItems', roleItem);
     state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
 };
 
@@ -208,13 +207,15 @@ const initForm = () => {
                                :invalid-text="invalidTexts.selectedRoleItems"
                 >
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="state.roleItems"
                             :selected="selectedRoleItems"
+                            is-filterable
+                            show-delete-all-button
                             show-select-marker
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @update:selected="handleSelectRoleItems"
+                            @update:selected="handleSelectRoleItem"
                         />
                     </template>
                     <template #label-extra>

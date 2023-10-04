@@ -5,7 +5,7 @@ import {
 import { cloneDeep } from 'lodash';
 import type { ComponentPublicInstance, Component } from 'vue';
 import {
-    computed, nextTick, reactive, toRef, watch,
+    computed, reactive, toRef, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -21,15 +21,13 @@ import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/Das
 import DashboardVariablesSelectDropdown
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
 import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
-import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
     WidgetSize,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-
+import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 interface WidgetViewModeModalProps {
     visible: boolean;
@@ -57,11 +55,11 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
-const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
 const allReferenceStore = useAllReferenceStore();
+
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
+    loadingWidget: true,
     hasManagePermission: useManagePermissionState(),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
     component: null as Component|null,
@@ -71,9 +69,14 @@ const state = reactive({
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
-        const nonInheritedWidgetOptions = getNonInheritedWidgetOptions(widgetFormState.inheritOptions);
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptionsAmongUsedVariables(
+            dashboardDetailState.variablesSchema,
+            state.updatedWidgetInfo?.inherit_options,
+            state.updatedWidgetInfo?.widget_options,
+        );
         return nonInheritedWidgetOptions.length > 0;
     }),
+    updatedWidgetInfo: props.widgetInfo as Partial<DashboardLayoutWidgetInfo>|undefined,
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -102,12 +105,8 @@ const handleUpdateSidebarWidgetInfo = () => {
     state.widgetRef?.refreshWidget();
 };
 
-const handleUpdateData = (widgetKey: string, data: any) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.widgetDataMap[widgetKey] = data;
-    });
-};
 const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    state.updatedWidgetInfo = widgetInfo;
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
@@ -119,10 +118,8 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         initSnapshot();
         state.component = props.widgetInfo.component;
-        await nextTick();
-        state.widgetRef?.initWidget();
-        state.initiated = true;
     } else {
+        state.loadingWidget = true;
         state.sidebarVisible = false;
         state.component = null;
         emit('update:visible', false);
@@ -173,7 +170,8 @@ watch(() => props.visible, async (visible) => {
                 </div>
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <dashboard-variables-select-dropdown :is-manageable="false"
+                        <dashboard-variables-select-dropdown :is-manageable="state.hasManagePermission"
+                                                             disable-more-button
                                                              disable-save-button
                                                              :origin-variables="state.variablesSnapshot"
                                                              :origin-variables-schema="state.variableSchemaSnapshot"
@@ -198,12 +196,11 @@ watch(() => props.visible, async (visible) => {
                                :theme="props.widgetInfo.theme"
                                :error-mode="dashboardDetailState.widgetValidMap[props.widgetInfo.widget_key] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
-                               :disable-view-mode="true"
-                               :initiated="state.initiated"
                                :dashboard-settings="dashboardDetailState.settings"
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
-                               @update-data="handleUpdateData(props.widgetInfo.widget_key, $event)"
+                               :loading="state.loadingWidget"
+                               @mounted="state.loadingWidget = false"
                                @update-widget-info="handleUpdateWidgetInfo(props.widgetInfo.widget_key, $event)"
                                @update-widget-validation="handleUpdateValidation(props.widgetInfo.widget_key, $event)"
                     />

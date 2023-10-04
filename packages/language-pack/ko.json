@@ -1279,7 +1279,7 @@
 			"VIEW": "보기"
 		},
 		"CUSTOMIZE": {
-			"ADD_LABEL": "+ 버튼을 추가하여 레이블을 추가할 수 있습니다.",
+			"ADD_LABEL": "+ 버튼을 클릭하여 레이블을 추가할 수 있습니다.",
 			"ADD_WIDGET": {
 				"ADD": "위젯 추가",
 				"ADD_OPTIONS": "옵션 추가",
@@ -1327,7 +1327,7 @@
 				"DELETE_TITLE": "이 변수를 삭제하시겠습니까?",
 				"DESCRIPTION_ACCOUNT": "AWS 계정 생성 시 할당되는 계정 ID",
 				"DESCRIPTION_ASSET_ACCOUNT": "AWS 계정 생성 시 할당되는 계정 ID",
-				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "클라우드 보안 및 규정 준수를 위한 컴플라이언스 프레임워크 리스트",
+				"DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK": "클라우드 보안 및 규정 준수를 위한 컴플라이언스 프레임워크 리스트",
 				"DESCRIPTION_DATA_SOURCE": "클라우드 환경에서 수집되는 데이터 및 정보의 원천으로, AWS, Google, Azure와 같은 클라우드 제공 업체로부터 수집된 데이터뿐만 아니라, 특정 회사나 서비스의 통합 빌링 데이터와 같이 다양한 원천 데이터가 포함될 수 있음.",
 				"DESCRIPTION_GROUP_BY": "특정 옵션 기반 데이터를 그룹화하고 해당 그룹의 트렌드나 패턴을 파악하는데 사용가능",
 				"DESCRIPTION_PRODUCT": "각 클라우드 프로바이더가 제공하는 클라우드 컴퓨팅 제품 및 서비스",
@@ -1472,13 +1472,10 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "클라우드 자원의 비용 추이 또는 서버, 데이터베이스, 스토리지 사용 추이를 빠르게 파악할 수 있는 위젯. "
 			},
-			"COMPLIANCE_CHECK_STATUS": {
-				"CHECKED_SERVICE_ACCOUNT": "확인된 서비스 어카운트 ",
-				"COMPLIANCE_SCORE": "컴플라이언스 점수",
+			"COMPLIANCE_STATUS": {
 				"DESC": "조회 기간동안 확인된 컴플라이언스 Pass/Fail 관련 전반적인 상태를 보여주는 위젯. ",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
-				"MORE_THAN_PREV_MONTH": "전월 대비 상승",
-				"TOTAL_COMPLIANCE_NUMBER": "전체 컴플라이언스 개수"
+				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
 			},
 			"COST_BY_REGION": {
 				"DESC": "조회 기간동안 발생한 Region별 총 비용 데이터를 보여주는 위젯. "
@@ -1535,13 +1532,10 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
-			"TOTAL_FAILURE_AND_SEVERITY": {
+			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "조회 기간동안 확인된 컴플라이언스 Failure 개수, 비율과 심각도를 보여주는 위젯. ",
-				"FAILURE_RATE": "Failure 비율 ",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
-				"MORE_THAN_PREV_MONTH": "전월 대비 상승",
-				"SEVERITY": "심각도",
-				"TOTAL_FAILURE_COUNT": "총 failure 개수"
+				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "선택한 'Group By' 옵션을 기준으로 조회 기간 동안의 컴플라이언스 Pass/Fail findings 트렌드를 보여주는 위젯. "

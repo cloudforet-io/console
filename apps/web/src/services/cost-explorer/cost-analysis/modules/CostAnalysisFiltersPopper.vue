@@ -3,13 +3,12 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import {
-    PFilterableDropdown, PTextButton,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { PTextButton, PSelectDropdown } from '@spaceone/design-system';
 import type {
-    AutocompleteHandler, FilterableDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
     computed, reactive,
 } from 'vue';
@@ -39,8 +38,8 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     enabledFilters: computed<MenuItem[]>(() => costAnalysisPageStore.defaultGroupByItems.filter((d) => costAnalysisPageState.enabledFiltersProperties?.includes(d.name))),
-    selectedFilterableItemsMap: computed<Record<string, FilterableDropdownMenuItem[]>>(() => {
-        const _selectedItems = {} as Record<string, FilterableDropdownMenuItem[]>;
+    selectedFilterableItemsMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => {
+        const _selectedItems = {} as Record<string, SelectDropdownMenuItem[]>;
         Object.entries(costAnalysisPageState.filters ?? {}).forEach(([groupBy, items]) => {
             _selectedItems[groupBy] = getRefinedMenuItems(groupBy, items.map((d) => ({ name: d, label: d })));
         });
@@ -74,15 +73,19 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
         return undefined;
     }
 };
-const menuHandler = (groupBy: string): AutocompleteHandler => async (value: string) => {
+const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue: string) => {
     if (!groupBy) return { results: [] };
 
     state.loading = true;
-    const results = await getResources(value, groupBy);
+    const results = await getResources('', groupBy);
+    /* Get all resources without inputValue.
+    * Because, results has no label to be filtered by inputValue. */
     state.loading = false;
 
     const refinedMenuItems = getRefinedMenuItems(groupBy, results?.map((d) => ({ name: d.key, label: d.name })));
-    return { results: refinedMenuItems };
+    // filter by inputValue here.
+    const refinedMenuItemsFilteredByInputValue = refinedMenuItems.filter((d) => (d.label as string).toLowerCase().includes(inputValue.toLowerCase()));
+    return { results: refinedMenuItemsFilteredByInputValue };
 };
 const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
     if (!results) return [];
@@ -100,7 +103,7 @@ const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; lab
     });
 };
 
-const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: FilterableDropdownMenuItem[]) => {
+const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
     costAnalysisPageStore.$patch((_state) => {
         _state.filters = {
             ..._state.filters,
@@ -145,10 +148,10 @@ const handleClickResetFilters = () => {
 
 <template>
     <div class="cost-analysis-filters-popper">
-        <p-filterable-dropdown
+        <p-select-dropdown
             v-for="groupBy in state.enabledFilters"
             :key="`filters-dropdown-${groupBy.name}`"
-            :group-by="groupBy.name"
+            is-filterable
             :handler="menuHandler(groupBy.name)"
             :selected="state.selectedFilterableItemsMap[groupBy.name] ?? []"
             :loading="state.loading"
@@ -156,6 +159,7 @@ const handleClickResetFilters = () => {
             style-type="rounded"
             appearance-type="badge"
             show-select-marker
+            use-fixed-menu-style
             selection-highlight
             :selection-label="groupBy.label"
             :show-delete-all-button="false"
@@ -176,24 +180,25 @@ const handleClickResetFilters = () => {
 
 <style lang="postcss" scoped>
 .cost-analysis-filters-popper {
-    /* custom design-system component - p-filterable-dropdown */
-    :deep(.p-filterable-dropdown) {
-        display: inline-block;
-        width: auto;
-        max-width: 22.5rem;
-        padding: 0.25rem;
-        .dropdown-button {
-            height: 1.5rem;
-        }
-        .dropdown-context-menu {
-            min-width: 12rem;
-        }
-    }
+    @apply flex items-center flex-wrap;
+    flex: 1;
+    gap: 0.5rem;
 
     .reset-button {
         display: inline-block;
         vertical-align: middle;
         padding: 0.5rem 0;
     }
+}
+
+/* custom design-system component - p-context-menu */
+:deep(.p-context-menu) {
+    /*
+        CAUTION:
+        When the parent has a specific style attribute called 'transform,' 'fixed' behaves like 'absolute,' causing the context-menu's top position not to work correctly,
+        so it is manually forced to be specified.
+    */
+    top: initial !important;
+    left: initial !important;
 }
 </style>

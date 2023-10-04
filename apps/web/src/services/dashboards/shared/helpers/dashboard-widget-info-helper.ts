@@ -1,5 +1,7 @@
+import { isObjectEqual } from '@cloudforet/core-lib';
 import { cloneDeep, isEmpty, isEqual } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
+
 
 import type {
     DashboardLayoutWidgetInfo,
@@ -15,7 +17,7 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
     const updatedWidgetOptions: WidgetOptions = cloneDeep(mergedWidgetInfo.widget_options) ?? {};
 
     Object.entries(updatedInheritOptions).forEach(([key, inheritOption]) => {
-        if (isEqual(inheritOption, configInheritOptions[key])) {
+        if (isObjectEqual(inheritOption, configInheritOptions[key])) {
             delete updatedInheritOptions[key];
         }
     });
@@ -24,7 +26,7 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
         if (key.startsWith('filters.')) {
             if (!val) return;
             Object.entries(val).forEach(([filterKey, filterVal]) => {
-                if (isEqual(filterVal, configWidgetOptions.filters?.[filterKey])) {
+                if (isObjectEqual(filterVal, configWidgetOptions.filters?.[filterKey])) {
                     delete (updatedWidgetOptions.filters as WidgetFiltersMap)[filterKey];
                 }
             });

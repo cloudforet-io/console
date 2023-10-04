@@ -215,6 +215,7 @@ const handleUpdateThisPage = (_thisPage: number) => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -242,7 +243,7 @@ defineExpose<WidgetExpose<FullData>>({
         <div class="data-container">
             <div class="chart-wrapper">
                 <p-data-loader class="chart-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="state.data"
                                loader-type="skeleton"
                                :loader-backdrop-opacity="1"
@@ -259,7 +260,7 @@ defineExpose<WidgetExpose<FullData>>({
                 </p-data-loader>
             </div>
             <widget-data-table v-model:legends="state.legends"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :fields="state.tableFields"
                                :items="state.data ? state.data.results: []"
                                :currency="widgetState.currency"
