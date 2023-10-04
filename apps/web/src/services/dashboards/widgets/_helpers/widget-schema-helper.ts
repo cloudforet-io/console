@@ -17,7 +17,7 @@ import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/confi
 import {
     ASSET_GROUP_BY_SCHEMA, ASSET_REFERENCE_SCHEMA,
     COST_REFERENCE_SCHEMA, COST_GROUP_BY_SCHEMA,
-    RESOURCE_REFERENCE_SCHEMA, COST_DATA_SOURCE_SCHEMA,
+    RESOURCE_REFERENCE_SCHEMA, COST_DATA_SOURCE_SCHEMA, ASSET_QUERY_SET_SCHEMA,
 } from '@/services/dashboards/widgets/_configs/widget-schema-config';
 
 export const getWidgetOptionsSchema = (...optionNames: WidgetOptionsSchemaProperty[]): object => {
@@ -25,6 +25,7 @@ export const getWidgetOptionsSchema = (...optionNames: WidgetOptionsSchemaProper
 
     optionNames.forEach((optionName) => {
         if (optionName === 'cost_data_source') result.cost_data_source = COST_DATA_SOURCE_SCHEMA;
+        else if (optionName === 'asset_query_set') result.asset_query_set = ASSET_QUERY_SET_SCHEMA;
         else if (optionName === 'cost_group_by') result.cost_group_by = COST_GROUP_BY_SCHEMA;
         else if (optionName === 'asset_group_by') result.asset_group_by = ASSET_GROUP_BY_SCHEMA;
         else if (optionName.startsWith('filters.')) {

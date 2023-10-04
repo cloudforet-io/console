@@ -52,6 +52,10 @@ export const COST_REFERENCE_SCHEMA = {
 } as const;
 
 export const ASSET_REFERENCE_SCHEMA = {
+    [ASSET_VARIABLE_TYPE_INFO.asset_query_set.type]: {
+        title: ASSET_VARIABLE_TYPE_INFO.asset_query_set.name,
+        type: 'array',
+    },
     [ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.type]: {
         title: ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.name,
         type: 'array',
@@ -89,6 +93,15 @@ export const COST_DATA_SOURCE_SCHEMA = {
     type: 'string',
     reference: {
         resource_type: 'cost_analysis.DataSource',
+        default_path: 0,
+    },
+};
+
+export const ASSET_QUERY_SET_SCHEMA = {
+    title: 'Query Set',
+    type: 'string',
+    reference: {
+        resource_type: 'inventory.CloudServiceQuerySet',
         default_path: 0,
     },
 };
