@@ -102,9 +102,23 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
                 resource_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
             },
         },
+        [ASSET_VARIABLE_TYPE_INFO.asset_query_set.type]: {
+            name: ASSET_VARIABLE_TYPE_INFO.asset_query_set.name,
+            variable_type: 'MANAGED',
+            use: false,
+            selection_type: 'SINGLE',
+            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_QUERY_SET',
+            options: {
+                type: 'SEARCH_RESOURCE',
+                resource_type: 'inventory.CloudServiceQuerySet',
+                resource_key: ASSET_VARIABLE_TYPE_INFO.asset_query_set.key,
+                default_path: 0,
+            },
+        },
     },
     order: [
         COST_VARIABLE_TYPE_INFO.cost_data_source.type,
+        ASSET_VARIABLE_TYPE_INFO.asset_query_set.type,
         REFERENCE_TYPE_INFO.project.type,
         REFERENCE_TYPE_INFO.provider.type,
         REFERENCE_TYPE_INFO.service_account.type,
