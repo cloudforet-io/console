@@ -9,25 +9,23 @@
                 >
                     {{ $t('DASHBOARDS.CREATE.PUBLIC') }}
                 </p-radio>
-                <p class="viewer-description">
+                <p class="viewer-description public">
                     {{ $t('DASHBOARDS.CREATE.PUBLIC_DESC') }}
                 </p>
-                <div class="dashboard-viewers-private">
-                    <p-radio
-                        :selected="!isPublicViewer"
-                        @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
-                    >
-                        <p-i name="ic_lock-filled"
-                             width="0.875rem"
-                             height="0.875rem"
-                             class="mr-1 mb-1 ml-1 gray-500"
-                        />
-                        <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
-                    </p-radio>
-                    <p class="viewer-description">
-                        {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
-                    </p>
-                </div>
+                <p-radio
+                    :selected="!isPublicViewer"
+                    @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
+                >
+                    <p-i name="ic_lock-filled"
+                         width="0.875rem"
+                         height="0.875rem"
+                         class="mr-1 mb-1 ml-1 gray-500"
+                    />
+                    <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
+                </p-radio>
+                <p class="viewer-description">
+                    {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
+                </p>
             </p-radio-group>
         </div>
     </section>
@@ -81,8 +79,8 @@ export default {
             font-weight: 400;
             margin-left: 1.5rem;
         }
-        .dashboard-viewers-private {
-            margin-top: 0.25rem;
+        .public {
+            margin-bottom: 0.25rem;
         }
     }
 }
