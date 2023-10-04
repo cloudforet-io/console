@@ -42,3 +42,9 @@ export const FILTER = {
     ...GROUP_BY,
     ...ADDITIONAL_FILTER,
 } as const;
+
+export const USAGE_TYPE_ADDITIONAL_FILTER_MAP = {
+    cost: 'cost',
+    usage: 'usage',
+} as const;
+export type UsageTypeAdditionalFilter = typeof USAGE_TYPE_ADDITIONAL_FILTER_MAP[keyof typeof USAGE_TYPE_ADDITIONAL_FILTER_MAP];
