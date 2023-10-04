@@ -50,7 +50,7 @@ export const ASSET_GROUP_BY = {
     // asset reference
     // REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
     SERVICE: ASSET_VARIABLE_TYPE_INFO.asset_service.key,
-    COMPLIANCE_TYPE: 'cloud_service_type',
+    COMPLIANCE_FRAMEWORK: 'cloud_service_type',
     ACCOUNT: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
 };
 
@@ -131,7 +131,7 @@ export const WIDGET_FILTER_KEYS = [
     COST_VARIABLE_TYPE_INFO.cost_product.type,
     COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
     // asset reference
-    ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type,
+    ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.type,
     ASSET_VARIABLE_TYPE_INFO.asset_account.type,
 ] as const;
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
