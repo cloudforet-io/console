@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions,
     getWidgetInheritOptionsForFilter,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
@@ -32,6 +32,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     inherit_options: {
+        ...getWidgetInheritOptions('asset_query_set'),
         ...getWidgetInheritOptionsForFilter(
             'project',
             'provider',
@@ -41,19 +42,19 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         ),
     },
     options_schema: {
-        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
+        default_properties: ['asset_query_set', 'asset_group_by', ...getWidgetFilterSchemaPropertyNames(
             'project',
             'provider',
             'asset_compliance_framework',
             'region',
             'asset_account',
         )],
-        fixed_properties: ['asset_group_by'],
+        fixed_properties: ['asset_query_set', 'asset_group_by'],
         non_inheritable_properties: ['asset_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('asset_group_by'),
+                ...getWidgetOptionsSchema('asset_query_set', 'asset_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'project',
                     // 'service_account', HACK: Re-enable it after backend is ready
@@ -63,7 +64,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                     'asset_account',
                 ),
             },
-            order: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
+            order: ['asset_query_set', 'asset_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'project',
                 // 'service_account',
                 'provider',
