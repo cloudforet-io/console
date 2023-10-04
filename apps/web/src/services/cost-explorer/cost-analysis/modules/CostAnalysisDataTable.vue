@@ -303,7 +303,7 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
         refinedTableData.push({
             ...d,
             cost_sum: _costSum,
-            ...(state.isIncludedUsageTypeInGroupBy && { usage_quantity_sum: _usageQuantitySum }),
+            ...((state.isIncludedUsageTypeInGroupBy) && { usage_quantity_sum: d.usage_unit ? _usageQuantitySum : '' }),
         });
     });
     return refinedTableData;
