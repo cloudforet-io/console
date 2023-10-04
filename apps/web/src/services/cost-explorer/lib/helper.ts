@@ -1,9 +1,7 @@
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
-import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
-import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/lib/config';
-import { GRANULARITY, USAGE_TYPE_ADDITIONAL_FILTER_MAP } from '@/services/cost-explorer/lib/config';
+import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import type {
     Period, Granularity,
 } from '@/services/cost-explorer/type';
@@ -22,48 +20,4 @@ export const getPeriodByGranularity = (granularity: Granularity, period: Period)
         };
     }
     return period;
-};
-
-/* data table field */
-const getDataTableDateFields = (granularity: Granularity, period: Period, additionalFilter:UsageTypeAdditionalFilter): DataTableFieldType[] => {
-    const dateFields: DataTableFieldType[] = [];
-
-    const timeUnit = getTimeUnitByGranularity(granularity);
-    const _period = getPeriodByGranularity(granularity, period);
-
-    let labelDateFormat = 'M/D';
-    if (timeUnit === 'month') {
-        labelDateFormat = 'MMM';
-    } else if (timeUnit === 'year') {
-        labelDateFormat = 'YYYY';
-    }
-
-    const today = dayjs.utc();
-    let now = dayjs.utc(_period.start);
-    let index = 0;
-    // TODO: We don't know exactly what filter it is, not yet.
-    // so the state name is not clear. (To be updated later)
-    const itemName = additionalFilter === USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost ? 'cost_sum' : 'usage_quantity_sum';
-    while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
-        if (now.isAfter(today, timeUnit)) break;
-        dateFields.push({
-            name: `${itemName}.${index}.value`,
-            label: now.locale('en').format(labelDateFormat),
-            textAlign: 'right',
-            sortable: true,
-        });
-        now = now.add(1, timeUnit);
-        index += 1;
-    }
-    return dateFields;
-};
-export const getDataTableCostFields = (granularity: Granularity, period: Period, hasGroupBy: boolean, additionalFilter: UsageTypeAdditionalFilter): DataTableFieldType[] => {
-    const costFields: DataTableFieldType[] = [];
-    if (!hasGroupBy) {
-        costFields.push({
-            name: 'totalCost', label: ' ',
-        });
-    }
-    const dateFields = getDataTableDateFields(granularity, period, additionalFilter);
-    return costFields.concat(dateFields);
 };
