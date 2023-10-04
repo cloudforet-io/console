@@ -52,7 +52,7 @@ test.describe('Create Compliance Overview Dashboard', () => {
                 labelList.push(variableName);
             }
             expect(labelList).toEqual([
-                'Project', 'Provider', 'Region', 'Compliance Type', 'AWS Account ID (Asset)',
+                'Project', 'Provider', 'Region', 'Compliance Framework', 'AWS Account ID (Asset)',
             ]);
         });
 
