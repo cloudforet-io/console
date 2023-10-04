@@ -17,7 +17,6 @@ import { i18n } from '@/translations';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
-import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import { getPagePermissionMapFromRaw } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,7 +26,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { checkEmailFormat } from '@/services/administration/iam/user/lib/user-form-validations';
-import type { MemberItem } from '@/services/project/project-detail/project-member/type';
+import type { MemberItem, RoleMenuItem } from '@/services/project/project-detail/project-member/type';
 import { AUTH_TYPE } from '@/services/project/project-detail/project-member/type';
 
 type ExternalItemErrorCode = 'DUPLICATED'|'EMAIL_FORMAT'|'ALREADY_EXIST'|'NOT_FOUND';
@@ -41,9 +40,6 @@ interface Props {
 interface ExternalItemsError {
     all?: ExternalItemErrorCode;
     [selectedIndex: number]: ExternalItemErrorCode
-}
-interface RoleMenuItem extends SelectDropdownMenuItem {
-    pagePermissions: RawPagePermission[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -299,11 +295,11 @@ const handleUpdateExternalUser = async (inputUserItems: InputItem[], isValid: bo
     selectedExternalUserItems.value = [...selectedExternalUserItems.value, _addedUserItem];
     externalItemsErrors.value = errors;
 };
-const handleSelectRoleItems = (roleItems: RoleMenuItem[]) => {
+const handleSelectRoleItems = (roleItems: string) => {
     if (!roleItems.length) return;
-    const roleItem = { ...roleItems[0] };
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
-    setForm('selectedRoleItems', roleItems);
+    const roleItem = state.roleItems.filter((d) => d.name === roleItems);
+    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
+    setForm('selectedRoleItems', roleItem);
     state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
 };
 

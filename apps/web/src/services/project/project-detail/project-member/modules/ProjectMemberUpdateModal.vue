@@ -19,7 +19,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { MemberItem } from '@/services/project/project-detail/project-member/type';
+import type { MemberItem, RoleMenuItem } from '@/services/project/project-detail/project-member/type';
 
 interface Props {
     visible?: boolean;
@@ -43,7 +43,7 @@ const emit = defineEmits<{(e: 'confirm'): void;
 const state = reactive({
     loading: false,
     proxyVisible: useProxyValue('visible', props, emit),
-    roleItems: [] as MenuItem[],
+    roleItems: [] as RoleMenuItem[],
     labelText: '',
     userId: '',
     showRoleWarning: false,
@@ -160,11 +160,11 @@ const handleConfirm = async () => {
     emit('confirm');
     state.proxyVisible = false;
 };
-const handleSelectRoleItems = (roleItems) => {
+const handleSelectRoleItems = (roleItems: string) => {
     if (!roleItems.length) return;
-    const roleItem: any = state.roleItems.find((d) => d?.name === roleItems[0]?.name);
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
-    setForm('selectedRoleItems', [roleItem]);
+    const roleItem = state.roleItems.filter((d) => d.name === roleItems);
+    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
+    setForm('selectedRoleItems', roleItem);
     state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
 };
 
