@@ -53,18 +53,17 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
         ),
     },
     options_schema: {
-        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+        default_properties: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames(
             'cost_product',
             'project',
             'service_account',
             'region',
         )],
-        fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
-        non_inheritable_properties: ['cost_group_by'],
+        fixed_properties: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames('cost_product')],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
+                ...getWidgetOptionsSchema('cost_data_source'),
                 ...getWidgetFilterOptionsSchema(
                     'cost_product',
                     'project',
@@ -73,7 +72,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
                     'region',
                 ),
             },
-            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
+            order: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames(
                 'cost_product',
                 'project',
                 'service_account',
