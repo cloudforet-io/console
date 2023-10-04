@@ -1,3 +1,5 @@
+import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 export const ASSET_VARIABLE_TYPE_INFO = {
     asset_compliance_framework: {
         type: 'asset_compliance_framework',
@@ -19,4 +21,5 @@ export const ASSET_VARIABLE_TYPE_INFO = {
         key: 'additional_info.service',
         name: 'Service',
     },
+    asset_query_set: REFERENCE_TYPE_INFO.asset_query_set,
 } as const;
