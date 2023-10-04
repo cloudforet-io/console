@@ -155,20 +155,10 @@ const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({
-                k: 'key',
-                v: [
-                    'compliance_count',
-                    'pass_check_count',
-                    'fail_check_count',
-                    'pass_score',
-                    'fail_score',
-                ],
-                o: '',
-            });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         const prevMonth = dayjs.utc(widgetState.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
         const { status, response } = await fetchCloudServiceStatsAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,

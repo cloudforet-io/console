@@ -133,9 +133,10 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
     try {
         chartDataApiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        // .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
         const { status, response } = await fetchChartDataAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
@@ -169,10 +170,11 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
 
         tableDataApiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        // .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         if (pageSize.value) tableDataApiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchTableDataAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,

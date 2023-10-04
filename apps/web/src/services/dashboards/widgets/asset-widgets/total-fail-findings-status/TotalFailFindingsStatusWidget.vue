@@ -141,9 +141,10 @@ const fetchTrendData = async (): Promise<Data[]> => {
     try {
         trendDataApiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        // .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         const { status, response } = await fetchTrendDataAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
@@ -175,10 +176,11 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
     try {
         realtimeDataApiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        // .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
         const prevMonth = dayjs.utc(widgetState.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
         const { status, response } = await fetchRealtimeDataAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: prevMonth,

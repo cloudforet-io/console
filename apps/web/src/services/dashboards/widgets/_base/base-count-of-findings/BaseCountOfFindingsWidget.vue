@@ -106,12 +106,13 @@ const fetchData = async (): Promise<Data[]> => {
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        if (state.showPassFindings) {
-            apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        } else {
-            apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
-        }
+        // if (state.showPassFindings) {
+        //     apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
+        // } else {
+        //     apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
+        // }
         const { status, response } = await fetchCloudServiceStatsAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.end,
