@@ -185,7 +185,11 @@ const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boole
     if (!props.multiSelectable) {
         hideMenu();
         if (!props.indexMode) {
-            emit('select', item.name || '', isSelected);
+            if (Array.isArray(state.proxySelectedItem)) {
+                emit('select', item, isSelected);
+            } else {
+                emit('select', item.name || '', isSelected);
+            }
         } else {
             emit('select', state.selectedIndex, isSelected);
         }
@@ -217,6 +221,8 @@ const handleEnterKey = () => {
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
     if (props.multiSelectable) {
+        state.proxySelectedItem = selected;
+    } else if (Array.isArray(state.proxySelectedItem)) {
         state.proxySelectedItem = selected;
     } else {
         state.selectedIndex = props.menu.findIndex((data) => data.name === selected[0]?.name);
