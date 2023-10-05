@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
-    chain, get, union, isEmpty,
+    chain, get, union,
 } from 'lodash';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
@@ -105,17 +105,14 @@ export const getWidgetInheritOptionsForFilter = (...properties: WidgetFilterKey[
 export const getNonInheritedWidgetOptionsAmongUsedVariables = (
     variablesSchema: DashboardVariablesSchema,
     widgetInheritOptions: InheritOptions = {},
-    widgetOptions: WidgetOptions = {},
+    schemaProperties: string[] = [],
 ): string[] => {
     const nonInheritedOptions: string[] = [];
     const enabledInheritedOptions = Object.entries(widgetInheritOptions).filter(([, inheritOption]) => inheritOption?.enabled).map(([key, inheritOption]) => inheritOption?.variable_info?.key ?? key);
     if (variablesSchema?.properties) {
         Object.entries(variablesSchema.properties).forEach(([key, property]) => {
             const optionName = getWidgetOptionName(key);
-            if (property.use
-                && !enabledInheritedOptions.includes(optionName)
-                && !isEmpty(get(widgetOptions, optionName))
-            ) nonInheritedOptions.push(optionName);
+            if (property.use && schemaProperties.includes(optionName) && !enabledInheritedOptions.includes(key)) nonInheritedOptions.push(optionName);
         });
     }
     return nonInheritedOptions;
