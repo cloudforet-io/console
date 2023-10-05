@@ -185,7 +185,11 @@ const drawChart = (chartData: ChartData[]) => {
     xAxis.get('baseInterval').timeUnit = 'month';
     const xRendered = xAxis.get('renderer');
     xRendered.grid.template.setAll({ strokeOpacity: 0.8, location: 0.5 });
-    xRendered.labels.template.setAll({ visible: true });
+    xRendered.labels.template.setAll({
+        visible: true,
+        oversizedBehavior: 'hide',
+        maxWidth: 25,
+    });
 
     // set y-axis
     const yRendered = yAxis.get('renderer');
