@@ -89,14 +89,6 @@ const handleClickConfirm = () => {
     createBudget();
 };
 
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        allReferenceStore.load('project'),
-        allReferenceStore.load('projectGroup'),
-        allReferenceStore.load('costDataSource'),
-    ]);
-})();
 </script>
 
 <template>
