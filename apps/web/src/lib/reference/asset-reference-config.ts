@@ -1,11 +1,6 @@
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 export const ASSET_VARIABLE_TYPE_INFO = {
-    asset_compliance_framework: {
-        type: 'asset_compliance_framework',
-        key: 'name',
-        name: 'Compliance Framework',
-    },
     asset_account: {
         type: 'asset_account',
         key: 'account',

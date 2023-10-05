@@ -36,7 +36,6 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         ...getWidgetInheritOptionsForFilter(
             'project',
             'provider',
-            'asset_compliance_framework',
             'region',
             'asset_account',
         ),
@@ -45,7 +44,6 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         default_properties: ['asset_query_set', 'asset_group_by', ...getWidgetFilterSchemaPropertyNames(
             'project',
             'provider',
-            'asset_compliance_framework',
             'region',
             'asset_account',
         )],
@@ -59,7 +57,6 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                     'project',
                     // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
-                    'asset_compliance_framework',
                     'region',
                     'asset_account',
                 ),
@@ -68,7 +65,6 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
                 'project',
                 // 'service_account',
                 'provider',
-                'asset_compliance_framework',
                 'region',
                 'asset_account',
             )],

@@ -78,18 +78,6 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             },
         },
         // Variable for Asset
-        [ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.type]: {
-            name: ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.name,
-            variable_type: 'MANAGED',
-            use: false,
-            selection_type: 'MULTI',
-            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK',
-            options: {
-                type: 'SEARCH_RESOURCE',
-                resource_type: 'inventory.CloudServiceQuerySet',
-                resource_key: ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.key,
-            },
-        },
         [ASSET_VARIABLE_TYPE_INFO.asset_account.type]: {
             name: ASSET_VARIABLE_TYPE_INFO.asset_account.name,
             variable_type: 'MANAGED',
@@ -123,7 +111,6 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         REFERENCE_TYPE_INFO.service_account.type,
         REFERENCE_TYPE_INFO.region.type,
         COST_VARIABLE_TYPE_INFO.cost_product.type,
-        ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.type,
         ASSET_VARIABLE_TYPE_INFO.asset_account.type,
     ],
 };

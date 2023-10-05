@@ -131,7 +131,6 @@ export const WIDGET_FILTER_KEYS = [
     COST_VARIABLE_TYPE_INFO.cost_product.type,
     COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
     // asset reference
-    ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.type,
     ASSET_VARIABLE_TYPE_INFO.asset_account.type,
 ] as const;
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];

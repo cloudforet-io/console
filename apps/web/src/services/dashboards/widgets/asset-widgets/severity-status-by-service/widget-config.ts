@@ -34,12 +34,11 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
             'project',
             'provider',
             'region',
-            'asset_compliance_framework',
             'asset_account',
         ),
     },
     options_schema: {
-        default_properties: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_compliance_framework', 'asset_account')],
+        default_properties: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_account')],
         fixed_properties: ['asset_query_set'],
         schema: {
             type: 'object',
@@ -50,7 +49,6 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
                     // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
-                    'asset_compliance_framework',
                     'asset_account',
                 ),
             },
@@ -59,7 +57,6 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
                 // 'service_account',
                 'provider',
                 'region',
-                'asset_compliance_framework',
                 'asset_account',
             )],
         },
