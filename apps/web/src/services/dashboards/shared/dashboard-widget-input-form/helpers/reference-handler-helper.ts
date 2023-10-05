@@ -5,9 +5,11 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 const getApi = ({ schemaProperty }: ReferenceHandlerOptions) => {
     const referenceKey = schemaProperty.reference?.reference_key;
@@ -30,10 +32,17 @@ const getResources = async (inputText: string, options: ReferenceHandlerOptions)
         const resourceType = schemaProperty.reference?.resource_type;
         const distinctKey = schemaProperty.reference?.reference_key;
 
+        // NOTE: Some variables(asset) require specific API filters.
+        if (schemaProperty.title === ASSET_VARIABLE_TYPE_INFO.asset_query_set.name) {
+            filterHelper.setFilters([{ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' }]);
+        } else if (schemaProperty.title === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
+            filterHelper.setFilters([{ k: 'provider', o: '=', v: 'aws' }]);
+        }
+
         if (filters?.length) {
             const resourceKey = distinctKey ?? REFERENCE_TYPE_INFO[propertyName]?.key;
             if (resourceKey) {
-                filterHelper.setFilters([{ k: resourceKey, v: filters.map((d) => d.name as string), o: '=' }]);
+                filterHelper.addFilter({ k: resourceKey, v: filters.map((d) => d.name as string), o: '=' });
             }
         }
 
@@ -43,9 +52,9 @@ const getResources = async (inputText: string, options: ReferenceHandlerOptions)
             options: {
                 // TODO: update page start and limit if api is ready
                 limit: pageSize ?? 10,
+                filter: filterHelper.apiQuery.filter,
             },
             distinct_key: distinctKey,
-            filters: filterHelper.apiQuery.filter,
         });
 
         if (status === 'succeed') {

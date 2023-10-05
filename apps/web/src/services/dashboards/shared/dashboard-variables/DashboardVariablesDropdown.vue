@@ -146,13 +146,11 @@ const handleUpdateSearchText = debounce((text: string) => {
 const filtersHelper = new QueryHelper();
 
 const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHelper['apiQuery']['filter']|undefined => {
-    filtersHelper.setFilters([]);
-
     // NOTE: Some variables(asset) require specific API filters.
-    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.name) {
-        filtersHelper.addFilter({ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' });
+    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_query_set.name) {
+        filtersHelper.setFilters([{ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' }]);
     } else if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
-        filtersHelper.addFilter({ k: 'provider', o: '=', v: 'aws' });
+        filtersHelper.setFilters([{ k: 'provider', o: '=', v: 'aws' }]);
     }
 
     const filters = filtersHelper.apiQuery.filter;
