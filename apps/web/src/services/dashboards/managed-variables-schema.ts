@@ -111,7 +111,6 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'inventory.CloudServiceQuerySet',
-                resource_key: ASSET_VARIABLE_TYPE_INFO.asset_query_set.key,
                 default_path: 0,
             },
         },
