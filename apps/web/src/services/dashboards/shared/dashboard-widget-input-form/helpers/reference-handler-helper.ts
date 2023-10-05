@@ -21,7 +21,7 @@ const getApi = ({ schemaProperty }: ReferenceHandlerOptions) => {
 };
 
 
-const filterHelper = new QueryHelper();
+const filtersHelper = new QueryHelper();
 const getResources = async (inputText: string, options: ReferenceHandlerOptions): Promise<{name: string; key: string}[]> => {
     try {
         const fetcher = getCancellableFetcher(getApi(options));
@@ -32,17 +32,19 @@ const getResources = async (inputText: string, options: ReferenceHandlerOptions)
         const resourceType = schemaProperty.reference?.resource_type;
         const distinctKey = schemaProperty.reference?.reference_key;
 
+        filtersHelper.setFilters([]);
+
         // NOTE: Some variables(asset) require specific API filters.
         if (schemaProperty.title === ASSET_VARIABLE_TYPE_INFO.asset_query_set.name) {
-            filterHelper.setFilters([{ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' }]);
+            filtersHelper.setFilters([{ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' }]);
         } else if (schemaProperty.title === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
-            filterHelper.setFilters([{ k: 'provider', o: '=', v: 'aws' }]);
+            filtersHelper.setFilters([{ k: 'provider', o: '=', v: 'aws' }]);
         }
 
         if (filters?.length) {
             const resourceKey = distinctKey ?? REFERENCE_TYPE_INFO[propertyName]?.key;
             if (resourceKey) {
-                filterHelper.addFilter({ k: resourceKey, v: filters.map((d) => d.name as string), o: '=' });
+                filtersHelper.addFilter({ k: resourceKey, v: filters.map((d) => d.name as string), o: '=' });
             }
         }
 
@@ -52,7 +54,7 @@ const getResources = async (inputText: string, options: ReferenceHandlerOptions)
             options: {
                 // TODO: update page start and limit if api is ready
                 limit: pageSize ?? 10,
-                filter: filterHelper.apiQuery.filter,
+                filter: filtersHelper.apiQuery.filter,
             },
             distinct_key: distinctKey,
         });
