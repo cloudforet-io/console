@@ -180,7 +180,8 @@ const loadSearchResourceOptions = async () => {
 
 const initVariable = () => {
     const variableSchema = dashboardDetailState.variablesSchema.properties[props.propertyName];
-    if ((variableSchema.options as SearchResourceOptions)?.type === 'SEARCH_RESOURCE') {
+    const existingVariableInfoValue = dashboardDetailState.dashboardInfo?.variables[props.propertyName];
+    if ((variableSchema.options as SearchResourceOptions)?.type === 'SEARCH_RESOURCE' && !existingVariableInfoValue) {
         const path = (variableSchema.options as SearchResourceOptions).default_path;
         if (path !== undefined) {
             const found = get(state.searchResourceOptions, path, undefined);
