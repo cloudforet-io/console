@@ -150,6 +150,7 @@ const handleClickResetFilters = () => {
         <p-select-dropdown
             v-for="groupBy in state.enabledFilters"
             :key="`filters-dropdown-${groupBy.name}`"
+            class="filters-popper-dropdown"
             is-filterable
             :handler="menuHandler(groupBy.name)"
             :selected="state.selectedFilterableItemsMap[groupBy.name] ?? []"
@@ -182,6 +183,9 @@ const handleClickResetFilters = () => {
     @apply flex items-center flex-wrap;
     flex: 1;
     gap: 0.5rem;
+    .filters-popper-dropdown {
+        width: initial;
+    }
 
     .reset-button {
         display: inline-block;
