@@ -174,7 +174,7 @@ watch(() => store.state.user.language, (language) => {
         }
     }
     .p-text-input,
-    .p-select-dropdown, {
+    .p-select-dropdown {
         width: 100%;
         max-width: 25rem;
         flex-shrink: 0;
@@ -188,7 +188,7 @@ watch(() => store.state.user.language, (language) => {
 
 @screen mobile {
     .p-text-input,
-    .p-select-dropdown, {
+    .p-select-dropdown {
         max-width: unset;
     }
 }

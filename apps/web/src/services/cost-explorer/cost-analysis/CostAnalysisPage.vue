@@ -75,8 +75,9 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 .cost-analysis-page {
     .content-wrapper {
         overflow-x: auto;
+        padding-bottom: 1.625rem;
         .overflow-wrapper {
-            min-width: 40rem;
+            min-width: 50rem;
             .contents-wrapper {
                 @apply bg-white rounded-md border border-gray-200;
                 padding: 0 1rem 2.5rem 1rem;
