@@ -12,6 +12,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -24,8 +28,12 @@ import BudgetFormBaseInfo from '@/services/cost-explorer/budget/shared/budget-fo
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 
 const router = useRouter();
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
+    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    dataSource: computed(() => allReferenceStore.getters.costDataSource),
     baseInfo: {} as BudgetBaseInfo,
     isBaseInfoValid: false,
     amountPlanInfo: {} as BudgetAmountPlanInfo,
@@ -48,8 +56,20 @@ const createBudget = async () => {
         router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));
+    } catch (e:any) {
+        const errorCode = e.axiosError?.response?.data?.detail?.code;
+        const ALREADY_EXIST_ERROR_CODE = 'ERROR_BUDGET_ALREADY_EXIST';
+        if (errorCode === ALREADY_EXIST_ERROR_CODE) {
+            const selectedProjectOrProjectGroupName = state.baseInfo.project_group_id
+                ? state.projectGroup[state.baseInfo.project_group_id]?.label
+                : state.project[state.baseInfo.project_id]?.label;
+            ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET_ALREADY_EXIST', {
+                dataSourceName: state.dataSource[state.baseInfo.data_source_id]?.label,
+                name: selectedProjectOrProjectGroupName,
+            }));
+        } else {
+            ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));
+        }
     } finally {
         state.loading = false;
     }
@@ -69,6 +89,15 @@ const handleChangeAmountPlanning = (amountPlanInfo: BudgetAmountPlanInfo, isVali
 const handleClickConfirm = () => {
     createBudget();
 };
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        allReferenceStore.load('project'),
+        allReferenceStore.load('projectGroup'),
+        allReferenceStore.load('costDataSource'),
+    ]);
+})();
 </script>
 
 <template>
