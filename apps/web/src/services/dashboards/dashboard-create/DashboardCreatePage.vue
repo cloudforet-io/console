@@ -260,6 +260,8 @@ defineExpose({ setPathFrom });
 <style lang="postcss" scoped>
 .dashboard-create-page {
     &.step-2 {
+        @apply absolute;
+        top: 2rem;
         width: 100%;
         max-width: 1000px;
     }
