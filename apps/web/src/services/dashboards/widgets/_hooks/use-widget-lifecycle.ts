@@ -5,6 +5,7 @@ import {
 } from 'vue';
 
 import {
+    debounce,
     isEqual,
 } from 'lodash';
 
@@ -47,10 +48,10 @@ export const useWidgetLifecycle = <Data = any>({
 }: UseWidgetLifecycleOptions<Data>): void => {
     const initiated = ref(false);
 
-    const refreshWidgetAndEmitEvent = () => {
+    const refreshWidgetAndEmitEvent = debounce(() => {
         const newData = refreshWidget();
         emit('refreshed', newData);
-    };
+    }, 300);
 
     const stopVariablesWatch = watch(() => props.dashboardVariables, (after, before) => {
         if (!initiated.value || props.errorMode || !widgetState.inheritOptions || props.disableRefreshOnVariableChange) return;
@@ -59,7 +60,7 @@ export const useWidgetLifecycle = <Data = any>({
     }, { deep: true });
 
     const stopVariablesSchemaWatch = watch(() => props.dashboardVariablesSchema, (after, before) => {
-        if (!initiated.value || props.loading || !props.editMode || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
+        if (!initiated.value || !props.editMode || !widgetState.inheritOptions || !widgetState.schemaProperties || !widgetState.options
             || isEqual(after, before) || props.disableRefreshOnVariableChange) return;
 
         const { isWidgetUpdated, isValid, updatedWidgetInfo } = validateWidgetByVariablesSchemaUpdate({
