@@ -59,6 +59,9 @@ export default defineConfig(({ mode }) => ({
         globals: true,
         environment: 'jsdom',
         include: ['./src/**/__tests__/**/*.+(ts|js)'],
+        coverage: {
+            provider: 'istanbul',
+        },
     },
     resolve: {
         alias: {
