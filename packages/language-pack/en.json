@@ -380,6 +380,7 @@
 		"COST_MANAGEMENT": {
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "Failed to Create Budget",
+				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "The selected data source ({dataSourceName}) already has a budget created for the same target ({name}).",
 				"ALT_E_DELETE_BUDGET": "Failed to Delete Budget",
 				"ALT_E_UPDATE_BUDGET": "Failed to Update Budget",
 				"ALT_S_CREATE_BUDGET": "Budget successfully created",
