@@ -183,6 +183,7 @@ export interface CostWidgetOptions extends BaseWidgetOptions {
     selector_options?: SelectorOptions;
 }
 export interface AssetWidgetOptions extends BaseWidgetOptions {
+    asset_query_set?: string;
     asset_group_by?: AssetGroupBy | string;
 }
 export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;

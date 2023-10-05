@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptionsForFilter,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter, getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const severityStatusByServiceWidgetConfig: WidgetConfig = {
@@ -29,6 +29,7 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
         },
     },
     inherit_options: {
+        ...getWidgetInheritOptions('asset_query_set'),
         ...getWidgetInheritOptionsForFilter(
             'project',
             'provider',
@@ -38,10 +39,12 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
         ),
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_compliance_framework', 'asset_account'),
+        default_properties: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_compliance_framework', 'asset_account')],
+        fixed_properties: ['asset_query_set'],
         schema: {
             type: 'object',
             properties: {
+                ...getWidgetOptionsSchema('asset_query_set'),
                 ...getWidgetFilterOptionsSchema(
                     'project',
                     // 'service_account', HACK: Re-enable it after backend is ready
@@ -51,14 +54,14 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
                     'asset_account',
                 ),
             },
-            order: getWidgetFilterSchemaPropertyNames(
+            order: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames(
                 'project',
                 // 'service_account',
                 'provider',
                 'region',
                 'asset_compliance_framework',
                 'asset_account',
-            ),
+            )],
         },
     },
 };

@@ -22,6 +22,8 @@ import type {
     ReferenceLoadOptions,
 } from '@/store/modules/reference/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import type { AssetQuerySetReferenceMap } from '@/store/reference/asset-query-set-reference-store';
+import { useAssetQuerySetReferenceStore } from '@/store/reference/asset-query-set-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import {
     useCostDataSourceReferenceStore,
@@ -29,7 +31,7 @@ import {
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cost_data_source';
+export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cost_data_source'|'assetQuerySet'|'asset_query_set';
 
 export interface ReferenceTypeInfo {
     type: ReferenceType;
@@ -41,6 +43,7 @@ export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
+    const assetQuerySetReferenceStore = useAssetQuerySetReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -118,6 +121,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             //
             costDataSource: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
             cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
+            asset_query_set: assetQuerySetReferenceStore.getters.assetQuerySetTypeInfo,
+            assetQuerySet: assetQuerySetReferenceStore.getters.assetQuerySetTypeInfo,
         })),
         projectGroup: asyncComputed<ProjectGroupReferenceMap>(async () => {
             await store.dispatch('reference/projectGroup/load');
@@ -180,6 +185,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             return store.getters['reference/webhookItems'];
         }, {}, { lazy: true }),
         costDataSource: computed<CostDataSourceReferenceMap>(() => costDataSourceReferenceStore.getters.costDataSourceItems),
+        assetQuerySet: computed<AssetQuerySetReferenceMap>(() => assetQuerySetReferenceStore.getters.assetQuerySetItems),
     });
 
     const actions = {
