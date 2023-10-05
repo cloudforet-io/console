@@ -6,11 +6,10 @@ import type { Location } from 'vue-router/types/router';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
-import bytes from 'bytes';
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { byteFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -58,12 +57,12 @@ import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
-const USAGE_SOURCE_UNIT = 'GB';
 const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
 const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
 interface SubData {
     [USAGE_TYPE_VALUE_KEY]: string;
-    value: number
+    value: number;
+    usage_unit: string;
 }
 interface Data {
     cost_sum: SubData[];
@@ -76,9 +75,11 @@ interface Data {
 type Response = CostAnalyzeResponse<Data>;
 interface TableData extends WidgetTableData {
     [groupBy: string]: string | any;
+    usage_unit: string;
 }
 interface ChartData {
     [key: string]: number | any; // // project_id: 'project-1', HTTP Requests: 0.0, HTTPS Requests: 0.0, TransferOut: 0, ...
+    usage_unit: string;
 }
 
 
@@ -132,6 +133,7 @@ const state = reactive({
             categoryKey: USAGE_TYPE_VALUE_KEY,
             valueKey: 'value',
             isHorizontal: true,
+            additionalIncludeKeysFromParent: ['usage_unit'],
         });
         return _chartData.reverse();
     }),
@@ -141,9 +143,10 @@ const state = reactive({
         const tableData: TableData[] = state.data.results.map((d: Data) => {
             const row: TableData = {
                 [groupBy]: d[groupBy],
-            };
+            } as TableData;
             d[`${state.fieldsKey}_sum`]?.forEach((subData: SubData) => {
                 row[subData[USAGE_TYPE_VALUE_KEY]] = subData.value;
+                row.usage_unit = subData.usage_unit;
             });
             return row;
         });
@@ -152,8 +155,7 @@ const state = reactive({
     tableFields: computed<Field[]>(() => {
         if (!widgetState.groupBy) return [];
         const textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost' ? 'cost' : 'size',
-            sourceUnit: USAGE_SOURCE_UNIT,
+            type: state.fieldsKey === 'cost' ? 'cost' : 'number',
         };
 
         const dynamicTableFields: Field[] = state.data?.results?.[0]?.cost_sum?.map((d: SubData) => ({
@@ -169,13 +171,22 @@ const state = reactive({
 
         const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+
+        const fixedFields: Field[] = [{
+            name: widgetState.groupBy,
+            label: groupByLabel,
+            textOptions: { type: 'reference', referenceType },
+            width: groupByFieldWidth,
+        }];
+        if (state.fieldsKey === 'usage_quantity') {
+            fixedFields.push({
+                label: 'Usage Unit',
+                name: 'usage_unit',
+                width: otherFieldWidth,
+            });
+        }
         return [
-            {
-                name: widgetState.groupBy,
-                label: groupByLabel,
-                textOptions: { type: 'reference', referenceType },
-                width: groupByFieldWidth,
-            },
+            ...fixedFields,
             ...dynamicTableFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
@@ -195,7 +206,7 @@ const fetchData = async (): Promise<Response> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy, USAGE_TYPE_QUERY_KEY],
+                group_by: [widgetState.groupBy, USAGE_TYPE_QUERY_KEY, 'usage_unit'],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -209,7 +220,7 @@ const fetchData = async (): Promise<Response> => {
                     },
                 },
                 sort: [{ key: '_total_cost_sum', desc: true }],
-                field_group: [USAGE_TYPE_VALUE_KEY],
+                field_group: ['usage_unit', USAGE_TYPE_VALUE_KEY],
                 ...apiQueryHelper.data,
             },
         });
@@ -250,20 +261,21 @@ const drawChart = (chartData) => {
         };
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
         chart.series.push(series);
+        series.data.setAll(cloneDeep(chartData));
+
         const tooltip = chartHelper.createTooltip();
         tooltip.label.adapters.add('text', (text, target) => {
-            // let _text = `[${gray[700]}]{valueX}[/]`;
             let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[groupBy]}[/]`;
             chart.series.each((s) => {
                 const fieldName = s.get('valueYField') || s.get('valueXField') || '' as UsageType;
                 let value = target.dataItem?.dataContext?.[fieldName];
+                const unit = (target.dataItem?.dataContext as ChartData)?.usage_unit ?? '';
                 if (value === undefined) value = '--';
-                if (fieldName === 'data-transfer.out') {
+                if (typeof value === 'number') {
                     if (selectedSelectorType.value === 'cost') {
-                        if (state.currency) value = currencyMoneyFormatter(value, widgetState.currency);
+                        if (widgetState.currency) value = currencyMoneyFormatter(value, widgetState.currency);
                     } else {
-                        value = bytes.parse(`${value}${USAGE_SOURCE_UNIT}`);
-                        value = byteFormatter(value);
+                        value = `${numberFormatter(value)}${unit ? ` (${unit})` : ''}`;
                     }
                 }
                 _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
@@ -271,7 +283,6 @@ const drawChart = (chartData) => {
             return _text;
         });
         series.set('tooltip', tooltip);
-        series.data.setAll(cloneDeep(chartData));
     });
     if (legend) legend.data.setAll(chart.series.values);
 };
@@ -365,7 +376,7 @@ defineExpose<WidgetExpose<Response>>({
                                :all-reference-type-info="props.allReferenceTypeInfo"
                                :legends="state.legends"
                                :color-set="colorSet"
-                               :this-page="state.thisPage"
+                               :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
                                @update:this-page="handleUpdateThisPage"
             />
