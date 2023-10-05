@@ -380,6 +380,7 @@
 		"COST_MANAGEMENT": {
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "예산 생성 실패",
+				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "선택한 데이터 소스({dataSourceName})에 동일한 타겟({name})으로 이미 예산이 생성되어 있습니다.",
 				"ALT_E_DELETE_BUDGET": "예산 삭제 실패",
 				"ALT_E_UPDATE_BUDGET": "예산 수정 실패",
 				"ALT_S_CREATE_BUDGET": "예산 생성 완료",

@@ -380,6 +380,7 @@
 		"COST_MANAGEMENT": {
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "予算の作成に失敗しました",
+				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "選択したデータソース（{dataSourceName}）には、すでに同じターゲット（{name}）の予算が作成されています。",
 				"ALT_E_DELETE_BUDGET": "予算の削除に失敗しました",
 				"ALT_E_UPDATE_BUDGET": "予算の更新に失敗しました",
 				"ALT_S_CREATE_BUDGET": "予算が正常に作成されました",
