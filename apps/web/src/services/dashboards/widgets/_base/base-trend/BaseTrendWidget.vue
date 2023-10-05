@@ -18,6 +18,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -211,7 +212,7 @@ const drawChart = (chartData: ChartData[]) => {
 
     // create tooltip
     const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency);
+    chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
 
     // set series
     state.legends.forEach((legend) => {
