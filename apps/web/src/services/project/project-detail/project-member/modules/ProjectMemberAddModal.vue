@@ -295,11 +295,11 @@ const handleUpdateExternalUser = async (inputUserItems: InputItem[], isValid: bo
     selectedExternalUserItems.value = [...selectedExternalUserItems.value, _addedUserItem];
     externalItemsErrors.value = errors;
 };
-const handleSelectRoleItem = (roleItemName: string) => {
-    if (!roleItemName) return;
-    const roleItem = state.roleItems.filter((d) => d.name === roleItemName);
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
-    setForm('selectedRoleItems', roleItem);
+const handleSelectRoleItem = (roleItems: RoleMenuItem[]) => {
+    if (!roleItems.length) return;
+    const roleItem = { ...roleItems[0] };
+    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
+    setForm('selectedRoleItems', roleItems);
     state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
 };
 
