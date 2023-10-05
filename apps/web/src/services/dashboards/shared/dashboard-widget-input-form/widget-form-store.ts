@@ -139,12 +139,11 @@ export const useWidgetFormStore = defineStore('widget-form', {
             this.widgetKey = widgetKey;
             this.widgetConfigId = widgetConfigId;
             const widgetInfo = this.mergedWidgetInfo;
-            if (!widgetInfo) return;
 
-            this.widgetTitle = widgetInfo.title ?? '';
-            this.widgetOptions = widgetInfo.widget_options ?? {};
-            this.inheritOptions = widgetInfo.inherit_options ?? {};
-            this.schemaProperties = widgetInfo.schema_properties ?? [];
+            this.widgetTitle = widgetInfo?.title ?? '';
+            this.widgetOptions = widgetInfo?.widget_options ?? {};
+            this.inheritOptions = widgetInfo?.inherit_options ?? {};
+            this.schemaProperties = widgetInfo?.schema_properties ?? [];
         },
     },
 });

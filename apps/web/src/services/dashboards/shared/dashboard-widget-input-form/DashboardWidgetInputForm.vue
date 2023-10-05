@@ -123,7 +123,7 @@ const isInheritDisabled = (propertyName: string): boolean => {
 /* reset */
 const handleReturnToInitialSettings = () => {
     if (!widgetFormState.widgetConfigId) return;
-    initSchemaAndFormData(widgetFormState.widgetConfigId, widgetFormState.widgetKey);
+    initSchemaAndFormData(widgetFormState.widgetConfigId);
 };
 
 /* inherit */
