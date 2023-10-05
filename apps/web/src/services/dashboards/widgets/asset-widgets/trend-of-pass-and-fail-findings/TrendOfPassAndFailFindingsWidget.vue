@@ -42,18 +42,24 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { Legend, XYChartData } from '@/services/dashboards/widgets/type';
+import type { Legend } from '@/services/dashboards/widgets/type';
 
 
-interface ChartDataModel extends CloudServiceStatsModel {
-    value: Array<{ key: string, value: number }>;
+interface ChartDataResult extends CloudServiceStatsModel {
+    pass_finding_count: number;
+    fail_finding_count: number;
 }
 interface TableDataModel extends CloudServiceStatsModel {
     value: Array<{ date: string; value: number }>;
 }
 interface FullData {
-    chartData: { results: ChartDataModel[] }|null;
+    chartData: { results: ChartDataResult[] }|null;
     tableData: { more: boolean, results: TableDataModel[] }|null;
+}
+interface ChartData {
+    date: string;
+    [COMPLIANCE_STATUS_MAP.PASS.name]: number;
+    [COMPLIANCE_STATUS_MAP.FAIL.name]: number;
 }
 
 const DATE_FORMAT = 'YYYY-MM';
@@ -89,7 +95,7 @@ const state = reactive({
         if (dotIndex !== -1) return widgetState.groupBy.slice(dotIndex + 1);
         return widgetState.groupBy;
     }),
-    chartData: computed<XYChartData[]>(() => refineChartData(state.data?.chartData?.results ?? [])),
+    chartData: computed<ChartData[]>(() => refineChartData(state.data?.chartData?.results ?? [])),
     noChartData: computed<boolean>(() => !state.data?.chartData),
     tableLoading: false,
     tableFields: computed<Field[]>(() => {
@@ -134,21 +140,22 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
         chartDataApiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        // .addFilter({ k: 'key', v: ['pass_finding_count', 'fail_finding_count'], o: '' });
         const { status, response } = await fetchChartDataAnalyze({
             query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
-                group_by: ['key', 'unit'],
                 fields: {
-                    value: {
-                        key: 'value',
+                    pass_finding_count: {
+                        key: 'values.pass_finding_count',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'values.fail_finding_count',
                         operator: 'sum',
                     },
                 },
-                field_group: ['key'],
                 sort: [{ key: DATE_FIELD_NAME, desc: false }],
                 ...chartDataApiQueryHelper.data,
             },
@@ -171,7 +178,6 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
         tableDataApiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        // .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         if (pageSize.value) tableDataApiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchTableDataAnalyze({
             query_set_id: widgetState.options.asset_query_set,
@@ -179,10 +185,10 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
-                group_by: ['key', 'unit', widgetState.groupBy],
+                group_by: [widgetState.groupBy],
                 fields: {
                     value: {
-                        key: 'value',
+                        key: 'values.fail_finding_count',
                         operator: 'sum',
                     },
                 },
@@ -207,19 +213,19 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
 };
 
 /* Util */
-const refineChartData = (data: ChartDataModel[]): XYChartData[] => {
+const refineChartData = (data: ChartDataResult[]): ChartData[] => {
     if (!data?.length) return [];
-    const refinedChartData: XYChartData[] = [];
+    const refinedChartData: ChartData[] = [];
     data.forEach((d) => {
         refinedChartData.push({
             date: d.date,
-            [COMPLIANCE_STATUS_MAP.PASS.name]: d.value.find((v) => v.key === 'fail_finding_count')?.value ?? 0,
-            [COMPLIANCE_STATUS_MAP.FAIL.name]: d.value.find((v) => v.key === 'pass_finding_count')?.value ?? 0,
+            [COMPLIANCE_STATUS_MAP.PASS.name]: d.pass_finding_count ?? 0,
+            [COMPLIANCE_STATUS_MAP.FAIL.name]: d.fail_finding_count ?? 0,
         });
     });
     return refinedChartData;
 };
-const drawChart = (chartData: XYChartData[]) => {
+const drawChart = (chartData: ChartData[]) => {
     // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
 

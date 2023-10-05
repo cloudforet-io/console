@@ -37,7 +37,8 @@ import type { Legend } from '@/services/dashboards/widgets/type';
 
 interface Data extends CloudServiceStatsModel {
     [groupBy: string]: string | null | any;
-    value: { key: string, value: number }[];
+    pass_finding_count: number;
+    fail_finding_count: number;
 }
 interface ChartData {
     [key: string]: string | number;
@@ -53,7 +54,6 @@ const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed(() => ({
-        start: dayjs(widgetState.settings?.date_range?.start).format('YYYY-MM-DD'),
         end: dayjs(widgetState.settings?.date_range?.end).format('YYYY-MM'),
     })),
 });
@@ -105,27 +105,24 @@ const fetchData = async (): Promise<Data[]> => {
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
-
-        // if (state.showPassFindings) {
-        //     apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        // } else {
-        //     apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
-        // }
         const { status, response } = await fetchCloudServiceStatsAnalyze({
             query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.end,
                 end: widgetState.dateRange.end,
-                group_by: ['key', 'unit', widgetState.groupBy],
+                group_by: [widgetState.groupBy],
                 fields: {
-                    value: {
-                        key: 'value',
+                    pass_finding_count: {
+                        key: 'values.pass_finding_count',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'values.fail_finding_count',
                         operator: 'sum',
                     },
                 },
-                field_group: ['key'],
-                sort: [{ key: 'value', desc: false }],
+                sort: [{ key: 'fail_finding_count', desc: false }],
                 ...apiQueryHelper.data,
             },
         });
@@ -147,9 +144,6 @@ const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMa
 
     const refinedChartData: ChartData[] = [];
     data.forEach((d) => {
-        const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
-        const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
-
         const rawValue = d[groupByKey];
         let refinedValue: string|null|undefined;
 
@@ -158,9 +152,8 @@ const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMa
         else refinedValue = referenceMap[rawValue]?.label ?? rawValue;
 
         refinedChartData.push({
+            ...d,
             [groupByKey]: refinedValue ?? `no_${groupByKey}`,
-            fail_finding_count,
-            pass_finding_count,
         });
     });
     return refinedChartData;

@@ -35,7 +35,8 @@ import type { XYChartData } from '@/services/dashboards/widgets/type';
 
 
 interface Data extends CloudServiceStatsModel {
-    value: number;
+    pass_finding_count: number;
+    fail_finding_count: number;
     severity: Severity;
 }
 interface FullData {
@@ -65,7 +66,13 @@ const { colorSet } = useWidgetColorSet({
     dataSize: computed(() => 1),
 });
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    dateRange: computed<DateRange>(() => {
+        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
+        const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
+        return { start, end };
+    }),
+});
 const state = reactive({
     loading: true,
     data: null as FullData|null,
@@ -79,10 +86,9 @@ const state = reactive({
         if (!state.data?.realtimeData) return [];
         const results: SeverityData[] = [];
         const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
-        const failFindingCountDataList = state.data.realtimeData.filter((d) => d.key === 'fail_finding_count');
         SEVERITY_FAIL_STATUS_MAP_VALUES.forEach((status) => {
-            const currValue = failFindingCountDataList.find((d) => d.severity === status.name && d.date === widgetState.dateRange.end)?.value;
-            const prevValue = failFindingCountDataList.find((d) => d.severity === status.name && d.date === prevMonth)?.value;
+            const currValue = state.data.realtimeData.find((d) => d.severity === status.name && d.date === widgetState.dateRange.end)?.fail_finding_count;
+            const prevValue = state.data.realtimeData.find((d) => d.severity === status.name && d.date === prevMonth)?.fail_finding_count;
             results.push({
                 name: status.name,
                 label: status.label,
@@ -97,13 +103,13 @@ const state = reactive({
     prevTotalFailureCount: computed<number>(() => {
         if (!state.data?.realtimeData) return 0;
         const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === prevMonth && d.key === 'fail_finding_count') ?? [];
-        return sum(targetDataList.map((d) => d.value));
+        const targetDataList = state.data.realtimeData.filter((d) => d.date === prevMonth) ?? [];
+        return sum(targetDataList.map((d) => d.fail_finding_count));
     }),
     totalFailureCount: computed<number>(() => {
         if (!state.data?.realtimeData) return 0;
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === widgetState.dateRange.end && d.key === 'fail_finding_count') ?? [];
-        return sum(targetDataList.map((d) => d.value));
+        const targetDataList = state.data.realtimeData.filter((d) => d.date === widgetState.dateRange.end) ?? [];
+        return sum(targetDataList.map((d) => d.fail_finding_count));
     }),
     totalFailureComparingMessage: computed<string|undefined>(() => {
         if (state.totalFailureCount === state.prevTotalFailureCount) return undefined;
@@ -142,17 +148,15 @@ const fetchTrendData = async (): Promise<Data[]> => {
         trendDataApiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        // .addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
         const { status, response } = await fetchTrendDataAnalyze({
             query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
-                group_by: ['key', 'unit'],
                 fields: {
-                    value: {
-                        key: 'value',
+                    fail_finding_count: {
+                        key: 'values.fail_finding_count',
                         operator: 'sum',
                     },
                 },
@@ -185,10 +189,14 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
                 granularity: 'MONTHLY',
                 start: prevMonth,
                 end: widgetState.dateRange.end,
-                group_by: ['key', 'unit', 'additional_info.severity'],
+                group_by: ['additional_info.severity'],
                 fields: {
-                    value: {
-                        key: 'value',
+                    pass_finding_count: {
+                        key: 'values.pass_finding_count',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'values.fail_finding_count',
                         operator: 'sum',
                     },
                 },
@@ -207,8 +215,8 @@ const fetchRealtimeData = async (): Promise<Data[]> => {
 
 /* Util */
 const getFailureRate = (targetDataList: Data[]): number => {
-    const passCount = sum(targetDataList.filter((d) => d.key === 'pass_finding_count').map((d) => d.value));
-    const failCount = sum(targetDataList.filter((d) => d.key === 'fail_finding_count').map((d) => d.value));
+    const passCount = sum(targetDataList.map((d) => d.pass_finding_count));
+    const failCount = sum(targetDataList.map((d) => d.fail_finding_count));
     const totalCount = passCount + failCount;
     return totalCount ? Math.round((failCount / totalCount) * 100) : 0;
 };
@@ -222,8 +230,8 @@ const drawChart = (chartData: XYChartData[]) => {
     });
 
     const seriesSettings = {
-        name: 'value',
-        valueYField: 'value',
+        name: 'fail_finding_count',
+        valueYField: 'fail_finding_count',
     };
     const series = chartHelper.createXYLineSeries(chart, seriesSettings);
     chart.series.push(series);
