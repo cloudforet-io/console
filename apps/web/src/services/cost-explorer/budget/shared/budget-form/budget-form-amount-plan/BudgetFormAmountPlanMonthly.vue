@@ -60,25 +60,30 @@ const state = reactive({
     }),
 });
 
-const getAutofillAmount = (index: number, { start, growth }: AutofillOptions) => {
-    const amount = start ?? 0;
-    const growthAmount = growth ? amount / 100 * growth : 0;
-    return amount + (growthAmount * index);
+const getAutofillAmount = (baseValue: number, growth: AutofillOptions['growth']) => {
+    if (!growth) return baseValue;
+    return Number((baseValue + (baseValue / 100 * growth)).toFixed(2));
 };
 
 const fillAmountMapWithOptions = (options: AutofillOptions) => {
+    let beforeMonthAmount = 0;
     Object.keys(state.monthAmountInputMap).forEach((month, index) => {
-        state.monthAmountInputMap[month].amount = getAutofillAmount(index, options);
+        const amount = (index === 0) ? options.start : getAutofillAmount(beforeMonthAmount, options.growth);
+        state.monthAmountInputMap[month].amount = amount;
+        beforeMonthAmount = amount;
         state.monthAmountInputMap[month].isValid = true;
     });
 };
 
 const initAmountInputMapWithMonths = (months: string[]) => {
     const amountMap: MonthAmountInputMap = {};
+    let beforeMonthAmount = 0;
     months.forEach((month, index) => {
         if (state.autofillOptions) {
+            const amount = (index === 0) ? state.autofillOptions.start : getAutofillAmount(beforeMonthAmount, state.autofillOptions.growth);
+            beforeMonthAmount = amount;
             amountMap[month] = {
-                amount: getAutofillAmount(index, state.autofillOptions),
+                amount,
                 isValid: true,
             };
         } else {
