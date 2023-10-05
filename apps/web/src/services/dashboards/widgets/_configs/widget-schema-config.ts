@@ -56,14 +56,6 @@ export const ASSET_REFERENCE_SCHEMA = {
         title: ASSET_VARIABLE_TYPE_INFO.asset_query_set.name,
         type: 'array',
     },
-    [ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.type]: {
-        title: ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.name,
-        type: 'array',
-        reference: {
-            resource_type: 'inventory.CloudServiceType',
-            reference_key: ASSET_VARIABLE_TYPE_INFO.asset_compliance_framework.key,
-        },
-    },
     [ASSET_VARIABLE_TYPE_INFO.asset_account.type]: {
         title: ASSET_VARIABLE_TYPE_INFO.asset_account.name,
         type: 'array',
