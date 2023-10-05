@@ -125,24 +125,5 @@ const getConvertedCloudServiceStatsConsoleFilters = (widgetFiltersMap: WidgetFil
             results.push(d);
         });
     });
-    // TODO: will be removed after compliance_framework filter is implemented
-    // Object.entries(widgetFiltersMap).forEach(([filterKey, filterItems]) => {
-    //     if (!filterItems?.length) return;
-    //     // HACK: This is temporary code for cloud_service_type filter
-    //     if ((filterKey === ASSET_VARIABLE_TYPE_INFO.asset_compliance_type.type)) {
-    //         filterItems.forEach((d) => {
-    //             const key = 'cloud_service_type';
-    //             results.push({
-    //                 k: key,
-    //                 v: d.v,
-    //                 o: d.o,
-    //             });
-    //         });
-    //     } else {
-    //         filterItems.forEach((d) => {
-    //             results.push(d);
-    //         });
-    //     }
-    // });
     return results;
 };
