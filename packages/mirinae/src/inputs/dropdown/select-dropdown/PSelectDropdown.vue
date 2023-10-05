@@ -102,6 +102,9 @@ const state = reactive({
     selectedIndex: typeof props.selected === 'number' ? props.selected : undefined,
     selectedItems: computed<SelectDropdownMenuItem[]>(() => {
         if (state.proxySelectedItem === undefined) return [];
+        if (props.handler) {
+            return state.proxySelectedItem as SelectDropdownMenuItem[];
+        }
         if (props.indexMode) return [props.menu[state.selectedIndex || 0]];
         if (Array.isArray(state.proxySelectedItem)) return state.proxySelectedItem;
         return props.menu.filter((m) => m.name === state.proxySelectedItem);
@@ -217,6 +220,8 @@ const handleEnterKey = () => {
 };
 const updateSelected = (selected: SelectDropdownMenuItem[]) => {
     if (props.multiSelectable) {
+        state.proxySelectedItem = selected;
+    } else if (props.handler) {
         state.proxySelectedItem = selected;
     } else {
         state.selectedIndex = props.menu.findIndex((data) => data.name === selected[0]?.name);

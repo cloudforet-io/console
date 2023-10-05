@@ -304,7 +304,8 @@ const extraArgTypes: ArgTypes = {
     handler: {
         name: 'handler',
         type: { name: 'function' },
-        description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
+        description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed. '
+            + 'With handler, selected prop only accepts MenuItem[] type.',
         defaultValue: undefined,
         table: {
             type: {
