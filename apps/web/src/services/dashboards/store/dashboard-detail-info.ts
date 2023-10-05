@@ -216,6 +216,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 _dashboardWidgetInfoList[targetIndex] = {
                     ...this.dashboardWidgetInfoList[targetIndex],
                     ...data,
+                    widget_key: widgetKey, // widget_key should not be changed
                 };
                 this.dashboardWidgetInfoList = _dashboardWidgetInfoList;
             }
