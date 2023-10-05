@@ -374,6 +374,24 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    initSelectedWithHandler: {
+        name: 'initSelectedWithHandler',
+        type: { name: 'boolean' },
+        description: 'Whether to initialize selected items with handler or not.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
 
     /* events */
     onHideMenu: {
