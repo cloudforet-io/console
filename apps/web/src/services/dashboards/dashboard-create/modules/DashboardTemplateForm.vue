@@ -89,15 +89,13 @@
                             </div>
                         </template>
                         <template #item-overlay-content="{board}">
-                            <div class="dashboard-template-overlay-content"
-                                 @click="handleOpenDashboardNewTab(board)"
-                            >
-                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.VIEW') }}</span>
-                                <p-i name="ic_external-link"
-                                     height="1em"
-                                     width="1em"
-                                />
-                            </div>
+                            <p-link class="legend"
+                                    action-icon="internal-link"
+                                    new-tab
+                                    highlight
+                                    :text="$t('DASHBOARDS.CREATE.VIEW')"
+                                    @click="handleOpenDashboardNewTab(board)"
+                            />
                         </template>
                     </p-board>
                     <p-text-pagination
@@ -248,6 +246,9 @@ const handleInputSearch = () => {
         @apply overflow-auto;
         .card-container {
             @apply mt-6;
+            .legend {
+                @apply text-label-md;
+            }
         }
         .card-wrapper-title {
             @apply text-gray-500 !important text-xs block;
@@ -262,13 +263,6 @@ const handleInputSearch = () => {
         }
         .dashboard-description-text {
             @apply text-gray-500 text-xs;
-        }
-        .dashboard-template-overlay-content {
-            @apply text-blue-700;
-            height: 1.5rem;
-        }
-        .dashboard-template-overlay-preview {
-            @apply text-sm mr-1;
         }
         .p-empty {
             padding-top: 3.25rem;
