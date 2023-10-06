@@ -466,9 +466,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
             </template>
             <template #toolbox-left>
                 <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
-                <usage-type-additional-filter-selector v-if="state.isIncludedUsageTypeInGroupBy"
-                                                       @update-filter="handleUpdateUsageTypeAdditionalFilterSelected"
-                />
+                <usage-type-additional-filter-selector @update-filter="handleUpdateUsageTypeAdditionalFilterSelected" />
             </template>
             <template #th-format="{field}">
                 {{ field.label }}
