@@ -59,6 +59,7 @@ export const Template = (args, { argTypes }) => ({
             :disable-handler="disableHandler"
             :page-size="pageSize"
             :reset-selected-on-unmounted="resetSelectedOnUnmounted"
+            :init-selected-with-handler="initSelectedWithHandler"
             @update:visible-menu="onUpdateVisibleMenu"
             @update:search-text="onUpdateSearchText"
             @update:selected="onUpdateSelected"
@@ -607,13 +608,20 @@ interface AutocompleteHandler {
                 <p class="text-label-lg font-bold my-3">With custom handler and loading</p>
                 <p-select-dropdown :loading="loading" :handler="simpleHandler" />
                 <br/>
+                <p class="text-label-lg font-bold my-3">With custom handler & init selected with handler</p>
+                With <span class="text-blue-700">initSelectedWithHandler</span> prop, the selected values' label will be initialized with the handler's result.<br/>
+                So you can see the selected values' label even if there is no label property in the given selected items.<br/>
+                <br/>
+                <p-filterable-dropdown :loading="loading" :handler="simpleHandler" :selected="selected" initSelectedWithHandler />
+                <br/>
             </div>
 `,
             setup() {
+                const menu = getFilterableDropdownMenuWithMultiTypes()
                 const state = reactive({
                     loading: false,
+                    selected: [{ name: menu[2].name }]
                 })
-                const menu = getSelectDropdownMenuWithMultiTypes()
                 let allResults = []
                 const simpleHandler = async (inputText) => {
                     state.loading = true;
