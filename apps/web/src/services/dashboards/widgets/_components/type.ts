@@ -20,10 +20,10 @@ interface PercentOption {
 interface NumberOption {
     type: 'number';
 }
-interface SizeOption {
-    type: 'size';
-    sourceUnit?: UnitMap;
-    default?: number;
+interface UsageOption {
+    type: 'usage';
+    unit?: string; // used at table column header and value formatting. this has higher priority than unitPath.
+    unitPath?: string; // used at value formatting only
 }
 
 interface ReferenceOption {
@@ -39,7 +39,7 @@ export interface Field {
     width?: string;
     label?: string;
     textAlign?: 'left' | 'right';
-    textOptions?: CostOption | PercentOption | SizeOption | NumberOption | ReferenceOption;
+    textOptions?: CostOption | PercentOption | NumberOption | UsageOption | ReferenceOption;
     detailOptions?: {
         enabled?: boolean;
         type?: 'modal'|'popover';
@@ -60,5 +60,5 @@ export const TABLE_SIZE = {
 export type TableSize = typeof TABLE_SIZE[keyof typeof TABLE_SIZE];
 
 export interface WidgetTableData {
-    [fieldName: string]: string|number
+    [fieldName: string]: any;
 }

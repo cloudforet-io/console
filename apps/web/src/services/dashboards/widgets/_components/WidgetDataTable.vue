@@ -7,10 +7,9 @@ import {
 import {
     PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
 } from '@spaceone/design-system';
-import bytes from 'bytes';
 import { throttle } from 'lodash';
 
-import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
+import { numberFormatter, getValueByPath } from '@cloudforet/core-lib';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
@@ -26,7 +25,7 @@ import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets'
 import type {
     Field, TableSize, WidgetTableData,
 } from '@/services/dashboards/widgets/_components/type';
-import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
+import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
 import type { Legend } from '@/services/dashboards/widgets/type';
 
 interface Props {
@@ -84,7 +83,7 @@ const getLegendTextColor = (index) => {
 const getHeadSlotProps = (field, colIndex) => ({
     field, index: colIndex, colIndex,
 });
-const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
+const textFormatter = (value:string|number, textOptions: Field['textOptions'], cellData: any) => {
     if (typeof value !== 'number') {
         if (!value) return '--';
         if (textOptions?.type === 'reference') {
@@ -95,40 +94,27 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions']) =
         }
         return value;
     }
-    if (textOptions?.type === 'size') {
-        let data: number|null;
-
-        if (typeof value === 'number') data = value;
-        else if (typeof value === 'string') data = Number(value);
-        else if (textOptions?.default !== undefined) data = textOptions?.default ?? 0;
-        else data = null;
-
-        let formattedValue: string;
-        if (data === null) formattedValue = '-';
-        else {
-            const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.sourceUnit as string] || undefined;
-            if (sourceUnit) {
-                data = bytes.parse(`${value}${sourceUnit}`);
-            }
-
-            if (!data) formattedValue = '--';
-            else formattedValue = byteFormatter(data);
-        }
-        return formattedValue;
-    } if (textOptions?.type === 'cost') {
+    if (textOptions?.type === 'cost') {
         return currencyMoneyFormatter(value, props.currency);
     } if (textOptions?.type === 'number') {
         return numberFormatter(value);
     } if (textOptions?.type === 'percent') {
         return `${value.toFixed(1)}%`;
     }
+    if (textOptions?.type === 'usage') {
+        let unit = textOptions?.unit;
+        const unitPath = textOptions?.unitPath;
+        if (!unit && unitPath) unit = getValueByPath(cellData, unitPath);
+        // TODO: change to use usageFormatter
+        return numberFormatter(value) + (unit ? ` ${unit}` : '');
+    }
     return value;
 };
 const getValue = (item:string|number|object, field: Field):string|number => {
     if (typeof item === 'object') {
-        return textFormatter(getValueByPath(item, field.name), field.textOptions);
+        return textFormatter(getValueByPath(item, field.name), field.textOptions, item);
     }
-    return textFormatter(item, field.textOptions);
+    return textFormatter(item, field.textOptions, item);
 };
 const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
     if (typeof option === 'string' || typeof option === 'boolean') {
@@ -211,6 +197,11 @@ watch(() => props.legends, () => {
                                                   v-bind="getHeadSlotProps(field, fieldColIndex)"
                                             >
                                                 {{ field.label ? field.label : field.name }}
+                                                <span v-if="field.textOptions?.type === 'usage' && field.textOptions?.unit"
+                                                      class="usage-unit"
+                                                >
+                                                    ({{ field.textOptions.unit }})
+                                                </span>
                                             </slot>
                                             <template v-if="field.tooltipText">
                                                 <p-tooltip :contents="field.tooltipText">
@@ -394,6 +385,9 @@ watch(() => props.legends, () => {
                 white-space: pre-line;
                 text-align: right;
                 line-height: 1.25;
+                .usage-unit {
+                    margin-left: 0.25rem;
+                }
             }
             &.right {
                 justify-content: flex-end;
