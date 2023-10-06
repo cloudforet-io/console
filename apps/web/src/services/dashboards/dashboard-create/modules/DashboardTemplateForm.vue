@@ -94,7 +94,7 @@
                                     new-tab
                                     highlight
                                     :text="$t('DASHBOARDS.CREATE.VIEW')"
-                                    @click="handleOpenDashboardNewTab(board)"
+                                    :to="getDashboardLocation(board)"
                             />
                         </template>
                     </p-board>
@@ -120,16 +120,15 @@
 import {
     computed, nextTick, reactive, ref,
 } from 'vue';
+import type { Location } from 'vue-router';
 
 import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
 } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-
 
 import type { DashboardConfig, DashboardScope } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
@@ -200,18 +199,17 @@ const existingTemplateState = reactive({
 
 });
 
-const handleOpenDashboardNewTab = (board: DashboardModel) => {
+const getDashboardLocation = (board: DashboardModel): Location => {
     const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
     const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-    const { href } = SpaceRouter.router.resolve({
+    return {
         name: routeName,
         params: {
             dashboardId: isProjectDashboard
                 ? (board as ProjectDashboardModel).project_dashboard_id
                 : (board as DomainDashboardModel).domain_dashboard_id,
         },
-    });
-    window.open(href, '_blank');
+    };
 };
 
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
