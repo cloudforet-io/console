@@ -53,7 +53,7 @@ export const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitS
  * getNumberFromString('$1,000,000') => 1000000
  */
 export const getNumberFromString = (value?: string): number|undefined => {
-    const str = value?.match(/\d+/g)?.join('');
+    const str = value?.match(/[\d.]+/g)?.join('');
     return str ? parseFloat(str) : undefined;
 };
 
