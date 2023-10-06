@@ -327,7 +327,6 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
 const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|string => {
     const dateIndex = Number(fieldName.split('.')[1]);
     const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
-    if (!usageQuantity || !item.usage_unit) return '--';
     return numberFormatter(usageQuantity);
 };
 
