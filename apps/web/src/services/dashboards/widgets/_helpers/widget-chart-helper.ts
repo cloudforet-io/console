@@ -31,18 +31,16 @@ export const getXYChartLegends = <T = Record<string, any>>(
         let _name = d[groupBy];
         let _label = d[groupBy];
         let _color;
-        if (allReferenceTypeInfo) {
-            const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
-            if (_name && referenceTypeInfo) {
-                const referenceMap = referenceTypeInfo.referenceMap;
-                _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-                if (groupBy === COST_GROUP_BY.PROVIDER && !disableReferenceColor) {
-                    _color = referenceMap[_name]?.color;
-                }
-            } else if (!_name) {
-                _name = `no_${groupBy}`;
-                _label = 'Unknown';
+        const referenceTypeInfo = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === groupBy);
+        if (_name && referenceTypeInfo) {
+            const referenceMap = referenceTypeInfo.referenceMap;
+            _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
+            if (groupBy === COST_GROUP_BY.PROVIDER && !disableReferenceColor) {
+                _color = referenceMap[_name]?.color;
             }
+        } else if (!_name) {
+            _name = `no_${groupBy}`;
+            _label = 'Unknown';
         }
         legends.push({
             name: _name,

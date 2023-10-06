@@ -7,7 +7,7 @@ import type { Location } from 'vue-router/types/router';
 import type { XYChart } from '@amcharts/amcharts4/charts';
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep, sortBy } from 'lodash';
+import { cloneDeep, sortBy, uniqBy } from 'lodash';
 
 import { numberFormatter, sortArrayInObjectArray } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -24,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
-import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
+import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
@@ -56,18 +56,16 @@ const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
 const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
 interface SubData { date: string; value: number }
 interface Data {
-    cost_sum: SubData[];
-    usage_quantity_sum: SubData[];
-    _total_cost_sum: number;
-    _total_usage_quantity_sum: number;
+    value_sum: SubData[];
+    _total_value_sum: number;
     [USAGE_TYPE_VALUE_KEY]: string;
-    usage_unit: string;
+    usage_unit: string|null;
 }
 interface ChartData {
     date: string;
     value: number;
     [USAGE_TYPE_VALUE_KEY]: string;
-    usage_unit: string;
+    usage_unit?: string|null;
 }
 type FullData = CostAnalyzeResponse<Data>;
 
@@ -113,58 +111,76 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 const state = reactive({
     loading: true,
     data: null as FullData | null,
-    fieldsKey: computed<'cost_sum'|'usage_quantity_sum'>(() => (selectedSelectorType.value === 'cost' ? 'cost_sum' : 'usage_quantity_sum')),
+    fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
     chartData: computed<ChartData[]>(() => {
         if (!state.data?.results) return [];
-        const dataKey = state.fieldsKey;
+
         const chartData: ChartData[] = getRefinedXYChartData<Data, ChartData>(state.data.results, {
             groupBy: USAGE_TYPE_VALUE_KEY,
-            arrayDataKey: dataKey,
+            arrayDataKey: 'value_sum',
             categoryKey: DATE_FIELD_NAME,
             valueKey: 'value',
-            additionalIncludeKeysFromParent: ['usage_unit'],
         });
         return sortBy(chartData, widgetState.dateRange, DATE_FIELD_NAME);
     }),
     tableFields: computed<Field[]>(() => {
-        const _textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost_sum' ? 'cost' : 'number',
+        const _textOptions: Field['textOptions'] = state.fieldsKey === 'cost' ? {
+            type: 'cost',
+        } : {
+            type: 'usage',
+            unitPath: 'usage_unit',
         };
 
-        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, state.fieldsKey);
+        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
 
         // set width of table fields
         const groupByFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
         const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
 
-        const fixedFields = [{
+        const groupByField: Field = {
             label: USAGE_TYPE_VALUE_KEY,
             name: USAGE_TYPE_VALUE_KEY,
             width: groupByFieldWidth,
-        }];
-        if (state.fieldsKey === 'usage_quantity_sum') {
-            fixedFields.push({
-                label: 'Usage Unit',
-                name: 'usage_unit',
-                width: otherFieldWidth,
-            });
-        }
+        };
         return [
-            ...fixedFields,
+            groupByField,
             ...refinedFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
-    tableData: computed<WidgetTableData[]>(() => {
-        const tableData = sortArrayInObjectArray(
-            getRefinedDateTableData(state.data?.results, widgetState.dateRange, ['cost_sum', 'usage_quantity_sum']),
+    tableData: computed<Data[]>(() => {
+        const tableData: Data[] = sortArrayInObjectArray(
+            getRefinedDateTableData(state.data?.results, widgetState.dateRange, ['value_sum']),
             DATE_FIELD_NAME,
-            ['cost_sum', 'usage_quantity_sum'],
-        );
+            ['value_sum'],
+        ).map((data) => {
+            let value = data[USAGE_TYPE_VALUE_KEY] ?? 'Unknown';
+            if (state.fieldsKey === 'usage_quantity') value = `${value}${data.usage_unit ? ` (${data.usage_unit})` : ''}`;
+            return {
+                ...data,
+                [USAGE_TYPE_VALUE_KEY]: value,
+            };
+        });
+
         return tableData;
     }),
-    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, USAGE_TYPE_VALUE_KEY)),
+    legends: computed<Legend[]>(() => {
+        const data = state.data?.results ?? [];
+        const legends: Legend[] = getXYChartLegends(data, USAGE_TYPE_VALUE_KEY)
+            .map((l, i) => {
+                let label = l.label;
+                if (state.fieldsKey === 'usage_quantity') label = `${label}${data[i]?.usage_unit ? ` (${data[i]?.usage_unit})` : ''}`;
+                return { ...l, label };
+            });
+        return legends;
+    }),
     showLegendsOnTable: computed(() => widgetState.options.legend_options?.enabled && widgetState.options.legend_options.show_at === 'table'),
     chart: null as XYChart | null,
+    showChart: computed(() => {
+        if (state.fieldsKey === 'cost') return true;
+        if (!state.data?.results) return true;
+        // hide chart when there are different usage_unit in data
+        return uniqBy(state.data.results, 'usage_unit').length === 1;
+    }),
 
 });
 const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown({
@@ -186,20 +202,21 @@ const fetchData = async (): Promise<FullData|null> => {
             ...widgetState.consoleFilters]);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
+        const groupBy = [USAGE_TYPE_QUERY_KEY, 'date'];
+        if (state.fieldsKey === 'usage_quantity') {
+            groupBy.push('usage_unit');
+        }
+
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: ['usage_unit', USAGE_TYPE_QUERY_KEY],
+                group_by: groupBy,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
-                        key: 'cost',
-                        operator: 'sum',
-                    },
-                    usage_quantity_sum: {
-                        key: 'usage_quantity',
+                    value_sum: {
+                        key: state.fieldsKey,
                         operator: 'sum',
                     },
                 },
@@ -223,6 +240,7 @@ const fetchData = async (): Promise<FullData|null> => {
 
 /* Util */
 const drawChart = (chartData: ChartData[]) => {
+    if (!state.showChart) return;
     const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
     xAxis.get('baseInterval').timeUnit = 'month';
     chartHelper.setChartColors(chart, colorSet.value);
@@ -259,7 +277,12 @@ const drawChart = (chartData: ChartData[]) => {
         });
         const tooltip = chartHelper.createTooltip();
         if (selectedSelectorType.value === 'usage') {
-            chartHelper.setXYSharedTooltipText(chart, tooltip, (value, data) => `${numberFormatter(value)}${data?.usage_unit ? ` (${data.usage_unit})` : ''}`);
+            chartHelper.setXYSharedTooltipText(
+                chart,
+                tooltip,
+                // TODO: change to use usageFormatter
+                (value) => numberFormatter(value),
+            );
         } else {
             chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
         }
@@ -295,9 +318,7 @@ const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
 /* Event */
 const handleSelectSelectorType = async (selected: SelectorType) => {
     selectedSelectorType.value = selected;
-    chartHelper.refreshRoot();
-    await nextTick();
-    if (chartHelper.root.value) drawChart(state.chartData);
+    await refreshWidget();
 };
 const handleToggleLegend = (index: number) => {
     chartHelper.toggleSeries(state.chart, index);
@@ -345,7 +366,9 @@ defineExpose<WidgetExpose<FullData>>({
             />
         </template>
         <div class="data-container">
-            <div class="chart-wrapper">
+            <div v-if="state.showChart"
+                 class="chart-wrapper"
+            >
                 <p-data-loader class="chart-loader"
                                :loading="props.loading || state.loading"
                                :data="state.chartData"
