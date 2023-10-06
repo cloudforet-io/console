@@ -161,6 +161,7 @@ export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<
  */
 export const getStackedChartData = (chartData: XYChartData[], granularity: Granularity, period: Period): XYChartData[] => {
     const timeUnit = getTimeUnitByGranularity(granularity);
+    const dateFormat = DATE_FORMAT[timeUnit];
     const _period = getPeriodByGranularity(granularity, period);
 
     const accumulatedChartData = [] as XYChartData[];
@@ -168,7 +169,7 @@ export const getStackedChartData = (chartData: XYChartData[], granularity: Granu
     const today = dayjs.utc();
     let accumulatedData: Record<string, number> = {};
     while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
-        let eachChartData: XYChartData = { date: now.format('YYYY-MM-DD') };
+        let eachChartData: XYChartData = { date: now.format(dateFormat) };
         if (!now.isAfter(today, timeUnit)) {
             // eslint-disable-next-line no-loop-func
             const existData = chartData.find((d) => now.isSame(dayjs.utc(d.date), timeUnit));
