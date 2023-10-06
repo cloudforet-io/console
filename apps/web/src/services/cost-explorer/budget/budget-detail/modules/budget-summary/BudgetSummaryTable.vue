@@ -2,7 +2,7 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PCollapsibleToggle, PDataTable } from '@spaceone/design-system';
+import { PCollapsibleToggle, PDataTable, PLink } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -199,24 +199,24 @@ setTableKeysAndItems();
                       class="budget-summary-table"
         >
             <template #col-format="{field, value}">
-                <span v-if="field.name && value.path === 'limit'">
+                <template v-if="field.name && value.path === 'limit'">
                     {{
-                        state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency)
-                        : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, undefined, false, 1000000000)
+                        state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetData?.currency)
+                        : currencyMoneyFormatter(value[value.path], state.budgetData?.currency, undefined, false, 1000000000)
                     }}
-                </span>
-                <span v-else-if="field.name && value.path === 'cost'"
-                      class="text-blue-700"
-                >
-                    <router-link :to="value.link"
-                                 class="link-text"
+                </template>
+                <template v-else-if="field.name && value.path === 'cost'">
+                    <p-link v-if="dayjs.utc(value.date).isSameOrBefore(dayjs.utc())"
+                            :to="value.link"
+                            highlight
                     >
                         {{
-                            state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency)
-                            : currencyMoneyFormatter(value[value.path], state.budgetUsageData?.currency, undefined, false, 1000000000)
+                            state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetData?.currency)
+                            : currencyMoneyFormatter(value[value.path], state.budgetData?.currency, undefined, false, 1000000000)
                         }}
-                    </router-link>
-                </span>
+                    </p-link>
+                    <span v-else>--</span>
+                </template>
                 <span v-else>{{ value[value.path] }}</span>
             </template>
         </p-data-table>
@@ -229,14 +229,5 @@ setTableKeysAndItems();
     line-height: 125%;
     margin-bottom: 0.75rem;
     gap: 0.5rem;
-}
-.budget-summary-table {
-    td {
-        .link-text {
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-    }
 }
 </style>
