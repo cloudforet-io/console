@@ -20,6 +20,7 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
@@ -45,6 +46,7 @@ const targetRef = ref<HTMLElement | null>(null);
 const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 
 const state = reactive({
+    hasManagePermission: useManagePermissionState(),
     queryFormModalVisible: false,
     granularityItems: computed<MenuItem[]>(() => ([
         {
@@ -205,7 +207,8 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                     </template>
                 </p-popover>
             </div>
-            <div ref="rightPartRef"
+            <div v-if="state.hasManagePermission"
+                 ref="rightPartRef"
                  class="right-part"
             >
                 <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
