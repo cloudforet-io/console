@@ -174,11 +174,17 @@ const widgetEditState = reactive({
     visibleModal: false,
     targetWidget: null as ReformedWidgetInfo|null,
 });
-const handleUpdateWidgetEditModalVisible = (visible: boolean) => {
-    widgetEditState.visibleModal = visible;
-    if (visible) return;
-
+const handleWidgetEditModalCancel = () => {
+    widgetEditState.visibleModal = false;
+};
+const handleWidgetEditModalConfirm = (widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+    const widgetKey = widgetEditState.targetWidget?.widget_key;
+    if (!widgetKey || !widgetInfo) return;
+    dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
+    dashboardDetailStore.updateWidgetValidation(true, widgetKey);
+    widgetEditState.visibleModal = false;
     widgetEditState.targetWidget = null;
+    widgetRef.value.find((comp) => comp?.$el.id === widgetKey)?.refreshWidget();
 };
 
 /* widget delete modal */
@@ -256,7 +262,8 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
                                      :widget-config-id="widgetEditState.targetWidget.widget_name"
                                      :visible="widgetEditState.visibleModal"
                                      :widget-key="widgetEditState.targetWidget.widget_key"
-                                     @update:visible="handleUpdateWidgetEditModalVisible"
+                                     @cancel="handleWidgetEditModalCancel"
+                                     @confirm="handleWidgetEditModalConfirm"
         />
         <delete-modal :visible="widgetDeleteState.visibleModal"
                       :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
