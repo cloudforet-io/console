@@ -22,7 +22,7 @@ interface NumberOption {
 }
 interface UsageOption {
     type: 'usage';
-    unit?: string; // used at table column header and value formatting. this has higher priority than unitPath.
+    unit?: string|null; // used at table column header and value formatting. this has higher priority than unitPath.
     unitPath?: string; // used at value formatting only
 }
 

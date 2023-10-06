@@ -143,19 +143,15 @@ const state = reactive({
     tableFields: computed<Field[]>(() => {
         if (!widgetState.groupBy) return [];
         const textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost' ? 'cost' : 'number',
+            type: state.fieldsKey === 'cost' ? 'cost' : 'usage',
         };
 
         const dynamicTableFields: Field[] = [];
         state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
-            let label = d[USAGE_TYPE_VALUE_KEY];
-            if (state.fieldsKey === 'usage_quantity' && d.usage_unit !== null) {
-                label = `${d[USAGE_TYPE_VALUE_KEY]} (${d.usage_unit})`; // HTTP Requests (Bytes)
-            }
             dynamicTableFields.push({
-                label,
+                label: d[USAGE_TYPE_VALUE_KEY],
                 name: state.fieldsKey === 'usage_quantity' ? `${d[USAGE_TYPE_VALUE_KEY]}_${d.usage_unit}` : d[USAGE_TYPE_VALUE_KEY], // HTTP Requests_Bytes
-                textOptions,
+                textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
                 textAlign: 'right',
             });
         });
