@@ -9,12 +9,13 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy } from 'lodash';
 
-import { sortArrayInObjectArray } from '@cloudforet/core-lib';
+import { numberFormatter, sortArrayInObjectArray } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -33,8 +34,7 @@ import type {
 import { CHART_TYPE, COST_GROUP_BY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import {
-    getDateAxisSettings,
-    getXYChartLegends,
+    getDateAxisSettings, getXYChartLegends,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
@@ -74,7 +74,6 @@ type FullData = CostAnalyzeResponse<Data>;
 
 const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
-const USAGE_SOURCE_UNIT = 'GB';
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -119,17 +118,17 @@ const state = reactive({
         if (!state.data?.results) return [];
         const dataKey = state.fieldsKey;
         const chartData: ChartData[] = getRefinedXYChartData<Data, ChartData>(state.data.results, {
+            groupBy: USAGE_TYPE_VALUE_KEY,
             arrayDataKey: dataKey,
             categoryKey: DATE_FIELD_NAME,
             valueKey: 'value',
-            additionalIncludeKeysFromParent: [USAGE_TYPE_VALUE_KEY, 'usage_unit'],
+            additionalIncludeKeysFromParent: ['usage_unit'],
         });
         return sortBy(chartData, widgetState.dateRange, DATE_FIELD_NAME);
     }),
     tableFields: computed<Field[]>(() => {
         const _textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost_sum' ? 'cost' : 'size',
-            sourceUnit: USAGE_SOURCE_UNIT,
+            type: state.fieldsKey === 'cost_sum' ? 'cost' : 'number',
         };
 
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, state.fieldsKey);
@@ -138,12 +137,20 @@ const state = reactive({
         const groupByFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
         const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
 
+        const fixedFields = [{
+            label: USAGE_TYPE_VALUE_KEY,
+            name: USAGE_TYPE_VALUE_KEY,
+            width: groupByFieldWidth,
+        }];
+        if (state.fieldsKey === 'usage_quantity_sum') {
+            fixedFields.push({
+                label: 'Usage Unit',
+                name: 'usage_unit',
+                width: otherFieldWidth,
+            });
+        }
         return [
-            {
-                label: USAGE_TYPE_VALUE_KEY,
-                name: USAGE_TYPE_VALUE_KEY,
-                width: groupByFieldWidth,
-            },
+            ...fixedFields,
             ...refinedFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
@@ -155,7 +162,7 @@ const state = reactive({
         );
         return tableData;
     }),
-    legends: computed<Legend[]>(() => getXYChartLegends(state.tableData, undefined, props.allReferenceTypeInfo)),
+    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, USAGE_TYPE_VALUE_KEY)),
     showLegendsOnTable: computed(() => widgetState.options.legend_options?.enabled && widgetState.options.legend_options.show_at === 'table'),
     chart: null as XYChart | null,
 
@@ -252,9 +259,9 @@ const drawChart = (chartData: ChartData[]) => {
         });
         const tooltip = chartHelper.createTooltip();
         if (selectedSelectorType.value === 'usage') {
-            chartHelper.setXYSharedTooltipTextByUsage(chart, tooltip, USAGE_SOURCE_UNIT);
+            chartHelper.setXYSharedTooltipText(chart, tooltip, (value, data) => `${numberFormatter(value)}${data?.usage_unit ? ` (${data.usage_unit})` : ''}`);
         } else {
-            chartHelper.setXYSharedTooltipText(chart, tooltip, widgetState.currency);
+            chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
         }
         (series as any).set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));

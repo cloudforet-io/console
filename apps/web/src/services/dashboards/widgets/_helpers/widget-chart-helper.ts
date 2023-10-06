@@ -25,22 +25,24 @@ export const getXYChartLegends = <T = Record<string, any>>(
     allReferenceTypeInfo?: AllReferenceTypeInfo,
     disableReferenceColor = false,
 ): Legend[] => {
-    if (!rawData || !groupBy || !allReferenceTypeInfo) return [];
+    if (!rawData || !groupBy) return [];
     const legends: Legend[] = [];
     rawData.forEach((d) => {
         let _name = d[groupBy];
         let _label = d[groupBy];
         let _color;
-        const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
-        if (_name && referenceTypeInfo) {
-            const referenceMap = referenceTypeInfo.referenceMap;
-            _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-            if (groupBy === COST_GROUP_BY.PROVIDER && !disableReferenceColor) {
-                _color = referenceMap[_name]?.color;
+        if (allReferenceTypeInfo) {
+            const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+            if (_name && referenceTypeInfo) {
+                const referenceMap = referenceTypeInfo.referenceMap;
+                _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
+                if (groupBy === COST_GROUP_BY.PROVIDER && !disableReferenceColor) {
+                    _color = referenceMap[_name]?.color;
+                }
+            } else if (!_name) {
+                _name = `no_${groupBy}`;
+                _label = 'Unknown';
             }
-        } else if (!_name) {
-            _name = `no_${groupBy}`;
-            _label = 'Unknown';
         }
         legends.push({
             name: _name,

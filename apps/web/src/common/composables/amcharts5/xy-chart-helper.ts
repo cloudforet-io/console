@@ -230,15 +230,15 @@ export const createXYColumnSeries = (
 };
 
 // Tooltip
-export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
+export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, valueFormatter?: (value: any, data?: any) => string): void => {
     tooltip.label.adapters.add('text', (text, target) => {
         let _text = `[${gray[700]}]{valueX}[/]`;
         chart.series.each((s) => {
             const fieldName = s.get('valueYField') || s.get('valueXField') || '';
             let value = target.dataItem?.dataContext?.[fieldName];
             if (value === undefined) value = '--';
-            if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
-            _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${value}[/]`;
+            const formatted = valueFormatter ? valueFormatter(value, target.dataItem?.dataContext) : value;
+            _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${formatted}[/]`;
         });
         return _text;
     });

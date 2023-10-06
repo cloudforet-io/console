@@ -78,7 +78,7 @@ const mergeByKey = <S extends RawData>(arrA: S[], arrB: S[], key: keyof S): S[] 
 };
 const mergeRefinedHorizontalXYChartData = <T extends RawData, S extends RawData>(chartData: S[], data: T, options: RefineOptions<T, S>, groupByLabel: keyof S|undefined): S[] => {
     const {
-        groupBy, arrayDataKey, categoryKey, valueKey,
+        groupBy, arrayDataKey, categoryKey, valueKey, additionalIncludeKeysFromParent,
     } = options;
     if (!groupBy) {
         console.error(Error('groupBy is required for horizontal chart.'));
@@ -97,6 +97,12 @@ const mergeRefinedHorizontalXYChartData = <T extends RawData, S extends RawData>
                 [valueSet[categoryKey] as string]: valueSet[valueKey],
                 [groupBy]: groupByLabel,
             };
+
+            if (additionalIncludeKeysFromParent) {
+                additionalIncludeKeysFromParent.forEach((key) => {
+                    refinedChartItem[key as keyof S] = valueSet[key] as unknown as S[keyof S];
+                });
+            }
         });
 
         mergedChartData.push(refinedChartItem);
