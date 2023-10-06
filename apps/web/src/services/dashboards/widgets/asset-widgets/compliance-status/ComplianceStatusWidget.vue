@@ -34,8 +34,12 @@ import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-w
 
 
 interface Data extends CloudServiceStatsModel {
-    value: number;
     severity: Severity;
+    compliance_count: number;
+    pass_check_count: number;
+    fail_check_count: number;
+    pass_score: number;
+    fail_score: number;
 }
 interface OuterChartData {
     status: string;
@@ -112,13 +116,13 @@ const state = reactive({
     prevComplianceCount: computed<number>(() => {
         if (!state.data) return 0;
         const prevMonth = dayjs.utc(widgetState.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
-        const targetDataList = state.data.filter((d) => d.date === prevMonth && d.key === 'compliance_count');
-        return sum(targetDataList.map((d) => d.value));
+        const targetDataList = state.data.filter((d) => d.date === prevMonth).map((d) => d.compliance_count);
+        return sum(targetDataList);
     }),
     complianceCount: computed<number>(() => {
         if (!state.data) return 0;
-        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end && d.key === 'compliance_count');
-        return sum(targetDataList.map((d) => d.value));
+        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end).map((d) => d.compliance_count);
+        return sum(targetDataList);
     }),
     complianceCountComparingMessage: computed<string|undefined>(() => {
         if (state.complianceCount === state.prevComplianceCount) return undefined;
@@ -130,8 +134,8 @@ const state = reactive({
     checkCount: computed<Record<string, number>>(() => {
         if (!state.data) return {} as Record<string, number>;
         const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end);
-        const passCheckCount = sum(targetDataList.filter((d) => d.key === 'pass_check_count').map((d) => d.value));
-        const failCheckCount = sum(targetDataList.filter((d) => d.key === 'fail_check_count').map((d) => d.value));
+        const passCheckCount = sum(targetDataList.map((d) => d.pass_check_count));
+        const failCheckCount = sum(targetDataList.map((d) => d.fail_check_count));
         return {
             [COMPLIANCE_STATUS_MAP.PASS.name]: passCheckCount,
             [COMPLIANCE_STATUS_MAP.FAIL.name]: failCheckCount,
@@ -140,8 +144,8 @@ const state = reactive({
     score: computed<number|undefined>(() => {
         if (!state.data) return undefined;
         const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end);
-        const passScore = sum(targetDataList.filter((d) => d.key === 'pass_score').map((d) => d.value)) ?? 0;
-        const failScore = sum(targetDataList.filter((d) => d.key === 'fail_score').map((d) => d.value)) ?? 0;
+        const passScore = sum(targetDataList.map((d) => d.pass_score)) ?? 0;
+        const failScore = sum(targetDataList.map((d) => d.fail_score)) ?? 0;
         const totalScore = passScore + failScore;
         if (totalScore === 0) return 0;
         return Math.round((passScore / totalScore) * 100);
@@ -163,10 +167,26 @@ const fetchData = async (): Promise<Data[]> => {
                 granularity: 'MONTHLY',
                 start: prevMonth,
                 end: widgetState.dateRange.end,
-                group_by: ['key', 'unit', 'additional_info.severity'],
+                group_by: ['unit', 'additional_info.severity'],
                 fields: {
-                    value: {
-                        key: 'value',
+                    compliance_count: {
+                        key: 'values.compliance_count',
+                        operator: 'sum',
+                    },
+                    pass_check_count: {
+                        key: 'values.pass_check_count',
+                        operator: 'sum',
+                    },
+                    fail_check_count: {
+                        key: 'values.fail_check_count',
+                        operator: 'sum',
+                    },
+                    pass_score: {
+                        key: 'values.pass_score',
+                        operator: 'sum',
+                    },
+                    fail_score: {
+                        key: 'values.fail_score',
                         operator: 'sum',
                     },
                 },

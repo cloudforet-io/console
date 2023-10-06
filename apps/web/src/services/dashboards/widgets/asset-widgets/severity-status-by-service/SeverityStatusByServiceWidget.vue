@@ -5,7 +5,7 @@ import {
 
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { flattenDeep, min } from 'lodash';
+import { min } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -27,7 +27,8 @@ import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-w
 
 interface Data extends CloudServiceStatsModel {
     service: string;
-    value: number;
+    pass_finding_count: number;
+    fail_finding_count: number;
     severity: Severity[];
     status: ComplianceStatus[];
 }
@@ -73,18 +74,20 @@ const fetchData = async (): Promise<Data[]> => {
         apiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        // .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
         const { status, response } = await fetchCloudServiceStatsAnalyze({
             query_set_id: widgetState.options.asset_query_set,
             query: {
-                group_by: ['key', 'unit', 'additional_info.service'],
+                group_by: ['additional_info.service'],
                 granularity: 'MONTHLY',
-                start: prevMonth,
+                start: widgetState.dateRange.end,
                 end: widgetState.dateRange.end,
                 fields: {
-                    value: {
-                        key: 'value',
+                    pass_finding_count: {
+                        key: 'values.pass_finding_count',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'values.fail_finding_count',
                         operator: 'sum',
                     },
                     status: {
@@ -96,7 +99,7 @@ const fetchData = async (): Promise<Data[]> => {
                         operator: 'add_to_set',
                     },
                 },
-                sort: [{ key: 'service' }, { key: 'key' }],
+                sort: [{ key: 'service' }],
                 page: {
                     limit: 80,
                     start: 1,
@@ -113,39 +116,28 @@ const fetchData = async (): Promise<Data[]> => {
 
 
 /* Util */
-const _getStatus = (targetServiceDataList: Data[]): ComplianceStatus => {
-    const statusList = flattenDeep(targetServiceDataList.map((d) => d.status));
+const _getStatus = (statusList: ComplianceStatus[]): ComplianceStatus => {
     if (statusList.includes('FAIL')) return 'FAIL';
     return 'PASS';
 };
-const _getSeverity = (targetServiceDataList: Data[], status: ComplianceStatus): Severity => {
+const _getSeverity = (severityList: Severity[], status: ComplianceStatus): Severity => {
     let severity: Severity = 'PASS';
     if (status === 'FAIL') {
-        const severityList = flattenDeep(targetServiceDataList.map((d) => d.severity));
         const minSeverityPriority = min(severityList.map((d) => SEVERITY_STATUS_MAP[d].priority));
         if (minSeverityPriority) severity = SEVERITY_PRIORITY_MAP[minSeverityPriority];
     }
     return severity;
 };
-const _getValue = (targetServiceDataList: Data[], status: ComplianceStatus): number => {
-    if (status === 'FAIL') {
-        return targetServiceDataList.find((d) => d.key === 'fail_finding_count')?.value ?? 0;
-    }
-    return targetServiceDataList.find((d) => d.key === 'pass_finding_count')?.value ?? 0;
-};
 const refineData = (data?: Data[]): RefinedData[] => {
     if (!data?.length) return [];
-    const serviceSet = new Set();
-    data.forEach((result) => serviceSet.add(result.service));
     const refinedData: RefinedData[] = [];
-    serviceSet.forEach((service) => {
-        const targetServiceDataList = data.filter((result) => result.service === service);
-        const status = _getStatus(targetServiceDataList);
-        const severity = _getSeverity(targetServiceDataList, status);
-        const value = _getValue(targetServiceDataList, status);
+    data.forEach((d) => {
+        const status = _getStatus(d.status);
+        const severity = _getSeverity(d.severity, status);
+        const value: number = status === 'FAIL' ? d.fail_finding_count : d.pass_finding_count;
 
         refinedData.push({
-            service: service as string,
+            service: d.service,
             severity,
             value,
         });
