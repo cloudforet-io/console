@@ -2,8 +2,6 @@ import {
     cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
 
-import type { i18n } from '@/translations';
-
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import {
     getVariableKeyFromWidgetSchemaProperty,
@@ -17,35 +15,30 @@ import {
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
-export interface InheritOptionsErrorMap {
-    [propertyName: string]: string|undefined;
-}
-
 export const getWidgetInheritOptionsErrorMap = (
     schemaProperties: string[],
     inheritOptions?: InheritOptions,
     widgetOptionsSchema?: WidgetOptionsSchema['schema'],
     dashboardVariablesSchema?: DashboardVariablesSchema,
-    translator?: typeof i18n.t,
-): InheritOptionsErrorMap => {
+): Record<string, boolean> => {
     if (!inheritOptions || isEmpty(inheritOptions)) {
         return {};
     }
-    const errorMap: InheritOptionsErrorMap = {};
+    const errorMap: Record<string, boolean> = {};
     schemaProperties.forEach((propertyName) => {
         if (!inheritOptions[propertyName]?.enabled) return;
 
         const variableKey = inheritOptions[propertyName]?.variable_info?.key ?? getVariableKeyFromWidgetSchemaProperty(propertyName);
         if (!variableKey) return;
         if (!dashboardVariablesSchema?.properties?.[variableKey]?.use) {
-            errorMap[propertyName] = translator ? translator('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string : 'Property is not used in dashboard variables';
+            errorMap[propertyName] = true;
             return;
         }
 
         const variableType = dashboardVariablesSchema.properties[variableKey].selection_type === 'MULTI' ? 'array' : 'string';
         const widgetPropertyType = widgetOptionsSchema?.properties?.[propertyName]?.type;
         if (variableType !== widgetPropertyType) {
-            errorMap[propertyName] = translator ? translator('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string : 'Property type mismatch';
+            errorMap[propertyName] = true;
         }
     });
     return errorMap;

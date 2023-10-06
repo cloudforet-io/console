@@ -3,16 +3,13 @@ import { merge } from 'lodash';
 import type { DashboardVariables } from '@/services/dashboards/config';
 import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
-import type { InheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
-
-
 
 export const getRefinedWidgetOptions = (
     widgetConfig?: WidgetConfig,
     optionsData?: WidgetOptions,
     mergedInheritOptions?: InheritOptions,
     dashboardVariables?: DashboardVariables,
-    optionsErrorMap?: InheritOptionsErrorMap,
+    optionsErrorMap?: Record<string, boolean>,
 ): WidgetOptions => {
     const mergedOptions = getMergedWidgetOptions(widgetConfig, optionsData);
     if (!mergedInheritOptions || !dashboardVariables) return mergedOptions;
@@ -28,7 +25,7 @@ const getMergedWidgetOptions = (widgetConfig?: WidgetConfig, widgetOptions?: Wid
 const getRefinedParentOptions = (
     inheritOptions: InheritOptions,
     dashboardVariables: DashboardVariables,
-    optionsErrorMap?: InheritOptionsErrorMap,
+    optionsErrorMap?: Record<string, boolean>,
 ): Partial<WidgetOptions> => {
     const result: Partial<WidgetOptions> = {
         filters: {},
