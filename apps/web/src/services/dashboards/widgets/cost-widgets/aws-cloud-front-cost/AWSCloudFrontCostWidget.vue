@@ -68,11 +68,9 @@ interface Data {
 type Response = CostAnalyzeResponse<Data>;
 interface TableData extends WidgetTableData {
     [groupBy: string]: string | any;
-    // usage_unit: string;
 }
 interface ChartData {
     [key: string]: number | any; // // project_id: 'project-1', HTTP Requests: 0.0, HTTPS Requests: 0.0, TransferOut: 0, ...
-    // usage_unit: string;
 }
 
 
@@ -182,6 +180,7 @@ const state = reactive({
     }),
     //
     disableChart: computed(() => {
+        // NOTE: disable chart when there's same 'Usage Type Details' with different usage_unit
         const usageTypeValueKeyList = state.data?.results?.[0]?.value_sum.map((d) => d[USAGE_TYPE_VALUE_KEY]) ?? [];
         return uniq(usageTypeValueKeyList).length !== usageTypeValueKeyList.length;
     }),

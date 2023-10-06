@@ -153,7 +153,7 @@ const state = reactive({
             ...dynamicTableFields.map((d) => ({ ...d, width: otherFieldWidth })),
         ];
     }),
-    //
+    // NOTE: disable chart when there's same 'Usage Type Details' with different usage_unit
     disableChart: computed(() => {
         const usageTypeValueKeyList = state.data?.results?.[0]?.value_sum.map((d) => d[USAGE_TYPE_VALUE_KEY]) ?? [];
         return uniq(usageTypeValueKeyList).length !== usageTypeValueKeyList.length;
