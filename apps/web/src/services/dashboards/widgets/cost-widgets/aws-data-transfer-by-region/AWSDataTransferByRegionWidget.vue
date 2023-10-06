@@ -7,7 +7,7 @@ import type { Location } from 'vue-router/types/router';
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
-import { uniq } from 'lodash';
+import { uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -99,7 +99,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 const state = reactive({
     loading: true,
     data: null as FullData | null,
-    fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
+    fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
     legends: computed<Legend[]>(() => (state.data?.results ? getPieChartLegends(state.data.results, widgetState.groupBy) : [])),
     chartData: computed<CircleData[]>(() => {
         const chartData = getRefinedCircleData(state.data?.results, props.allReferenceTypeInfo?.region?.referenceMap as RegionReferenceMap);
@@ -121,19 +121,15 @@ const state = reactive({
     }),
     tableFields: computed<Field[]>(() => {
         const textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost' ? 'cost' : 'number',
+            type: state.fieldsKey === 'cost' ? 'cost' : 'usage',
         };
 
         const dynamicTableFields: Field[] = [];
         state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
-            let label = d[USAGE_TYPE_VALUE_KEY];
-            if (state.fieldsKey === 'usage_quantity' && d.usage_unit !== null) {
-                label = `${d[USAGE_TYPE_VALUE_KEY]} (${d.usage_unit})`; // HTTP Requests (Bytes)
-            }
             dynamicTableFields.push({
-                label,
+                label: d[USAGE_TYPE_VALUE_KEY],
                 name: state.fieldsKey === 'usage_quantity' ? `${d[USAGE_TYPE_VALUE_KEY]}_${d.usage_unit}` : d[USAGE_TYPE_VALUE_KEY], // HTTP Requests_Bytes
-                textOptions,
+                textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
                 textAlign: 'right',
             });
         });
@@ -153,10 +149,12 @@ const state = reactive({
             ...dynamicTableFields.map((d) => ({ ...d, width: otherFieldWidth })),
         ];
     }),
-    // NOTE: disable chart when there's same 'Usage Type Details' with different usage_unit
-    disableChart: computed(() => {
-        const usageTypeValueKeyList = state.data?.results?.[0]?.value_sum.map((d) => d[USAGE_TYPE_VALUE_KEY]) ?? [];
-        return uniq(usageTypeValueKeyList).length !== usageTypeValueKeyList.length;
+    //
+    showChart: computed<boolean>(() => {
+        if (state.fieldsKey === 'cost') return true;
+        if (!state.data?.results) return true;
+        // hide chart when there are different usage_unit in data
+        return uniqBy(state.data.results[0].value_sum, 'usage_unit').length === 1;
     }),
 });
 
@@ -196,11 +194,16 @@ const fetchData = async (): Promise<FullData> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
+        const groupBy = [COST_GROUP_BY.REGION, USAGE_TYPE_QUERY_KEY];
+        if (state.fieldsKey === 'usage_quantity') {
+            groupBy.push('usage_unit');
+        }
+
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [COST_GROUP_BY.REGION, USAGE_TYPE_QUERY_KEY, 'usage_unit'],
+                group_by: groupBy,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -227,7 +230,7 @@ const fetchData = async (): Promise<FullData> => {
 };
 
 const drawChart = (chartData: CircleData[]) => {
-    if (state.disableChart) return;
+    if (!state.showChart) return;
     const chart = chartHelper.createMapChart();
     const polygonSeries = chartHelper.createMapPolygonSeries();
     chart.series.push(polygonSeries);
@@ -325,7 +328,7 @@ defineExpose<WidgetExpose<FullData>>({
             />
         </template>
         <div class="data-container">
-            <div v-if="!state.disableChart"
+            <div v-if="state.showChart"
                  class="chart-wrapper"
             >
                 <p-data-loader class="chart-loader"

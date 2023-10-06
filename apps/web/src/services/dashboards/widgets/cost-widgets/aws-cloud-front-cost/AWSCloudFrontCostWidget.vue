@@ -7,7 +7,7 @@ import type { Location } from 'vue-router/types/router';
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep, uniq } from 'lodash';
+import { cloneDeep, uniqBy } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -113,7 +113,7 @@ const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown
 const state = reactive({
     loading: true,
     data: null as Response | null,
-    fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
+    fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
     legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo) : [])),
     chartData: computed<ChartData[]>(() => {
         const _chartData = getRefinedXYChartData<Data, ChartData>(state.data?.results, {
@@ -175,17 +175,16 @@ const state = reactive({
         ];
     }),
     //
-    disableChart: computed(() => {
-        // NOTE: disable chart when there's same 'Usage Type Details' with different usage_unit
-        const usageTypeValueKeyList = state.data?.results?.[0]?.value_sum.map((d) => d[USAGE_TYPE_VALUE_KEY]) ?? [];
-        return uniq(usageTypeValueKeyList).length !== usageTypeValueKeyList.length;
+    showChart: computed<boolean>(() => {
+        if (state.fieldsKey === 'cost') return true;
+        if (!state.data?.results) return true;
+        // hide chart when there are different usage_unit in data
+        return uniqBy(state.data.results[0].value_sum, 'usage_unit').length === 1;
     }),
-    usageUnitMap: computed<Record<string, string|null>>(() => {
-        const result: Record<string, string|null> = {};
-        state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
-            result[d[USAGE_TYPE_VALUE_KEY]] = d.usage_unit;
-        });
-        return result;
+    usageUnit: computed(() => state.data?.results?.[0]?.value_sum[0]?.usage_unit),
+    chartSeriesList: computed<string[]>(() => {
+        if (!state.chartData?.length) return [];
+        return Object.keys(state.chartData[0]).filter((d) => d !== widgetState.groupBy);
     }),
 });
 
@@ -199,11 +198,15 @@ const fetchData = async (): Promise<Response> => {
     apiQueryHelper.setFilters(widgetState.consoleFilters);
     if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
     try {
+        const groupBy = [widgetState.groupBy, USAGE_TYPE_QUERY_KEY];
+        if (state.fieldsKey === 'usage_quantity') {
+            groupBy.push('usage_unit');
+        }
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy, USAGE_TYPE_QUERY_KEY, 'usage_unit'],
+                group_by: groupBy,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -230,7 +233,7 @@ const fetchData = async (): Promise<Response> => {
 };
 
 const drawChart = (chartData) => {
-    if (state.disableChart) return;
+    if (!state.showChart) return;
     const groupBy = widgetState.groupBy;
     if (!groupBy) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
@@ -243,7 +246,7 @@ const drawChart = (chartData) => {
     });
     chart.children.push(legend);
 
-    Object.keys(state.usageUnitMap).forEach((d) => {
+    state.chartSeriesList.forEach((d) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: d,
             valueXField: d,
@@ -263,16 +266,17 @@ const drawChart = (chartData) => {
             chart.series.each((s) => {
                 const fieldName = s.get('valueYField') || s.get('valueXField') || '' as UsageType;
                 let value = target.dataItem?.dataContext?.[fieldName];
-                const usageUnit = state.usageUnitMap[fieldName];
                 if (value === undefined) value = '--';
                 if (typeof value === 'number') {
                     if (selectedSelectorType.value === 'cost') {
                         if (widgetState.currency) value = currencyMoneyFormatter(value, widgetState.currency);
                     } else {
+                        // TODO: change to use usageFormatter
                         value = numberFormatter(value);
                     }
                 }
-                _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}${usageUnit ? ` (${usageUnit})` : ''}:[/] [bold; fontSize: 14px]${value}[/]`;
+                const _seriesName = state.usageUnit ? ` (${state.usageUnit})` : '';
+                _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}${_seriesName}:[/] [bold; fontSize: 14px]${value}[/]`;
             });
             return _text;
         });
@@ -349,7 +353,7 @@ defineExpose<WidgetExpose<Response>>({
             />
         </template>
         <div class="data-container">
-            <div v-if="!state.disableChart"
+            <div v-if="state.showChart"
                  class="chart-wrapper"
             >
                 <p-data-loader class="chart-loader"
