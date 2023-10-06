@@ -553,11 +553,6 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
     .usage-wrapper {
         display: inline-flex;
         align-items: center;
-        .divider {
-            @apply text-gray-200 inline-block;
-            height: 1rem;
-            margin: 0 0.25rem;
-        }
     }
 }
 </style>
