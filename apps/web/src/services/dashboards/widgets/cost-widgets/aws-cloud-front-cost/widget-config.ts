@@ -66,7 +66,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('cost_group_by'),
+                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'cost_product',
                     'project',
