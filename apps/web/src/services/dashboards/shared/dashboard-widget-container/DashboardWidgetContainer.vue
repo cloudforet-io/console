@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ComponentPublicInstance } from 'vue';
 import {
-    reactive, ref, watch, computed, toRef, onBeforeUnmount,
+    reactive, ref, watch, computed, toRef, onBeforeUnmount, nextTick,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -177,13 +177,14 @@ const widgetEditState = reactive({
 const handleWidgetEditModalCancel = () => {
     widgetEditState.visibleModal = false;
 };
-const handleWidgetEditModalConfirm = (widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+const handleWidgetEditModalConfirm = async (widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
     const widgetKey = widgetEditState.targetWidget?.widget_key;
     if (!widgetKey || !widgetInfo) return;
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
     dashboardDetailStore.updateWidgetValidation(true, widgetKey);
     widgetEditState.visibleModal = false;
     widgetEditState.targetWidget = null;
+    await nextTick(); // wait for updated widget info to be applied to the widget component's states
     widgetRef.value.find((comp) => comp?.$el.id === widgetKey)?.refreshWidget();
 };
 
