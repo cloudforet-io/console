@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { isEqual, merge } from 'lodash';
 
 import type { DashboardVariables } from '@/services/dashboards/config';
 import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
@@ -6,20 +6,28 @@ import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/w
 
 export const getRefinedWidgetOptions = (
     widgetConfig?: WidgetConfig,
-    optionsData?: WidgetOptions,
+    storedOptions?: WidgetOptions,
     mergedInheritOptions?: InheritOptions,
     dashboardVariables?: DashboardVariables,
     optionsErrorMap?: Record<string, boolean>,
 ): WidgetOptions => {
-    const mergedOptions = getMergedWidgetOptions(widgetConfig, optionsData);
+    const mergedOptions = getMergedWidgetOptions(widgetConfig?.options, storedOptions);
     if (!mergedInheritOptions || !dashboardVariables) return mergedOptions;
 
     const parentOptions: Partial<WidgetOptions> = getRefinedParentOptions(mergedInheritOptions, dashboardVariables, optionsErrorMap);
-    const refined = merge({}, mergedOptions, parentOptions);
+    const refined = getMergedWidgetOptions(mergedOptions, parentOptions);
     return refined;
 };
 
-const getMergedWidgetOptions = (widgetConfig?: WidgetConfig, widgetOptions?: WidgetOptions) => merge({}, widgetConfig?.options ?? {}, widgetOptions);
+const getMergedWidgetOptions = (source1?: WidgetOptions, source2?: WidgetOptions) => {
+    const merged = merge({}, source1 ?? {}, source2 ?? {});
+    const filters1 = source1?.filters ?? {};
+    const filters2 = source2?.filters ?? {};
+    if (isEqual(filters1, filters2)) return merged;
+    const mergedFilters = merge({}, filters1, filters2);
+    merged.filters = mergedFilters;
+    return merged;
+};
 
 
 const getRefinedParentOptions = (
