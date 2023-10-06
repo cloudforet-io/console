@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { debouncedWatch } from '@vueuse/core';
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -12,7 +12,6 @@ import { isEqual } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
@@ -22,19 +21,17 @@ import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashb
 
 
 interface Props {
-    visible: boolean;
     widgetKey?: string;
     widgetConfigId?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    visible: false,
     widgetKey: undefined,
     widgetConfigId: undefined,
 });
-const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
-    (e: 'close'): void;
+const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:widget-info'): void;
+    (e: 'update:has-non-inherited-widget-options', value: boolean): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -42,10 +39,13 @@ const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
     nonInheritedOptionModalVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
-        const nonInheritedWidgetOptions = getNonInheritedWidgetOptionsAmongUsedVariables(dashboardDetailState.variablesSchema, widgetFormState.inheritOptions, widgetFormState.widgetOptions);
+        const nonInheritedWidgetOptions = getNonInheritedWidgetOptionsAmongUsedVariables(
+            dashboardDetailState.variablesSchema,
+            widgetFormState.inheritOptions,
+            widgetFormState.schemaProperties,
+        );
         return nonInheritedWidgetOptions.length > 0;
     }),
 });
@@ -83,11 +83,9 @@ const handleClickSaveButton = async () => {
     }
     updateDashboardWidgetStore();
     await updateWidgetInfo();
-    state.proxyVisible = false;
     state.nonInheritedOptionModalVisible = false;
 };
 const handleCloseSidebar = () => {
-    state.proxyVisible = false;
     emit('close');
 };
 
@@ -95,11 +93,16 @@ debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
     emit('update:widget-info');
 }, { debounce: 150 });
+
+watch(() => state.hasNonInheritedWidgetOptions, (value) => {
+    emit('update:has-non-inherited-widget-options', value);
+}, { immediate: true });
+
 </script>
 
 <template>
     <div class="widget-view-mode-sidebar">
-        <p-sidebar :visible="state.proxyVisible"
+        <p-sidebar :visible="true"
                    style-type="primary"
                    size="md"
                    is-fixed-size

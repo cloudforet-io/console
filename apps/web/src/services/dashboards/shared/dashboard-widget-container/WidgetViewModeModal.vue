@@ -27,7 +27,6 @@ import type {
     WidgetSize,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 interface WidgetViewModeModalProps {
@@ -65,14 +64,7 @@ const state = reactive({
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
-    hasNonInheritedWidgetOptions: computed<boolean>(() => {
-        const nonInheritedWidgetOptions = getNonInheritedWidgetOptionsAmongUsedVariables(
-            dashboardDetailState.variablesSchema,
-            state.updatedWidgetInfo?.inherit_options,
-            state.updatedWidgetInfo?.widget_options,
-        );
-        return nonInheritedWidgetOptions.length > 0;
-    }),
+    hasNonInheritedWidgetOptions: false,
     updatedWidgetInfo: props.widgetInfo as Partial<DashboardLayoutWidgetInfo>|undefined,
 });
 const widgetRef = toRef(state, 'widgetRef');
@@ -96,10 +88,14 @@ const handleClickEditOption = () => {
     state.sidebarVisible = true;
 };
 const handleCloseSidebar = () => {
+    state.sidebarVisible = false;
     state.widgetRef?.refreshWidget();
 };
 const handleUpdateSidebarWidgetInfo = () => {
     state.widgetRef?.refreshWidget();
+};
+const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
+    state.hasNonInheritedWidgetOptions = value;
 };
 
 const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
@@ -205,12 +201,13 @@ watch(() => props.visible, async (visible) => {
                 </div>
             </div>
             <transition name="slide-left">
-                <widget-view-mode-sidebar v-if="props.widgetInfo && state.sidebarVisible"
+                <widget-view-mode-sidebar v-if="props.widgetInfo"
+                                          v-show="state.sidebarVisible"
                                           :widget-config-id="props.widgetInfo.widget_name"
                                           :widget-key="props.widgetInfo.widget_key"
-                                          :visible.sync="state.sidebarVisible"
                                           @close="handleCloseSidebar"
                                           @update:widget-info="handleUpdateSidebarWidgetInfo"
+                                          @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"
                 />
             </transition>
         </div>
@@ -284,7 +281,13 @@ watch(() => props.visible, async (visible) => {
 .slide-left-enter {
     transform: translate(100%, 0);
 }
+.slide-left-leave {
+    transform: translate(0, 0);
+}
 .slide-left-leave-to {
     transform: translate(100%, 0);
+}
+.slide-left-enter-to {
+    transform: translate(0, 0);
 }
 </style>

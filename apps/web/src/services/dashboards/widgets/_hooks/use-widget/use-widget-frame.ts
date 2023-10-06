@@ -32,7 +32,7 @@ export const useWidgetFrame = (
     });
     const nonInheritOptionsTooltipText = computed<string | undefined>(() => {
         if (!props.dashboardVariablesSchema) return undefined;
-        const nonInheritOptions = getNonInheritedWidgetOptionsAmongUsedVariables(props.dashboardVariablesSchema, widgetState.inheritOptions, widgetState.options);
+        const nonInheritOptions = getNonInheritedWidgetOptionsAmongUsedVariables(props.dashboardVariablesSchema, widgetState.inheritOptions, widgetState.schemaProperties);
         if (!nonInheritOptions.length) return undefined;
 
         // TODO: widget option name must be changed to readable name.

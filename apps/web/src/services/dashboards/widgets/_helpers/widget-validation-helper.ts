@@ -88,6 +88,7 @@ export const validateWidgetByVariablesSchemaUpdate = ({
         if (affected) {
             newWidgetInfo.inherit_options = affected.inherit_options;
             newWidgetInfo.schema_properties = affected.schema_properties;
+            newWidgetInfo.widget_options = affected.widget_options;
         }
     }
     if (deletedVariableSchemaProperties.length) {
@@ -143,30 +144,38 @@ const getUpdatedDashboardVariableSchemaProperties = (
     return [added, deleted, changed];
 };
 const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
-    dashboardVariables: WidgetFilterKey[],
+    addedVariables: WidgetFilterKey[],
     widgetConfig: WidgetConfig,
-    widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'>,
-): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'>|undefined => {
+    widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
+): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
     const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
     const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
+    const _widgetOptions = cloneDeep(widgetInfo.widget_options) ?? {};
     const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.schema.properties ?? {});
     let isAffected = false;
-    dashboardVariables.forEach((variableKey) => {
+    addedVariables.forEach((variableKey) => {
         const property = getWidgetOptionName(variableKey);
 
         const isInWidgetOptionsSchema = optionsSchemaProperties.some((d) => d.includes(property));
         if (!isInWidgetOptionsSchema) return; // not exist in widget options schema
 
-        if (_schemaProperties.includes(property)) return; // already added property
-
-        // enable widget option that match added variable
         isAffected = true;
+
+        // add property to schemaProperties
+        if (!_schemaProperties.includes(property)) {
+            _schemaProperties.push(property);
+        }
+
+        // enable inheritOption that match added variable
         _inheritOptions[property] = { enabled: true, variable_info: { key: variableKey } };
-        _schemaProperties.push(property);
+
+        // remove property from widget options
+        delete _widgetOptions[property];
     });
     return isAffected ? {
         inherit_options: _inheritOptions,
         schema_properties: _schemaProperties,
+        widget_options: _widgetOptions,
     } : undefined;
 };
 const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (

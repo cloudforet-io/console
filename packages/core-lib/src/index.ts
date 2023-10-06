@@ -68,7 +68,9 @@ export const isNotEmpty = (value): boolean => {
     return !isEmpty(value); // String, Object
 };
 
-export const isObjectEqual = (objValue: object, othValue: object) => {
+export const isObjectEqual = (objValue?: object, othValue?: object) => {
+    if (!objValue && !othValue) return true;
+    if (!objValue || !othValue) return false;
     const _isEqual = isEqual(objValue, othValue);
     if (_isEqual) return true;
     const keys = union(Object.keys(objValue), Object.keys(othValue));
