@@ -47,9 +47,6 @@ import type {
 import {
     getWidgetFilterSchemaPropertyName,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-import type {
-    InheritOptionsErrorMap,
-} from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 import {
     getWidgetInheritOptionsErrorMap,
 } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
@@ -80,13 +77,20 @@ const state = reactive({
     inheritableProperties: computed(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
         .filter(([, inheritOption]) => !!inheritOption.enabled)
         .map(([propertyName]) => propertyName)),
-    inheritOptionsErrorMap: computed<InheritOptionsErrorMap>(() => getWidgetInheritOptionsErrorMap(
-        widgetFormState.schemaProperties,
-        widgetFormStore.updatedWidgetInfo?.inherit_options ?? {}, // use updated inherit options not to show error message when updating widget info
-        widgetFormStore.widgetConfig?.options_schema?.schema,
-        dashboardDetailState.variablesSchema,
-        i18n.t,
-    )),
+    inheritOptionsErrorMessageMap: computed<Record<string, string>>(() => {
+        const errorText = i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string;
+        const errorMap = getWidgetInheritOptionsErrorMap(
+            widgetFormState.schemaProperties,
+            widgetFormStore.updatedWidgetInfo?.inherit_options ?? {}, // use updated inherit options not to show error message when updating widget info
+            widgetFormStore.widgetConfig?.options_schema?.schema,
+            dashboardDetailState.variablesSchema,
+        );
+        const errorMessageMap: Record<string, string> = {};
+        Object.keys(errorMap).forEach((propertyName) => {
+            errorMessageMap[propertyName] = errorText;
+        });
+        return errorMessageMap;
+    }),
     isFocused: false,
     //
     defaultWidgetFormData: computed(() => (props.widgetConfigId ? getDefaultWidgetFormData(props.widgetConfigId) : {})),
@@ -245,7 +249,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
                                 :key="`${widgetFormStore.widgetConfigId}-${widgetFormStore.widgetKey}`"
                                 :schema="state.widgetOptionsJsonSchema"
                                 :form-data="state.schemaFormData"
-                                :custom-error-map="state.inheritOptionsErrorMap"
+                                :custom-error-map="state.inheritOptionsErrorMessageMap"
                                 :validation-mode="widgetKey ? 'all' : 'input'"
                                 use-fixed-menu-style
                                 uniform-width

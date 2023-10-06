@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { defineEmits, reactive } from 'vue';
+import { defineEmits } from 'vue';
 
 import {
     PButtonModal,
 } from '@spaceone/design-system';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
-
 import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
     visible: boolean;
@@ -17,38 +15,29 @@ interface Props {
     widgetConfigId: string;
 }
 interface EmitFn {
-    (e: 'update:visible', value: boolean): void;
-    (e: 'confirm'): void;
-    // TODO: remove this emit after refactoring WidgetFrame.vue
-    (e: 'refresh'): void;
+    (e: 'cancel'): void;
+    (e: 'confirm', widgetInfo?: Partial<DashboardLayoutWidgetInfo>): void;
 }
 const emit = defineEmits<EmitFn>();
 const props = defineProps<Props>();
-const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
-});
-const dashboardDetailStore = useDashboardDetailInfoStore();
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
+const handleEditModalCancel = () => {
+    emit('cancel');
+};
 const handleEditModalConfirm = () => {
-    const widgetInfo = widgetFormStore.updatedWidgetInfo;
-    if (!widgetInfo) return;
-    dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
-    dashboardDetailStore.updateWidgetValidation(true, props.widgetKey);
-    state.proxyVisible = false;
-    emit('confirm');
-    // TODO: remove this emit after refactoring WidgetFrame.vue
-    emit('refresh');
+    emit('confirm', widgetFormStore.updatedWidgetInfo);
 };
 </script>
 
 <template>
     <p-button-modal class="dashboard-widget-edit-modal"
-                    :visible.sync="state.proxyVisible"
+                    :visible="props.visible"
                     :header-title="$t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
                     :disabled="!widgetFormState.isValid"
                     size="sm"
+                    @cancel="handleEditModalCancel"
                     @confirm="handleEditModalConfirm"
     >
         <template #body>

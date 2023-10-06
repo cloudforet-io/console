@@ -3,8 +3,6 @@ import {
     computed, reactive,
 } from 'vue';
 
-import { i18n } from '@/translations';
-
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     WidgetConfig, WidgetOptions,
@@ -59,7 +57,6 @@ export function useMergedWidgetState(
         optionState.inheritOptions,
         state.widgetConfig?.options_schema?.schema,
         optionState.dashboardVariablesSchema,
-        i18n.t,
     ));
 
     const state = reactive<MergedWidgetState>({
