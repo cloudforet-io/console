@@ -178,10 +178,11 @@ const state = reactive({
     showChart: computed<boolean>(() => {
         if (state.fieldsKey === 'cost') return true;
         if (!state.data?.results) return true;
-        // hide chart when there are different usage_unit in data
+        // hide chart when there are different usage_unit in data or usage_unit is null
+        if (state.data.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
         return uniqBy(state.data.results[0].value_sum, 'usage_unit').length === 1;
     }),
-    usageUnit: computed(() => state.data?.results?.[0]?.value_sum[0]?.usage_unit),
+    usageUnit: computed<string|null>(() => state.data?.results?.[0]?.value_sum[0]?.usage_unit),
     chartSeriesList: computed<string[]>(() => {
         if (!state.chartData?.length) return [];
         return Object.keys(state.chartData[0]).filter((d) => d !== widgetState.groupBy);
