@@ -9,7 +9,6 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep, uniqBy } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
@@ -18,6 +17,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -271,8 +271,7 @@ const drawChart = (chartData) => {
                     if (selectedSelectorType.value === 'cost') {
                         if (widgetState.currency) value = currencyMoneyFormatter(value, widgetState.currency);
                     } else {
-                        // TODO: change to use usageFormatter
-                        value = numberFormatter(value);
+                        value = usageUnitFormatter(value, { unit: state.usageUnit });
                     }
                 }
                 const _seriesName = state.usageUnit ? ` (${state.usageUnit})` : '';
