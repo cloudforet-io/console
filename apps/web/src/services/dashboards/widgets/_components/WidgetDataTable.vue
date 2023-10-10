@@ -16,6 +16,7 @@ import type { Currency } from '@/store/modules/settings/type';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -105,8 +106,7 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions'], c
         let unit = textOptions?.unit;
         const unitPath = textOptions?.unitPath;
         if (!unit && unitPath) unit = getValueByPath(cellData, unitPath);
-        // TODO: change to use usageFormatter
-        return numberFormatter(value) + (unit ? ` ${unit}` : '');
+        return usageUnitFormatter(value, { unit });
     }
     return value;
 };
