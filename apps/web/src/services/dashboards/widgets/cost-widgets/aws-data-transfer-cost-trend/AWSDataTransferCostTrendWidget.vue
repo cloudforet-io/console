@@ -9,13 +9,14 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy, uniqBy } from 'lodash';
 
-import { numberFormatter, sortArrayInObjectArray } from '@cloudforet/core-lib';
+import { sortArrayInObjectArray } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -182,7 +183,7 @@ const state = reactive({
         if (state.data.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
         return uniqBy(state.data.results, 'usage_unit').length === 1;
     }),
-
+    usageUnit: computed(() => state.data?.results?.[0]?.usage_unit),
 });
 const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown({
     selectorOptions: computed(() => widgetState.options?.selector_options),
@@ -281,8 +282,7 @@ const drawChart = (chartData: ChartData[]) => {
             chartHelper.setXYSharedTooltipText(
                 chart,
                 tooltip,
-                // TODO: change to use usageFormatter
-                (value) => numberFormatter(value),
+                (value) => usageUnitFormatter(value, { unit: state.usageUnit }),
             );
         } else {
             chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
