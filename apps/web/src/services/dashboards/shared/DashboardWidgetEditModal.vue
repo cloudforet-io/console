@@ -39,6 +39,7 @@ const handleEditModalConfirm = () => {
                     size="sm"
                     @cancel="handleEditModalCancel"
                     @confirm="handleEditModalConfirm"
+                    @close="handleEditModalCancel"
     >
         <template #body>
             <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
