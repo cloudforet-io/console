@@ -27,3 +27,18 @@ export const getInitialWidgetInheritOptions = (widgetConfig?: WidgetConfig, stor
 
     return refined;
 };
+
+/**
+ * @description get all inheriting properties from inheritOptions.
+ * it returns option properties whose inheritOption is enabled and variable_info.key is same with given variableKey.
+ * @param variableKey
+ * @param inheritOptions
+ */
+export const getInheritingProperties = (variableKey: string, inheritOptions: InheritOptions) => {
+    const properties: string[] = [];
+    Object.entries(inheritOptions).forEach(([property, inheritOption]) => {
+        if (!inheritOption.enabled) return;
+        if (inheritOption.variable_info?.key === variableKey) properties.push(property);
+    });
+    return properties;
+};
