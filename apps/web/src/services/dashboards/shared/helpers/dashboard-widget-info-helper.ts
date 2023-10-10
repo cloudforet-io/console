@@ -3,13 +3,17 @@ import { cloneDeep, isEmpty, isEqual } from 'lodash';
 import { isObjectEqual } from '@cloudforet/core-lib';
 
 import type {
-    DashboardLayoutWidgetInfo,
     InheritOptions, UpdatableWidgetInfo,
     WidgetConfig, WidgetFiltersMap,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 
-export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInfo: Partial<DashboardLayoutWidgetInfo>): UpdatableWidgetInfo => {
+/**
+ * @description get updated widget info. if the property is not changed, it will be declared as undefined.
+ * @param widgetConfig
+ * @param mergedWidgetInfo
+ */
+export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInfo: UpdatableWidgetInfo): UpdatableWidgetInfo => {
     const configInheritOptions = widgetConfig.inherit_options ?? {};
     const configWidgetOptions = widgetConfig.options ?? {};
     const updatedInheritOptions: InheritOptions = cloneDeep(mergedWidgetInfo.inherit_options) ?? {};
@@ -36,9 +40,10 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
     });
 
     return {
-        title: mergedWidgetInfo.title,
+        title: mergedWidgetInfo.title === widgetConfig.title ? undefined : mergedWidgetInfo.title,
         inherit_options: isEmpty(updatedInheritOptions) ? undefined : updatedInheritOptions,
         widget_options: isEmpty(updatedWidgetOptions) ? undefined : updatedWidgetOptions,
         schema_properties: mergedWidgetInfo.schema_properties?.length ? mergedWidgetInfo.schema_properties : undefined,
+        size: mergedWidgetInfo.size === widgetConfig.sizes?.[0] ? undefined : mergedWidgetInfo.size,
     };
 };
