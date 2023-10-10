@@ -109,7 +109,7 @@ const state = reactive({
         if (!state.data?.results?.length) return [];
         const tableData: TableData[] = state.data.results.map((d: Data) => {
             const row: TableData = {
-                [COST_GROUP_BY.REGION]: d.region_code,
+                [COST_GROUP_BY.REGION]: d.region_code ?? 'Unknown',
             };
             d.value_sum.forEach((subData: SubData) => {
                 const rowKey = state.fieldsKey === 'usage_quantity' ? `${subData[USAGE_TYPE_VALUE_KEY]}_${subData.usage_unit}` : subData[USAGE_TYPE_VALUE_KEY];
@@ -127,7 +127,7 @@ const state = reactive({
         const dynamicTableFields: Field[] = [];
         state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
             dynamicTableFields.push({
-                label: d[USAGE_TYPE_VALUE_KEY],
+                label: d[USAGE_TYPE_VALUE_KEY] ?? 'Unknown',
                 name: state.fieldsKey === 'usage_quantity' ? `${d[USAGE_TYPE_VALUE_KEY]}_${d.usage_unit}` : d[USAGE_TYPE_VALUE_KEY], // HTTP Requests_Bytes
                 textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
                 textAlign: 'right',
