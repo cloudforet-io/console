@@ -54,17 +54,12 @@ import type { CostAnalyzeResponse, Granularity, Period } from '@/services/cost-e
 
 type CostAnalyzeRawData = {
     [groupBy: string]: string | any;
-    cost_sum?: Array<{
-        date: string;
-        value: number
-    }>;
-    usage_quantity_sum?: Array<{
+    value_sum?: Array<{
         date: string;
         value: number|null;
     }>;
     usage_unit?: string;
-    _total_cost_sum?: number;
-    _total_usage_quantity_sum?: number;
+    _total_value_sum?: number;
 };
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -98,10 +93,11 @@ const state = reactive({
         let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
-        const fields = state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage ? {
-            usage_quantity_sum: { key: 'usage_quantity', operator: 'sum' },
-        } : {
-            cost_sum: { key: 'cost', operator: 'sum' },
+        const fields = {
+            value_sum: {
+                key: state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage ? 'usage_quantity' : 'cost',
+                operator: 'sum',
+            },
         };
         return {
             granularity: costAnalysisPageState.granularity,
@@ -109,7 +105,7 @@ const state = reactive({
             start: dayjs.utc(costAnalysisPageState.period?.start).format(dateFormat),
             end: dayjs.utc(costAnalysisPageState.period?.end).format(dateFormat),
             fields,
-            sort: [{ key: '_total_cost_sum', desc: true }],
+            sort: [{ key: '_total_value_sum', desc: true }],
             field_group: ['date'],
         };
     }),
@@ -277,8 +273,7 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
     const refinedTableData: CostAnalyzeRawData[] = [];
     const today = dayjs.utc();
     _results.forEach((d) => {
-        const isUsageSelected = state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage;
-        let target = cloneDeep(isUsageSelected ? d.usage_quantity_sum : d.cost_sum);
+        let target = cloneDeep(d.value_sum);
         let now = dayjs.utc(period.start).clone();
         while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
             if (now.isAfter(today, timeUnit)) break;
@@ -288,10 +283,9 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
             now = now.add(1, timeUnit);
         }
         target = sortBy(target, ['date']);
-        const targetKey = (isUsageSelected) ? 'usage_quantity_sum' : 'cost_sum';
         refinedTableData.push({
             ...d,
-            [targetKey]: target,
+            value_sum: target,
         });
     });
     return refinedTableData;
@@ -322,12 +316,6 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
     } finally {
         tableState.loading = false;
     }
-};
-
-const getUsageQuantity = (item: CostAnalyzeRawData, fieldName: string): number|string => {
-    const dateIndex = Number(fieldName.split('.')[1]);
-    const usageQuantity = item.usage_quantity_sum?.[dateIndex]?.value;
-    return numberFormatter(usageQuantity);
 };
 
 /* event */
@@ -396,16 +384,14 @@ watch(
         () => costAnalysisPageStore.selectedQueryId,
         () => state.usageTypeAdditionalFilterSelected,
     ],
-    async ([, selectedDataSourceId, , usageTypeAdditionalFilterSelected]) => {
+    async ([, selectedDataSourceId]) => {
         if (!selectedDataSourceId) return;
         tableState.thisPage = 1;
         const { results, more } = await listCostAnalysisTableData();
         if (costAnalysisPageState.period) {
             tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
             tableState.more = more ?? false;
-            const isUsageSelected = usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage;
-            const additionalFilter = isUsageSelected ? USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage : USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost;
-            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length, additionalFilter);
+            tableState.costFields = getDataTableCostFields(costAnalysisPageState.granularity, costAnalysisPageState.period, !!tableState.groupByFields.length);
         }
     },
     { immediate: true, deep: true },
@@ -506,14 +492,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                             />
                         </template>
                         <template v-else>
-                            <span v-if="state.usageTypeAdditionalFilterSelected === 'usage'"
-                                  class="usage-wrapper"
-                            >
-                                {{ getUsageQuantity(item, field.name) }}
-                            </span>
-                            <span v-else
-                                  class="usage-wrapper"
-                            >
+                            <span class="usage-wrapper">
                                 {{ numberFormatter(value) }}
                             </span>
                         </template>
