@@ -10,25 +10,26 @@ export const SIZE_UNIT_MAP = {
     PB: 'PB',
     TB: 'TB',
 } as const;
-export type SizeUnitMap = keyof typeof SIZE_UNIT_MAP;
+export type SizeUnit = keyof typeof SIZE_UNIT_MAP;
 
-export const EXTRA_UNIT_MAP = {
-    Count: 'Count',
-} as const;
-export type ExtraUnitMap = keyof typeof EXTRA_UNIT_MAP;
 
-interface UsageUnitFormatterOptions {
-    unit?: SizeUnitMap | ExtraUnitMap | string | null;
-    outputSizeUnit?: typeof SIZE_UNIT_MAP[SizeUnitMap];
+interface BasicUsageUnitFormatterOptions {
+    unit?: 'Count' | string | null;
 }
+interface SizeUsageUnitFormatterOptions {
+    unit: SizeUnit;
+    outputUnit?: typeof SIZE_UNIT_MAP[SizeUnit];
+}
+
+type UsageUnitFormatterOptions = BasicUsageUnitFormatterOptions | SizeUsageUnitFormatterOptions;
 
 const isSizeUnit = (unit: string): boolean => unit in SIZE_UNIT_MAP;
 
 export const usageUnitFormatter = (value: number, options?: UsageUnitFormatterOptions): string => {
-    const { unit, outputSizeUnit } = options || {};
-    if (unit && isSizeUnit(unit)) {
-        const parsedValue = bytes.parse(`${value}${SIZE_UNIT_MAP[unit]}`); // 1kb -> 1024
-        return byteFormatter(parsedValue, { unit: outputSizeUnit });
+    if (options?.unit && isSizeUnit(options.unit)) {
+        const sizeOptions = options as SizeUsageUnitFormatterOptions;
+        const parsedValue = bytes.parse(`${value}${SIZE_UNIT_MAP[sizeOptions.unit]}`); // 1KB -> 1024
+        return byteFormatter(parsedValue, { unit: sizeOptions.outputUnit });
     }
     return numberFormatter(value);
 };
