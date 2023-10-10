@@ -11,6 +11,7 @@ import type {
     InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
     UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
+import { getInheritingProperties } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {
     getWidgetOptionName,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
@@ -177,34 +178,43 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
+    let isAffected = false;
     const _widgetOptions = cloneDeep(widgetInfo.widget_options) ?? {};
     const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
     const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
 
     // delete or update options using deleted variables
     dashboardVariables.forEach((variableKey) => {
-        const property = getWidgetOptionName(variableKey);
-        const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(property) ?? false;
+        const inheritingProperties = getInheritingProperties(variableKey, _inheritOptions);
 
-        // do nothing if inherit option is already disabled
-        if (!_inheritOptions[property]?.enabled) return;
+        // do nothing if inheriting properties are not exist
+        if (!inheritingProperties.length) return;
 
-        // remove option from schemaProperties and revert inherit option if the option is not fixed property
+        // revert to default inheritOption for each inheriting properties
+        inheritingProperties.forEach((inheritingProperty) => {
+            _inheritOptions[inheritingProperty] = widgetConfig.inherit_options?.[inheritingProperty] as InheritOptions['string'];
+        });
+
+        const targetProperty = getWidgetOptionName(variableKey);
+        const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(targetProperty) ?? false;
         if (!isFixedProperty) {
-            const propertyIdx = _schemaProperties.indexOf(property);
-            if (propertyIdx === -1) return; // already deleted property
-            _schemaProperties.splice(_schemaProperties.indexOf(property), 1); // delete property from schemaProperties
-            // just initiate inherit option since the option is deleted from schemaProperties
-            _inheritOptions[property] = widgetConfig.inherit_options?.[property] as InheritOptions['string'];
+            // remove from schemaProperties if it is not fixed property
+            const propertyIdx = _schemaProperties.indexOf(targetProperty);
+            if (propertyIdx > -1) {
+                _schemaProperties.splice(_schemaProperties.indexOf(targetProperty), 1);
+            }
         }
+
+        isAffected = true;
     });
 
-    return {
+    return isAffected ? {
         schema_properties: _schemaProperties,
         inherit_options: _inheritOptions,
         widget_options: _widgetOptions,
-    };
+    } : undefined;
 };
+
 const isAffectedByChangedVariableSchemaProperties = (
     dashboardVariables: string[],
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'>,
