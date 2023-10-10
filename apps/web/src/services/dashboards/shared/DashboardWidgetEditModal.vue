@@ -6,8 +6,10 @@ import {
 } from '@spaceone/design-system';
 
 import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
-import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import {
+    useWidgetFormStore,
+} from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 interface Props {
     visible: boolean;
@@ -16,7 +18,7 @@ interface Props {
 }
 interface EmitFn {
     (e: 'cancel'): void;
-    (e: 'confirm', widgetInfo?: Partial<DashboardLayoutWidgetInfo>): void;
+    (e: 'confirm', widgetInfo?: UpdatableWidgetInfo): void;
 }
 const emit = defineEmits<EmitFn>();
 const props = defineProps<Props>();

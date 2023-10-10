@@ -17,6 +17,7 @@ import DashboardWidgetInputForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
@@ -30,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     widgetConfigId: undefined,
 });
 const emit = defineEmits<{(e: 'close'): void;
-    (e: 'update:widget-info'): void;
+    (e: 'update:widget-info', widgetInfo: UpdatableWidgetInfo): void;
     (e: 'update:has-non-inherited-widget-options', value: boolean): void;
 }>();
 
@@ -92,7 +93,7 @@ const handleCloseSidebar = () => {
 
 debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
-    emit('update:widget-info');
+    emit('update:widget-info', after);
 }, { debounce: 150 });
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {

@@ -25,6 +25,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboa
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
     WidgetSize,
+    UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
@@ -98,7 +99,7 @@ const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
     state.hasNonInheritedWidgetOptions = value;
 };
 
-const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: UpdatableWidgetInfo) => {
     state.updatedWidgetInfo = widgetInfo;
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };

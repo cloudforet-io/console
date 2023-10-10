@@ -23,7 +23,7 @@ import WidgetViewModeModal from '@/services/dashboards/shared/dashboard-widget-c
 import DashboardWidgetEditModal from '@/services/dashboards/shared/DashboardWidgetEditModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
-    DashboardLayoutWidgetInfo,
+    UpdatableWidgetInfo,
     WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 
@@ -106,7 +106,7 @@ const handleIntersectionObserver: IntersectionObserverCallback = async ([{ isInt
 const handleWidgetMounted = (widgetKey: string) => {
     state.mountedWidgetMap[widgetKey] = true;
 };
-const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: UpdatableWidgetInfo) => {
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
@@ -177,7 +177,7 @@ const widgetEditState = reactive({
 const handleWidgetEditModalCancel = () => {
     widgetEditState.visibleModal = false;
 };
-const handleWidgetEditModalConfirm = async (widgetInfo: Partial<DashboardLayoutWidgetInfo>) => {
+const handleWidgetEditModalConfirm = async (widgetInfo: UpdatableWidgetInfo) => {
     const widgetKey = widgetEditState.targetWidget?.widget_key;
     if (!widgetKey || !widgetInfo) return;
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
