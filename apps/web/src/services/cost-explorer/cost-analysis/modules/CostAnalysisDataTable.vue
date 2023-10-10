@@ -28,6 +28,7 @@ import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -493,7 +494,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                         </template>
                         <template v-else>
                             <span class="usage-wrapper">
-                                {{ numberFormatter(value) }}
+                                {{ usageUnitFormatter(value, {unit: item.usage_unit}) }}
                             </span>
                         </template>
                     </p-link>
