@@ -216,7 +216,7 @@ const fetchData = async (): Promise<Response> => {
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_value_sum', desc: true }],
+                sort: [{ key: '_total_value_sum', desc: true }, { key: USAGE_TYPE_QUERY_KEY, desc: false }],
                 field_group: ['usage_unit', USAGE_TYPE_VALUE_KEY],
                 ...apiQueryHelper.data,
             },
