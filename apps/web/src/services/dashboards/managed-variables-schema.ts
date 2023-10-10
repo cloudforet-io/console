@@ -21,7 +21,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
         [REFERENCE_TYPE_INFO.provider.type]: {
             name: REFERENCE_TYPE_INFO.provider.name,
             variable_type: 'MANAGED',
-            use: true,
+            use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROVIDER',
             options: {
