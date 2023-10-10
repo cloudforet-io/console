@@ -7,6 +7,7 @@ import type { Location } from 'vue-router/types/router';
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
 import { PDataLoader } from '@spaceone/design-system';
+import { uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -46,20 +47,20 @@ import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/
 const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
 const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
 
-interface SubData { [USAGE_TYPE_VALUE_KEY]: string; value: number }
+interface SubData {
+    [USAGE_TYPE_VALUE_KEY]: string;
+    value: number;
+    usage_unit: string | null;
+}
 interface Data {
     date: string;
-    cost_sum: SubData[];
-    usage_quantity_sum: SubData[];
-    _total_cost_sum: number;
-    _total_usage_quantity_sum: number;
+    value_sum: SubData[];
+    _total_value_sum: number;
     [COST_GROUP_BY.REGION]: string;
-    usage_unit: string;
 }
 
 interface TableData extends WidgetTableData {
     [COST_GROUP_BY.REGION]: string;
-    usage_unit: string;
 }
 
 type FullData = CostAnalyzeResponse<Data>;
@@ -68,12 +69,10 @@ interface CircleData {
     [COST_GROUP_BY.REGION]: string;
     latitude: number;
     longitude: number;
-    _total_cost_sum?: number;
-    _total_usage_quantity?: number;
+    _total_value_sum?: number;
     circleSettings?: {
         fill: string;
     }
-    usage_unit: string;
 }
 
 const chartContext = ref<HTMLElement|null>(null);
@@ -100,7 +99,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 const state = reactive({
     loading: true,
     data: null as FullData | null,
-    fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
+    fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
     legends: computed<Legend[]>(() => (state.data?.results ? getPieChartLegends(state.data.results, widgetState.groupBy) : [])),
     chartData: computed<CircleData[]>(() => {
         const chartData = getRefinedCircleData(state.data?.results, props.allReferenceTypeInfo?.region?.referenceMap as RegionReferenceMap);
@@ -111,10 +110,10 @@ const state = reactive({
         const tableData: TableData[] = state.data.results.map((d: Data) => {
             const row: TableData = {
                 [COST_GROUP_BY.REGION]: d.region_code,
-                usage_unit: d.usage_unit,
             };
-            d[`${state.fieldsKey}_sum`]?.forEach((subData: SubData) => {
-                row[subData[USAGE_TYPE_VALUE_KEY]] = subData.value;
+            d.value_sum.forEach((subData: SubData) => {
+                const rowKey = state.fieldsKey === 'usage_quantity' ? `${subData[USAGE_TYPE_VALUE_KEY]}_${subData.usage_unit}` : subData[USAGE_TYPE_VALUE_KEY];
+                row[rowKey] = subData.value;
             });
             return row;
         });
@@ -122,15 +121,18 @@ const state = reactive({
     }),
     tableFields: computed<Field[]>(() => {
         const textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost' ? 'cost' : 'number',
+            type: state.fieldsKey === 'cost' ? 'cost' : 'usage',
         };
 
-        const dynamicTableFields: Field[] = state.data?.results?.[0]?.cost_sum?.map((d: SubData) => ({
-            label: d[USAGE_TYPE_VALUE_KEY],
-            name: d[USAGE_TYPE_VALUE_KEY],
-            textOptions,
-            textAlign: 'right',
-        })) ?? [];
+        const dynamicTableFields: Field[] = [];
+        state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
+            dynamicTableFields.push({
+                label: d[USAGE_TYPE_VALUE_KEY],
+                name: state.fieldsKey === 'usage_quantity' ? `${d[USAGE_TYPE_VALUE_KEY]}_${d.usage_unit}` : d[USAGE_TYPE_VALUE_KEY], // HTTP Requests_Bytes
+                textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
+                textAlign: 'right',
+            });
+        });
 
         // set width of table fields
         const groupByFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
@@ -142,17 +144,17 @@ const state = reactive({
             textOptions: { type: 'reference', referenceType: 'region' },
             width: groupByFieldWidth,
         }];
-        if (state.fieldsKey === 'usage_quantity') {
-            fixedFields.push({
-                label: 'Usage Unit',
-                name: 'usage_unit',
-                width: otherFieldWidth,
-            });
-        }
         return [
             ...fixedFields,
             ...dynamicTableFields.map((d) => ({ ...d, width: otherFieldWidth })),
         ];
+    }),
+    //
+    showChart: computed<boolean>(() => {
+        if (state.fieldsKey === 'cost') return true;
+        if (!state.data?.results) return true;
+        // hide chart when there are different usage_unit in data
+        return uniqBy(state.data.results[0].value_sum, 'usage_unit').length === 1;
     }),
 });
 
@@ -192,25 +194,26 @@ const fetchData = async (): Promise<FullData> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
+        const groupBy = [COST_GROUP_BY.REGION, USAGE_TYPE_QUERY_KEY];
+        if (state.fieldsKey === 'usage_quantity') {
+            groupBy.push('usage_unit');
+        }
+
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [COST_GROUP_BY.REGION, USAGE_TYPE_QUERY_KEY, 'usage_unit'],
+                group_by: groupBy,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
-                        key: 'cost',
-                        operator: 'sum',
-                    },
-                    usage_quantity_sum: {
-                        key: 'usage_quantity',
+                    value_sum: {
+                        key: state.fieldsKey,
                         operator: 'sum',
                     },
                 },
-                field_group: [USAGE_TYPE_VALUE_KEY],
-                sort: [{ key: '_total_cost_sum', desc: true }],
+                field_group: ['usage_unit', USAGE_TYPE_VALUE_KEY],
+                sort: [{ key: '_total_value_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
@@ -227,12 +230,13 @@ const fetchData = async (): Promise<FullData> => {
 };
 
 const drawChart = (chartData: CircleData[]) => {
+    if (!state.showChart) return;
     const chart = chartHelper.createMapChart();
     const polygonSeries = chartHelper.createMapPolygonSeries();
     chart.series.push(polygonSeries);
     const pointSeries = chartHelper.createMapPointSeries({
         calculateAggregates: true,
-        valueField: `_total_${state.fieldsKey}_sum`,
+        valueField: '_total_value_sum',
     });
     chart.series.push(pointSeries);
 
@@ -281,11 +285,9 @@ const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
 };
 
 /* Event */
-const handleSelectSelectorType = async (selected: SelectorType) => {
+const handleSelectSelectorType = (selected: SelectorType) => {
     selectedSelectorType.value = selected;
-    chartHelper.refreshRoot();
-    await nextTick();
-    if (chartHelper.root.value) drawChart(state.chartData);
+    refreshWidget();
 };
 const handleUpdateThisPage = (_thisPage: number) => {
     thisPage.value = _thisPage;
@@ -326,7 +328,9 @@ defineExpose<WidgetExpose<FullData>>({
             />
         </template>
         <div class="data-container">
-            <div class="chart-wrapper">
+            <div v-if="state.showChart"
+                 class="chart-wrapper"
+            >
                 <p-data-loader class="chart-loader"
                                :loading="props.loading || state.loading"
                                :data="state.data"
