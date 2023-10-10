@@ -84,6 +84,7 @@ const handleClickSaveButton = async () => {
     updateDashboardWidgetStore();
     await updateWidgetInfo();
     state.nonInheritedOptionModalVisible = false;
+    emit('close');
 };
 const handleCloseSidebar = () => {
     emit('close');
