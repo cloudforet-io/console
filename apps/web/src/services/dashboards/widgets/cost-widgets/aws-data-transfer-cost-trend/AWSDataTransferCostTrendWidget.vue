@@ -178,7 +178,8 @@ const state = reactive({
     showChart: computed(() => {
         if (state.fieldsKey === 'cost') return true;
         if (!state.data?.results) return true;
-        // hide chart when there are different usage_unit in data
+        // hide chart when there are different usage_unit in data or usage_unit is null
+        if (state.data.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
         return uniqBy(state.data.results, 'usage_unit').length === 1;
     }),
 

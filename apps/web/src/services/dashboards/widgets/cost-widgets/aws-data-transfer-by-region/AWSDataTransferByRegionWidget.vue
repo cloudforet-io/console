@@ -101,15 +101,12 @@ const state = reactive({
     data: null as FullData | null,
     fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
     legends: computed<Legend[]>(() => (state.data?.results ? getPieChartLegends(state.data.results, widgetState.groupBy) : [])),
-    chartData: computed<CircleData[]>(() => {
-        const chartData = getRefinedCircleData(state.data?.results, props.allReferenceTypeInfo?.region?.referenceMap as RegionReferenceMap);
-        return chartData;
-    }),
+    chartData: computed<CircleData[]>(() => getRefinedCircleData(state.data?.results, props.allReferenceTypeInfo?.region?.referenceMap as RegionReferenceMap)),
     tableData: computed<TableData[]>(() => {
         if (!state.data?.results?.length) return [];
         const tableData: TableData[] = state.data.results.map((d: Data) => {
             const row: TableData = {
-                [COST_GROUP_BY.REGION]: d.region_code,
+                [COST_GROUP_BY.REGION]: d.region_code ?? 'Unknown',
             };
             d.value_sum.forEach((subData: SubData) => {
                 const rowKey = state.fieldsKey === 'usage_quantity' ? `${subData[USAGE_TYPE_VALUE_KEY]}_${subData.usage_unit}` : subData[USAGE_TYPE_VALUE_KEY];
@@ -127,7 +124,7 @@ const state = reactive({
         const dynamicTableFields: Field[] = [];
         state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
             dynamicTableFields.push({
-                label: d[USAGE_TYPE_VALUE_KEY],
+                label: d[USAGE_TYPE_VALUE_KEY] ?? 'Unknown',
                 name: state.fieldsKey === 'usage_quantity' ? `${d[USAGE_TYPE_VALUE_KEY]}_${d.usage_unit}` : d[USAGE_TYPE_VALUE_KEY], // HTTP Requests_Bytes
                 textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
                 textAlign: 'right',
@@ -153,7 +150,8 @@ const state = reactive({
     showChart: computed<boolean>(() => {
         if (state.fieldsKey === 'cost') return true;
         if (!state.data?.results) return true;
-        // hide chart when there are different usage_unit in data
+        // hide chart when there are different usage_unit in data or usage_unit is null
+        if (state.data.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
         return uniqBy(state.data.results[0].value_sum, 'usage_unit').length === 1;
     }),
 });
