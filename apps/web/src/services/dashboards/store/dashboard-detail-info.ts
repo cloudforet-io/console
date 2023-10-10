@@ -12,7 +12,7 @@ import type {
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import type { DashboardLayoutWidgetInfo, UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
@@ -209,14 +209,17 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 this.dashboardWidgetInfoList = _dashboardWidgetInfoList;
             }
         },
-        updateWidgetInfo(widgetKey: string, data: Partial<DashboardLayoutWidgetInfo>) {
+        updateWidgetInfo(widgetKey: string, data: UpdatableWidgetInfo) {
             const targetIndex = this.dashboardWidgetInfoList.findIndex((info) => info.widget_key === widgetKey);
             if (targetIndex > -1) {
                 const _dashboardWidgetInfoList = cloneDeep(this.dashboardWidgetInfoList);
+                const originWidgetInfo = _dashboardWidgetInfoList[targetIndex];
                 _dashboardWidgetInfoList[targetIndex] = {
                     ...this.dashboardWidgetInfoList[targetIndex],
-                    ...data,
-                    widget_key: widgetKey, // widget_key should not be changed
+                    title: data.title ?? originWidgetInfo.title,
+                    inherit_options: data.inherit_options ?? originWidgetInfo.inherit_options,
+                    widget_options: data.widget_options ?? originWidgetInfo.widget_options,
+                    schema_properties: data.schema_properties ?? originWidgetInfo.schema_properties,
                 };
                 this.dashboardWidgetInfoList = _dashboardWidgetInfoList;
             }

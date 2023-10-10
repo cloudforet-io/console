@@ -9,6 +9,7 @@ import {
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
     InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
+    UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetOptionName,
@@ -66,7 +67,7 @@ export const validateWidgetByVariablesSchemaUpdate = ({
     let isWidgetOptionChanged: boolean|undefined;
     let isWidgetOptionAdded: boolean|undefined;
     let isWidgetOptionDeleted: boolean|undefined;
-    const newWidgetInfo: Partial<DashboardLayoutWidgetInfo> = {
+    const newWidgetInfo: UpdatableWidgetInfo = {
         inherit_options: cloneDeep(widgetInfo.inherit_options),
         schema_properties: widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [],
         widget_options: cloneDeep(widgetInfo.widget_options),

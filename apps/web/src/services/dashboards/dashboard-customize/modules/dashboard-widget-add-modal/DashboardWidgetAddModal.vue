@@ -43,12 +43,9 @@ const handleConfirm = () => {
     const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
         widget_key: uuidv4(),
         widget_name: widgetFormState.widgetConfigId,
-        title: widgetFormState.widgetTitle,
         size: widgetConfig.sizes[0],
         version: '1', // TODO: auto?
-        inherit_options: widgetFormState.inheritOptions ?? {},
-        widget_options: widgetFormState.widgetOptions ?? {},
-        schema_properties: widgetFormState.schemaProperties ?? [],
+        ...widgetFormStore.updatedWidgetInfo,
     };
     emit('add-widget', dashboardLayoutWidgetInfo);
     state.proxyVisible = false;

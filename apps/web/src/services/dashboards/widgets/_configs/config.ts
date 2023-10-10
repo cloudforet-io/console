@@ -197,6 +197,8 @@ export interface DashboardLayoutWidgetInfo {
     inherit_options?: InheritOptions; // inherit information for the widget option
     schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
 }
+export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'|'size'>;
+
 export type InheritOptions = Record<string, {
     enabled?: boolean;
     variable_info?: {
@@ -254,7 +256,7 @@ export interface WidgetEmit {
     (e: 'mounted'): void;
     (e: 'initiated', data: any): void;
     (e: 'refreshed', data: any): void;
-    (e: 'update-widget-info', widgetInfo: Partial<DashboardLayoutWidgetInfo>): void;
+    (e: 'update-widget-info', widgetInfo: UpdatableWidgetInfo): void;
     (e: 'update-widget-validation', validation: boolean): void;
     (event: 'click-delete'): void;
     (event: 'click-expand'): void;

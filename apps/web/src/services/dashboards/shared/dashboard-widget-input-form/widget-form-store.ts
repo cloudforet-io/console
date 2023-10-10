@@ -12,7 +12,7 @@ import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashb
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo,
-    InheritOptions, WidgetConfig,
+    InheritOptions, UpdatableWidgetInfo, WidgetConfig,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
@@ -86,19 +86,16 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 schema_properties: mergedWidgetState.schemaProperties,
             };
         },
-        updatedWidgetInfo(): DashboardLayoutWidgetInfo|undefined {
+        updatedWidgetInfo(): UpdatableWidgetInfo|undefined {
             if (!this.widgetConfig || !this.widgetConfigId) {
                 return undefined;
             }
 
             return getUpdatedWidgetInfo(this.widgetConfig, {
-                widget_key: this.widgetKey,
-                widget_name: this.widgetConfigId,
                 title: this.widgetTitle,
                 inherit_options: this.inheritOptions,
                 widget_options: this.widgetOptions,
                 schema_properties: this.schemaProperties,
-                version: '1',
             });
         },
     },
