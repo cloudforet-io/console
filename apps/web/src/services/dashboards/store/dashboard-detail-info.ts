@@ -15,10 +15,6 @@ import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_c
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
-
-interface WidgetDataMap {
-    [widgetKey: string]: any;
-}
 interface WidgetValidMap {
     [widgetKey: string]: boolean;
 }
@@ -38,7 +34,6 @@ export interface DashboardDetailInfoStoreState {
     // widget info states
     dashboardWidgetInfoList: DashboardLayoutWidgetInfo[];
     loadingWidgets: boolean;
-    widgetDataMap: WidgetDataMap;
     // validation
     isNameValid?: boolean;
     widgetValidMap: WidgetValidMap;
@@ -97,7 +92,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // widget info states
         dashboardWidgetInfoList: [],
         loadingWidgets: false,
-        widgetDataMap: {},
         // validation
         isNameValid: undefined,
         widgetValidMap: {},

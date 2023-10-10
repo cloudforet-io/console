@@ -58,7 +58,7 @@ if (options.link) {
     Render = h(PLink, {
         ...attrs,
         href: props.options.link,
-        target: '_blank',
+        newTab: true,
     }, [Render]);
 }
 

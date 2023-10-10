@@ -22,12 +22,10 @@ import type {
     CostQuerySetModel, Granularity,
 } from '@/services/cost-explorer/type';
 
-
 const route = useRoute();
 const router = useRouter();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
 
 /* util */
 const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetModel['options'] => ({
@@ -46,7 +44,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
     if (selectedQuerySet) {
         await costAnalysisPageStore.setQueryOptions(selectedQuerySet.options);
     } else if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
-        const currentQuery = SpaceRouter.router.currentRoute.query;
+        const currentQuery = router.currentRoute.query;
         const costQuerySetOptions = getQueryOptionsFromUrlQuery(currentQuery);
         await costAnalysisPageStore.setQueryOptions(costQuerySetOptions);
     } else {
@@ -58,12 +56,14 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 <template>
     <div class="cost-analysis-page">
         <cost-analysis-header />
-        <cost-analysis-query-filter />
         <div class="content-wrapper">
             <div class="overflow-wrapper">
-                <cost-analysis-group-by-filter />
-                <cost-analysis-chart />
-                <cost-analysis-data-table />
+                <cost-analysis-query-filter />
+                <div class="contents-wrapper">
+                    <cost-analysis-group-by-filter />
+                    <cost-analysis-chart />
+                    <cost-analysis-data-table />
+                </div>
             </div>
         </div>
     </div>
@@ -72,11 +72,13 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
 <style lang="postcss" scoped>
 .cost-analysis-page {
     .content-wrapper {
-        @apply bg-white rounded-md border border-gray-200;
         overflow-x: auto;
-        padding: 0 1rem 2.5rem;
         .overflow-wrapper {
             min-width: 40rem;
+            .contents-wrapper {
+                @apply bg-white rounded-md border border-gray-200;
+                padding: 0 1rem 2.5rem;
+            }
         }
     }
 }

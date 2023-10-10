@@ -1,21 +1,18 @@
 <script lang="ts" setup>
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import {
     PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useStore } from 'vuex';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { managedCostQuerySetIdList } from '@/services/cost-explorer/cost-analysis/config';
+import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/cost-analysis/config';
 import type { RequestType } from '@/services/cost-explorer/cost-analysis/lib/config';
 import {
     REQUEST_TYPE,
@@ -28,7 +25,6 @@ interface Props {
     requestType: RequestType;
     selectedQuerySetId?: string;
 }
-const costQuerySetFetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
 
 const props = withDefaults(defineProps<Props>(), {
     requestType: REQUEST_TYPE.SAVE,
@@ -38,7 +34,6 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
     (e: 'update-query', updatedQueryId: string)
 }>();
 const { t } = useI18n();
-const store = useStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 
 const formState = reactive({
@@ -62,8 +57,8 @@ const state = reactive({
     isQueryNameValid: computed(() => !state.queryNameInvalidText),
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
-    managedCostQuerySetIdList: [...managedCostQuerySetIdList],
-    existingCostQuerySetNameList: [] as string[],
+    managedCostQuerySetIdList: [...MANAGED_COST_QUERY_SET_ID_LIST],
+    existingCostQuerySetNameList: computed(() => costAnalysisPageStore.costQueryList.map((query) => query.name)),
     mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
 });
 
@@ -114,23 +109,6 @@ watch(() => state.proxyVisible, (visible) => {
     } else {
         formState.queryName = undefined;
         state.showValidation = false;
-    }
-});
-
-onMounted(async () => {
-    try {
-        const { status, response } = await costQuerySetFetcher({
-            query: {
-                filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
-                only: ['name'],
-            },
-        });
-        if (status === 'succeed' && response?.results) {
-            state.existingCostQuerySetNameList = response.results.map((query) => query.name);
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.existingCostQuerySetNameList = [];
     }
 });
 </script>

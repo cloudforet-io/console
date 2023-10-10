@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PFieldGroup, PTextInput, PButton, PFilterableDropdown,
+    PFieldGroup, PTextInput, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { MaybeElementRef } from '@vueuse/core';
@@ -207,16 +207,18 @@ watch(() => state.searchText, (searchText) => {
             </template>
             <template #default="{invalid}">
                 <div v-if="props.activeTab === 'external' && state.supportFind">
-                    <p-filterable-dropdown
+                    <p-select-dropdown
                         v-model:search-text="state.searchText"
                         v-model:selected="state.selectedItems"
+                        class="external-select-dropdown"
                         :class="{invalid}"
                         show-select-marker
                         :menu="state.externalItems"
                         :loading="state.loading"
                         disable-handler
-                        :exact-mode="false"
                         use-fixed-menu-style
+                        is-filterable
+                        show-delete-all-button
                         @select="handleSelectExternalUser"
                         @delete-tag="handleDeleteSelectedExternalUser"
                     />
@@ -264,7 +266,7 @@ watch(() => state.searchText, (searchText) => {
         line-height: 1.3;
         padding: 0.25rem 0;
     }
-    .p-filterable-dropdown {
+    .external-select-dropdown {
         &.invalid {
             .p-search {
                 @apply border-alert;

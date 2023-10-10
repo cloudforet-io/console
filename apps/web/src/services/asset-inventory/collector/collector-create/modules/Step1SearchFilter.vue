@@ -1,6 +1,8 @@
 <template>
     <div class="left-area">
-        <div class="radio-container">
+        <div v-if="state.isLaptopView"
+             class="radio-container"
+        >
             <div class="provider">
                 <p-field-title class="title">
                     Provider
@@ -51,7 +53,9 @@
                 </p-radio-group>
             </div>
         </div>
-        <div class="dropdown-container">
+        <div v-else
+             class="dropdown-container"
+        >
             <div class="provider">
                 <p-select-dropdown :selected="state.selectedProvider"
                                    :menu="state.providerList"
@@ -109,9 +113,10 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import {
-    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI,
+    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI, screens,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 import { useStore } from 'vuex';
 
@@ -129,6 +134,8 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
 const emit = defineEmits<{(e:'select-repository', repository: string):void}>();
+const { width } = useWindowSize();
+
 const store = useStore();
 
 const state = reactive({
@@ -157,6 +164,7 @@ const state = reactive({
         })),
     ])),
     selectedRepository: 'all',
+    isLaptopView: computed<boolean>(() => width.value > screens.tablet.max),
 });
 
 const repoApiQuery = new ApiQueryHelper();
@@ -235,7 +243,6 @@ watch(() => state.selectedRepository, (repository) => {
 
     .dropdown-container {
         width: 100%;
-        display: none;
     }
 }
 
@@ -244,9 +251,6 @@ watch(() => state.selectedRepository, (repository) => {
 
     .left-area {
         width: 100%;
-        .radio-container {
-            display: none;
-        }
         .dropdown-container {
             @apply flex gap-4;
         }

@@ -10,7 +10,7 @@ import { useI18n } from 'vue-i18n';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
 import { makeByPassListeners } from '@/utils/composition-helpers';
 import { getTextHighlightRegex } from '@/utils/helpers';
@@ -55,7 +55,7 @@ const state = reactive({
     }),
     filteredMenu: [] as MenuItem[],
     searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
-    bindingMenu: computed<FilterableDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+    bindingMenu: computed<SelectDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
     proxyValue: useProxyValue('value', props, emit),
     menuRef: null,
 });

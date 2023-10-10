@@ -36,6 +36,7 @@ const {
     hideContextMenu,
     initiateMenu,
 } = useContextMenuController({
+    useFixedStyle: true,
     targetRef,
     contextMenuRef,
     useReorderBySelection: true,

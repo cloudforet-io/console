@@ -227,11 +227,6 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
             white-space: nowrap;
         }
     }
-
-    @screen mobile {
-        @apply flex flex-wrap items-center;
-        width: 100%;
-    }
 }
 
 </style>

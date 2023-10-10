@@ -197,8 +197,7 @@ const updateUser = async (userParam: UpdateUserRequest) => {
             margin-left: 8.5rem;
         }
     }
-    .p-text-input,
-    .p-filterable-dropdown {
+    .p-text-input {
         width: 100%;
         max-width: 25rem;
         flex-shrink: 0;

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown, PFilterableDropdown,
+    PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import {
@@ -93,15 +93,15 @@ const state = reactive({
             };
         },
     }),
-    selectedAssignee: computed<MenuItem[]>({
+    selectedAssignee: computed<MenuItem[]|undefined>({
         get() {
             const assignee: string = props.actions.change_assignee;
-            return assignee ? [{ name: assignee, label: assignee }] : [];
+            return assignee ? [{ name: assignee, label: assignee }] : undefined;
         },
         set(items) {
             state.proxyActions = {
                 ...state.proxyActions,
-                change_assignee: items[0]?.name,
+                change_assignee: items && items[0]?.name,
             };
         },
     }),
@@ -207,22 +207,28 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
                 <p class="label">
                     {{ t('PROJECT.EVENT_RULE.ASSIGNEE') }}
                 </p>
-                <p-filterable-dropdown v-model:selected="state.selectedAssignee"
-                                       class="user-search-dropdown"
-                                       show-select-marker
-                                       :menu="state.userItems"
+                <p-select-dropdown v-model:selected="state.selectedAssignee"
+                                   class="user-search-dropdown"
+                                   show-select-marker
+                                   :menu="state.userItems"
+                                   is-filterable
+                                   show-delete-all-button
+                                   index-mode
+                                   reset-selected-on-unmounted
                 />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
                     {{ t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') }}
                 </p>
-                <p-filterable-dropdown v-model:selected="state.selectedResponder"
-                                       class="user-search-dropdown"
-                                       :menu="state.userItems"
-                                       multi-selectable
-                                       appearance-type="stack"
-                                       show-select-marker
+                <p-select-dropdown v-model:selected="state.selectedResponder"
+                                   class="user-search-dropdown"
+                                   :menu="state.userItems"
+                                   multi-selectable
+                                   appearance-type="stack"
+                                   show-select-marker
+                                   is-filterable
+                                   show-delete-all-button
                 />
             </div>
             <div class="form-box additional-information">

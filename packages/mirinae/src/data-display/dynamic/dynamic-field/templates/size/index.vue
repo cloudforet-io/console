@@ -60,7 +60,7 @@ let Render = h('span', { ...attrs }, `${props.options.prefix ?? ''}${formattedVa
 if (props.options.link) {
     Render = h(PLink, {
         href: (props.options as SizeOptions).link,
-        target: '_blank',
+        newTab: true,
         value,
         showIcon: !!formattedValue,
     }, [Render]);

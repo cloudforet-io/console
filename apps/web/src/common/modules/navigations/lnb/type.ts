@@ -1,7 +1,10 @@
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { RouteLocationRaw } from 'vue-router';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
-import type { FavoriteType } from '@/store/modules/favorite/type';
+
+
+import type { FavoriteOptions } from '@/store/modules/favorite/type';
 
 import type { MenuId } from '@/lib/menu/config';
 
@@ -26,13 +29,13 @@ export type hightlightTagType = 'new' | 'beta' | 'update';
 
 export interface LNBItem {
     type: MenuItemType;
-    label?: string;
+    label?: TranslateResult;
     id?: MenuId | string; // It can be change MenuId or etc.
     foldable?: boolean;
-    to?: RouteLocationRaw;
+    to?: Location;
     hightlightTag?: hightlightTagType;
     hideFavorite?: boolean;
-    favoriteType?: FavoriteType;
+    favoriteOptions?: FavoriteOptions;
     icon?: LNBIcon;
     selectOptions?: SelectOptions;
 }
@@ -40,13 +43,13 @@ export interface LNBItem {
 export type LNBMenu = LNBItem[]|LNBItem;
 
 export interface BackLink {
-    label: string;
-    to: RouteLocationRaw;
+    label: TranslateResult;
+    to: Location;
 }
 
 export interface TopTitle {
     icon?: string;
     label: string;
     visibleAddButton?: boolean;
-    addButtonLink?: RouteLocationRaw;
+    addButtonLink?: Location;
 }

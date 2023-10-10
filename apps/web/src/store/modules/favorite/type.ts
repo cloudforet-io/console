@@ -9,6 +9,11 @@ export const FAVORITE_TYPE = {
 } as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
 
+export interface FavoriteOptions {
+    type: FavoriteType;
+    id?: string;
+}
+
 export interface FavoriteConfig {
     itemType: FavoriteType;
     itemId: string;

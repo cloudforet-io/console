@@ -11,7 +11,7 @@ import {
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
@@ -22,11 +22,12 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboa
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
-    isManageable: boolean;
+    isManageable?: boolean;
     disabled?: boolean;
 }
 
 const props = defineProps<Props>();
+const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 
@@ -168,11 +169,18 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 // event
 const handleOpenOverlay = () => {
     hideContextMenu();
-    router.push({
-        name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
-        hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-    });
+    if (route.name === DASHBOARDS_ROUTE.CREATE._NAME) {
+        router.push({
+            name: DASHBOARDS_ROUTE.CREATE._NAME,
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        });
+    } else {
+        router.push({
+            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        });
+    }
 };
 const handleClickButton = () => {
     if (visibleMenu.value) {

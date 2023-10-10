@@ -96,7 +96,7 @@ const drawChart = () => {
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
-            return commaFormatter(numberFormatter(Number(convertedText)));
+            return commaFormatter(numberFormatter(Number(convertedText), 1, 0));
         }
         return text;
     });

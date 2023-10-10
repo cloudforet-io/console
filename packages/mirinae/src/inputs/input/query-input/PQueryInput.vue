@@ -107,7 +107,7 @@ import { useQuerySearch } from '@/hooks/query-search';
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { FilterableDropdownAppearanceType } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownAppearanceType } from '@/inputs/dropdown/select-dropdown/type';
 import { useInputDeletion } from '@/inputs/input/composables/use-input-deletion';
 import { useSelectedValidation } from '@/inputs/input/composables/use-selected-validation';
 import type { InputSize } from '@/inputs/input/text-input/type';
@@ -131,7 +131,7 @@ interface QueryInputProps {
     valueHandlerMap?: ValueHandlerMap;
     visibleMenu?: boolean;
     useFixedMenuStyle?: boolean;
-    appearanceType?: FilterableDropdownAppearanceType;
+    appearanceType?: SelectDropdownAppearanceType;
 }
 const props = withDefaults(defineProps<QueryInputProps>(), {
     value: '',

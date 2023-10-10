@@ -26,7 +26,8 @@ import { green, red, gray } from '@/styles/colors';
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { getDateAxisSettings, getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
+import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getRefinedDateTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
@@ -279,6 +280,7 @@ const refreshWidget = async (): Promise<Data[]> => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -308,7 +310,7 @@ defineExpose<WidgetExpose<Data[]>>({
                     <strong>({{ formattedCurrentMonth }})</strong>
                 </p>
                 <p-data-loader class="data-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="!state.noData"
                                :loader-backdrop-opacity="1"
                                disable-empty-case
@@ -353,7 +355,7 @@ defineExpose<WidgetExpose<Data[]>>({
                     <strong>({{ formattedPreviousMonth }})</strong>
                 </p>
                 <p-data-loader class="data-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="!state.noData"
                                :loader-backdrop-opacity="1"
                                disable-empty-case
@@ -375,7 +377,7 @@ defineExpose<WidgetExpose<Data[]>>({
             </div>
             <div class="chart-wrapper">
                 <p-data-loader class="data-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="!state.noData"
                                :loader-backdrop-opacity="1"
                                loader-type="skeleton"

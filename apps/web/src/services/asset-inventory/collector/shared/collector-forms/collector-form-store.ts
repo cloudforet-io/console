@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { defineStore } from 'pinia';
 
 
@@ -15,7 +15,7 @@ import type {
 } from '@/services/asset-inventory/collector/model';
 
 
-export type AttachedServiceAccount = FilterableDropdownMenuItem[];
+export type AttachedServiceAccount = SelectDropdownMenuItem[];
 
 export type AttachedServiceAccountType = 'all'|'specific';
 

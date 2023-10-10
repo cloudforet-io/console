@@ -30,6 +30,7 @@ import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboard
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 
+
 interface Data extends CloudServiceStatsModel {
     value: number;
     severity: Severity;
@@ -55,10 +56,10 @@ const COMPLIANCE_STATUS_MAP_VALUES = Object.values(COMPLIANCE_STATUS_MAP);
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const DATE_FORMAT = 'YYYY-MM';
 
+const { t } = useI18n();
+
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
-
-const { t } = useI18n();
 
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -122,9 +123,9 @@ const state = reactive({
     complianceCountComparingMessage: computed<string|undefined>(() => {
         if (state.complianceCount === state.prevComplianceCount) return undefined;
         if (state.prevComplianceCount < state.complianceCount) {
-            return t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.MORE_THAN_PREV_MONTH');
+            return t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.MORE_THAN_PREV_MONTH') as string;
         }
-        return t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.LESS_THAN_PREV_MONTH');
+        return t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.LESS_THAN_PREV_MONTH') as string;
     }),
     checkCount: computed<Record<string, number>>(() => {
         if (!state.data) return {} as Record<string, number>;
@@ -246,7 +247,7 @@ const drawChart = (outerChartData: OuterChartData[], innerChartData: InnerChartD
     innerSeries.data.setAll(innerChartData);
 
     if (!state.noData) {
-        chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]${t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.COMPLIANCE_SCORE')}[/]:\n[fontSize:32px]${state.score}[/]` });
+        chartHelper.setPieLabelText(chart, { text: `[fontSize:16px]Compliance Score[/]:\n[fontSize:32px]${state.score}[/]` });
     }
 };
 
@@ -285,6 +286,7 @@ const redrawChart = () => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -307,18 +309,9 @@ defineExpose<WidgetExpose<Data[]>>({
         <div class="compliance-check-status">
             <div class="data-container">
                 <div class="summary-wrapper">
-                    <!--                    <div class="left-wrapper">-->
-                    <!--                        <p class="title">-->
-                    <!--                            {{ t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.CHECKED_SERVICE_ACCOUNT') }}-->
-                    <!--                        </p>-->
-                    <!--                        <p class="value">-->
-                    <!--                            {{ state.accountCount }}-->
-                    <!--                        </p>-->
-                    <!--                    </div>-->
-                    <!--                    <p-divider :vertical="true" />-->
                     <div class="right-wrapper">
                         <p class="title">
-                            {{ t('DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.TOTAL_COMPLIANCE_NUMBER') }}
+                            Total number of requirements
                         </p>
                         <p class="value">
                             {{ commaFormatter(state.complianceCount) }}
@@ -336,7 +329,7 @@ defineExpose<WidgetExpose<Data[]>>({
                 </div>
                 <div class="chart-wrapper">
                     <p-data-loader class="chart-loader"
-                                   :loading="state.loading"
+                                   :loading="props.loading || state.loading"
                                    :data="state.data"
                                    loader-type="skeleton"
                                    :loader-backdrop-opacity="1"

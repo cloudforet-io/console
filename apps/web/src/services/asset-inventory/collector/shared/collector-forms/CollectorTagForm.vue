@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import { PFieldGroup } from '@spaceone/design-system';
 import { reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -9,8 +8,8 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/collector/shared/collector-forms/collector-form-store';
 
+const emit = defineEmits<{(event: 'update-valid', value: boolean): void; }>();
 
-const emit = defineEmits<{(event: 'update:is-tags-valid', value: boolean): void; }>();
 const { t } = useI18n();
 
 const collectorFormStore = useCollectorFormStore();
@@ -30,10 +29,8 @@ const handleUpdateTags = (tags: Tag) => {
 };
 
 watch(() => state.isTagsValid, (isTagsValid) => {
-    emit('update:is-tags-valid', isTagsValid);
+    emit('update-valid', isTagsValid);
 }, { immediate: true });
-
-
 </script>
 
 <template>

@@ -1,8 +1,12 @@
 import {
     cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
+import { useI18n } from 'vue-i18n';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import {
+    getVariableKeyFromWidgetSchemaProperty,
+} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
     InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
@@ -16,12 +20,14 @@ export interface InheritOptionsErrorMap {
     [propertyName: string]: string|undefined;
 }
 
+const { t } = useI18n();
+
 export const getWidgetInheritOptionsErrorMap = (
     schemaProperties: string[],
     inheritOptions?: InheritOptions,
     widgetOptionsSchema?: WidgetOptionsSchema['schema'],
     dashboardVariablesSchema?: DashboardVariablesSchema,
-    errorMessage?: string,
+    translator?: typeof t,
 ): InheritOptionsErrorMap => {
     if (!inheritOptions || isEmpty(inheritOptions)) {
         return {};
@@ -30,17 +36,17 @@ export const getWidgetInheritOptionsErrorMap = (
     schemaProperties.forEach((propertyName) => {
         if (!inheritOptions[propertyName]?.enabled) return;
 
-        const variableKey = inheritOptions[propertyName]?.variable_info?.key;
+        const variableKey = inheritOptions[propertyName]?.variable_info?.key ?? getVariableKeyFromWidgetSchemaProperty(propertyName);
         if (!variableKey) return;
         if (!dashboardVariablesSchema?.properties?.[variableKey]?.use) {
-            errorMap[propertyName] = errorMessage;
+            errorMap[propertyName] = translator ? translator('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string : 'Property is not used in dashboard variables';
             return;
         }
 
         const variableType = dashboardVariablesSchema.properties[variableKey].selection_type === 'MULTI' ? 'array' : 'string';
         const widgetPropertyType = widgetOptionsSchema?.properties?.[propertyName]?.type;
         if (variableType !== widgetPropertyType) {
-            errorMap[propertyName] = errorMessage;
+            errorMap[propertyName] = translator ? translator('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string : 'Property type mismatch';
         }
     });
     return errorMap;
@@ -172,6 +178,7 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
     const _widgetOptions = cloneDeep(widgetInfo.widget_options) ?? {};
     const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
     const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
+
     // delete or update options using deleted variables
     dashboardVariables.forEach((variableKey) => {
         const property = getWidgetOptionName(variableKey);
@@ -212,6 +219,6 @@ const validateWidget = (
     widgetConfig: WidgetConfig,
     dashboardVariableSchema?: DashboardVariablesSchema,
 ): boolean => {
-    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(schemaProperties, inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema, 'Invalid');
+    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(schemaProperties, inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema);
     return isEmpty(_widgetSchemaErrorMap);
 };

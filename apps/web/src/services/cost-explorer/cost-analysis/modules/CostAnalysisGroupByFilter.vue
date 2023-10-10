@@ -2,10 +2,12 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import {
-    PSelectButton, PFilterableDropdown,
+    PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { xor } from 'lodash';
 import { computed, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
@@ -118,7 +120,10 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
 <template>
     <div class="cost-analysis-group-by-filter">
         <b class="label">{{ t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}:</b>
-        <span class="count-text">{{ state.selectedGroupByItems.length }}/3</span>
+        <p class="count-text">
+            <span class="selected-group-by-items-count">{{ state.selectedGroupByItems.length }}</span>
+            <span>/3</span>
+        </p>
         <p-select-button v-for="defaultGroupByItem in costAnalysisPageStore.defaultGroupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
@@ -131,16 +136,17 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             {{ defaultGroupByItem.label }}
         </p-select-button>
         <div class="tags-button-wrapper">
-            <p-filterable-dropdown v-model:selected="state.selectedTagsMenu"
-                                   :handler="tagsMenuHandler"
-                                   selection-label="Tags"
-                                   appearance-type="badge"
-                                   :show-delete-all-button="false"
-                                   multi-selectable
-                                   selection-highlight
-                                   show-select-marker
-                                   @select="handleSelectTagsGroupBy"
-                                   @clear-selection="handleClearTagsGroupBy"
+            <p-select-dropdown v-model:selected="state.selectedTagsMenu"
+                               :handler="tagsMenuHandler"
+                               selection-label="Tags"
+                               appearance-type="badge"
+                               :show-delete-all-button="false"
+                               multi-selectable
+                               selection-highlight
+                               show-select-marker
+                               is-filterable
+                               @select="handleSelectTagsGroupBy"
+                               @clear-selection="handleClearTagsGroupBy"
             />
         </div>
     </div>
@@ -156,19 +162,36 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
     padding: 1rem 0;
 
     .count-text {
-        @apply text-label-lg text-gray-700;
+        @apply text-label-lg text-gray-500;
+        .selected-group-by-items-count {
+            @apply text-gray-900;
+        }
     }
     .tags-button-wrapper {
         position: relative;
         padding-right: 3.5rem;
 
-        /* custom design-system component - p-filterable-dropdown */
-        :deep(.p-filterable-dropdown) {
-            .dropdown-button {
-                height: 1.375rem;
-                min-height: 1.5rem;
-                .placeholder {
-                    font-size: 0.75rem;
+        /* custom design-system component - p-select-dropdown */
+        :deep(.p-select-dropdown) {
+            .dropdown-button-component {
+                .dropdown-button {
+                    height: 1.375rem;
+                    min-height: 1.5rem;
+                    .placeholder {
+                        font-size: 0.75rem;
+                    }
+                }
+                &.selected {
+                    .dropdown-button {
+                        @apply bg-secondary border-secondary text-white;
+                        .p-badge {
+                            @apply bg-white text-gray-800;
+                            margin-left: 0.375rem;
+                        }
+                        .selection-wrapper, .arrow-button {
+                            @apply text-white;
+                        }
+                    }
                 }
             }
             .selection-wrapper {
@@ -176,18 +199,6 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             }
             .p-context-menu {
                 min-width: 9rem;
-            }
-            &.selected {
-                .dropdown-button {
-                    @apply bg-secondary border-secondary text-white;
-                    .p-badge {
-                        @apply bg-white text-gray-800;
-                        margin-left: 0.125rem;
-                    }
-                    .selection-wrapper, .arrow-button {
-                        @apply text-white;
-                    }
-                }
             }
         }
     }

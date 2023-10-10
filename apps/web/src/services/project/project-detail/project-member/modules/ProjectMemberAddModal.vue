@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PButtonModal, PFieldGroup, PBoxTab, PFilterableDropdown, PTooltip, PI, PTextInput,
+    PButtonModal, PFieldGroup, PBoxTab, PSelectDropdown, PTooltip, PI, PTextInput,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 import { debounce, union } from 'lodash';
 import {
@@ -14,7 +14,6 @@ import { useStore } from 'vuex';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
-import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import { getPagePermissionMapFromRaw } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -24,16 +23,13 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { checkEmailFormat } from '@/services/administration/iam/user/lib/user-form-validations';
-import type { MemberItem } from '@/services/project/project-detail/project-member/type';
+import type { MemberItem, RoleMenuItem } from '@/services/project/project-detail/project-member/type';
 import { AUTH_TYPE } from '@/services/project/project-detail/project-member/type';
 
 type ExternalItemErrorCode = 'DUPLICATED'|'EMAIL_FORMAT'|'ALREADY_EXIST'|'NOT_FOUND';
 interface ExternalItemsError {
     all?: ExternalItemErrorCode;
     [selectedIndex: number]: ExternalItemErrorCode
-}
-interface RoleMenuItem extends FilterableDropdownMenuItem {
-    pagePermissions: RawPagePermission[]
 }
 
 interface Props {
@@ -74,7 +70,7 @@ const state = reactive({
     }),
     activeTab: AUTH_TYPE.INTERNAL_USER,
     roleItems: [] as RoleMenuItem[],
-    internalUserItems: [] as FilterableDropdownMenuItem[],
+    internalUserItems: [] as SelectDropdownMenuItem[],
     externalUserItems: [] as InputItem[],
     invalidUserList: [] as string[],
     existingMemberList: [] as string[],
@@ -106,9 +102,9 @@ const {
 } = useFormValidator({
     labels: [] as InputItem[],
     selectedRoleItems: [] as RoleMenuItem[],
-    selectedInternalUserItems: [] as FilterableDropdownMenuItem[],
+    selectedInternalUserItems: [] as SelectDropdownMenuItem[],
 }, {
-    selectedInternalUserItems: (val: FilterableDropdownMenuItem[]) => {
+    selectedInternalUserItems: (val: SelectDropdownMenuItem[]) => {
         if (!val.length) return t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
         return true;
     },
@@ -293,11 +289,11 @@ const handleUpdateExternalUser = async (inputUserItems: InputItem[], isValid: bo
     selectedExternalUserItems.value = [...selectedExternalUserItems.value, _addedUserItem];
     externalItemsErrors.value = errors;
 };
-const handleSelectRoleItems = (roleItems: RoleMenuItem[]) => {
-    if (!roleItems.length) return;
-    const roleItem = { ...roleItems[0] };
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
-    setForm('selectedRoleItems', roleItems);
+const handleSelectRoleItem = (roleItemName: string) => {
+    if (!roleItemName) return;
+    const roleItem = state.roleItems.filter((d) => d.name === roleItemName);
+    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem[0].pagePermissions);
+    setForm('selectedRoleItems', roleItem);
     state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
 };
 
@@ -348,12 +344,14 @@ watch(() => state.activeTab, () => {
                                :invalid-text="invalidTexts.selectedInternalUserItems"
                 >
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="state.internalUserItems"
                             :selected="selectedInternalUserItems"
                             multi-selectable
                             appearance-type="stack"
                             show-select-marker
+                            is-filterable
+                            show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
                             @update:selected="setForm('selectedInternalUserItems', $event)"
@@ -413,13 +411,15 @@ watch(() => state.activeTab, () => {
                         >{{ t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
                     </template>
                     <template #default="{invalid}">
-                        <p-filterable-dropdown
+                        <p-select-dropdown
                             :menu="state.roleItems"
                             :selected="selectedRoleItems"
                             show-select-marker
+                            is-filterable
+                            show-delete-all-button
                             use-fixed-menu-style
                             :invalid="invalid"
-                            @update:selected="handleSelectRoleItems"
+                            @update:selected="handleSelectRoleItem"
                         />
                     </template>
                 </p-field-group>

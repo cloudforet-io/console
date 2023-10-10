@@ -1,8 +1,7 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
-
-import { i18n } from '@/translations';
+import { useI18n } from 'vue-i18n';
+import type { Location } from 'vue-router/types/router';
 
 import type { Currency } from '@/store/modules/settings/type';
 
@@ -12,33 +11,35 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import { getNonInheritedWidgetOptions } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 import type { MergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
 
 export interface WidgetFrameOptions {
     dateRange?: DateRange|ComputedRef<DateRange>;
     currency?: Currency|ComputedRef<Currency>;
-    widgetLocation?: RouteLocationRaw|ComputedRef<RouteLocationRaw>;
+    widgetLocation?: Location|ComputedRef<Location>;
 }
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,
     emit: WidgetEmit,
     widgetState: UnwrapRef<MergedWidgetState & WidgetFrameOptions>,
 ) => {
+    const { t } = useI18n();
     const title = computed(() => props.title ?? widgetState.widgetConfig.title);
     const size = computed(() => {
         if (props.size && widgetState.widgetConfig.sizes.includes(props.size)) return props.size;
         return widgetState.widgetConfig.sizes[0];
     });
     const nonInheritOptionsTooltipText = computed<string | undefined>(() => {
-        const nonInheritOptions = getNonInheritedWidgetOptions(widgetState.inheritOptions);
+        if (!props.dashboardVariablesSchema) return undefined;
+        const nonInheritOptions = getNonInheritedWidgetOptionsAmongUsedVariables(props.dashboardVariablesSchema, widgetState.inheritOptions, widgetState.options);
         if (!nonInheritOptions.length) return undefined;
 
         // TODO: widget option name must be changed to readable name.
         // const tooltipText = nonInheritOptions.map((d) => `<p>• ${getWidgetOptionsSchemaPropertyName(d)}</p>`).join('\n');
         const tooltipText = nonInheritOptions.map((d) => `<p>• ${d}</p>`).join('\n');
-        return `${i18n.global.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_1')}</br></br>
-            ${i18n.global.t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_2')}</br>${tooltipText}`;
+        return `${t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_1')}</br></br>
+            ${t('DASHBOARDS.WIDGET.INHERIT_OPTIONS_TOOLTIP_TEXT_2')}</br>${tooltipText}`;
     });
     const widgetFrameProps = computed<Partial<WidgetFrameProps>>(() => ({
         widgetKey: props.widgetKey,

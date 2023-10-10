@@ -2,9 +2,9 @@
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import {
-    PCheckbox, PI, PRadio, PFilterableDropdown, PTree, PButton,
+    PCheckbox, PI, PRadio, PSelectDropdown, PTree, PButton,
 } from '@spaceone/design-system';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -63,7 +63,7 @@ const state = reactive({
     selectedProjectItems: [] as ProjectTreeItem[],
     selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map((d) => d.node.data)),
     _selectedProjectIds: [...props.selectedProjectIds] as string[],
-    selectedItems: computed<FilterableDropdownMenuItem[]>({
+    selectedItems: computed<SelectDropdownMenuItem[]>({
         get() {
             const items: ReferenceMap = {
                 ...storeState.projects,
@@ -232,20 +232,22 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
 
 <template>
     <div class="project-select-dropdown">
-        <p-filterable-dropdown v-model:selected="state.selectedItems"
-                               :loading="state.loading"
-                               :visible-menu="state.visibleMenu"
-                               show-select-marker
-                               :multi-selectable="multiSelectable"
-                               :use-fixed-menu-style="useFixedMenuStyle"
-                               :invalid="invalid"
-                               :disabled="disabled"
-                               :placeholder="t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
-                               :readonly="readonly"
-                               disable-handler
-                               appearance-type="stack"
-                               @update:visible-menu="handleUpdateVisibleMenu"
-                               @delete-tag="handleDeleteTag"
+        <p-select-dropdown v-model:selected="state.selectedItems"
+                           :loading="state.loading"
+                           :visible-menu="state.visibleMenu"
+                           show-select-marker
+                           :multi-selectable="props.multiSelectable"
+                           :use-fixed-menu-style="props.useFixedMenuStyle"
+                           :invalid="props.invalid"
+                           :disabled="props.disabled"
+                           :placeholder="t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
+                           :readonly="props.readonly"
+                           disable-handler
+                           appearance-type="stack"
+                           is-filterable
+                           show-delete-all-button
+                           @update:visible-menu="handleUpdateVisibleMenu"
+                           @delete-tag="handleDeleteTag"
         >
             <template #menu-no-data-format>
                 <div />
@@ -300,7 +302,7 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                     </p-button>
                 </div>
             </template>
-        </p-filterable-dropdown>
+        </p-select-dropdown>
     </div>
 </template>
 
@@ -323,11 +325,6 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
         .toggle-right {
             @apply flex-shrink-0;
         }
-    }
-
-    /* custom design-system component - p-filterable-dropdown */
-    :deep(.no-data) {
-        padding: 0;
     }
 }
 </style>

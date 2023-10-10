@@ -84,8 +84,8 @@ const getIconName = (icon: LNBIcon): string => {
         />
         <favorite-button
             v-if="!item.hideFavorite && !isDomainOwner"
-            :item-id="item.id"
-            :favorite-type="item.favoriteType ? item.favoriteType : FAVORITE_TYPE.MENU"
+            :item-id="item.favoriteOptions?.id ? item.favoriteOptions.id : item.id"
+            :favorite-type="item.favoriteOptions?.type ? item.favoriteOptions.type : FAVORITE_TYPE.MENU"
             :visible-active-case-only="!getIsHovered(item.id)"
             scale="0.8"
             class="favorite-button"

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 import {
     PFieldTitle, PToggleButton, PSelectDropdown,
 } from '@spaceone/design-system';
@@ -16,8 +15,9 @@ const props = defineProps<{
     getVersionsOnPluginIdChange?: boolean;
 }>();
 
-const emit = defineEmits<{(event: 'update:is-version-valid', value: boolean): void;
+const emit = defineEmits<{(event: 'update-valid', value: boolean): void;
 }>();
+
 const { t } = useI18n();
 
 const state = reactive({
@@ -65,7 +65,7 @@ const handleClickAutoUpgrade = () => {
 };
 
 watch(() => state.isVersionValid, (value) => {
-    emit('update:is-version-valid', value);
+    emit('update-valid', value);
 }, { immediate: true });
 
 // get version list when pluginId changed and init selected version

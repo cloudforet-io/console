@@ -63,7 +63,7 @@ const {
 });
 
 const handleClickDeleteAll = () => {
-    if (props.selectedItems) {
+    if (props.selectedItems.length > 0) {
         emit('click-delete');
     }
 };
@@ -80,9 +80,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         disabled: props.disabled,
         readonly: props.readonly,
         opened: props.isVisibleMenu,
-        selected: props.selectedItems,
+        selected: props.selectedItems.length > 0,
         'is-fixed-width': props.isFixedWidth,
-        'selection-highlight': props.selectionHighlight && props.selectedItems,
+        'selection-highlight': props.selectionHighlight && props.selectedItems.length > 0,
     }"
     >
         <span v-if="props.styleType === SELECT_DROPDOWN_STYLE_TYPE.ICON_BUTTON"
@@ -132,7 +132,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                             >
                                 <span class="selected-item-text">{{ displayValueOnDropdownButton }}</span>
                                 <p-badge v-if="displayBadgeValueOnDropdownButton"
-                                         :style-type="props.disabled ? 'gray200' : 'blue200'"
+                                         class="selected-item-badge"
+                                         :style-type="props.disabled ? 'gray200' : 'blue300'"
                                          :badge-type="props.disabled ? 'solid' : 'subtle'"
                                 >
                                     {{ displayBadgeValueOnDropdownButton }}
@@ -191,6 +192,8 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
             @apply flex flex-grow flex-shrink items-center text-label-md;
             width: 100%;
             min-height: 2rem;
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
             .placeholder {
                 @apply text-gray-600;
             }
@@ -199,6 +202,9 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 gap: 0.25rem;
                 .selected-item-text {
                     @apply font-medium;
+                }
+                .selected-item-badge {
+                    margin-left: 0.25rem;
                 }
                 .tags-wrapper {
                     @apply flex flex-wrap;
@@ -409,13 +415,13 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
                 @apply truncate;
                 flex: 1;
                 .selection-display-wrapper {
-                    .placeholder, .selected-item-text {
+                    .placeholder, .selected-item {
                         @apply truncate;
                     }
                     .selection-wrapper {
                         width: 100%;
                     }
-                    .selected-item-text {
+                    .selected-item {
                         @apply absolute;
                         top: 25%;
                         left: 0.5rem;

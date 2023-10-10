@@ -54,7 +54,7 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         strokeOpacity: 1,
         strokeWidth: 1,
         stroke: am5.color(gray[200]),
-        minGridDistance: 20,
+        minGridDistance: 15,
     });
     xRenderer.grid.template.setAll({
         strokeOpacity: 0,

@@ -1,41 +1,41 @@
-import { defineAsyncComponent } from 'vue';
-
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptionsForFilter,
+    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptionsForFilter,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-const complianceCheckStatusWidgetConfig: WidgetConfig = {
-    widget_config_id: 'complianceCheckStatus',
-    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/asset-widgets/compliance-check-status/ComplianceCheckStatusWidget.vue')),
-    title: 'Compliance Check Status',
+const totalFailFindingsStatusWidgetConfig: WidgetConfig = {
+    widget_config_id: 'totalFailFindingsStatus',
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/asset-widgets/total-fail-findings-status/TotalFailFindingsStatusWidget.vue'),
+    }),
+    title: 'Total Fail Findings Status',
     labels: ['Asset'],
     description: {
-        translation_id: 'DASHBOARDS.WIDGET.COMPLIANCE_CHECK_STATUS.DESC',
-        preview_image: 'widget-img_complianceCheckStatus--thumbnail.png',
+        translation_id: 'DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.DESC',
+        preview_image: 'widget-img_totalFailFindingsStatus--thumbnail.png',
     },
     scopes: ['WORKSPACE'],
     theme: {
-        inherit: false,
+        inherit: true,
+        inherit_count: 1,
     },
-    sizes: ['md'],
+    sizes: ['lg'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.MONTHLY,
     },
     inherit_options: {
         ...getWidgetInheritOptionsForFilter(
             'project',
             'provider',
             'region',
-            'asset_compliance_type',
+            'asset_compliance_framework',
             'asset_account',
         ),
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_framework', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
@@ -44,7 +44,7 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
                     // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
-                    'asset_compliance_type',
+                    'asset_compliance_framework',
                     'asset_account',
                 ),
             },
@@ -53,11 +53,11 @@ const complianceCheckStatusWidgetConfig: WidgetConfig = {
                 // 'service_account',
                 'provider',
                 'region',
-                'asset_compliance_type',
+                'asset_compliance_framework',
                 'asset_account',
             ),
         },
     },
 };
 
-export default complianceCheckStatusWidgetConfig;
+export default totalFailFindingsStatusWidgetConfig;

@@ -1,41 +1,41 @@
-import { defineAsyncComponent } from 'vue';
-
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptionsForFilter,
+    getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptionsForFilter,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
-    widget_config_id: 'totalFailureAndSeverity',
-    widget_component: defineAsyncComponent(() => import('@/services/dashboards/widgets/asset-widgets/total-failure-and-severity/TotalFailureAndSeverityWidget.vue')),
-    title: 'Total Failure and Severity',
+const complianceStatusWidgetConfig: WidgetConfig = {
+    widget_config_id: 'complianceStatus',
+    widget_component: () => ({
+        component: import('@/services/dashboards/widgets/asset-widgets/compliance-status/ComplianceStatusWidget.vue'),
+    }),
+    title: 'Compliance Status',
     labels: ['Asset'],
     description: {
-        translation_id: 'DASHBOARDS.WIDGET.TOTAL_FAILURE_AND_SEVERITY.DESC',
-        preview_image: 'widget-img_totalFailureAndSeverity--thumbnail.png',
+        translation_id: 'DASHBOARDS.WIDGET.COMPLIANCE_STATUS.DESC',
+        preview_image: 'widget-img_complianceStatus--thumbnail.png',
     },
     scopes: ['WORKSPACE'],
     theme: {
-        inherit: true,
-        inherit_count: 1,
+        inherit: false,
     },
-    sizes: ['lg'],
+    sizes: ['md'],
     options: {
-        granularity: GRANULARITY.MONTHLY,
+        granularity: GRANULARITY.YEARLY,
     },
     inherit_options: {
         ...getWidgetInheritOptionsForFilter(
             'project',
             'provider',
             'region',
-            'asset_compliance_type',
+            'asset_compliance_framework',
             'asset_account',
         ),
     },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account'),
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_framework', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
@@ -44,7 +44,7 @@ const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
                     // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
-                    'asset_compliance_type',
+                    'asset_compliance_framework',
                     'asset_account',
                 ),
             },
@@ -53,11 +53,11 @@ const totalFailureAndSeverityWidgetConfig: WidgetConfig = {
                 // 'service_account',
                 'provider',
                 'region',
-                'asset_compliance_type',
+                'asset_compliance_framework',
                 'asset_account',
             ),
         },
     },
 };
 
-export default totalFailureAndSeverityWidgetConfig;
+export default complianceStatusWidgetConfig;

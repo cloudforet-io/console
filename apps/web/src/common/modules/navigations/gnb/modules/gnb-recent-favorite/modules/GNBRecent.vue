@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { PDataLoader, PEmpty } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 import {
@@ -9,15 +11,20 @@ import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
+import type { FavoriteItem } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
     convertCloudServiceConfigToReferenceData,
+    convertCostAnalysisConfigToReferenceData,
+    convertDashboardConfigToReferenceData,
     convertMenuConfigToReferenceData,
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
@@ -27,11 +34,15 @@ import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
+import type { DashboardModel } from '@/services/dashboards/model';
 
 const RECENT_LIMIT = 30;
 
@@ -41,24 +52,38 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'close'): void}>();
+
 const router = useRouter();
 const store = useStore();
 const { t } = useI18n();
+
+const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
     cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+    domainDashboardItems: computed<DashboardModel[]>(() => {
+        const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_WORKSPACE, store.getters['user/pagePermissionList']);
+        return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
+    }),
+    projectDashboardItems: computed<DashboardModel[]>(() => {
+        const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_PROJECT, store.getters['user/pagePermissionList']);
+        return isUserAccessibleToProjectDashboards ? store.getters['dashboard/getProjectItems'] : [];
+    }),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
     recents: computed<RecentConfig[]>(() => store.state.recent.allItems),
 });
 const state = reactive({
     loading: true,
     items: computed<SuggestionItem[]>(() => sortBy(
         state.recentMenuItems
-            .concat(state.recentCloudServiceItems)
+            .concat(state.recentDashboardItems)
             .concat(state.recentProjectItems)
-            .concat(state.recentProjectGroupItems),
+            .concat(state.recentProjectGroupItems)
+            .concat(state.recentCloudServiceItems)
+            .concat(state.recentCostAnalysisItems),
         (recent) => recent.updatedAt,
     ).reverse()),
     recentMenuItems: computed<RecentItem[]>(() => convertMenuConfigToReferenceData(
@@ -86,6 +111,33 @@ const state = reactive({
             storeState.projectGroups,
         ) : [];
     }),
+    recentDashboardItems: computed<FavoriteItem[]>(() => {
+        const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
+        if (!isUserAccessibleToDashboards) return [];
+        const domainDashboardReferenceData = convertDashboardConfigToReferenceData(
+            storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith(DASHBOARD_SCOPE.DOMAIN)),
+            storeState.domainDashboardItems,
+            DASHBOARD_SCOPE.DOMAIN,
+        );
+        const projectDashboardReferenceData = convertDashboardConfigToReferenceData(
+            storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith(DASHBOARD_SCOPE.PROJECT)),
+            storeState.projectDashboardItems,
+            DASHBOARD_SCOPE.PROJECT,
+        );
+        return [...domainDashboardReferenceData, ...projectDashboardReferenceData];
+    }),
+    recentCostAnalysisItems: computed<RecentItem[]>(() => {
+        const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_COST_ANALYSIS, store.getters['user/pagePermissionList']);
+        return isUserAccessible
+            ? convertCostAnalysisConfigToReferenceData(
+                storeState.recents.filter((d) => d.itemType === RECENT_TYPE.COST_ANALYSIS),
+                state.costQuerySets,
+                storeState.dataSourceMap,
+            )
+            : [];
+    }),
+
+    costQuerySets: [] as CostQuerySetModel[],
 });
 
 const handleSelect = (item: SuggestionItem) => {
@@ -112,8 +164,23 @@ const handleSelect = (item: SuggestionItem) => {
     }
     emit('close');
 };
-const handleClose = () => {
-    emit('close');
+const costQuerySetFetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.costQuerySet.list);
+
+const getAllCostQuerySetList = async () => {
+    try {
+        const { status, response } = await costQuerySetFetcher({
+            query: {
+                filter: [{ k: 'user_id', v: store.state.user.userId, o: 'eq' }],
+                only: ['cost_query_set_id', 'data_source_id', 'name'],
+            },
+        });
+        if (status === 'succeed' && response?.results) {
+            state.costQuerySets = response.results;
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.costQuerySets = [];
+    }
 };
 
 /* Watcher */
@@ -121,6 +188,7 @@ watch(() => props.visible, async (visible) => {
     if (visible) {
         state.loading = true;
         await store.dispatch('recent/load', { limit: RECENT_LIMIT });
+        await getAllCostQuerySetList();
         state.loading = false;
     }
 }, { immediate: true });
@@ -135,7 +203,7 @@ watch(() => props.visible, async (visible) => {
         >
             <g-n-b-suggestion-list :items="state.items"
                                    use-favorite
-                                   @close="handleClose"
+                                   @close="$emit('close')"
                                    @select="handleSelect"
             />
             <template #no-data>

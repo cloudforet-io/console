@@ -6,7 +6,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { range } from 'lodash';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive,
+    computed, defineExpose, defineProps, reactive,
 } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { RouteLocationRaw } from 'vue-router';
@@ -20,6 +20,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import type { Legend, BudgetUsageAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
 
@@ -88,7 +89,7 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
-const fetchData = async (): Promise<Response> => {
+const fetchData = async (): Promise<Response|undefined> => {
     try {
         apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
@@ -130,21 +131,20 @@ const fetchData = async (): Promise<Response> => {
             },
         });
         if (status === 'succeed') return response;
-        return { more: false, results: [] };
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
         return { more: false, results: [] };
     }
 };
 
-const initWidget = async (data?: Response): Promise<Response> => {
+const initWidget = async (data?: Response): Promise<Response|undefined> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     state.loading = false;
     return state.data;
 };
-const refreshWidget = async (): Promise<Response> => {
-    await nextTick();
+const refreshWidget = async (): Promise<Response|undefined> => {
     state.loading = true;
     state.data = await fetchData();
     state.loading = false;
@@ -153,13 +153,14 @@ const refreshWidget = async (): Promise<Response> => {
 
 useWidgetLifecycle({
     disposeWidget: undefined,
+    initWidget,
     refreshWidget,
     props,
     emit,
     widgetState,
 });
 
-defineExpose<WidgetExpose<Response>>({
+defineExpose<WidgetExpose<Response|undefined>>({
     initWidget,
     refreshWidget,
 });
@@ -170,7 +171,7 @@ defineExpose<WidgetExpose<Response>>({
                   class="budget-status-widget"
                   v-on="widgetFrameEventHandlers"
     >
-        <p-data-loader :loading="state.loading"
+        <p-data-loader :loading="props.loading || state.loading"
                        class="chart-wrapper"
                        :loader-backdrop-opacity="1"
         >

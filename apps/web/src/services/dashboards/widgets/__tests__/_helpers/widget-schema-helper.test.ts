@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetConfig, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
 import {
     getInitialSchemaProperties,
+    getRefinedSchemaProperties,
     getWidgetFilterOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -53,7 +54,7 @@ describe('[Widget Schema Helper] getInitialSchemaProperties', () => {
         const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchemaMock);
         expect(refined).not.toEqual(expect.arrayContaining(['filters.cost_product', 'filters.region']));
     });
-    it('should not include used variables if it is not in schema', () => {
+    it('should not include used variables if it is not in widget config schema properties', () => {
         const variablesSchema = cloneDeep(variablesSchemaMock);
         variablesSchema.properties.abc = { ...managedDashboardVariablesSchema.properties.project, use: true };
 
@@ -76,5 +77,34 @@ describe('[Widget Schema Helper] getInitialSchemaProperties', () => {
     it('should be ordered by schema.order and fixed properties', () => {
         const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchemaMock);
         expect(refined).toEqual(['filters.provider', 'filters.project', 'filters.service_account']);
+    });
+});
+
+
+describe('[Widget Schema Helper] getRefinedSchemaProperties', () => {
+    it('should be the same as initial schema properties if stored properties are empty', () => {
+        const initialProperties = ['filters.provider', 'filters.project', 'filters.service_account'];
+        const storedProperties = [];
+        const widgetOptions = {};
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
+        expect(refined).toEqual(['filters.provider', 'filters.project', 'filters.service_account']);
+    });
+    it('should be not exist if the value is not set in widget options and it is not in initial schema properties even if it is in stored properties', () => {
+        const initialProperties = ['filters.project', 'filters.service_account'];
+        const storedProperties = ['filters.provider'];
+        const widgetOptions = {};
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
+        expect(refined).toEqual(['filters.project', 'filters.service_account']);
+    });
+    it('should be exist if the value is set in widget options, stored properties even if it is not in initial schema properties.', () => {
+        const initialProperties = ['filters.project', 'filters.service_account'];
+        const storedProperties = ['filters.provider'];
+        const widgetOptions: WidgetOptions = {
+            filters: {
+                provider: [{ k: 'provider', v: 'aws' }],
+            },
+        };
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
+        expect(refined).toEqual(['filters.project', 'filters.service_account', 'filters.provider']);
     });
 });

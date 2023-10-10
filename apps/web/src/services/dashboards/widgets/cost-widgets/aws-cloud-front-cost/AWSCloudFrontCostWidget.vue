@@ -36,8 +36,8 @@ import type {
 } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import {
-    getRefinedXYChartData,
     getXYChartLegends,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
@@ -57,25 +57,24 @@ import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/
 const USAGE_SOURCE_UNIT = 'GB';
 const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
 const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
-
+interface SubData {
+    [USAGE_TYPE_VALUE_KEY]: string;
+    value: number
+}
 interface Data {
-    [groupBy: string]: string | any; // product: 'AmazonCloudFront'
-    cost_sum?: Array<{
-        [field_group: string]: any;
-        value: number
-    }>;
+    cost_sum: SubData[];
+    usage_quantity_sum: SubData[];
+    _total_cost_sum: number;
+    _total_usage_quantity_sum: number;
     date: string;
-    usage_quantity_sum?: Array<{
-        [field_group: string]: any;
-        value: number
-    }>;
-    _total_cost_sum?: number;
-    _total_usage_quantity_sum?: number;
+    [groupBy: string]: string | any; // product: 'AmazonCloudFront'
 }
 type Response = CostAnalyzeResponse<Data>;
-interface SubData { [USAGE_TYPE_VALUE_KEY]: string; value: number }
 interface TableData extends WidgetTableData {
     [groupBy: string]: string | any;
+}
+interface ChartData {
+    [key: string]: number | any; // // project_id: 'project-1', HTTP Requests: 0.0, HTTPS Requests: 0.0, TransferOut: 0, ...
 }
 
 
@@ -120,9 +119,9 @@ const state = reactive({
     data: null as Response | null,
     fieldsKey: computed<string>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
     legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo) : [])),
-    chartData: computed(() => {
+    chartData: computed<ChartData[]>(() => {
         const dataKey = `${state.fieldsKey}_sum`;
-        const _chartData = getRefinedXYChartData(state.data?.results, {
+        const _chartData = getRefinedXYChartData<Data, ChartData>(state.data?.results, {
             groupBy: widgetState.groupBy,
             allReferenceTypeInfo: props.allReferenceTypeInfo,
             arrayDataKey: dataKey,
@@ -308,6 +307,7 @@ const handleUpdateThisPage = (_thisPage: number) => {
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
     emit,
@@ -342,7 +342,7 @@ defineExpose<WidgetExpose<Response>>({
         <div class="data-container">
             <div class="chart-wrapper">
                 <p-data-loader class="chart-loader"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :data="state.data"
                                loader-type="skeleton"
                                :loader-backdrop-opacity="1"
@@ -355,7 +355,7 @@ defineExpose<WidgetExpose<Response>>({
             </div>
 
             <widget-data-table v-model:legends="state.legends"
-                               :loading="state.loading"
+                               :loading="props.loading || state.loading"
                                :fields="state.tableFields"
                                :items="state.tableData"
                                :currency="widgetState.currency"
