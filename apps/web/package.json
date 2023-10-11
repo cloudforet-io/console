@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "1.12.0-dev66",
+  "version": "1.12.0-rc1",
   "private": true,
   "description": "Cloudforet Console Web Application",
   "author": "Cloudforet",
