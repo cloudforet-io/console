@@ -45,6 +45,7 @@ const handleClickEdit = () => {
                            style-type="tertiary"
                            size="md"
                            shape="square"
+                           @click="handleClickEdit"
             />
         </template>
     </p-heading>

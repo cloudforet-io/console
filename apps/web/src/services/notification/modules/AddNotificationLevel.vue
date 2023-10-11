@@ -5,8 +5,8 @@
                        class="level-dropdown"
         >
             <template #default>
-                <p-select-dropdown v-model="proxyNotificationLevel"
-                                   :items="LEVEL_LIST"
+                <p-select-dropdown :selected="proxyNotificationLevel"
+                                   :menu="LEVEL_LIST"
                                    @select="onChangeLevel"
                 />
             </template>

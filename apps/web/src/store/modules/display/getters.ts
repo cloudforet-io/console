@@ -10,9 +10,7 @@ import type {
 } from '@/store/modules/display/type';
 
 import type { PagePermissionTuple } from '@/lib/access-control/config';
-import config from '@/lib/config';
 import type { Menu, MenuInfo } from '@/lib/menu/config';
-import { MENU_ID } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -87,31 +85,18 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
         ...d,
         label: i18n.t(menuInfo.translationId),
         icon: menuInfo.icon,
-        isNew: menuInfo.isNew,
-        isBeta: menuInfo.isBeta,
+        highlightTag: menuInfo.highlightTag,
         to: { name: d.id },
         subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList) : [],
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
-    const menuList = rootState.domain.billingEnabled ? MENU_LIST : MENU_LIST.filter((d) => d.id !== MENU_ID.COST_EXPLORER);
-
-    let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(menuList);
+    let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(MENU_LIST);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;
 };
 
-export const GNBMenuList: Getter<DisplayState, any> = (state, getters, rootState): DisplayMenu[] => {
-    const allowedDomainIds = Array.isArray(config.get('DASHBOARD_ENABLED')) ? config.get('DASHBOARD_ENABLED') : [];
-    const currentDomainId = rootState.domain.domainId;
-    const isDashboardMenuEnabled = allowedDomainIds.some((id) => id === currentDomainId);
-    return getters.allMenuList.filter((d) => {
-        if (d.id === MENU_ID.DASHBOARDS) {
-            return isDashboardMenuEnabled && !d.hideOnGNB;
-        }
-        return !d.hideOnGNB;
-    });
-};
+export const GNBMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter((d) => !d.hideOnGNB);
 
 export const siteMapMenuList: Getter<DisplayState, any> = (state, getters): DisplayMenu[] => getters.allMenuList.filter((d) => !d.hideOnSiteMap);

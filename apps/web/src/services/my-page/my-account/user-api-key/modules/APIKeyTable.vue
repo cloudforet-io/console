@@ -13,12 +13,11 @@
                         {{ $t('IDENTITY.USER.MAIN.CREATE_API_KEY') }}
                     </p-button>
                     <p-select-dropdown class="dropdown-btn"
-                                       :items="dropdownMenu"
+                                       :menu="dropdownMenu"
                                        :disabled="disabled"
+                                       :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
                                        @select="onSelectDropdown"
-                    >
-                        {{ $t('IDENTITY.USER.MAIN.ACTION') }}
-                    </p-select-dropdown>
+                    />
                 </div>
                 <div class="table-desc">
                     {{ $t('IDENTITY.USER.MAIN.API_TABLE_DESC') }}

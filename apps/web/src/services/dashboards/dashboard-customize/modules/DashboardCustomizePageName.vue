@@ -2,49 +2,27 @@
     <p-heading show-back-button
                @click-back-button="handleClickBackButton"
     >
-        <template v-if="props.dashboardId">
-            <p-field-group v-if="dashboardDetailState.name"
-                           :invalid="invalidState.nameInput"
-                           :invalid-text="invalidTexts.nameInput"
-            >
-                <template #default>
-                    <input ref="inputRef"
-                           v-on-click-outside="handleEnter"
-                           class="name-input"
-                           :value="nameInput"
-                           @input="handleInput"
-                           @keydown.esc="handleEscape"
-                           @keydown.enter="handleEnter"
-                    >
-                </template>
-            </p-field-group>
-            <p-skeleton v-else
-                        width="20rem"
-                        height="1.5rem"
-            />
-        </template>
-        <template v-else>
-            <p-field-group
-                :invalid="invalidState.nameInput"
-                :invalid-text="invalidTexts.nameInput"
-            >
-                <template #default="{invalid}">
-                    <p-text-input
-                        :invalid="invalid"
-                        :placeholder="state.placeHolder"
-                        :value="nameInput"
-                        :is-focused.sync="isTextInputFocused"
-                        @update:value="handlePTextInput"
-                    />
-                </template>
-            </p-field-group>
-        </template>
+        <p-skeleton v-if="state.loading"
+                    width="20rem"
+                    height="1.5rem"
+        />
+        <p-field-group v-else
+                       :invalid="invalidState.nameInput"
+                       :invalid-text="invalidTexts.nameInput"
+        >
+            <template #default="{invalid}">
+                <p-text-input :value="nameInput"
+                              :invalid="invalid"
+                              :placeholder="state.placeHolder"
+                              :is-focused.sync="isTextInputFocused"
+                              @update:value="handleInput"
+                />
+            </template>
+        </p-field-group>
     </p-heading>
 </template>
 <script setup lang="ts">
 // Below directive is used. Do not remove!!!
-import { vOnClickOutside } from '@vueuse/components';
-import { useFocus } from '@vueuse/core';
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
@@ -67,13 +45,15 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:name', value?: string): void,
     (e: 'click-back-button'): void}>();
 
-
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
+    loading: computed<boolean>(() => {
+        if (!props.dashboardId) return false;
+        return !dashboardDetailState.name;
+    }),
     placeHolder: dashboardDetailState.placeholder,
-    editMode: false,
     dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
 });
 const {
@@ -94,34 +74,15 @@ const {
     },
 });
 
-const inputRef = ref<HTMLElement|null>(null);
-useFocus(inputRef, { initialValue: true });
-const isTextInputFocused = ref(true);
+const isTextInputFocused = ref(false);
 
 const updateName = (name: string) => {
     setForm('nameInput', name);
     emit('update:name', name);
 };
 
-// handlers for <p-text-input /> (creating feature)
-const handlePTextInput = (t: string) => {
+const handleInput = (t: string) => {
     updateName(t);
-};
-
-// handlers for <input /> (customizing feature)
-const handleInput = (e: InputEvent): void => {
-    updateName((e.target as HTMLInputElement).value);
-};
-const handleEscape = () => {
-    if (!state.editMode) return;
-    state.editMode = false;
-    updateName(props.name);
-};
-const handleEnter = () => {
-    state.editMode = false;
-    if (invalidState.nameInput) {
-        updateName(props.name);
-    }
 };
 const handleClickBackButton = () => {
     emit('click-back-button');
@@ -152,11 +113,6 @@ onMounted(() => {
     cursor: pointer;
 }
 .title-area:hover {
-    text-decoration: underline;
-}
-.name-input {
-    width: 60%;
-    max-width: 60%;
     text-decoration: underline;
 }
 .p-text-input {

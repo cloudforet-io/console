@@ -1,40 +1,6 @@
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  class="count-of-findings-widget"
-                  @refresh="refreshWidget"
-    >
-        <div class="data-container">
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="state.loading"
-                               :data="state.data"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                               show-data-from-scratch
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-            <div class="table-pagination-wrapper">
-                <p-text-pagination :this-page="state.thisPage"
-                                   :disable-next-page="!state.showNextPage"
-                                   @update:thisPage="handleUpdateThisPage"
-                >
-                    <template #default>
-                        <span class="this-page">{{ state.thisPage }}</span>
-                        <span v-if="state.showNextPage"> / ...</span>
-                    </template>
-                </p-text-pagination>
-            </div>
-        </div>
-    </widget-frame>
-</template>
 <script setup lang="ts">
-import type { ComputedRef } from 'vue';
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRefs,
+    computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
 
 import { percent, array } from '@amcharts/amcharts5';
@@ -48,57 +14,69 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ReferenceMap } from '@/store/modules/reference/type';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
+import WidgetChartNoDataOverlay from '@/services/dashboards/widgets/_components/WidgetChartNoDataOverlay.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
-// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import countOfPassAndFailFindingsWidgetConfig
     from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import type { Legend } from '@/services/dashboards/widgets/type';
 
 
 interface Data extends CloudServiceStatsModel {
-    [groupBy: string]: string | any;
-    value: { key: string, value: number }[];
+    [groupBy: string]: string | null | any;
+    pass_finding_count: number;
+    fail_finding_count: number;
 }
 interface ChartData {
-    [key: string]: number;
+    [key: string]: string | number;
     fail_finding_count: number;
     pass_finding_count: number;
 }
 
-const DATE_FORMAT = 'YYYY-MM';
 const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    dateRange: computed(() => ({
+        end: dayjs(widgetState.settings?.date_range?.end).format('YYYY-MM'),
+    })),
+});
+
+const { pageSize, thisPage } = useWidgetPagination(widgetState);
+
 const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
+    loading: true,
+    data: null as Data[]|null,
     groupByKey: computed<string|undefined>(() => {
         // NOTE: When a dot(".") is included in the groupBy field, the API return value will only include the portion of the field that appears after the dot.
         // ex. additional_info.service -> service
-        if (!state.groupBy) return undefined;
-        const dotIndex = state.groupBy.indexOf('.');
+        if (!widgetState.groupBy) return undefined;
+        const dotIndex = widgetState.groupBy.indexOf('.');
         if (dotIndex !== -1) {
-            return state.groupBy.slice(dotIndex + 1);
+            return widgetState.groupBy.slice(dotIndex + 1);
         }
-        return state.groupBy;
+        return widgetState.groupBy;
     }),
-    thisPage: 1,
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
-    })),
+    groupByReferenceMap: computed<ReferenceMap>(() => {
+        if (!state.groupByKey || !props.allReferenceTypeInfo) return {};
+        return Object.values(props.allReferenceTypeInfo).find((info) => info.key === state.groupByKey)?.referenceMap ?? {};
+    }),
     legends: computed<Legend[]>(() => {
         if (state.showPassFindings) {
             return [
@@ -110,101 +88,119 @@ const state = reactive({
             { name: 'fail_finding_count', label: COMPLIANCE_STATUS_MAP.FAIL.label, color: COMPLIANCE_STATUS_MAP.FAIL.color },
         ];
     }),
-    chartData: computed(() => refineChartData(state.data)),
+    noData: computed(() => !state.data?.length),
+    chartData: computed<ChartData[]>(() => refineChartData(state.data, state.groupByKey, state.groupByReferenceMap)),
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
     showNextPage: computed(() => !!state.data?.more),
 });
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
-        apiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        if (state.pageSize) apiQueryHelper.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+        state.loading = true;
 
-        if (state.showPassFindings) {
-            apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        } else {
-            apiQueryHelper.addFilter({ k: 'key', v: ['fail_finding_count'], o: '' });
-        }
+        apiQueryHelper
+            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCloudServiceStatsAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
-                start: state.dateRange.end,
-                end: state.dateRange.end,
-                group_by: ['key', 'unit', state.groupBy],
+                start: widgetState.dateRange.end,
+                end: widgetState.dateRange.end,
+                group_by: [widgetState.groupBy],
                 fields: {
-                    value: {
-                        key: 'value',
+                    pass_finding_count: {
+                        key: 'values.pass_finding_count',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'values.fail_finding_count',
                         operator: 'sum',
                     },
                 },
-                field_group: ['key'],
-                sort: [{ key: 'value', desc: false }],
+                sort: [{ key: 'fail_finding_count', desc: false }],
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') return response.results;
+        if (status === 'succeed') {
+            state.loading = false;
+            return response.results;
+        }
+        return state.data;
     } catch (e) {
         ErrorHandler.handleError(e);
+        state.loading = false;
+        return [];
     }
-    return [];
 };
 
 /* Util */
-const refineChartData = (data: Data[]): ChartData[] => {
-    if (!data?.length) return [];
+const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMap: ReferenceMap): ChartData[] => {
+    if (!data?.length || !groupByKey) return [];
+
     const refinedChartData: ChartData[] = [];
-    const referenceMap = Object.values(props.allReferenceTypeInfo ?? {}).find((info) => info.key === state.groupBy)?.referenceMap;
     data.forEach((d) => {
-        const fail_finding_count = d.value?.find((v) => v.key === 'fail_finding_count')?.value ?? 0;
-        const pass_finding_count = d.value?.find((v) => v.key === 'pass_finding_count')?.value ?? 0;
-        const rawValue = d[state.groupByKey];
-        let refinedValue = referenceMap ? referenceMap[rawValue]?.label : rawValue; // google_cloud -> Google Cloud
-        if (state.groupBy === ASSET_GROUP_BY.REGION) refinedValue = referenceMap?.[rawValue]?.name ?? rawValue;
+        const rawValue = d[groupByKey];
+        let refinedValue: string|null|undefined;
+
+        // google_cloud -> Google Cloud
+        if (groupByKey === ASSET_GROUP_BY.REGION) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
+        else refinedValue = referenceMap[rawValue]?.label ?? rawValue;
+
         refinedChartData.push({
-            [state.groupByKey]: refinedValue ?? `no_${state.groupByKey}`,
-            fail_finding_count,
-            pass_finding_count,
+            ...d,
+            [groupByKey]: refinedValue ?? `no_${groupByKey}`,
         });
     });
     return refinedChartData;
 };
-const drawChart = (chartData) => {
-    if (!state.groupByKey || !state.legends) return;
+const drawChart = (chartData: ChartData[]) => {
+    if (!state.groupByKey) {
+        console.error(new Error('groupByKey is undefined'));
+        return;
+    }
+
+    // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     yAxis.set('categoryField', state.groupByKey);
     yAxis.data.setAll(cloneDeep(chartData));
 
-    const legend = chartHelper.createLegend({
+    // create legends
+    const legends = chartHelper.createLegend({
         nameField: 'name',
         clickTarget: 'none',
     });
-    chart.children.push(legend);
 
-    state.legends.forEach((_legend) => {
+    // add legends to chart
+    chart.children.push(legends);
+
+    // set series for each legend
+    state.legends.forEach((legend: Legend) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
-            name: _legend.label,
-            valueXField: _legend.name,
+            name: legend.label as string,
+            valueXField: legend.name,
             categoryYField: state.groupByKey,
             xAxis,
             yAxis,
             baseAxis: yAxis,
             stacked: true,
-            fill: _legend.color,
-            stroke: _legend.color,
+            fill: chartHelper.color(legend.color as string),
+            stroke: chartHelper.color(legend.color as string),
+            opacity: state.noData ? 0 : 1,
         };
+
+        // create series
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
-        series.columns.template.setAll({
-            height: 20,
-        });
+
+        // add bullets to series
+        series.bullets.clear();
         series.bullets.push(() => {
             const label = chartHelper.createLabel({
-                text: `{${_legend.name}}`,
+                text: `{${legend.name}}`,
                 populateText: true,
                 textAlign: 'end',
                 centerY: percent(50),
@@ -217,53 +213,69 @@ const drawChart = (chartData) => {
                 dynamic: true,
             });
         });
+
+        // set series style
+        series.columns.template.setAll({
+            height: 20,
+        });
         series.columns.template.onPrivate(('width'), (width, target) => {
-            array.each(target?.dataItem?.bullets, (bullet) => {
+            array.each(target?.dataItem?.bullets ?? [], (bullet) => {
                 if ((width !== undefined) && width < 30) {
                     bullet.get('sprite').hide();
                 }
             });
         });
+
+        // set tooltip if showPassFindings is true
         if (state.showPassFindings) {
             const tooltip = chartHelper.createTooltip();
             setXYSharedTooltipTextWithRate(chart, tooltip);
             series.set('tooltip', tooltip);
         }
+
+        // add series to chart
         chart.series.push(series);
-        series.data.setAll(cloneDeep(chartData));
+
+        // set data to series
+        const data: ChartData[] = state.noData ? [
+            { fail_finding_count: 90, pass_finding_count: 0 },
+        ] : cloneDeep(chartData);
+        series.data.setAll(data);
     });
-    legend.data.setAll(chart.series.values);
+
+
+
+    // set series values to legends data
+    legends.data.setAll(chart.series.values);
 };
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
-    state.loading = true;
     state.data = data ?? await fetchData();
+    chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
-const refreshWidget = async (thisPage = 1): Promise<Data[]> => {
-    await nextTick();
-    state.loading = true;
-    state.thisPage = thisPage;
+const refreshWidget = async (_thisPage = 1): Promise<Data[]> => {
+    thisPage.value = _thisPage;
     state.data = await fetchData();
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
-    state.loading = false;
     return state.data;
 };
 
-const handleUpdateThisPage = (thisPage: number) => {
-    state.thisPage = thisPage;
-    refreshWidget(thisPage);
+const handleUpdateThisPage = (_thisPage: number) => {
+    thisPage.value = _thisPage;
+    refreshWidget(_thisPage);
 };
 
 useWidgetLifecycle({
     disposeWidget: chartHelper.disposeRoot,
+    initWidget,
     refreshWidget,
     props,
-    state,
+    emit,
+    widgetState,
 });
 defineExpose<WidgetExpose<Data[]>>({
     initWidget,
@@ -271,6 +283,44 @@ defineExpose<WidgetExpose<Data[]>>({
 });
 
 </script>
+
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  class="count-of-findings-widget"
+                  v-on="widgetFrameEventHandlers"
+    >
+        <div class="data-container">
+            <div class="chart-wrapper">
+                <p-data-loader class="chart-loader"
+                               :loading="props.loading || state.loading"
+                               :data="state.data"
+                               loader-type="skeleton"
+                               :loader-backdrop-opacity="1"
+                               show-data-from-scratch
+                               disable-empty-case
+                >
+                    <div ref="chartContext"
+                         class="chart"
+                    />
+                    <widget-chart-no-data-overlay v-if="state.noData && !state.loading" />
+                </p-data-loader>
+            </div>
+            <div class="table-pagination-wrapper">
+                <p-text-pagination :this-page="thisPage"
+                                   :disable-next-page="!state.showNextPage"
+                                   @update:thisPage="handleUpdateThisPage"
+                >
+                    <template #default>
+                        <span class="this-page">{{ thisPage }}</span>
+                        <span v-if="state.showNextPage"> / ...</span>
+                    </template>
+                </p-text-pagination>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
+
 <style lang="postcss" scoped>
 .count-of-findings-widget {
     &.full {

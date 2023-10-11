@@ -21,7 +21,7 @@
                        required
         >
             <p-select-dropdown class="selection-type-dropdown"
-                               :items="selectionMenu"
+                               :menu="selectionMenu"
                                :selected.sync="selectionType"
             />
         </p-field-group>

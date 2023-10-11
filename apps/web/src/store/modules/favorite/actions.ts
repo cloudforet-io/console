@@ -35,6 +35,7 @@ const addCommitsByItemType = {
     [FAVORITE_TYPE.PROJECT_GROUP]: 'addProjectGroupItem',
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'addCloudServiceItem',
     [FAVORITE_TYPE.DASHBOARD]: 'addDashboardItem',
+    [FAVORITE_TYPE.COST_ANALYSIS]: 'addCostAnalysisItem',
     [FAVORITE_TYPE.MENU]: 'addMenuItem',
 };
 export const addItem: Action<FavoriteState, any> = async ({ commit }, favorite: FavoriteConfig): Promise<void> => {
@@ -49,6 +50,7 @@ const removeCommitsByItemType = {
     [FAVORITE_TYPE.PROJECT_GROUP]: 'removeProjectGroupItem',
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'removeCloudServiceItem',
     [FAVORITE_TYPE.DASHBOARD]: 'removeDashboardItem',
+    [FAVORITE_TYPE.COST_ANALYSIS]: 'removeCostAnalysisItem',
     [FAVORITE_TYPE.MENU]: 'removeMenuItem',
 };
 export const removeItem: Action<FavoriteState, any> = async ({ commit }, favorite: FavoriteConfig): Promise<void> => {
@@ -63,6 +65,7 @@ const favoriteItemsByItemType = {
     [FAVORITE_TYPE.PROJECT]: 'projectItems',
     [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
+    [FAVORITE_TYPE.COST_ANALYSIS]: 'costAnalysisItems',
     [FAVORITE_TYPE.DASHBOARD]: 'dashboardItems',
 };
 const setCommitsByItemType = {
@@ -70,6 +73,7 @@ const setCommitsByItemType = {
     [FAVORITE_TYPE.PROJECT_GROUP]: 'setProjectGroupItems',
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'setCloudServiceItems',
     [FAVORITE_TYPE.MENU]: 'setMenuItems',
+    [FAVORITE_TYPE.COST_ANALYSIS]: 'setCostAnalysisItems',
     [FAVORITE_TYPE.DASHBOARD]: 'setDashboardItems',
 };
 export const load: Action<FavoriteState, any> = async ({ state, commit }, itemType: FavoriteType): Promise<void|Error> => {

@@ -8,12 +8,7 @@ export const initDomain = async (store, config): Promise<string|undefined> => {
     }
 
     try {
-        await Promise.allSettled([
-            // load domain info
-            store.dispatch('domain/load', domainName),
-            // check if billing menu is accessible from current domain
-            store.dispatch('domain/setBillingEnabled'),
-        ]);
+        await store.dispatch('domain/load', domainName);
         return store.state.domain.name;
     } catch (e) {
         console.error(e);

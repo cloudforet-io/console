@@ -23,8 +23,8 @@
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.32",
     "@amcharts/amcharts4-geodata": "^4.1.18",
-    "@amcharts/amcharts5": "^5.2.31",
-    "@amcharts/amcharts5-geodata": "^5.0.6",
+    "@amcharts/amcharts5": "^5.4.7",
+    "@amcharts/amcharts5-geodata": "^5.1.1",
     "@cloudforet/core-lib": "*",
     "@cloudforet/language-pack": "*",
     "@gtm-support/vue2-gtm": "^1.3.0",
@@ -97,6 +97,7 @@
     "@types/uuid": "^8.3.0",
     "@vitejs/plugin-vue2": "^2.2.0",
     "@vitest/coverage-c8": "^0.24.3",
+    "@vitest/coverage-istanbul": "^0.34.5",
     "@vitest/ui": "^0.26.3",
     "@vue/test-utils": "^1.3.3",
     "axios-mock-adapter": "^1.17.0",
@@ -110,7 +111,7 @@
     "vite": "^4.3.9",
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
-    "vitest": "^0.26.3",
+    "vitest": "^0.34.5",
     "vue-template-compiler": "^2.7.14"
   },
   "browserslist": [

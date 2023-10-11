@@ -1,5 +1,4 @@
 export const GRANULARITY = {
-    ACCUMULATED: 'ACCUMULATED',
     DAILY: 'DAILY',
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',
@@ -10,29 +9,19 @@ export const GROUP_BY = {
     PROJECT: 'project_id',
     PROVIDER: 'provider',
     SERVICE_ACCOUNT: 'service_account_id',
-    CATEGORY: 'category',
-    RESOURCE_GROUP: 'resource_group',
     PRODUCT: 'product',
     REGION: 'region_code',
-    TYPE: 'usage_type',
-    ACCOUNT: 'account',
+    USAGE_TYPE: 'usage_type',
 } as const;
 
-export const MORE_GROUP_BY = {
+export const ADDITIONAL_GROUP_BY = {
     TAGS: 'tags',
     ADDITIONAL_INFO: 'additional_info',
 };
 
-export const GRANULARITY_ITEM_MAP = {
-    [GRANULARITY.ACCUMULATED]: { name: GRANULARITY.ACCUMULATED, label: 'Accumulated' },
-    [GRANULARITY.DAILY]: { name: GRANULARITY.DAILY, label: 'Daily' },
-    [GRANULARITY.MONTHLY]: { name: GRANULARITY.MONTHLY, label: 'Monthly' },
-    [GRANULARITY.YEARLY]: { name: GRANULARITY.YEARLY, label: 'Yearly' },
-} as const;
-
-export const MORE_GROUP_BY_ITEM_MAP = {
-    [MORE_GROUP_BY.TAGS]: { name: MORE_GROUP_BY.TAGS, label: 'Tags' },
-    [MORE_GROUP_BY.ADDITIONAL_INFO]: { name: MORE_GROUP_BY.ADDITIONAL_INFO, label: 'Additional Info' },
+export const ADDITIONAL_GROUP_BY_ITEM_MAP = {
+    [ADDITIONAL_GROUP_BY.TAGS]: { name: ADDITIONAL_GROUP_BY.TAGS, label: 'Tags' },
+    [ADDITIONAL_GROUP_BY.ADDITIONAL_INFO]: { name: ADDITIONAL_GROUP_BY.ADDITIONAL_INFO, label: 'Additional Info' },
 } as const;
 
 export const GROUP_BY_ITEM_MAP = {
@@ -40,12 +29,9 @@ export const GROUP_BY_ITEM_MAP = {
     [GROUP_BY.PROJECT]: { name: GROUP_BY.PROJECT, label: 'Project' },
     [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
     [GROUP_BY.SERVICE_ACCOUNT]: { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
-    [GROUP_BY.CATEGORY]: { name: GROUP_BY.CATEGORY, label: 'Category' },
-    [GROUP_BY.RESOURCE_GROUP]: { name: GROUP_BY.RESOURCE_GROUP, label: 'Resource Group' },
     [GROUP_BY.PRODUCT]: { name: GROUP_BY.PRODUCT, label: 'Product' },
     [GROUP_BY.REGION]: { name: GROUP_BY.REGION, label: 'Region' },
-    [GROUP_BY.TYPE]: { name: GROUP_BY.TYPE, label: 'Type' },
-    [GROUP_BY.ACCOUNT]: { name: GROUP_BY.ACCOUNT, label: 'Account ID' },
+    [GROUP_BY.USAGE_TYPE]: { name: GROUP_BY.USAGE_TYPE, label: 'Usage Type' },
 } as const;
 
 export const ADDITIONAL_FILTER = {
@@ -57,8 +43,8 @@ export const FILTER = {
     ...ADDITIONAL_FILTER,
 } as const;
 
-export const FILTER_ITEM_MAP = {
-    ...GROUP_BY_ITEM_MAP,
-    [ADDITIONAL_FILTER.TAGS]: { name: ADDITIONAL_FILTER.TAGS, label: 'Tags' },
-    [ADDITIONAL_FILTER.ADDITIONAL_INFO]: { name: ADDITIONAL_FILTER.ADDITIONAL_INFO, label: 'Additional Info' },
-};
+export const USAGE_TYPE_ADDITIONAL_FILTER_MAP = {
+    cost: 'cost',
+    usage: 'usage',
+} as const;
+export type UsageTypeAdditionalFilter = typeof USAGE_TYPE_ADDITIONAL_FILTER_MAP[keyof typeof USAGE_TYPE_ADDITIONAL_FILTER_MAP];

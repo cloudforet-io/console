@@ -1,6 +1,8 @@
 <template>
     <div class="left-area">
-        <div class="radio-container">
+        <div v-if="state.isLaptopView"
+             class="radio-container"
+        >
             <div class="provider">
                 <p-field-title class="title">
                     Provider
@@ -51,15 +53,19 @@
                 </p-radio-group>
             </div>
         </div>
-        <div class="dropdown-container">
+        <div v-else
+             class="dropdown-container"
+        >
             <div class="provider">
                 <p-select-dropdown :selected="state.selectedProvider"
-                                   :items="state.providerList"
+                                   :menu="state.providerList"
                                    class="select-dropdown"
                                    @update:selected="handleChangeProvider"
                 >
-                    <template #default="{ item }">
-                        <span class="content-menu-placeholder">
+                    <template #dropdown-button="item">
+                        <span v-if="item"
+                              class="content-menu-placeholder"
+                        >
                             <p-lazy-img v-if="item.name !== 'all'"
                                         width="1rem"
                                         height="1rem"
@@ -83,11 +89,11 @@
                 </p-select-dropdown>
             </div>
             <div class="repository">
-                <p-select-dropdown v-model="state.selectedRepository"
-                                   :items="state.repositoryList"
+                <p-select-dropdown :selected.sync="state.selectedRepository"
+                                   :menu="state.repositoryList"
                                    class="select-dropdown"
                 >
-                    <template #default="{ item }">
+                    <template #dropdown-button="item">
                         <div class="content-menu-placeholder">
                             <span>{{ item.label }}</span>
                         </div>
@@ -104,10 +110,11 @@
 </template>
 
 <script lang="ts" setup>
+import { useWindowSize } from '@vueuse/core';
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI,
+    PFieldTitle, PRadioGroup, PRadio, PLazyImg, PSelectDropdown, PI, screens,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -130,6 +137,7 @@ const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
 const emit = defineEmits<{(e:'selectRepository', repository: string):void}>();
+const { width } = useWindowSize();
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -157,6 +165,7 @@ const state = reactive({
         })),
     ])),
     selectedRepository: 'all',
+    isLaptopView: computed<boolean>(() => width.value > screens.tablet.max),
 });
 
 const repoApiQuery = new ApiQueryHelper();
@@ -197,7 +206,7 @@ watch(() => state.selectedRepository, (repository) => {
     }
 
     .content-menu-placeholder {
-        @apply inline-flex items-center text-label-md;
+        @apply inline-flex items-center;
         line-height: 1.5;
         margin-left: 0.25rem;
         width: 100%;
@@ -235,7 +244,6 @@ watch(() => state.selectedRepository, (repository) => {
 
     .dropdown-container {
         width: 100%;
-        display: none;
     }
 }
 
@@ -244,9 +252,6 @@ watch(() => state.selectedRepository, (repository) => {
 
     .left-area {
         width: 100%;
-        .radio-container {
-            display: none;
-        }
         .dropdown-container {
             @apply flex gap-4;
         }
@@ -258,13 +263,6 @@ watch(() => state.selectedRepository, (repository) => {
         .dropdown-container {
             @apply grid grid-cols-2 gap-4;
             width: 100%;
-
-            /* custom design-system component - p-select-dropdown */
-            &:deep(.p-select-dropdown) {
-                .text {
-                    width: calc(100% - 1.25rem);
-                }
-            }
         }
     }
 }

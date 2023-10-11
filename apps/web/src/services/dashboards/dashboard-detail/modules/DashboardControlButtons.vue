@@ -69,7 +69,7 @@ const handleClickCustomize = () => {
 
 <style lang="postcss">
 .dashboard-control-buttons {
-    display: flex;
+    @apply flex justify-end;
     gap: 0.75rem;
 }
 </style>
