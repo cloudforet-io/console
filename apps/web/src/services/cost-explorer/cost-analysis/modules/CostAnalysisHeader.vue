@@ -15,6 +15,7 @@ import { i18n } from '@/translations';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 
+import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/config-data-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -105,7 +106,7 @@ const handleDeleteQueryConfirm = async () => {
                          class="title-right-extra icon-wrapper"
                     >
                         <div class="favorite-button-wrapper">
-                            <favorite-button :item-id="costAnalysisPageStore.selectedQueryId"
+                            <favorite-button :item-id="getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageStore.selectedDataSourceId,costAnalysisPageStore.selectedQueryId)"
                                              :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
                                              scale="0.8"
                             />
