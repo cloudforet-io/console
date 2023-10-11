@@ -149,6 +149,7 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
             });
         } else if (parsedKeys) { // managed cost query set
             const [dataSourceId, costQuerySetId] = parsedKeys;
+            if (!dataSourceMap[dataSourceId]) return;
             results.push({
                 ...d,
                 name: d.itemId,
