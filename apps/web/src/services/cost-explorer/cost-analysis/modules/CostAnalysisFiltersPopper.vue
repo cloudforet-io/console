@@ -60,9 +60,6 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
             resource_type: resourceType,
             distinct_key: distinctKey,
             search: inputText,
-            options: {
-                limit: 10,
-            },
             ...resourceApiQueryHelper.data,
         });
         if (status) return response?.results;
@@ -72,7 +69,7 @@ const getResources = async (inputText: string, distinctKey: string): Promise<{na
         return undefined;
     }
 };
-const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue: string) => {
+const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue: string, pageStart, pageLimit = 10) => {
     if (!groupBy) return { results: [] };
 
     state.loading = true;
@@ -84,7 +81,8 @@ const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue:
     const refinedMenuItems = getRefinedMenuItems(groupBy, results?.map((d) => ({ name: d.key, label: d.name })));
     // filter by inputValue here.
     const refinedMenuItemsFilteredByInputValue = refinedMenuItems.filter((d) => (d.label as string).toLowerCase().includes(inputValue.toLowerCase()));
-    return { results: refinedMenuItemsFilteredByInputValue };
+    const slicedResults = refinedMenuItemsFilteredByInputValue?.slice((pageStart ?? 1) - 1, pageLimit);
+    return { results: slicedResults, more: pageLimit < refinedMenuItemsFilteredByInputValue.length };
 };
 const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
     if (!results) return [];
@@ -163,6 +161,7 @@ const handleClickResetFilters = () => {
             selection-highlight
             :selection-label="groupBy.label"
             :show-delete-all-button="false"
+            :page-size="10"
             @update:selected="handleUpdateFiltersDropdown(groupBy.name, $event)"
         />
         <cost-analysis-filters-add-more-button @disable-filter="handleDisabledFilters(false, $event)"
