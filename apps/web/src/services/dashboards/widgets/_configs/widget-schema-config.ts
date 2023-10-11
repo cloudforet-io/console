@@ -89,8 +89,8 @@ export const COST_DATA_SOURCE_SCHEMA = {
     },
 };
 
-export const ASSET_QUERY_SET_SCHEMA = {
-    title: 'Query Set',
+export const ASSET_COMPLIANCE_FRAMEWORK_SCHEMA = {
+    title: 'Compliance Framework',
     type: 'string',
     reference: {
         resource_type: 'inventory.CloudServiceQuerySet',

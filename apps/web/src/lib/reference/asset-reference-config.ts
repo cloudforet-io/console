@@ -16,5 +16,8 @@ export const ASSET_VARIABLE_TYPE_INFO = {
         key: 'additional_info.service',
         name: 'Service',
     },
-    asset_query_set: REFERENCE_TYPE_INFO.asset_query_set,
+    asset_query_set: {
+        ...REFERENCE_TYPE_INFO.asset_query_set,
+        name: 'Compliance Framework',
+    },
 } as const;

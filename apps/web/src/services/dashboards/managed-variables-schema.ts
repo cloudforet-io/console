@@ -95,7 +95,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'SINGLE',
-            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_QUERY_SET',
+            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK',
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'inventory.CloudServiceQuerySet',
