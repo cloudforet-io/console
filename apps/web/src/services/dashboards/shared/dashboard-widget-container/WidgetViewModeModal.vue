@@ -206,6 +206,7 @@ watch(() => props.visible, async (visible) => {
                                           v-show="state.sidebarVisible"
                                           :widget-config-id="props.widgetInfo.widget_name"
                                           :widget-key="props.widgetInfo.widget_key"
+                                          :visible="state.sidebarVisible"
                                           @close="handleCloseSidebar"
                                           @update:widget-info="handleUpdateSidebarWidgetInfo"
                                           @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"

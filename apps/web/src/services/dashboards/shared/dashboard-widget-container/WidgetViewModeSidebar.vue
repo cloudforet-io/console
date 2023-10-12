@@ -11,6 +11,8 @@ import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { getUUID } from '@/lib/component-util/getUUID';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardWidgetInputForm
@@ -24,6 +26,7 @@ import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashb
 interface Props {
     widgetKey?: string;
     widgetConfigId?: string;
+    visible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -49,6 +52,7 @@ const state = reactive({
         );
         return nonInheritedWidgetOptions.length > 0;
     }),
+    contextKey: getUUID(),
 });
 
 /* Util */
@@ -93,13 +97,16 @@ const handleCloseSidebar = () => {
 
 debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
-    emit('update:widget-info', after);
+    emit('update:widget-info', after as UpdatableWidgetInfo);
 }, { debounce: 150 });
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {
     emit('update:has-non-inherited-widget-options', value);
 }, { immediate: true });
 
+watch(() => props.visible, (value) => {
+    if (value) state.contextKey = getUUID();
+});
 </script>
 
 <template>
@@ -119,7 +126,8 @@ watch(() => state.hasNonInheritedWidgetOptions, (value) => {
             </template>
             <template #sidebar>
                 <div class="sidebar-contents">
-                    <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
+                    <dashboard-widget-input-form :key="state.contextKey"
+                                                 :widget-config-id="props.widgetConfigId"
                                                  :widget-key="props.widgetKey"
                     />
                 </div>
