@@ -88,12 +88,16 @@ const handleCloseModal = () => {
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
 };
-const handleCloseSidebar = () => {
+const handleCloseSidebar = (save: boolean) => {
     state.sidebarVisible = false;
+    if (!save) state.updatedWidgetInfo = props.widgetInfo;
     state.widgetRef?.refreshWidget();
 };
-const handleUpdateSidebarWidgetInfo = () => {
-    state.widgetRef?.refreshWidget();
+const handleUpdateSidebarWidgetInfo = (widgetInfo: UpdatableWidgetInfo) => {
+    // NOTE: Do not refresh when the title changes. There are no cases where title and other options change together.
+    const refreshWidget = widgetInfo.title === state.updatedWidgetInfo?.title;
+    state.updatedWidgetInfo = widgetInfo;
+    if (refreshWidget) state.widgetRef?.refreshWidget();
 };
 const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
     state.hasNonInheritedWidgetOptions = value;
@@ -183,7 +187,7 @@ watch(() => props.visible, async (visible) => {
                                ref="widgetRef"
                                :widget-key="props.widgetInfo.widget_key"
                                :widget-config-id="props.widgetInfo.widget_name"
-                               :title="props.widgetInfo.title"
+                               :title="state.updatedWidgetInfo?.title ?? props.widgetInfo.title"
                                :options="state.updatedWidgetInfo?.widget_options ?? props.widgetInfo.widget_options"
                                :inherit-options="state.updatedWidgetInfo?.inherit_options ?? props.widgetInfo.inherit_options"
                                :schema-properties="state.updatedWidgetInfo?.schema_properties ?? props.widgetInfo.schema_properties"
@@ -206,6 +210,7 @@ watch(() => props.visible, async (visible) => {
                                           v-show="state.sidebarVisible"
                                           :widget-config-id="props.widgetInfo.widget_name"
                                           :widget-key="props.widgetInfo.widget_key"
+                                          :visible="state.sidebarVisible"
                                           @close="handleCloseSidebar"
                                           @update:widget-info="handleUpdateSidebarWidgetInfo"
                                           @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"
