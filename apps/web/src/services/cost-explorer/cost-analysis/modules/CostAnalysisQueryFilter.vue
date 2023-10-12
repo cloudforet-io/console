@@ -7,7 +7,7 @@ import {
 } from 'vue';
 
 import {
-    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover, PBadge,
+    PButton, PContextMenu, PIconButton, PPopover, PBadge,
     useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -27,8 +27,8 @@ import {
 } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
-import CostAnalysisPeriodSelectDropdown
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
+import CostAnalysisGranularityPeriodDropdown
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGranularityPeriodDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
@@ -116,10 +116,6 @@ const {
 onClickOutside(rightPartRef, hideContextMenu);
 
 /* event */
-const handleSelectGranularity = async (granularity: Granularity) => {
-    costAnalysisPageStore.$patch({ granularity });
-    state.granularity = granularity;
-};
 const handleSaveQuerySet = async () => {
     try {
         await SpaceConnector.client.costAnalysis.costQuerySet.update({
@@ -166,20 +162,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
         >
             <div class="left-part">
-                <p-select-dropdown :menu="state.granularityItems"
-                                   :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
-                                   style-type="rounded"
-                                   :selected="costAnalysisPageState.granularity"
-                                   class="granularity-dropdown"
-                                   @select="handleSelectGranularity"
-                />
-                <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
-                <p-badge v-if="state.showPeriodBadge"
-                         badge-type="subtle"
-                         style-type="gray200"
-                >
-                    {{ state.periodBadgeText }}
-                </p-badge>
+                <cost-analysis-granularity-period-dropdown />
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
