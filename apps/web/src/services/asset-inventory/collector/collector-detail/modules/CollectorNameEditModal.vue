@@ -8,7 +8,7 @@
                     @update:visible="handleUpdateVisible"
     >
         <template #body>
-            <collector-name-form @update:isValid="handleUpdateIsValid" />
+            <collector-name-form @update-valid="handleUpdateIsValid" />
         </template>
     </p-button-modal>
 </template>
