@@ -1,4 +1,7 @@
-import type { SelectDropdownMenuItem, AutocompleteHandler } from '@/inputs/dropdown/select-dropdown/type';
+import type { JSONSchemaType } from 'ajv';
+
+import type { AutocompleteHandler, FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenu } from '@/inputs/dropdown/select-dropdown/type';
 import type { InputAppearanceType } from '@/inputs/input/text-input/type';
 import type { SupportLanguage } from '@/translations';
 
@@ -9,27 +12,17 @@ const COMPONENTS = ['PTextInput', 'GenerateIdFormat', 'PJsonSchemaForm', 'PSelec
 export type ComponentName = typeof COMPONENTS[number];
 
 interface Reference {
-    resource_type: string; // 'identity.ServiceAccount'
-    reference_key?: string; // 'service_account_id' (auto-complete/resource api, must not given) // 'project_id' (auto-complete/distinct api, must given)
-    default_path?: number // if it is given, it will be used as the path to get the default value from the result array
+    resource_type: string;
+    reference_key?: string;
 }
-export interface JsonSchema {
-    type?: string;
-    properties?: Record<string, JsonSchema>;
-    required?: string[];
-    default?: any;
-    examples?: any[];
-    format?: string;
-    maxItems?: number;
-    enum?: Array<string|null>;
-    items?: JsonSchema|JsonSchema[];
+export type JsonSchema<Properties = object> = JSONSchemaType<Properties> & {
     title?: string;
     order?: string[];
     disabled?: boolean;
     json?: boolean;
-    menuItems?: SelectDropdownMenuItem[];
+    menuItems?: SelectDropdownMenu[];
     reference?: Reference;
-}
+};
 
 export const VALIDATION_MODES = ['input', 'all', 'none'] as const;
 export type ValidationMode = typeof VALIDATION_MODES[number];
@@ -49,19 +42,11 @@ export type InnerJsonSchema = JsonSchema & {
 export type CustomErrorMap = Record<string, string>;
 
 export interface HandlerRes {
-    results: SelectDropdownMenuItem[];
+    results: FilterableDropdownMenuItem[];
     more?: boolean;
 }
-
-interface ReferenceHandlerOptions {
-    propertyName?: string;
-    schemaProperty: JsonSchema;
-    pageStart?: number;
-    pageSize?: number;
-    filters?: SelectDropdownMenuItem[]
-}
 export interface ReferenceHandler {
-    (inputText: string, referenceOptions: ReferenceHandlerOptions): Promise<HandlerRes>|HandlerRes;
+    (inputText: string, schema: InnerJsonSchema, pageStart?: number, pageLimit?: number): Promise<HandlerRes>|HandlerRes;
 }
 
 

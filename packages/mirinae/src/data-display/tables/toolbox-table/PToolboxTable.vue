@@ -25,11 +25,6 @@
                        @refresh="$emit('refresh')"
                        @click-settings="$emit('click-settings')"
             >
-                <template v-if="$scopedSlots['pagination-area']"
-                          #pagination-area
-                >
-                    <slot name="pagination-area" />
-                </template>
                 <template v-if="$scopedSlots['toolbox-left']"
                           #left-area
                 >

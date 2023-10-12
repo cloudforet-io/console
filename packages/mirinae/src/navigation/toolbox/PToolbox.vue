@@ -24,11 +24,7 @@
                 <div v-if="paginationVisible"
                      class="tool"
                 >
-                    <div v-if="$scopedSlots['pagination-area']">
-                        <slot name="pagination-area" />
-                    </div>
-                    <p-text-pagination v-else
-                                       :this-page="proxyState.thisPage"
+                    <p-text-pagination :this-page="proxyState.thisPage"
                                        :all-page="allPage"
                                        @pageChange="onChangeThisPage"
                     />
@@ -37,26 +33,21 @@
                      class="tool"
                 >
                     <p-select-dropdown class="dropdown-list"
-                                       :selected="pageSize"
-                                       :menu="pageMenu"
+                                       :items="pageMenu"
                                        @select="onChangePageSize"
                     >
-                        <template #dropdown-button>
-                            {{ proxyState.pageSize }}
-                        </template>
+                        {{ proxyState.pageSize }}
                     </p-select-dropdown>
                 </div>
                 <div v-if="sortable"
                      class="tool"
                 >
                     <p-select-dropdown class="dropdown-list"
-                                       :selected="selectedSortBy"
-                                       :menu="sortByOptions"
+                                       :items="sortByOptions"
+                                       :sort-by="sortBy"
                                        @select="onChangeSortBy"
                     >
-                        <template #dropdown-button>
-                            {{ selectedSortBy }}
-                        </template>
+                        {{ selectedSortBy }}
                     </p-select-dropdown>
                 </div>
                 <div class="right-tool-group">
@@ -348,7 +339,6 @@ export default defineComponent<ToolboxProps>({
             display: flex;
         }
         .dropdown-list {
-            min-width: 6.5rem;
             .p-dropdown-btn {
                 min-width: 6rem;
             }

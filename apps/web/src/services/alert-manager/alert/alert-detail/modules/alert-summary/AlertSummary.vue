@@ -4,17 +4,15 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
             <template v-if="alertState !== ALERT_STATE.ERROR">
                 <p-select-dropdown
-                    :menu="alertStateList"
+                    :items="alertStateList"
                     :selected="alertState"
                     :disabled="manageDisabled"
                     class="state-dropdown"
                     @select="changeAlertState"
                 >
-                    <template #dropdown-button>
-                        <span :class="{'text-alert': alertState === ALERT_STATE.TRIGGERED}">
-                            {{ alertStateList.find(d => d.name === alertState).label }}
-                        </span>
-                    </template>
+                    <span :class="{'text-alert': alertState === ALERT_STATE.TRIGGERED}">
+                        {{ alertStateList.find(d => d.name === alertState).label }}
+                    </span>
                 </p-select-dropdown>
             </template>
             <template v-else>
@@ -28,30 +26,26 @@
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
-            <p-select-dropdown :menu="alertUrgencyList"
+            <p-select-dropdown :items="alertUrgencyList"
                                :selected="alertUrgency"
                                :disabled="alertState === ALERT_STATE.ERROR || manageDisabled"
                                class="state-dropdown"
                                @select="changeAlertUrgency"
             >
-                <template #dropdown-button>
-                    <span class="selected-urgency">
-                        <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH"
-                             name="ic_error-filled"
-                             width="1em"
-                             height="1em"
-                             class="mr-2"
-                             :color="red[400]"
-                        />
-                        <p-i v-if="alertUrgency === ALERT_URGENCY.LOW"
-                             name="ic_warning-filled"
-                             width="1em"
-                             height="1em"
-                             class="mr-2"
-                        />
-                        <span>{{ alertUrgencyList.find(d => d.name === alertUrgency).label }}</span>
-                    </span>
-                </template>
+                <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH"
+                     name="ic_error-filled"
+                     width="1em"
+                     height="1em"
+                     class="mr-2"
+                     :color="red[400]"
+                />
+                <p-i v-if="alertUrgency === ALERT_URGENCY.LOW"
+                     name="ic_warning-filled"
+                     width="1em"
+                     height="1em"
+                     class="mr-2"
+                />
+                <span>{{ alertUrgencyList.find(d => d.name === alertUrgency).label }}</span>
             </p-select-dropdown>
         </p>
         <p class="content-wrapper">
@@ -217,9 +211,6 @@ export default {
     padding-bottom: 1.5rem;
     .state-dropdown {
         width: 9rem;
-        .text-alert, .selected-urgency {
-            @apply flex items-center;
-        }
     }
 
     @screen mobile {

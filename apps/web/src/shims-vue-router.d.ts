@@ -25,9 +25,6 @@ import {
   interface RouteBreadcrumbsFormatter {
       (route: Route): Breadcrumb[];
   }
-  interface RouteCopiableFormatter {
-        (route: Route): boolean;
-  }
   interface RouteMeta {
     lnbVisible?: boolean;
     centeredLayout?: boolean;
@@ -35,7 +32,7 @@ import {
     label?: string|RouteLabelFormatter;
     translationId?: string|RouteTranslationIdFormatter;
     breadcrumbs?: RouteBreadcrumbsFormatter;
-    copiable?: boolean|RouteCopiableFormatter; // for breadcrumbs
+    copiable?: boolean; // for breadcrumbs
     isSignInPage?: boolean;
     accessLevel?: AccessLevel;
     accessInfo?: AccessInfo;

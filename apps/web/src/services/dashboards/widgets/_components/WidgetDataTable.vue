@@ -1,167 +1,3 @@
-<script setup lang="ts">
-import { useResizeObserver } from '@vueuse/core';
-import {
-    defineProps, reactive, ref, watch,
-} from 'vue';
-
-import {
-    PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
-} from '@spaceone/design-system';
-import { throttle } from 'lodash';
-
-import { numberFormatter, getValueByPath } from '@cloudforet/core-lib';
-
-import { CURRENCY } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
-
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { gray } from '@/styles/colors';
-import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
-
-import type {
-    Field, TableSize, WidgetTableData,
-} from '@/services/dashboards/widgets/_components/type';
-import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
-import type { Legend } from '@/services/dashboards/widgets/type';
-
-interface Props {
-    loading: boolean;
-    fields: Field[];
-    items?: WidgetTableData[];
-    thisPage?: number;
-    showLegend?: boolean;
-    showLegendIndex?: boolean;
-    legends?: Legend[];
-    currency?: Currency;
-    disablePagination?: boolean;
-    widgetKey?: string;
-    size?: TableSize;
-    showNextPage?: boolean;
-    allReferenceTypeInfo?: AllReferenceTypeInfo;
-    colorSet?: string[];
-    disableToggle?: boolean;
-    disableEllipsis?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    fields: () => [],
-    items: () => [],
-    thisPage: 1,
-    legends: () => [],
-    currency: CURRENCY.USD,
-    widgetKey: '',
-    size: TABLE_SIZE.sm,
-    allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
-    colorSet: () => [],
-    disableEllipsis: false,
-});
-const emit = defineEmits<{(e: string, value: any): void}>();
-const state = reactive({
-    proxyThisPage: useProxyValue('thisPage', props, emit),
-    disabledLegends: {} as Record<number, boolean>,
-});
-
-const labelRef = ref<HTMLElement[]|null>(null);
-
-/* util */
-const getLegendIconColor = (index: number): string => {
-    const legend = props.legends[index];
-    if (legend?.disabled || state.disabledLegends[index]) return DISABLED_LEGEND_COLOR;
-    if (legend?.color) return legend.color;
-    if (props.colorSet) return props.colorSet[index];
-    return DEFAULT_CHART_COLORS[index];
-};
-const getLegendTextColor = (index) => {
-    const legend = props.legends[index];
-    if (legend?.disabled || state.disabledLegends[index]) return DISABLED_LEGEND_COLOR;
-    return null;
-};
-const getHeadSlotProps = (field, colIndex) => ({
-    field, index: colIndex, colIndex,
-});
-const textFormatter = (value:string|number, textOptions: Field['textOptions'], cellData: any) => {
-    if (typeof value !== 'number') {
-        if (!value) return '--';
-        if (textOptions?.type === 'reference') {
-            if (!value) return 'Unknown';
-            const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType]?.referenceMap;
-            if (textOptions.referenceType === 'region') return referenceMap?.[value]?.name ?? value;
-            return referenceMap?.[value]?.label ?? referenceMap?.[value]?.name ?? value;
-        }
-        return value;
-    }
-    if (textOptions?.type === 'cost') {
-        return currencyMoneyFormatter(value, props.currency);
-    } if (textOptions?.type === 'number') {
-        return numberFormatter(value);
-    } if (textOptions?.type === 'percent') {
-        return `${value.toFixed(1)}%`;
-    }
-    if (textOptions?.type === 'usage') {
-        let unit = textOptions?.unit;
-        const unitPath = textOptions?.unitPath;
-        if (!unit && unitPath) unit = getValueByPath(cellData, unitPath);
-        return usageUnitFormatter(value, { unit });
-    }
-    return value;
-};
-const getValue = (item:string|number|object, field: Field):string|number => {
-    if (typeof item === 'object') {
-        return textFormatter(getValueByPath(item, field.name), field.textOptions, item);
-    }
-    return textFormatter(item, field.textOptions, item);
-};
-const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
-    if (typeof option === 'string' || typeof option === 'boolean') {
-        return option;
-    }
-    if (option) return option(item);
-    return undefined;
-};
-const getColSlotProps = (item, field, colIndex, rowIndex) => ({
-    item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
-});
-const isEllipsisActive = (rowIndex: number, colIndex: number): boolean => {
-    if (props.fields[colIndex].detailOptions?.type === 'popover') return false;
-    const tdIndex = props.fields.length * rowIndex + colIndex;
-    if (labelRef.value?.length && labelRef.value) {
-        const labelElement = labelRef.value[tdIndex]?.getElementsByClassName('common-text-box')[0] as HTMLElement;
-        return (labelElement?.offsetWidth < labelElement?.scrollWidth);
-    } return false;
-};
-const tableRef = ref<null|HTMLElement>(null);
-const tableWidth = ref<number>(0);
-useResizeObserver(tableRef, throttle((entries) => {
-    const entry = entries[0];
-    const { width } = entry.contentRect;
-    tableWidth.value = width;
-}, 500));
-
-const getTooltipContents = (item, field:Field):string => {
-    const value = getValue(item, field);
-    return (typeof value === 'number') ? value.toString() : value;
-};
-
-/* event */
-const handleClickLegend = (index: number) => {
-    // if (props.printMode) return;
-    state.disabledLegends = { ...state.disabledLegends, [index]: !state.disabledLegends[index] };
-    emit('toggle-legend', index);
-};
-const handleClickRow = (rowData) => {
-    // if (props.printMode) return;
-    emit('click-row', rowData);
-};
-watch(() => props.legends, () => {
-    state.disabledLegends = {};
-});
-</script>
-
 <template>
     <div class="widget-data-table">
         <p-data-loader class="table-container"
@@ -197,11 +33,6 @@ watch(() => props.legends, () => {
                                                   v-bind="getHeadSlotProps(field, fieldColIndex)"
                                             >
                                                 {{ field.label ? field.label : field.name }}
-                                                <span v-if="field.textOptions?.type === 'usage' && field.textOptions?.unit"
-                                                      class="usage-unit"
-                                                >
-                                                    ({{ field.textOptions.unit }})
-                                                </span>
                                             </slot>
                                             <template v-if="field.tooltipText">
                                                 <p-tooltip :contents="field.tooltipText">
@@ -250,7 +81,7 @@ watch(() => props.legends, () => {
                                           v-bind="getColSlotProps(item, field, colIndex, rowIndex)"
                                     >
                                         <p-tooltip position="bottom"
-                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : ''"
+                                                   :contents="isEllipsisActive(rowIndex, colIndex) ? getTooltipContents(item, field) : undefined"
                                         >
                                             <div class="detail-item-wrapper">
                                                 <span ref="labelRef"
@@ -337,6 +168,185 @@ watch(() => props.legends, () => {
     </div>
 </template>
 
+<script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core';
+import {
+    defineProps, reactive, ref,
+} from 'vue';
+
+import {
+    PI, PDataLoader, PTooltip, PStatus, PEmpty, PPopover, PTextPagination,
+} from '@spaceone/design-system';
+import bytes from 'bytes';
+import { cloneDeep, throttle } from 'lodash';
+
+import { numberFormatter, byteFormatter, getValueByPath } from '@cloudforet/core-lib';
+
+import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { gray } from '@/styles/colors';
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
+
+import type {
+    Field, TableSize, WidgetTableData,
+} from '@/services/dashboards/widgets/_components/type';
+import { TABLE_SIZE, UNIT_MAP } from '@/services/dashboards/widgets/_components/type';
+import type { Legend } from '@/services/dashboards/widgets/type';
+
+interface Props {
+    loading: boolean;
+    fields: Field[];
+    items?: WidgetTableData[];
+    thisPage?: number;
+    showLegend?: boolean;
+    showLegendIndex?: boolean;
+    legends?: Legend[];
+    currency?: Currency;
+    currencyRates?: CurrencyRates;
+    disablePagination?: boolean;
+    widgetKey?: string;
+    size?: TableSize;
+    showNextPage?: boolean;
+    allReferenceTypeInfo?: AllReferenceTypeInfo;
+    colorSet?: string[];
+    disableToggle?: boolean;
+    disableEllipsis?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    fields: () => [],
+    items: () => [],
+    thisPage: 1,
+    legends: () => [],
+    currency: CURRENCY.USD,
+    currencyRates: () => ({}) as CurrencyRates,
+    widgetKey: '',
+    size: TABLE_SIZE.sm,
+    allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
+    colorSet: () => [],
+    disableEllipsis: false,
+});
+const emit = defineEmits<{(e: string, value: any): void}>();
+const state = reactive({
+    proxyThisPage: useProxyValue('thisPage', props, emit),
+    proxyLegend: useProxyValue('legends', props, emit),
+});
+
+const labelRef = ref<HTMLElement[]|null>(null);
+
+/* util */
+const getLegendIconColor = (index): string => {
+    const legend = props.legends[index];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    if (legend?.color) return legend.color;
+    if (props.colorSet) return props.colorSet[index];
+    return DEFAULT_CHART_COLORS[index];
+};
+const getLegendTextColor = (index) => {
+    const legend = props.legends[index];
+    if (legend?.disabled) return DISABLED_LEGEND_COLOR;
+    return null;
+};
+const getHeadSlotProps = (field, colIndex) => ({
+    field, index: colIndex, colIndex,
+});
+const textFormatter = (value:string|number, textOptions: Field['textOptions']) => {
+    if (typeof value !== 'number') {
+        if (!value) return '--';
+        if (textOptions?.type === 'reference') {
+            if (!value) return 'Unknown';
+            const referenceMap = props.allReferenceTypeInfo[textOptions.referenceType]?.referenceMap;
+            if (textOptions.referenceType === 'region') return referenceMap?.[value]?.name ?? value;
+            return referenceMap?.[value]?.label ?? referenceMap?.[value]?.name ?? value;
+        }
+        return value;
+    }
+    if (textOptions?.type === 'size') {
+        let data: number|null;
+
+        if (typeof value === 'number') data = value;
+        else if (typeof value === 'string') data = Number(value);
+        else if (textOptions?.default !== undefined) data = textOptions?.default ?? 0;
+        else data = null;
+
+        let formattedValue: string;
+        if (data === null) formattedValue = '-';
+        else {
+            const sourceUnit: bytes.Unit|undefined = UNIT_MAP[textOptions?.sourceUnit as string] || undefined;
+            if (sourceUnit) {
+                data = bytes.parse(`${value}${sourceUnit}`);
+            }
+
+            if (!data) formattedValue = '--';
+            else formattedValue = byteFormatter(data);
+        }
+        return formattedValue;
+    } if (textOptions?.type === 'cost') {
+        return currencyMoneyFormatter(value, props.currency, props.currencyRates);
+    } if (textOptions?.type === 'number') {
+        return numberFormatter(value);
+    } if (textOptions?.type === 'percent') {
+        return `${value.toFixed(1)}%`;
+    }
+    return value;
+};
+const getValue = (item:string|number|object, field: Field):string|number => {
+    if (typeof item === 'object') {
+        return textFormatter(getValueByPath(item, field.name), field.textOptions);
+    }
+    return textFormatter(item, field.textOptions);
+};
+const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
+    if (typeof option === 'string' || typeof option === 'boolean') {
+        return option;
+    }
+    if (option) return option(item);
+    return undefined;
+};
+const getColSlotProps = (item, field, colIndex, rowIndex) => ({
+    item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
+});
+const isEllipsisActive = (rowIndex: number, colIndex: number): boolean => {
+    if (props.fields[colIndex].detailOptions?.type === 'popover') return false;
+    const tdIndex = props.fields.length * rowIndex + colIndex;
+    if (labelRef.value?.length && labelRef.value) {
+        const labelElement = labelRef.value[tdIndex]?.getElementsByClassName('common-text-box')[0] as HTMLElement;
+        return (labelElement?.offsetWidth < labelElement?.scrollWidth);
+    } return false;
+};
+const tableRef = ref<null|HTMLElement>(null);
+const tableWidth = ref<number>(0);
+useResizeObserver(tableRef, throttle((entries) => {
+    const entry = entries[0];
+    const { width } = entry.contentRect;
+    tableWidth.value = width;
+}, 500));
+
+const getTooltipContents = (item, field:Field):string => {
+    const value = getValue(item, field);
+    return (typeof value === 'number') ? value.toString() : value;
+};
+
+/* event */
+const handleClickLegend = (index) => {
+    // if (props.printMode) return;
+    const _legends = cloneDeep(props.legends);
+    _legends[index].disabled = !_legends[index].disabled;
+    state.proxyLegend = _legends;
+    emit('toggle-legend', index);
+};
+const handleClickRow = (rowData) => {
+    // if (props.printMode) return;
+    emit('click-row', rowData);
+};
+</script>
+
 <style lang="postcss" scoped>
 .widget-data-table {
     display: flex;
@@ -385,9 +395,6 @@ watch(() => props.legends, () => {
                 white-space: pre-line;
                 text-align: right;
                 line-height: 1.25;
-                .usage-unit {
-                    margin-left: 0.25rem;
-                }
             }
             &.right {
                 justify-content: flex-end;

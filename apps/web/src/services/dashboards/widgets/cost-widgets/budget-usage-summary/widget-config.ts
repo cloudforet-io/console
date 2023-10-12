@@ -3,9 +3,6 @@ import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
     getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const budgetUsageSummaryConfig: WidgetConfig = {
@@ -26,39 +23,14 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     },
     sizes: ['sm', 'full'],
     options: {
-        granularity: GRANULARITY.MONTHLY,
-    },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'service_account',
-        ),
+        granularity: GRANULARITY.ACCUMULATED,
     },
     options_schema: {
-        default_properties: [
-            'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames(
-                'project',
-            ),
-        ],
-        fixed_properties: ['cost_data_source'],
+        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'cost_product'),
         schema: {
             type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source'),
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    'service_account',
-                ),
-            },
-            order: [
-                'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames(
-                    'project',
-                    'service_account',
-                ),
-            ],
+            properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'cost_product', 'region'),
+            order: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'cost_product', 'region'),
         },
     },
 };

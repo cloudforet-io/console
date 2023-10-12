@@ -18,7 +18,7 @@ interface UseWidgetReformerOptions {
     containerWidth: Ref<number>;
 }
 
-export interface ReformedWidgetInfo extends DashboardLayoutWidgetInfo {
+interface ReformedWidgetInfo extends DashboardLayoutWidgetInfo {
     size: WidgetSize;
     theme?: WidgetTheme;
     width: number;
@@ -52,7 +52,7 @@ export const useWidgetReformer = ({
             const themes = getWidgetThemes(widgetInfoList, state.widgetConfigMap);
 
             // get sizes
-            const sizes = widgetInfoList.map((widget) => widget.size ?? state.widgetConfigMap[widget.widget_key]?.sizes[0]);
+            const sizes = widgetInfoList.map((widget) => widget.size);
 
             // get widths
             const widths = flattenDeep(widgetWidthAssigner(sizes, containerWidth.value));

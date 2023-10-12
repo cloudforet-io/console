@@ -121,3 +121,9 @@ export default {
 
 };
 </script>
+
+<style lang="postcss" scoped>
+.p-select-dropdown {
+    min-width: 11rem;
+}
+</style>

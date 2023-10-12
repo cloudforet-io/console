@@ -11,5 +11,4 @@ export interface ProgressBarProps {
     gradient?: Gradient;
     size?: string;
     disableAnimation?: boolean;
-    height?: string;
 }

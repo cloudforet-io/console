@@ -17,9 +17,7 @@
     "ENDPOINT_V1": "",
     "ENDPOINT_V2": "",
     "REFLECTION": false,
-    "SKIP_TOKEN_CHECK": false,
-    "API_LIST_V1": [],
-    "API_LIST_V2": []
+    "SKIP_TOKEN_CHECK": false
   },
   "ASSET_PATH": {
   },
@@ -30,5 +28,6 @@
     { "label": "API Guide", "link": "https://cloudforet-io.github.io/api-doc/" },
     { "label": "GitHub", "link": "https://github.com/cloudforet-io" }
   ],
-  "CONTACT_LINK": ""
+  "CONTACT_LINK": "",
+  "DASHBOARD_ENABLED": false
 }

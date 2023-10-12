@@ -52,7 +52,7 @@ export const currencyMoneyFormatter = (
     rates?: CurrencyRates,
     disableSymbol = false,
     transitionValue = 10000,
-): string => {
+): string|number => {
     if (typeof value === 'number') {
         const money = (currency && rates) ? convertUSDToCurrency(value, currency, rates) : value;
 

@@ -1,12 +1,12 @@
 <template>
     <div>
-        <p-select-dropdown :selected.sync="proxySelectedMonth"
+        <p-select-dropdown v-model="proxySelectedMonth"
                            class="month-select-dropdown"
-                           :menu="monthMenuItems"
+                           :items="monthMenuItems"
         />
-        <p-select-dropdown :selected.sync="proxySelectedYear"
+        <p-select-dropdown v-model="proxySelectedYear"
                            class="year-select-dropdown"
-                           :menu="yearMenuItems"
+                           :items="yearMenuItems"
         />
     </div>
 </template>
@@ -18,7 +18,7 @@ import { computed, reactive, toRefs } from 'vue';
 import {
     PSelectDropdown,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { SelectDropdownMenu } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
@@ -48,16 +48,16 @@ export default {
         const state = reactive({
             proxySelectedYear: useProxyValue('selectedYear', props, emit),
             proxySelectedMonth: useProxyValue('selectedMonth', props, emit),
-            yearMenuItems: computed<SelectDropdownMenuItem[]>(() => {
+            yearMenuItems: computed<SelectDropdownMenu[]>(() => {
                 const currYear = dayjs.utc();
-                const menuItems: SelectDropdownMenuItem[] = [];
+                const menuItems: SelectDropdownMenu[] = [];
                 range(4).forEach((i) => {
                     const date = currYear.subtract(i, 'year').format('YYYY');
                     menuItems.push({ name: date, label: date });
                 });
                 return menuItems;
             }),
-            monthMenuItems: computed<SelectDropdownMenuItem[]>(() => {
+            monthMenuItems: computed<SelectDropdownMenu[]>(() => {
                 const months = i18nDayjs.value.months();
                 const menuItems = [
                     { name: 'all', label: i18n.t('INVENTORY.CLOUD_SERVICE.HISTORY.ALL_MONTH') },

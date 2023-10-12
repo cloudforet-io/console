@@ -1,115 +1,242 @@
+<template>
+    <widget-frame v-bind="widgetFrameProps"
+                  no-height-limit
+                  @refresh="handleRefresh"
+    >
+        <div class="budget-usage-summary">
+            <div class="data-container">
+                <div class="budget">
+                    <p class="budget-label">
+                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET_USAGE_IN', {period: totalSpentPeriod}) }}
+                    </p>
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div class="budget-value">
+                            {{ currencyMoneyFormatter(state.totalSpent, state.currency, props.currencyRates) }}
+                        </div>
+                        <div class="budget-info">
+                            {{ state.budgetCount }} {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETS') }}
+                        </div>
+                        <template #loader>
+                            <div class="skeleton-wrapper">
+                                <p-skeleton class="skeleton"
+                                            width="10rem"
+                                            height="1.875rem"
+                                />
+                                <p-skeleton class="skeleton"
+                                            width="7.5rem"
+                                            height="1.5rem"
+                                />
+                            </div>
+                        </template>
+                    </p-data-loader>
+                </div>
+                <div class="budget">
+                    <p class="budget-label">
+                        {{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.TOTAL_BUDGET') }}
+                    </p>
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div class="budget-value">
+                            {{ currencyMoneyFormatter(state.totalBudget, state.currency, props.currencyRates) }}
+                        </div>
+                        <div v-if="state.leftBudget"
+                             class="budget-info"
+                             :style="{ color: state.leftBudget.color }"
+                        >
+                            {{ state.leftBudget.label }}
+                        </div>
+                        <template #loader>
+                            <div class="skeleton-wrapper">
+                                <p-skeleton class="skeleton"
+                                            width="10rem"
+                                            height="1.875rem"
+                                />
+                                <p-skeleton class="skeleton"
+                                            width="7.5rem"
+                                            height="1.5rem"
+                                />
+                            </div>
+                        </template>
+                    </p-data-loader>
+                </div>
+                <div class="chart-wrapper">
+                    <p-data-loader class="data-loader"
+                                   :loading="state.loading"
+                                   :data="state.data"
+                                   :loader-backdrop-opacity="1"
+                                   disable-empty-case
+                                   loader-type="skeleton"
+                    >
+                        <div ref="chartContext"
+                             class="chart"
+                        >
+                            <span class="budget-usage">
+                                <template v-if="Number.isNaN(state.spentBudget.rate)">
+                                    -- %
+                                </template>
+                                <template v-else>
+                                    {{ state.spentBudget.rate.toFixed(2) }}%{{ state.spentBudget.isOver ? '+' : '' }}
+                                </template>
+                            </span>
+                        </div>
+                    </p-data-loader>
+                </div>
+            </div>
+        </div>
+    </widget-frame>
+</template>
+
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed, defineExpose,
-    defineProps, nextTick, reactive, ref,
+    defineProps, nextTick, reactive, ref, toRef, toRefs,
 } from 'vue';
 
-import { PDataLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
+import { color } from '@amcharts/amcharts5';
+import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { CurrencySymbol } from '@/store/modules/settings/type';
+import { i18n } from '@/translations';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
+import type { createPieChart } from '@/common/composables/amcharts5/pie-chart-helper';
 import { useDateRangeFormatter } from '@/common/composables/date-range-formatter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { indigo, red, gray } from '@/styles/colors';
+import { gray, red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
+import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
+// eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
 
 
 interface Data {
-    date: string;
-    spent: number;
-    budget: number;
+    budget_type: string;
     budget_count: number;
+    limit: number;
+    usd_cost: number;
+    usage: number;
+    pieSettings?: {
+        fill: ReturnType<typeof color>
+    }
 }
 
 interface ChartData {
-    date: string;
-    spent: number;
-    budget: number;
-    budget_count: number;
+    budget_type: string;
+    budget_rate: number;
+    pieSettings?: {
+        fill: string
+    }
 }
 
+const DATE_FORMAT = 'YYYY-MM';
+
 const props = defineProps<WidgetProps>();
-const emit = defineEmits<WidgetEmit>();
-
 const chartContext = ref<HTMLElement|null>(null);
-const chartHelper = useAmcharts5(chartContext);
-
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format('YYYY-MM');
-        const start = dayjs.utc(end).subtract(11, 'month').format('YYYY-MM');
-        return { start, end };
-    }),
-});
+const {
+    createDonutChart, createPieSeries,
+    disposeRoot, refreshRoot, setChartColors, root,
+} = useAmcharts5(chartContext);
 const state = reactive({
-    loading: true,
-    data: null as null|Data[],
-    chartData: computed<ChartData[]>(() => cloneDeep(state.data ?? [])),
-    //
-    noData: computed<boolean>(() => !state.data?.length),
-    recentSpentData: computed<number>(() => {
-        if (!state.data?.length) return 0;
-        const recent = state.data[state.data.length - 1];
-        if (recent.date === widgetState.dateRange.end) return recent.spent;
-        return 0;
+    ...toRefs(useWidgetState<Data[]>(props)),
+    skeletons: [1, 2],
+    chart: null as null|ReturnType<typeof createPieChart>,
+    series: null as null|ReturnType<typeof createPieSeries>,
+    chartData: computed<ChartData[]>(() => {
+        if (!state.data) return [];
+
+        let chartSpentBudgetRate = state.spentBudget.rate;
+        if (chartSpentBudgetRate > 100) chartSpentBudgetRate = 100;
+
+        const results = [
+            {
+                budget_type: 'spent_budget',
+                budget_rate: chartSpentBudgetRate,
+            },
+            {
+                budget_type: 'left_budget',
+                budget_rate: (100 - chartSpentBudgetRate),
+                pieSettings: {
+                    fill: color(gray[200]),
+                },
+            },
+        ];
+
+        return results;
     }),
-    recentBudgetData: computed<number>(() => {
-        if (!state.data?.length) return 0;
-        const recent = state.data[state.data.length - 1];
-        if (recent.date === widgetState.dateRange.end) return recent.budget;
-        return 0;
+    dateRange: computed<DateRange>(() => ({
+        start: dayjs.utc(state.settings?.date_range?.start).format(DATE_FORMAT),
+        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
+    })),
+    totalBudget: computed<number|string>(() => {
+        if (!state.data?.length) return '--';
+        return state.data[0].total_budget;
+    }),
+    totalSpent: computed<number|string>(() => {
+        if (!state.data?.length) return '--';
+        return state.data[0].total_spent;
+    }),
+    spentBudget: computed<{rate: number, isOver: boolean}>(() => {
+        let isOver = false;
+        let totalBudget = state.totalBudget;
+        if (totalBudget === 0) totalBudget = 1;
+
+        let rate = (state.totalSpent / totalBudget) * 100;
+        if (rate > 9999.99) {
+            rate = 9999.99;
+            isOver = true;
+        }
+
+        return { rate, isOver };
+    }),
+    leftBudget: computed<{label: string, color?: string}|undefined>(() => {
+        if (!state.data?.length) return undefined;
+        const value = state.totalBudget - state.totalSpent;
+        if (value >= 0) {
+            return {
+                label: `${currencyMoneyFormatter(value, state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.AVAILABLE')}`,
+            };
+        }
+        return {
+            label: `${currencyMoneyFormatter(Math.abs(value), state.currency)} ${i18n.t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEEDED')}`,
+            color: red[400],
+        };
+    }),
+    budgetCount: computed(() => {
+        if (!state.data?.length) return '--';
+        return state.data[0].budget_count;
     }),
 });
 
-const displayState = reactive({
-    recentSpent: computed<number>(() => {
-        if (!state.recentSpentData) return 0;
-        return state.recentSpentData;
-    }),
-    recentBudget: computed<number>(() => {
-        if (!state.recentBudgetData) return 0;
-        return state.recentBudgetData;
-    }),
-    recentBudgetLeft: computed<number>(() => {
-        if (!state.recentSpentData || !state.recentBudgetData) return 0;
-        return Math.abs(state.recentBudgetData - state.recentSpentData);
-    }),
-    isSpentOverBudget: computed<boolean>(() => {
-        if (!state.recentSpentData || !state.recentBudgetData) return false;
-        return state.recentSpentData > state.recentBudgetData;
-    }),
-    recentSpentRate: computed<number>(() => {
-        if (!state.recentSpentData || !state.recentBudgetData) return 0;
-        return (state.recentSpentData / state.recentBudgetData) * 100;
-    }),
-    budgetCount: computed<number>(() => {
-        if (!state.data?.length) return 0;
-        return state.data[state.data.length - 1].budget_count ?? 0;
-    }),
-    currencySymbol: computed<CurrencySymbol>(() => (widgetState.currency ? CURRENCY_SYMBOL[widgetState.currency] : CURRENCY_SYMBOL.USD)),
-});
+const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
 
-const [recentSpentPeriod] = useDateRangeFormatter({
-    end: computed(() => widgetState.dateRange.end),
-    showTildeIfEndThisMonth: true,
+const [totalSpentPeriod] = useDateRangeFormatter({
+    start: computed(() => state.settings?.date_range?.start),
+    end: computed(() => state.settings?.date_range?.end),
 });
 
 /* Api */
@@ -117,19 +244,18 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
-        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
+        apiQueryHelper.setFilters(state.budgetConsoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
-            data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: widgetState.options.granularity,
-                start: widgetState.dateRange.start,
-                end: widgetState.dateRange.end,
+                granularity: state.options.granularity,
+                start: state.dateRange.start,
+                end: state.dateRange.end,
                 fields: {
-                    spent: {
-                        key: 'cost',
+                    total_spent: {
+                        key: 'usd_cost',
                         operator: 'sum',
                     },
-                    budget: {
+                    total_budget: {
                         key: 'limit',
                         operator: 'sum',
                     },
@@ -137,109 +263,63 @@ const fetchData = async (): Promise<Data[]> => {
                         operator: 'count',
                     },
                 },
-                sort: [{ key: 'date', desc: false }],
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') {
-            return response.results;
-        }
-        return state.data;
+        if (status === 'succeed') return response.results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
     }
+    return [];
 };
 
-const dataColor = (data: ChartData) => {
-    if (data.spent > data.budget) return chartHelper.color(red[400]);
-    return chartHelper.color(indigo[400]);
-};
-const drawChart = (chartData: ChartData[]) => {
-    // create chart
-    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
+/* Util */
+const { colorSet } = useWidgetColorSet({
+    theme: toRef(props, 'theme'),
+    dataSize: computed(() => state.chartData?.length ?? 0),
+});
+const drawChart = (chartData) => {
+    const chart = createDonutChart();
+    const seriesSettings = {
+        categoryField: 'budget_type',
+        valueField: 'budget_rate',
+    };
+    const series = createPieSeries(seriesSettings);
+    chart.series.push(series);
+    const chartColor = state.spentBudget.rate > 100 ? [red[500]] : colorSet.value;
+    setChartColors(chart, chartColor);
 
-    // set chart padding
-    chart.setAll({
-        paddingTop: 0,
-        paddingRight: 0,
-        paddingBottom: 0,
-        paddingLeft: -10,
-    });
-
-    // set axis
-    xAxis.get('baseInterval').timeUnit = 'month';
-    const yRendered = yAxis.get('renderer');
-    yRendered.grid.template.setAll({ strokeOpacity: 0 });
-    yRendered.labels.template.setAll({ visible: false });
-
-    // create column series, line series
-    const columnSeries = chartHelper.createXYColumnSeries(chart, {
-        valueYField: 'spent',
-    });
-    const lineSeries = chartHelper.createXYLineSeries(chart, {
-        valueYField: 'budget',
-        stroke: chartHelper.color(gray[300]),
-        maskBullets: false,
-    });
-
-    // set series to chart. do not move this to the bottom of this function.
-    chart.series.push(columnSeries);
-    chart.series.push(lineSeries);
-
-    // set series default settings
-    columnSeries.columns.template.setAll({
+    series.labels.template.set('forceHidden', true);
+    series.ticks.template.set('visible', false);
+    series.slices.template.setAll({
+        toggleKey: 'none',
+        forceInactive: true,
+        templateField: 'pieSettings',
         strokeOpacity: 0,
-        width: chartHelper.percent(35),
-    });
-    lineSeries.strokes.template.setAll({
-        strokeWidth: 0.5,
-        strokeDasharray: [10, 5],
     });
 
-    // disable line series bullets
-    lineSeries.bullets.setAll([]);
+    if (chartData.some((d) => d[seriesSettings.valueField] && d[seriesSettings.valueField] > 0)) {
+        series.data.setAll(chartData);
+    } else {
+        series.data.setAll([{
+            [seriesSettings.valueField]: 1,
+        }]);
+        series.slices.template.setAll({
+            fill: color(gray[200]),
+            strokeOpacity: 0,
+            forceInactive: true,
+        });
+    }
 
-    // set columns color
-    columnSeries.columns.template.adapters.add('fill', (fill, target) => {
-        const data = target.dataItem?.dataContext as ChartData;
-        if (!data) return chartHelper.color(indigo[400]);
-        return dataColor(data);
-    });
-
-    // set tooltip to column series
-    const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSingleTooltipText(chart, tooltip, widgetState.currency);
-    tooltip.label.adapters.add('text', (_, target) => {
-        const data = target.dataItem?.dataContext as ChartData;
-        if (!data) return '';
-        const spent = currencyMoneyFormatter(data.spent, widgetState.currency);
-        const budget = currencyMoneyFormatter(data.budget, widgetState.currency);
-        let text = `[${dataColor(data)};fontSize: 10px]●[/] {valueX}\n`;
-        text += `spent: [bold]${spent}[/]\n`;
-        text += `budget: [bold]${budget}[/]`;
-        return text;
-    });
-    columnSeries.set('tooltip', tooltip);
-
-    // set series data processor for date
-    columnSeries.data.processor = chartHelper.createDataProcessor({
-        dateFormat: 'YYYY-MM',
-    });
-    lineSeries.data.processor = chartHelper.createDataProcessor({
-        dateFormat: 'YYYY-MM',
-    });
-
-    // set data to series
-    columnSeries.data.setAll(chartData);
-    lineSeries.data.setAll(chartData);
+    state.chart = chart;
+    state.series = series;
 };
 
 const initWidget = async (data?: Data[]): Promise<Data[]> => {
     state.loading = true;
     state.data = data ?? await fetchData();
     await nextTick();
-    if (chartHelper.root.value) drawChart(state.chartData);
+    if (root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
@@ -248,20 +328,22 @@ const refreshWidget = async (): Promise<Data[]> => {
     await nextTick();
     state.loading = true;
     state.data = await fetchData();
-    chartHelper.refreshRoot();
+    refreshRoot();
     await nextTick();
-    if (chartHelper.root.value) drawChart(state.chartData);
+    if (root.value) drawChart(state.chartData);
     state.loading = false;
     return state.data;
 };
 
+const handleRefresh = () => {
+    refreshWidget();
+};
+
 useWidgetLifecycle({
-    disposeWidget: chartHelper.disposeRoot,
-    initWidget,
+    disposeWidget: disposeRoot,
     refreshWidget,
     props,
-    emit,
-    widgetState,
+    state,
 });
 
 defineExpose<WidgetExpose<Data[]>>({
@@ -270,132 +352,37 @@ defineExpose<WidgetExpose<Data[]>>({
 });
 
 </script>
-
-<template>
-    <widget-frame v-bind="widgetFrameProps"
-                  no-height-limit
-                  v-on="widgetFrameEventHandlers"
-    >
-        <div class="budget-usage-summary">
-            <div class="recent-budget-spent">
-                <p-data-loader class="data-loader"
-                               :loading="props.loading || state.loading"
-                               :data="!state.noData"
-                               :loader-backdrop-opacity="1"
-                               disable-empty-case
-                               loader-type="skeleton"
-                >
-                    <div class="row-wrapper">
-                        <span class="spent-rate">{{ displayState.recentSpentRate === undefined ? '--' : displayState.recentSpentRate.toFixed(2) }}%</span>
-                        <span class="budget-count">{{ $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGETED', { count: displayState.budgetCount }) }}</span>
-                    </div>
-                    <div class="row-wrapper">
-                        <p-progress-bar :percentage="displayState.recentSpentRate"
-                                        :color="displayState.isSpentOverBudget ? red[400] : indigo[300]"
-                                        size="lg"
-                                        height="1.5rem"
-                        />
-                    </div>
-                    <div class="row-wrapper">
-                        <span class="spent-cost">
-                            <span class="currency-symbol">{{ displayState.currencySymbol }}</span>{{ currencyMoneyFormatter(displayState.recentSpent, undefined, undefined, true) }}
-                        </span>
-                        <i18n path="DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.OUT_OF"
-                              class="recent-budget"
-                        >
-                            <template #value>
-                                <span class="currency-symbol">{{ displayState.currencySymbol }}</span>
-                                <span class="value">{{ currencyMoneyFormatter(displayState.recentBudget, undefined, undefined, true) }}</span>
-                            </template>
-                        </i18n>
-                    </div>
-                    <div class="row-wrapper">
-                        <i18n path="DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.BUDGET_USAGE_IN"
-                              class="period"
-                        >
-                            <template #period>
-                                <strong>{{ recentSpentPeriod }}</strong>
-                            </template>
-                        </i18n>
-                        <span class="budget-left">
-                            ({{ displayState.isSpentOverBudget ?
-                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEED', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, widgetState.currency) }) :
-                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.LEFT', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, widgetState.currency) })
-                            }})
-                        </span>
-                    </div>
-                    <template #loader>
-                        <div class="skeleton-wrapper">
-                            <p-skeleton class="skeleton"
-                                        width="10rem"
-                                        height="1.875rem"
-                            />
-                        </div>
-                    </template>
-                </p-data-loader>
-            </div>
-            <div class="chart-wrapper">
-                <p-data-loader class="data-loader"
-                               :loading="props.loading || state.loading"
-                               :data="!state.noData"
-                               :loader-backdrop-opacity="1"
-                               loader-type="skeleton"
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
-            </div>
-        </div>
-    </widget-frame>
-</template>
-
 <style lang="postcss" scoped>
 .budget-usage-summary {
-    display: flex;
-    flex-direction: column;
     height: 100%;
-}
-.recent-budget-spent {
-    min-height: 7.5rem;
-    .row-wrapper {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
-    .spent-rate {
-        @apply text-display-lg font-bold;
-    }
-    .budget-count {
-        @apply text-label-lg font-normal;
-    }
-    .spent-cost {
-        @apply text-display-md font-medium;
-        .currency-symbol {
-            @apply text-display-sm font-normal text-gray-600;
+    min-height: 10rem;
+    .budget {
+        @apply flex flex-col row-gap-1 text-gray-900;
+        line-height: 1.25;
+        height: 94px;
+        margin-bottom: 1rem;
+        .budget-label {
+            font-size: 1rem;
+        }
+        .budget-value {
+            margin: 0.25rem 0;
+            font-size: 1.5rem;
+        }
+        .budget-info {
+            @apply text-gray-700 font-medium;
         }
     }
-    .recent-budget {
-        @apply text-label-lg font-normal text-gray-600;
-        .currency-symbol {
-            @apply text-label-xl font-normal text-gray-900;
-        }
-        .value {
-            @apply text-display-md font-medium text-gray-900;
-        }
-    }
-    .period {
-        @apply text-label-lg font-normal text-gray-600;
-    }
-    .budget-left {
-        @apply text-label-lg font-medium text-gray-600;
+    .budget-usage {
+        @apply inline-block absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate3d(-50%, -50%, 0);
     }
 }
 .chart-wrapper {
-    flex-grow: 1;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    width: 100%;
+    @apply relative;
+    width: 9rem;
+    height: 9rem;
     .chart {
         height: 100%;
     }
@@ -410,6 +397,24 @@ defineExpose<WidgetExpose<Data[]>>({
         .skeleton {
             display: block;
             margin-top: 0.25rem;
+        }
+    }
+}
+.full {
+    @screen desktop {
+        .budget-usage-summary {
+            .data-container {
+                @apply flex justify-between;
+            }
+            .budget {
+                width: 30%;
+            }
+        }
+        .skeleton-container {
+            @apply flex flex-row justify-between;
+            .skeleton-wrapper {
+                margin-top: 0;
+            }
         }
     }
 }

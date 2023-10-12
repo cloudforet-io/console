@@ -26,13 +26,13 @@
                         {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
                     </p-button>
                     <p-select-dropdown
-                        class="left-toolbox-dropdown-item"
                         :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
-                        :menu="actionItems"
-                        :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
+                        :items="actionItems"
                         :disabled="!selectedItem || !hasManagePermission"
                         @select="onSelectAction"
-                    />
+                    >
+                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.ACTION') }}
+                    </p-select-dropdown>
                 </template>
             </p-toolbox>
             <escalation-policy-data-table
@@ -266,9 +266,6 @@ export default {
 .escalation-policy-page {
     .table-wrapper {
         @apply bg-white border border-gray-200 rounded-lg;
-    }
-    .left-toolbox-dropdown-item {
-        min-width: 6.5rem;
     }
 
     /* custom design-system component - p-toolbox */

@@ -2,9 +2,8 @@
     <div ref="containerRef"
          class="create-collector-step-1"
     >
-        <p-search :value="state.inputValue"
+        <p-search v-model="state.searchValue"
                   @search="handleSearch"
-                  @delete="handleDeleteInputValue"
         />
         <div class="contents-container">
             <step1-search-filter @selectRepository="handleChangeRepository" />
@@ -101,7 +100,7 @@ const collectorFormState = collectorFormStore.$state;
 
 
 const state = reactive({
-    inputValue: '',
+    searchValue: '',
     pluginList: [] as RepositoryPluginModel[],
     loading: false,
     selectedRepository: '',
@@ -116,7 +115,7 @@ const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
     try {
         state.loading = true;
         pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
-            .setFilters([{ v: state.inputValue }]);
+            .setFilters([{ v: state.searchValue }]);
 
         const params = {
             service_type: 'inventory.Collector',
@@ -148,9 +147,11 @@ const loadMorePlugin = async () => {
     connectObserver();
 };
 
-const handleSearch = async (keyword) => {
-    if (!state.inputValue && !keyword) return;
-    await updateKeyword(keyword);
+const handleSearch = async (value) => {
+    disconnectObserver();
+    state.searchValue = value;
+    state.pluginList = await getPlugins();
+    connectObserver();
 };
 const handleClickNextStep = (item: RepositoryPluginModel) => {
     emit('update:currentStep', 2);
@@ -158,18 +159,6 @@ const handleClickNextStep = (item: RepositoryPluginModel) => {
 };
 const handleChangeRepository = (value:string) => {
     state.selectedRepository = value;
-};
-
-const handleDeleteInputValue = async () => {
-    if (!state.inputValue) return;
-    await updateKeyword('');
-};
-
-const updateKeyword = async (keyword) => {
-    disconnectObserver();
-    state.inputValue = keyword;
-    state.pluginList = await getPlugins();
-    connectObserver();
 };
 
 const pluginListContainerRef = ref<HTMLElement|null>(null);
@@ -189,7 +178,6 @@ watch([() => collectorFormState.provider, () => state.selectedRepository], async
 onMounted(() => {
     collectorFormStore.$reset();
 });
-
 </script>
 
 <style lang="postcss" scoped>

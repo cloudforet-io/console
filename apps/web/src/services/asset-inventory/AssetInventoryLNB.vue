@@ -70,10 +70,7 @@ export default defineComponent({
                         label: d.name,
                         id: d.cloud_service_type_key,
                         to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
-                        favoriteOptions: {
-                            type: FAVORITE_TYPE.CLOUD_SERVICE,
-                            id: d.cloud_service_type_key,
-                        },
+                        favoriteType: FAVORITE_TYPE.CLOUD_SERVICE,
                     });
                 });
                 results.push({ type: 'divider' });

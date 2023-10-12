@@ -6,14 +6,8 @@ export const FAVORITE_TYPE = {
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
     DASHBOARD: 'DASHBOARD',
-    COST_ANALYSIS: 'COST_ANALYSIS',
 } as const;
 export type FavoriteType = typeof FAVORITE_TYPE[keyof typeof FAVORITE_TYPE];
-
-export interface FavoriteOptions {
-    type: FavoriteType;
-    id?: string;
-}
 
 export interface FavoriteConfig {
     itemType: FavoriteType;
@@ -34,7 +28,6 @@ export interface FavoriteHasLoaded {
     [FAVORITE_TYPE.PROJECT]: boolean;
     [FAVORITE_TYPE.PROJECT_GROUP]: boolean;
     [FAVORITE_TYPE.DASHBOARD]: boolean;
-    [FAVORITE_TYPE.COST_ANALYSIS]: boolean;
 }
 
 export interface FavoriteState {
@@ -43,7 +36,6 @@ export interface FavoriteState {
     projectGroupItems: FavoriteConfig[]|null;
     cloudServiceItems: FavoriteConfig[]|null;
     dashboardItems: FavoriteConfig[]|null;
-    costAnalysisItems: FavoriteConfig[]|null;
     isLoading: FavoriteHasLoaded;
 }
 
@@ -53,5 +45,4 @@ export const FAVORITE_TYPE_TO_STATE_NAME = {
     [FAVORITE_TYPE.PROJECT_GROUP]: 'projectGroupItems',
     [FAVORITE_TYPE.CLOUD_SERVICE]: 'cloudServiceItems',
     [FAVORITE_TYPE.DASHBOARD]: 'dashboardItems',
-    [FAVORITE_TYPE.COST_ANALYSIS]: 'costAnalysisItems',
 };

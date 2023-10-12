@@ -1,12 +1,12 @@
 import type { ArgTypes } from '@storybook/addons';
 
+import { getFilterableDropdownArgTypes } from '@/inputs/dropdown/filterable-dropdown/story-helper';
 import { getKeyItemSets, getValueHandlerMap } from '@/inputs/dropdown/filterable-query-dropdown/mock';
-import { getSelectDropdownArgTypes } from '@/inputs/dropdown/select-dropdown/story-helper';
 import { getTextInputArgTypes } from '@/inputs/input/text-input/story-helper';
 
 export const getQueryInputArgTypes = (): ArgTypes => {
     const textInputArgTypes = getTextInputArgTypes();
-    const filterableDropdownArgTypes = getSelectDropdownArgTypes();
+    const filterableDropdownArgTypes = getFilterableDropdownArgTypes();
     const keyItemSets = getKeyItemSets(5, 1);
     return {
         value: textInputArgTypes.value,

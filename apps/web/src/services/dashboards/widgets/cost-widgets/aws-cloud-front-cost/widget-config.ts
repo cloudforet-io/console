@@ -2,9 +2,7 @@ import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
+    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames,
     getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
@@ -29,7 +27,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     options: {
         cost_group_by: COST_GROUP_BY.PROJECT,
         chart_type: CHART_TYPE.STACKED_COLUMN,
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.ACCUMULATED,
         legend_options: {
             enabled: true,
             show_at: 'chart',
@@ -42,40 +40,17 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
             enabled: true,
             page_size: 5,
         },
-        filters: {
-            cost_product: [{ k: 'product', v: 'AmazonCloudFront', o: '=' }],
-        },
-    },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'service_account',
-            'region',
-        ),
     },
     options_schema: {
-        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
-            'cost_product',
-            'project',
-            'service_account',
-            'region',
-        )],
-        fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
-        non_inheritable_properties: ['cost_group_by'],
+        default_properties: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'region', 'cost_account')],
+        fixed_properties: ['cost_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
-                ...getWidgetFilterOptionsSchema(
-                    'cost_product',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'region',
-                ),
+                ...getWidgetOptionsSchema('cost_group_by'),
+                ...getWidgetFilterOptionsSchema('project', 'service_account', 'project_group', 'region', 'cost_account'),
             },
-            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'project_group', 'region')],
+            order: ['cost_group_by', ...getWidgetFilterSchemaPropertyNames('project', 'service_account', 'project_group', 'region', 'cost_account')],
         },
     },
 };

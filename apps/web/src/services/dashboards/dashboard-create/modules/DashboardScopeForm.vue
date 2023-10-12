@@ -2,9 +2,7 @@
     <section class="dashboard-scope-form">
         <p-field-title>{{ $t('DASHBOARDS.CREATE.LABEL_SCOPE') }}</p-field-title>
         <div class="dashboard-scope-wrapper">
-            <p-radio-group direction="vertical"
-                           class="dashboard-scope-radio-group"
-            >
+            <p-radio-group direction="vertical">
                 <p-radio :selected="isDomainScope"
                          :disabled="!workspaceManagePermission"
                          @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
@@ -105,13 +103,8 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .dashboard-scope-form {
-    @apply flex flex-col mt-8;
-    gap: 0.5rem;
+    @apply mt-8;
     .dashboard-scope-wrapper {
-        .dashboard-scope-radio-group {
-            @apply flex flex-col;
-            gap: 0.5rem;
-        }
         .project-select-dropdown {
             @apply mt-1 ml-6;
         }

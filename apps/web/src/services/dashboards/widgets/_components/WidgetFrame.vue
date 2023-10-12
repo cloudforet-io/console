@@ -1,143 +1,3 @@
-<script setup lang="ts">
-import {
-    reactive, computed,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router/types/router';
-
-import {
-    PLink, PButton, PDivider, PIconButton, PI, PTooltip,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import dayjs from 'dayjs';
-
-import { i18n } from '@/translations';
-
-import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
-import type { Currency } from '@/store/modules/settings/type';
-
-import { getUUID } from '@/lib/component-util/getUUID';
-
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-
-import { red } from '@/styles/colors';
-
-import type { DateRange } from '@/services/dashboards/config';
-import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-
-
-export interface WidgetFrameProps {
-    title: TranslateResult;
-    size: WidgetSize;
-    width?: number;
-    widgetLink?: string;
-    widgetLocation?: Location;
-    widgetConfigId?: string;
-    dateRange?: DateRange;
-    noData?: boolean;
-    printMode?: boolean;
-    selectedDates?: string[];
-    currency?: Currency;
-    editMode?: boolean;
-    errorMode?: boolean;
-    disableExpandIcon?: boolean;
-    disableEditIcon?: boolean;
-    disableDeleteIcon?: boolean;
-    disableFullSize?: boolean;
-    disableViewMode?: boolean;
-    isOnlyFullSize?: boolean;
-    widgetKey: string;
-    overflowY?: string;
-    theme?: WidgetTheme;
-    nonInheritOptionsTooltipText?: string;
-}
-
-interface IconConfig {
-    isAvailable: boolean;
-    name: string;
-    handleClick: () => void;
-}
-const { i18nDayjs } = useI18nDayjs();
-
-const props = withDefaults(defineProps<WidgetFrameProps>(), {
-    width: undefined,
-    widgetLink: undefined,
-    widgetLocation: undefined,
-    widgetConfigId: undefined,
-    dateRange: () => ({ start: undefined, end: undefined }),
-    selectedDates: () => [],
-    currency: undefined,
-    overflowY: undefined,
-    theme: undefined,
-    nonInheritOptionsTooltipText: undefined,
-});
-
-const emit = defineEmits<{(event: 'click-delete'): void;
-    (event: 'click-expand'): void;
-    (event: 'click-edit'): void;
-}>();
-
-const state = reactive({
-    isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
-    dateLabel: computed<TranslateResult|undefined>(() => {
-        const start = props.dateRange?.start;
-        const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
-        if (endDayjs) {
-            let endText;
-            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
-            if (isCurrentMonth) endText = dayjs.utc().format('YY-MM-DD');
-            else endText = endDayjs.endOf('month').format('YY-MM-DD');
-            if (start) {
-                const startText = dayjs.utc(start).format('YY-MM-DD');
-                return `${startText} ~ ${endText}`;
-            }
-            return endText;
-        }
-        if (start && !endDayjs) {
-            const today = dayjs();
-            const diff = today.diff(start, 'day', true);
-            if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
-            if (diff >= 6 && diff < 7) return i18n.t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
-            return i18nDayjs.value(start).from(today.subtract(1, 'day'));
-        }
-        return undefined;
-    }),
-    currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
-    isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
-    //
-    editModeIconButtonList: computed<IconConfig[]>(() => [
-        {
-            isAvailable: !(props.disableFullSize || props.isOnlyFullSize),
-            name: state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all',
-            handleClick: () => {
-                emit('click-expand');
-            },
-        },
-        {
-            isAvailable: !props.disableEditIcon,
-            name: 'ic_edit',
-            handleClick: handleEditButtonClick,
-        },
-        {
-            isAvailable: !props.disableDeleteIcon,
-            name: 'ic_delete',
-            handleClick: () => {
-                emit('click-delete');
-            },
-        },
-    ]),
-});
-
-const handleEditButtonClick = () => {
-    emit('click-edit');
-};
-const handleClickViewModeButton = () => {
-    emit('click-expand');
-};
-</script>
-
 <template>
     <div class="widget-frame"
          :class="{ full: state.isFull, 'edit-mode': props.editMode }"
@@ -193,7 +53,7 @@ const handleClickViewModeButton = () => {
                     <p-divider v-if="state.isDivided"
                                :vertical="true"
                     />
-                    <label class="widget-footer-label currency">{{ state.currencyLabel }}</label>
+                    <label class="widget-footer-label">{{ state.currencyLabel }}</label>
                     <p-divider v-if="props.nonInheritOptionsTooltipText"
                                :vertical="true"
                     />
@@ -211,7 +71,6 @@ const handleClickViewModeButton = () => {
                 <div class="footer-right">
                     <slot name="footer-right">
                         <p-link v-if="(props.widgetLink || props.widgetLocation) && !props.printMode && !props.editMode"
-                                new-tab
                                 :href="props.widgetLink"
                                 :to="props.widgetLocation"
                                 :action-icon="ACTION_ICON.INTERNAL_LINK"
@@ -238,8 +97,172 @@ const handleClickViewModeButton = () => {
                 </template>
             </div>
         </div>
+        <delete-modal :visible.sync="state.visibleDeleteModal"
+                      :header-title="$t('DASHBOARDS.WIDGET.DELETE_TITLE')"
+                      :contents="$t('DASHBOARDS.WIDGET.DELETE_CONTENTS')"
+                      @confirm="handleDeleteModalConfirm"
+        />
+        <dashboard-widget-edit-modal :widget-config-id="props.widgetConfigId"
+                                     :visible.sync="state.visibleEditModal"
+                                     :widget-key="props.widgetKey"
+                                     @refresh="emit('refresh')"
+        />
     </div>
 </template>
+
+<script setup lang="ts">
+import {
+    reactive, computed,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router/types/router';
+
+import {
+    PLink, PButton, PDivider, PIconButton, PI, PTooltip,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import dayjs from 'dayjs';
+
+import { i18n } from '@/translations';
+
+import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+
+import { getUUID } from '@/lib/component-util/getUUID';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+
+import { red } from '@/styles/colors';
+
+import type { DateRange } from '@/services/dashboards/config';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import DashboardWidgetEditModal from '@/services/dashboards/widgets/_components/DashboardWidgetEditModal.vue';
+import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+
+
+interface WidgetFrameProps {
+    title: TranslateResult;
+    size: WidgetSize;
+    width?: number;
+    widgetLink?: string;
+    widgetLocation?: Location;
+    widgetConfigId?: string;
+    dateRange?: DateRange;
+    noData?: boolean;
+    printMode?: boolean;
+    selectedDates?: string[];
+    currency?: Currency;
+    editMode?: boolean;
+    errorMode?: boolean;
+    disableExpandIcon?: boolean;
+    disableEditIcon?: boolean;
+    disableDeleteIcon?: boolean;
+    disableFullSize?: boolean;
+    disableViewMode?: boolean;
+    isOnlyFullSize?: boolean;
+    widgetKey: string;
+    overflowY?: string;
+    refreshOnResize?: boolean;
+    theme?: WidgetTheme;
+    nonInheritOptionsTooltipText?: string;
+}
+
+interface IconConfig {
+    isAvailable: boolean;
+    name: string;
+    handleClick: () => void;
+}
+const { i18nDayjs } = useI18nDayjs();
+
+const props = withDefaults(defineProps<WidgetFrameProps>(), {
+    width: undefined,
+    widgetLink: undefined,
+    widgetLocation: undefined,
+    widgetConfigId: undefined,
+    dateRange: () => ({ start: undefined, end: undefined }),
+    selectedDates: () => [],
+    currency: undefined,
+    overflowY: undefined,
+    theme: undefined,
+    nonInheritOptionsTooltipText: undefined,
+});
+
+const emit = defineEmits(['refresh']);
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const widgetFormStore = useWidgetFormStore();
+const state = reactive({
+    isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
+    dateLabel: computed<TranslateResult|undefined>(() => {
+        const start = props.dateRange?.start;
+        const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
+        if (endDayjs) {
+            let endText;
+            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
+            if (isCurrentMonth) endText = dayjs.utc().format('YY-MM-DD');
+            else endText = endDayjs.endOf('month').format('YY-MM-DD');
+            if (start) {
+                const startText = dayjs.utc(start).format('YY-MM-DD');
+                return `${startText} ~ ${endText}`;
+            }
+            return endText;
+        }
+        if (start && !endDayjs) {
+            const today = dayjs();
+            const diff = today.diff(start, 'day', true);
+            if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
+            if (diff >= 6 && diff < 7) return i18n.t('DASHBOARDS.WIDGET.DATE_PAST_7_DAYS');
+            return i18nDayjs.value(start).from(today.subtract(1, 'day'));
+        }
+        return undefined;
+    }),
+    currencyLabel: computed<string|undefined>(() => (props.currency ? `${CURRENCY_SYMBOL[props.currency]}${props.currency}` : undefined)),
+    isDivided: computed<boolean|undefined>(() => (state.dateLabel && !props.noData && state.currencyLabel)),
+    visibleEditModal: false,
+    visibleDeleteModal: false,
+    editModeIconButtonList: computed<IconConfig[]>(() => [
+        {
+            isAvailable: !(props.disableFullSize || props.isOnlyFullSize),
+            name: state.isFull ? 'ic_arrows-collapse-all' : 'ic_arrows-expand-all',
+            handleClick: () => {
+                dashboardDetailStore.toggleWidgetSize(props.widgetKey);
+                if (props.refreshOnResize) emit('refresh');
+            },
+        },
+        {
+            isAvailable: !props.disableEditIcon,
+            name: 'ic_edit',
+            handleClick: handleEditButtonClick,
+        },
+        {
+            isAvailable: !props.disableDeleteIcon,
+            name: 'ic_delete',
+            handleClick: () => {
+                state.visibleDeleteModal = true;
+            },
+        },
+    ]),
+});
+
+const handleEditButtonClick = () => { state.visibleEditModal = true; };
+const handleDeleteModalConfirm = () => {
+    dashboardDetailStore.deleteWidget(props.widgetKey);
+    state.visibleDeleteModal = false;
+};
+const handleClickViewModeButton = () => {
+    widgetFormStore.$patch({
+        widgetKey: props.widgetKey,
+        theme: props.theme,
+    });
+    dashboardDetailStore.$patch({
+        widgetViewModeModalVisible: true,
+    });
+};
+</script>
 
 <style lang="postcss" scoped>
 .widget-frame {
@@ -328,10 +351,6 @@ const handleClickViewModeButton = () => {
                     color: theme('colors.gray.700');
                     line-height: 1.25;
                     margin: 0;
-
-                    &.currency {
-                        @apply text-gray-500;
-                    }
                 }
                 .p-divider {
                     &.vertical {
@@ -363,7 +382,8 @@ const handleClickViewModeButton = () => {
     }
     .edit-mode-cover {
         position: absolute;
-        right: 0;
+        width: 100%;
+        height: 100%;
         padding: 0.75rem;
         .button-group {
             @apply flex gap-2 flex-wrap justify-end;

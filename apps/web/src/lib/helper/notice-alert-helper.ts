@@ -10,7 +10,7 @@ import Vue from 'vue';
 export const showErrorMessage = (errorTitle, error) => {
     let errorMsg = '';
     if (error.message) errorMsg = error.message;
-    else if (error.response) { errorMsg = error.response.data.detail.message; } else { errorMsg = error; }
+    else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
     if (Vue) {
         Vue.notify({
             group: 'toastTopCenter',
@@ -73,19 +73,6 @@ export const hideLoadingMessage = () => {
         Vue.notify({
             group: 'toastTopCenter',
             clean: true,
-        });
-    }
-};
-
-export const showInfoMessage = (infoTitle, infoText) => {
-    if (Vue) {
-        Vue.notify({
-            group: 'toastTopCenter',
-            type: 'info',
-            title: infoTitle,
-            text: infoText,
-            duration: 5000,
-            speed: 1000,
         });
     }
 };

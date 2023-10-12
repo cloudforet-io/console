@@ -31,11 +31,12 @@
                     {{ $t('IDENTITY.USER.MAIN.ADD') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item"
-                                   :menu="dropdownMenu"
-                                   :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
+                                   :items="dropdownMenu"
                                    :disabled="manageDisabled"
                                    @select="handleSelectDropdown"
-                />
+                >
+                    {{ $t('IDENTITY.USER.MAIN.ACTION') }}
+                </p-select-dropdown>
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
@@ -362,9 +363,10 @@ export default {
                 }
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
             } catch (e: any) {
-                if (e.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH') {
-                    showErrorMessage(e.message, '');
-                } else if (e.code === 'ERROR_PASSWORD_NOT_CHANGED') {
+                const errorDetail = e.axiosError.response.data.detail;
+                if (errorDetail.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH') {
+                    showErrorMessage(errorDetail.message, '');
+                } else if (errorDetail.code === 'ERROR_PASSWORD_NOT_CHANGED') {
                     ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_SAME_PASSWORD'));
                 } else {
                     ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
@@ -417,7 +419,6 @@ export default {
 
 <style lang="postcss" scoped>
 .left-toolbox-item {
-    min-width: 6.5rem;
     margin-left: 1rem;
     &:last-child {
         flex-grow: 1;

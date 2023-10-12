@@ -10,7 +10,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.DASHBOARDS',
         icon: 'ic_service_dashboard',
         needPermissionByRole: true,
-        highlightTag: 'new',
     },
     [MENU_ID.DASHBOARDS_PROJECT]: {
         translationId: 'MENU.DASHBOARDS_PROJECT',
@@ -51,6 +50,10 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.COST_EXPLORER]: {
         translationId: 'MENU.COST_EXPLORER',
         icon: 'ic_service_cost-explorer',
+        needPermissionByRole: true,
+    },
+    [MENU_ID.COST_EXPLORER_DASHBOARD]: {
+        translationId: 'MENU.COST_EXPLORER_DASHBOARD',
         needPermissionByRole: true,
     },
     [MENU_ID.COST_EXPLORER_COST_ANALYSIS]: {
@@ -125,9 +128,11 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     },
     [MENU_ID.INFO]: {
         translationId: 'MENU.INFO',
+        isNew: true,
         icon: 'ic_service_info',
     },
     [MENU_ID.INFO_NOTICE]: {
         translationId: 'MENU.INFO_NOTICE',
+        isNew: true,
     },
 });

@@ -8,37 +8,36 @@
             <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                       #title-left-extra
             >
-                <div class="title-left-extra">
-                    <p-i name="ic_globe-filled"
-                         width="1rem"
-                         height="1rem"
-                         :color="PUBLIC_ICON_COLOR"
-                    />
-                </div>
+                <p-i name="ic_globe-filled"
+                     width="1rem"
+                     height="1rem"
+                     :color="PUBLIC_ICON_COLOR"
+                />
             </template>
             <template v-if="dashboardDetailState.name"
                       #title-right-extra
             >
-                <div class="title-right-extra">
-                    <div class="favorite-button-wrapper">
+                <span class="dashboard-title-icon-buttons-wrapper">
+                    <div class="favorite-wrapper">
                         <favorite-button :item-id="props.dashboardId"
                                          :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                          scale="0.8"
                         />
                     </div>
                     <p-icon-button name="ic_edit-text"
-                                   size="md"
+                                   width="1.5rem"
+                                   height="1.5rem"
                                    :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_delete"
-                                   size="md"
-
+                                   width="1.5rem"
+                                   height="1.5rem"
                                    :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
                                    class="delete-button"
                                    @click="handleVisibleDeleteModal"
                     />
-                </div>
+                </span>
             </template>
             <template #extra>
                 <dashboard-control-buttons v-if="state.hasManagePermission"
@@ -82,7 +81,8 @@
 
 <script setup lang="ts">
 import {
-    onUnmounted, reactive, ref, watch,
+    computed, onMounted, onUnmounted,
+    reactive, ref, watch,
 } from 'vue';
 
 import {
@@ -96,12 +96,20 @@ import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
+import type { RouteQueryString } from '@/lib/router-query-string';
+import {
+    objectToQueryString, primitiveToQueryString,
+    queryStringToObject, queryStringToString,
+    replaceUrlQuery,
+} from '@/lib/router-query-string';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import { gray } from '@/styles/colors';
 
+import type { RefreshIntervalOption } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import DashboardControlButtons from '@/services/dashboards/dashboard-detail/modules/DashboardControlButtons.vue';
 import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules/DashboardDeleteModal.vue';
@@ -133,11 +141,34 @@ const state = reactive({
     cloneModalVisible: false,
 });
 
+const queryState = reactive({
+    variables: computed(() => dashboardDetailState.variables),
+    settings: computed(() => dashboardDetailState.settings),
+    urlQueryString: computed(() => {
+        const result = { variables: objectToQueryString(queryState.variables) } as Record<string, RouteQueryString>;
+        if (queryState.settings.date_range.enabled) {
+            result.dateRange = objectToQueryString({
+                start: queryState.settings.date_range.start,
+                end: queryState.settings.date_range.end,
+            });
+        }
+        if (queryState.settings.currency.enabled) {
+            result.currency = objectToQueryString({
+                value: queryState.settings.currency.value,
+            });
+        }
+        if (queryState.settings.refresh_interval_option) {
+            result.refresh_interval_option = primitiveToQueryString(queryState.settings.refresh_interval_option);
+        }
+        return result;
+    }),
+});
+
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
-const getDashboardData = async (dashboardId: string) => {
+const getDashboardData = async (dashboardId: string, force = false) => {
     try {
-        await dashboardDetailStore.getDashboardInfo(dashboardId, true);
+        await dashboardDetailStore.getDashboardInfo(dashboardId, force);
     } catch (e) {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
@@ -187,62 +218,114 @@ const handleUpdateLabels = async (labels: string[]) => {
     }
 };
 
+/* init */
+let urlQueryStringWatcherStop;
+const init = async () => {
+    const currentQuery = SpaceRouter.router.currentRoute.query;
+    const useQueryValue = {
+        variables: queryStringToObject(currentQuery.variables),
+        dateRange: queryStringToObject(currentQuery.dateRange),
+        currency: queryStringToObject(currentQuery.currency),
+        refresh_interval_option: queryStringToString(currentQuery.refresh_interval_option) as RefreshIntervalOption,
+    };
 
-watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
-    /* NOTE: The dashboard data is reset in three cases.
-        1. the dashboard is changed from project dashboard to domain dashboard
-        2. vice versa
-        3. first entering case
-    * This is because in case of project dashboard, there are some different variables settings, so it is not safe to reuse dashboard store data with domain dashboard.
-    * But in case of the same type of dashboard, the dashboard store must be reused to smoothly update the dashboard data without blinking.
-     */
-    if (dashboardId && !prevDashboardId) { // this includes all three cases
-        dashboardDetailStore.$reset();
+    if (useQueryValue.variables) {
+        dashboardDetailStore.$patch((_state) => {
+            _state.variables = useQueryValue.variables;
+        });
     }
-    await getDashboardData(dashboardId);
-}, { immediate: true });
+    if (useQueryValue.dateRange) {
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                date_range: {
+                    enabled: true,
+                    ...useQueryValue.dateRange,
+                },
+            };
+        });
+    }
+    if (useQueryValue.currency) {
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                currency: {
+                    enabled: true,
+                    ...useQueryValue.currency,
+                },
+            };
+        });
+    }
+    if (useQueryValue.refresh_interval_option) {
+        dashboardDetailStore.$patch((_state) => {
+            _state.settings = {
+                ..._state.settings,
+                refresh_interval_option: useQueryValue.refresh_interval_option,
+            };
+        });
+    }
+
+    urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
+        replaceUrlQuery(urlQueryString);
+    }, { immediate: true });
+};
+
+(async () => {
+    await getDashboardData(props.dashboardId, true);
+    await init();
+})();
+
+onUnmounted(() => {
+    if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
+});
+
+watch(() => props.dashboardId, (_dashboardId) => {
+    getDashboardData(_dashboardId);
+});
 
 onUnmounted(() => {
     dashboardDetailStore.revertDashboardData();
 });
 
+onMounted(() => {
+    /*
+    Empty widget data map which is used in DashboardWidgetContainer to reuse data and not to call api when going to customize page.
+     */
+    dashboardDetailStore.$patch((_state) => {
+        _state.widgetDataMap = {};
+    });
+});
 </script>
 
 <style lang="postcss" scoped>
 .p-heading {
     margin-bottom: 0.75rem;
 }
-.dashboard-detail-page {
-    .title-left-extra {
-        @apply inline-block;
-        height: 2rem;
-        margin-top: 0.075rem;
+.dashboard-title-icon-buttons-wrapper {
+    display: inline-flex;
+    gap: 0.5rem;
+    align-items: center;
+    .favorite-wrapper {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2rem;
     }
-    .title-right-extra {
-        @apply flex-shrink-0 inline-flex items-center;
-        margin-bottom: -0.25rem;
-        gap: 0.5rem;
-        .favorite-button-wrapper {
-            @apply flex items-center justify-center;
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-    }
-    .divider {
-        @apply mb-6;
-    }
-    .filter-box {
-        @apply flex justify-between items-start mb-4;
-    }
-    .dashboard-selectors {
-        @apply relative flex justify-between items-start z-10;
-        padding-bottom: 1.25rem;
+}
+.divider {
+    @apply mb-6;
+}
+.filter-box {
+    @apply flex justify-between items-start mb-4;
+}
+.dashboard-selectors {
+    @apply relative flex justify-between items-start z-10;
+    padding-bottom: 1.25rem;
 
-        .variable-selector-wrapper {
-            @apply relative flex items-center flex-wrap;
-            gap: 0.5rem;
-            padding-right: 1rem;
-        }
+    .variable-selector-wrapper {
+        @apply relative flex items-center flex-wrap;
+        gap: 0.5rem;
+        padding-right: 1rem;
     }
 }
 </style>

@@ -50,8 +50,8 @@
                     >
                         {{ urgency.label }}
                     </p-radio>
-                    <p-select-dropdown :selected.sync="selectedUrgency"
-                                       :menu="urgencyList"
+                    <p-select-dropdown v-model="selectedUrgency"
+                                       :items="urgencyList"
                     />
                 </div>
             </div>
@@ -59,28 +59,22 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}
                 </p>
-                <p-select-dropdown class="user-search-dropdown"
-                                   show-select-marker
-                                   :menu="userItems"
-                                   :selected.sync="selectedAssignee"
-                                   is-filterable
-                                   show-delete-all-button
-                                   index-mode
-                                   reset-selected-on-unmounted
+                <p-filterable-dropdown class="user-search-dropdown"
+                                       show-select-marker
+                                       :menu="userItems"
+                                       :selected.sync="selectedAssignee"
                 />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') }}
                 </p>
-                <p-select-dropdown class="user-search-dropdown"
-                                   :menu="userItems"
-                                   :selected.sync="selectedResponder"
-                                   multi-selectable
-                                   appearance-type="stack"
-                                   show-select-marker
-                                   is-filterable
-                                   show-delete-all-button
+                <p-filterable-dropdown class="user-search-dropdown"
+                                       :menu="userItems"
+                                       :selected.sync="selectedResponder"
+                                       multi-selectable
+                                       appearance-type="stack"
+                                       show-select-marker
                 />
             </div>
             <div class="form-box additional-information">
@@ -118,7 +112,7 @@ import {
 } from 'vue';
 
 import {
-    PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown,
+    PToggleButton, PRadio, PButton, PCheckbox, PSelectDropdown, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
@@ -148,6 +142,7 @@ export default {
         PButton,
         PCheckbox,
         PSelectDropdown,
+        PFilterableDropdown,
     },
     props: {
         actions: {
@@ -214,15 +209,15 @@ export default {
                     };
                 },
             }),
-            selectedAssignee: computed<MenuItem[]|undefined>({
+            selectedAssignee: computed<MenuItem[]>({
                 get() {
                     const assignee: string = props.actions.change_assignee;
-                    return assignee ? [{ name: assignee, label: assignee }] : undefined;
+                    return assignee ? [{ name: assignee, label: assignee }] : [];
                 },
                 set(items) {
                     state.proxyActions = {
                         ...state.proxyActions,
-                        change_assignee: items && items[0]?.name,
+                        change_assignee: items[0]?.name,
                     };
                 },
             }),

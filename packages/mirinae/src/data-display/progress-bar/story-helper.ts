@@ -112,24 +112,6 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    height: {
-        name: 'height',
-        type: { name: 'string' },
-        description: 'Height of progress bar',
-        defaultValue: 'undefined',
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'undefined',
-            },
-        },
-        control: {
-            type: 'text',
-        },
-    },
     /* slots */
     labelSlot: {
         name: 'label',

@@ -20,7 +20,7 @@
         <p-select-dropdown :selected="selectedTextStyle"
                            class="menu-dropdown text-style"
                            style-type="transparent"
-                           :menu="textStyleItems"
+                           :items="textStyleItems"
                            @select="handleTextStyleSelect"
         >
             <template #menu-item--format="{item}">
@@ -36,24 +36,22 @@
                    vertical
         />
 
-        <div class="text-align-wrapper">
-            <p-select-dropdown :selected="selectedTextAlign"
-                               class="menu-dropdown"
-                               style-type="transparent"
-                               :menu="textAlignItems"
-                               @select="handleTextAlignSelect"
-            >
-                <template #menu-item--format="{item}">
-                    <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
-                    {{ item.label }}
-                </template>
-                <template #dropdown-button>
-                    <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]"
-                         color="inherit"
-                    />
-                </template>
-            </p-select-dropdown>
-        </div>
+        <p-select-dropdown :selected="selectedTextAlign"
+                           class="menu-dropdown"
+                           style-type="transparent"
+                           :items="textAlignItems"
+                           @select="handleTextAlignSelect"
+        >
+            <template #default>
+                <p-i :name="TEXT_ALIGN_ICONS[selectedTextAlign]"
+                     color="inherit"
+                />
+            </template>
+            <template #menu-item--format="{item}">
+                <p-i :name="TEXT_ALIGN_ICONS[item.name]" />
+                {{ item.label }}
+            </template>
+        </p-select-dropdown>
 
         <p-divider class="menu-divider"
                    vertical
@@ -318,22 +316,15 @@ export default defineComponent<Props>({
         margin: 0.25rem 0.5rem;
     }
 
-    .text-align-wrapper {
-        @apply flex items-center;
-    }
-
-    .menu-dropdown {
-        &.text-style {
-            min-width: 7.5rem;
-        }
-    }
-
     .menu-button, .menu-dropdown {
         &:not(:first-of-type) {
             margin-left: 0.125rem;
         }
         &:not(:last-of-type) {
             margin-right: 0.125rem;
+        }
+        &.text-style {
+            width: 110px;
         }
 
         @mixin text-style;
@@ -357,6 +348,27 @@ export default defineComponent<Props>({
         }
 
         &:active:not(.disabled), &.selected:not(.disabled) {
+            @apply bg-gray-700 text-white outline-none;
+        }
+    }
+
+    /* custom design-system component - p-select-dropdown */
+    :deep(.menu-dropdown.p-select-dropdown:not(.invalid):not(.disabled):not(.read-only).transparent) {
+        > .dropdown-button {
+            @apply rounded text-gray-900 outline-none;
+            padding-left: 0.5rem;
+
+            @media (hover: hover) {
+                &:hover {
+                    @apply bg-gray-200 text-gray-900;
+                }
+            }
+
+            &:active, &.selected {
+                @apply bg-gray-700 text-white outline-none;
+            }
+        }
+        &.active > .dropdown-button {
             @apply bg-gray-700 text-white outline-none;
         }
     }

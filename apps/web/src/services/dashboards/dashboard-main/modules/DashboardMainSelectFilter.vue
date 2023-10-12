@@ -11,7 +11,7 @@
             {{ view.label }}
         </p-select-status>
         <p-select-dropdown class="select-tablet"
-                           :menu="viewerFilterList"
+                           :items="viewerFilterList"
                            :selected="viewersStatus"
                            style-type="transparent"
                            @update:selected="handleChangeViewers"
@@ -31,7 +31,7 @@
                 {{ scope.label }}
             </p-select-status>
             <p-select-dropdown class="select-tablet"
-                               :menu="scopeFilterList"
+                               :items="scopeFilterList"
                                :selected="scopeStatus"
                                style-type="transparent"
                                @update:selected="handleChangeScope"

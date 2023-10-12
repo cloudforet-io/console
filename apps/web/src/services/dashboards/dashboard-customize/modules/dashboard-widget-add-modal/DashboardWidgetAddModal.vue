@@ -1,60 +1,5 @@
-<script setup lang="ts">
-import {
-    computed, reactive,
-} from 'vue';
-
-import { PButtonModal, PTab } from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { v4 as uuidv4 } from 'uuid';
-
-import { i18n } from '@/translations';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardDefaultWidgetTab.vue';
-import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-
-
-interface Props {
-    visible: boolean;
-}
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
-    (e: 'add-widget', dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo): void;
-}>();
-const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
-const state = reactive({
-    proxyVisible: useProxyValue('visible', props, emit),
-});
-const tabState = reactive({
-    tabs: computed<TabItem[]>(() => ([
-        { name: 'default-widget', label: i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_DEFAULT') },
-        // { name: 'custom-widget', label: i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_CUSTOM') },
-    ])),
-    activeTab: 'default-widget',
-});
-
-const handleConfirm = () => {
-    if (!widgetFormState.widgetConfigId || !widgetFormState.widgetTitle) return;
-    const widgetConfig = getWidgetConfig(widgetFormState.widgetConfigId);
-    const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
-        widget_key: uuidv4(),
-        widget_name: widgetFormState.widgetConfigId,
-        size: widgetConfig.sizes[0],
-        version: '1', // TODO: auto?
-        ...widgetFormStore.updatedWidgetInfo,
-    };
-    emit('add-widget', dashboardLayoutWidgetInfo);
-    state.proxyVisible = false;
-};
-
-</script>
-
 <template>
-    <p-button-modal :visible.sync="state.proxyVisible"
+    <p-button-modal :visible.sync="proxyVisible"
                     :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
@@ -72,7 +17,82 @@ const handleConfirm = () => {
         </template>
     </p-button-modal>
 </template>
+<script lang="ts">
+import type { SetupContext } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
 
+import { PButtonModal, PTab } from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import { v4 as uuidv4 } from 'uuid';
+
+import { i18n } from '@/translations';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import DashboardDefaultWidgetTab from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardDefaultWidgetTab.vue';
+import { useWidgetFormStore } from '@/services/dashboards/store/widget-form';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+
+
+interface Props {
+    visible: boolean;
+}
+export default defineComponent<Props>({
+    name: 'DashboardAddWidgetModal',
+    components: {
+        DashboardDefaultWidgetTab,
+        PTab,
+        PButtonModal,
+    },
+    props: {
+        visible: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }: SetupContext) {
+        const widgetFormStore = useWidgetFormStore();
+        const widgetFormState = widgetFormStore.$state;
+        const state = reactive({
+            proxyVisible: useProxyValue('visible', props, emit),
+        });
+        const tabState = reactive({
+            tabs: computed<TabItem[]>(() => ([
+                { name: 'default-widget', label: i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_DEFAULT') },
+                // { name: 'custom-widget', label: i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TAB_CUSTOM') },
+            ])),
+            activeTab: 'default-widget',
+        });
+
+        const handleConfirm = () => {
+            if (!widgetFormState.widgetConfigId || !widgetFormState.widgetTitle) return;
+            const widgetConfig = getWidgetConfig(widgetFormState.widgetConfigId);
+            const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
+                widget_key: uuidv4(),
+                widget_name: widgetFormState.widgetConfigId,
+                title: widgetFormState.widgetTitle,
+                size: widgetConfig.sizes[0],
+                version: '1', // TODO: auto?
+                inherit_options: widgetFormState.inheritOptions ?? {},
+                widget_options: widgetFormState.widgetOptions ?? {},
+                schema_properties: widgetFormState.schemaProperties ?? [],
+            };
+            emit('add-widget', dashboardLayoutWidgetInfo);
+            state.proxyVisible = false;
+        };
+
+        return {
+            ...toRefs(state),
+            widgetFormState,
+            tabState,
+            handleConfirm,
+        };
+    },
+});
+</script>
 <style lang="postcss" scoped>
 .dashboard-add-widget-modal {
     .p-tab {

@@ -5,16 +5,19 @@ export const COST_GROUP_BY_ITEM_MAP = {
     [COST_GROUP_BY.PROJECT]: { name: COST_GROUP_BY.PROJECT, label: 'Project' },
     [COST_GROUP_BY.PROVIDER]: { name: COST_GROUP_BY.PROVIDER, label: 'Provider' },
     [COST_GROUP_BY.SERVICE_ACCOUNT]: { name: COST_GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
+    [COST_GROUP_BY.CATEGORY]: { name: COST_GROUP_BY.CATEGORY, label: 'Category' },
+    [COST_GROUP_BY.RESOURCE_GROUP]: { name: COST_GROUP_BY.RESOURCE_GROUP, label: 'Resource Group' },
     [COST_GROUP_BY.PRODUCT]: { name: COST_GROUP_BY.PRODUCT, label: 'Product' },
     [COST_GROUP_BY.REGION]: { name: COST_GROUP_BY.REGION, label: 'Region' },
-    [COST_GROUP_BY.USAGE_TYPE]: { name: COST_GROUP_BY.USAGE_TYPE, label: 'Type' },
+    [COST_GROUP_BY.TYPE]: { name: COST_GROUP_BY.TYPE, label: 'Type' },
+    [COST_GROUP_BY.ACCOUNT]: { name: COST_GROUP_BY.ACCOUNT, label: 'Account ID' },
 } as const;
 
 export const ASSET_GROUP_BY_ITEM_MAP = {
     [ASSET_GROUP_BY.PROJECT]: { name: ASSET_GROUP_BY.PROJECT, label: 'Project' },
     [ASSET_GROUP_BY.PROVIDER]: { name: ASSET_GROUP_BY.PROVIDER, label: 'Provider' },
     [ASSET_GROUP_BY.REGION]: { name: ASSET_GROUP_BY.REGION, label: 'Region' },
-    [ASSET_GROUP_BY.COMPLIANCE_FRAMEWORK]: { name: ASSET_GROUP_BY.COMPLIANCE_FRAMEWORK, label: 'Compliance Framework' },
+    [ASSET_GROUP_BY.COMPLIANCE_TYPE]: { name: ASSET_GROUP_BY.COMPLIANCE_TYPE, label: 'Compliance Type' },
     // [ASSET_GROUP_BY.REQUIREMENT_ID]: { name: ASSET_GROUP_BY.REQUIREMENT_ID, label: 'Requirement ID' },
     [ASSET_GROUP_BY.SERVICE]: { name: ASSET_GROUP_BY.SERVICE, label: 'Service' },
     [ASSET_GROUP_BY.ACCOUNT]: { name: ASSET_GROUP_BY.ACCOUNT, label: 'AWS Account ID' },

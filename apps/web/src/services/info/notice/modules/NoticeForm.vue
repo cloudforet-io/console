@@ -1,207 +1,3 @@
-<script lang="ts" setup>
-import type { ComputedRef } from 'vue';
-import {
-    computed, reactive, watch,
-} from 'vue';
-
-import {
-    PPaneLayout, PFieldGroup, PTextInput, PRadio, PSelectDropdown, PCheckbox, PButton,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
-import type { Attachment } from '@/common/components/editor/extensions/image/type';
-import TextEditor from '@/common/components/editor/TextEditor.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useFileUploader } from '@/common/composables/file-uploader';
-import { useFormValidator } from '@/common/composables/form-validator';
-
-import type { NoticePostModel } from '@/services/info/notice/type';
-import { INFO_ROUTE } from '@/services/info/route-config';
-
-interface Props {
-    boardId?: string;
-    type?: NoticeFormType;
-    noticePostData?: Partial<NoticePostModel>;
-}
-interface DomainItem {
-    name: string;
-    label: string;
-}
-
-type NoticeFormType = 'CREATE' | 'EDIT';
-
-const props = withDefaults(defineProps<Props>(), {
-    boardId: undefined,
-    type: 'CREATE',
-    noticePostData: undefined,
-});
-
-const state = reactive({
-    hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
-    hasDomainRole: computed<boolean>(() => store.getters['user/hasDomainRole']),
-    userName: computed<string>(() => store.state.user.name),
-    isPinned: false,
-    isPopup: false,
-    attachments: [] as Attachment[],
-    isAllDomainSelected: !!store.getters['user/hasSystemRole'], // It's active only in root domain case
-    boardIdState: '',
-    domainList: [] as Array<DomainItem>,
-    selectedDomain: store.getters['user/hasSystemRole']
-        ? []
-        : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
-    postId: '',
-    domainName: '',
-});
-
-const {
-    forms: {
-        noticeTitle,
-        writerName,
-        contents,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-    isAllValid,
-} = useFormValidator({
-    noticeTitle: props.noticePostData?.title ?? '',
-    writerName: props.noticePostData?.writer || state.userName || '',
-    contents: props.noticePostData?.contents || '',
-}, {
-    noticeTitle(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.TITLE_REQUIRED'); },
-    writerName(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.WRITER_REQUIRED'); },
-    contents(value: string) {
-        return value.replace(emptyHtmlRegExp, '').length ? '' : i18n.t('INFO.NOTICE.FORM.CONTENT_REQUIRED');
-    },
-});
-
-const formData:ComputedRef = computed(() => ({
-    board_id: state.boardIdState,
-    title: noticeTitle.value,
-    writer: writerName.value,
-    contents: contents.value,
-    files: state.attachments.map(({ fileId }) => fileId) as string[],
-    options: {
-        is_pinned: state.isPinned,
-        is_popup: state.isPopup,
-    },
-}));
-
-const { fileUploader } = useFileUploader(computed(() => (state.isAllDomainSelected ? null : state.selectedDomain[0].name)));
-
-const handleConfirm = () => {
-    if (props.type === 'CREATE') handleCreateNotice();
-    if (props.type === 'EDIT') handleEditNotice();
-};
-
-const handleCreateNotice = async () => {
-    try {
-        await SpaceConnector.client.board.post.create({
-            ...formData.value,
-            domain_id: state.isAllDomainSelected ? null : state.selectedDomain[0].name,
-        });
-        showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
-        await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
-    }
-};
-const handleEditNotice = async () => {
-    try {
-        await SpaceConnector.client.board.post.update(
-            state.isAllDomainSelected
-                ? {
-                    ...formData.value,
-                    post_id: state.postId,
-                }
-                : {
-                    ...formData.value,
-                    domain_id: state.selectedDomain[0].name,
-                    post_id: state.postId,
-                },
-        );
-        showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
-        await SpaceRouter.router.back();
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_UPDATE_NOTICE'));
-    }
-};
-
-const handleClickAllDomainRadio = () => { state.isAllDomainSelected = true; };
-const handleClickSelectDomainRadio = () => { state.isAllDomainSelected = false; };
-
-const handleSelectDomain = (domain: Array<DomainItem>) => {
-    if (!state.isAllDomainSelected) {
-        state.selectedDomain = domain;
-    }
-};
-
-const getDomainList = async () => {
-    try {
-        const { results } = await SpaceConnector.client.identity.domain.list();
-        state.domainList = results.map((d) => ({
-            name: d.domain_id,
-            label: d.name,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.domainList = [];
-    }
-};
-
-const getBoardList = async () => {
-    try {
-        const { results } = await SpaceConnector.client.board.board.list({
-            domain_id: state.domainList.length ? state.domainList.map((d) => d.name)
-                : store.state.domain.domainId,
-        });
-        state.boardIdState = results.filter((d) => d.name === 'Notice')[0]?.board_id ?? '';
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.boardIdState = '';
-    }
-};
-
-watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
-    if (isAllDomain) state.selectedDomain = [];
-});
-
-watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
-    if (!Object.keys(d).length) return;
-    if (d?.domain_id) {
-        const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: d.domain_id });
-        state.domainName = name;
-    }
-
-    // INIT STATES
-    state.isPinned = d.options?.is_pinned ?? false;
-    state.isPopup = d.options?.is_popup ?? false;
-    state.attachments = d.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
-    state.isAllDomainSelected = !d?.domain_id;
-    state.boardIdState = d?.board_id ?? '';
-    state.selectedDomain = d?.domain_id
-        ? [{ name: d.domain_id, label: state.domainName || d.domain_id }]
-        : [];
-    state.postId = d.post_id ?? '';
-    setForm('writerName', d.writer);
-    setForm('noticeTitle', d.title);
-    setForm('contents', d.contents);
-});
-
-(async () => {
-    if (state.hasSystemRole) await getDomainList();
-    await getBoardList();
-})();
-</script>
-
 <template>
     <div class="notice-form">
         <p-pane-layout class="notice-form-wrapper">
@@ -217,33 +13,31 @@ watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
                     />
                 </template>
             </p-field-group>
-            <p-field-group v-if="state.hasSystemRole"
+            <p-field-group v-if="hasSystemRole"
                            class="notice-label-wrapper"
                            :label="$t('INFO.NOTICE.FORM.LABEL_VIEWER')"
                            required
             >
-                <p-radio :disabled="props.type === 'EDIT'"
-                         :selected="state.isAllDomainSelected"
+                <p-radio :disabled="type === 'EDIT'"
+                         :selected="isAllDomainSelected"
                          class="mr-4"
                          @change="handleClickAllDomainRadio"
                 >
                     <span>{{ $t('INFO.NOTICE.FORM.ALL_DOMAINS') }}</span>
                 </p-radio>
-                <p-radio :disabled="props.type === 'EDIT'"
-                         :selected="!state.isAllDomainSelected"
+                <p-radio :disabled="type === 'EDIT'"
+                         :selected="!isAllDomainSelected"
                          @change="handleClickSelectDomainRadio"
                 >
                     <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
                 </p-radio>
                 <br>
-                <p-select-dropdown class="mt-2 w-1/2"
-                                   :menu="state.domainList"
-                                   :selected="state.selectedDomain"
-                                   :disabled="state.isAllDomainSelected || props.type === 'EDIT'"
-                                   :placeholder="state.isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
-                                   is-filterable
-                                   show-delete-all-button
-                                   @update:selected="handleSelectDomain"
+                <p-filterable-dropdown class="mt-2 w-1/2"
+                                       :menu="domainList"
+                                       :selected="selectedDomain"
+                                       :disabled="isAllDomainSelected || type === 'EDIT'"
+                                       :placeholder="isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
+                                       @update:selected="handleSelectDomain"
                 />
             </p-field-group>
             <p-field-group class="notice-label-wrapper"
@@ -268,20 +62,20 @@ watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
             >
                 <template #default="{invalid}">
                     <text-editor :value="contents"
-                                 :attachments.sync="state.attachments"
+                                 :attachments.sync="attachments"
                                  :image-uploader="fileUploader"
                                  :invalid="invalid"
                                  @update:value="(d) => setForm('contents', d)"
                     />
                 </template>
             </p-field-group>
-            <div v-if="state.hasSystemRole || state.hasDomainRole"
+            <div v-if="hasSystemRole || hasDomainRole"
                  class="notice-create-options-wrapper"
             >
-                <p-checkbox v-model="state.isPinned">
+                <p-checkbox v-model="isPinned">
                     <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
                 </p-checkbox>
-                <p-checkbox v-model="state.isPopup">
+                <p-checkbox v-model="isPopup">
                     <span>{{ $t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
                 </p-checkbox>
             </div>
@@ -303,6 +97,245 @@ watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
         </div>
     </div>
 </template>
+
+<script lang="ts">
+import type { ComputedRef, PropType } from 'vue';
+import {
+    computed,
+    reactive, toRefs, watch,
+} from 'vue';
+
+import {
+    PPaneLayout, PFieldGroup, PTextInput, PRadio, PFilterableDropdown, PCheckbox, PButton,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import { emptyHtmlRegExp } from '@/common/components/editor/extensions/image/helper';
+import type { Attachment } from '@/common/components/editor/extensions/image/type';
+import TextEditor from '@/common/components/editor/TextEditor.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFileUploader } from '@/common/composables/file-uploader';
+import { useFormValidator } from '@/common/composables/form-validator';
+
+import type { NoticePostModel } from '@/services/info/notice/type';
+import { INFO_ROUTE } from '@/services/info/route-config';
+
+interface DomainItem {
+    name: string;
+    label: string;
+}
+
+type NoticeFormType = 'CREATE' | 'EDIT';
+
+export default {
+    name: 'NoticeForm',
+    components: {
+        TextEditor,
+        PPaneLayout,
+        PFieldGroup,
+        PTextInput,
+        PRadio,
+        PFilterableDropdown,
+        PCheckbox,
+        PButton,
+    },
+    props: {
+        boardId: {
+            type: String,
+            default: undefined,
+        },
+        type: {
+            default: 'CREATE',
+            type: String as PropType<NoticeFormType>,
+        },
+        noticePostData: {
+            default: () => {},
+            type: Object as PropType<Partial<NoticePostModel>>,
+        },
+    },
+    setup(props) {
+        const state = reactive({
+            hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
+            hasDomainRole: computed<boolean>(() => store.getters['user/hasDomainRole']),
+            userName: computed<string>(() => store.state.user.name),
+            isPinned: false,
+            isPopup: false,
+            attachments: [] as Attachment[],
+            isAllDomainSelected: !!store.getters['user/hasSystemRole'], // It's active only in root domain case
+            boardIdState: '',
+            domainList: [] as Array<DomainItem>,
+            selectedDomain: store.getters['user/hasSystemRole']
+                ? []
+                : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
+            postId: '',
+            domainName: '',
+        });
+
+        const {
+            forms: {
+                noticeTitle,
+                writerName,
+                contents,
+            },
+            setForm,
+            invalidState,
+            invalidTexts,
+            isAllValid,
+        } = useFormValidator({
+            noticeTitle: props.noticePostData?.title ?? '',
+            writerName: props.noticePostData?.writer || state.userName || '',
+            contents: props.noticePostData?.contents || '',
+        }, {
+            noticeTitle(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.TITLE_REQUIRED'); },
+            writerName(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.WRITER_REQUIRED'); },
+            contents(value: string) {
+                return value.replace(emptyHtmlRegExp, '').length ? '' : i18n.t('INFO.NOTICE.FORM.CONTENT_REQUIRED');
+            },
+        });
+
+        const formData:ComputedRef = computed(() => ({
+            board_id: state.boardIdState,
+            title: noticeTitle.value,
+            writer: writerName.value,
+            contents: contents.value,
+            files: state.attachments.map(({ fileId }) => fileId) as string[],
+            options: {
+                is_pinned: state.isPinned,
+                is_popup: state.isPopup,
+            },
+        }));
+
+        const { fileUploader } = useFileUploader(computed(() => (state.isAllDomainSelected ? null : state.selectedDomain[0].name)));
+
+        const handleConfirm = () => {
+            if (props.type === 'CREATE') handleCreateNotice();
+            if (props.type === 'EDIT') handleEditNotice();
+        };
+
+        const handleCreateNotice = async () => {
+            try {
+                await SpaceConnector.client.board.post.create({
+                    ...formData.value,
+                    domain_id: state.isAllDomainSelected ? null : state.selectedDomain[0].name,
+                });
+                showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
+                await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_CREATE_NOTICE'));
+            }
+        };
+        const handleEditNotice = async () => {
+            try {
+                await SpaceConnector.client.board.post.update(
+                    state.isAllDomainSelected
+                        ? {
+                            ...formData.value,
+                            post_id: state.postId,
+                        }
+                        : {
+                            ...formData.value,
+                            domain_id: state.selectedDomain[0].name,
+                            post_id: state.postId,
+                        },
+                );
+                showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
+                await SpaceRouter.router.back();
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_UPDATE_NOTICE'));
+            }
+        };
+
+        const handleClickAllDomainRadio = () => { state.isAllDomainSelected = true; };
+        const handleClickSelectDomainRadio = () => { state.isAllDomainSelected = false; };
+
+        const handleSelectDomain = (domain: Array<DomainItem>) => {
+            if (!state.isAllDomainSelected) {
+                state.selectedDomain = domain;
+            }
+        };
+
+        const getDomainList = async () => {
+            try {
+                const { results } = await SpaceConnector.client.identity.domain.list();
+                state.domainList = results.map((d) => ({
+                    name: d.domain_id,
+                    label: d.name,
+                }));
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.domainList = [];
+            }
+        };
+
+        const getBoardList = async () => {
+            try {
+                const { results } = await SpaceConnector.client.board.board.list({
+                    domain_id: state.domainList.length ? state.domainList.map((d) => d.name)
+                        : store.state.domain.domainId,
+                });
+                state.boardIdState = results.filter((d) => d.name === 'Notice')[0]?.board_id ?? '';
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.boardIdState = '';
+            }
+        };
+
+        watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
+            if (isAllDomain) state.selectedDomain = [];
+        });
+
+        watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
+            if (!Object.keys(d).length) return;
+            if (d?.domain_id) {
+                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: d.domain_id });
+                state.domainName = name;
+            }
+
+            // INIT STATES
+            state.isPinned = d.options?.is_pinned ?? false;
+            state.isPopup = d.options?.is_popup ?? false;
+            state.attachments = d.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
+            state.isAllDomainSelected = !d?.domain_id;
+            state.boardIdState = d?.board_id ?? '';
+            state.selectedDomain = d?.domain_id
+                ? [{ name: d.domain_id, label: state.domainName || d.domain_id }]
+                : [];
+            state.postId = d.post_id ?? '';
+            setForm('writerName', d.writer);
+            setForm('noticeTitle', d.title);
+            setForm('contents', d.contents);
+        });
+
+        (async () => {
+            if (state.hasSystemRole) await getDomainList();
+            await getBoardList();
+        })();
+
+        return {
+            ...toRefs(state),
+            handleConfirm,
+            handleClickAllDomainRadio,
+            handleClickSelectDomainRadio,
+            handleSelectDomain,
+            noticeTitle,
+            writerName,
+            contents,
+            setForm,
+            invalidState,
+            invalidTexts,
+            isAllValid,
+            fileUploader,
+        };
+    },
+};
+</script>
 
 <style scoped lang="postcss">
 .notice-form-wrapper {

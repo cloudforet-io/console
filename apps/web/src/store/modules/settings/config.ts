@@ -9,3 +9,9 @@ export const CURRENCY_SYMBOL = Object.freeze({
     KRW: '₩',
     JPY: '¥',
 });
+
+export const DEFAULT_CURRENCY_RATES = Object.freeze({
+    USD: 1,
+    KRW: 1,
+    JPY: 1,
+});

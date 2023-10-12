@@ -1,6 +1,3 @@
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
-import type { RawPagePermission } from '@/lib/access-control/config';
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type { RoleData } from '@/services/administration/iam/role/type';
@@ -14,10 +11,6 @@ export interface MemberItem {
     project_group_info?: ProjectGroupInfo;
     role_info?: RoleData;
     labels?: string[];
-}
-
-export interface RoleMenuItem extends SelectDropdownMenuItem {
-    pagePermissions: RawPagePermission[]
 }
 
 export const AUTH_TYPE = Object.freeze({

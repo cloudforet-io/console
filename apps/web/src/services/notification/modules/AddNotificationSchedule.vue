@@ -33,7 +33,7 @@
             </p-select-button>
             <div class="dropdown-wrapper">
                 <p-select-dropdown :selected="timePeriod.startHour"
-                                   :menu="startTimeList"
+                                   :items="startTimeList"
                                    :invalid="invalidState.timePeriod"
                                    class="dropdown"
                                    use-fixed-menu-style
@@ -41,7 +41,7 @@
                 />
                 <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
                 <p-select-dropdown :selected="timePeriod.endHour"
-                                   :menu="endTimeList"
+                                   :items="endTimeList"
                                    :invalid="invalidState.timePeriod"
                                    class="dropdown"
                                    use-fixed-menu-style

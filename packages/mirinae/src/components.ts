@@ -60,6 +60,7 @@ export { default as PCheckbox } from './inputs/checkbox/PCheckbox.vue';
 export { default as PCheckboxGroup } from './inputs/checkbox-group/PCheckboxGroup.vue';
 export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue';
 export { default as PDatetimePicker } from './inputs/datetime-picker/PDatetimePicker.vue';
+export { default as PFilterableDropdown } from './inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
 export { default as PFilterableQueryDropdown } from './inputs/dropdown/filterable-query-dropdown/PFilterableQueryDropdown.vue';
 export { default as PSelectDropdown } from './inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 export { default as PFileUploader } from './inputs/file-uploader/PFileUploader.vue';

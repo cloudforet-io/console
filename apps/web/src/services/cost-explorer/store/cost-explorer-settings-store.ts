@@ -2,28 +2,30 @@ import { defineStore } from 'pinia';
 
 import { initServiceSettingsStore } from '@/store/util';
 
-interface CostExplorerSettingsStore {
-    relocateDashboardStatus?: RelocateDashboardStatus;
-}
-export interface RelocateDashboardStatus {
-    hideBanner?: boolean;
-    hideModal?: boolean;
+import type { MoreGroupByItem } from '@/services/cost-explorer/type';
+
+interface CostExplorerSettingsState {
+    homeDashboardId: string;
+    costAnalysisMoreGroupBy: MoreGroupByItem[];
 }
 
+
 export const useCostExplorerSettingsStore = defineStore('cost-explorer-settings', {
-    state: (): CostExplorerSettingsStore => ({
-        relocateDashboardStatus: {},
+    state: (): CostExplorerSettingsState => ({
+        homeDashboardId: '',
+        costAnalysisMoreGroupBy: [],
     }),
-    getters: {
-        getRelocateDashboardStatus: (state): CostExplorerSettingsStore['relocateDashboardStatus'] => state.relocateDashboardStatus,
-    },
     actions: {
-        setRelocateDashboardState(state: CostExplorerSettingsStore['relocateDashboardStatus']) {
-            this.relocateDashboardStatus = state;
+        setHomeDashboardId(id: string) {
+            this.homeDashboardId = id;
+        },
+        setCostAnalysisMoreGroupBy(moreGroupBy: MoreGroupByItem[]) {
+            this.costAnalysisMoreGroupBy = moreGroupBy;
         },
         initState() {
-            const localStorageItem = initServiceSettingsStore<CostExplorerSettingsStore>('costExplorer');
-            this.relocateDashboardStatus = localStorageItem?.relocateDashboardStatus;
+            const localStorageItem = initServiceSettingsStore<CostExplorerSettingsState>('costExplorer');
+            this.homeDashboardId = localStorageItem?.homeDashboardId || '';
+            this.costAnalysisMoreGroupBy = localStorageItem?.costAnalysisMoreGroupBy || [];
         },
     },
 });

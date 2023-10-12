@@ -6,7 +6,6 @@ export const RECENT_TYPE = Object.freeze({
     PROJECT: 'PROJECT',
     PROJECT_GROUP: 'PROJECT_GROUP',
     DASHBOARD: 'DASHBOARD',
-    COST_ANALYSIS: 'COST_ANALYSIS',
 } as const);
 export type RecentType = typeof RECENT_TYPE[keyof typeof RECENT_TYPE];
 
@@ -31,5 +30,4 @@ export interface RecentState {
     projectGroupItems: RecentItem[];
     cloudServiceItems: RecentItem[];
     dashboardItems: RecentItem[];
-    costAnalysisItems: RecentItem[];
 }

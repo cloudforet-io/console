@@ -1,10 +1,7 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
+    getWidgetFilterOptionsSchema, getWidgetFilterSchemaPropertyNames, getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const countOfFailFindingsWidgetConfig: WidgetConfig = {
@@ -22,48 +19,35 @@ const countOfFailFindingsWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.ACCUMULATED,
         asset_group_by: ASSET_GROUP_BY.SERVICE,
         pagination_options: {
             enabled: true,
             page_size: 8,
         },
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('asset_query_set'),
-        ...getWidgetInheritOptionsForFilter(
-            'provider',
-            'project',
-            'region',
-            'asset_account',
-        ),
-    },
     options_schema: {
-        default_properties: ['asset_query_set', 'asset_group_by', ...getWidgetFilterSchemaPropertyNames(
-            'provider',
-            'project',
-            'region',
-            'asset_account',
-        )],
-        fixed_properties: ['asset_query_set', 'asset_group_by'],
-        non_inheritable_properties: ['asset_group_by'],
+        default_properties: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_compliance_type', 'asset_account')],
+        fixed_properties: ['asset_group_by'],
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('asset_query_set', 'asset_group_by'),
+                ...getWidgetOptionsSchema('asset_group_by'),
                 ...getWidgetFilterOptionsSchema(
                     'project',
                     // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
+                    'asset_compliance_type',
                     'asset_account',
                 ),
             },
-            order: ['asset_query_set', 'asset_group_by', ...getWidgetFilterSchemaPropertyNames(
+            order: ['asset_group_by', ...getWidgetFilterSchemaPropertyNames(
                 'project',
                 // 'service_account',
                 'provider',
                 'region',
+                'asset_compliance_type',
                 'asset_account',
             )],
         },

@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter, getWidgetOptionsSchema,
+    getWidgetFilterSchemaPropertyNames,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const severityStatusByServiceWidgetConfig: WidgetConfig = {
@@ -22,43 +22,34 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
     },
     sizes: ['full'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        granularity: GRANULARITY.ACCUMULATED,
         legend_options: {
             enabled: true,
             show_at: 'chart',
         },
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('asset_query_set'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'provider',
-            'region',
-            'asset_account',
-        ),
-    },
     options_schema: {
-        default_properties: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_account')],
-        fixed_properties: ['asset_query_set'],
+        default_properties: getWidgetFilterSchemaPropertyNames('project', 'provider', 'region', 'asset_compliance_type', 'asset_account'),
         schema: {
             type: 'object',
             properties: {
-                ...getWidgetOptionsSchema('asset_query_set'),
                 ...getWidgetFilterOptionsSchema(
                     'project',
                     // 'service_account', HACK: Re-enable it after backend is ready
                     'provider',
                     'region',
+                    'asset_compliance_type',
                     'asset_account',
                 ),
             },
-            order: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames(
+            order: getWidgetFilterSchemaPropertyNames(
                 'project',
                 // 'service_account',
                 'provider',
                 'region',
+                'asset_compliance_type',
                 'asset_account',
-            )],
+            ),
         },
     },
 };

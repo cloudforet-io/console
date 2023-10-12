@@ -8,6 +8,7 @@ const state: DomainState = {
     name: undefined,
     extendedAuthType: undefined,
     authOptions: undefined,
+    billingEnabled: false,
     extraMenu: undefined,
 };
 

@@ -21,9 +21,9 @@ export class APIError extends Error {
 	    if (axiosError.response) {
 	        this.status = axiosError.response.status;
 
-	        if (axiosError.response.data.detail) {
-	            this.message = axiosError.response.data.detail.message;
-	            this.code = axiosError.response.data.detail.code;
+	        if (axiosError.response.data.error) {
+	            this.message = axiosError.response.data.error.message;
+	            this.code = axiosError.response.data.error.code;
 	        } else {
 	            this.message = axiosError.response.statusText;
 	        }

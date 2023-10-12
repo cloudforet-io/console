@@ -380,7 +380,6 @@
 		"COST_MANAGEMENT": {
 			"BUDGET": {
 				"ALT_E_CREATE_BUDGET": "Failed to Create Budget",
-				"ALT_E_CREATE_BUDGET_ALREADY_EXIST": "The selected data source ({dataSourceName}) already has a budget created for the same target ({name}).",
 				"ALT_E_DELETE_BUDGET": "Failed to Delete Budget",
 				"ALT_E_UPDATE_BUDGET": "Failed to Update Budget",
 				"ALT_S_CREATE_BUDGET": "Budget successfully created",
@@ -427,7 +426,6 @@
 					"NOTIFICATIONS_CHANNEL": "Notifications Channel",
 					"ORIGINAL_DATA": "Original Data",
 					"PERIOD": "Period",
-					"PROVIDER": "Provider",
 					"SET": "Set",
 					"SET_NOTIFICATION_CHANNEL": "Set Notifications Channel",
 					"TARGET": "Target",
@@ -458,7 +456,6 @@
 						"ACCOUNT": "Account",
 						"ALL": "All",
 						"BASE_INFORMATION": "Base Information",
-						"DATA_SOURCE": "Data Source",
 						"LABEL_COST_TYPE": "Cost Type",
 						"LABEL_CURRENCY": "Currency",
 						"LABEL_NAME": "Name",
@@ -470,8 +467,7 @@
 						"REGION": "Region",
 						"REQUIRED_COST_TYPE": "Particular cost type must be selected.",
 						"REQUIRED_NAME": "Please enter name.",
-						"REQUIRED_TARGET": "Please select target.",
-						"SPECIFIC_PROVIDER": "Specific Provider"
+						"REQUIRED_TARGET": "Please select target."
 					},
 					"CANCEL": "Cancel",
 					"CONFIRM": "Confirm",
@@ -487,15 +483,14 @@
 					"BUDGET": "Budget",
 					"BUDGETED": "Budgeted",
 					"BUDGET_NAME": "Budget Name",
+					"BULK_BUDGET": "Bulk Budget",
 					"COST_TYPE": "Cost Type",
 					"CREATE": "Create",
 					"CREATE_BUDGET": "Create Budget",
-					"DATA_SOURCE": "Data Source",
+					"CREATE_BULK_BUDGET": "Create Bulk Budget",
 					"DESC": "Desc",
-					"NO_BUDGET": "No Budget",
 					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
-					"PROVIDER": "Provider",
 					"SINGLE_BUDGET": "Single Budget",
 					"THIS_MONTH": "This Month",
 					"TOTAL": "Total",
@@ -508,39 +503,32 @@
 					"MTD": "MTD",
 					"TOTAL_BUDGET": "Total Budget",
 					"TOTAL_COST": "Total Cost"
-				},
-				"VIEW_ALL": "View All"
+				}
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",
 				"ADDITIONAL_INFO": "Additional Info",
 				"ADD_MORE": "Add More",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "The file will be downloaded as monthly data rather than accumulated data.",
-				"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
-				"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
 				"ALT_E_DELETE_QUERY": "Failed to Delete Query",
 				"ALT_E_EDITED_QUERY": "Failed to Edit Query",
 				"ALT_E_SAVED_QUERY": "Failed to Save Query",
-				"ALT_S_DELETE_QUERY": "The analysis successfully deleted",
-				"ALT_S_SAVE_AS_QUERY": "Successfully saved as a new analysis",
-				"ALT_S_SAVE_QUERY": "The analysis successfully updated",
+				"ALT_S_DELETE_QUERY": "Query successfully deleted",
+				"ALT_S_EDITED_QUERY": "Query successfully edited",
+				"ALT_S_SAVED_QUERY": "The query successfully saved as a widget",
 				"CHART_TYPE": "Chart Type",
-				"CHECK_DELETE_MODAL_DESC": "Are you sure you want to delete the analysis?",
+				"CHECK_DELETE_MODAL_DESC": "Are you sure you want to delete the query?",
 				"CLEAR_ALL": "Clear all",
 				"COLUMN": "Column",
 				"COST_ANALYSIS": "Cost Analysis",
 				"CURRENCY": "Currency",
-				"DAILY": "Daily (Accumulated)",
+				"DAILY": "Daily",
 				"DEFAULT": "Default",
-				"DETAIL": {
-					"ORIGINAL_CURRENCY": "Original Currency"
-				},
 				"DONUT": "Donut",
 				"DOWNLOAD": "Download",
-				"EDIT_COST_ANALYSIS": "Edit Analysis Name",
+				"EDIT_QUERY": "Edit Query",
 				"END_DATE": "End Date",
-				"FEATURE_UDATED": "FEATURE UPDATED",
-				"FILTERS": "Filters",
+				"FILTER": "Filter",
 				"FILTER_MODAL_HELP_TEXT_1": "No selected filters",
 				"FILTER_MODAL_HELP_TEXT_2": "Select filters from the list.",
 				"GRANULARITY": "Granularity",
@@ -550,19 +538,17 @@
 					"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
 				},
 				"HIDE_ALL": "Hide all",
-				"INVALID_PERIOD_TEXT": "No data found for previously selected period",
 				"KEEP_MY_SETTING": "Keep the settings above as my settings",
 				"LABEL_ADDITIONAL_FIELD": "Additional Field",
-				"LABEL_COST_ANALYSIS_NAME": "Cost Analysis Name",
+				"LABEL_QUERY_NAME": "Query Name",
 				"LABEL_TAG": "Tag",
 				"LABEL_VISIBILITY": "Visibility",
 				"LINE": "Line",
-				"MODAL_VALIDATION_DUPLICATED": "An analysis with this name already exists.",
 				"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"MONTHLY": "Monthly",
 				"MORE_FILTERS": "More Filters",
-				"NAME_LABEL": "Name",
+				"MY_QUERY": "My Query",
 				"NO_FILTERS": "No Filters",
 				"NO_ITEMS": "No Items",
 				"PDF": {
@@ -573,40 +559,25 @@
 				},
 				"PERIOD": {
 					"CUSTOM_DATE_RANGE": "Custom Date Range",
-					"LAST_12_MONTHS": "Last 12 Months",
 					"LAST_14_DAYS": "Last 14 Days",
 					"LAST_3_MONTHS": "Last 3 Months",
-					"LAST_3_YEARS": "Last 3 Years",
 					"LAST_6_MONTHS": "Last 6 Months",
 					"LAST_7_DAYS": "Last 7 Days",
 					"LAST_MONTH": "Last Month",
 					"LAST_YEAR": "Last Year",
-					"PERIOD": "Period",
-					"THIS_MONTH": "This Month",
-					"THIS_YEAR": "This Year"
+					"THIS_MONTH": "This Month"
 				},
 				"PRIVATE": "Private",
 				"PROJECT": "Project",
 				"PUBLIC": "Public",
-				"RELOCATE_DASHBOARD_LABEL": "Go to Dashboard",
-				"RELOCATE_DASHBOARD_NOTI_DESCRIPTION": "You can now create enhanced cost dashboards within the new Dashboards menu.",
-				"RELOCATE_DASHBOARD_NOTI_DISMISS": "Dismiss",
-				"RELOCATE_DASHBOARD_NOTI_LEARN_MORE": "Learn more",
-				"RELOCATE_DASHBOARD_NOTI_TITLE": "Looking for your cost dashboards?",
-				"RELOCATE_MODAL_CONFIRM_TEXT": "Got it",
-				"RELOCATE_MODAL_DESCRIPTION_FIRST": "We have integrated the previous Cost Explorer's Dashboard feature into a brand new standalone service called \"Dashboards\".",
-				"RELOCATE_MODAL_DESCRIPTION_SECOND": "Therefore, the old dashboards are no longer supported. Go to \"Dashboards\" menu and explore expanded widget options, advanced variables with much better visuals.",
-				"RELOCATE_MODAL_DISMISS_TEXT": "Don't show me again",
-				"RELOCATE_MODAL_TITLE": "We are thrilled to introduce a significant enhancement to your cost dashboard!",
-				"RESET": "Reset",
 				"SAVE": "Save",
 				"SAVED_QUERY": "Saved Query",
 				"SAVE_AS": "Save as",
-				"SAVE_TO_COST_ANALYSIS_LIBRARY": "Save to Cost Analysis Library",
+				"SAVE_QUERY": "Save Query",
 				"SEARCH_PLACEHOLDER": "Search",
 				"SEARCH_TAG_PLACEHOLDER": "Search Tag",
-				"SELECTED_FILTERS": "Selected Filters",
-				"SET_FILTERS": "Set Filters",
+				"SELECTED_FILTER": "Selected Filter",
+				"SET_FILTER": "Set Filter",
 				"SET_MORE": "Set More",
 				"SET_QUERY": "Set query",
 				"SHOW_ALL": "Show all",
@@ -784,6 +755,7 @@
 				"DUPLICATE": "Duplicate",
 				"FILTER_NONE": "None",
 				"MONTH": "Month",
+				"NO_SELECTED_FILTER": "No selected filters.",
 				"OVERSPENT": "Overspent",
 				"SET_HOME": "Set as Home",
 				"VIEW_FILTER": "View Filter"
@@ -902,8 +874,6 @@
 			},
 			"FAVORITES": {
 				"ALL_CLOUD_SERVICES": "All Cloud Services",
-				"ALL_COST_ANALYSIS": "All Cost Analysis",
-				"ALL_DASHBOARD": "All Dashboards",
 				"ALL_MENU": "All Menu",
 				"ALL_PROJECTS": "All Projects",
 				"FAVORITES": "Favorites",
@@ -1328,8 +1298,7 @@
 				"DELETE_TITLE": "Are you sure you want to delete this variable?",
 				"DESCRIPTION_ACCOUNT": "The account IDs assigned by AWS during account creation",
 				"DESCRIPTION_ASSET_ACCOUNT": "The account IDs assigned by AWS during account creation",
-				"DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK": "List of compliance frameworks for cloud security and regulatory compliance",
-				"DESCRIPTION_DATA_SOURCE": "A central source of data and information in the cloud environment, comprising data from cloud providers like AWS, Google, Azure, as well as data from specific companies and services, including integrated billing data.",
+				"DESCRIPTION_ASSET_COMPLIANCE_TYPE": "List of compliance frameworks for cloud security and regulatory compliance",
 				"DESCRIPTION_GROUP_BY": "It’s used to group data together and see overall trends or patterns based on a specific option",
 				"DESCRIPTION_PRODUCT": "The cloud computing products and services provided by each cloud provider",
 				"DESCRIPTION_PROJECT": "The collections of cloud resources and services that are grouped together for a specific purpose",
@@ -1363,21 +1332,17 @@
 			}
 		},
 		"DETAIL": {
-			"APPLY": "Apply",
 			"AUTO": "Auto",
 			"CLONE": "Clone",
 			"CURRENT_MONTH": "Current month",
 			"CUSTOM": "Custom",
 			"CUSTOMIZE": "Customize",
-			"CUSTOM_DATE_MODAL_MONTH": "Month",
-			"CUSTOM_DATE_MODAL_TITLE": "Apply Custom Range",
 			"DEFAULT": "Default",
 			"DELETE": "Delete",
 			"EXPORT": "Export",
 			"PDF_EXPORT": {
 				"APPLIED_FILTERS": "Applied Filters"
 			},
-			"PERIOD": "Period",
 			"PERIOD_CUSTOM": "Custom",
 			"PERIOD_LAST_14_DAYS": "Last 14 days",
 			"PERIOD_LAST_3_MONTHS": "Last 3 months",
@@ -1425,7 +1390,7 @@
 			"SAVE": "Save"
 		},
 		"LNB": {
-			"ONLY_FAVORITE": "Favorites only"
+			"ONLY_FAVORITE": "Show favorites only"
 		},
 		"WIDGET": {
 			"ALERT_HISTORY": {
@@ -1460,12 +1425,12 @@
 				"DESC": "Displays the top 200 highest budget usage during the selected period."
 			},
 			"BUDGET_USAGE_SUMMARY": {
-				"BUDGETED": "{count} budgeted",
-				"BUDGET_USAGE_IN": "budget usage in {period}",
+				"AVAILABLE": "available",
+				"BUDGETS": "Budgets",
 				"DESC": "Displays an overview of the total budget consumption along with total cost, budget, and usage rate.",
-				"EXCEED": "{value} exceeded",
-				"LEFT": "{value} left",
-				"OUT_OF": "out of {value}"
+				"EXCEEDED": "exceeded",
+				"TOTAL_BUDGET": "Total budget",
+				"TOTAL_BUDGET_USAGE_IN": "Total budget usage in {period}"
 			},
 			"BUDGET_USAGE_WITH_FORECAST": {
 				"DESC": "Displays the project-wise budget usage during the selected period, along with shortage forecast. "
@@ -1473,10 +1438,13 @@
 			"CLOUD_ASSEST_SUMMARY": {
 				"DESC": "Displays the cost trend of cloud resources or the status of server, database, storage usage."
 			},
-			"COMPLIANCE_STATUS": {
+			"COMPLIANCE_CHECK_STATUS": {
+				"CHECKED_SERVICE_ACCOUNT": "Checked service account",
+				"COMPLIANCE_SCORE": "Compliance score",
 				"DESC": "Displays an overall status of compliance Pass/Fail during the selected period.",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
-				"MORE_THAN_PREV_MONTH": "more than previous month"
+				"MORE_THAN_PREV_MONTH": "more than previous month",
+				"TOTAL_COMPLIANCE_NUMBER": "Total compliance number"
 			},
 			"COST_BY_REGION": {
 				"DESC": "Displays the total costs by Region for the selected period. "
@@ -1517,8 +1485,7 @@
 			"INHERIT_OPTIONS_TOOLTIP_TEXT_2": "List of non-inherited options:",
 			"MONTHLY_COST": {
 				"DESC": "Displays the amount spent between start and end date of the most recent month along with the comparison to prior month for the same period.",
-				"PREVIOUS_MONTH": "Previous month",
-				"SELECTED_MONTH": "Selected month "
+				"TOTAL_SPENT_IN": "Total spent in {period}"
 			},
 			"NO_DATA": "No Data",
 			"PROJECT_ACTIVITY_SUMMARY": {
@@ -1533,10 +1500,13 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
 			},
-			"TOTAL_FAIL_FINDINGS_STATUS": {
+			"TOTAL_FAILURE_AND_SEVERITY": {
 				"DESC": "Displays the count, rate, and severity of compliance failures observed during the selected period.",
+				"FAILURE_RATE": "Failure rate",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
-				"MORE_THAN_PREV_MONTH": "more than previous month"
+				"MORE_THAN_PREV_MONTH": "more than previous month",
+				"SEVERITY": "Severity",
+				"TOTAL_FAILURE_COUNT": "Total failure count"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group By' option."
@@ -2285,7 +2255,7 @@
 				"VIEW_HISTORY_DETAIL": "View history details"
 			},
 			"NO_DATA": "No Data",
-			"NO_JOB": "No recent jobs",
+			"NO_JOB": "No Job",
 			"NO_OPTIONS": "No Selectable Options"
 		},
 		"SERVER": {

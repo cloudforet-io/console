@@ -23,7 +23,7 @@ export const postValidationEmail = async (body): Promise<void|Error> => {
         }
         return undefined;
     } catch (e: any) {
-        showErrorMessage(e.message, e);
+        showErrorMessage(e.axiosError.response.data.detail.message, e);
         throw e;
     }
 };

@@ -32,14 +32,14 @@
                      class="input-wrapper"
                 >
                     <div class="left-part">
-                        <p-select-dropdown :selected.sync="condition.key"
+                        <p-select-dropdown v-model="condition.key"
                                            class="input"
-                                           :menu="keys"
+                                           :items="keys"
                                            use-fixed-menu-style
                         />
-                        <p-select-dropdown :selected.sync="condition.operator"
+                        <p-select-dropdown v-model="condition.operator"
                                            class="input"
-                                           :menu="operators"
+                                           :items="operators"
                                            use-fixed-menu-style
                         />
                         <p-text-input v-model="condition.value"

@@ -50,8 +50,8 @@
             </div>
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
-                <p-select-dropdown :selected.sync="selectedStat"
-                                   :menu="statItems"
+                <p-select-dropdown v-model="selectedStat"
+                                   :items="statItems"
                 />
                 <p-icon-button class="ml-4 flex-shrink-0"
                                name="ic_refresh"

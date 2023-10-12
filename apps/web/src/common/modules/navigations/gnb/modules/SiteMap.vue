@@ -60,8 +60,8 @@
                                                @keydown.enter="navigateToMenu(navigate, $event)"
                                             >
                                                 {{ subMenu.label }}
-                                                <new-mark v-if="subMenu.highlightTag === 'new'" />
-                                                <beta-mark v-else-if="subMenu.highlightTag === 'beta'" />
+                                                <new-mark v-if="subMenu.isNew" />
+                                                <beta-mark v-if="subMenu.isBeta" />
                                             </a>
                                         </template>
                                     </router-link>

@@ -1,9 +1,75 @@
+<template>
+    <div class="user-info-form-wrapper">
+        <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
+                       :required="true"
+                       :invalid="validationState.isUserIdValid === false"
+                       :invalid-text="validationState.userIdInvalidText"
+                       :valid="validationState.isUserIdValid"
+                       :valid-text="validationState.userIdValidText"
+        >
+            <template v-if="props.activeTab === 'external'
+                          && state.supportFind
+                          && state.externalItems.length > 100"
+                      #help
+            >
+                <div class="external-items-help-text">
+                    <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
+                </div>
+            </template>
+            <template #default="{invalid}">
+                <div v-if="props.activeTab === 'external' && state.supportFind">
+                    <p-filterable-dropdown
+                        :search-text.sync="state.searchText"
+                        :class="{invalid}"
+                        show-select-marker
+                        :menu="state.externalItems"
+                        :selected.sync="state.selectedItems"
+                        :loading="state.loading"
+                        disable-handler
+                        :exact-mode="false"
+                        use-fixed-menu-style
+                        @select="handleSelectExternalUser"
+                        @delete-tag="handleDeleteSelectedExternalUser"
+                    />
+                </div>
+                <div v-else
+                     class="id-input-form"
+                >
+                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
+                    <p-text-input v-model="formState.userId"
+                                  v-focus
+                                  placeholder="user@spaceone.io"
+                                  :invalid="invalid"
+                                  :valid="validationState.isUserIdValid"
+                                  :disabled="userPageState.visibleUpdateModal"
+                    />
+                    <p-button v-if="!userPageState.visibleUpdateModal"
+                              style-type="secondary"
+                              class="user-id-check-button"
+                              @click="handleClickCheckId"
+                    >
+                        {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
+                    </p-button>
+                </div>
+            </template>
+        </p-field-group>
+        <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
+                       class="input-form"
+        >
+            <p-text-input v-model="formState.name"
+                          class="text-input"
+                          @update:value="handleChangeInput"
+            />
+        </p-field-group>
+    </div>
+</template>
+
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PFieldGroup, PTextInput, PButton, PSelectDropdown,
+    PFieldGroup, PTextInput, PButton, PFilterableDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { debounce } from 'lodash';
@@ -183,74 +249,6 @@ watch(() => state.searchText, (searchText) => {
 });
 </script>
 
-<template>
-    <div class="user-info-form-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
-                       :required="true"
-                       :invalid="validationState.isUserIdValid === false"
-                       :invalid-text="validationState.userIdInvalidText"
-                       :valid="validationState.isUserIdValid"
-                       :valid-text="validationState.userIdValidText"
-        >
-            <template v-if="props.activeTab === 'external'
-                          && state.supportFind
-                          && state.externalItems.length > 100"
-                      #help
-            >
-                <div class="external-items-help-text">
-                    <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
-                </div>
-            </template>
-            <template #default="{invalid}">
-                <div v-if="props.activeTab === 'external' && state.supportFind">
-                    <p-select-dropdown
-                        class="external-select-dropdown"
-                        :search-text.sync="state.searchText"
-                        :class="{invalid}"
-                        show-select-marker
-                        :menu="state.externalItems"
-                        :selected.sync="state.selectedItems"
-                        :loading="state.loading"
-                        disable-handler
-                        use-fixed-menu-style
-                        is-filterable
-                        show-delete-all-button
-                        @select="handleSelectExternalUser"
-                        @delete-tag="handleDeleteSelectedExternalUser"
-                    />
-                </div>
-                <div v-else
-                     class="id-input-form"
-                >
-                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
-                    <p-text-input v-model="formState.userId"
-                                  v-focus
-                                  placeholder="user@spaceone.io"
-                                  :invalid="invalid"
-                                  :valid="validationState.isUserIdValid"
-                                  :disabled="userPageState.visibleUpdateModal"
-                    />
-                    <p-button v-if="!userPageState.visibleUpdateModal"
-                              style-type="secondary"
-                              class="user-id-check-button"
-                              @click="handleClickCheckId"
-                    >
-                        {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-field-group>
-        <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
-                       class="input-form"
-        >
-            <p-text-input v-model="formState.name"
-                          class="text-input"
-                          @update:value="handleChangeInput"
-            />
-        </p-field-group>
-    </div>
-</template>
-
 <style lang="postcss" scoped>
 .user-info-form-wrapper {
     @apply flex flex-col bg-white rounded-lg;
@@ -262,7 +260,7 @@ watch(() => state.searchText, (searchText) => {
         line-height: 1.3;
         padding: 0.25rem 0;
     }
-    .external-select-dropdown {
+    .p-filterable-dropdown {
         &.invalid {
             .p-search {
                 @apply border-alert;

@@ -1,3 +1,30 @@
+<template>
+    <div v-on-click-outside="hideContextMenu"
+         class="dashboard-widget-more-options"
+    >
+        <p-button ref="targetRef"
+                  style-type="secondary"
+                  icon-left="ic_plus_bold"
+                  block
+                  @click="handleClickAddOptions"
+        >
+            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
+        </p-button>
+        <p-context-menu v-show="visibleContextMenu"
+                        ref="contextMenuRef"
+                        :menu="refinedMenu"
+                        :selected="selectedOptions"
+                        :style="contextMenuStyle"
+                        use-fixed-menu-style
+                        multi-selectable
+                        item-height-fixed
+                        show-select-marker
+                        :reset-selected-on-unmounted="false"
+                        @update:selected="handleUpdateSelectedOptions"
+        />
+    </div>
+</template>
+
 <script setup lang="ts">
 import { vOnClickOutside } from '@vueuse/components';
 import {
@@ -117,33 +144,6 @@ watch(() => props.selectedProperties, (selectedProperties) => {
 }, { immediate: true });
 
 </script>
-
-<template>
-    <div v-on-click-outside="hideContextMenu"
-         class="dashboard-widget-more-options"
-    >
-        <p-button ref="targetRef"
-                  style-type="secondary"
-                  icon-left="ic_plus_bold"
-                  block
-                  @click="handleClickAddOptions"
-        >
-            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.ADD_OPTIONS') }}
-        </p-button>
-        <p-context-menu v-show="visibleContextMenu"
-                        ref="contextMenuRef"
-                        :menu="refinedMenu"
-                        :selected="selectedOptions"
-                        :style="contextMenuStyle"
-                        use-fixed-menu-style
-                        multi-selectable
-                        item-height-fixed
-                        show-select-marker
-                        :reset-selected-on-unmounted="false"
-                        @update:selected="handleUpdateSelectedOptions"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .dashboard-widget-more-options {

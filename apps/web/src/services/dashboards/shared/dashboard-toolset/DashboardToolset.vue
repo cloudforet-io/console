@@ -1,17 +1,29 @@
 <template>
     <div class="dashboard-toolset">
+        <dashboard-date-range-badge v-show="dashboardDetailState.settings.date_range.enabled"
+                                    :date-range="dashboardDetailState.settings.date_range"
+        />
         <dashboard-date-dropdown v-show="dashboardDetailState.settings.date_range.enabled"
                                  :date-range="dashboardDetailState.settings.date_range"
                                  @update:date-range="handleUpdateDateRange"
+        />
+        <dashboard-currency-select-dropdown v-show="dashboardDetailState.settings.currency.enabled"
+                                            :currency="dashboardDetailState.settings.currency.value"
+                                            @update:currency="handleUpdateCurrency"
         />
     </div>
 </template>
 
 <script setup lang="ts">
+import type { Currency } from '@/store/modules/settings/type';
 
 import type { DashboardSettings } from '@/services/dashboards/config';
+import DashboardCurrencySelectDropdown
+    from '@/services/dashboards/shared/dashboard-toolset/DashboardCurrencySelectDropdown.vue';
 import DashboardDateDropdown from '@/services/dashboards/shared/dashboard-toolset/DashboardDateDropdown.vue';
+import DashboardDateRangeBadge from '@/services/dashboards/shared/dashboard-toolset/DashboardDateRangeBadge.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
@@ -25,7 +37,14 @@ const handleUpdateDateRange = (dateRange: DashboardSettings['date_range']) => {
         };
     });
 };
-
+const handleUpdateCurrency = (currency: Currency) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.settings.currency = {
+            ..._state.settings.currency,
+            value: currency,
+        };
+    });
+};
 </script>
 
 <style scoped>

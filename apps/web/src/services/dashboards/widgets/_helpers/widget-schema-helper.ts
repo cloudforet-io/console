@@ -1,32 +1,26 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import {
-    chain, get, union,
-} from 'lodash';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
+    WidgetConfig,
     WidgetFilterKey,
     WidgetFiltersSchemaProperty,
     WidgetOptionsSchemaProperty,
     InheritOptions,
-    WidgetConfig, WidgetOptionsSchema, WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/config';
 import {
     ASSET_GROUP_BY_SCHEMA, ASSET_REFERENCE_SCHEMA,
     COST_REFERENCE_SCHEMA, COST_GROUP_BY_SCHEMA,
-    RESOURCE_REFERENCE_SCHEMA, COST_DATA_SOURCE_SCHEMA, ASSET_COMPLIANCE_FRAMEWORK_SCHEMA,
+    RESOURCE_REFERENCE_SCHEMA,
 } from '@/services/dashboards/widgets/_configs/widget-schema-config';
+
 
 export const getWidgetOptionsSchema = (...optionNames: WidgetOptionsSchemaProperty[]): object => {
     const result: JsonSchema['properties'] = {};
 
     optionNames.forEach((optionName) => {
-        if (optionName === 'cost_data_source') result.cost_data_source = COST_DATA_SOURCE_SCHEMA;
-        else if (optionName === 'asset_query_set') result.asset_query_set = ASSET_COMPLIANCE_FRAMEWORK_SCHEMA;
-        else if (optionName === 'cost_group_by') result.cost_group_by = COST_GROUP_BY_SCHEMA;
+        if (optionName === 'cost_group_by') result.cost_group_by = COST_GROUP_BY_SCHEMA;
         else if (optionName === 'asset_group_by') result.asset_group_by = ASSET_GROUP_BY_SCHEMA;
         else if (optionName.startsWith('filters.')) {
             const filterKey = optionName.replace('filters.', '');
@@ -56,15 +50,6 @@ export const getWidgetFilterOptionsSchema = (...filterKeys: WidgetFilterKey[]): 
 
 export const getWidgetFilterSchemaPropertyNames = (...keys: WidgetFilterKey[]): WidgetFiltersSchemaProperty[] => keys.map((key) => `filters.${key}` as WidgetFiltersSchemaProperty);
 export const getWidgetFilterSchemaPropertyName = (key: WidgetFilterKey): WidgetFiltersSchemaProperty => `filters.${key}`;
-export const getWidgetOptionName = (key: string): string => {
-    if (WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey)) return `filters.${key}`;
-    return key;
-};
-export const isWidgetFilterKey = (key: string): boolean => {
-    if (key.startsWith('filters.')) return WIDGET_FILTER_KEYS.includes(getWidgetFilterKey(key));
-    return WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey);
-};
-export const getWidgetFilterKey = (key: string): WidgetFilterKey => key.replace('filters.', '') as WidgetFilterKey;
 
 /** @function
  * @name getWidgetOptionsSchemaPropertyName
@@ -80,73 +65,25 @@ export const getWidgetOptionsSchemaPropertyName = (property: WidgetOptionsSchema
     return property;
 };
 
-export const getWidgetInheritOptions = (...properties: WidgetOptionsSchemaProperty[]): InheritOptions => {
+export const getWidgetDefaultInheritOptions = (widgetConfig: WidgetConfig): InheritOptions => {
     const inheritOptions: InheritOptions = {};
-    properties.forEach((propertyName) => {
+    const defaultProperties = widgetConfig.options_schema?.default_properties ?? [];
+    const fixedProperties = widgetConfig.options_schema?.fixed_properties ?? [];
+    defaultProperties.filter((d) => !fixedProperties.includes(d)).forEach((propertyName) => {
         inheritOptions[propertyName] = {
             enabled: true,
-            variable_info: { key: propertyName },
+            variable_info: { key: propertyName.replace('filters.', '') },
         };
     });
     return inheritOptions;
 };
 
-export const getWidgetInheritOptionsForFilter = (...properties: WidgetFilterKey[]): InheritOptions => {
-    const inheritOptions: InheritOptions = {};
-    properties.forEach((propertyName) => {
-        inheritOptions[`filters.${propertyName}`] = {
-            enabled: true,
-            variable_info: { key: propertyName },
-        };
-    });
-    return inheritOptions;
-};
-
-export const getNonInheritedWidgetOptionsAmongUsedVariables = (
-    variablesSchema: DashboardVariablesSchema,
-    widgetInheritOptions: InheritOptions = {},
-    schemaProperties: string[] = [],
-): string[] => {
+export const getNonInheritedWidgetOptions = (widgetInheritOptions?: InheritOptions): string[] => {
+    if (!widgetInheritOptions) return [];
+    const enabledInheritedOptions: string[] = Object.entries(widgetInheritOptions).filter(([, v]) => v.enabled).map(([k]) => k);
     const nonInheritedOptions: string[] = [];
-    const enabledInheritedOptions = Object.entries(widgetInheritOptions).filter(([, inheritOption]) => inheritOption?.enabled).map(([key, inheritOption]) => inheritOption?.variable_info?.key ?? key);
-    if (variablesSchema?.properties) {
-        Object.entries(variablesSchema.properties).forEach(([key, property]) => {
-            const optionName = getWidgetOptionName(key);
-            if (property.use && schemaProperties.includes(optionName) && !enabledInheritedOptions.includes(key)) nonInheritedOptions.push(optionName);
-        });
-    }
+    Object.keys(widgetInheritOptions).forEach((property) => {
+        if (!enabledInheritedOptions.includes(property)) nonInheritedOptions.push(property);
+    });
     return nonInheritedOptions;
-};
-
-export const getInitialSchemaProperties = (
-    widgetConfig?: WidgetConfig,
-    variablesSchema?: DashboardVariablesSchema,
-): string[] => {
-    const widgetOptionsSchema = widgetConfig?.options_schema ?? {} as WidgetOptionsSchema;
-    const allVariableProperties = Object.keys(variablesSchema?.properties ?? {});
-    const allOptionProperties = Object.keys(widgetOptionsSchema.schema?.properties ?? {});
-    const fixedProperties = widgetOptionsSchema.fixed_properties ?? [];
-    const order: string[] = widgetOptionsSchema.schema?.order ?? [];
-
-    return chain(allVariableProperties) // get all possible properties from variables schema
-        .filter((key) => !!variablesSchema?.properties?.[key]?.use) // get only used variables
-        .map((key) => getWidgetOptionName(key)) // convert variable key to widget option name
-        .intersection(allOptionProperties) // intersect with all possible properties from widget options schema
-        .union(fixedProperties) // union with fixed properties
-        .sortBy((key) => {
-            const idx = order.indexOf(key);
-            if (idx >= 0) return idx;
-            if (fixedProperties.includes(key)) return -1;
-            return 9999;
-        }) // sort by order and fixedProperties
-        .value();
-};
-
-export const getRefinedSchemaProperties = (
-    storedProperties: string[],
-    initialProperties: string[],
-    widgetOptions?: WidgetOptions,
-): string[] => {
-    const optionExistProperties = storedProperties.filter((property) => !!get(widgetOptions, property));
-    return union(initialProperties, optionExistProperties);
 };

@@ -19,7 +19,9 @@
                                         refresh-disabled
             />
         </div>
-        <dashboard-widget-container edit-mode />
+        <dashboard-widget-container edit-mode
+                                    reuse-previous-data
+        />
         <dashboard-customize-sidebar :loading="props.loading"
                                      :save-button-text="props.saveButtonText"
                                      :hide-cancel-button="props.hideCancelButton"

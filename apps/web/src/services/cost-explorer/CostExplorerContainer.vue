@@ -19,25 +19,19 @@
 </template>
 
 <script lang="ts">
-import { computed, onUnmounted, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
+import { computed, onUnmounted } from 'vue';
 
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
+import { useCostExplorerDashboardStore } from '@/services/cost-explorer/store/cost-explorer-dashboard-store';
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
-import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
-
-
 
 export default {
     name: 'CostExplorerContainer',
@@ -49,10 +43,9 @@ export default {
     setup() {
         const { breadcrumbs } = useBreadcrumbs();
         const userId = computed(() => store.state.user.userId);
-        const costQuerySetStore = useCostQuerySetStore();
-        const costQuerySetState = costQuerySetStore.$state;
         const costExplorerSettingsStore = useCostExplorerSettingsStore();
         costExplorerSettingsStore.initState();
+        const costExplorerDashboardStore = useCostExplorerDashboardStore();
         costExplorerSettingsStore.$onAction((action) => {
             action.after(() => {
                 if (window) {
@@ -62,48 +55,13 @@ export default {
                 }
             });
         });
-        const route = useRoute();
 
         onUnmounted(() => {
-            costQuerySetStore.$dispose();
-            costQuerySetStore.$reset();
             costExplorerSettingsStore.$dispose();
             costExplorerSettingsStore.$reset();
+            costExplorerDashboardStore.$dispose();
+            costExplorerDashboardStore.$reset();
         });
-
-        watch(() => route.params, async (params) => {
-            // Case - Directly access Budget Page
-            if (!costQuerySetState.selectedDataSourceId) {
-                const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
-                try {
-                    const { status, response } = await fetcher({
-                        query: {
-                            only: ['data_source_id'],
-                        },
-                    });
-                    if (status === 'succeed') {
-                        const dataSourceId = response.results[0].data_source_id;
-                        costQuerySetStore.$patch({
-                            selectedDataSourceId: dataSourceId,
-                        });
-                    }
-                } catch (e) {
-                    ErrorHandler.handleError(e);
-                }
-            }
-
-            /*
-            * Both parameters are set in the route. (beforeEnter navigation guard in route.ts)
-            * */
-            if (params.dataSourceId && params.costQuerySetId) {
-                costQuerySetStore.$patch({
-                    selectedDataSourceId: params.dataSourceId,
-                    selectedQuerySetId: params.costQuerySetId,
-                });
-            }
-            await costQuerySetStore.listCostQuerySets();
-        }, { immediate: true });
-
 
         return {
             breadcrumbs,

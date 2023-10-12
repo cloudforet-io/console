@@ -1,55 +1,6 @@
-<script lang="ts" setup>
-import {
-    computed, reactive,
-} from 'vue';
-
-import { PI, PSelectDropdown } from '@spaceone/design-system';
-
-import { store } from '@/store';
-
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import NewMark from '@/common/components/marks/NewMark.vue';
-import UpdateMark from '@/common/components/marks/UpdateMark.vue';
-import LNBDividerMenuItem from '@/common/modules/navigations/lnb/modules/LNBDividerMenuItem.vue';
-import LNBRouterMenuItem from '@/common/modules/navigations/lnb/modules/LNBRouterMenuItem.vue';
-import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
-import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
-
-interface Props {
-    menuData: LNBMenu;
-    currentPath: string;
-    depth: number
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    menuData: () => ({}) as LNBItem,
-    currentPath: undefined,
-    depth: 1,
-});
-const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
-
-const state = reactive({
-    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-    processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
-    isFolded: false,
-    isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
-    showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
-    hoveredItem: '',
-});
-
-const handleFoldableToggle = () => {
-    state.isFolded = !state.isFolded;
-};
-
-const handleSelect = (id: string, selected: string) => {
-    emit('select', id, selected);
-};
-
-</script>
-
 <template>
     <div class="lnb-menu-list">
-        <div v-for="(item, idx) in state.processedMenuData"
+        <div v-for="(item, idx) in processedMenuData"
              :key="item.id"
              class="lnb-menu-item"
         >
@@ -66,53 +17,164 @@ const handleSelect = (id: string, selected: string) => {
                 <slot name="title-right"
                       v-bind="$props"
                 />
-                <new-mark v-if="item.hightlightTag === 'new'" />
-                <update-mark v-else-if="item.hightlightTag === 'update'" />
-                <beta-mark v-else-if="item.hightlightTag === 'beta'" />
+                <new-mark v-if="item.isNew" />
+                <beta-mark v-if="item.isBeta" />
                 <span v-if="item.foldable"
                       class="toggle-button"
                       @click="handleFoldableToggle"
                 >
                     <p-i width="1rem"
                          height="1rem"
-                         :name="state.isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
+                         :name="isFolded ? 'ic_chevron-up' : 'ic_chevron-down'"
                          color="inherit transparent"
                     />
                 </span>
             </p>
-            <p v-else-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
+            <p v-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
                class="top-title-wrapper"
             >
                 <span class="top-title">{{ item.label }}</span>
             </p>
-            <div v-else-if="item.type === MENU_ITEM_TYPE.DROPDOWN"
-                 class="select-options-wrapper"
+
+            <div v-if="item.type === MENU_ITEM_TYPE.DIVIDER && showMenu"
+                 class="divider"
             >
-                <p-select-dropdown class="select-options-dropdown"
-                                   :menu="item.selectOptions.items"
-                                   :selected="item.selectOptions.defaultSelected"
-                                   @update:selected="handleSelect(item.id, $event)"
-                />
+                <p-divider />
             </div>
-            <l-n-b-divider-menu-item v-else-if="item.type === MENU_ITEM_TYPE.DIVIDER && state.showMenu" />
-            <l-n-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
-                                    :item="item"
-                                    :depth="depth"
-                                    :is-domain-owner="state.isDomainOwner"
-                                    :idx="idx"
-                                    :current-path="currentPath"
+            <router-link
+                v-if="item.type === MENU_ITEM_TYPE.ITEM && showMenu"
+                class="menu-item"
+                :class="[{'second-depth': depth === 2}, {'selected': isSelectedMenu(item.to)}]"
+                :to="item.to"
+                @click.native="$event.stopImmediatePropagation()"
+                @mouseenter.native="hoveredItem = item.id"
+                @mouseleave.native="hoveredItem = ''"
             >
-                <template v-for="(_, slot) of $scopedSlots"
-                          #[slot]="scope"
-                >
-                    <slot :name="slot"
-                          v-bind="scope"
+                <slot name="before-text"
+                      v-bind="{...$props, item, index: idx}"
+                />
+                <div class="text-wrapper">
+                    <p-i v-if="item.icon"
+                         :name="item.icon"
+                         width="1rem"
+                         height="1rem"
+                         class="icon"
                     />
-                </template>
-            </l-n-b-router-menu-item>
+                    <span class="text">{{ item.label }}</span>
+                    <slot name="after-text"
+                          v-bind="{...$props, item, index: idx}"
+                    />
+                    <new-mark v-if="item.isNew" />
+                    <beta-mark v-if="item.isBeta" />
+                </div>
+                <slot name="right-extra"
+                      v-bind="{...$props, item, index: idx}"
+                />
+                <favorite-button
+                    v-if="!item.hideFavorite && !isDomainOwner"
+                    :item-id="item.id"
+                    :favorite-type="item.favoriteType ? item.favoriteType : FAVORITE_TYPE.MENU"
+                    :visible-active-case-only="!getIsHovered(item.id)"
+                    scale="0.8"
+                    class="favorite-button"
+                />
+            </router-link>
         </div>
     </div>
 </template>
+
+<script lang="ts">
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from 'vue';
+import type { Location } from 'vue-router';
+
+import { PDivider, PI } from '@spaceone/design-system';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
+import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
+
+interface Props {
+    menuData: LNBMenu;
+    currentPath: string;
+}
+
+export default defineComponent<Props>({
+    name: 'LNBMenuItem',
+    components: {
+        FavoriteButton,
+        PI,
+        BetaMark,
+        NewMark,
+        PDivider,
+    },
+    props: {
+        menuData: {
+            type: [Object, Array] as PropType<LNBMenu>,
+            default: () => ({}),
+        },
+        currentPath: {
+            type: String,
+            default: undefined,
+        },
+        depth: {
+            type: Number,
+            default: 1,
+        },
+    },
+
+    setup(props) {
+        const state = reactive({
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            processedMenuData: computed(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
+            isFolded: false,
+            isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
+            showMenu: computed(() => (state.isFoldableMenu && !state.isFolded) || !state.isFoldableMenu), // toggle menu
+            hoveredItem: '',
+        });
+
+        const handleFoldableToggle = () => {
+            state.isFolded = !state.isFolded;
+        };
+
+        const isSelectedMenu = (selectedMenuRoute: Location): boolean => {
+            let currentPath = props.currentPath;
+            if (!currentPath) return false;
+
+            const resolved = SpaceRouter.router.resolve(selectedMenuRoute);
+            if (!resolved) return false;
+
+            if (currentPath.indexOf('?') > 0) {
+                currentPath = currentPath.slice(0, currentPath.indexOf('?'));
+            }
+            let resolvedHref = resolved.href;
+            if (!currentPath.endsWith('/')) currentPath += '/';
+            if (!resolvedHref.endsWith('/')) resolvedHref += '/';
+            return currentPath.startsWith(resolvedHref);
+        };
+
+        const getIsHovered = (itemId: string) => state.hoveredItem && state.hoveredItem === itemId;
+
+        return {
+            ...toRefs(state),
+            handleFoldableToggle,
+            isSelectedMenu,
+            FAVORITE_TYPE,
+            MENU_ITEM_TYPE,
+            getIsHovered,
+        };
+    },
+});
+</script>
 
 <style lang="postcss" scoped>
 .lnb-menu-item {
@@ -144,11 +206,50 @@ const handleSelect = (id: string, selected: string) => {
         padding-left: 0.5rem;
         padding-bottom: 0.75rem;
     }
-    .select-options-wrapper {
-        padding: 0 0.5rem;
-        .select-options-dropdown {
-            @apply w-full;
+    .menu-item {
+        @apply border border-transparent inline-flex items-center w-full h-full justify-between;
+        font-size: 0.875rem;
+        line-height: 125%;
+        border-radius: 4px;
+        box-sizing: border-box;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        outline: 0;
+        height: 2rem;
+
+        &.second-depth {
+            padding-left: 1.25rem;
         }
+        &:focus, &:focus-within, &:active {
+            @apply bg-white border-secondary1;
+            box-shadow: 0 0 0 2px rgba(theme('colors.secondary1'), 0.2);
+        }
+        &.selected {
+            @apply bg-blue-200;
+        }
+        &:hover {
+            @apply bg-blue-100 cursor-pointer;
+        }
+        .text-wrapper {
+            @apply inline-flex overflow-hidden whitespace-no-wrap;
+            .text {
+                @apply overflow-hidden whitespace-no-wrap;
+                text-overflow: ellipsis;
+            }
+            .icon {
+                flex-shrink: 0;
+                margin-right: 0.25rem;
+            }
+        }
+        .favorite-button {
+            flex-shrink: 0;
+            margin-left: 0.25rem;
+        }
+    }
+    .divider {
+        margin-top: 1.25rem;
+        margin-bottom: 1.25rem;
+        height: 0;
     }
 }
 </style>

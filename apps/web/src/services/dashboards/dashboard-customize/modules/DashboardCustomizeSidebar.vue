@@ -1,82 +1,3 @@
-<script setup lang="ts">
-import {
-    computed,
-    defineEmits,
-    onMounted, onUnmounted, reactive,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-import draggable from 'vuedraggable';
-
-import {
-    PButton, PDivider, PI, PToggleButton, PFieldTitle,
-} from '@spaceone/design-system';
-
-import { store } from '@/store';
-
-import { red } from '@/styles/colors';
-
-import DashboardWidgetAddModal from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardWidgetAddModal.vue';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import type { DashboardLayoutWidgetInfo, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-
-interface Props {
-    loading?: boolean;
-    saveButtonText?: TranslateResult;
-    hideCancelButton?: boolean;
-}
-
-const props = defineProps<Props>();
-const emit = defineEmits<{(e: string, value: string): void,
-    (e: 'save'): void,
-    (e: 'cancel'): void,
-}>();
-
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
-const state = reactive({
-    widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => dashboardDetailState.dashboardWidgetInfoList),
-    widgetConfigMap: computed<Record<string, WidgetConfig>>(() => {
-        const _configMap: Record<string, WidgetConfig> = {};
-        state.widgetInfoList.forEach((d) => {
-            _configMap[d.widget_key] = getWidgetConfig(d.widget_name);
-        });
-        return _configMap;
-    }),
-    enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
-    addWidgetModalVisible: false,
-});
-
-/* Event */
-const handleChangeDateRangeToggle = () => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.settings.date_range.enabled = !_state.settings.date_range.enabled;
-    });
-};
-const handleClickAddWidget = () => {
-    state.addWidgetModalVisible = true;
-};
-const handleClickCancelButton = () => {
-    emit('cancel');
-    // TODO: revert dashboardState here
-};
-const handleClickSaveButton = () => {
-    emit('save');
-};
-const handleAddWidget = (newWidget: DashboardLayoutWidgetInfo) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.dashboardWidgetInfoList = _state.dashboardWidgetInfoList.concat([newWidget]);
-    });
-};
-
-onMounted(() => {
-    store.dispatch('display/showWidget');
-});
-onUnmounted(() => {
-    store.dispatch('display/hideSidebar');
-});
-</script>
-
 <template>
     <div class="dashboard-customize-sidebar">
         <portal to="widget-title">
@@ -92,6 +13,18 @@ onUnmounted(() => {
                             <p-toggle-button :value="state.enableDateRange"
                                              class="toggle-button"
                                              @change-toggle="handleChangeDateRangeToggle"
+                            />
+                        </template>
+                    </p-field-title>
+                </div>
+                <div class="selector-wrapper">
+                    <p-field-title :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_CURRENCY')"
+                                   font-weight="regular"
+                    >
+                        <template #left>
+                            <p-toggle-button :value="state.enableCurrency"
+                                             class="toggle-button"
+                                             @change-toggle="handleChangeCurrencyToggle"
                             />
                         </template>
                     </p-field-title>
@@ -119,7 +52,7 @@ onUnmounted(() => {
                                  width="1rem"
                                  height="1rem"
                             /></span>
-                        <span class="text">{{ widget.title ?? state.widgetConfigMap[widget.widget_key]?.title }}</span>
+                        <span class="text">{{ widget.title }}</span>
                         <span v-if="dashboardDetailState.widgetValidMap[widget.widget_key] === false"
                               class="error-icon-wrapper"
                         >
@@ -156,6 +89,83 @@ onUnmounted(() => {
         />
     </div>
 </template>
+
+<script setup lang="ts">
+import {
+    computed,
+    defineEmits,
+    onMounted, onUnmounted, reactive,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import draggable from 'vuedraggable';
+
+import {
+    PButton, PDivider, PI, PToggleButton, PFieldTitle,
+} from '@spaceone/design-system';
+
+import { store } from '@/store';
+
+import { red } from '@/styles/colors';
+
+import DashboardWidgetAddModal from '@/services/dashboards/dashboard-customize/modules/dashboard-widget-add-modal/DashboardWidgetAddModal.vue';
+import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+
+interface Props {
+    loading?: boolean;
+    saveButtonText?: TranslateResult;
+    hideCancelButton?: boolean;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits<{(e: string, value: string): void,
+    (e: 'save'): void,
+    (e: 'cancel'): void,
+}>();
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
+const state = reactive({
+    widgetInfoList: computed(() => dashboardDetailState.dashboardWidgetInfoList),
+    enableDateRange: computed(() => dashboardDetailState.settings.date_range?.enabled ?? false),
+    enableCurrency: computed(() => dashboardDetailState.settings.currency?.enabled ?? false),
+    addWidgetModalVisible: false,
+});
+
+/* Event */
+const handleChangeDateRangeToggle = () => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.settings.date_range.enabled = !_state.settings.date_range.enabled;
+    });
+};
+const handleChangeCurrencyToggle = () => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.settings.currency.enabled = !_state.settings.currency.enabled;
+    });
+};
+const handleClickAddWidget = () => {
+    state.addWidgetModalVisible = true;
+};
+const handleClickCancelButton = () => {
+    emit('cancel');
+    // TODO: revert dashboardState here
+};
+const handleClickSaveButton = () => {
+    emit('save');
+};
+const handleAddWidget = (newWidget: DashboardLayoutWidgetInfo) => {
+    dashboardDetailStore.$patch((_state) => {
+        _state.dashboardWidgetInfoList = _state.dashboardWidgetInfoList.concat([newWidget]);
+    });
+};
+
+onMounted(() => {
+    store.dispatch('display/showWidget');
+});
+onUnmounted(() => {
+    store.dispatch('display/hideSidebar');
+});
+</script>
 
 <style lang="postcss" scoped>
 .sidebar-title {

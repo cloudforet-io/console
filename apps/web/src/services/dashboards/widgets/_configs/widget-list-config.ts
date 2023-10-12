@@ -3,11 +3,11 @@ import baseCountOfFindings from '@/services/dashboards/widgets/_base/base-count-
 import basePie from '@/services/dashboards/widgets/_base/base-pie/widget-config';
 import baseTrend from '@/services/dashboards/widgets/_base/base-trend/widget-config';
 // console widgets
-import complianceStatus from '@/services/dashboards/widgets/asset-widgets/compliance-status/widget-config';
+import complianceCheckStatus from '@/services/dashboards/widgets/asset-widgets/compliance-check-status/widget-config';
 import countOfFailFindings from '@/services/dashboards/widgets/asset-widgets/count-of-fail-findings/widget-config';
 import countOfPassAndFailFindings from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import severityStatusByService from '@/services/dashboards/widgets/asset-widgets/severity-status-by-service/widget-config';
-import totalFailFindingsStatus from '@/services/dashboards/widgets/asset-widgets/total-fail-findings-status/widget-config';
+import totalFailureAndSeverity from '@/services/dashboards/widgets/asset-widgets/total-failure-and-severity/widget-config';
 import trendOfPassAndFailFindings from '@/services/dashboards/widgets/asset-widgets/trend-of-pass-and-fail-findings/widget-config';
 import awsCloudFrontCost from '@/services/dashboards/widgets/cost-widgets/aws-cloud-front-cost/widget-config';
 import awsDataTransferByRegion from '@/services/dashboards/widgets/cost-widgets/aws-data-transfer-by-region/widget-config';
@@ -43,8 +43,8 @@ export const CONSOLE_WIDGET_LIST = [
     'countOfFailFindings',
     'countOfPassAndFailFindings',
     'trendOfPassAndFailFindings',
-    'totalFailFindingsStatus',
-    'complianceStatus',
+    'totalFailureAndSeverity',
+    'complianceCheckStatus',
 ] as const;
 
 export type WidgetKey = typeof CONSOLE_WIDGET_LIST[number];
@@ -69,8 +69,8 @@ export const CONSOLE_WIDGET_CONFIGS: Record<WidgetKey, Partial<WidgetConfig>> = 
     countOfFailFindings,
     countOfPassAndFailFindings,
     trendOfPassAndFailFindings,
-    totalFailFindingsStatus,
-    complianceStatus,
+    totalFailureAndSeverity,
+    complianceCheckStatus,
 };
 
 export const BASE_WIDGET_CONFIGS: Record<string, Partial<WidgetConfig>> = {

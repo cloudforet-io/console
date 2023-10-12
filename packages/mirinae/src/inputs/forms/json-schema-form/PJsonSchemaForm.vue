@@ -11,7 +11,7 @@
             <p-text-editor :code="jsonInputData"
                            disable-auto-reformat
                            :read-only="schema.disabled"
-                           @update:code="handleUpdateJsonData(schema, $event)"
+                           @update:code="handleUpdateJsonData(schema, ...arguments)"
             />
             <template #invalid>
                 <span v-for="invalidMessage in invalidMessages"
@@ -75,41 +75,40 @@
                             <p-select-dropdown v-else-if="schemaProperty.componentName === 'PSelectDropdown'"
                                                :key="`PSelectDropdown-${schemaProperty.propertyName}`"
                                                :selected="rawFormData[schemaProperty.propertyName]"
-                                               :menu="schemaProperty.menuItems"
+                                               :items="schemaProperty.menuItems"
                                                :disabled="schemaProperty.disabled"
                                                :use-fixed-menu-style="useFixedMenuStyle"
+                                               :button-text-ellipsis="uniformWidth"
                                                is-fixed-width
-                                               class="input-form"
+                                               class="input-form select-dropdown"
                                                @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
-                                <template #dropdown-button="item">
+                                <template #default="{ item }">
                                     <slot name="dropdown-extra"
                                           v-bind="{...schemaProperty, selectedItem: item }"
                                     />
                                 </template>
                             </p-select-dropdown>
-                            <p-select-dropdown v-else-if="schemaProperty.componentName === 'PFilterableDropdown'"
-                                               :key="`PFilterableDropdown-${schemaProperty.propertyName}`"
-                                               :menu="schemaProperty.menuItems"
-                                               :selected="rawFormData[schemaProperty.propertyName]"
-                                               :multi-selectable="schemaProperty.multiInputMode"
-                                               :appearance-type="schemaProperty.appearanceType"
-                                               :page-size="10"
-                                               show-select-marker
-                                               :use-fixed-menu-style="useFixedMenuStyle"
-                                               :invalid="invalid"
-                                               :handler="schemaProperty.referenceHandler"
-                                               is-filterable
-                                               is-fixed-width
-                                               class="input-form"
-                                               @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
+                            <p-filterable-dropdown v-else-if="schemaProperty.componentName === 'PFilterableDropdown'"
+                                                   :key="`PFilterableDropdown-${schemaProperty.propertyName}`"
+                                                   :menu="schemaProperty.menuItems"
+                                                   :selected="rawFormData[schemaProperty.propertyName]"
+                                                   :multi-selectable="schemaProperty.multiInputMode"
+                                                   :appearance-type="schemaProperty.appearanceType"
+                                                   :page-size="10"
+                                                   show-select-marker
+                                                   :use-fixed-menu-style="useFixedMenuStyle"
+                                                   :invalid="invalid"
+                                                   :handler="schemaProperty.referenceHandler"
+                                                   class="input-form"
+                                                   @update:selected="handleUpdateFormValue(schemaProperty, propertyIdx, ...arguments)"
                             >
                                 <template #selected-extra="{ items }">
                                     <slot name="dropdown-extra"
                                           v-bind="{...schemaProperty, selectedItem: items}"
                                     />
                                 </template>
-                            </p-select-dropdown>
+                            </p-filterable-dropdown>
                             <template v-else>
                                 <p-text-input :key="`PTextInput-${schemaProperty.propertyName}`"
                                               :value="schemaProperty.multiInputMode ? undefined : rawFormData[schemaProperty.propertyName]"
@@ -144,14 +143,15 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import {
-    computed, defineComponent, onBeforeUnmount, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from 'vue';
 
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { isEqual } from 'lodash';
+import { isEmpty } from 'lodash';
 
 import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
+import PFilterableDropdown from '@/inputs/dropdown/filterable-dropdown/PFilterableDropdown.vue';
 import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import GenerateIdFormat from '@/inputs/forms/json-schema-form/components/GenerateIdFormat.vue';
@@ -159,12 +159,20 @@ import { useLocalize } from '@/inputs/forms/json-schema-form/composables/localiz
 import { useValidation } from '@/inputs/forms/json-schema-form/composables/validation';
 import { addCustomFormats, addCustomKeywords } from '@/inputs/forms/json-schema-form/custom-schema';
 import {
-    initRefinedFormData, refineObjectByProperties,
+    getAppearanceType,
+    getComponentNameBySchemaProperty,
+    getInputPlaceholderBySchemaProperty,
+    getInputTypeBySchemaProperty,
+    getMenuItemsBySchemaProperty,
+    getMultiInputMode,
+    getReferenceHandler,
+    getUseAutoComplete,
+    initFormDataWithSchema,
+    initJsonInputDataWithSchema,
+    initRefinedFormData,
+    refineObjectByProperties,
     refineValueByProperty,
-} from '@/inputs/forms/json-schema-form/helpers/form-data-refine-helper';
-import { getSchemaProperties } from '@/inputs/forms/json-schema-form/helpers/inner-schema-helper';
-import { initJsonInputDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/json-input-helper';
-import { initRawFormDataWithSchema, updateRawFormDataWithSchema } from '@/inputs/forms/json-schema-form/helpers/raw-form-data-helper';
+} from '@/inputs/forms/json-schema-form/helper';
 import type {
     InnerJsonSchema,
     JsonSchema,
@@ -184,6 +192,7 @@ const PJsonSchemaForm = () => ({
 export default defineComponent<JsonSchemaFormProps>({
     name: 'PJsonSchemaForm',
     components: {
+        PFilterableDropdown,
         PJsonSchemaForm,
         PSelectDropdown,
         PTextEditor,
@@ -251,16 +260,52 @@ export default defineComponent<JsonSchemaFormProps>({
 
         const state = reactive({
             isJsonInputMode: computed(() => props.schema?.json),
+            schemaProperties: computed<InnerJsonSchema[]>(() => {
+                const properties: object|undefined = props.schema?.properties;
+                const order: string[] = props.schema?.order ?? [];
+                if (properties && !isEmpty(properties)) {
+                    return Object.entries(properties).map(([k, schemaProperty]) => {
+                        const refined: InnerJsonSchema = {
+                            ...schemaProperty,
+                            propertyName: k,
+                            componentName: getComponentNameBySchemaProperty(schemaProperty),
+                            inputType: getInputTypeBySchemaProperty(schemaProperty),
+                            inputPlaceholder: getInputPlaceholderBySchemaProperty(schemaProperty),
+                            menuItems: getMenuItemsBySchemaProperty(schemaProperty),
+                            multiInputMode: getMultiInputMode(schemaProperty),
+                            useAutoComplete: getUseAutoComplete(schemaProperty),
+                            appearanceType: getAppearanceType(schemaProperty),
+                            referenceHandler: getReferenceHandler(schemaProperty, props),
+                        };
+                        return refined;
+                    }).sort((a, b) => {
+                        const orderA = order.findIndex((propertyName) => propertyName === a.propertyName);
+                        const orderB = order.findIndex((propertyName) => propertyName === b.propertyName);
+
+                        // If both do not have order information, they are sorted based on title or property name.
+                        if (orderA === -1 && orderB === -1) {
+                            const textA = a.title ?? a.propertyName;
+                            const textB = b.title ?? b.propertyName;
+                            return textA.localeCompare(textB);
+                        }
+
+                        // If only one of them does not have order information, the item without order information is placed at the back.
+                        if (orderA === -1) return 1;
+                        if (orderB === -1) return -1;
+
+                        // If both have order information, sort based on the order information.
+                        return orderA - orderB;
+                    });
+                }
+                return [];
+            }),
             requiredList: computed<string[]>(() => props.schema?.required ?? []),
-            // refined schema properties to bind props to components
-            schemaProperties: [] as InnerJsonSchema[],
             // For form input case
-            rawFormData: {} as object,
+            rawFormData: initFormDataWithSchema(props.schema, props.formData) as object,
             // For json input case
-            jsonInputData: undefined as string|undefined,
+            jsonInputData: initJsonInputDataWithSchema(props.schema, props.formData) as string|undefined,
             // For all cases. In root case, it can be only an object.
-            refinedFormData: {} as any,
-            unmounting: false,
+            refinedFormData: initRefinedFormData(props.schema, props.formData, props.isRoot) as any,
         });
 
         const { localize } = useLocalize(props);
@@ -274,53 +319,23 @@ export default defineComponent<JsonSchemaFormProps>({
             customErrorMap: computed(() => props.customErrorMap),
         });
 
-        const initSchemaAndData = async () => {
-            let jsonInputData: string|undefined;
-            let rawFormData: object|undefined;
-            let refined: any;
+        const initFormData = () => {
+            if (state.isJsonInputMode) state.jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
+            else state.rawFormData = initFormDataWithSchema(props.schema, props.formData);
 
-            if (state.isJsonInputMode) {
-                jsonInputData = initJsonInputDataWithSchema(props.schema, props.formData);
-                if (props.isRoot) refined = initRefinedFormData(props.schema, props.formData, props.isRoot);
-            } else {
-                rawFormData = await initRawFormDataWithSchema(props.schema, props.formData, props.referenceHandler);
-                refined = initRefinedFormData(props.schema, rawFormData, props.isRoot);
-            }
-
-            // CAUTION: states should be updated together after all async operations are done.
-            state.schemaProperties = getSchemaProperties(props.schema, props.referenceHandler);
-
-            if (jsonInputData !== undefined) state.jsonInputData = jsonInputData;
-            if (rawFormData !== undefined) state.rawFormData = rawFormData;
-            if (refined !== undefined) state.refinedFormData = refined;
+            if (props.isRoot) state.refinedFormData = initRefinedFormData(props.schema, props.formData);
         };
-        const updateFormData = async (schema: JsonSchema, prevSchema: JsonSchema) => {
-            const [rawFormData, newInputOccurredMap] = await updateRawFormDataWithSchema(schema, prevSchema, state.rawFormData, inputOccurredMap.value, props.referenceHandler);
-
-            let refined: any;
-            if (props.isRoot) {
-                refined = initRefinedFormData(schema, rawFormData, props.isRoot);
-            }
-
-            // CAUTION: states should be updated together after all async operations are done.
-            state.schemaProperties = getSchemaProperties(schema, props.referenceHandler);
-            state.rawFormData = rawFormData;
-            inputOccurredMap.value = newInputOccurredMap;
-            if (refined !== undefined) state.refinedFormData = refined;
-        };
-
-        const reset = async () => {
-            await initSchemaAndData();
+        const reset = () => {
+            initFormData();
             validatorErrors.value = null;
             inputOccurredMap.value = {};
             jsonInputOccurred.value = false;
         };
 
+
         /* Event Handlers */
         // form input case
         const handleUpdateFormValue = (property: InnerJsonSchema, propertyIdx: number, val?: any) => {
-            if (state.unmounting) return;
-
             const { propertyName, componentName } = property;
 
             /*
@@ -364,23 +379,15 @@ export default defineComponent<JsonSchemaFormProps>({
             if (props.isRoot) setJsonInputParsingError(jsonParsingError);
         };
 
-        (async () => {
-            await initSchemaAndData();
-        })();
-
         /* Watchers */
-        watch([() => props.schema, () => props.formData], async ([schema, formData], [prevSchema, prevFormData]) => {
-            if (isEqual(schema, prevSchema)) {
-                if (isEqual(formData, prevFormData)) return;
-                if (isEqual(formData, state.refinedFormData)) return;
-            } else if (props.resetOnSchemaChange || state.isJsonInputMode) {
-                await reset();
-                return;
-            }
-
-            await updateFormData(schema, prevSchema);
+        watch(() => props.schema, () => {
+            if (props.resetOnSchemaChange) reset();
         });
-        const stopWatch = watch(() => state.refinedFormData, (refinedFormData) => {
+        watch(() => props.formData, (formData) => {
+            if (formData === state.refinedFormData) return;
+            initFormData();
+        });
+        watch(() => state.refinedFormData, (refinedFormData) => {
             emit('update:form-data', refinedFormData);
             if (props.isRoot) {
                 const isValid = validateFormData();
@@ -388,11 +395,6 @@ export default defineComponent<JsonSchemaFormProps>({
                 emit('change', isValid, refinedFormData);
             }
         }, { immediate: !state.isJsonInputMode });
-
-        onBeforeUnmount(() => {
-            stopWatch();
-            state.unmounting = true;
-        });
 
         return {
             ...toRefs(state),

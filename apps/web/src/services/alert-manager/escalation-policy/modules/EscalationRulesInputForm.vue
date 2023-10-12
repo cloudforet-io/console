@@ -29,8 +29,8 @@
                 >{{ idx + 1 }}</p-badge>
             </span>
             <span class="col-notification">
-                <p-select-dropdown :selected="rule.notification_level"
-                                   :menu="NOTIFICATION_LEVELS"
+                <p-select-dropdown v-model="rule.notification_level"
+                                   :items="NOTIFICATION_LEVELS"
                                    use-fixed-menu-style
                 >
                     <template #menu-item--format="{item}">
@@ -74,8 +74,8 @@
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_LV') }}
                 </span>
                 <span class="input">
-                    <p-select-dropdown :selected="rule.notification_level"
-                                       :menu="MINIFIED_NOTIFICATION_LEVELS"
+                    <p-select-dropdown v-model="rule.notification_level"
+                                       :items="MINIFIED_NOTIFICATION_LEVELS"
                                        use-fixed-menu-style
                     >
                         <template #menu-item--format="{item}">
@@ -465,7 +465,9 @@ export default {
 
     /* custom design-system component - p-select-dropdown */
     :deep(.p-select-dropdown) {
-        min-width: 6rem;
+        .dropdown-button {
+            min-width: 6rem;
+        }
         .context-item {
             @apply border-b border-secondary;
             box-sizing: border-box;

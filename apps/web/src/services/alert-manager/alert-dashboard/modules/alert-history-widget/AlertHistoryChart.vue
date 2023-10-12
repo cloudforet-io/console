@@ -233,11 +233,9 @@ export default {
             state.loading = false;
         });
         watch(() => props.activatedProjects, async (activatedProjects) => {
-            if (activatedProjects) {
+            if (activatedProjects.length) {
                 state.loading = true;
                 await getDailyAlertHistory();
-                state.loading = false;
-            } else {
                 state.loading = false;
             }
         }, { immediate: true });

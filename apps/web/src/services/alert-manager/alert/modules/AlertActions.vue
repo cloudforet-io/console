@@ -9,11 +9,12 @@
         >
             {{ button.label }}
         </p-button>
-        <p-select-dropdown :menu="buttonGroup"
-                           :placeholder="$t('PLUGIN.COLLECTOR.MAIN.ACTION')"
+        <p-select-dropdown :items="buttonGroup"
                            class="only-mobile"
                            @select="onSelectAction"
-        />
+        >
+            {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
+        </p-select-dropdown>
 
         <p-table-check-modal
             theme-color="alert"

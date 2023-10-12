@@ -69,7 +69,7 @@ export const createLabel = (root: Root, settings?: am5.ILabelSettings): am5.Labe
     ...settings,
 });
 
-export const createCircle = (root: Root, settings: ICircleSettings, circleTemplate?: am5.Template<Circle>): am5.Circle => am5.Circle.new(root, {
+export const createCircle = (root: Root, settings: ICircleSettings, circleTemplate: am5.Template<Circle>): am5.Circle => am5.Circle.new(root, {
     ...settings,
 }, circleTemplate);
 
@@ -94,35 +94,5 @@ export const toggleSeries = (chart: am5.SerialChart, index: number) => {
         } else {
             series.hide();
         }
-    }
-};
-export const hideAllSeries = (chart: am5.SerialChart) => {
-    if (chart instanceof am5percent.PieChart) {
-        const series = chart.series.getIndex(0);
-        if (!series) return;
-        const slices = series.slices.values;
-        slices.forEach((slice) => {
-            if (slice.dataItem) slice.dataItem.hide();
-        });
-    } else {
-        const series = chart.series.values;
-        series.forEach((d) => {
-            d.hide();
-        });
-    }
-};
-export const showAllSeries = (chart: am5.SerialChart) => {
-    if (chart instanceof am5percent.PieChart) {
-        const series = chart.series.getIndex(0);
-        if (!series) return;
-        const slices = series.slices.values;
-        slices.forEach((slice) => {
-            if (slice.dataItem) slice.dataItem.show();
-        });
-    } else {
-        const series = chart.series.values;
-        series.forEach((d) => {
-            d.show();
-        });
     }
 };

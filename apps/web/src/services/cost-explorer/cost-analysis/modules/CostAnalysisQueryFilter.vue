@@ -1,332 +1,255 @@
-<script lang="ts" setup>
-import {
-    onClickOutside, useElementSize,
-} from '@vueuse/core';
-import {
-    computed, reactive, ref, watch,
-} from 'vue';
+<template>
+    <div class="cost-analysis-query-filter"
+         :class="{ 'print-mode': printMode }"
+    >
+        <div class="filter-wrapper tablet-off">
+            <div class="left-part">
+                <div class="filter-item">
+                    <b class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
+                    <p-select-dropdown :items="granularityItems"
+                                       :selected="costAnalysisPageState.granularity"
+                                       style-type="transparent"
+                                       :read-only="printMode"
+                                       class="granularity-select"
+                                       @select="handleSelectGranularity"
+                    />
+                </div>
+                <div v-if="costAnalysisPageState.granularity !== GRANULARITY.ACCUMULATED"
+                     class="filter-item"
+                >
+                    <template v-if="!printMode">
+                        <span class="v-divider" />
+                        <p-field-title :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.STACK')">
+                            <template #right>
+                                <p-toggle-button :value="costAnalysisPageState.stack"
+                                                 class="toggle-button"
+                                                 @change-toggle="handleToggleStack"
+                                />
+                            </template>
+                        </p-field-title>
+                    </template>
+                    <template v-else-if="costAnalysisPageState.stack">
+                        <span class="v-divider" />
+                        <span>Stacked</span>
+                    </template>
+                </div>
+            </div>
+            <div class="right-part">
+                <span class="timezone-text">UTC</span>
+                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
+                                                      :print-mode="printMode"
+                                                      @update="handleSelectedDates"
+                />
+                <span class="v-divider" />
+                <currency-select-dropdown :print-mode="printMode" />
+            </div>
+        </div>
+        <div class="filter-wrapper tablet-on">
+            <div class="right-part">
+                <cost-analysis-period-select-dropdown :fixed-period="costAnalysisPageState.period"
+                                                      :print-mode="printMode"
+                                                      @update="handleSelectedDates"
+                />
+                <span class="v-divider" />
+                <p-icon-button class="filter-item"
+                               name="ic_settings-filled"
+                               @click="handleClickSetFilter"
+                />
+            </div>
+        </div>
+        <cost-analysis-set-query-modal :visible.sync="setQueryModalVisible" />
+    </div>
+</template>
+
+<script lang="ts">
+import { computed, reactive, toRefs } from 'vue';
 
 import {
-    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover, PBadge,
-    useContextMenuController,
+    PIconButton, PSelectDropdown, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import CurrencySelectDropdown from '@/common/modules/dropdown/currency-select-dropdown/CurrencySelectDropdown.vue';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
-import {
-    DYNAMIC_COST_QUERY_SET_PARAMS,
-} from '@/services/cost-explorer/cost-analysis/config';
-import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
-import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { getInitialDates } from '@/services/cost-explorer/lib/helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
-const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisQueryFormModal.vue');
+const CostAnalysisSetQueryModal = () => import('@/services/cost-explorer/cost-analysis/modules/CostAnalysisSetQueryModal.vue');
 
-const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+export default {
+    name: 'CostAnalysisQueryFilter',
+    components: {
+        CurrencySelectDropdown,
+        CostAnalysisSetQueryModal,
+        CostAnalysisPeriodSelectDropdown,
+        PSelectDropdown,
+        PIconButton,
+        PToggleButton,
+        PFieldTitle,
+    },
+    props: {
+        printMode: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup() {
+        const costAnalysisPageStore = useCostAnalysisPageStore();
+        const costAnalysisPageState = costAnalysisPageStore.$state;
 
-const filtersPopperRef = ref<any|null>(null);
-const rightPartRef = ref<HTMLElement|null>(null);
-const contextMenuRef = ref<any|null>(null);
-const targetRef = ref<HTMLElement | null>(null);
-
-const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
-
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-    queryFormModalVisible: false,
-    granularityItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: GRANULARITY.DAILY,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
-        },
-        {
-            type: 'item',
-            name: GRANULARITY.MONTHLY,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
-        },
-        {
-            type: 'item',
-            name: GRANULARITY.YEARLY,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
-        },
-    ])),
-    saveDropdownMenuItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: 'saveAs',
-            icon: 'ic_disk-edit-filled',
-            label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
-        },
-    ])),
-    selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
-    isManagedQuerySet: computed(() => costAnalysisPageStore.managedCostQuerySetList.map((d) => d.cost_query_set_id).includes(state.selectedQuerySetId)),
-    isDynamicQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
-    filtersPopoverVisible: false,
-    granularity: undefined as Granularity|undefined,
-    isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
-    invalidPeriodMessage: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.INVALID_PERIOD_TEXT')),
-    selectedFiltersCount: computed(() => {
-        let count = 0;
-        Object.values(costAnalysisPageState.filters ?? {}).forEach((filterItems) => {
-            count += filterItems.length;
+        const state = reactive({
+            granularityItems: computed<MenuItem[]>(() => ([
+                {
+                    type: 'item',
+                    name: GRANULARITY.ACCUMULATED,
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ACCUMULATED'),
+                },
+                {
+                    type: 'item',
+                    name: GRANULARITY.DAILY,
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
+                },
+                {
+                    type: 'item',
+                    name: GRANULARITY.MONTHLY,
+                    label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
+                },
+            ])),
+            setQueryModalVisible: false,
         });
-        return count;
-    }),
-    showPeriodBadge: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
-    periodBadgeText: computed<string>(() => {
-        if (!costAnalysisPageState.period) return '';
-        let startDateFormat = 'MMM D';
-        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) startDateFormat = 'MMM YYYY';
-        else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) startDateFormat = 'YYYY';
-        const endDateFormat = costAnalysisPageState.granularity === GRANULARITY.DAILY ? 'MMM D, YYYY' : startDateFormat;
-        //
-        const start = dayjs.utc(costAnalysisPageState.period.start);
-        let end = dayjs.utc(costAnalysisPageState.period.end);
-        if (costAnalysisPageState.granularity === GRANULARITY.DAILY) end = dayjs.utc(costAnalysisPageState.period.end).endOf('month');
-        return `${start.format(startDateFormat)} ~ ${end.format(endDateFormat)}`;
-    }),
-});
 
-const {
-    visibleMenu: visibleContextMenu,
-    contextMenuStyle,
-    showContextMenu,
-    hideContextMenu,
-} = useContextMenuController({
-    useFixedStyle: false,
-    targetRef,
-    contextMenuRef,
-    menu: state.saveDropdownMenuItems,
-});
-onClickOutside(rightPartRef, hideContextMenu);
+        /* event */
+        const handleSelectGranularity = async (granularity: Granularity) => {
+            if (granularity !== costAnalysisPageState.granularity) {
+                costAnalysisPageStore.$patch((_state) => {
+                    _state.period = getInitialDates();
+                });
+            }
+            costAnalysisPageStore.$patch({ granularity });
+        };
+        const handleToggleStack = async (value) => {
+            costAnalysisPageStore.$patch({ stack: value });
+        };
+        const handleSelectedDates = (period) => {
+            costAnalysisPageStore.$patch((_state) => {
+                _state.period = period;
+            });
+        };
+        const handleClickSetFilter = () => {
+            state.setQueryModalVisible = true;
+        };
 
-/* event */
-const handleSelectGranularity = async (granularity: Granularity) => {
-    costAnalysisPageStore.$patch({ granularity });
-    state.granularity = granularity;
-};
-const handleSaveQuerySet = async () => {
-    try {
-        await SpaceConnector.client.costAnalysis.costQuerySet.update({
-            cost_query_set_id: costAnalysisPageStore.selectedQueryId,
-            options: {
-                granularity: costAnalysisPageState.granularity,
-                period: costAnalysisPageState.period,
-                relative_period: costAnalysisPageState.relativePeriod,
-                group_by: costAnalysisPageState.groupBy,
-                filters: costAnalysisPageStore.consoleFilters,
-                metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
-            },
-        });
-        showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVE_QUERY'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
-    }
-};
-const handleClickMoreMenuButton = () => {
-    if (visibleContextMenu.value) hideContextMenu();
-    else showContextMenu();
-};
-const handleClickSaveAsButton = () => {
-    state.queryFormModalVisible = true;
-};
-const handleUpdateQuery = (updatedQueryId: string) => {
-    costAnalysisPageStore.getCostQueryList();
-    costAnalysisPageStore.selectQueryId(updatedQueryId);
-};
-const handleClickFilter = () => {
-    state.filtersPopoverVisible = !state.filtersPopoverVisible;
-};
+        const dateFormatter = (date) => dayjs.utc(date).format('YYYY/MM/DD');
 
-watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
-    if (updatedQueryId !== '') {
-        state.filtersPopoverVisible = false;
-    }
-}, { immediate: true });
+        return {
+            ...toRefs(state),
+            costAnalysisPageState,
+            GRANULARITY,
+            handleSelectGranularity,
+            handleToggleStack,
+            handleSelectedDates,
+            handleClickSetFilter,
+            dateFormatter,
+        };
+    },
+};
 </script>
-
-<template>
-    <div class="cost-analysis-query-filter">
-        <div class="filter-wrapper"
-             :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
-        >
-            <div class="left-part">
-                <p-select-dropdown :menu="state.granularityItems"
-                                   :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
-                                   style-type="rounded"
-                                   :selected="costAnalysisPageState.granularity"
-                                   class="granularity-dropdown"
-                                   @select="handleSelectGranularity"
-                />
-                <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
-                <p-badge v-if="state.showPeriodBadge"
-                         badge-type="subtle"
-                         style-type="gray200"
-                >
-                    {{ state.periodBadgeText }}
-                </p-badge>
-                <p-popover :is-visible.sync="state.filtersPopoverVisible"
-                           :class="{ 'open': state.filtersPopoverVisible }"
-                           ignore-outside-click
-                           trigger="click"
-                           relative-style
-                           position="bottom-start"
-                           class="filters-popover"
-                >
-                    <p-button style-type="tertiary"
-                              class="filters-button"
-                              icon-left="ic_filter"
-                              @click="handleClickFilter"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTERS') }}
-                        <p-badge v-if="state.selectedFiltersCount"
-                                 badge-type="subtle"
-                                 :style-type="state.filtersPopoverVisible ? 'gray100' : 'gray200'"
-                                 class="filters-badge"
-                        >
-                            {{ state.selectedFiltersCount }}
-                        </p-badge>
-                    </p-button>
-                    <template #content>
-                        <cost-analysis-filters-popper ref="filtersPopperRef" />
-                    </template>
-                </p-popover>
-            </div>
-            <div v-if="state.hasManagePermission"
-                 ref="rightPartRef"
-                 class="right-part"
-            >
-                <template v-if="!state.isManagedQuerySet && !state.isDynamicQuerySet">
-                    <p-button class="save-button"
-                              style-type="tertiary"
-                              icon-left="ic_disk-filled"
-                              @click="handleSaveQuerySet"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
-                    </p-button>
-                    <p-icon-button ref="targetRef"
-                                   class="more-menu-button"
-                                   :name="visibleContextMenu ? 'ic_chevron-up' : 'ic_chevron-down'"
-                                   style-type="tertiary"
-                                   shape="square"
-                                   size="md"
-                                   color="inherit"
-                                   @click="handleClickMoreMenuButton"
-                    />
-                    <p-context-menu v-show="visibleContextMenu"
-                                    ref="contextMenuRef"
-                                    :menu="state.saveDropdownMenuItems"
-                                    :style="contextMenuStyle"
-                                    @select="handleClickSaveAsButton"
-                    />
-                </template>
-                <template v-else>
-                    <p-button style-type="tertiary"
-                              icon-left="ic_disk-edit-filled"
-                              @click="handleClickSaveAsButton"
-                    >
-                        {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS') }}
-                    </p-button>
-                </template>
-            </div>
-        </div>
-        <div v-if="state.isPeriodInvalid"
-             class="invalid-text"
-        >
-            {{ state.invalidPeriodMessage }}
-        </div>
-        <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
-                                        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
-                                        :request-type="REQUEST_TYPE.SAVE"
-                                        :selected-query-set-id="costAnalysisPageStore.selectedQueryId"
-                                        @update-query="handleUpdateQuery"
-        />
-    </div>
-</template>
 
 <style lang="postcss" scoped>
 .cost-analysis-query-filter {
-    margin-top: 1.5rem;
     .filter-wrapper {
-        @apply relative flex items-center justify-between;
+        display: flex;
+        justify-content: space-between;
         font-size: 0.875rem;
+        .timezone-text {
+            @apply text-gray-400;
+            font-size: 0.875rem;
+            font-weight: bold;
+            line-height: 1.5;
+            padding-right: 0.5rem;
+        }
         .left-part {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            .granularity-dropdown {
-                min-width: unset;
+            .filter-item {
+                .p-select-dropdown {
+                    padding-left: 0.5rem;
+                }
             }
         }
         .right-part {
-            @apply relative;
             display: flex;
-            align-items: flex-start;
-
-            .save-button {
-                border-top-right-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-            .more-menu-button {
-                border-top-left-radius: 0;
-                border-bottom-left-radius: 0;
-                border-left: 0;
-            }
-
-            /* custom design-system component - p-context-menu */
-            :deep(.p-context-menu) {
-                @apply absolute;
-                top: 2.125rem;
-                margin-top: -1px;
-                z-index: 100;
-                right: 0;
-                .p-context-menu-item {
-                    min-width: 10rem;
-                }
-            }
+            align-items: center;
         }
-        .filters-button {
-            .filters-badge {
+        .filter-item {
+            display: flex;
+            align-items: center;
+            .toggle-button {
                 margin-left: 0.25rem;
             }
         }
+        .v-divider {
+            @apply bg-gray-300;
+            display: inline-block;
+            position: relative;
+            width: 1px;
+            height: 1rem;
+            margin: 0 0.5rem;
+        }
+        .p-select-dropdown {
+            @apply bg-transparent;
+        }
+    }
+    .tablet-on {
+        display: none;
+    }
 
-        /* custom design-system component - p-popover */
-        :deep(.p-popover) {
-            &.open {
-                .p-button.filters-button {
-                    @apply bg-gray-200;
-                }
-            }
-            .popper {
-                width: 100%;
-                max-width: 100%;
-                left: 2rem;
-                transform: translate(0, 3rem) !important;
-                .arrow {
-                    left: 1.25rem !important;
-                }
+    &.print-mode {
+        .label {
+            white-space: nowrap;
+        }
+
+        /* custom design-system component - p-select-dropdown */
+        :deep(.granularity-select) {
+            .text {
+                white-space: nowrap;
             }
         }
     }
-    .invalid-text {
-        @apply text-red-400 text-label-md;
-        margin-top: 0.5rem;
+
+    @screen tablet {
+        .tablet-off {
+            display: none;
+        }
+        .tablet-on {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            padding-bottom: 1rem;
+        }
+        .right-part {
+            margin-left: auto;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+    }
+
+    @screen mobile {
+        .filter-wrapper {
+            .cost-analysis-period-select-dropdown {
+                width: 100%;
+            }
+            .v-divider {
+                @apply hidden;
+            }
+        }
     }
 }
 </style>

@@ -1,3 +1,12 @@
+<template>
+    <p-select-dropdown :selected="selected"
+                       :items="props.items"
+                       style-type="transparent"
+                       class="widget-frame-header-dropdown"
+                       @select="handleSelectItem"
+    />
+</template>
+
 <script setup lang="ts">
 import { defineProps, defineEmits } from 'vue';
 
@@ -15,12 +24,3 @@ const handleSelectItem = (selected: string) => {
     emit('select', selected);
 };
 </script>
-
-<template>
-    <p-select-dropdown :selected="selected"
-                       :menu="props.items"
-                       style-type="transparent"
-                       class="widget-frame-header-dropdown"
-                       @select="handleSelectItem"
-    />
-</template>

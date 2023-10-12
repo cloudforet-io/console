@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import Fuse from 'fuse.js';
 import { range } from 'lodash';
 
-import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
+import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { ReferenceHandler } from '@/inputs/forms/json-schema-form/type';
 
 export const getDefaultSchema = () => ({
@@ -170,18 +170,18 @@ export const getJsonInputSchema = () => {
     return schema;
 };
 
-const getMenuItem = (): SelectDropdownMenuItem => ({
+const getMenuItem = (): FilterableDropdownMenuItem => ({
     name: faker.datatype.uuid(),
     label: `${faker.random.word()}`, // (${faker.random.word()})`,
     type: 'item',
     // disabled: faker.datatype.boolean(),
 });
-export const getMenuItems = (min = 10, max = 30): SelectDropdownMenuItem[] => range(faker.datatype.number({ min, max })).map(() => getMenuItem());
+export const getMenuItems = (min = 10, max = 30): FilterableDropdownMenuItem[] => range(faker.datatype.number({ min, max })).map(() => getMenuItem());
 
 export const getReferenceHandler = (pageSize = 10): ReferenceHandler => {
-    const allItems: SelectDropdownMenuItem[] = getMenuItems(pageSize * 3, pageSize * 4);
-    return async (inputText, { pageStart, pageSize: pageLimit }) => {
-        const allResults = await new Promise<SelectDropdownMenuItem[]>((resolve) => {
+    const allItems: FilterableDropdownMenuItem[] = getMenuItems(pageSize * 3, pageSize * 4);
+    return async (inputText, schema, pageStart, pageLimit) => {
+        const allResults = await new Promise<FilterableDropdownMenuItem[]>((resolve) => {
             setTimeout(() => {
                 let filtered;
                 const trimmed = inputText.trim();

@@ -27,8 +27,8 @@
                             <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button"
-                                           button-icon="ic_chevron-down"
-                                           :menu="menuItems"
+                                           button-icon="ic_more"
+                                           :items="menuItems"
                                            menu-position="right"
                                            :disabled="manageDisabled"
                                            @select="handleSelect(data.note_id)"

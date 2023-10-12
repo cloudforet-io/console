@@ -9,23 +9,25 @@
                 >
                     {{ $t('DASHBOARDS.CREATE.PUBLIC') }}
                 </p-radio>
-                <p class="viewer-description public">
+                <p class="viewer-description">
                     {{ $t('DASHBOARDS.CREATE.PUBLIC_DESC') }}
                 </p>
-                <p-radio
-                    :selected="!isPublicViewer"
-                    @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
-                >
-                    <p-i name="ic_lock-filled"
-                         width="0.875rem"
-                         height="0.875rem"
-                         class="mr-1 mb-1 ml-1 gray-500"
-                    />
-                    <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
-                </p-radio>
-                <p class="viewer-description">
-                    {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
-                </p>
+                <div>
+                    <p-radio
+                        :selected="!isPublicViewer"
+                        @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
+                    >
+                        <p-i name="ic_lock-filled"
+                             width="0.875rem"
+                             height="0.875rem"
+                             class="mr-1 mb-1 ml-1 gray-500"
+                        />
+                        <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
+                    </p-radio>
+                    <p class="viewer-description">
+                        {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
+                    </p>
+                </div>
             </p-radio-group>
         </div>
     </section>
@@ -71,16 +73,12 @@ export default {
 
 <style lang="postcss" scoped>
 .dashboard-viewers-form {
-    @apply flex flex-col mt-6;
-    gap: 0.5rem;
+    @apply mt-6;
     .dashboard-viewers-wrapper {
         .viewer-description {
             @apply text-xs text-gray-500;
             font-weight: 400;
-            margin-left: 1.5rem;
-        }
-        .public {
-            margin-bottom: 0.25rem;
+            margin: 0.25rem 0 0 1.5rem;
         }
     }
 }

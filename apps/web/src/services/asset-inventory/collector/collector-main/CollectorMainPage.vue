@@ -13,9 +13,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
@@ -33,10 +33,9 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 const state = reactive({
     initLoading: true,
@@ -89,24 +88,30 @@ const handleSelectedProvider = (providerName: string) => {
 
 /* API */
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
-const fetchCollectorCount = async () => {
+const fetchCollectorCount = async (): Promise<number> => {
     try {
         const { total_count } = await SpaceConnector.client.inventory.collector.list({
             query: collectorCountApiQueryHelper.data,
         });
-        state.hasCollectorList = total_count > 0;
+        return total_count;
     } catch (e) {
         ErrorHandler.handleError(e);
-    } finally {
-        state.initLoading = false;
+        return 0;
     }
 };
 
 /* INIT */
 onMounted(async () => {
+    state.initLoading = true;
+    await Promise.allSettled([
+        store.dispatch('reference/plugin/load'),
+        store.dispatch('reference/provider/load'),
+    ]);
     await collectorPageStore.$reset();
     setValuesFromUrlQueryString();
-    await fetchCollectorCount();
+    const count = await fetchCollectorCount();
+    state.hasCollectorList = count > 0;
+    state.initLoading = false;
 });
 </script>
 
@@ -137,7 +142,7 @@ onMounted(async () => {
             loader-backdrop-color="gray.100"
             class="collector-loader-wrapper"
         >
-            <div v-if="state.hasCollectorList && state.providerList.length > 1"
+            <div v-if="state.hasCollectorList"
                  class="collector-contents-wrapper"
             >
                 <provider-list

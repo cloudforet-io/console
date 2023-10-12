@@ -216,7 +216,8 @@ const sendResetEmail = async (userId, domainId) => {
         await SpaceConnector.clientV2.identity.user.resetPassword({ user_id: userId, domain_id: domainId });
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'done' } }).catch(() => {});
     } catch (e: any) {
-        if (e.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
+        const errorType = e.axiosError.response.data.detail.code;
+        if (errorType === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
             passwordFormEl.value.validationState.isIdValid = true;
             passwordFormEl.value.validationState.idInvalidText = i18n.t('AUTH.PASSWORD.FIND.INVALID_EMAIL_FORMAT');
         } else {

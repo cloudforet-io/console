@@ -16,7 +16,7 @@ import type { CollectorModel, Schedule, JobModel } from '@/services/asset-invent
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({
         loading: {
-            collectorList: true,
+            collectorList: false,
         },
         selectedProvider: 'all',
 

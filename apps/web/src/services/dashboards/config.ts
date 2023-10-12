@@ -1,5 +1,7 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { CURRENCY } from '@/store/modules/settings/config';
+
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 
@@ -45,10 +47,15 @@ export interface DateRange {
 
 
 // dashboard configs
+export type DashboardCurrency = 'DEFAULT' | typeof CURRENCY[keyof typeof CURRENCY];
 export interface DashboardSettings {
     date_range: {
         enabled: boolean;
     } & DateRange;
+    currency: {
+        enabled: boolean;
+        value?: DashboardCurrency;
+    };
     refresh_interval_option: RefreshIntervalOption;
 }
 
@@ -72,7 +79,6 @@ export const DASHBOARD_LABEL = {
     ASSET: 'Asset',
     COMPLIANCE: 'Compliance',
     SECURITY: 'Security',
-    BLANK: 'blank',
 } as const;
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 
@@ -99,8 +105,7 @@ export interface EnumOptions {
 export interface SearchResourceOptions {
     type: 'SEARCH_RESOURCE';
     resource_type: string;
-    resource_key?: string;
-    default_path?: string|number;
+    resource_key: string;
 }
 export interface ReferenceResourceOptions {
     type: 'REFERENCE_RESOURCE',
@@ -116,14 +121,15 @@ export interface DashboardVariableSchemaProperty {
     variable_type: VariableType;
     use: boolean;
     selection_type: VariableSelectionType;
-    description?: string;
+    description?: string | TranslateResult;
     disabled?: boolean;
     options?: VariableOptions;
-    required?: boolean;
 }
-export interface DashboardVariablesSchema<T = Record<string, DashboardVariableSchemaProperty>> {
-    properties: T;
-    order: Array<keyof T>;
+export interface DashboardVariablesSchema {
+    properties: {
+        [key: string]: DashboardVariableSchemaProperty;
+    };
+    order: string[];
 }
 
 export const MANAGE_VARIABLES_HASH_NAME = 'manage-variables';

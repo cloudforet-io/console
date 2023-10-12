@@ -136,6 +136,7 @@ const state = reactive({
             display: block;
             font-size: 1rem;
             line-height: 1.375;
+            text-transform: capitalize;
         }
         .contents {
             @apply text-gray-300;

@@ -4,18 +4,17 @@
         <div class="input-form">
             <collector-name-form ref="nameInputRef"
                                  class="name-form"
-                                 @update-valid="handleUpdateIsValid"
+                                 @update:isValid="handleUpdateIsValid"
             />
-            <multiple-provider-form v-if="state.providerFormVisible"
+            <multiple-provider-form v-if="state.supportedProviders.length"
                                     class="multiple-provider-form"
-                                    @update-valid="handleChangeIsProviderValid"
             />
             <collector-version-form class="version-row"
                                     get-versions-on-plugin-id-change
-                                    @update-valid="handleChangeIsVersionValid"
+                                    @update:isVersionValid="handleChangeIsVersionValid"
             />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
-                                @update-valid="handleChangeIsTagsValid"
+                                @update:isTagsValid="handleChangeIsTagsValid"
             />
         </div>
         <div class="step-footer">
@@ -89,11 +88,9 @@ const state = reactive({
     collectorNames: computed(() => Object.values(state.collectors).map((item:any) => item.name)),
     isNameValid: false,
     isTagsValid: true,
-    isProviderValid: false,
     isVersionValid: false,
-    providerFormVisible: computed(() => !!state.supportedProviders.length),
     deleteModalVisible: false,
-    isAllFormValid: computed(() => (state.isProviderValid || !state.providerFormVisible) && state.isNameValid && state.isVersionValid && state.isTagsValid),
+    isAllFormValid: computed(() => state.isNameValid && state.isVersionValid && state.isTagsValid),
     pluginName: computed(() => collectorFormState.repositoryPlugin?.name),
     supportedProviders: computed<string[]>(() => collectorFormState.repositoryPlugin?.capability?.supported_providers ?? []),
 });
@@ -114,10 +111,6 @@ const handleClose = () => {
 
 const handleUpdateIsValid = (isValid: boolean) => {
     state.isNameValid = isValid;
-};
-
-const handleChangeIsProviderValid = (isValid: boolean) => {
-    state.isProviderValid = isValid;
 };
 
 const handleChangeIsVersionValid = (isValid: boolean) => {

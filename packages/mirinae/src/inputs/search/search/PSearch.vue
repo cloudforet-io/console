@@ -7,21 +7,21 @@
              class="input-container"
              :class="{ focused, invalid, disabled }"
         >
-            <p-i v-if="!disableIcon && !focused && !proxyValue && !readonly"
+            <p-i v-if="!disableIcon && !focused && !value && !readonly"
                  class="left-icon"
                  name="ic_search"
                  color="inherit"
             />
             <slot name="left"
-                  v-bind="{ value: proxyValue, placeholder: placeholderText }"
+                  v-bind="{ value, placeholder: placeholderText }"
             />
             <span class="input-wrapper">
                 <slot name="default"
-                      v-bind="{ value: proxyValue, placeholder: placeholderText }"
+                      v-bind="{ value, placeholder: placeholderText }"
                 >
                     <input ref="inputRef"
                            v-bind="$attrs"
-                           :value="proxyValue"
+                           :value="value"
                            :placeholder="placeholderText"
                            :disabled="disabled"
                            :readonly="readonly"
@@ -30,10 +30,10 @@
                 </slot>
             </span>
             <slot name="right"
-                  v-bind="{ value: proxyValue, placeholder: placeholderText }"
+                  v-bind="{ value, placeholder: placeholderText }"
             >
                 <div class="right">
-                    <span v-if="proxyValue"
+                    <span v-if="value"
                           class="delete-btn"
                           @click="handleDelete"
                     >
@@ -73,7 +73,7 @@ import type { TranslateResult } from 'vue-i18n';
 import PI from '@/foundation/icons/PI.vue';
 import { useContextMenuFixedStyle, useProxyValue } from '@/hooks';
 import type { MenuItem } from '@/inputs/context-menu/type';
-import type { SelectDropdownMenuItem } from '@/inputs/dropdown/select-dropdown/type';
+import type { FilterableDropdownMenuItem } from '@/inputs/dropdown/filterable-dropdown/type';
 import type { SearchProps } from '@/inputs/search/search/type';
 import { I18nConnector } from '@/translations';
 import { makeByPassListeners } from '@/utils/composition-helpers';
@@ -165,7 +165,7 @@ export default defineComponent<SearchProps>({
             }),
             filteredMenu: [] as MenuItem[],
             searchableItems: computed<MenuItem[]>(() => props.menu.filter((d) => d.type === undefined || d.type === 'item')),
-            bindingMenu: computed<SelectDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+            bindingMenu: computed<FilterableDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             proxyValue: useProxyValue('value', props, emit),
             menuRef: null,
         });
@@ -239,7 +239,7 @@ export default defineComponent<SearchProps>({
         const inputListeners = {
             ...listeners,
             input(e) {
-                state.proxyValue = e.target.value;
+                emit('update:value', e.target.value);
                 showMenu();
                 filterMenu(e.target.value);
                 makeByPassListeners(listeners, 'input', e.target.value, e);
@@ -278,8 +278,8 @@ export default defineComponent<SearchProps>({
         };
         const handleDelete = () => {
             if (props.disabled) return;
-            state.proxyValue = '';
-            emit('delete', state.proxyValue);
+            emit('delete', props.value);
+            emit('update:value', '');
         };
 
         watch(() => props.isFocused, (isFocused) => {

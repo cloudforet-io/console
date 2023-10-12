@@ -13,11 +13,12 @@ import type {
     InheritOptions,
     WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
+    DashboardLayoutWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 
 type ReferenceStoreState = ReturnType<typeof useReferenceStore>['referenceStoreState'];
 
-const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSchema, referenceStoreState: ReferenceStoreState): JsonSchema => {
+const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties'], referenceStoreState: ReferenceStoreState): JsonSchema['properties'] => {
     const referenceType = propertyName.replace('filters.', '');
 
     // use reference store data if exists
@@ -41,11 +42,11 @@ const refineFilterOptionSchema = (propertyName: string, propertySchema: JsonSche
 
     return propertySchema;
 };
-const refineOptionSchema = (propertyName: string, propertySchema: JsonSchema, referenceStoreState: ReferenceStoreState): JsonSchema => {
+const refineOptionSchema = (propertyName: string, propertySchema: JsonSchema['properties'], referenceStoreState: ReferenceStoreState): JsonSchema['properties'] => {
     if (propertyName.startsWith('filters.')) return refineFilterOptionSchema(propertyName, propertySchema, referenceStoreState);
     return propertySchema;
 };
-const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema, variableKey: string, variablesSchema: DashboardVariablesSchema): JsonSchema => {
+const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema['properties'], variablesSchema: DashboardVariablesSchema): JsonSchema['properties'] => {
     const availableVariables = Object.entries(variablesSchema.properties)
         .filter(([, d]) => {
             if (!d.use) return false;
@@ -53,7 +54,6 @@ const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema, variabl
             return propertySchema.type === variableType;
         });
     const _enum = availableVariables.map(([key]) => key);
-    const isVariableActivated = variablesSchema.properties[variableKey]?.use;
     return {
         title: propertySchema.title,
         type: 'string',
@@ -61,32 +61,35 @@ const refineOptionSchemaByVariablesSchema = (propertySchema: JsonSchema, variabl
         menuItems: availableVariables.map(([key, val]) => ({
             name: key, label: val.name,
         })),
-        default: isVariableActivated ? variableKey : undefined,
+        default: undefined,
     };
 };
 
 export const getWidgetOptionSchema = (
     propertyName: string,
-    propertySchema: JsonSchema,
+    propertySchema: JsonSchema['properties'],
     variablesSchema: DashboardVariablesSchema,
     referenceStoreState: ReferenceStoreState,
     isInherit: boolean,
     projectId?: string,
-): JsonSchema => {
-    const variableKey = propertyName.replace('filters.', '');
-    const _isProjectDashboard = projectId && variableKey === REFERENCE_TYPE_INFO.project.type;
+): JsonSchema['properties'] | undefined => {
+    const _referenceType = propertyName.replace('filters.', '');
+    const _isProjectDashboard = projectId && _referenceType === REFERENCE_TYPE_INFO.project.type;
     if (isInherit) { // inherit case
-        const refinedPropertySchema = refineOptionSchemaByVariablesSchema(propertySchema, variableKey, variablesSchema);
+        const refinedPropertySchema = refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
         if (_isProjectDashboard) {
             return {
                 ...refinedPropertySchema,
                 disabled: true,
                 default: REFERENCE_TYPE_INFO.project.type,
             };
+        } if (variablesSchema.properties[_referenceType]?.use) {
+            return refineOptionSchemaByVariablesSchema(propertySchema, variablesSchema);
         }
-        return refinedPropertySchema;
-    } // non inherit case
-    return refineOptionSchema(propertyName, propertySchema, referenceStoreState);
+    } else { // non inherit case
+        return refineOptionSchema(propertyName, propertySchema, referenceStoreState);
+    }
+    return undefined;
 };
 export const getRefinedWidgetOptionsSchema = (
     referenceStoreState: ReferenceStoreState,
@@ -95,17 +98,16 @@ export const getRefinedWidgetOptionsSchema = (
     inheritOptions: InheritOptions,
     schemaProperties: string[],
     projectId?: string,
-): JsonSchema => {
-    const schema = widgetOptionsSchema.schema;
+): WidgetOptionsSchema['schema'] => {
+    const schema = widgetOptionsSchema?.schema;
 
-    // init schema
-    const refinedJsonSchema: JsonSchema = {
+    const refinedJsonSchema: WidgetOptionsSchema['schema'] = {
         type: 'object',
         properties: {},
         required: [] as WidgetOptionsSchemaProperty[],
         order: schema?.order ?? schemaProperties as WidgetOptionsSchemaProperty[],
     };
-    if (!schema.properties) return refinedJsonSchema;
+    if (!schema?.properties) return refinedJsonSchema;
 
     // refine each property schema
     Object.entries(schema.properties).forEach(([propertyName, propertySchema]) => {
@@ -114,11 +116,22 @@ export const getRefinedWidgetOptionsSchema = (
         const isInherit = !!inheritOptions[propertyName]?.enabled;
         const refinedWidgetOptionsSchema = getWidgetOptionSchema(propertyName, propertySchema, variablesSchema, referenceStoreState, isInherit, projectId);
         if (refinedWidgetOptionsSchema) {
-            if (refinedJsonSchema.properties) refinedJsonSchema.properties[propertyName] = refinedWidgetOptionsSchema;
+            refinedJsonSchema.properties[propertyName] = refinedWidgetOptionsSchema;
             refinedJsonSchema.required?.push(propertyName);
         }
     });
 
     return refinedJsonSchema;
 };
-
+export const getRefinedWidgetInheritOptions = (widgetInfo: DashboardLayoutWidgetInfo, projectId?: string): InheritOptions => {
+    let inheritOptions = widgetInfo.inherit_options ?? {};
+    if (projectId) {
+        inheritOptions = {
+            ...inheritOptions,
+            [`filters.${REFERENCE_TYPE_INFO.project.type}`]: {
+                enabled: true,
+            },
+        };
+    }
+    return inheritOptions;
+};
