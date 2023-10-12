@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<Props>(), {
     widgetKey: undefined,
     widgetConfigId: undefined,
 });
-const emit = defineEmits<{(e: 'close'): void;
+const emit = defineEmits<{(e: 'close', save: boolean): void;
     (e: 'update:widget-info', widgetInfo: UpdatableWidgetInfo): void;
     (e: 'update:has-non-inherited-widget-options', value: boolean): void;
 }>();
@@ -89,10 +89,10 @@ const handleClickSaveButton = async () => {
     updateDashboardWidgetStore();
     await updateWidgetInfo();
     state.nonInheritedOptionModalVisible = false;
-    emit('close');
+    emit('close', true);
 };
 const handleCloseSidebar = () => {
-    emit('close');
+    emit('close', false);
 };
 
 debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {

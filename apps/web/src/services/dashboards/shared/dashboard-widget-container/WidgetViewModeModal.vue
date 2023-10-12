@@ -88,8 +88,9 @@ const handleCloseModal = () => {
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
 };
-const handleCloseSidebar = () => {
+const handleCloseSidebar = (save: boolean) => {
     state.sidebarVisible = false;
+    if (!save) state.updatedWidgetInfo = props.widgetInfo;
     state.widgetRef?.refreshWidget();
 };
 const handleUpdateSidebarWidgetInfo = () => {
