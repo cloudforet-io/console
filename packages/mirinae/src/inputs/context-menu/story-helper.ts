@@ -32,6 +32,7 @@ const contextMenuEvents: [string, string][] = [
     ['click-button', 'This event is emitted when the button(in the item whose type is button) is clicked. As arguments, item, index and click event will be passed.'],
     ['click-done', 'This event is emitted when the done-button(in multi-selectable & show-select-header case) is clicked.'],
     ['click-show-more', 'This event is emitted when the show-more-button is clicked.'],
+    ['clear-selection', 'This event is emitted when the clear-selection is clicked.'],
     ['update:search-text', 'This event is emitted when the input value of search component(in searchable case) is updated. It allows two way binding of searchText prop.'],
 ];
 
@@ -62,6 +63,24 @@ const getArgTypes = (category: string, info: [string, string][]) => {
 export const getContextMenuArgTypes = (): ArgTypes => {
     const contextMenuItemArgTypes = getContextMenuItemArgTypes();
     return {
+        title: {
+            name: 'title',
+            type: { name: 'string' },
+            description: 'Context menu title',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: undefined,
+                },
+            },
+            control: {
+                type: 'text',
+            },
+        },
         menu: {
             name: 'menu',
             type: { name: 'array' },

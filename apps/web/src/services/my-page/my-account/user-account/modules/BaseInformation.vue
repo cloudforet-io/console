@@ -1,76 +1,11 @@
-<template>
-    <user-account-module-container
-        :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
-        class="base-information-wrapper"
-    >
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.ID')"
-                       class="input-form"
-        >
-            <p-text-input v-model="state.userId"
-                          disabled
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.NAME')"
-                       class="input-form"
-        >
-            <p-text-input v-model="formState.userName"
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.ROLE')"
-                       class="input-form"
-        >
-            <p-text-input v-model="state.userRole"
-                          disabled
-                          class="text-input"
-            />
-        </p-field-group>
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.TIMEZONE')"
-                       class="input-form"
-                       :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
-                       :invalid-text="validationState.timezoneInvalidText"
-        >
-            <template #default="{invalid}">
-                <p-filterable-dropdown :menu="state.timezones"
-                                       :selected.sync="formState.timezone"
-                                       :invalid="invalid"
-                                       :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
-                                       :page-size="10"
-                />
-            </template>
-        </p-field-group>
-        <p-field-group required
-                       :label="$t('COMMON.PROFILE.LANGUAGE')"
-                       class="input-form"
-        >
-            <p-select-dropdown v-model="formState.language"
-                               :items="state.languages"
-                               is-fixed-width
-            />
-        </p-field-group>
-        <div class="save-button">
-            <p-button style-type="primary"
-                      @click="handleClickProfileConfirm"
-            >
-                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
-            </p-button>
-        </div>
-    </user-account-module-container>
-</template>
-
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PButton, PFieldGroup, PSelectDropdown, PTextInput, PFilterableDropdown,
+    PButton, PFieldGroup, PSelectDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { map } from 'lodash';
 
 import { store } from '@/store';
@@ -98,11 +33,11 @@ const state = reactive({
     })) as MenuItem[],
     timezones: map(timezoneList, (d) => ({
         type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
-    })) as FilterableDropdownMenuItem[],
+    })) as SelectDropdownMenuItem[],
 });
 const formState = reactive({
     userName: '' as string | undefined,
-    timezone: [] as FilterableDropdownMenuItem[],
+    timezone: [] as SelectDropdownMenuItem[],
     language: '' as LanguageCode | undefined,
 });
 const validationState = reactive({
@@ -156,6 +91,73 @@ watch(() => store.state.user.language, (language) => {
 })();
 </script>
 
+<template>
+    <user-account-module-container
+        :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
+        class="base-information-wrapper"
+    >
+        <p-field-group required
+                       :label="$t('COMMON.PROFILE.ID')"
+                       class="input-form"
+        >
+            <p-text-input v-model="state.userId"
+                          disabled
+                          class="text-input"
+            />
+        </p-field-group>
+        <p-field-group required
+                       :label="$t('COMMON.PROFILE.NAME')"
+                       class="input-form"
+        >
+            <p-text-input v-model="formState.userName"
+                          class="text-input"
+            />
+        </p-field-group>
+        <p-field-group required
+                       :label="$t('COMMON.PROFILE.ROLE')"
+                       class="input-form"
+        >
+            <p-text-input v-model="state.userRole"
+                          disabled
+                          class="text-input"
+            />
+        </p-field-group>
+        <p-field-group required
+                       :label="$t('COMMON.PROFILE.TIMEZONE')"
+                       class="input-form"
+                       :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
+                       :invalid-text="validationState.timezoneInvalidText"
+        >
+            <template #default="{invalid}">
+                <p-select-dropdown :menu="state.timezones"
+                                   :selected.sync="formState.timezone"
+                                   :invalid="invalid"
+                                   :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
+                                   :page-size="10"
+                                   is-filterable
+                                   show-delete-all-button
+                />
+            </template>
+        </p-field-group>
+        <p-field-group required
+                       :label="$t('COMMON.PROFILE.LANGUAGE')"
+                       class="input-form"
+        >
+            <p-select-dropdown :selected.sync="formState.language"
+                               :menu="state.languages"
+                               is-fixed-width
+            />
+        </p-field-group>
+        <div class="save-button">
+            <p-button style-type="primary"
+                      @click="handleClickProfileConfirm"
+            >
+                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
+            </p-button>
+        </div>
+    </user-account-module-container>
+</template>
+
 <style lang="postcss" scoped>
 .base-information-wrapper {
     /* custom design-system component - p-field-group */
@@ -172,8 +174,7 @@ watch(() => store.state.user.language, (language) => {
         }
     }
     .p-text-input,
-    .p-select-dropdown,
-    .p-filterable-dropdown {
+    .p-select-dropdown {
         width: 100%;
         max-width: 25rem;
         flex-shrink: 0;
@@ -187,8 +188,7 @@ watch(() => store.state.user.language, (language) => {
 
 @screen mobile {
     .p-text-input,
-    .p-select-dropdown,
-    .p-filterable-dropdown {
+    .p-select-dropdown {
         max-width: unset;
     }
 }

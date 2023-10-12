@@ -25,9 +25,6 @@ export const cdnAndTrafficCostDashboard: DashboardConfig = {
         date_range: {
             enabled: true,
         },
-        currency: {
-            enabled: true,
-        },
         refresh_interval_option: '5m',
     },
     variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST),

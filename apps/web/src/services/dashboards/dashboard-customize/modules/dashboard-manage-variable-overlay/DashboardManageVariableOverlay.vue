@@ -57,7 +57,7 @@ import {
     computed, reactive, toRefs,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-
+import { useRoute } from 'vue-router/composables';
 
 import {
     PButton, PHeading,
@@ -91,6 +91,8 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+
+const route = useRoute();
 
 const state = reactive({
     contentType: 'LIST' as OverlayStatus,
@@ -188,10 +190,16 @@ const handleClickGoBackButton = () => {
         deleteModalState.visible = true;
         return;
     }
-    SpaceRouter.router.replace({
-        name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
-    });
+    if (route.name === DASHBOARDS_ROUTE.CREATE._NAME) {
+        SpaceRouter.router.replace({
+            name: DASHBOARDS_ROUTE.CREATE._NAME,
+        });
+    } else {
+        SpaceRouter.router.replace({
+            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+        });
+    }
 };
 const handleClickCancel = () => {
     deleteModalState.type = 'CANCEL';

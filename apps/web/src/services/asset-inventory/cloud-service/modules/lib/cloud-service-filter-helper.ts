@@ -1,9 +1,10 @@
-import type { FilterableDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
-export interface RegionMenuItem extends FilterableDropdownMenuItem {
+export interface RegionMenuItem extends SelectDropdownMenuItem {
     name: string;
     label: string;
     regionName: string;

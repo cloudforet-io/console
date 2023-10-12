@@ -26,13 +26,20 @@
                            required
                            class="mt-6"
             >
-                <p-radio v-for="{ name: visibilityName, label } in filteredVisibilityList"
+                <p-radio v-for="{ name: visibilityName, label, icon } in filteredVisibilityList"
                          :key="visibilityName"
                          :value="visibilityName"
                          :selected="viewers"
                          class="radio-group"
                          @change="setForm('viewers', $event)"
                 >
+                    <p-i v-if="icon"
+                         :name="icon"
+                         width="0.875rem"
+                         height="0.875rem"
+                         :color="gray[500]"
+                         class="ml-1"
+                    />
                     <span class="ml-1">{{ label }}</span>
                 </p-radio>
             </p-field-group>
@@ -50,7 +57,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PRadio, PTextInput,
+    PButtonModal, PFieldGroup, PRadio, PTextInput, PI,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -61,6 +68,8 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+
+import { gray } from '@/styles/colors';
 
 import type { DashboardViewer, DashboardConfig, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
@@ -83,6 +92,7 @@ export default defineComponent<Props>({
         PRadio,
         PFieldGroup,
         PTextInput,
+        PI,
     },
     model: {
         prop: 'visible',
@@ -136,7 +146,7 @@ export default defineComponent<Props>({
         const state = reactive({
             proxyVisible: props.visible,
             filteredVisibilityList: computed(() => [
-                { name: DASHBOARD_VIEWER.PRIVATE, label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE') },
+                { name: DASHBOARD_VIEWER.PRIVATE, label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'), icon: 'ic_lock-filled' },
                 { name: DASHBOARD_VIEWER.PUBLIC, label: i18n.t('DASHBOARDS.FORM.LABEL_PUBLIC') },
             ]),
             projectId: computed(() => {
@@ -156,10 +166,10 @@ export default defineComponent<Props>({
                 }
                 return store.state.dashboard.domainItems.map((item) => item.name);
             }),
-            layouts: computed<DashboardLayoutWidgetInfo[]|DashboardLayoutWidgetInfo[][]>(() => {
+            layouts: computed<DashboardLayoutWidgetInfo[][]>(() => {
                 if (props.dashboard?.layouts) return props.dashboard?.layouts;
                 if ((props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList) {
-                    return (props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList;
+                    return [(props.dashboard as unknown as DashboardDetailInfoStoreState)?.dashboardWidgetInfoList];
                 }
                 return [];
             }),
@@ -247,6 +257,7 @@ export default defineComponent<Props>({
             ...toRefs(state),
             handleConfirm,
             handleUpdateVisible,
+            gray,
         };
     },
 });

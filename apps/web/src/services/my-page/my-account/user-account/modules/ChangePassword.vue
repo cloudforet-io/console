@@ -1,69 +1,3 @@
-<template>
-    <user-account-module-container
-        :title="$t('COMMON.PROFILE.PASSWORD')"
-        class="change-password-wrapper"
-    >
-        <form class="form">
-            <p-field-group
-                :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
-                required
-                :invalid="validationState.isCurrentPasswordValid"
-                :invalid-text="validationState.currentPasswordInvalidText"
-                class="input-form"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="currentPassword"
-                                  type="password"
-                                  class="text-input"
-                                  :invalid="invalid"
-                                  @update:value="setForm('currentPassword', $event)"
-                    />
-                </template>
-            </p-field-group>
-            <p-field-group
-                :label="$t('COMMON.PROFILE.NEW_PASSWORD')"
-                required
-                :invalid="invalidState.password"
-                :invalid-text="invalidTexts.password"
-                class="input-form"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="password"
-                                  type="password"
-                                  class="text-input"
-                                  :invalid="invalid"
-                                  @update:value="setForm('password', $event)"
-                    />
-                </template>
-            </p-field-group>
-            <p-field-group
-                :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                required
-                :invalid="invalidState.passwordCheck"
-                :invalid-text="invalidTexts.passwordCheck"
-                class="input-form"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="passwordCheck"
-                                  type="password"
-                                  class="text-input"
-                                  :invalid="invalid"
-                                  @update:value="setForm('passwordCheck', $event)"
-                    />
-                </template>
-            </p-field-group>
-        </form>
-        <div class="save-button">
-            <p-button style-type="primary"
-                      :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
-                      @click="handleClickPasswordConfirm"
-            >
-                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
-            </p-button>
-        </div>
-    </user-account-module-container>
-</template>
-
 <script setup lang="ts">
 
 import { computed, reactive } from 'vue';
@@ -172,15 +106,80 @@ const updateUser = async (userParam: UpdateUserRequest) => {
         await store.dispatch('user/setUser', userParam);
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
     } catch (e: any) {
-        const errorDetail = e.axiosError.response.data.detail;
-        if (errorDetail.code === 'ERROR_PASSWORD_NOT_CHANGED') {
-            showErrorMessage(errorDetail.message, '');
+        if (e.code === 'ERROR_PASSWORD_NOT_CHANGED') {
+            showErrorMessage(e.message, '');
         } else {
             showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
         }
     }
 };
 </script>
+
+<template>
+    <user-account-module-container
+        :title="$t('COMMON.PROFILE.PASSWORD')"
+        class="change-password-wrapper"
+    >
+        <form class="form">
+            <p-field-group
+                :label="$t('COMMON.PROFILE.CURRENT_PASSWORD')"
+                required
+                :invalid="validationState.isCurrentPasswordValid"
+                :invalid-text="validationState.currentPasswordInvalidText"
+                class="input-form"
+            >
+                <template #default="{invalid}">
+                    <p-text-input :value="currentPassword"
+                                  type="password"
+                                  class="text-input"
+                                  :invalid="invalid"
+                                  @update:value="setForm('currentPassword', $event)"
+                    />
+                </template>
+            </p-field-group>
+            <p-field-group
+                :label="$t('COMMON.PROFILE.NEW_PASSWORD')"
+                required
+                :invalid="invalidState.password"
+                :invalid-text="invalidTexts.password"
+                class="input-form"
+            >
+                <template #default="{invalid}">
+                    <p-text-input :value="password"
+                                  type="password"
+                                  class="text-input"
+                                  :invalid="invalid"
+                                  @update:value="setForm('password', $event)"
+                    />
+                </template>
+            </p-field-group>
+            <p-field-group
+                :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                required
+                :invalid="invalidState.passwordCheck"
+                :invalid-text="invalidTexts.passwordCheck"
+                class="input-form"
+            >
+                <template #default="{invalid}">
+                    <p-text-input :value="passwordCheck"
+                                  type="password"
+                                  class="text-input"
+                                  :invalid="invalid"
+                                  @update:value="setForm('passwordCheck', $event)"
+                    />
+                </template>
+            </p-field-group>
+        </form>
+        <div class="save-button">
+            <p-button style-type="primary"
+                      :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
+                      @click="handleClickPasswordConfirm"
+            >
+                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
+            </p-button>
+        </div>
+    </user-account-module-container>
+</template>
 
 <style lang="postcss" scoped>
 .change-password-wrapper {
@@ -199,8 +198,7 @@ const updateUser = async (userParam: UpdateUserRequest) => {
             margin-left: 8.5rem;
         }
     }
-    .p-text-input,
-    .p-filterable-dropdown {
+    .p-text-input {
         width: 100%;
         max-width: 25rem;
         flex-shrink: 0;

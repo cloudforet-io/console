@@ -1,11 +1,184 @@
+<script setup lang="ts">
+import {
+    computed, defineExpose, defineProps, reactive,
+} from 'vue';
+
+import { PDataLoader } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { min } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type { DateRange } from '@/services/dashboards/config';
+import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import type {
+    CloudServiceStatsModel, ComplianceStatus, Severity,
+} from '@/services/dashboards/widgets/_configs/asset-config';
+import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+
+
+interface Data extends CloudServiceStatsModel {
+    service: string;
+    pass_finding_count: number;
+    fail_finding_count: number;
+    severity: Severity[];
+    status: ComplianceStatus[];
+}
+interface RefinedData {
+    service: string;
+    severity: Severity;
+    value: number;
+}
+
+const BOX_MIN_WIDTH = 112;
+const SEVERITY_PRIORITY_MAP: Record<number, Severity> = {};
+Object.values(SEVERITY_STATUS_MAP).forEach((s) => { SEVERITY_PRIORITY_MAP[s.priority] = s.name; });
+
+const DATE_FORMAT = 'YYYY-MM';
+const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
+const props = defineProps<WidgetProps>();
+const emit = defineEmits<WidgetEmit>();
+
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    dateRange: computed<DateRange>(() => ({
+        end: dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT),
+    })),
+});
+
+const state = reactive({
+    loading: true,
+    data: null as Data[] | null,
+    boxWidth: computed<number>(() => {
+        if (!props.width) return BOX_MIN_WIDTH;
+        const widgetPadding = 24;
+        const widgetContentWidth = props.width - (widgetPadding * 2);
+        if (props.width >= 990) return widgetContentWidth / 8;
+        return widgetContentWidth / 7 < BOX_MIN_WIDTH ? BOX_MIN_WIDTH : widgetContentWidth / 7;
+    }),
+    refinedData: computed<RefinedData[]>(() => refineData(state.data)),
+});
+
+/* Api */
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchData = async (): Promise<Data[]> => {
+    try {
+        apiQueryHelper
+            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        const { status, response } = await fetchCloudServiceStatsAnalyze({
+            query_set_id: widgetState.options.asset_query_set,
+            query: {
+                group_by: ['additional_info.service'],
+                granularity: 'MONTHLY',
+                start: widgetState.dateRange.end,
+                end: widgetState.dateRange.end,
+                fields: {
+                    pass_finding_count: {
+                        key: 'values.pass_finding_count',
+                        operator: 'sum',
+                    },
+                    fail_finding_count: {
+                        key: 'values.fail_finding_count',
+                        operator: 'sum',
+                    },
+                    status: {
+                        key: 'additional_info.status',
+                        operator: 'add_to_set',
+                    },
+                    severity: {
+                        key: 'additional_info.severity',
+                        operator: 'add_to_set',
+                    },
+                },
+                sort: [{ key: 'service' }],
+                page: {
+                    limit: 80,
+                    start: 1,
+                },
+                ...apiQueryHelper.data,
+            },
+        });
+        if (status === 'succeed') return response.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+    return [];
+};
+
+
+/* Util */
+const _getStatus = (statusList: ComplianceStatus[]): ComplianceStatus => {
+    if (statusList.includes('FAIL')) return 'FAIL';
+    return 'PASS';
+};
+const _getSeverity = (severityList: Severity[], status: ComplianceStatus): Severity => {
+    let severity: Severity = 'PASS';
+    if (status === 'FAIL') {
+        const minSeverityPriority = min(severityList.map((d) => SEVERITY_STATUS_MAP[d].priority));
+        if (minSeverityPriority) severity = SEVERITY_PRIORITY_MAP[minSeverityPriority];
+    }
+    return severity;
+};
+const refineData = (data?: Data[]): RefinedData[] => {
+    if (!data?.length) return [];
+    const refinedData: RefinedData[] = [];
+    data.forEach((d) => {
+        const status = _getStatus(d.status);
+        const severity = _getSeverity(d.severity, status);
+        const value: number = status === 'FAIL' ? d.fail_finding_count : d.pass_finding_count;
+
+        refinedData.push({
+            service: d.service,
+            severity,
+            value,
+        });
+    });
+    return refinedData;
+};
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
+    state.loading = true;
+    state.data = data ?? await fetchData();
+    state.loading = false;
+    return state.data;
+};
+const refreshWidget = async (): Promise<Data[]> => {
+    state.loading = true;
+    state.data = await fetchData();
+    state.loading = false;
+    return state.data;
+};
+
+useWidgetLifecycle({
+    disposeWidget: undefined,
+    initWidget,
+    refreshWidget,
+    props,
+    emit,
+    widgetState,
+});
+defineExpose<WidgetExpose>({
+    initWidget,
+    refreshWidget,
+});
+</script>
+
 <template>
     <widget-frame v-bind="widgetFrameProps"
                   class="severity-status-by-service"
-                  @refresh="refreshWidget"
+                  v-on="widgetFrameEventHandlers"
     >
         <div class="data-container">
             <p-data-loader class="chart-wrapper"
-                           :loading="state.loading"
+                           :loading="props.loading || state.loading"
                            :data="state.refinedData"
                            loader-type="skeleton"
                            :loader-backdrop-opacity="1"
@@ -40,182 +213,7 @@
         </div>
     </widget-frame>
 </template>
-<script setup lang="ts">
-import type { ComputedRef } from 'vue';
-import {
-    computed, defineExpose, defineProps, reactive, toRefs,
-} from 'vue';
 
-import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { flattenDeep, min } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import type { DateRange } from '@/services/dashboards/config';
-import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type {
-    CloudServiceStatsModel, ComplianceStatus, Severity,
-} from '@/services/dashboards/widgets/_configs/asset-config';
-import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetFrameProps } from '@/services/dashboards/widgets/_hooks/use-widget-frame-props';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget-state';
-
-
-interface Data extends CloudServiceStatsModel {
-    service: string;
-    value: number;
-    severity: Severity[];
-    status: ComplianceStatus[];
-}
-interface RefinedData {
-    service: string;
-    severity: Severity;
-    value: number;
-}
-
-const BOX_MIN_WIDTH = 112;
-const SEVERITY_PRIORITY_MAP: Record<number, Severity> = {};
-Object.values(SEVERITY_STATUS_MAP).forEach((s) => { SEVERITY_PRIORITY_MAP[s.priority] = s.name; });
-
-const DATE_FORMAT = 'YYYY-MM';
-const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
-const props = defineProps<WidgetProps>();
-const state = reactive({
-    ...toRefs(useWidgetState<Data[]>(props)),
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(state.settings?.date_range?.end).format(DATE_FORMAT),
-    })),
-    boxWidth: computed<number>(() => {
-        if (!props.width) return BOX_MIN_WIDTH;
-        const widgetPadding = 24;
-        const widgetContentWidth = props.width - (widgetPadding * 2);
-        if (props.width >= 990) return widgetContentWidth / 8;
-        return widgetContentWidth / 7 < BOX_MIN_WIDTH ? BOX_MIN_WIDTH : widgetContentWidth / 7;
-    }),
-    refinedData: computed<RefinedData[]>(() => refineData(state.data)),
-});
-const widgetFrameProps:ComputedRef = useWidgetFrameProps(props, state);
-
-
-/* Api */
-const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
-const fetchData = async (): Promise<Data[]> => {
-    try {
-        apiQueryHelper
-            .setFilters(state.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        const prevMonth = dayjs.utc(state.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
-        const { status, response } = await fetchCloudServiceStatsAnalyze({
-            query: {
-                group_by: ['key', 'unit', 'additional_info.service'],
-                granularity: 'MONTHLY',
-                start: prevMonth,
-                end: state.dateRange.end,
-                fields: {
-                    value: {
-                        key: 'value',
-                        operator: 'sum',
-                    },
-                    status: {
-                        key: 'additional_info.status',
-                        operator: 'add_to_set',
-                    },
-                    severity: {
-                        key: 'additional_info.severity',
-                        operator: 'add_to_set',
-                    },
-                },
-                sort: [{ key: 'service' }, { key: 'key' }],
-                page: {
-                    limit: 80,
-                    start: 1,
-                },
-                ...apiQueryHelper.data,
-            },
-        });
-        if (status === 'succeed') return response.results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-    return [];
-};
-
-
-/* Util */
-const _getStatus = (targetServiceDataList: Data[]): ComplianceStatus => {
-    const statusList = flattenDeep(targetServiceDataList.map((d) => d.status));
-    if (statusList.includes('FAIL')) return 'FAIL';
-    return 'PASS';
-};
-const _getSeverity = (targetServiceDataList: Data[], status: ComplianceStatus): Severity => {
-    let severity: Severity = 'PASS';
-    if (status === 'FAIL') {
-        const severityList = flattenDeep(targetServiceDataList.map((d) => d.severity));
-        const minSeverityPriority = min(severityList.map((d) => SEVERITY_STATUS_MAP[d].priority));
-        if (minSeverityPriority) severity = SEVERITY_PRIORITY_MAP[minSeverityPriority];
-    }
-    return severity;
-};
-const _getValue = (targetServiceDataList: Data[], status: ComplianceStatus): number => {
-    if (status === 'FAIL') {
-        return targetServiceDataList.find((d) => d.key === 'fail_finding_count')?.value ?? 0;
-    }
-    return targetServiceDataList.find((d) => d.key === 'pass_finding_count')?.value ?? 0;
-};
-const refineData = (data?: Data[]): RefinedData[] => {
-    if (!data?.length) return [];
-    const serviceSet = new Set();
-    data.forEach((result) => serviceSet.add(result.service));
-    const refinedData: RefinedData[] = [];
-    serviceSet.forEach((service) => {
-        const targetServiceDataList = data.filter((result) => result.service === service);
-        const status = _getStatus(targetServiceDataList);
-        const severity = _getSeverity(targetServiceDataList, status);
-        const value = _getValue(targetServiceDataList, status);
-
-        refinedData.push({
-            service: service as string,
-            severity,
-            value,
-        });
-    });
-    return refinedData;
-};
-const initWidget = async (data?: Data[]): Promise<Data[]> => {
-    state.loading = true;
-    state.data = data ?? await fetchData();
-    state.loading = false;
-    return state.data;
-};
-const refreshWidget = async (): Promise<Data[]> => {
-    state.loading = true;
-    state.data = await fetchData();
-    state.loading = false;
-    return state.data;
-};
-
-useWidgetLifecycle({
-    disposeWidget: undefined,
-    refreshWidget,
-    props,
-    state,
-});
-defineExpose<WidgetExpose>({
-    initWidget,
-    refreshWidget,
-});
-</script>
 <style lang="postcss" scoped>
 .severity-status-by-service {
     .data-container {

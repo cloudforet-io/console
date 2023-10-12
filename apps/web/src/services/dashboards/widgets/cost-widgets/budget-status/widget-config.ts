@@ -4,12 +4,15 @@ import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
     getWidgetFilterSchemaPropertyNames,
+    getWidgetInheritOptions,
+    getWidgetInheritOptionsForFilter,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const budgetStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetStatus',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/budget-status/BudgetStatus.vue'),
+        component: import('@/services/dashboards/widgets/cost-widgets/budget-status/BudgetStatusWidget.vue'),
     }),
     title: 'Budget Status',
     labels: ['Cost'],
@@ -24,15 +27,40 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     sizes: ['sm'],
     options: {
         chart_type: CHART_TYPE.WAFFLE,
-        granularity: GRANULARITY.ACCUMULATED,
+        granularity: GRANULARITY.MONTHLY,
         cost_group_by: 'budget_id',
     },
+    inherit_options: {
+        ...getWidgetInheritOptions('cost_data_source'),
+        ...getWidgetInheritOptionsForFilter(
+            'project',
+        ),
+    },
     options_schema: {
-        default_properties: getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'cost_product'),
+        default_properties: [
+            'cost_data_source',
+            ...getWidgetFilterSchemaPropertyNames(
+                'project',
+                'service_account',
+            ),
+        ],
+        fixed_properties: ['cost_data_source'],
         schema: {
             type: 'object',
-            properties: getWidgetFilterOptionsSchema('provider', 'project', 'service_account', 'cost_product', 'region'),
-            order: getWidgetFilterSchemaPropertyNames('provider', 'project', 'service_account', 'cost_product', 'region'),
+            properties: {
+                ...getWidgetOptionsSchema('cost_data_source'),
+                ...getWidgetFilterOptionsSchema(
+                    'project',
+                    'service_account',
+                ),
+            },
+            order: [
+                'cost_data_source',
+                ...getWidgetFilterSchemaPropertyNames(
+                    'project',
+                    'service_account',
+                ),
+            ],
         },
     },
 };

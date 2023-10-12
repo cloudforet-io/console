@@ -18,36 +18,34 @@ export const Template = (args, {argTypes} ) => ({
     props: Object.keys(argTypes),
     components: { PButtonModal, PButton, PSelectDropdown },
     template: `<div>
-                <p-button @click="launchModal">Launch a modal</p-button>
-                <p-button-modal :visible.sync="modalVisible"
-                                :size="size"
-                                :backdrop="backdrop"
-                                :theme-color="themeColor"
-                                :header-title="headerTitle"
-                                :hide-header="hideHeader"
-                                :hide-body="hideBody"
-                                :hide-footer="hideFooter"
-                                :hide-header-close-button="hideHeaderCloseButton"
-                                :hide-footer-close-button="hideFooterCloseButton"
-                                :hide-footer-confirm-button="hideFooterConfirmButton"
-                                :footer-reset-button-visible="footerResetButtonVisible"
-                                :loading="loading"
-                                :disabled="disabled"
-                                :absolute="absolute"
-                                @close="closeModal"
-                >
-                    <template #body>
-                        <p-select-dropdown
-                            :items="items"
-                            v-model="selectItem"
-                            use-fixed-menu-style
-                        >
-                           select dropdown (default)
-                        </p-select-dropdown>
-                        <p>{{contents}}</p>
-                    </template>
-                </p-button-modal>
-            </div>`,
+    <p-button @click="launchModal">Launch a modal</p-button>
+    <p-button-modal :visible.sync="modalVisible"
+                    :size="size"
+                    :backdrop="backdrop"
+                    :theme-color="themeColor"
+                    :header-title="headerTitle"
+                    :hide-header="hideHeader"
+                    :hide-body="hideBody"
+                    :hide-footer="hideFooter"
+                    :hide-header-close-button="hideHeaderCloseButton"
+                    :hide-footer-close-button="hideFooterCloseButton"
+                    :hide-footer-confirm-button="hideFooterConfirmButton"
+                    :footer-reset-button-visible="footerResetButtonVisible"
+                    :loading="loading"
+                    :disabled="disabled"
+                    :absolute="absolute"
+                    @close="closeModal"
+    >
+        <template #body>
+            <p-select-dropdown
+                :menu="items"
+                placeholder="select dropdown (default)"
+                use-fixed-menu-style
+            />
+            <p>{{ contents }}</p>
+        </template>
+    </p-button-modal>
+    </div>`,
     setup(props) {
         const selectItem = ref('init');
         const state = reactive({

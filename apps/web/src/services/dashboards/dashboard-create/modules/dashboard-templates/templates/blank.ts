@@ -3,6 +3,7 @@ import { computed, reactive } from 'vue';
 import { i18n } from '@/translations';
 
 import type { DashboardConfig } from '@/services/dashboards/config';
+import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 
@@ -23,12 +24,9 @@ export const blankDashboard: DashboardConfig = {
         date_range: {
             enabled: true,
         },
-        currency: {
-            enabled: true,
-        },
         refresh_interval_option: '5m',
     },
-    variables_schema: getDashboardVariablesSchema(),
+    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.BLANK),
     variables: {},
     layouts: [],
 };

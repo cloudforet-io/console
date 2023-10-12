@@ -1,3 +1,96 @@
+<script setup lang="ts">
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
+
+import {
+    PPaneLayout, PLink, PI, PTextButton, PPopover,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { gray } from '@/styles/colors';
+
+import AmountPlanningTypePopover
+    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
+import type { BudgetModel } from '@/services/cost-explorer/budget/model';
+import {
+    BUDGET_TIME_UNIT,
+} from '@/services/cost-explorer/budget/model';
+import type { BudgetTargetLabel } from '@/services/cost-explorer/budget/type';
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
+
+const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => state.providers[provider]?.label ?? '').join(', ') || 'All';
+
+const allReferenceStore = useAllReferenceStore();
+
+const budgetPageStore = useBudgetDetailPageStore();
+const budgetPageState = budgetPageStore.$state;
+
+const costTypeWrapperRef = ref<HTMLElement|null>(null);
+const costTypeRef = ref<HTMLElement|null>(null);
+
+const state = reactive({
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
+    processedProviderValue: computed<string>(() => {
+        if (!budgetPageState.budgetData) return '';
+        const providerFilter = budgetPageState.budgetData?.provider_filter;
+        if (providerFilter?.state === 'DISABLED') return 'All';
+        return changeToLabelList(providerFilter?.providers ?? []);
+    }),
+    isTextTruncate: undefined as boolean|undefined,
+    popoverVisible: false,
+});
+
+const getTargetLabel = (projects: ProjectReferenceMap): BudgetTargetLabel => {
+    let project;
+    if (budgetPageState.budgetData?.project_id) {
+        project = projects[budgetPageState.budgetData.project_id];
+        return {
+            group: project.data.groupInfo?.name ?? '',
+            name: project?.name ?? '',
+        };
+    }
+    if (budgetPageState.budgetData?.project_group_id) {
+        project = state.projectGroups[budgetPageState.budgetData.project_group_id];
+        return {
+            name: project?.name ?? '',
+        };
+    }
+    return {
+        name: 'No Item',
+    };
+};
+
+
+/* Watcher */
+watch(() => costTypeRef.value, (costType) => {
+    if (costTypeWrapperRef.value && costType) {
+        const costTypeWrapperWidth = costTypeWrapperRef.value.offsetWidth;
+        const costTypeWidth = costType.offsetWidth;
+        state.isTextTruncate = costTypeWrapperWidth <= (costTypeWidth + 60);
+    }
+});
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        allReferenceStore.load('project'),
+        allReferenceStore.load('projectGroup'),
+        allReferenceStore.load('plugin'),
+    ]);
+})();
+</script>
+
 <template>
     <section class="budget-detail-summary">
         <p-pane-layout class="summary-card">
@@ -9,18 +102,18 @@
             <div v-if="!budgetPageState.loading"
                  class="flex justify-between"
             >
-                <p v-if="budgetPageState.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL"
+                <p v-if="state.budgetData?.time_unit === BUDGET_TIME_UNIT.TOTAL"
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TOTAL_AMOUNT') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
                 <p v-else
                    class="summary-content"
                 >
-                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ budgetPageState.budgetData?.start }} ~ {{ budgetPageState.budgetData?.end }})
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
                 <amount-planning-type-popover class="summary-content"
-                                              :budget-data="budgetPageState.budgetData"
+                                              :budget-data="state.budgetData"
                 >
                     <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </amount-planning-type-popover>
@@ -29,152 +122,66 @@
         <p-pane-layout class="summary-card">
             <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.TARGET') }}</span>
             <p v-if="!budgetPageState.loading"
-               class="summary-content"
+               class="summary-content target"
             >
-                <p-link v-if="budgetPageState.budgetData?.project_group_id || budgetPageState.budgetData?.project_id"
+                <span v-if="budgetPageState.budgetData?.project_id"
+                      class="target-project-group"
+                >
+                    <span>
+                        {{ getTargetLabel(state.projects).group }}
+                    </span>
+                    <p-i name="ic_chevron-right-thin"
+                         width="0.75rem"
+                         height="0.75rem"
+                         :color="gray[400]"
+                    />
+                </span>
+                <p-link v-if="state.budgetData?.project_group_id || state.budgetData?.project_id"
                         :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
+                        highlight
                         :to="referenceRouter(
-                            (budgetPageState.budgetData?.project_id || budgetPageState.budgetData?.project_group_id),
-                            { resource_type: budgetPageState.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                            (state.budgetData?.project_id || state.budgetData?.project_group_id) ?? '',
+                            { resource_type: state.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
                 >
-                    {{ getTargetLabel(projects) }}
+                    {{ getTargetLabel(state.projects).name }}
                 </p-link>
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
-            <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.COST_TYPE') }}
-                <span v-if="!budgetPageState.loading"
-                      class="text-gray-900 font-normal"
-                >{{ costTypeMap[costTypeKey] }}</span>
-            </span>
-            <p v-if="!budgetPageState.loading"
-               class="summary-content cost-type"
+            <span class="summary-title">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.PROVIDER') }}</span>
+            <div v-if="!budgetPageState.loading"
+                 ref="costTypeWrapperRef"
+                 class="cost-type-wrapper"
             >
-                <span class="cost-type-content">{{ processedCostTypeValue }}</span>
-                <budget-cost-type-popover
-                    :cost-type-key="costTypeKey"
-                    :cost-type-value="processedCostTypeValue"
+                <span ref="costTypeRef"
+                      class="summary-content cost-type"
                 >
-                    <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.VIEW_ALL') }}</span>
-                </budget-cost-type-popover>
-            </p>
+                    <span class="cost-type-content">{{ state.processedProviderValue }}</span>
+                </span>
+                <p-popover :is-visible="state.popoverVisible">
+                    <p-text-button v-if="state.isTextTruncate"
+                                   style-type="highlight"
+                    >
+                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.VIEW_ALL') }}
+                    </p-text-button>
+                    <template #content>
+                        <div class="content-wrapper">
+                            {{ state.processedProviderValue }}
+                        </div>
+                    </template>
+                </p-popover>
+            </div>
         </p-pane-layout>
     </section>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import { PPaneLayout, PLink } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { store } from '@/store';
-
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import { CURRENCY } from '@/store/modules/settings/config';
-
-import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import AmountPlanningTypePopover
-    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/AmountPlanningTypePopover.vue';
-import BudgetCostTypePopover
-    from '@/services/cost-explorer/budget/budget-detail/modules/budget-info/BudgetCostTypePopover.vue';
-import type { CostType } from '@/services/cost-explorer/budget/type';
-import {
-    BUDGET_TIME_UNIT,
-} from '@/services/cost-explorer/budget/type';
-import { useBudgetPageStore } from '@/services/cost-explorer/store/budget-page-store';
-
-
-const getKeyOfCostType = (costType: Record<CostType, string[]|null>): string => Object.keys(costType).filter((k) => (costType[k] !== null))[0];
-const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
-
-const costTypeMap = {
-    region_code: 'Region',
-    service_account_id: 'Service Account',
-    provider: 'Provider',
-    product: 'Product',
-};
-
-export default {
-    name: 'BudgetDetailInfo',
-    components: {
-        AmountPlanningTypePopover,
-        BudgetCostTypePopover,
-        PPaneLayout,
-        PLink,
-    },
-    props: {
-        currency: {
-            type: String,
-            default: CURRENCY.USD,
-        },
-        currencyRates: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup() {
-        const budgetPageStore = useBudgetPageStore();
-        const budgetPageState = budgetPageStore.$state;
-
-        const state = reactive({
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            costTypeKey: computed(() => {
-                if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return '';
-                return getKeyOfCostType(budgetPageState.budgetData.cost_types);
-            }),
-            costTypeValue: computed(() => {
-                if (!budgetPageState.budgetData || !budgetPageState.budgetData?.cost_types) return [];
-                return getValueOfCostType(budgetPageState.budgetData.cost_types, state.costTypeKey);
-            }),
-            processedCostTypeValue: computed(() => state.costTypeValue?.join(', ') || 'All'),
-            buttonRef: null as HTMLElement | null,
-            balloonVisible: false,
-        });
-
-        const handleClickViewAll = () => {
-            state.balloonVisible = true;
-        };
-
-        const getTargetLabel = (projects: ProjectReferenceMap) => {
-            if (budgetPageState.budgetData?.project_id) return projects[budgetPageState.budgetData.project_id]?.label ?? '';
-            if (budgetPageState.budgetData?.project_group_id) return state.projectGroups[budgetPageState.budgetData.project_group_id]?.label ?? '';
-            return 'No Item';
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            budgetPageState,
-            referenceRouter,
-            handleClickViewAll,
-            currencyMoneyFormatter,
-            getTargetLabel,
-            costTypeMap,
-            BUDGET_TIME_UNIT,
-            ACTION_ICON,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .budget-detail-summary {
     @apply flex;
     column-gap: 1rem;
     .summary-card {
+        @apply flex flex-col justify-between;
         width: 33%;
         min-height: 4.875rem;
         padding: 1rem 1rem;
@@ -184,18 +191,36 @@ export default {
         font-size: 0.875rem;
         line-height: 130%;
     }
-    .summary-content {
-        margin-top: 0.5rem;
-        font-size: 0.875rem;
-        line-height: 120%;
-        &.cost-type {
+    .cost-type-wrapper {
+        @apply relative flex justify-between items-end;
+        .summary-content.cost-type {
             @apply flex justify-between;
-            position: relative;
+            max-width: calc(100% - 3.75rem);
+            &.is-view-all {
+                max-width: initial;
+                margin-top: 0.5rem;
+                .cost-type-content {
+                    overflow: initial;
+                    text-overflow: initial;
+                    white-space: initial;
+                }
+            }
             .cost-type-content {
                 @apply truncate;
-                max-width: calc(100% - 4rem);
                 font-size: 0.875rem;
                 line-height: 130%;
+            }
+        }
+    }
+    .summary-content {
+        font-size: 0.875rem;
+        line-height: 120%;
+        &.target {
+            @apply flex;
+            gap: 0.125rem;
+            .target-project-group {
+                @apply flex items-center;
+                gap: 0.125rem;
             }
         }
     }
@@ -204,6 +229,12 @@ export default {
         font-size: 0.875rem;
         margin-left: 0.5rem;
         flex-shrink: 0;
+    }
+
+    .content-wrapper {
+        @apply flex flex-col;
+        line-height: 125%;
+        font-size: 0.875rem;
     }
 
     @screen tablet {

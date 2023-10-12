@@ -8,7 +8,7 @@
             >
                 <template #left-area>
                     <p-select-dropdown v-if="domainName !== 'root'"
-                                       :items="dropdownItems"
+                                       :menu="dropdownItems"
                                        :selected="selectedPostType"
                                        @update:selected="handleSearchPostTypeChange"
                     />

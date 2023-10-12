@@ -24,8 +24,7 @@
                         >
                             <g-n-b-sub-menu :label="subMenu.label"
                                             :to="subMenu.to"
-                                            :is-beta="subMenu.isBeta"
-                                            :is-new="subMenu.isNew"
+                                            :higlight-tag="subMenu.highlightTag"
                                             @navigate="hideMenu"
                             />
                         </div>
@@ -131,6 +130,7 @@ export default defineComponent({
         };
 
         (async () => {
+            // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
             await Promise.allSettled([
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
                 store.dispatch('dashboard/loadAllDashboard'),
