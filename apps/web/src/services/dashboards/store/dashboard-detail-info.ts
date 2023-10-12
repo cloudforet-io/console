@@ -213,13 +213,12 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             const targetIndex = this.dashboardWidgetInfoList.findIndex((info) => info.widget_key === widgetKey);
             if (targetIndex > -1) {
                 const _dashboardWidgetInfoList = cloneDeep(this.dashboardWidgetInfoList);
-                const originWidgetInfo = _dashboardWidgetInfoList[targetIndex];
                 _dashboardWidgetInfoList[targetIndex] = {
                     ...this.dashboardWidgetInfoList[targetIndex],
-                    title: data.title ?? originWidgetInfo.title,
-                    inherit_options: data.inherit_options ?? originWidgetInfo.inherit_options,
-                    widget_options: data.widget_options ?? originWidgetInfo.widget_options,
-                    schema_properties: data.schema_properties ?? originWidgetInfo.schema_properties,
+                    title: data.title,
+                    inherit_options: data.inherit_options,
+                    widget_options: data.widget_options,
+                    schema_properties: data.schema_properties,
                 };
                 this.dashboardWidgetInfoList = _dashboardWidgetInfoList;
             }
