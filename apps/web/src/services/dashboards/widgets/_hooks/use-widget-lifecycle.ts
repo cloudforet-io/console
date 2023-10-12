@@ -68,6 +68,7 @@ export const useWidgetLifecycle = <Data = any>({
             previousVariablesSchema: before,
             widgetConfig: widgetState.widgetConfig,
             widgetInfo: {
+                title: widgetState.title,
                 inherit_options: widgetState.inheritOptions,
                 schema_properties: widgetState.schemaProperties,
                 widget_options: widgetState.options,
