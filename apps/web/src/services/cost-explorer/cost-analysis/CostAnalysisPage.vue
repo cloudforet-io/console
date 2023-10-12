@@ -2,9 +2,7 @@
 import {
     onUnmounted, watch,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
-
-import { SpaceRouter } from '@/router';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     queryStringToArray,
@@ -26,6 +24,7 @@ import type {
 
 
 const route = useRoute();
+const router = useRouter();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
 
@@ -46,7 +45,7 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
     if (selectedQuerySet) {
         await costAnalysisPageStore.setQueryOptions(selectedQuerySet.options);
     } else if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
-        const currentQuery = SpaceRouter.router.currentRoute.query;
+        const currentQuery = router.currentRoute.query;
         const costQuerySetOptions = getQueryOptionsFromUrlQuery(currentQuery);
         await costAnalysisPageStore.setQueryOptions(costQuerySetOptions);
     } else {
