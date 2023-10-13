@@ -73,7 +73,8 @@ const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
+            .addFilter({ k: 'additional_info.status', v: ['PASS', 'FAIL'], o: '=' });
         const { status, response } = await fetchCloudServiceStatsAnalyze({
             query_set_id: widgetState.options.asset_query_set,
             query: {

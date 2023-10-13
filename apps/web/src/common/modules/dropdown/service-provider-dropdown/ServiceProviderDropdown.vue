@@ -29,7 +29,7 @@
                 <p-lazy-img width="1rem"
                             height="1rem"
                             error-icon="ic_cloud-filled"
-                            :src="item.icon"
+                            :src="providers[item.name]?.icon"
                             class="mr-1"
                 /><span>{{ item.label }}</span>
             </div>
@@ -79,7 +79,6 @@ export default {
                 ...Object.keys(state.providers).map((k) => ({
                     label: state.providers[k].name,
                     name: k,
-                    icon: state.providers[k]?.icon,
                 })),
             ]),
         });
