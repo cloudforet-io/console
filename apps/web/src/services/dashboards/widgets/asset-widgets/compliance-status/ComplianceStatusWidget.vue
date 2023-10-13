@@ -7,7 +7,7 @@ import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { sum } from 'lodash';
+import { isEmpty, sum } from 'lodash';
 
 import { commaFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -29,12 +29,18 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 
-interface Data extends CloudServiceStatsModel {
+interface SubData {
     severity: Severity;
+    value: number;
+}
+interface Data extends CloudServiceStatsModel {
     status: 'PASS'|'FAIL';
-    compliance_count: number;
-    pass_score: number;
-    fail_score: number;
+    compliance_count: SubData[];
+    pass_score: SubData[];
+    fail_score: SubData[];
+    _total_compliance_count: number;
+    _total_pass_score: number;
+    _total_fail_score: number;
 }
 interface OuterChartData {
     status: string;
@@ -80,16 +86,16 @@ const state = reactive({
             stroke: color(status.color),
         },
     }))),
-    // TODO: need to fix this
     innerChartData: computed<InnerChartData[]>(() => {
-        const failCheckDataList = state.data?.filter((d) => d.date === widgetState.dateRange.end && d.key === 'fail_check_count') ?? [];
+        const targetStatusData: Data['compliance_count'] = state.data?.find((d) => d.status === 'FAIL')?.compliance_count;
+        if (isEmpty(targetStatusData)) return [];
         const innerChartData: InnerChartData[] = [];
         SEVERITY_STATUS_MAP_VALUES.forEach((severity) => {
-            const targetSeverityData = failCheckDataList.find((d) => d.severity === severity.name);
-            if (!targetSeverityData) return;
+            const severityData = targetStatusData.find((d) => d.severity === severity.name);
+            if (!severityData) return;
             innerChartData.push({
                 severity: severity.label,
-                value: targetSeverityData.value,
+                value: severityData.value,
                 pieSettings: {
                     fill: color(severity.color),
                     stroke: color(severity.color),
@@ -112,8 +118,8 @@ const state = reactive({
     complianceCount: computed<number>(() => sum(Object.values(state.complianceCountMap))),
     complianceCountMap: computed<Record<string, number>>(() => {
         if (!state.data) return {} as Record<string, number>;
-        const passComplianceCount = sum(state.data.filter((d) => d.status === 'PASS').map((d) => d.compliance_count));
-        const failComplianceCount = sum(state.data.filter((d) => d.status === 'FAIL').map((d) => d.compliance_count));
+        const passComplianceCount = sum(state.data.filter((d) => d.status === 'PASS').map((d) => d._total_compliance_count));
+        const failComplianceCount = sum(state.data.filter((d) => d.status === 'FAIL').map((d) => d._total_compliance_count));
         return {
             [COMPLIANCE_STATUS_MAP.PASS.name]: passComplianceCount,
             [COMPLIANCE_STATUS_MAP.FAIL.name]: failComplianceCount,
@@ -121,8 +127,8 @@ const state = reactive({
     }),
     score: computed<number|undefined>(() => {
         if (!state.data) return undefined;
-        const passScore = sum(state.data.map((d) => d.pass_score)) ?? 0;
-        const failScore = sum(state.data.map((d) => d.fail_score)) ?? 0;
+        const passScore = sum(state.data.map((d) => d._total_pass_score)) ?? 0;
+        const failScore = sum(state.data.map((d) => d._total_fail_score)) ?? 0;
         const totalScore = passScore + failScore;
         if (totalScore === 0) return 0;
         return Math.round((passScore / totalScore) * 100);
@@ -144,7 +150,7 @@ const fetchData = async (): Promise<Data[]> => {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.end,
                 end: widgetState.dateRange.end,
-                group_by: ['unit', 'additional_info.status'],
+                group_by: ['unit', 'additional_info.status', 'additional_info.severity'],
                 fields: {
                     compliance_count: {
                         key: 'values.compliance_count',
@@ -159,6 +165,7 @@ const fetchData = async (): Promise<Data[]> => {
                         operator: 'sum',
                     },
                 },
+                field_group: ['severity'],
                 ...apiQueryHelper.data,
             },
         });
