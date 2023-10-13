@@ -27,9 +27,6 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
         const response = await SpaceConnector.client.identity.provider.list({
             query: {
                 only: ['provider', 'name', 'tags'],
-                sort: {
-                    key: 'provider',
-                },
             },
         }, { timeout: 3000 });
         const providers: ProviderReferenceMap = {};
