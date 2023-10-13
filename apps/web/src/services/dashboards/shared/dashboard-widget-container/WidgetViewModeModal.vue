@@ -33,10 +33,6 @@ import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widge
 
 interface WidgetViewModeModalProps {
     visible: boolean;
-    /*
-    NOTE: widgetInfo's type is to prevent vue2 bundling error when using extended interface from other file as a prop's type
-    This type is exactly the same with ReformedWidgetInfo in use-widget-reformer.ts
-    */
     widgetKey?: string;
     size?: WidgetSize;
     theme?: WidgetTheme;
