@@ -266,6 +266,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         // This action is for handling dashboard data that does not reflect schema changes.
         convertDashboardInfoByChangedVariableSchema(dashboardInfo: DashboardModel) {
             const _dashboardInfo = cloneDeep(dashboardInfo);
+            if (isEmpty(_dashboardInfo.variables_schema)) return _dashboardInfo;
             Object.entries(_dashboardInfo.variables_schema.properties).forEach(([k, v]) => {
                 if (!v.options) {
                     _dashboardInfo.variables_schema.properties[k] = {
