@@ -51,7 +51,7 @@ interface ValidateWidgetByVariablesSchemaUpdateOptions {
     updatedVariablesSchema?: DashboardVariablesSchema;
     previousVariablesSchema?: DashboardVariablesSchema;
     widgetConfig: WidgetConfig;
-    widgetInfo: UpdatableWidgetInfo;
+    widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>;
 }
 
 export const validateWidgetByVariablesSchemaUpdate = ({
@@ -69,7 +69,6 @@ export const validateWidgetByVariablesSchemaUpdate = ({
     let isWidgetOptionAdded: boolean|undefined;
     let isWidgetOptionDeleted: boolean|undefined;
     const newWidgetInfo: UpdatableWidgetInfo = {
-        title: widgetInfo.title,
         inherit_options: cloneDeep(widgetInfo.inherit_options),
         schema_properties: widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [],
         widget_options: cloneDeep(widgetInfo.widget_options),

@@ -5,6 +5,7 @@
             searchable
             selectable
             sortable
+            exportable
             :loading="userPageState.loading"
             :items="userPageState.users"
             :select-index="userPageState.selectedIndices"

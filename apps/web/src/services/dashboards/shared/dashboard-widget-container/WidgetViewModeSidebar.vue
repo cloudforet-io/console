@@ -11,8 +11,6 @@ import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { getUUID } from '@/lib/component-util/getUUID';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardWidgetInputForm
@@ -26,14 +24,13 @@ import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashb
 interface Props {
     widgetKey?: string;
     widgetConfigId?: string;
-    visible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     widgetKey: undefined,
     widgetConfigId: undefined,
 });
-const emit = defineEmits<{(e: 'close', save: boolean): void;
+const emit = defineEmits<{(e: 'close'): void;
     (e: 'update:widget-info', widgetInfo: UpdatableWidgetInfo): void;
     (e: 'update:has-non-inherited-widget-options', value: boolean): void;
 }>();
@@ -52,7 +49,6 @@ const state = reactive({
         );
         return nonInheritedWidgetOptions.length > 0;
     }),
-    contextKey: getUUID(),
 });
 
 /* Util */
@@ -89,24 +85,21 @@ const handleClickSaveButton = async () => {
     updateDashboardWidgetStore();
     await updateWidgetInfo();
     state.nonInheritedOptionModalVisible = false;
-    emit('close', true);
+    emit('close');
 };
 const handleCloseSidebar = () => {
-    emit('close', false);
+    emit('close');
 };
 
 debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
-    emit('update:widget-info', after as UpdatableWidgetInfo);
+    emit('update:widget-info', after);
 }, { debounce: 150 });
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {
     emit('update:has-non-inherited-widget-options', value);
 }, { immediate: true });
 
-watch(() => props.visible, (value) => {
-    if (value) state.contextKey = getUUID();
-});
 </script>
 
 <template>
@@ -126,8 +119,7 @@ watch(() => props.visible, (value) => {
             </template>
             <template #sidebar>
                 <div class="sidebar-contents">
-                    <dashboard-widget-input-form :key="state.contextKey"
-                                                 :widget-config-id="props.widgetConfigId"
+                    <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
                                                  :widget-key="props.widgetKey"
                     />
                 </div>
