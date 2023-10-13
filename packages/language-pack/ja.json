@@ -471,7 +471,7 @@
 						"REQUIRED_COST_TYPE": "一つ以上のコストタイプを選択してください",
 						"REQUIRED_NAME": "名前を入力してください",
 						"REQUIRED_TARGET": "ターゲットを選択してください",
-						"SPECIFIC_PROVIDER": ""
+						"SPECIFIC_PROVIDER": "特定プロバイダ"
 					},
 					"CANCEL": "取消",
 					"CONFIRM": "確認",
