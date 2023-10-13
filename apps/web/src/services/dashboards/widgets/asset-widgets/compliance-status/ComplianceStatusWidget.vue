@@ -5,7 +5,7 @@ import {
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
-import { PDataLoader, PI } from '@spaceone/design-system';
+import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { sum } from 'lodash';
 
@@ -14,12 +14,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { i18n } from '@/translations';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { red, green } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
@@ -35,9 +31,8 @@ import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-w
 
 interface Data extends CloudServiceStatsModel {
     severity: Severity;
+    status: 'PASS'|'FAIL';
     compliance_count: number;
-    pass_check_count: number;
-    fail_check_count: number;
     pass_score: number;
     fail_score: number;
 }
@@ -79,12 +74,13 @@ const state = reactive({
     noData: computed(() => !state.data?.length),
     outerChartData: computed<OuterChartData[]>(() => COMPLIANCE_STATUS_MAP_VALUES.map((status) => ({
         status: status.label,
-        value: state.checkCount?.[status.name],
+        value: state.complianceCountMap?.[status.name],
         pieSettings: {
             fill: color(status.color),
             stroke: color(status.color),
         },
     }))),
+    // TODO: need to fix this
     innerChartData: computed<InnerChartData[]>(() => {
         const failCheckDataList = state.data?.filter((d) => d.date === widgetState.dateRange.end && d.key === 'fail_check_count') ?? [];
         const innerChartData: InnerChartData[] = [];
@@ -113,39 +109,20 @@ const state = reactive({
         });
         return text;
     }),
-    prevComplianceCount: computed<number>(() => {
-        if (!state.data) return 0;
-        const prevMonth = dayjs.utc(widgetState.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
-        const targetDataList = state.data.filter((d) => d.date === prevMonth).map((d) => d.compliance_count);
-        return sum(targetDataList);
-    }),
-    complianceCount: computed<number>(() => {
-        if (!state.data) return 0;
-        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end).map((d) => d.compliance_count);
-        return sum(targetDataList);
-    }),
-    complianceCountComparingMessage: computed<string|undefined>(() => {
-        if (state.complianceCount === state.prevComplianceCount) return undefined;
-        if (state.prevComplianceCount < state.complianceCount) {
-            return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.MORE_THAN_PREV_MONTH') as string;
-        }
-        return i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.LESS_THAN_PREV_MONTH') as string;
-    }),
-    checkCount: computed<Record<string, number>>(() => {
+    complianceCount: computed<number>(() => sum(Object.values(state.complianceCountMap))),
+    complianceCountMap: computed<Record<string, number>>(() => {
         if (!state.data) return {} as Record<string, number>;
-        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end);
-        const passCheckCount = sum(targetDataList.map((d) => d.pass_check_count));
-        const failCheckCount = sum(targetDataList.map((d) => d.fail_check_count));
+        const passComplianceCount = sum(state.data.filter((d) => d.status === 'PASS').map((d) => d.compliance_count));
+        const failComplianceCount = sum(state.data.filter((d) => d.status === 'FAIL').map((d) => d.compliance_count));
         return {
-            [COMPLIANCE_STATUS_MAP.PASS.name]: passCheckCount,
-            [COMPLIANCE_STATUS_MAP.FAIL.name]: failCheckCount,
+            [COMPLIANCE_STATUS_MAP.PASS.name]: passComplianceCount,
+            [COMPLIANCE_STATUS_MAP.FAIL.name]: failComplianceCount,
         };
     }),
     score: computed<number|undefined>(() => {
         if (!state.data) return undefined;
-        const targetDataList = state.data.filter((d) => d.date === widgetState.dateRange.end);
-        const passScore = sum(targetDataList.map((d) => d.pass_score)) ?? 0;
-        const failScore = sum(targetDataList.map((d) => d.fail_score)) ?? 0;
+        const passScore = sum(state.data.map((d) => d.pass_score)) ?? 0;
+        const failScore = sum(state.data.map((d) => d.fail_score)) ?? 0;
         const totalScore = passScore + failScore;
         if (totalScore === 0) return 0;
         return Math.round((passScore / totalScore) * 100);
@@ -159,26 +136,18 @@ const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
             .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        const prevMonth = dayjs.utc(widgetState.settings?.date_range?.start).subtract(1, 'month').format(DATE_FORMAT);
+            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
+            .addFilter({ k: 'additional_info.status', v: ['PASS', 'FAIL'], o: '=' });
         const { status, response } = await fetchCloudServiceStatsAnalyze({
             query_set_id: widgetState.options.asset_query_set,
             query: {
                 granularity: 'MONTHLY',
-                start: prevMonth,
+                start: widgetState.dateRange.end,
                 end: widgetState.dateRange.end,
-                group_by: ['unit', 'additional_info.severity'],
+                group_by: ['unit', 'additional_info.status'],
                 fields: {
                     compliance_count: {
                         key: 'values.compliance_count',
-                        operator: 'sum',
-                    },
-                    pass_check_count: {
-                        key: 'values.pass_check_count',
-                        operator: 'sum',
-                    },
-                    fail_check_count: {
-                        key: 'values.fail_check_count',
                         operator: 'sum',
                     },
                     pass_score: {
@@ -326,15 +295,6 @@ defineExpose<WidgetExpose<Data[]>>({
                         <p class="value">
                             {{ commaFormatter(state.complianceCount) }}
                         </p>
-                        <div v-if="state.complianceCountComparingMessage"
-                             class="diff-wrapper"
-                        >
-                            <p-i :name="state.prevComplianceCount < state.complianceCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                                 :color="state.prevComplianceCount < state.complianceCount ? red[500] : green[500]"
-                            />
-                            <span class="diff-value">{{ Math.abs(state.complianceCount - state.prevComplianceCount) }}</span>
-                            <span class="diff-text">{{ state.complianceCountComparingMessage }}</span>
-                        </div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -361,7 +321,7 @@ defineExpose<WidgetExpose<Data[]>>({
                                 <span class="text">{{ status.label }}</span>
                             </div>
                             <p class="value">
-                                {{ commaFormatter(state.checkCount[status.name] ?? 0) }}
+                                {{ commaFormatter(state.complianceCountMap[status.name] ?? 0) }}
                             </p>
                         </div>
                     </div>
@@ -390,21 +350,6 @@ defineExpose<WidgetExpose<Data[]>>({
                 .value {
                     @apply text-display-md;
                 }
-                .diff-wrapper {
-                    @apply text-gray-700;
-                    display: flex;
-                    align-items: center;
-                    .diff-value {
-                        @apply text-label-lg;
-                        padding-right: 0.25rem;
-                    }
-                    .diff-text {
-                        @apply text-label-sm;
-                    }
-                }
-            }
-            .left-wrapper {
-                padding-right: 2rem;
             }
             .right-wrapper {
                 padding-left: 2rem;
