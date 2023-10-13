@@ -211,7 +211,7 @@ const drawChart = () => {
     state.chart = chart;
 };
 
-const setChartData = (data) => {
+const getChartData = (data): ChartData[] => {
     const chartData: ChartData[] = [];
     const dateType = state.selectedDateType;
     const dateRange = dateType === 'MONTHLY' ? MONTH_COUNT : DAY_COUNT;
@@ -249,7 +249,7 @@ const setChartData = (data) => {
     });
 
     const orderedData = orderBy(chartData, ['date'], ['asc']);
-    chartState.data = orderedData.map((d, idx) => {
+    return orderedData.map((d, idx) => {
         const tooltipText = state.activeTab === DATA_TYPE.BILLING ? numberFormatter(d.count) : d.count || '';
         let bulletText;
         if ((dateType === 'DAILY' && idx % 3 === 1) || (dateType === 'MONTHLY' && idx % 3 === 2)) {
@@ -373,9 +373,10 @@ const getTrend = async (type) => {
             });
             data = res.results;
         }
-        setChartData(data);
+        chartState.data = getChartData(data);
     } catch (e) {
         ErrorHandler.handleError(e);
+        chartState.data = [];
     } finally {
         chartState.loading = false;
     }
