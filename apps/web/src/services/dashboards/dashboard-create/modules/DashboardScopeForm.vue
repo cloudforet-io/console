@@ -20,6 +20,7 @@
             </p-radio-group>
             <project-select-dropdown v-show="!isDomainScope"
                                      project-selectable
+                                     :project-group-selectable="false"
                                      @select="handleSelectProjects"
             />
         </div>
