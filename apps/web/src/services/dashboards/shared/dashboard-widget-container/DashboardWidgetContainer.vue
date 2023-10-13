@@ -256,7 +256,9 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
             </div>
         </p-data-loader>
         <widget-view-mode-modal :visible="widgetViewState.visibleModal"
-                                :widget-info="widgetViewState.targetWidget"
+                                :widget-key="widgetViewState.targetWidget?.widget_key"
+                                :size="widgetViewState.targetWidget?.size"
+                                :theme="widgetViewState.targetWidget?.theme"
                                 @update:visible="handleUpdateViewModalVisible"
         />
         <dashboard-widget-edit-modal v-if="widgetEditState.targetWidget"

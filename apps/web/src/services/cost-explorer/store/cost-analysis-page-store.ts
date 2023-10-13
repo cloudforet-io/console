@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { isEmpty } from 'lodash';
+import { isEmpty, sortBy } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -82,7 +82,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
                     }));
                 }
             }
-            return [...Object.values(GROUP_BY_ITEM_MAP), ...additionalInfoGroupBy];
+            return [...Object.values(GROUP_BY_ITEM_MAP), ...sortBy(additionalInfoGroupBy, 'label')];
         },
         consoleFilters: (state): ConsoleFilter[] => {
             const results: ConsoleFilter[] = [];
