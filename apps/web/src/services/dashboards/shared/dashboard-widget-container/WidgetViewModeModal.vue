@@ -28,6 +28,7 @@ import type {
     UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 
 interface WidgetViewModeModalProps {
@@ -36,18 +37,17 @@ interface WidgetViewModeModalProps {
     NOTE: widgetInfo's type is to prevent vue2 bundling error when using extended interface from other file as a prop's type
     This type is exactly the same with ReformedWidgetInfo in use-widget-reformer.ts
     */
-    widgetInfo?: DashboardLayoutWidgetInfo & {
-        size: WidgetSize;
-        theme?: WidgetTheme;
-        width: number;
-        component: AsyncComponent|null;
-    }; // = ReformedWidgetInfo
+    widgetKey?: string;
+    size?: WidgetSize;
+    theme?: WidgetTheme;
 }
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 
 const props = withDefaults(defineProps<WidgetViewModeModalProps>(), {
     visible: false,
-    widgetInfo: undefined,
+    widgetKey: undefined,
+    size: undefined,
+    theme: undefined,
 });
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
@@ -66,7 +66,11 @@ const state = reactive({
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
     hasNonInheritedWidgetOptions: false,
-    updatedWidgetInfo: props.widgetInfo as Partial<DashboardLayoutWidgetInfo>|undefined,
+    originWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
+        if (!props.widgetKey) return undefined;
+        return dashboardDetailState.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
+    }),
+    updatedWidgetInfo: undefined as Partial<DashboardLayoutWidgetInfo>|undefined,
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -90,7 +94,7 @@ const handleClickEditOption = () => {
 };
 const handleCloseSidebar = (save: boolean) => {
     state.sidebarVisible = false;
-    if (!save) state.updatedWidgetInfo = props.widgetInfo;
+    if (!save) state.updatedWidgetInfo = cloneDeep(state.originWidgetInfo);
     state.widgetRef?.refreshWidget();
 };
 const handleUpdateSidebarWidgetInfo = (widgetInfo: UpdatableWidgetInfo) => {
@@ -112,10 +116,10 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
 };
 
 watch(() => props.visible, async (visible) => {
-    if (!props.widgetInfo) return;
+    if (!state.originWidgetInfo) return;
     if (visible) {
         initSnapshot();
-        state.component = props.widgetInfo.component;
+        state.component = getWidgetComponent(state.originWidgetInfo.widget_name);
     } else {
         state.loadingWidget = true;
         state.sidebarVisible = false;
@@ -180,36 +184,36 @@ watch(() => props.visible, async (visible) => {
                         <dashboard-toolset />
                     </div>
                 </div>
-                <div v-if="props.widgetInfo && state.component"
+                <div v-if="state.originWidgetInfo && state.component"
                      class="widget-wrapper"
                 >
                     <component :is="state.component"
                                ref="widgetRef"
-                               :widget-key="props.widgetInfo.widget_key"
-                               :widget-config-id="props.widgetInfo.widget_name"
-                               :title="state.updatedWidgetInfo?.title ?? props.widgetInfo.title"
-                               :options="state.updatedWidgetInfo?.widget_options ?? props.widgetInfo.widget_options"
-                               :inherit-options="state.updatedWidgetInfo?.inherit_options ?? props.widgetInfo.inherit_options"
-                               :schema-properties="state.updatedWidgetInfo?.schema_properties ?? props.widgetInfo.schema_properties"
+                               :widget-key="props.widgetKey"
+                               :widget-config-id="state.originWidgetInfo.widget_name"
+                               :title="state.updatedWidgetInfo?.title ?? state.originWidgetInfo.title"
+                               :options="state.updatedWidgetInfo?.widget_options ?? state.originWidgetInfo.widget_options"
+                               :inherit-options="state.updatedWidgetInfo?.inherit_options ?? state.originWidgetInfo.inherit_options"
+                               :schema-properties="state.updatedWidgetInfo?.schema_properties ?? state.originWidgetInfo.schema_properties"
                                size="full"
-                               :theme="props.widgetInfo.theme"
-                               :error-mode="dashboardDetailState.widgetValidMap[props.widgetInfo.widget_key] === false"
+                               :theme="props.theme"
+                               :error-mode="dashboardDetailState.widgetValidMap[props.widgetKey] === false"
                                :all-reference-type-info="state.allReferenceTypeInfo"
                                :dashboard-settings="dashboardDetailState.settings"
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="state.loadingWidget"
                                @mounted="state.loadingWidget = false"
-                               @update-widget-info="handleUpdateWidgetInfo(props.widgetInfo.widget_key, $event)"
-                               @update-widget-validation="handleUpdateValidation(props.widgetInfo.widget_key, $event)"
+                               @update-widget-info="handleUpdateWidgetInfo(props.widgetKey, $event)"
+                               @update-widget-validation="handleUpdateValidation(props.widgetKey, $event)"
                     />
                 </div>
             </div>
             <transition name="slide-left">
-                <widget-view-mode-sidebar v-if="props.widgetInfo"
+                <widget-view-mode-sidebar v-if="state.originWidgetInfo"
                                           v-show="state.sidebarVisible"
-                                          :widget-config-id="props.widgetInfo.widget_name"
-                                          :widget-key="props.widgetInfo.widget_key"
+                                          :widget-config-id="state.originWidgetInfo.widget_name"
+                                          :widget-key="state.originWidgetInfo.widget_key"
                                           :visible="state.sidebarVisible"
                                           @close="handleCloseSidebar"
                                           @update:widget-info="handleUpdateSidebarWidgetInfo"
