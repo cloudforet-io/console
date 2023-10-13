@@ -39,19 +39,14 @@
                             </div>
                         </template>
                         <template #item-overlay-content="{board}">
-                            <router-link
-                                v-if="board.description?.preview_image"
-                                :to="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
-                                target="_blank"
-                            >
-                                <div class="dashboard-template-overlay-content">
-                                    <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.PREVIEW') }}</span>
-                                    <p-i name="ic_external-link"
-                                         height="1em"
-                                         width="1em"
-                                    />
-                                </div>
-                            </router-link>
+                            <p-link v-if="board.description?.preview_image"
+                                    action-icon="internal-link"
+                                    size="md"
+                                    highlight
+                                    new-tab
+                                    :text="$t('DASHBOARDS.CREATE.PREVIEW')"
+                                    :href="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
+                            />
                         </template>
                     </p-board>
                     <p-text-pagination
@@ -94,15 +89,13 @@
                             </div>
                         </template>
                         <template #item-overlay-content="{board}">
-                            <div class="dashboard-template-overlay-content"
-                                 @click="handleOpenDashboardNewTab(board)"
-                            >
-                                <span class="dashboard-template-overlay-preview">{{ $t('DASHBOARDS.CREATE.VIEW') }}</span>
-                                <p-i name="ic_external-link"
-                                     height="1em"
-                                     width="1em"
-                                />
-                            </div>
+                            <p-link class="legend"
+                                    action-icon="internal-link"
+                                    new-tab
+                                    highlight
+                                    :text="$t('DASHBOARDS.CREATE.VIEW')"
+                                    :to="getDashboardLocation(board)"
+                            />
                         </template>
                     </p-board>
                     <p-text-pagination
@@ -127,16 +120,15 @@
 import {
     computed, nextTick, reactive, ref,
 } from 'vue';
+import type { Location } from 'vue-router';
 
 import {
-    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex,
+    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
 } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-
 
 import type { DashboardConfig, DashboardScope } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
@@ -207,18 +199,17 @@ const existingTemplateState = reactive({
 
 });
 
-const handleOpenDashboardNewTab = (board: DashboardModel) => {
+const getDashboardLocation = (board: DashboardModel): Location => {
     const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
     const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-    const { href } = SpaceRouter.router.resolve({
+    return {
         name: routeName,
         params: {
             dashboardId: isProjectDashboard
                 ? (board as ProjectDashboardModel).project_dashboard_id
                 : (board as DomainDashboardModel).domain_dashboard_id,
         },
-    });
-    window.open(href, '_blank');
+    };
 };
 
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
@@ -253,6 +244,9 @@ const handleInputSearch = () => {
         @apply overflow-auto;
         .card-container {
             @apply mt-6;
+            .legend {
+                @apply text-label-md;
+            }
         }
         .card-wrapper-title {
             @apply text-gray-500 !important text-xs block;
@@ -267,13 +261,6 @@ const handleInputSearch = () => {
         }
         .dashboard-description-text {
             @apply text-gray-500 text-xs;
-        }
-        .dashboard-template-overlay-content {
-            @apply text-blue-700;
-            height: 1.5rem;
-        }
-        .dashboard-template-overlay-preview {
-            @apply text-sm mr-1;
         }
         .p-empty {
             padding-top: 3.25rem;

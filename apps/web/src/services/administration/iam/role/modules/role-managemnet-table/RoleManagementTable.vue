@@ -29,12 +29,11 @@
                     {{ $t('IAM.ROLE.CREATE') }}
                 </p-button>
                 <p-select-dropdown class="left-toolbox-item-select-dropdown"
-                                   :items="dropdownMenu"
+                                   :menu="dropdownMenu"
+                                   :placeholder="$t('IAM.ROLE.ACTION')"
                                    :disabled="manageDisabled"
                                    @select="handleSelectDropdown"
-                >
-                    {{ $t('IAM.ROLE.ACTION') }}
-                </p-select-dropdown>
+                />
             </template>
             <template #col-role_type-format="{ value }">
                 <p-badge v-if="value"
@@ -252,6 +251,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .left-toolbox-item-select-dropdown {
+    min-width: 6.5rem;
     margin-left: 1rem;
 }
 .description {

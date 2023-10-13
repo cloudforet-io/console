@@ -124,7 +124,7 @@ const handleDelete = (index: number) => {
     flex-flow: wrap;
     column-gap: 0.25rem;
     row-gap: 0.25rem;
-    max-width: 50%;
+    max-width: calc(100% - 14rem);
     min-height: 2rem;
     padding-top: 0.25rem;
 }

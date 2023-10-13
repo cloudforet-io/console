@@ -1,249 +1,153 @@
+<script lang="ts" setup>
+import {
+    reactive, watch,
+} from 'vue';
+
+import type { XYChart } from '@amcharts/amcharts5/xy';
+import dayjs from 'dayjs';
+import { debounce } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { hideAllSeries, showAllSeries, toggleSeries } from '@/common/composables/amcharts5/concepts-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    getLegends, getXYChartData,
+} from '@/services/cost-explorer/cost-analysis/lib/widget-data-helper';
+import CostAnalysisChartLegends
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartLegends.vue';
+import CostAnalysisStackedColumnChart
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
+import type {
+    Legend, XYChartData,
+} from '@/services/cost-explorer/cost-analysis/type';
+import {
+    GRANULARITY,
+} from '@/services/cost-explorer/lib/config';
+import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
+import type {
+    CostAnalyzeResponse,
+    Period,
+} from '@/services/cost-explorer/type';
+
+
+type CostAnalyzeRawData = {
+    [groupBy: string]: string | any;
+    cost_sum?: Array<{
+        date: string;
+        value: number
+    }>;
+    _total_cost_sum?: number;
+};
+
+const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageState = costAnalysisPageStore.$state;
+
+const state = reactive({
+    loading: true,
+    legends: [] as Legend[],
+    chartData: [] as XYChartData[],
+    chart: null as XYChart | null,
+});
+
+/* api */
+const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
+const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
+    try {
+        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        let dateFormat = 'YYYY-MM';
+        if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
+        const { status, response } = await fetchCostAnalyze({
+            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            query: {
+                granularity: costAnalysisPageState.granularity,
+                group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
+                start: dayjs.utc(period.start).format(dateFormat),
+                end: dayjs.utc(period.end).format(dateFormat),
+                fields: {
+                    cost_sum: {
+                        key: 'cost',
+                        operator: 'sum',
+                    },
+                },
+                sort: [{ key: '_total_cost_sum', desc: true }],
+                field_group: ['date'],
+                ...analyzeApiQueryHelper.data,
+            },
+        });
+        if (status === 'succeed') return response;
+        return { more: false, results: [] };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return { more: false, results: [] };
+    }
+};
+const setChartData = debounce(async (period:Period) => {
+    state.loading = true;
+
+    const rawData = await listCostAnalysisData(period);
+    const { granularity, chartGroupBy } = costAnalysisPageState;
+    state.legends = getLegends<CostAnalyzeRawData>(rawData, granularity, chartGroupBy);
+    state.chartData = getXYChartData<CostAnalyzeRawData>(rawData, granularity, period, chartGroupBy);
+    state.loading = false;
+}, 300);
+
+/* event */
+const handleToggleSeries = (index) => {
+    toggleSeries(state.chart as XYChart, index);
+};
+const handleAllSeries = (type) => {
+    if (type === 'show') {
+        showAllSeries(state.chart as XYChart);
+    } else {
+        hideAllSeries(state.chart as XYChart);
+    }
+};
+
+watch([
+    () => costAnalysisPageState,
+    () => costAnalysisPageStore.selectedDataSourceId,
+    () => costAnalysisPageStore.selectedQueryId,
+], ([, selectedDataSourceId]) => {
+    if (costAnalysisPageState.period && selectedDataSourceId) setChartData(costAnalysisPageState.period);
+}, { immediate: true, deep: true });
+</script>
+
 <template>
-    <div class="cost-analysis-chart"
-         :class="{'print-mode': printMode}"
-    >
-        <section ref="chartRef"
-                 class="chart-section"
-        >
-            <cost-analysis-pie-chart v-if="costAnalysisPageState.granularity === GRANULARITY.ACCUMULATED"
-                                     :loading="loading"
-                                     :chart.sync="chart"
-                                     :chart-data="chartData"
-                                     :legends="legends"
-                                     :currency="currency"
-                                     :currency-rates="currencyRates"
-                                     :print-mode="printMode"
-                                     @rendered="handleChartRendered"
-            />
-            <cost-analysis-stacked-column-chart v-else
-                                                :loading="loading"
-                                                :chart.sync="chart"
-                                                :chart-data="chartData"
-                                                :legends="legends"
-                                                :granularity="costAnalysisPageState.granularity"
-                                                :stack="costAnalysisPageState.stack"
-                                                :period="costAnalysisPageState.period"
-                                                :currency="currency"
-                                                :currency-rates="currencyRates"
-                                                :print-mode="printMode"
-                                                @rendered="handleChartRendered"
-            />
-        </section>
-        <cost-analysis-chart-query-section ref="queryRef"
-                                           :print-mode="printMode"
-                                           :loading="loading"
-                                           :legends.sync="legends"
-                                           @toggle-series="handleToggleSeries"
-                                           @show-all-series="handleAllSeries('show')"
-                                           @hide-all-series="handleAllSeries('hide')"
+    <div class="cost-analysis-chart">
+        <cost-analysis-stacked-column-chart :loading="state.loading"
+                                            :chart.sync="state.chart"
+                                            :chart-data="state.chartData"
+                                            :legends="state.legends"
+                                            class="cost-analysis-stacked-column-chart"
+        />
+        <cost-analysis-chart-legends :loading="state.loading"
+                                     :legends.sync="state.legends"
+                                     class="cost-analysis-chart-legends"
+                                     @toggle-series="handleToggleSeries"
+                                     @show-all-series="handleAllSeries('show')"
+                                     @hide-all-series="handleAllSeries('hide')"
         />
     </div>
 </template>
 
-<script lang="ts">
-import type Vue from 'vue';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import type { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
-import dayjs from 'dayjs';
-import {
-    debounce,
-} from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-
-import { hideAllSeries, showAllSeries, toggleSeries } from '@/lib/amcharts/helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import CostAnalysisChartQuerySection
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisChartQuerySection.vue';
-import CostAnalysisPieChart
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPieChart.vue';
-import CostAnalysisStackedColumnChart
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisStackedColumnChart.vue';
-import {
-    GRANULARITY,
-} from '@/services/cost-explorer/lib/config';
-import {
-    getConvertedFilter,
-} from '@/services/cost-explorer/lib/helper';
-import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type {
-    Period, Granularity, GroupBy,
-} from '@/services/cost-explorer/type';
-import {
-    getLegends, getPieChartData, getXYChartData,
-} from '@/services/cost-explorer/widgets/lib/widget-data-helper';
-import type {
-    Legend, PieChartData, XYChartData,
-} from '@/services/cost-explorer/widgets/type';
-
-
-export default {
-    name: 'CostAnalysisChart',
-    components: {
-        CostAnalysisChartQuerySection,
-        CostAnalysisStackedColumnChart,
-        CostAnalysisPieChart,
-    },
-    props: {
-        printMode: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const costAnalysisPageStore = useCostAnalysisPageStore();
-        const costAnalysisPageState = costAnalysisPageStore.$state;
-
-        const state = reactive({
-            currency: computed(() => store.state.settings.currency),
-            currencyRates: computed(() => store.state.settings.currencyRates),
-            //
-            loading: true,
-            legends: [] as Legend[],
-            chartData: [] as Array<XYChartData|PieChartData>,
-            chart: null as XYChart | PieChart | null,
-            queryRef: null as null|Vue,
-            chartRef: null as null|HTMLElement,
-        });
-
-        /* api */
-        let listCostAnalysisRequest: CancelTokenSource | undefined;
-        const costQueryHelper = new QueryHelper();
-        const listCostAnalysisData = async () => {
-            if (listCostAnalysisRequest) {
-                listCostAnalysisRequest.cancel('Next request has been called.');
-                listCostAnalysisRequest = undefined;
-            }
-            listCostAnalysisRequest = axios.CancelToken.source();
-            try {
-                costQueryHelper.setFilters(getConvertedFilter(costAnalysisPageState.filters));
-                const dateFormat = costAnalysisPageState.granularity === GRANULARITY.MONTHLY ? 'YYYY-MM' : 'YYYY-MM-DD';
-                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_others: !!costAnalysisPageState.primaryGroupBy,
-                    granularity: costAnalysisPageState.granularity,
-                    group_by: costAnalysisPageState.primaryGroupBy ? [costAnalysisPageState.primaryGroupBy] : [],
-                    start: dayjs.utc(costAnalysisPageState.period.start).format(dateFormat),
-                    end: dayjs.utc(costAnalysisPageState.period.end).format(dateFormat),
-                    limit: 15,
-                    ...costQueryHelper.apiQuery,
-                }, { cancelToken: listCostAnalysisRequest.token });
-                listCostAnalysisRequest = undefined;
-                return results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return [];
-            }
-        };
-        const setChartData = debounce(async (granularity: Granularity, period: Period, groupBy?: GroupBy | string) => {
-            state.loading = true;
-
-            const rawData = await listCostAnalysisData();
-            state.legends = getLegends(rawData, granularity, groupBy);
-            if (granularity === GRANULARITY.ACCUMULATED) {
-                state.chartData = getPieChartData(rawData, groupBy);
-            } else {
-                state.chartData = getXYChartData(rawData, granularity, period, groupBy);
-            }
-            state.loading = false;
-        }, 300);
-
-        /* event */
-        const handleToggleSeries = (index) => {
-            toggleSeries(state.chart as XYChart | PieChart, index);
-        };
-        const handleAllSeries = (type) => {
-            if (type === 'show') {
-                showAllSeries(state.chart as XYChart | PieChart);
-            } else {
-                hideAllSeries(state.chart as XYChart | PieChart);
-            }
-        };
-        const handleChartRendered = () => {
-            if (state.chartRef && state.queryRef?.$el) {
-                const elements: Element[] = [
-                    state.queryRef.$el,
-                    state.chartRef,
-                ];
-                emit('rendered', elements);
-            }
-        };
-
-        watch([
-            () => costAnalysisPageState.granularity,
-            () => costAnalysisPageState.period,
-            () => costAnalysisPageState.primaryGroupBy,
-            () => costAnalysisPageState.filters,
-        ], ([granularity, period, groupBy]) => {
-            setChartData(granularity, period, groupBy);
-        }, { immediate: true, deep: true });
-
-        return {
-            ...toRefs(state),
-            costAnalysisPageState,
-            GRANULARITY,
-            handleChartRendered,
-            handleToggleSeries,
-            handleAllSeries,
-        };
-    },
-};
-</script>
-
 <style lang="postcss" scoped>
 .cost-analysis-chart {
-    @apply grid grid-cols-12;
+    @apply grid grid-cols-12 border border-gray-200 rounded-md;
     grid-gap: 1rem;
-    height: 30rem;
+    height: 26rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
 
-    .chart-section {
-        @apply col-span-9 bg-white rounded-md border border-gray-200;
-        padding: 1rem 1rem 1.5rem 1rem;
-        min-height: 480px;
+    .cost-analysis-stacked-column-chart {
+        @apply col-span-9;
     }
-
-    @define-mixin row-stack {
-        height: auto;
-        .chart-section {
-            @apply col-span-12;
-        }
-    }
-
-    &.print-mode {
-        @mixin row-stack;
-        .filter-wrapper {
-            height: auto;
-            padding: 0.75rem 1rem;
-            .p-tag {
-                margin-bottom: 0.5rem;
-            }
-            .p-empty {
-                @apply flex justify-start;
-            }
-        }
-        .legend-wrapper {
-            height: auto;
-            overflow-y: visible;
-        }
-        .query-section {
-            .title {
-                white-space: nowrap;
-            }
-        }
-    }
-    &:not(.print-mode) {
-        @screen tablet {
-            @mixin row-stack;
-        }
+    .cost-analysis-chart-legends {
+        @apply col-span-3;
     }
 }
 </style>

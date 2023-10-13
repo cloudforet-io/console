@@ -88,7 +88,8 @@ export interface Query {
 
 export interface MockInfo {
     all?: boolean;
-    endpoints?: string[];
+    endpoints?: string[]; // [v1_endpoint, v2_endpoint]
     reflection?: boolean;
     skipTokenCheck?: boolean;
+    apiList?: string[][]; // [[v1_api_1, v1_api_2], [v2_api_1, v2_api_2, v2_api_3]]
 }

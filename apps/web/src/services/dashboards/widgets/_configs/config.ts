@@ -6,13 +6,13 @@ import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { Tags } from '@/models';
 
-import type { AllReferenceTypeInfo } from '@/store/modules/reference/type';
-import type { CurrencyRates } from '@/store/modules/settings/type';
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import { ASSET_REFERENCE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_REFERENCE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
+import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
+import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
+import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 
@@ -25,7 +25,6 @@ export const WIDGET_SIZE = {
 } as const;
 
 export const GRANULARITY = {
-    ACCUMULATED: 'ACCUMULATED',
     DAILY: 'DAILY',
     MONTHLY: 'MONTHLY',
     YEARLY: 'YEARLY',
@@ -39,11 +38,8 @@ export const COST_GROUP_BY = {
     PROJECT_GROUP: REFERENCE_TYPE_INFO.project_group.key,
     REGION: REFERENCE_TYPE_INFO.region.key,
     // cost reference
-    CATEGORY: COST_REFERENCE_TYPE_INFO.cost_category.key,
-    RESOURCE_GROUP: COST_REFERENCE_TYPE_INFO.cost_resource_group.key,
-    TYPE: COST_REFERENCE_TYPE_INFO.cost_type.key,
-    PRODUCT: COST_REFERENCE_TYPE_INFO.cost_product.key,
-    ACCOUNT: COST_REFERENCE_TYPE_INFO.cost_account.key,
+    USAGE_TYPE: COST_VARIABLE_TYPE_INFO.cost_usage_type.key,
+    PRODUCT: COST_VARIABLE_TYPE_INFO.cost_product.key,
 } as const;
 
 export const ASSET_GROUP_BY = {
@@ -53,9 +49,9 @@ export const ASSET_GROUP_BY = {
     REGION: REFERENCE_TYPE_INFO.region.key,
     // asset reference
     // REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
-    SERVICE: ASSET_REFERENCE_TYPE_INFO.asset_service.key,
-    COMPLIANCE_TYPE: 'cloud_service_type',
-    ACCOUNT: ASSET_REFERENCE_TYPE_INFO.asset_account.key,
+    SERVICE: ASSET_VARIABLE_TYPE_INFO.asset_service.key,
+    COMPLIANCE_FRAMEWORK: 'cloud_service_type',
+    ACCOUNT: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
 };
 
 export const CHART_TYPE = {
@@ -84,7 +80,6 @@ export interface BaseWidgetConfig {
     widget_component?: AsyncComponent;
     base_configs?: BaseConfigInfo[];
     title?: string;
-    // labels?: string[];
 
     description?: {
         translation_id?: string;
@@ -97,7 +92,7 @@ export interface BaseWidgetConfig {
         inherit_count?: number;
     };
     sizes: WidgetSize[];
-    // options?: WidgetOptions;
+    inherit_options?: InheritOptions;
     options_schema?: WidgetOptionsSchema;
 }
 
@@ -123,7 +118,7 @@ export interface WidgetFilter {
     v: null|string|boolean|number|Array<null|string|boolean|number>;
     o?: ConsoleFilterOperator;
 }
-const WIDGET_FILTER_KEYS = [
+export const WIDGET_FILTER_KEYS = [
     // resource reference type
     REFERENCE_TYPE_INFO.provider.type,
     REFERENCE_TYPE_INFO.project.type,
@@ -133,14 +128,10 @@ const WIDGET_FILTER_KEYS = [
     REFERENCE_TYPE_INFO.cloud_service_type.type,
     REFERENCE_TYPE_INFO.region.type,
     // cost reference
-    COST_REFERENCE_TYPE_INFO.cost_category.type,
-    COST_REFERENCE_TYPE_INFO.cost_resource_group.type,
-    COST_REFERENCE_TYPE_INFO.cost_product.type,
-    COST_REFERENCE_TYPE_INFO.cost_type.type,
-    COST_REFERENCE_TYPE_INFO.cost_account.type,
+    COST_VARIABLE_TYPE_INFO.cost_product.type,
+    COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
     // asset reference
-    ASSET_REFERENCE_TYPE_INFO.asset_compliance_type.type,
-    ASSET_REFERENCE_TYPE_INFO.asset_account.type,
+    ASSET_VARIABLE_TYPE_INFO.asset_account.type,
 ] as const;
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
@@ -157,12 +148,8 @@ export type AssetWidgetOptionsSchemaProperty = 'asset_group_by'|WidgetFiltersSch
 export interface BaseWidgetOptionsSchema<T extends string> {
     default_properties?: T[];
     fixed_properties?: T[];
-    schema: {
-        type: 'object',
-        properties: Partial<Record<T, JsonSchema['properties']>>;
-        required?: T[];
-        order?: T[];
-    };
+    non_inheritable_properties?: T[];
+    schema: JsonSchema;
 }
 export type WidgetOptionsSchema =
      | BaseWidgetOptionsSchema<CostWidgetOptionsSchemaProperty>
@@ -185,33 +172,38 @@ export interface BaseWidgetOptions {
     };
     filters?: WidgetFiltersMap;
 }
+export interface SelectorOptions {
+    enabled?: boolean;
+    type: 'cost-usage'|'days';
+}
 export interface CostWidgetOptions extends BaseWidgetOptions {
+    cost_data_source?: string;
     cost_group_by?: CostGroupBy | string;
-    selector_options?: {
-        enabled?: boolean;
-        type: 'cost-usage'|'days';
-    };
+    selector_options?: SelectorOptions;
 }
 export interface AssetWidgetOptions extends BaseWidgetOptions {
+    asset_query_set?: string;
     asset_group_by?: AssetGroupBy | string;
 }
-export type WidgetOptions = CostWidgetOptions|AssetWidgetOptions;
+export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
     widget_key: string; // widget unique key. used for layout key binding.
-    title: string; // widget title
-    widget_options: WidgetOptions;
-    size: WidgetSize;
+    title?: string; // widget title
+    widget_options?: WidgetOptions;
+    size?: WidgetSize;
     version: string; // widget config version
-    inherit_options: InheritOptions; // inherit information for the widget option
-    schema_properties: string[]; // schema properties that are shown on widget form. updated when use add more options.
+    inherit_options?: InheritOptions; // inherit information for the widget option
+    schema_properties?: string[]; // schema properties that are shown on widget form. updated when use add more options.
 }
+export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
+
 export type InheritOptions = Record<string, {
     enabled?: boolean;
     variable_info?: {
         key: string;
-    }
+    },
 }>;
 
 export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
@@ -223,21 +215,52 @@ export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
     updated_at: string;
 }
 
-export interface WidgetProps {
+// TODO: replace with NewWidgetProps
+export interface WidgetProps<T = any> {
     widgetConfigId: string;
     title?: string;
     options?: WidgetOptions;
     inheritOptions?: InheritOptions;
+    schemaProperties?: string[];
     size?: WidgetSize;
     width?: number;
     theme?: WidgetTheme; // e.g. 'violet', 'coral', 'peacock', ... default: violet
     widgetKey: string; // unique widget key to identify widgets in layout
-    currencyRates?: CurrencyRates;
     editMode?: boolean;
     errorMode?: boolean;
     allReferenceTypeInfo: AllReferenceTypeInfo;
-    initiated?: boolean;
     disableViewMode?: boolean;
+    disableRefreshOnVariableChange?: boolean;
+    dashboardSettings?: DashboardSettings;
+    dashboardVariablesSchema?: DashboardVariablesSchema;
+    dashboardVariables?: DashboardVariables;
+    loading?: boolean;
+    data?: T;
+}
+
+// TODO: remove this after replacing WidgetProps with NewWidgetProps
+export interface NewWidgetProps {
+    widgetConfigId: string;
+    widgetInfo: DashboardLayoutWidgetInfo;
+    editMode?: boolean;
+    errorMode?: boolean;
+    disableViewMode?: boolean;
+    disableRefreshOnVariableChange?: boolean;
+    allReferenceTypeInfo: AllReferenceTypeInfo;
+    settings?: DashboardSettings;
+    variablesSchema?: DashboardVariablesSchema;
+    variables?: DashboardVariables;
+}
+
+export interface WidgetEmit {
+    (e: 'mounted'): void;
+    (e: 'initiated', data: any): void;
+    (e: 'refreshed', data: any): void;
+    (e: 'update-widget-info', widgetInfo: UpdatableWidgetInfo): void;
+    (e: 'update-widget-validation', validation: boolean): void;
+    (event: 'click-delete'): void;
+    (event: 'click-expand'): void;
+    (event: 'click-edit'): void;
 }
 
 export interface WidgetExpose<Data = any> {

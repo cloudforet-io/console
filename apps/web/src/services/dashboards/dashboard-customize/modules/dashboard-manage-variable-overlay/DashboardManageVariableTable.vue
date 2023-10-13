@@ -27,7 +27,7 @@
             </template>
             <template #col-use-format="{ value, item }">
                 <p-toggle-button :value="value"
-                                 :disabled="item.disabled"
+                                 :disabled="item.disabled || item.required"
                                  @change-toggle="handleToggleUse(item.propertyName, value)"
                 />
             </template>
@@ -36,7 +36,7 @@
                                      is-collapsed
                                      :line-clamp="1"
                 >
-                    {{ value }}
+                    {{ $t(value) }}
                 </p-collapsible-panel>
             </template>
             <template #col-managable-format="{ value }">
@@ -68,11 +68,13 @@ import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import type { VariableType, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
@@ -89,6 +91,8 @@ const emit = defineEmits<EmitFn>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+
+const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
@@ -114,7 +118,7 @@ const state = reactive({
         MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
         CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
     })),
-    allReferenceTypeInfo: computed(() => store.getters['reference/allReferenceTypeInfo']),
+    allReferenceTypeInfo: computed(() => allReferenceStore.getters.allReferenceTypeInfo),
 });
 
 /* EVENT */
@@ -154,6 +158,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
             return {
                 ...properties[d],
                 propertyName: d,
+                description: managedDashboardVariablesSchema.properties[d].description ?? properties[d].description ?? '',
             };
         }
         return {

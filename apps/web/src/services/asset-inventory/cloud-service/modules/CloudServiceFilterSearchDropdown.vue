@@ -1,53 +1,12 @@
-<template>
-    <div>
-        <p-filterable-dropdown :search-text.sync="searchTerm"
-                               :menu="menuItems"
-                               :selected="selectedItems"
-                               multi-selectable
-                               use-fixed-menu-style
-                               appearance-type="stack"
-                               show-select-marker
-                               :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
-                               @update:selected="handleUpdateSelected"
-        >
-            <template v-if="type === CLOUD_SERVICE_FILTER_KEY.REGION"
-                      #menu-item--format="{item}"
-            >
-                <div class="region-list-text">
-                    <div class="region-type">
-                        <text-highlighting class="region-provider"
-                                           :style="{color: item.color}"
-                                           :text="providers[item.provider] ? providers[item.provider].label : item.provider"
-                                           :term="searchTerm"
-                                           style-type="secondary"
-                        />
-                        <text-highlighting :text="item.regionName"
-                                           :term="searchTerm"
-                                           style-type="secondary"
-                        />
-                    </div>
-                    <text-highlighting class="region-code"
-                                       :text="item.name"
-                                       :term="searchTerm"
-                                       style-type="secondary"
-                    />
-                </div>
-            </template>
-        </p-filterable-dropdown>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import {
-    PFilterableDropdown, getTextHighlightRegex,
+    PSelectDropdown, getTextHighlightRegex,
 } from '@spaceone/design-system';
-import type {
-    FilterableDropdownMenuItem,
-} from '@spaceone/design-system/types/inputs/dropdown/filterable-dropdown/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { store } from '@/store';
 
@@ -60,7 +19,6 @@ import { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY } from '@/services/ass
 import type { RegionMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 import { getRegionFilterMenuItem } from '@/services/asset-inventory/cloud-service/modules/lib/cloud-service-filter-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
-
 
 const categoryItems = [
     { name: CLOUD_SERVICE_CATEGORY.SERVER, label: CLOUD_SERVICE_CATEGORY.SERVER },
@@ -80,87 +38,110 @@ interface Props {
     selected: string[];
 }
 
-export default defineComponent<Props>({
-    name: 'CloudServiceFilterSearchDropdown',
-    components: {
-        TextHighlighting,
-        PFilterableDropdown,
-    },
-    props: {
-        type: {
-            type: String,
-            default: undefined,
-        },
-        selected: {
-            type: Array,
-            default: () => ([]),
-        },
-    },
-    setup(props, { emit }) {
-        const cloudServicePageStore = useCloudServicePageStore();
-        const cloudServicePageState = cloudServicePageStore.$state;
-
-        const state = reactive({
-            searchTerm: '',
-            selectedItems: computed<FilterableDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
-                name: selectedName,
-                label: state.menuItems.find((d) => d.name === selectedName)?.label || selectedName,
-            }))),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            sortedRegions: computed<SortedRegionReferenceItem[]>(() => {
-                const regions: SortedRegionReferenceItem[] = store.getters['reference/region/regionsSortedByProvider'];
-                if (cloudServicePageState.selectedProvider === 'all') return regions;
-                return regions.filter((r) => r.data.provider === cloudServicePageState.selectedProvider);
-            }),
-            regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
-            regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
-            menuItems: computed<FilterableDropdownMenuItem[]|RegionMenuItem[]>(() => {
-                if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
-                    return categoryItems;
-                } if (props.type === CLOUD_SERVICE_FILTER_KEY.REGION) {
-                    return state.regionItems;
-                }
-                return [];
-            }),
-            menuLoading: false,
-        });
-        const regionMenuHandler = (inputText: string) => {
-            const trimmed = inputText?.trim();
-            let results: RegionMenuItem[];
-            if (trimmed) {
-                const regex = getTextHighlightRegex(inputText);
-                results = state.menuItems.filter((d) => regex.test(d.label));
-            } else {
-                results = [...state.menuItems];
-            }
-
-            return {
-                results,
-            };
-        };
-
-        /* event */
-        const handleUpdateSelected = (selected: FilterableDropdownMenuItem[]) => {
-            emit('update:selected', selected.map((d) => d.name));
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                store.dispatch('reference/region/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            CLOUD_SERVICE_FILTER_KEY,
-            regionMenuHandler,
-            handleUpdateSelected,
-        };
-    },
+const props = withDefaults(defineProps<Props>(), {
+    type: '',
+    selected: () => ([]),
 });
+
+const emit = defineEmits<{(e: 'update:selected', value: (string|undefined)[]): void;
+}>();
+
+const cloudServicePageStore = useCloudServicePageStore();
+const cloudServicePageState = cloudServicePageStore.$state;
+
+const state = reactive({
+    searchTerm: '',
+    selectedItems: computed<SelectDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
+        name: selectedName,
+        label: state.menuItems.find((d) => d.name === selectedName)?.label || selectedName,
+    }))),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    sortedRegions: computed<SortedRegionReferenceItem[]>(() => {
+        const regions: SortedRegionReferenceItem[] = store.getters['reference/region/regionsSortedByProvider'];
+        if (cloudServicePageState.selectedProvider === 'all') return regions;
+        return regions.filter((r) => r.data.provider === cloudServicePageState.selectedProvider);
+    }),
+    regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    regionItems: computed<RegionMenuItem[]>(() => state.sortedRegions.map((d) => getRegionFilterMenuItem(d.key, state.regions, state.providers))),
+    menuItems: computed<SelectDropdownMenuItem[]|RegionMenuItem[]>(() => {
+        if (props.type === CLOUD_SERVICE_FILTER_KEY.SERVICE_CATEGORY) {
+            return categoryItems;
+        } if (props.type === CLOUD_SERVICE_FILTER_KEY.REGION) {
+            return state.regionItems;
+        }
+        return [];
+    }),
+    menuLoading: false,
+});
+const regionMenuHandler = (inputText: string) => {
+    const trimmed = inputText?.trim();
+    let results: RegionMenuItem[];
+    if (trimmed) {
+        const regex = getTextHighlightRegex(inputText);
+        results = state.menuItems.filter((d) => regex.test(d.label));
+    } else {
+        results = [...state.menuItems];
+    }
+
+    return {
+        results,
+    };
+};
+
+/* event */
+const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
+    emit('update:selected', selected.map((d) => d.name));
+};
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/provider/load'),
+        store.dispatch('reference/region/load'),
+    ]);
+})();
 </script>
+
+<template>
+    <div>
+        <p-select-dropdown :search-text.sync="state.searchTerm"
+                           :menu="state.menuItems"
+                           :selected="state.selectedItems"
+                           multi-selectable
+                           use-fixed-menu-style
+                           appearance-type="stack"
+                           show-select-marker
+                           :handler="type === CLOUD_SERVICE_FILTER_KEY.REGION ? regionMenuHandler : undefined"
+                           is-filterable
+                           show-delete-all-button
+                           @update:selected="handleUpdateSelected"
+        >
+            <template v-if="props.type === CLOUD_SERVICE_FILTER_KEY.REGION"
+                      #menu-item--format="{item}"
+            >
+                <div class="region-list-text">
+                    <div class="region-type">
+                        <text-highlighting class="region-provider"
+                                           :style="{color: item.color}"
+                                           :text="state.providers[item.provider] ? state.providers[item.provider].label : item.provider"
+                                           :term="state.searchTerm"
+                                           style-type="secondary"
+                        />
+                        <text-highlighting :text="item.regionName"
+                                           :term="state.searchTerm"
+                                           style-type="secondary"
+                        />
+                    </div>
+                    <text-highlighting class="region-code"
+                                       :text="item.name"
+                                       :term="state.searchTerm"
+                                       style-type="secondary"
+                    />
+                </div>
+            </template>
+        </p-select-dropdown>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .region-list-text {

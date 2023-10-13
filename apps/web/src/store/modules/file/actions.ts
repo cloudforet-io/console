@@ -20,10 +20,12 @@ interface HeaderMessage {
 export interface ExcelPayload {
     url: string;
     param: any;
+    data?: any[];
     fields: ExcelDataField[];
     sheet_name?: string;
     header_message?: HeaderMessage;
     file_name_prefix?: string;
+    version?: string;
 }
 
 const getFileName = (contentDisposition) => {
@@ -40,11 +42,12 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
         if (Array.isArray(payload)) {
             params = payload.map(({
                 // eslint-disable-next-line @typescript-eslint/naming-convention
-                url, param, fields, sheet_name, file_name_prefix, header_message,
+                url, param, data, fields, sheet_name, file_name_prefix, header_message, version,
             }) => ({
                 source: {
                     url,
                     param,
+                    data,
                 },
                 template: {
                     options: {
@@ -56,12 +59,14 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                     },
                     fields,
                 },
+                version,
             }));
         } else {
             params = {
                 source: {
                     url: payload.url,
                     param: payload.param,
+                    data: payload.data,
                 },
                 template: {
                     options: {
@@ -73,6 +78,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                     },
                     fields: payload.fields,
                 },
+                version: payload.version,
             };
         }
 

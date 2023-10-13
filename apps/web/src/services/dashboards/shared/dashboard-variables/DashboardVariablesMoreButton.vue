@@ -67,12 +67,13 @@ import {
     computed,
     reactive, ref, toRef, toRefs, watch,
 } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton, PContextMenu, useContextMenuController } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { cloneDeep, debounce, union } from 'lodash';
-
-import { SpaceRouter } from '@/router';
+import {
+    cloneDeep, debounce, merge, union,
+} from 'lodash';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
@@ -80,10 +81,10 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {
-    isManageable: boolean;
+    isManageable?: boolean;
     disabled?: boolean;
 }
 
@@ -91,6 +92,9 @@ const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+
+const route = useRoute();
+const router = useRouter();
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
@@ -100,7 +104,9 @@ const state = reactive({
     variableList: computed<MenuItem[]>(() => state.variableSchema.order.map((property) => {
         const currentProperty = state.variableSchema.properties[property];
         return ({
-            name: property, label: currentProperty?.name ?? property,
+            name: property,
+            label: currentProperty?.name ?? property,
+            disabled: currentProperty?.required,
         });
     })),
     selected: computed<MenuItem[]>(() => {
@@ -108,7 +114,7 @@ const state = reactive({
         state.variableSchema.order.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
-            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled });
+            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled || currentProperty.required });
         });
         return result;
     }),
@@ -145,10 +151,14 @@ onClickOutside(containerRef, hideContextMenu);
 // helper
 const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string[] => {
     const widgetTitles: string[] = [];
+
     dashboardDetailState.dashboardWidgetInfoList.forEach((widgetInfo) => {
-        const widgetInheritVariableKeys = Object.values(widgetInfo.inherit_options).filter((d) => d.enabled).map((d) => d.variable_info?.key);
+        const widgetConfig = getWidgetConfig(widgetInfo.widget_name);
+        const mergedInheritOptions = merge({}, widgetConfig?.inherit_options ?? {}, widgetInfo.inherit_options);
+
+        const widgetInheritVariableKeys = Object.values(mergedInheritOptions).filter((d) => d.enabled).map((d) => d.variable_info?.key);
         if (widgetInheritVariableKeys.includes(targetProperty)) {
-            widgetTitles.push(widgetInfo.title);
+            widgetTitles.push(widgetInfo.title ?? widgetConfig.title as string);
         }
     });
     return widgetTitles;
@@ -199,6 +209,7 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 
     // Normal case
     beforePropertiesEntries.forEach(([k, v]) => {
+        if (v.required) return; /* required variable case */
         if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
             if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
                 state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(k);
@@ -220,11 +231,18 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 // event
 const handleOpenOverlay = () => {
     hideContextMenu();
-    SpaceRouter.router.push({
-        name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-        params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
-        hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
-    });
+    if (route.name === DASHBOARDS_ROUTE.CREATE._NAME) {
+        router.push({
+            name: DASHBOARDS_ROUTE.CREATE._NAME,
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        });
+    } else {
+        router.push({
+            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
+            hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
+        });
+    }
 };
 const handleClickButton = () => {
     if (visibleMenu.value) {

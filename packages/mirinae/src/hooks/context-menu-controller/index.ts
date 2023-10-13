@@ -37,6 +37,9 @@ export interface UseContextMenuControllerOptions {
 
     /* Required when to use show more button to attach items  */
     pageSize?: Ref<number|undefined>|number;
+
+    /* In the context of 'useFixedStyle,' to adjust the position of the context menu relative to the target, the default value is 'left.'  */
+    position?: 'left' | 'right';
 }
 
 
@@ -44,7 +47,7 @@ interface FocusOnContextMenu { (position?: number): void }
 
 export const useContextMenuController = ({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,
-    useMenuFiltering, searchText, handler, pageSize,
+    useMenuFiltering, searchText, handler, pageSize, position,
 }: UseContextMenuControllerOptions) => {
     if (!targetRef) throw new Error('\'targetRef\' option must be given.');
     if (useReorderBySelection) {
@@ -72,6 +75,7 @@ export const useContextMenuController = ({
         selected: selected ?? [] as MenuItem[],
         pageSize,
         searchText: searchText ?? '',
+        position: position ?? 'left',
     });
 
     /* fixed style */
@@ -81,6 +85,7 @@ export const useContextMenuController = ({
         useFixedMenuStyle: toRef(state, 'useFixedStyle'),
         visibleMenu: toRef(state, 'visibleMenu'),
         targetRef,
+        position: state.position,
     });
 
     // menu filtering
@@ -151,10 +156,10 @@ export const useContextMenuController = ({
         if (state.visibleMenu) hideContextMenu();
         else showContextMenu();
     };
-    const focusOnContextMenu: FocusOnContextMenu = async (position?: number) => {
+    const focusOnContextMenu: FocusOnContextMenu = async (focusPosition?: number) => {
         showContextMenu();
         if (state.contextMenuRef) {
-            state.contextMenuRef.focus(position);
+            state.contextMenuRef.focus(focusPosition);
         }
     };
     const initiateMenu = async () => {

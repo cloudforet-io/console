@@ -8,7 +8,7 @@ import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/que
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import type { QueryItem, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -17,12 +17,15 @@ import { store } from '@/store';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/collector/collector-main/collector-page-store';
+import { makePluginReferenceValueHandler } from '@/services/asset-inventory/collector/collector-main/lib/reference-value-helper';
 import CollectorContentItem from '@/services/asset-inventory/collector/collector-main/modules/CollectorContentItem.vue';
 import CollectorListNoData from '@/services/asset-inventory/collector/collector-main/modules/CollectorListNoData.vue';
 import CollectorScheduleModal
@@ -35,6 +38,11 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
+const allReferenceStore = useAllReferenceStore();
+
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+});
 
 const keyItemSets: KeyItemSet[] = [{
     title: 'Properties',
@@ -48,15 +56,17 @@ const keyItemSets: KeyItemSet[] = [{
         { name: 'last_collected_at', label: 'Last Collected' },
     ],
 }];
-const valueHandlerMap: ValueHandlerMap = {
-    collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
-    name: makeDistinctValueHandler('inventory.Collector', 'name'),
-    'schedule.state': makeDistinctValueHandler('inventory.Collector', 'schedule.state'),
-    'plugin_info.plugin_id': makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
-    'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
-    created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
-    last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
-};
+const collectorSearchHandler = reactive({
+    valueHandlerMap: computed<ValueHandlerMap>(() => ({
+        collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
+        name: makeDistinctValueHandler('inventory.Collector', 'name'),
+        'schedule.state': makeDistinctValueHandler('inventory.Collector', 'schedule.state'),
+        'plugin_info.plugin_id': makePluginReferenceValueHandler('plugin_info.plugin_id'),
+        'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
+        created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
+        last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
+    })),
+});
 const excelFields: ExcelDataField[] = [
     { key: 'name', name: 'Name' },
     { key: 'schedule.state', name: 'Schedule state' },
@@ -67,12 +77,18 @@ const excelFields: ExcelDataField[] = [
 
 const historyLinkQueryHelper = new QueryHelper();
 
-const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-});
-
 const state = reactive({
-    searchTags: computed(() => searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags),
+    loading: computed(() => collectorPageState.loading.collectorList),
+    searchTags: computed(() => {
+        const tags = searchQueryHelper.setFilters(collectorPageState.searchFilters).queryTags;
+        return tags.reduce((r: QueryItem[], d: any): QueryItem[] => {
+            if (d.value) {
+                const plugin = storeState.plugins[d.value.name];
+                r.push({ ...d, value: { label: plugin?.label, name: plugin?.key } });
+            }
+            return r;
+        }, []);
+    }),
     items: computed<CollectorItemInfo[]|undefined>(() => {
         const plugins = storeState.plugins;
         return collectorPageState.collectors?.map((d) => {
@@ -90,8 +106,8 @@ const state = reactive({
                 collectorId: d.collector_id,
                 name: d.name,
                 plugin: {
-                    name: plugins[d.plugin_info.plugin_id].label,
-                    icon: plugins[d.plugin_info.plugin_id].icon,
+                    name: plugins[d.plugin_info.plugin_id]?.label,
+                    icon: plugins[d.plugin_info.plugin_id]?.icon,
                     info: d.plugin_info,
                 },
                 historyLink: {
@@ -200,7 +216,7 @@ onMounted(async () => {
             search-type="query"
             :key-item-sets="keyItemSets"
             :query-tags="state.searchTags"
-            :value-handler-map="valueHandlerMap"
+            :value-handler-map="collectorSearchHandler.valueHandlerMap"
             :total-count="collectorPageState.totalCount"
             @change="handleChangeToolbox"
             @refresh="fetchCollectorList"
@@ -217,7 +233,7 @@ onMounted(async () => {
             </template>
         </p-toolbox>
         <p-data-loader :data="state.items"
-                       :loading="collectorPageState.loading.collectorList"
+                       :loading="state.loading"
                        class="collector-list-wrapper"
         >
             <div class="collector-lists">
