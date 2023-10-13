@@ -16,7 +16,7 @@ const isEveryWidthMax = (sizeRow: string[], widthRow: number[]): boolean => size
 
 // make widgets bigger to fit in container
 const getWidthRow = (sizeRow: string[], containerWidth: number): number[] => {
-    const widthRow = sizeRow.map((d) => WIDGET_WIDTH_RANGE_LIST[d][0]);
+    const widthRow = sizeRow.map((d) => WIDGET_WIDTH_RANGE_LIST[d]?.[0]);
     let extraWidth = containerWidth - ((widthRow.length - 1) * WIDGET_GAP) - sum(widthRow);
     if (extraWidth < WIDGET_WIDTH_CRITERIA) return widthRow;
 
@@ -42,8 +42,8 @@ export const widgetWidthAssigner = (widgetSizeList: WidgetSize[], containerWidth
             results.push([containerWidth]);
             sizeRow = [];
         } else {
-            const pMinWidth = WIDGET_WIDTH_RANGE_LIST[widgetSize][0];
-            const rowWidthSum = sum(sizeRow.map((d) => WIDGET_WIDTH_RANGE_LIST[d][0]));
+            const pMinWidth = WIDGET_WIDTH_RANGE_LIST[widgetSize]?.[0];
+            const rowWidthSum = sum(sizeRow.map((d) => WIDGET_WIDTH_RANGE_LIST[d]?.[0]));
             if (containerWidth - ((sizeRow.length - 1) * WIDGET_GAP) - rowWidthSum >= pMinWidth) {
                 sizeRow.push(widgetSize);
             } else {

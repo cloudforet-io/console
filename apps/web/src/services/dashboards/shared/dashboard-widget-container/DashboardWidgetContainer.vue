@@ -286,6 +286,7 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
         display: flex;
         height: 100%;
         width: 100%;
+        overflow: hidden;
         flex-wrap: wrap;
         gap: 1rem;
     }

@@ -10,6 +10,7 @@ import type {
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { xor } from 'lodash';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
@@ -37,18 +38,22 @@ const state = reactive({
         return { name: d, label: d.split('.')[1] };
     })),
     selectedTagsMenu: [] as SelectDropdownMenuItem[],
+    dataSourceId: computed<string>(() => costAnalysisPageStore.selectedDataSourceId ?? ''),
 });
 
 /* fetcher */
+const resourceQueryHelper = new QueryHelper();
 const fetchSearchResources = getCancellableFetcher<{results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
 const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|undefined> => {
     try {
+        resourceQueryHelper.setFilters([{ k: 'data_source_id', v: [state.dataSourceId], o: '=' }]);
         const { status, response } = await fetchSearchResources({
             resource_type: 'cost_analysis.Cost',
             distinct_key: distinctKey,
             search: inputText,
             options: {
                 limit: 10,
+                filter: resourceQueryHelper.apiQuery.filter,
             },
         });
         if (status === 'succeed') return response.results;

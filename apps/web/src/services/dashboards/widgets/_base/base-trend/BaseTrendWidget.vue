@@ -210,10 +210,6 @@ const drawChart = (chartData: ChartData[]) => {
         });
     }
 
-    // create tooltip
-    const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
-
     // set series
     state.legends.forEach((legend) => {
         const seriesSettings = {
@@ -233,7 +229,9 @@ const drawChart = (chartData: ChartData[]) => {
             dateFields: [DATE_FIELD_NAME],
         });
 
-        // set tooltip on series
+        // create tooltip and set on series
+        const tooltip = chartHelper.createTooltip();
+        chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
         (series as Series).set('tooltip', tooltip);
 
         // set data on series
