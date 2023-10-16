@@ -10,6 +10,12 @@
                 <router-view />
             </template>
         </vertical-page-layout>
+        <centered-page-layout v-else-if="$route.meta.centeredLayout"
+                              class="cost-centered-layout"
+                              has-nav-bar
+        >
+            <router-view />
+        </centered-page-layout>
         <general-page-layout v-else
                              :breadcrumbs="breadcrumbs"
         >
@@ -30,6 +36,7 @@ import { store } from '@/store';
 
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
@@ -42,6 +49,7 @@ import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-
 export default {
     name: 'CostExplorerContainer',
     components: {
+        CenteredPageLayout,
         GeneralPageLayout,
         CostExplorerLNB,
         VerticalPageLayout,
@@ -111,3 +119,13 @@ export default {
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+.cost-centered-layout {
+    &::before {
+        opacity: 1;
+        background-position: 50% 0;
+        background-size: 90rem auto;
+    }
+}
+</style>

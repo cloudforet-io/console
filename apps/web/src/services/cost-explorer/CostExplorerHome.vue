@@ -68,9 +68,9 @@ const SERVICE_CONTENTS = {
     topic: {
         title: i18n.t('BILLING.COST_MANAGEMENT.HOME.TITLE'),
         description: i18n.t('BILLING.COST_MANAGEMENT.HOME.TOPIC_DESC'),
-        button_link: 'https://help.spaceone.megazone.com/hc/ko',
-        button_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.ENABLE_BUTTON'),
-        link: 'https://help.spaceone.megazone.com/hc/ko',
+        button_link: 'https://spaceone.megazone.io/contact',
+        button_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.CONTACT_BUTTON'),
+        link: 'https://cloudforet.io/docs/guides/cost-explorer/',
         link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.MORE_INFO'),
         thumbnail_url: 'img_landing_cost-explorer_hero.png',
     },
@@ -113,7 +113,6 @@ export default {
     width: 100%;
     padding: 0 1.5rem;
     margin: 0 auto;
-    background: url('@/assets/images/landing/img_landing_cost-explorer_background.png') no-repeat 50% 0 / 90rem auto;
 }
 .service-topic {
     @apply flex;
@@ -149,7 +148,7 @@ export default {
     padding: 1rem;
     .sub-menu-card {
         @apply overflow-hidden relative bg-primary-4 rounded-md;
-        flex-basis: 33.33%;
+        flex-basis: 50%;
         min-height: 21.5625rem;
         .sub-menu-contents {
             min-height: 9.5625rem;
