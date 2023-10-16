@@ -15,6 +15,7 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -30,6 +31,7 @@ import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/mo
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
 
@@ -145,9 +147,16 @@ const handleClickMoreMenuButton = () => {
 const handleClickSaveAsButton = () => {
     state.queryFormModalVisible = true;
 };
-const handleUpdateQuery = (updatedQueryId: string) => {
-    costAnalysisPageStore.getCostQueryList();
-    costAnalysisPageStore.selectQueryId(updatedQueryId);
+const handleUpdateQuery = async (updatedQueryId: string) => {
+    await costAnalysisPageStore.getCostQueryList();
+    await costAnalysisPageStore.selectQueryId(updatedQueryId);
+    await SpaceRouter.router.push({
+        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        params: {
+            dataSourceId: costAnalysisPageStore.selectedDataSourceId as string,
+            costQuerySetId: updatedQueryId,
+        },
+    });
 };
 const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
