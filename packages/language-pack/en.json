@@ -762,7 +762,8 @@
 				"UPDATE_DASHBOARD": "Update Dashboard"
 			},
 			"HOME": {
-				"COST_ANALYSIS_DESC": "Explore granular cost breakdowns across \nall of your cloud resources.",
+				"CONTACT_BUTTON": "Contact Us",
+				"COST_ANALYSIS_DESC": "Visualize your costs with various widgets and allocate spend across your organization.",
 				"COST_BUDGET_DESC": "Track your costs, usage, and coverage with \n custom budgets.",
 				"COST_DASHBOARD": "Cost Dashboard",
 				"COST_DASHBOARD_DESC": "Visualize your costs with various widgets\nand allocate spend across your organization.",

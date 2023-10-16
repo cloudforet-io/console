@@ -762,7 +762,8 @@
 				"UPDATE_DASHBOARD": "대시보드 이름 변경"
 			},
 			"HOME": {
-				"COST_ANALYSIS_DESC": "여러 클라우드 리소스들을 그룹별로 세분화하여 보다 세밀하게 비용 분석이 가능합니다.",
+				"CONTACT_BUTTON": "",
+				"COST_ANALYSIS_DESC": "",
 				"COST_BUDGET_DESC": "각 프로젝트별 비용 예산을 설정하고 자원 사용량을 체계적으로 관리할 수 있습니다.",
 				"COST_DASHBOARD": "비용 대시보드",
 				"COST_DASHBOARD_DESC": "다양한 위젯들을 비용 관리 대시보드에 추가하여 빠르게 클라우드 비용 상태를 파악할 수 있습니다. ",
