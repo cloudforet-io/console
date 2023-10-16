@@ -126,6 +126,7 @@ export default {
         opacity: 1;
         background-position: 50% 0;
         background-size: 90rem auto;
+        background-repeat: no-repeat;
     }
 }
 </style>
