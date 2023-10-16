@@ -42,6 +42,8 @@ const state = reactive({
     notificationEmailModalVisible: false,
 });
 
+console.log('test!');
+
 const goToSignIn = async () => {
     state.isRoutingToSignIn = true;
     const res: Location = {
