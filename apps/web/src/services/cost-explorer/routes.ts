@@ -27,27 +27,6 @@ const costExplorerRoutes: RouteConfig = {
     meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
     redirect: () => getRedirectRouteByPagePermission(MENU_ID.COST_EXPLORER, store.getters['user/pagePermissionMap']),
     component: CostExplorerContainer,
-    beforeEnter: async (to, from, next) => {
-        try {
-            const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
-            const results = response?.results || [];
-            if (results.length === 0) {
-                next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
-            } else if (to.name === COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME && !(to.params.dataSourceId && to.params.costQuerySetId)) {
-                next({
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                    params: {
-                        dataSourceId: results[0].data_source_id,
-                        costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
-                    },
-                });
-            } else {
-                next();
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    },
     children: [
         {
             path: 'landing',
@@ -59,6 +38,27 @@ const costExplorerRoutes: RouteConfig = {
             path: 'cost-analysis',
             meta: { menuId: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
             component: { template: '<router-view />' },
+            beforeEnter: async (to, from, next) => {
+                try {
+                    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+                    const results = response?.results || [];
+                    if (results.length === 0) { // none-data-source case
+                        next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                    } else if (to.params.dataSourceId && to.params.costQuerySetId) {
+                        next();
+                    } else {
+                        next({
+                            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                            params: {
+                                dataSourceId: results[0].data_source_id,
+                                costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
+                            },
+                        });
+                    }
+                } catch (e) {
+                    ErrorHandler.handleError(e);
+                }
+            },
             children: [
                 {
                     path: '/',
@@ -82,6 +82,19 @@ const costExplorerRoutes: RouteConfig = {
             path: 'budget',
             meta: { menuId: MENU_ID.COST_EXPLORER_BUDGET },
             component: { template: '<router-view />' },
+            beforeEnter: async (to, from, next) => {
+                try {
+                    const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
+                    const results = response?.results || [];
+                    if (results.length === 0) { // none-data-source case
+                        next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                    } else {
+                        next();
+                    }
+                } catch (e) {
+                    ErrorHandler.handleError(e);
+                }
+            },
             children: [
                 {
                     path: '/',
