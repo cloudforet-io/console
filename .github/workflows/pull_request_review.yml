@@ -74,9 +74,6 @@ jobs:
       - name: Test
         run: npm run test
 
-      - name: Build Apps
-        run: npm run build -- --filter="./apps/*" --parallel --output-logs=new-only
-
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
