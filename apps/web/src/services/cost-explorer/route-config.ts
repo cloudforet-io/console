@@ -12,4 +12,7 @@ export const COST_EXPLORER_ROUTE = Object.freeze({
         CREATE: { _NAME: `${MENU_ID.COST_EXPLORER_BUDGET}.create` },
         UPDATE: { _NAME: `${MENU_ID.COST_EXPLORER_BUDGET}.update` },
     },
+    LANDING: {
+        _NAME: MENU_ID.COST_EXPLORER_LANDING,
+    },
 });
