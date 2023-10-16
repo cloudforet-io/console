@@ -129,10 +129,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', {
             this.enabledFiltersProperties = undefined;
         },
         async setQueryOptions(options?: CostQuerySetModel['options']) {
-            if (!options) {
-                await this.initState();
-                return;
-            }
+            await this.initState();
+            if (!options) return;
 
             if (options.granularity) this.granularity = options.granularity;
 
