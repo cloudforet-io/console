@@ -137,12 +137,6 @@ const tableState = reactive({
             if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
             if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
             if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
-            if (d.name.startsWith('cost')) {
-                field.type = 'currency';
-                field.options = {
-                    currency: costAnalysisPageStore.currency,
-                };
-            }
             return field;
         });
     }),
@@ -349,15 +343,6 @@ const handleExcelDownload = async () => {
         const results = await listCostAnalysisExcelData();
         const refinedData = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
         await store.dispatch('file/downloadExcel', {
-            // HACK: delete `url` and `param` after console-api 1.12.dev20 release
-            url: '/cost-analysis/cost/analyze',
-            param: {
-                data_source_id: costAnalysisPageStore.selectedDataSourceId,
-                query: {
-                    ...state.analyzeQuery,
-                    filter: costAnalyzeExportQueryHelper.apiQuery.filter,
-                },
-            },
             data: refinedData,
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,
