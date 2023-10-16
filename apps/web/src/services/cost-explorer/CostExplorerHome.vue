@@ -1,3 +1,40 @@
+<script lang="ts" setup>
+import { PLink, PButton, PPaneLayout } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
+import { i18n } from '@/translations';
+
+const SERVICE_CONTENTS = {
+    service_name: i18n.t('MENU.COST_EXPLORER'),
+    topic: {
+        title: i18n.t('BILLING.COST_MANAGEMENT.HOME.TITLE'),
+        description: i18n.t('BILLING.COST_MANAGEMENT.HOME.TOPIC_DESC'),
+        button_link: 'https://spaceone.megazone.io/contact',
+        button_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.CONTACT_BUTTON'),
+        link: 'https://cloudforet.io/docs/guides/cost-explorer/',
+        link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.MORE_INFO'),
+        thumbnail_url: 'img_landing_cost-explorer_hero.png',
+    },
+    sub_menu: [
+        {
+            name: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'),
+            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_ANALYSIS_DESC'),
+            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
+            link: 'https://cloudforet.io/docs/guides/cost-explorer/cost-analysis/',
+            thumbnail_url: 'img_landing_cost-explorer_cost-analysis.png',
+        },
+        {
+            name: i18n.t('MENU.COST_EXPLORER_BUDGET'),
+            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_BUDGET_DESC'),
+            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
+            link: 'https://cloudforet.io/docs/guides/cost-explorer/budget/',
+            thumbnail_url: 'img_landing_cost-explorer_budget.png',
+        },
+    ],
+};
+
+</script>
+
 <template>
     <div class="service-home">
         <div class="service-topic">
@@ -57,56 +94,6 @@
     </div>
 </template>
 
-<script lang="ts">
-import { PLink, PButton, PPaneLayout } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { i18n } from '@/translations';
-
-const SERVICE_CONTENTS = {
-    service_name: i18n.t('MENU.COST_EXPLORER'),
-    topic: {
-        title: i18n.t('BILLING.COST_MANAGEMENT.HOME.TITLE'),
-        description: i18n.t('BILLING.COST_MANAGEMENT.HOME.TOPIC_DESC'),
-        button_link: 'https://spaceone.megazone.io/contact',
-        button_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.CONTACT_BUTTON'),
-        link: 'https://cloudforet.io/docs/guides/cost-explorer/',
-        link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.MORE_INFO'),
-        thumbnail_url: 'img_landing_cost-explorer_hero.png',
-    },
-    sub_menu: [
-        {
-            name: i18n.t('MENU.COST_EXPLORER_COST_ANALYSIS'),
-            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_ANALYSIS_DESC'),
-            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
-            link: 'https://cloudforet.io/docs/guides/cost-explorer/cost-analysis/',
-            thumbnail_url: 'img_landing_cost-explorer_cost-analysis.png',
-        },
-        {
-            name: i18n.t('MENU.COST_EXPLORER_BUDGET'),
-            description: i18n.t('BILLING.COST_MANAGEMENT.HOME.COST_BUDGET_DESC'),
-            link_text: i18n.t('BILLING.COST_MANAGEMENT.HOME.LEARN_MORE'),
-            link: 'https://cloudforet.io/docs/guides/cost-explorer/budget/',
-            thumbnail_url: 'img_landing_cost-explorer_budget.png',
-        },
-    ],
-};
-
-export default {
-    name: 'CostExplorerHome',
-    components: {
-        PPaneLayout,
-        PLink,
-        PButton,
-    },
-    setup() {
-        return {
-            SERVICE_CONTENTS,
-            ACTION_ICON,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .service-home {
     max-width: 90rem;
