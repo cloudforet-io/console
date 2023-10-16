@@ -763,8 +763,8 @@
 			},
 			"HOME": {
 				"CONTACT_BUTTON": "Contact Us",
-				"COST_ANALYSIS_DESC": "Visualize your costs with various widgets and allocate spend across your organization.",
-				"COST_BUDGET_DESC": "Track your costs, usage, and coverage with \n custom budgets.",
+				"COST_ANALYSIS_DESC": "Explore your usage and costs while conducting analysis using various group-by options, filters, and granularity settings.",
+				"COST_BUDGET_DESC": "Set custom budgets and automatically generate notifications through various notification channels based on thresholds.",
 				"COST_DASHBOARD": "Cost Dashboard",
 				"COST_DASHBOARD_DESC": "Visualize your costs with various widgets\nand allocate spend across your organization.",
 				"ENABLE_BUTTON": "Enable Cost Explorer",
