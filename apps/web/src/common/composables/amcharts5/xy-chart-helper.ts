@@ -235,10 +235,11 @@ export const setXYSharedTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
         let _text = `[${gray[700]}]{valueX}[/]`;
         chart.series.each((s) => {
             const fieldName = s.get('valueYField') || s.get('valueXField') || '';
+            const seriesColor = s.get('stroke')?.toString() ?? s.get('fill')?.toString();
             let value = target.dataItem?.dataContext?.[fieldName];
             if (value === undefined) value = '--';
             const formatted = valueFormatter ? valueFormatter(value, target.dataItem?.dataContext) : value;
-            _text += `\n[${s.get('stroke')?.toString()}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${formatted}[/]`;
+            _text += `\n[${seriesColor}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.get('name')}:[/] [bold; fontSize: 14px]${formatted}[/]`;
         });
         return _text;
     });

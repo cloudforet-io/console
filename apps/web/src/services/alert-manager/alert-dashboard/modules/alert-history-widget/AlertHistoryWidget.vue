@@ -270,6 +270,8 @@ export default {
 
             .chart-wrapper {
                 @apply col-span-12 row-start-1;
+                height: 12rem;
+                padding-bottom: 1rem;
             }
         }
     }
