@@ -1,18 +1,14 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch, onUnmounted, ref,
+    computed, reactive, watch, ref, onBeforeUnmount,
 } from 'vue';
 import type { Location } from 'vue-router';
 
-import { PieChart } from '@amcharts/amcharts4/charts';
-import {
-    create, percent, color, Label,
-} from '@amcharts/amcharts4/core';
 import {
     PDataLoader, PDataTable, PI, PEmpty, PSkeleton,
 } from '@spaceone/design-system';
 import {
-    debounce, forEach, isEmpty,
+    debounce, forEach, isEmpty, sum,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -22,22 +18,23 @@ import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import config from '@/lib/config';
-
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import {
-    gray, white,
-} from '@/styles/colors';
+import { white } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+
 interface Data {
     provider?: string;
-    color: string;
+    providerLabel: string;
     service_account_count: number;
     href: string;
+    pieSettings: {
+        fill: string;
+    };
 }
 interface Props {
     extraParams?: object;
@@ -46,16 +43,16 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     extraParams: () => ({}),
 });
-const CATEGORY_KEY = 'name';
+const CATEGORY_KEY = 'providerLabel';
 const VALUE_KEY = 'service_account_count';
 
 const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     loading: true,
     data: [] as Data[],
-    chart: null as null | any,
-    chartRegistry: {},
+    totalServiceAccountCount: computed<number>(() => sum(state.data.map((d) => d.service_account_count))),
     fields: computed(() => [
         { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
         { name: 'service_account_count', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
@@ -63,47 +60,40 @@ const state = reactive({
 });
 
 /* Util */
-const disposeChart = (ctx) => {
-    if (state.chartRegistry[ctx]) {
-        state.chartRegistry[ctx].dispose();
-        delete state.chartRegistry[ctx];
-    }
-};
-const drawChart = (ctx) => {
-    const createChart = () => {
-        disposeChart(ctx);
-        state.chartRegistry[ctx] = create(ctx, PieChart);
-        return state.chartRegistry[ctx];
+const drawChart = () => {
+    // refresh chart root
+    chartHelper.refreshRoot();
+
+    // create donut chart
+    const chart = chartHelper.createDonutChart();
+
+    // create pie series
+    const seriesSettings = {
+        categoryField: CATEGORY_KEY,
+        valueField: VALUE_KEY,
+        strokeWidth: 1,
     };
-    const chart = createChart();
-    state.chart = chart;
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.responsive.enabled = true;
-    chart.innerRadius = percent(63);
-    chart.data = state.data;
+    const series = chartHelper.createPieSeries(seriesSettings);
+    series.ticks.template.set('forceHidden', true);
+    chart.series.push(series);
+    series.slices.template.setAll({
+        stroke: chartHelper.color(white),
+        templateField: 'pieSettings',
+    });
 
-    const series = chart.series.create();
-    series.slices.template.togglable = false;
-    series.slices.template.clickable = false;
-    series.dataFields.value = VALUE_KEY;
-    series.dataFields.category = CATEGORY_KEY;
-    series.slices.template.propertyFields.fill = 'color';
-    series.slices.template.stroke = color(white);
-    series.slices.template.strokeWidth = 2;
-    series.slices.template.strokeOpacity = 1;
-    series.slices.template.states.getKey('hover').properties.scale = 1;
-    series.tooltip.disabled = true;
-    series.ticks.template.disabled = true;
-    series.labels.template.text = '';
+    // create tooltip
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setPieTooltipText(series, tooltip);
+    series.slices.template.set('tooltip', tooltip);
 
-    const label = new Label();
-    label.parent = series;
-    label.horizontalCenter = 'middle';
-    label.verticalCenter = 'middle';
-    label.fontSize = 25;
-    label.fontWeight = 'lighter';
-    label.fill = color(gray[900]);
-    label.text = '{values.value.sum}';
+    // set data to series
+    series.data.setAll(state.data);
+
+    // create label text inside pie
+    chartHelper.setPieLabelText(chart, {
+        fontSize: 25,
+        text: state.totalServiceAccountCount,
+    });
 };
 
 const getLink = (data): Location => ({
@@ -123,9 +113,11 @@ const getData = debounce(async () => {
             data.push({
                 ...d,
                 provider: d.provider,
-                color: state.providers[d.provider].color || '',
+                providerLabel: state.providers[d.provider]?.label,
                 href: getLink(d),
-                service_account_count: d.service_account_count,
+                pieSettings: {
+                    fill: state.providers[d.provider].color || '',
+                },
             });
         });
         state.data = data;
@@ -148,12 +140,12 @@ watch(() => state.providers, (providers) => {
 }, { immediate: true });
 watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => {
     if (!loading && chartCtx) {
-        drawChart(chartCtx);
+        drawChart();
     }
 }, { immediate: true });
 
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+onBeforeUnmount(() => {
+    chartHelper.disposeRoot();
 });
 </script>
 
@@ -175,7 +167,7 @@ onUnmounted(() => {
                 </router-link>
             </div>
         </template>
-        <div class="chart-container">
+        <div class="content-wrapper">
             <p-data-loader :loading="state.loading"
                            :data="state.data"
                            class="chart"
@@ -196,25 +188,23 @@ onUnmounted(() => {
                         </div>
                     </div>
                 </template>
-                <div>
-                    <div ref="chartContext"
-                         class="w-full h-full"
-                    />
-                    <div class="legends">
-                        <p-data-table :loading="state.loading"
-                                      :fields="state.fields"
-                                      :items="state.data"
-                                      :bordered="false"
-                        >
-                            <template #col-provider-format="{ item }">
-                                <router-link :to="getLink(item)">
-                                    <span :style="{color: item.color}"
-                                          class="provider-label"
-                                    >{{ state.providers[item.provider].label }}</span>
-                                </router-link>
-                            </template>
-                        </p-data-table>
-                    </div>
+                <div ref="chartContext"
+                     class="chart"
+                />
+                <div class="table-wrapper">
+                    <p-data-table :loading="state.loading"
+                                  :fields="state.fields"
+                                  :items="state.data"
+                                  :bordered="false"
+                    >
+                        <template #col-provider-format="{ item }">
+                            <router-link :to="getLink(item)">
+                                <span :style="{color: item.color}"
+                                      class="provider-label"
+                                >{{ state.providers[item.provider].label }}</span>
+                            </router-link>
+                        </template>
+                    </p-data-table>
                 </div>
                 <template #no-data>
                     <p-empty
@@ -246,20 +236,22 @@ onUnmounted(() => {
         }
     }
 }
-.chart {
-    min-height: 11.25rem;
-    width: 100%;
-}
 
-.legends {
-    @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
-}
-.chart-container {
+.content-wrapper {
     @apply flex justify-center items-center mb-4;
 
     .loader-wrapper {
         width: 100%;
         text-align: center;
+    }
+
+    .chart {
+        min-height: 11.25rem;
+        width: 100%;
+    }
+
+    .table-wrapper {
+        @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
     }
 
     /* custom design-system component - p-data-loader */
