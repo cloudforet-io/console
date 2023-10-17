@@ -8,7 +8,7 @@ import {
     PDataLoader, PDataTable, PI, PEmpty, PSkeleton,
 } from '@spaceone/design-system';
 import {
-    debounce, forEach, isEmpty, sum,
+    cloneDeep, debounce, forEach, isEmpty, sum,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -74,7 +74,6 @@ const drawChart = () => {
         strokeWidth: 1,
     };
     const series = chartHelper.createPieSeries(seriesSettings);
-    series.ticks.template.set('forceHidden', true);
     chart.series.push(series);
     series.slices.template.setAll({
         stroke: chartHelper.color(white),
@@ -87,7 +86,7 @@ const drawChart = () => {
     series.slices.template.set('tooltip', tooltip);
 
     // set data to series
-    series.data.setAll(state.data);
+    series.data.setAll(cloneDeep(state.data));
 
     // create label text inside pie
     chartHelper.setPieLabelText(chart, {
@@ -138,8 +137,8 @@ const getData = debounce(async () => {
 watch(() => state.providers, (providers) => {
     if (!isEmpty(providers)) getData();
 }, { immediate: true });
-watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => {
-    if (!loading && chartCtx) {
+watch([() => state.loading, () => chartContext.value], ([loading, _chartContext]) => {
+    if (!loading && _chartContext) {
         drawChart();
     }
 }, { immediate: true });
