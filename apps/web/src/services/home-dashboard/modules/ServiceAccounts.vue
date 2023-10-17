@@ -9,9 +9,11 @@ import {
     create, percent, color, Label,
 } from '@amcharts/amcharts4/core';
 import {
-    PDataLoader, PDataTable, PI, PEmpty,
+    PDataLoader, PDataTable, PI, PEmpty, PSkeleton,
 } from '@spaceone/design-system';
-import { forEach, isEmpty } from 'lodash';
+import {
+    debounce, forEach, isEmpty,
+} from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -26,12 +28,10 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    gray, violet, white,
+    gray, white,
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-const DEFAULT_COLOR = violet[200];
 
 interface Data {
     provider?: string;
@@ -49,7 +49,6 @@ const props = withDefaults(defineProps<Props>(), {
 const CATEGORY_KEY = 'name';
 const VALUE_KEY = 'service_account_count';
 
-const loaderContext = ref<HTMLElement|null>(null);
 const chartContext = ref<HTMLElement|null>(null);
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -70,7 +69,7 @@ const disposeChart = (ctx) => {
         delete state.chartRegistry[ctx];
     }
 };
-const drawChart = (ctx, isLoading = false) => {
+const drawChart = (ctx) => {
     const createChart = () => {
         disposeChart(ctx);
         state.chartRegistry[ctx] = create(ctx, PieChart);
@@ -81,16 +80,7 @@ const drawChart = (ctx, isLoading = false) => {
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.responsive.enabled = true;
     chart.innerRadius = percent(63);
-
-    if (isLoading) {
-        chart.data = [{
-            provider: 'Dummy',
-            service_account_count: 1000,
-            color: DEFAULT_COLOR,
-        }];
-    } else {
-        chart.data = state.data;
-    }
+    chart.data = state.data;
 
     const series = chart.series.create();
     series.slices.template.togglable = false;
@@ -113,11 +103,7 @@ const drawChart = (ctx, isLoading = false) => {
     label.fontSize = 25;
     label.fontWeight = 'lighter';
     label.fill = color(gray[900]);
-    if (isLoading) {
-        label.text = '';
-    } else {
-        label.text = '{values.value.sum}';
-    }
+    label.text = '{values.value.sum}';
 };
 
 const getLink = (data): Location => ({
@@ -128,7 +114,7 @@ const getLink = (data): Location => ({
 });
 
 /* Api */
-const getData = async () => {
+const getData = debounce(async () => {
     state.loading = true;
     const data: Data[] = [];
     try {
@@ -149,7 +135,7 @@ const getData = async () => {
     } finally {
         state.loading = false;
     }
-};
+}, 300);
 
 /* Init */
 (async () => {
@@ -160,12 +146,9 @@ const getData = async () => {
 watch(() => state.providers, (providers) => {
     if (!isEmpty(providers)) getData();
 }, { immediate: true });
-watch([() => state.loading, () => loaderContext.value, () => chartContext.value], ([loading, loaderCtx, chartCtx]) => {
-    if (loading && loaderCtx) {
-        drawChart(loaderCtx, true);
-    }
+watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => {
     if (!loading && chartCtx) {
-        drawChart(chartCtx, false);
+        drawChart(chartCtx);
     }
 }, { immediate: true });
 
@@ -198,9 +181,20 @@ onUnmounted(() => {
                            class="chart"
             >
                 <template #loader>
-                    <div ref="loaderContext"
-                         class="w-full h-full"
-                    />
+                    <div class="loader-wrapper">
+                        <p-skeleton width="6.25rem"
+                                    height="6.25rem"
+                                    class="mb-6 mt-6"
+                        />
+                        <div class="text-left">
+                            <p-skeleton width="80%"
+                                        height="0.625rem"
+                            />
+                            <p-skeleton width="100%"
+                                        height="0.625rem"
+                            />
+                        </div>
+                    </div>
                 </template>
                 <div>
                     <div ref="chartContext"
@@ -263,6 +257,11 @@ onUnmounted(() => {
 .chart-container {
     @apply flex justify-center items-center mb-4;
 
+    .loader-wrapper {
+        width: 100%;
+        text-align: center;
+    }
+
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
         .no-data-wrapper {
@@ -276,6 +275,7 @@ onUnmounted(() => {
 :deep(.p-data-table) {
     @apply rounded-xs;
     margin-top: 1rem;
+    min-height: auto;
     overflow-x: hidden;
     &.default th {
         @apply bg-gray-100 text-gray-400;
