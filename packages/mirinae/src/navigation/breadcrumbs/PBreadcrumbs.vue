@@ -38,24 +38,27 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
     <div class="p-breadcrumbs">
         <span v-for="(route, idx) in props.routes"
               :key="idx"
+              class="breadcrumb-container"
         >
-            <span v-if="route.to || route.path">
-                <router-link
-                    v-if="isLengthOverFive(idx)"
-                    class="menu"
-                    :to="getLocation(route)"
+            <span v-if="isLengthOverFive(idx)"
+                  class="breadcrumb-wrapper"
+            >
+                <span v-if="route.to || route.path"
+                      class="breadcrumb"
                 >
-                    <span v-if="idx !== props.routes.length - 1"
-                          class="link"
-                    >{{ route.name }}</span>
-                    <span v-else
-                          class="current-page"
-                    >
-                        {{ route.name }}
-                        <p-copy-button v-if="props.copiable"
-                                       :value="route.name"
-                        />
-                    </span>
+                    <router-link :to="getLocation(route)">
+                        <span v-if="idx !== props.routes.length - 1"
+                              class="link"
+                        >{{ route.name }}</span>
+                        <span v-else
+                              class="current-page"
+                        >
+                            <span>{{ route.name }}</span>
+                            <p-copy-button v-if="props.copiable"
+                                           :value="route.name"
+                            />
+                        </span>
+                    </router-link>
                     <span v-if="idx < props.routes.length - 1">
                         <p-i name="ic_chevron-right-thin"
                              width="1rem"
@@ -64,11 +67,9 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
                              color="inherit white"
                         />
                     </span>
-                </router-link>
-            </span>
-            <span v-else>
-                <span v-if="isLengthOverFive(idx)"
-                      class="menu"
+                </span>
+                <span v-else
+                      class="breadcrumb"
                 >
                     <span v-if="idx !== props.routes.length - 1"
                           class="link"
@@ -77,7 +78,7 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
                     <span v-else
                           class="current-page"
                     >
-                        {{ route.name }}
+                        <span>{{ route.name }}</span>
                         <p-copy-button v-if="props.copiable"
                                        :value="route.name"
                         />
@@ -92,7 +93,9 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
                     </span>
                 </span>
             </span>
-            <span v-if="props.routes.length >= 5 && idx === 2 && !state.isShown">
+            <span v-if="props.routes.length >= 5 && idx === 2 && !state.isShown"
+                  class="breadcrumb-wrapper truncated"
+            >
                 <span class="link"
                       @click="showHidden"
                 >...</span>
@@ -109,28 +112,34 @@ const isLengthOverFive = (idx) => props.routes.length < 5 || (props.routes.lengt
 
 <style lang="postcss">
 .p-breadcrumbs {
-    .menu {
-        word-break: break-all;
-    }
-    .link {
-        @apply text-xs text-gray-700 cursor-pointer;
+    .breadcrumb-container {
+        @apply inline-flex items-center;
+        .breadcrumb-wrapper {
+            margin-right: 0.375rem;
+            word-break: break-all;
+            .breadcrumb, &.truncated {
+                @apply flex items-center;
+                gap: 0.375rem;
+            }
+        }
+        .link {
+            @apply text-xs text-gray-700 cursor-pointer;
 
-        &:hover {
-            @apply text-gray-900 underline;
+            &:hover {
+                @apply text-gray-900 underline;
+            }
         }
-    }
-    .current-page {
-        @apply text-xs text-gray-900 cursor-default;
-        > .p-copy-button {
-            font-size: inherit;
-            margin-left: 0.25rem;
-            vertical-align: 0.1rem;
+        .current-page {
+            @apply text-xs text-gray-900 cursor-default;
+            > .p-copy-button {
+                font-size: inherit;
+                margin-left: 0.25rem;
+                vertical-align: 0.1rem;
+            }
         }
-    }
-    .arrow-icon {
-        @apply text-gray-500;
-        margin-left: 0.375rem;
-        margin-right: 0.375rem;
+        .arrow-icon {
+            @apply text-gray-500;
+        }
     }
 }
 </style>
