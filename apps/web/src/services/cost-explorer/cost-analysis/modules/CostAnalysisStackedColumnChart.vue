@@ -178,6 +178,7 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 
 <template>
     <p-data-loader :loading="props.loading"
+                   :data="props.chartData"
                    class="cost-analysis-stacked-column-chart"
     >
         <template #loader>
@@ -193,6 +194,13 @@ watch([() => chartContext.value, () => props.loading, () => props.chartData], as
 .cost-analysis-stacked-column-chart {
     height: 25rem;
     padding-bottom: 1rem;
+
+    /* custom design-system component - p-data-loader */
+    :deep(.data-loader-container) {
+        .no-data-wrapper {
+            max-height: inherit;
+        }
+    }
     .chart {
         height: 100%;
     }

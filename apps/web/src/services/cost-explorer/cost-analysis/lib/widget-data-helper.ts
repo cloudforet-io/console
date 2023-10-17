@@ -121,6 +121,7 @@ export const getReferenceLabel = (data: string, groupBy: GroupBy | string): stri
  * @usage CostAnalysisChart, CostTrendByProduct|CostTrendByProject|CostTrendByProvider, SpcProjectWiseUsageSummary, LastMonthTotalSpend, BudgetSummaryChart
  */
 export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<CostAnalyzeRawData>, granularity: Granularity, period: Period, groupBy?: GroupBy | string): XYChartData[] => {
+    if (!rawData.results.length) return [];
     const chartData: XYChartData[] = [];
     const timeUnit = getTimeUnitByGranularity(granularity);
     const _period = getPeriodByGranularity(granularity, period);
