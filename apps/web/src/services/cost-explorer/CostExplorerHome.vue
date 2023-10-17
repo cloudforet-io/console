@@ -62,7 +62,7 @@ const SERVICE_CONTENTS = {
             </div>
             <div class="image-wrapper">
                 <img class="image"
-                     :src="`/src/assets/images/landing/${SERVICE_CONTENTS.topic.thumbnail_url}`"
+                     :src="`src/assets/images/landing/${SERVICE_CONTENTS.topic.thumbnail_url}`"
                      :alt="SERVICE_CONTENTS.topic.description"
                 >
             </div>
@@ -84,7 +84,7 @@ const SERVICE_CONTENTS = {
                     />
                 </div>
                 <div class="image-wrapper">
-                    <img :src="`/src/assets/images/landing/${submenu.thumbnail_url}`"
+                    <img :src="`src/assets/images/landing/${submenu.thumbnail_url}`"
                          :alt="submenu.description"
                          class="image"
                     >
