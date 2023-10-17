@@ -116,7 +116,7 @@ const drawChart = () => {
         // create column series
         const color = d === ALERT_STATE.OPEN ? OPEN_COLOR : RESOLVED_COLOR;
         const seriesSettings = {
-            name: d,
+            name: state.alertStateLabel[d],
             valueYField: d,
             stacked: true,
             strokeWidth: 1,
