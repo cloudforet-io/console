@@ -74,9 +74,13 @@ const handleDeleteQueryConfirm = async () => {
         await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
         await costAnalysisPageStore.getCostQueryList();
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '');
-        if (costAnalysisPageStore.selectedQueryId === state.itemIdForDeleteQuery) {
-            await SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME });
-        }
+        await SpaceRouter.router.push({
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: costAnalysisPageStore.selectedDataSourceId as string,
+                costQuerySetId: costAnalysisPageStore.managedCostQuerySetList[0].cost_query_set_id,
+            },
+        });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
     }
