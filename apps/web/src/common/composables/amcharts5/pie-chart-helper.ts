@@ -53,7 +53,7 @@ export const setPieTooltipText = (series: am5percent.PieSeries, tooltip: am5.Too
     series.slices.template.adapters.add('tooltipText', (_, target) => {
         let value = target.dataItem?.dataContext?.[valueFieldName];
         if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
-        const colorHex = target.get('stroke')?.toString();
+        const colorHex = target.get('fill')?.toString() ?? target.get('stroke')?.toString();
         return `[${colorHex}; fontSize: 10px]●[/] {${categoryFieldName}}: [bold]${value}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
     });
 };
