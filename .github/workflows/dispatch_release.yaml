@@ -56,6 +56,8 @@ jobs:
   versioning_and_docker:
     runs-on: ubuntu-latest
     needs: mirinae
+    outputs:
+      new_commit_sha: ${{ steps.get_sha.outputs.NEW_COMMIT_SHA }}
 
     services:
       turbo_cache:
@@ -121,10 +123,12 @@ jobs:
           git diff --exit-code --quiet || echo "::set-output name=changed::true"
         continue-on-error: true
 
-      - name: Commit changes
+      - name: Commit changes and Set current commit SHA to output
         if: steps.check_changes.outputs.changed == 'true'
+        id: get_sha
         run: |
           git commit -am "chore: version ${{ env.VERSION }}"
+          echo "NEW_COMMIT_SHA=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Push changes
         if: steps.check_changes.outputs.changed == 'true'
@@ -187,9 +191,13 @@ jobs:
   tagging:
     needs: versioning_and_docker
     runs-on: ubuntu-latest
+    env:
+      NEW_COMMIT_SHA: ${{ needs.versioning_and_docker.outputs.new_commit_sha }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ env.NEW_COMMIT_SHA }}
 
       - name: Configure git
         run: |
