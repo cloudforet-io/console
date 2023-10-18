@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, onBeforeUnmount, reactive, ref, watch,
 } from 'vue';
 
-import { PieChart, PieSeries } from '@amcharts/amcharts4/charts';
-import { create, color } from '@amcharts/amcharts4/core';
+import { cloneDeep } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -12,14 +11,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
-import config from '@/lib/config';
-
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { green, red, yellow } from '@/styles/colors';
+import {
+    green, red, white, yellow,
+} from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 
+
+const CATEGORY_KEY = 'category';
+const VALUE_KEY = 'value';
 const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
 const CLOUD_SERVICE_NAME = 'Check';
 const STATUS = Object.freeze({
@@ -33,9 +36,16 @@ const STATUS_COLORS = Object.freeze({
     [STATUS.OK]: green[600],
 });
 type Status = typeof STATUS[keyof typeof STATUS];
-interface OverallData {
+interface Data {
     status: Status;
     count: number;
+}
+interface ChartData {
+    category: string;
+    value: number;
+    pieSettings: {
+        fill: string;
+    };
 }
 interface Props {
     extraParams?: object;
@@ -46,29 +56,36 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
 const queryHelper = new QueryHelper();
 const state = reactive({
     loading: true,
-    chart: null as null | PieChart,
-    chartData: [] as OverallData[],
+    data: [] as Data[],
+    chartData: computed<ChartData[]>(() => state.data.map((d) => ({
+        category: d.status,
+        value: d.count,
+        pieSettings: {
+            fill: STATUS_COLORS[d.status],
+        },
+    }))),
     legendData: computed(() => ({
         [STATUS.ERROR]: {
             name: STATUS.ERROR,
             label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_ERROR'),
             color: STATUS_COLORS[STATUS.ERROR],
-            count: state.chartData.find((d) => d.status === STATUS.ERROR)?.count,
+            count: state.data.find((d) => d.status === STATUS.ERROR)?.count,
         },
         [STATUS.WARNING]: {
             name: STATUS.WARNING,
             label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_WARNING'),
             color: STATUS_COLORS[STATUS.WARNING],
-            count: state.chartData.find((d) => d.status === STATUS.WARNING)?.count,
+            count: state.data.find((d) => d.status === STATUS.WARNING)?.count,
         },
         [STATUS.OK]: {
             name: STATUS.OK,
             label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_OK'),
             color: STATUS_COLORS[STATUS.OK],
-            count: state.chartData.find((d) => d.status === STATUS.OK)?.count,
+            count: state.data.find((d) => d.status === STATUS.OK)?.count,
         },
     })),
 });
@@ -90,48 +107,45 @@ const overallLinkFormatter = (status) => {
         },
     };
 };
-const drawChart = (_chartContext) => {
-    const chart = create(_chartContext, PieChart);
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.paddingTop = 12;
-    chart.responsive.enabled = true;
-    chart.data = state.chartData;
+const drawChart = () => {
+    // refresh chart root
+    chartHelper.refreshRoot();
 
-    const series = chart.series.push(new PieSeries());
-    series.labels.template.disabled = true;
-    series.ticks.template.disabled = true;
-    series.dataFields.value = 'count';
-    series.dataFields.category = 'status';
+    // create donut chart
+    const chart = chartHelper.createPieChart();
 
-    const slice: any = series.slices.template;
-    slice.togglable = false;
-    slice.clickable = false;
-    slice.stroke = color('#fff');
-    slice.tooltipText = '';
-    slice.strokeWidth = 1;
-    slice.states.getKey('hover').properties.scale = 1;
-    slice.adapter.add('fill', (fill, target) => {
-        if (target.dataItem) return color(STATUS_COLORS[target.dataItem.category]);
+    // create pie series
+    const seriesSettings = {
+        categoryField: CATEGORY_KEY,
+        valueField: VALUE_KEY,
+        strokeWidth: 1,
+    };
+    const series = chartHelper.createPieSeries(seriesSettings);
+    chart.series.push(series);
+    series.slices.template.setAll({
+        stroke: chartHelper.color(white),
+        tooltipText: '',
+        templateField: 'pieSettings',
+    });
+    // set data to series
+    series.data.setAll(cloneDeep(state.chartData));
+
+    series.slices.template.adapters.add('fill', (fill, target) => {
+        const status = target.dataItem?.dataContext?.[CATEGORY_KEY];
+        if (!status) return STATUS_COLORS[status];
         return fill;
     });
-
-    // animation
-    series.hiddenState.properties.opacity = 1;
-    series.hiddenState.properties.endAngle = -90;
-    series.hiddenState.properties.startAngle = -90;
-
-    state.chart = chart;
 };
 
 /* Api */
-const getOverallData = async () => {
+const getData = async () => {
     state.loading = true;
     try {
         const { results } = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary(props.extraParams);
-        state.chartData = results;
+        state.data = results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.chartData = [];
+        state.data = [];
     } finally {
         state.loading = false;
     }
@@ -139,18 +153,16 @@ const getOverallData = async () => {
 
 /* Init */
 (async () => {
-    await getOverallData();
+    await getData();
 })();
 
 /* Watcher */
 watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
-    if (!loading && _chartContext) {
-        drawChart(_chartContext);
-    }
+    if (!loading && _chartContext) drawChart();
 }, { immediate: true });
 
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+onBeforeUnmount(() => {
+    chartHelper.disposeRoot();
 });
 </script>
 
@@ -205,6 +217,7 @@ onUnmounted(() => {
     }
     .chart-wrapper {
         @apply col-span-12;
+        height: 8.5rem;
 
         @screen mobile {
             @apply col-span-4;

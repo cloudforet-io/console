@@ -1,18 +1,14 @@
 <script lang="ts" setup>
 import {
-    computed, onUnmounted, reactive, ref, watch,
+    computed, onBeforeUnmount, reactive, ref, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    XYChart, CategoryAxis, ValueAxis, ColumnSeries, Legend,
-} from '@amcharts/amcharts4/charts';
-import { create, color } from '@amcharts/amcharts4/core';
-import {
     PButton, PDataLoader, PDataTable, PI, PSkeleton, PEmpty,
 } from '@spaceone/design-system';
 import bytes from 'bytes';
-import { range } from 'lodash';
+import { cloneDeep, range } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -20,19 +16,32 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import config from '@/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { arrayToQueryString } from '@/lib/router-query-string';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray, peacock, secondary } from '@/styles/colors';
+import {
+    gray, peacock, secondary, white,
+} from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
+
+interface Data {
+    server_count: number;
+    database_count: number;
+    storage_size: number;
+    //
+    project_group: string;
+    project_group_id: string;
+    project: string;
+    project_id: string;
+}
 interface ChartData {
     rank: string;
     server: number;
@@ -43,7 +52,7 @@ interface TableColumnData {
     count?: number;
     to: Location;
 }
-interface TableItem {
+interface TableData {
     [key: string]: TableColumnData;
 }
 interface Props {
@@ -57,14 +66,17 @@ const props = withDefaults(defineProps<Props>(), {
 const DATA_COUNT = 5;
 const SERVER_COLOR = secondary;
 const DATABASE_COLOR = peacock[200];
+const CATEGORY_KEY = 'rank';
 
 const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
+
 const state = reactive({
     projectItems: computed(() => store.state.reference.project.items),
     loading: true,
-    items: [] as TableItem[],
-    chartData: [] as ChartData[],
-    chart: null as null | any,
+    data: [] as Data[],
+    tableData: computed(() => getRefinedTableData(state.data)),
+    chartData: computed(() => getRefinedChartData(state.tableData)),
     colors: {
         server: SERVER_COLOR,
         database: DATABASE_COLOR,
@@ -80,82 +92,71 @@ const state = reactive({
 });
 
 /* Util */
-const drawChart = (chartCtx) => {
-    const chart = create(chartCtx, XYChart);
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.paddingRight = 10;
-    chart.paddingLeft = -5;
-    chart.paddingTop = 5;
-    chart.paddingBottom = 0;
+const drawChart = () => {
+    // refresh root for deleting previous chart
+    chartHelper.refreshRoot();
 
-    const projectAxis = chart.yAxes.push(new CategoryAxis());
-    projectAxis.renderer.minGridDistance = 0;
-    projectAxis.dataFields.category = 'rank';
+    // create chart and axis
+    const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
+    yAxis.set('categoryField', CATEGORY_KEY);
+    yAxis.data.setAll(cloneDeep(state.chartData));
 
-    projectAxis.renderer.grid.template.location = 0;
-    projectAxis.renderer.grid.template.strokeOpacity = 1;
-    projectAxis.renderer.grid.template.stroke = color(gray[200]);
-    projectAxis.renderer.labels.template.fill = color(gray[400]);
-    projectAxis.renderer.cellStartLocation = 0.3;
-    projectAxis.renderer.cellEndLocation = 0.7;
-    projectAxis.fontSize = 11;
-
-    const valueAxis = chart.xAxes.push(new ValueAxis());
-    valueAxis.renderer.minGridDistance = 60;
-    valueAxis.renderer.grid.template.stroke = color(gray[200]);
-    valueAxis.renderer.grid.template.strokeOpacity = 1;
-    valueAxis.renderer.grid.template.adapter.add('strokeOpacity', (opacity, target: any) => {
-        if (target.dataItem && (target.dataItem.value === 0)) return 0;
-        return opacity;
+    // yAxis
+    yAxis.get('renderer').setAll({
+        minGridDistance: 0,
+        cellStartLocation: 0.1,
+        cellEndLocation: 0.9,
     });
-    valueAxis.renderer.labels.template.adapter.add('text', (label, target: any) => {
-        if (target.dataItem && (target.dataItem.value === 0)) return '';
-        return label;
+    yAxis.get('renderer').grid.template.setAll({
+        location: 0,
+        strokeOpacity: 1,
+        stroke: chartHelper.color(gray[200]),
     });
-    valueAxis.renderer.labels.template.fill = color(gray[500]);
-    valueAxis.renderer.baseGrid.disabled = true;
-    valueAxis.fontSize = 11;
+    yAxis.get('renderer').labels.template.setAll({
+        fill: chartHelper.color(gray[400]),
+    });
 
+    // xAxis
+    xAxis.get('renderer').setAll({
+        minGridDistance: 60,
+    });
+    xAxis.get('renderer').grid.template.setAll({
+        strokeOpacity: 1,
+        stroke: chartHelper.color(gray[200]),
+    });
+    xAxis.get('renderer').labels.template.setAll({
+        fill: chartHelper.color(gray[500]),
+    });
+
+    // create legend
+    const legend = chartHelper.createLegend({
+    });
+    chart.children.push(legend);
+
+    // create series
     const createSeries = (field, name) => {
-        const series = chart.series.push(new ColumnSeries());
-        series.name = name;
-        series.dataFields.categoryY = 'rank';
-        series.dataFields.valueX = field;
-        series.fill = color(state.colors[field]);
-        series.stacked = true;
-        series.stroke = color('white');
-        series.strokeWidth = 1;
-        series.strokeOpacity = 0;
-    };
-
-    if (!state.chartData.length) {
-        const emptyChartData = [] as ChartData[];
-        range(0, 5).forEach((d) => {
-            emptyChartData.unshift({
-                rank: `#${d + 1}`,
-                server: 0,
-                database: 0,
-            });
+        const series = chartHelper.createXYColumnSeries(chart, {
+            name,
+            valueXField: field,
+            categoryYField: CATEGORY_KEY,
+            xAxis,
+            yAxis,
+            baseAxis: yAxis,
+            stacked: true,
+            fill: chartHelper.color(state.colors[field]),
+            stroke: chartHelper.color(white),
+            opacity: 1,
         });
-        chart.data = emptyChartData;
-        valueAxis.min = 1;
-    } else {
-        chart.data = state.chartData;
-    }
+        series.data.setAll(cloneDeep(state.chartData));
+
+        // add series to chart
+        chart.series.push(series);
+    };
     createSeries('server', i18n.t('COMMON.WIDGETS.TOP_PROJECT_SERVER'));
     createSeries('database', i18n.t('COMMON.WIDGETS.TOP_PROJECT_DATABASE'));
 
-    chart.legend = new Legend();
-    chart.legend.position = 'bottom';
-    chart.legend.contentAlign = 'left';
-    chart.legend.paddingTop = -10;
-    chart.legend.paddingLeft = 20;
-    chart.legend.fontSize = 12;
-    chart.legend.labels.template.fill = color(gray[400]);
-    chart.legend.markers.template.width = 8;
-    chart.legend.markers.template.height = 8;
-
-    state.chart = chart;
+    // set legend data
+    legend.data.setAll(chart.series.values);
 };
 //
 const queryHelper = new QueryHelper();
@@ -174,8 +175,7 @@ const getLocation = (type: string, projectId: string) => {
     };
     return location;
 };
-//
-const getConvertedData = (rawData): TableItem[] => rawData.map((d) => ({
+const getRefinedTableData = (rawData: Data[]): TableData[] => rawData.map((d) => ({
     project_group: {
         label: d.project_group,
         to: referenceRouter(d.project_group_id, { resource_type: 'identity.ProjectGroup' }),
@@ -197,7 +197,7 @@ const getConvertedData = (rawData): TableItem[] => rawData.map((d) => ({
         to: getLocation(DATA_TYPE.STORAGE, d.project_id),
     },
 }));
-const getConvertedChartData = (orderedData: TableItem[]): ChartData[] => {
+const getRefinedChartData = (tableData: TableData[]): ChartData[] => {
     const chartData = [] as ChartData[];
     range(0, DATA_COUNT).forEach((idx) => {
         chartData.push({
@@ -206,7 +206,7 @@ const getConvertedChartData = (orderedData: TableItem[]): ChartData[] => {
             database: 0,
         });
     });
-    orderedData.forEach((d, idx) => {
+    tableData.forEach((d, idx) => {
         chartData.splice(idx, 1, {
             rank: `#${idx + 1}`,
             server: d.server.count as number,
@@ -221,13 +221,10 @@ const getData = async () => {
     state.loading = true;
     try {
         const { results } = await SpaceConnector.client.statistics.topic.topProject(props.extraParams);
-        const orderedData = getConvertedData(results);
-        state.items = orderedData;
-        state.chartData = getConvertedChartData(orderedData);
+        state.data = results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.items = [];
-        state.chartData = [];
+        state.data = [];
     } finally {
         state.loading = false;
     }
@@ -238,14 +235,12 @@ const init = async () => {
 };
 init();
 
-watch([() => chartContext.value, () => state.chartData], ([chartCtx, data]) => {
-    if (chartCtx && data) {
-        drawChart(chartCtx);
-    }
+watch([() => chartContext.value, () => state.chartData], ([_chartContext, chartData]) => {
+    if (_chartContext && chartData) drawChart();
 });
 
-onUnmounted(() => {
-    if (state.chart) state.chart.dispose();
+onBeforeUnmount(() => {
+    chartHelper.disposeRoot();
 });
 </script>
 
@@ -281,7 +276,7 @@ onUnmounted(() => {
                      class="chart"
                 />
             </p-data-loader>
-            <p-empty v-if="!state.loading && state.items.length === 0 && state.projectItems.length === 0"
+            <p-empty v-if="!state.loading && state.tableData.length === 0 && state.projectItems.length === 0"
                      :title="$t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT')"
                      show-button
             >
@@ -296,7 +291,7 @@ onUnmounted(() => {
                     </router-link>
                 </template>
             </p-empty>
-            <p-empty v-else-if="!state.loading && state.items.length === 0 && state.projectItems.length !== 0"
+            <p-empty v-else-if="!state.loading && state.tableData.length === 0 && state.projectItems.length !== 0"
                      show-image
             >
                 {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
@@ -305,7 +300,7 @@ onUnmounted(() => {
                 <p-data-table
                     :loading="state.loading"
                     :fields="state.fields"
-                    :items="state.items"
+                    :items="state.tableData"
                     :bordered="false"
                 >
                     <template #col-rank-format="{ index }">
