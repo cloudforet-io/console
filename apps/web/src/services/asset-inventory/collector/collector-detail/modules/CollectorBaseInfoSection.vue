@@ -25,9 +25,9 @@
                                    :collector="collectorFormState.originCollector"
                                    show-minimal
             />
-            <collector-version-form @update:isVersionValid="handleUpdateIsVersionValid" />
+            <collector-version-form @update-valid="handleUpdateIsVersionValid" />
             <collector-tag-form :service-name="$t('MENU.ASSET_INVENTORY_COLLECTOR')"
-                                @update:isTagsValid="handleUpdateIsTagsValid"
+                                @update-valid="handleUpdateIsTagsValid"
             />
             <div class="button-group">
                 <p-button style-type="tertiary"
