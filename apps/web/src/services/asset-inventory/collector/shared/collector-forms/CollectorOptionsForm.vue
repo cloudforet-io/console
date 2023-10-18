@@ -131,7 +131,11 @@ const getPluginMetadata = async (provider: string|null) => {
 };
 
 const handleUpdateSchemaForm = (isValid:boolean, value) => {
-    emit('update:isValid', isValid);
+    if (state.isSchemaEmpty) {
+        emit('update:isValid', true);
+    } else {
+        emit('update:isValid', isValid);
+    }
     collectorFormStore.setOptions(value);
 };
 
