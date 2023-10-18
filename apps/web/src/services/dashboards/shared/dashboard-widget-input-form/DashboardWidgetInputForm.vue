@@ -4,20 +4,15 @@ import {
 } from 'vue';
 
 import {
-    PFieldGroup, PTextInput, PJsonSchemaForm, PToggleButton, PDataLoader, PIconButton, PTextButton,
+    PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 import {
-    isEmpty, isEqual,
+    isEmpty,
 } from 'lodash';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import {
-    getDefaultWidgetFormData,
-} from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import {
     useReferenceStore,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-reference-store';
@@ -29,10 +24,9 @@ import {
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-title-input';
 import DashboardWidgetMoreOptions
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
+import DashboardWidgetSchemaForm
+    from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetSchemaForm.vue';
 import { getInitialFormData } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/form-data-helper';
-import {
-    getReferenceHandler,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/reference-handler-helper';
 import {
     getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
@@ -92,15 +86,11 @@ const state = reactive({
         return errorMessageMap;
     }),
     isFocused: false,
-    //
-    defaultWidgetFormData: computed(() => (props.widgetConfigId ? getDefaultWidgetFormData(props.widgetConfigId) : {})),
-    isFormDataChanged: computed(() => !isEqual(state.schemaFormData, state.defaultWidgetFormData)),
     // validation
     isSchemaFormValid: undefined,
     isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
 });
 
-const referenceHandler = getReferenceHandler();
 
 /* title form validation */
 const {
@@ -113,19 +103,16 @@ const { referenceStoreState } = useReferenceStore();
 /* more options */
 const { handleSelectWidgetOptions, handleDeleteProperty } = useWidgetMoreOptions(state);
 
-/* utils */
-const isSelected = (selectedItem: SelectDropdownMenuItem): boolean => {
-    if (Array.isArray(selectedItem)) return !!selectedItem.length;
-    return selectedItem && !isEmpty(selectedItem);
+/* validation */
+const handleFormValidate = (isValid) => {
+    state.isSchemaFormValid = isValid;
 };
-const isInheritDisabled = (propertyName: string): boolean => {
-    const inputDisabled = !!state.widgetOptionsJsonSchema.properties?.[propertyName]?.disabled;
-    const nonInheritable = !!widgetFormStore.widgetConfig?.options_schema?.non_inheritable_properties?.includes(propertyName);
-    return inputDisabled || nonInheritable;
-};
+watch(() => state.isAllValid, (_isAllValid) => {
+    widgetFormStore.$patch({ isValid: _isAllValid });
+}, { immediate: true });
 
 /* reset */
-const handleReturnToInitialSettings = () => {
+const handleInitSchemaForm = () => {
     if (!widgetFormState.widgetConfigId) return;
     initSchemaAndFormData(widgetFormState.widgetConfigId);
 };
@@ -158,18 +145,7 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
     state.widgetOptionsJsonSchema = schema;
     state.schemaFormData = formData;
 };
-const handleUpdateFormData = (formData: Record<string, any>) => {
-    state.schemaFormData = formData;
-    widgetFormStore.updateInheritOptionsAndWidgetOptionsByFormData(formData);
-};
 
-/* validation */
-const handleFormValidate = (isValid) => {
-    state.isSchemaFormValid = isValid;
-};
-watch(() => state.isAllValid, (_isAllValid) => {
-    widgetFormStore.$patch({ isValid: _isAllValid });
-}, { immediate: true });
 
 /* states init */
 const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
@@ -234,61 +210,19 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
         >
             {{ $t(widgetFormStore.widgetConfig.description.translation_id) }}
         </div>
-        <p-data-loader :loading="referenceStoreState.loading || !state.isInitialized"
-                       class="widget-options-form-wrapper"
-        >
-            <p-text-button icon-left="ic_refresh"
-                           style-type="highlight"
-                           :disabled="!state.isFormDataChanged"
-                           class="return-to-initial-settings-button"
-                           @click="handleReturnToInitialSettings"
-            >
-                {{ $t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
-            </p-text-button>
-            <p-json-schema-form v-if="state.widgetOptionsJsonSchema.properties"
-                                :key="`${widgetFormStore.widgetConfigId}-${widgetFormStore.widgetKey}`"
-                                :schema="state.widgetOptionsJsonSchema"
-                                :form-data="state.schemaFormData"
-                                :custom-error-map="state.inheritOptionsErrorMessageMap"
-                                :validation-mode="widgetKey ? 'all' : 'input'"
-                                use-fixed-menu-style
-                                uniform-width
-                                :language="store.state.user.language"
-                                :reference-handler="referenceHandler"
-                                class="widget-options-form"
-                                @validate="handleFormValidate"
-                                @update:form-data="handleUpdateFormData"
-            >
-                <template #label-extra="{ propertyName }">
-                    <div class="inherit-toggle-button-wrapper">
-                        <span class="text"
-                              :class="{inherit: state.inheritableProperties.includes(propertyName)}"
-                        >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
-                        <p-toggle-button :value="state.inheritableProperties.includes(propertyName)"
-                                         :disabled="isInheritDisabled(propertyName)"
-                                         @change-toggle="handleChangeInheritToggle(propertyName, $event)"
-                        />
-                    </div>
-                </template>
-                <template #input-extra="{ propertyName }">
-                    <p-icon-button v-if="!state.fixedProperties.includes(propertyName)"
-                                   class="delete-button"
-                                   shape="square"
-                                   style-type="negative-secondary"
-                                   name="ic_delete"
-                                   @click="handleDeleteProperty(propertyName)"
-                    />
-                </template>
-                <template #dropdown-extra="{ propertyName, selectedItem }">
-                    <div v-if="isSelected(selectedItem) && state.inheritableProperties.includes(propertyName)"
-                         class="dropdown-inner"
-                    >
-                        <span class="item-label">{{ selectedItem.label }}</span>
-                        <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
-                    </div>
-                </template>
-            </p-json-schema-form>
-        </p-data-loader>
+
+        <dashboard-widget-schema-form :loading="referenceStoreState.loading || !state.isInitialized"
+                                      :project-id="dashboardDetailState.projectId"
+                                      :variables-schema="dashboardDetailState.variablesSchema"
+                                      :schema="state.widgetOptionsJsonSchema"
+                                      :form-data="state.schemaFormData"
+                                      @delete-property="handleDeleteProperty"
+                                      @init-schema-form="handleInitSchemaForm"
+                                      @validate="handleFormValidate"
+                                      @toggle-inherit="handleChangeInheritToggle"
+                                      @update:form-data="state.schemaFormData = $event"
+        />
+
         <dashboard-widget-more-options class="more-option-container"
                                        :widget-config-id="widgetConfigId"
                                        :selected-properties="widgetFormState.schemaProperties"
@@ -327,84 +261,6 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
         font-size: 0.875rem;
         font-weight: 400;
         padding: 0.75rem;
-    }
-
-    .widget-options-form-wrapper {
-        height: 100%;
-        min-height: 15rem;
-        .return-to-initial-settings-button {
-            float: right;
-            padding: 1rem 0;
-        }
-        .delete-button {
-            margin-left: 0.25rem;
-        }
-    }
-
-    .widget-options-form {
-        width: 100%;
-    }
-
-    /* custom design-system component - p-json-schema-form */
-    :deep(.widget-options-form) {
-        /* custom design-system component - p-field-group */
-
-        /* custom design-system component - p-field-title */
-        .p-field-group {
-            .form-label {
-                width: 100%;
-                > .title-wrapper .title {
-                    @apply text-label-md;
-                    display: flex;
-                    width: 100%;
-                    justify-content: space-between;
-                    align-items: center;
-                }
-            }
-
-            /* HACK: remove this when p-select-dropdown is fixed */
-            .input-wrapper {
-                width: calc(100% - 2.5rem);
-            }
-        }
-
-        /*
-        custom design-system component - p-select-dropdown
-        HACK: remove this when p-select-dropdown is fixed
-         */
-        .p-select-dropdown .dropdown-button {
-            > .text {
-                @apply truncate;
-                max-width: calc(100% - 1.5rem);
-            }
-        }
-    }
-    .dropdown-inner {
-        display: flex;
-        .item-label {
-            @apply truncate;
-            flex-shrink: 0;
-        }
-        .suffix-text {
-            @apply truncate text-gray-500;
-            padding-left: 0.25rem;
-        }
-    }
-    .inherit-toggle-button-wrapper {
-        @apply inline-flex bg-gray-100 rounded;
-        line-height: 1.25;
-        padding: 0.25rem 0.5rem;
-        pointer-events: initial;
-        .text {
-            @apply text-gray-300;
-            font-weight: 400;
-            font-size: 0.75rem;
-            letter-spacing: 0.02em;
-            padding-right: 0.375rem;
-            &.inherit {
-                @apply text-gray-600;
-            }
-        }
     }
 
     .more-option-container {
