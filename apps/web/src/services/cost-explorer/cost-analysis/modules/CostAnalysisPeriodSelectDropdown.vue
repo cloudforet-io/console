@@ -35,6 +35,7 @@ interface PeriodItem extends SelectDropdownMenuItem {
 
 const props = defineProps<{
     optionForInitialPeriod?: CostQuerySetOption;
+    granularity?: Granularity;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -187,11 +188,11 @@ const handleCustomRangeModalConfirm = (period: Period) => {
 };
 
 
-watch([() => props.optionForInitialPeriod, () => costAnalysisPageState.granularity], ([option, _granularity], [prevOption]) => {
+watch([() => props.optionForInitialPeriod, () => props.granularity], ([option, _granularity], [prevOption]) => {
     if (option !== prevOption && option) {
         const { relative_period, period, granularity } = option;
         setSelectedItemByQuerySet({ relativePeriod: relative_period, period, granularity });
-    } else {
+    } else if (_granularity) {
         setSelectedItemByGranularity(_granularity);
     }
 }, { immediate: true });

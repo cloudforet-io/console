@@ -94,7 +94,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (after, before) => {
                            class="granularity-dropdown"
                            @select="handleSelectGranularity"
         />
-        <cost-analysis-period-select-dropdown :option-for-initial-period="state.optionForInitialPeriod" />
+        <cost-analysis-period-select-dropdown :option-for-initial-period="state.optionForInitialPeriod"
+                                              :granularity="state.granularity"
+        />
         <p-badge v-if="state.showPeriodBadge"
                  badge-type="subtle"
                  style-type="gray200"
