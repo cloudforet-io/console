@@ -8,6 +8,7 @@ import {
     PButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { debounce } from 'lodash';
 
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
@@ -35,10 +36,12 @@ const {
     showContextMenu,
     hideContextMenu,
     initiateMenu,
+    reloadMenu,
 } = useContextMenuController({
     useFixedStyle: true,
     targetRef,
     contextMenuRef,
+    useMenuFiltering: true,
     useReorderBySelection: true,
     menu: toRef(state, 'menuItems'),
     selected: toRef(state, 'selectedItems'),
@@ -70,6 +73,10 @@ const handleClearAddMoreMenuItems = () => {
         emit('disable-all-filters');
     });
 };
+const handleUpdateSearchText = debounce((text: string) => {
+    state.searchText = text;
+    reloadMenu();
+}, 200);
 
 watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProperties) => {
     if (_enabledFiltersProperties?.length) {
@@ -102,6 +109,7 @@ watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProp
                         show-clear-selection
                         @select="handleSelectAddMoreMenuItem"
                         @clear-selection="handleClearAddMoreMenuItems"
+                        @update:search-text="handleUpdateSearchText"
         />
     </div>
 </template>
