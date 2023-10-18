@@ -213,15 +213,3 @@ watch([() => props.optionForInitialPeriod, () => props.granularity], ([option, _
         />
     </div>
 </template>
-
-<style lang="postcss" scoped>
-.cost-analysis-period-select-dropdown {
-    .p-badge {
-        margin-right: 0.5rem;
-        .text {
-            white-space: nowrap;
-        }
-    }
-}
-
-</style>
