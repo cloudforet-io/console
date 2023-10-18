@@ -20,7 +20,7 @@ import {
 import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type';
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
-import type { Granularity, Period } from '@/services/cost-explorer/type';
+import type { Granularity, Period, CostQuerySetOption } from '@/services/cost-explorer/type';
 import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 
@@ -34,7 +34,8 @@ interface PeriodItem extends SelectDropdownMenuItem {
 }
 
 const props = defineProps<{
-    localGranularity?: Granularity;
+    optionForInitialPeriod?: CostQuerySetOption;
+    granularity?: Granularity;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -186,21 +187,15 @@ const handleCustomRangeModalConfirm = (period: Period) => {
     state.customRangeModalVisible = false;
 };
 
-/* NOTE: Case for changing granularity dropdown */
-watch(() => props.localGranularity, (granularity) => {
-    if (granularity) setSelectedItemByGranularity(granularity);
-});
 
-/* NOTE: Case for changing query set(LNB, Dynamic Link) */
-watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => {
-    setSelectedItemByQuerySet({
-        relativePeriod: selectedQuerySet?.options?.relative_period,
-        period: selectedQuerySet?.options?.period,
-        granularity: selectedQuerySet?.options?.granularity,
-    });
-}, {
-    immediate: true,
-});
+watch([() => props.optionForInitialPeriod, () => props.granularity], ([option, _granularity], [prevOption]) => {
+    if (option !== prevOption && option) {
+        const { relative_period, period, granularity } = option;
+        setSelectedItemByQuerySet({ relativePeriod: relative_period, period, granularity });
+    } else if (_granularity) {
+        setSelectedItemByGranularity(_granularity);
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -218,15 +213,3 @@ watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => 
         />
     </div>
 </template>
-
-<style lang="postcss" scoped>
-.cost-analysis-period-select-dropdown {
-    .p-badge {
-        margin-right: 0.5rem;
-        .text {
-            white-space: nowrap;
-        }
-    }
-}
-
-</style>

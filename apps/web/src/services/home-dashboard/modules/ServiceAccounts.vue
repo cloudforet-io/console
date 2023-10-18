@@ -1,3 +1,153 @@
+<script lang="ts" setup>
+import {
+    computed, reactive, watch, ref, onBeforeUnmount,
+} from 'vue';
+import type { Location } from 'vue-router';
+
+import {
+    PDataLoader, PDataTable, PI, PEmpty, PSkeleton,
+} from '@spaceone/design-system';
+import {
+    cloneDeep, debounce, forEach, isEmpty, sum,
+} from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { white } from '@/styles/colors';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+
+interface Data {
+    provider?: string;
+    providerLabel: string;
+    service_account_count: number;
+    href: string;
+    pieSettings: {
+        fill: string;
+    };
+}
+interface Props {
+    extraParams?: object;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    extraParams: () => ({}),
+});
+const CATEGORY_KEY = 'providerLabel';
+const VALUE_KEY = 'service_account_count';
+
+const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
+const state = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    loading: true,
+    data: [] as Data[],
+    totalServiceAccountCount: computed<number>(() => sum(state.data.map((d) => d.service_account_count))),
+    fields: computed(() => [
+        { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
+        { name: 'service_account_count', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
+    ]),
+});
+
+/* Util */
+const drawChart = () => {
+    // refresh chart root
+    chartHelper.refreshRoot();
+
+    // create donut chart
+    const chart = chartHelper.createDonutChart();
+
+    // create pie series
+    const seriesSettings = {
+        categoryField: CATEGORY_KEY,
+        valueField: VALUE_KEY,
+        strokeWidth: 1,
+    };
+    const series = chartHelper.createPieSeries(seriesSettings);
+    chart.series.push(series);
+    series.slices.template.setAll({
+        stroke: chartHelper.color(white),
+        templateField: 'pieSettings',
+    });
+
+    // create tooltip
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setPieTooltipText(series, tooltip);
+    series.slices.template.set('tooltip', tooltip);
+
+    // set data to series
+    series.data.setAll(cloneDeep(state.data));
+
+    // create label text inside pie
+    chartHelper.setPieLabelText(chart, {
+        fontSize: 25,
+        text: state.totalServiceAccountCount,
+    });
+};
+
+const getLink = (data): Location => ({
+    name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+    query: {
+        provider: data.provider,
+    },
+});
+
+/* Api */
+const getData = debounce(async () => {
+    state.loading = true;
+    const data: Data[] = [];
+    try {
+        const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
+        forEach(results, (d) => {
+            data.push({
+                ...d,
+                provider: d.provider,
+                providerLabel: state.providers[d.provider]?.label,
+                href: getLink(d),
+                pieSettings: {
+                    fill: state.providers[d.provider].color || '',
+                },
+            });
+        });
+        state.data = data;
+    } catch (e) {
+        state.data = [];
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+}, 300);
+
+/* Init */
+(async () => {
+    await store.dispatch('reference/provider/load', true);
+})();
+
+/* Watcher */
+watch(() => state.providers, (providers) => {
+    if (!isEmpty(providers)) getData();
+}, { immediate: true });
+watch([() => state.loading, () => chartContext.value], ([loading, _chartContext]) => {
+    if (!loading && _chartContext) {
+        drawChart();
+    }
+}, { immediate: true });
+
+onBeforeUnmount(() => {
+    chartHelper.disposeRoot();
+});
+</script>
+
 <template>
     <widget-layout class="service-accounts">
         <template #title>
@@ -16,44 +166,44 @@
                 </router-link>
             </div>
         </template>
-        <div class="chart-container">
-            <p-data-loader :loading="loading"
-                           :data="data"
+        <div class="content-wrapper">
+            <p-data-loader :loading="state.loading"
+                           :data="state.data"
                            class="chart"
             >
                 <template #loader>
-                    <div ref="loaderRef"
-                         class="w-full h-full"
-                    />
-                </template>
-                <div>
-                    <div ref="chartRef"
-                         class="w-full h-full"
-                    />
-                    <div class="legends">
-                        <template v-if="loading">
-                            <div v-for="v in skeletons"
-                                 :key="v"
-                                 class="flex items-center p-4"
-                            >
-                                <p-skeleton class="flex-grow" />
-                            </div>
-                        </template>
-                        <p-data-table v-else
-                                      :loading="loading"
-                                      :fields="fields"
-                                      :items="data"
-                                      :bordered="false"
-                        >
-                            <template #col-provider-format="{ item }">
-                                <router-link :to="getLink(item)">
-                                    <span :style="{color: item.color}"
-                                          class="provider-label"
-                                    >{{ providers[item.provider].label }}</span>
-                                </router-link>
-                            </template>
-                        </p-data-table>
+                    <div class="loader-wrapper">
+                        <p-skeleton width="6.25rem"
+                                    height="6.25rem"
+                                    class="mb-6 mt-6"
+                        />
+                        <div class="text-left">
+                            <p-skeleton width="80%"
+                                        height="0.625rem"
+                            />
+                            <p-skeleton width="100%"
+                                        height="0.625rem"
+                            />
+                        </div>
                     </div>
+                </template>
+                <div ref="chartContext"
+                     class="chart"
+                />
+                <div class="table-wrapper">
+                    <p-data-table :loading="state.loading"
+                                  :fields="state.fields"
+                                  :items="state.data"
+                                  :bordered="false"
+                    >
+                        <template #col-provider-format="{ item }">
+                            <router-link :to="getLink(item)">
+                                <span :style="{color: item.color}"
+                                      class="provider-label"
+                                >{{ state.providers[item.provider].label }}</span>
+                            </router-link>
+                        </template>
+                    </p-data-table>
                 </div>
                 <template #no-data>
                     <p-empty
@@ -66,200 +216,6 @@
         </div>
     </widget-layout>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch, onUnmounted,
-} from 'vue';
-import type { Location } from 'vue-router';
-
-import * as am4charts from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
-import {
-    PDataLoader, PDataTable, PI, PSkeleton, PEmpty,
-} from '@spaceone/design-system';
-import { forEach, range, isEmpty } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import config from '@/lib/config';
-
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import {
-    gray, violet, white,
-} from '@/styles/colors';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-const DEFAULT_COLOR = violet[200];
-
-interface Data {
-    provider?: string;
-    color: string;
-    service_account_count: number;
-    href: string;
-}
-
-const CATEGORY_KEY = 'name';
-const VALUE_KEY = 'service_account_count';
-
-export default {
-    name: 'ServiceAccounts',
-    components: {
-        WidgetLayout,
-        PI,
-        PDataTable,
-        PSkeleton,
-        PDataLoader,
-        PEmpty,
-    },
-    props: {
-        extraParams: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            skeletons: range(4),
-            loading: true,
-            loaderRef: null,
-            chartRef: null as HTMLElement | null,
-            data: [] as Data[],
-            chart: null as null | any,
-            chartRegistry: {},
-            fields: computed(() => [
-                { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
-                { name: 'service_account_count', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
-            ]),
-        });
-
-        /* Util */
-        const disposeChart = (ctx) => {
-            if (state.chartRegistry[ctx]) {
-                state.chartRegistry[ctx].dispose();
-                delete state.chartRegistry[ctx];
-            }
-        };
-        const drawChart = (ctx, isLoading = false) => {
-            const createChart = () => {
-                disposeChart(ctx);
-                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
-                return state.chartRegistry[ctx];
-            };
-            const chart = createChart();
-            state.chart = chart;
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.responsive.enabled = true;
-            chart.innerRadius = am4core.percent(63);
-
-            if (isLoading) {
-                chart.data = [{
-                    provider: 'Dummy',
-                    service_account_count: 1000,
-                    color: DEFAULT_COLOR,
-                }];
-            } else {
-                chart.data = state.data;
-            }
-
-            const series = chart.series.create();
-            series.slices.template.togglable = false;
-            series.slices.template.clickable = false;
-            series.dataFields.value = VALUE_KEY;
-            series.dataFields.category = CATEGORY_KEY;
-            series.slices.template.propertyFields.fill = 'color';
-            series.slices.template.stroke = am4core.color(white);
-            series.slices.template.strokeWidth = 2;
-            series.slices.template.strokeOpacity = 1;
-            series.slices.template.states.getKey('hover').properties.scale = 1;
-            series.tooltip.disabled = true;
-            series.ticks.template.disabled = true;
-            series.labels.template.text = '';
-
-            const label = new am4core.Label();
-            label.parent = series;
-            label.horizontalCenter = 'middle';
-            label.verticalCenter = 'middle';
-            label.fontSize = 25;
-            label.fontWeight = 'lighter';
-            label.fill = am4core.color(gray[900]);
-            if (isLoading) {
-                label.text = '';
-            } else {
-                label.text = '{values.value.sum}';
-            }
-        };
-
-        const getLink = (data): Location => ({
-            name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-            query: {
-                provider: data.provider,
-            },
-        });
-
-        /* Api */
-        const getData = async () => {
-            state.loading = true;
-            const data: Data[] = [];
-            try {
-                const { results } = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
-                forEach(results, (d) => {
-                    data.push({
-                        ...d,
-                        provider: d.provider,
-                        color: state.providers[d.provider].color || '',
-                        href: getLink(d),
-                        service_account_count: d.service_account_count,
-                    });
-                });
-                state.data = data;
-            } catch (e) {
-                state.data = [];
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* Init */
-        (async () => {
-            await store.dispatch('reference/provider/load', true);
-        })();
-
-        /* Watcher */
-        watch(() => state.providers, (providers) => {
-            if (!isEmpty(providers)) getData();
-        }, { immediate: true });
-        watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
-            if (loading && loaderCtx) {
-                drawChart(loaderCtx, true);
-            }
-            if (!loading && chartCtx) {
-                drawChart(chartCtx, false);
-            }
-        }, { immediate: true });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
-
-        return {
-            ...toRefs(state),
-            ASSET_INVENTORY_ROUTE,
-            getLink,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .top {
@@ -279,16 +235,23 @@ export default {
         }
     }
 }
-.chart {
-    min-height: 11.25rem;
-    width: 100%;
-}
 
-.legends {
-    @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
-}
-.chart-container {
+.content-wrapper {
     @apply flex justify-center items-center mb-4;
+
+    .loader-wrapper {
+        width: 100%;
+        text-align: center;
+    }
+
+    .chart {
+        min-height: 11.25rem;
+        width: 100%;
+    }
+
+    .table-wrapper {
+        @apply w-full flex-grow justify-center items-center m-auto overflow-y-auto;
+    }
 
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {
@@ -303,6 +266,7 @@ export default {
 :deep(.p-data-table) {
     @apply rounded-xs;
     margin-top: 1rem;
+    min-height: auto;
     overflow-x: hidden;
     &.default th {
         @apply bg-gray-100 text-gray-400;

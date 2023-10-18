@@ -14,7 +14,7 @@ export type GroupBy = typeof GROUP_BY[keyof typeof GROUP_BY];
 export type Filter = typeof FILTER[keyof typeof FILTER];
 
 
-interface CostQuerySetOption {
+export interface CostQuerySetOption {
     group_by?: Array<string|GroupBy>;
     granularity: Granularity;
     period?: Period;

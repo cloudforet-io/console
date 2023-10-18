@@ -1,15 +1,183 @@
+<script lang="ts" setup>
+import {
+    computed, onBeforeUnmount, reactive, ref, watch,
+} from 'vue';
+
+import { cloneDeep } from 'lodash';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { i18n } from '@/translations';
+
+import { useAmcharts5 } from '@/common/composables/amcharts5';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    green, red, white, yellow,
+} from '@/styles/colors';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+
+
+const CATEGORY_KEY = 'category';
+const VALUE_KEY = 'value';
+const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
+const CLOUD_SERVICE_NAME = 'Check';
+const STATUS = Object.freeze({
+    ERROR: 'error',
+    WARNING: 'warning',
+    OK: 'ok',
+} as const);
+const STATUS_COLORS = Object.freeze({
+    [STATUS.ERROR]: red[500],
+    [STATUS.WARNING]: yellow[500],
+    [STATUS.OK]: green[600],
+});
+type Status = typeof STATUS[keyof typeof STATUS];
+interface Data {
+    status: Status;
+    count: number;
+}
+interface ChartData {
+    category: string;
+    value: number;
+    pieSettings: {
+        fill: string;
+    };
+}
+interface Props {
+    extraParams?: object;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    extraParams: () => ({}),
+});
+
+const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
+const queryHelper = new QueryHelper();
+const state = reactive({
+    loading: true,
+    data: [] as Data[],
+    chartData: computed<ChartData[]>(() => state.data.map((d) => ({
+        category: d.status,
+        value: d.count,
+        pieSettings: {
+            fill: STATUS_COLORS[d.status],
+        },
+    }))),
+    legendData: computed(() => ({
+        [STATUS.ERROR]: {
+            name: STATUS.ERROR,
+            label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_ERROR'),
+            color: STATUS_COLORS[STATUS.ERROR],
+            count: state.data.find((d) => d.status === STATUS.ERROR)?.count,
+        },
+        [STATUS.WARNING]: {
+            name: STATUS.WARNING,
+            label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_WARNING'),
+            color: STATUS_COLORS[STATUS.WARNING],
+            count: state.data.find((d) => d.status === STATUS.WARNING)?.count,
+        },
+        [STATUS.OK]: {
+            name: STATUS.OK,
+            label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_OK'),
+            color: STATUS_COLORS[STATUS.OK],
+            count: state.data.find((d) => d.status === STATUS.OK)?.count,
+        },
+    })),
+});
+
+/* Util */
+const overallLinkFormatter = (status) => {
+    const filters: ConsoleFilter[] = [];
+    filters.push({ k: 'data.status', o: '=', v: status });
+
+    return {
+        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+        query: {
+            filters: queryHelper.setFilters(filters).rawQueryStrings,
+        },
+        params: {
+            provider: 'aws',
+            group: CLOUD_SERVICE_GROUP,
+            name: CLOUD_SERVICE_NAME,
+        },
+    };
+};
+const drawChart = () => {
+    // refresh chart root
+    chartHelper.refreshRoot();
+
+    // create donut chart
+    const chart = chartHelper.createPieChart();
+
+    // create pie series
+    const seriesSettings = {
+        categoryField: CATEGORY_KEY,
+        valueField: VALUE_KEY,
+        strokeWidth: 1,
+    };
+    const series = chartHelper.createPieSeries(seriesSettings);
+    chart.series.push(series);
+    series.slices.template.setAll({
+        stroke: chartHelper.color(white),
+        tooltipText: '',
+        templateField: 'pieSettings',
+    });
+    // set data to series
+    series.data.setAll(cloneDeep(state.chartData));
+
+    series.slices.template.adapters.add('fill', (fill, target) => {
+        const status = target.dataItem?.dataContext?.[CATEGORY_KEY];
+        if (!status) return STATUS_COLORS[status];
+        return fill;
+    });
+};
+
+/* Api */
+const getData = async () => {
+    state.loading = true;
+    try {
+        const { results } = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary(props.extraParams);
+        state.data = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.data = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* Init */
+(async () => {
+    await getData();
+})();
+
+/* Watcher */
+watch([() => state.loading, () => chartContext.value], async ([loading, _chartContext]) => {
+    if (!loading && _chartContext) drawChart();
+}, { immediate: true });
+
+onBeforeUnmount(() => {
+    chartHelper.disposeRoot();
+});
+</script>
+
 <template>
     <div class="trusted-advisor-overall">
         <div class="title">
             <span class="text">{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.SUB_TITLE_OVERALL') }}</span>
         </div>
         <div class="chart-wrapper">
-            <div ref="chartRef"
+            <div ref="chartContext"
                  class="chart"
             />
         </div>
         <div class="legend-wrapper">
-            <template v-for="([k, v]) of Object.entries(legendData)">
+            <template v-for="([k, v]) of Object.entries(state.legendData)">
                 <router-link :key="k"
                              :to="overallLinkFormatter(v.name)"
                              class="legend-row"
@@ -32,173 +200,6 @@
     </div>
 </template>
 
-<script lang="ts">
-
-import {
-    computed, onUnmounted, reactive, toRefs, watch,
-} from 'vue';
-
-import type { PieChart } from '@amcharts/amcharts4/charts';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import * as am4core from '@amcharts/amcharts4/core';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import config from '@/lib/config';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { green, red, yellow } from '@/styles/colors';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-
-const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
-const CLOUD_SERVICE_NAME = 'Check';
-const STATUS = Object.freeze({
-    ERROR: 'error',
-    WARNING: 'warning',
-    OK: 'ok',
-} as const);
-const STATUS_COLORS = Object.freeze({
-    [STATUS.ERROR]: red[500],
-    [STATUS.WARNING]: yellow[500],
-    [STATUS.OK]: green[600],
-});
-type Status = typeof STATUS[keyof typeof STATUS];
-interface OverallData {
-    status: Status;
-    count: number;
-}
-
-export default {
-    name: 'TrustedAdvisorOverall',
-    props: {
-        extraParams: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const queryHelper = new QueryHelper();
-        const state = reactive({
-            loading: true,
-            chart: null as null | PieChart,
-            chartRef: null as HTMLElement | null,
-            chartData: [] as OverallData[],
-            legendData: computed(() => ({
-                [STATUS.ERROR]: {
-                    name: STATUS.ERROR,
-                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_ERROR'),
-                    color: STATUS_COLORS[STATUS.ERROR],
-                    count: state.chartData.find((d) => d.status === STATUS.ERROR)?.count,
-                },
-                [STATUS.WARNING]: {
-                    name: STATUS.WARNING,
-                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_WARNING'),
-                    color: STATUS_COLORS[STATUS.WARNING],
-                    count: state.chartData.find((d) => d.status === STATUS.WARNING)?.count,
-                },
-                [STATUS.OK]: {
-                    name: STATUS.OK,
-                    label: i18n.t('COMMON.WIDGETS.TRUSTED_ADVISOR.LABEL_OK'),
-                    color: STATUS_COLORS[STATUS.OK],
-                    count: state.chartData.find((d) => d.status === STATUS.OK)?.count,
-                },
-            })),
-        });
-
-        /* Util */
-        const overallLinkFormatter = (status) => {
-            const filters: ConsoleFilter[] = [];
-            filters.push({ k: 'data.status', o: '=', v: status });
-
-            return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                query: {
-                    filters: queryHelper.setFilters(filters).rawQueryStrings,
-                },
-                params: {
-                    provider: 'aws',
-                    group: CLOUD_SERVICE_GROUP,
-                    name: CLOUD_SERVICE_NAME,
-                },
-            };
-        };
-        const drawChart = (chartContext) => {
-            const chart = am4core.create(chartContext, am4charts.PieChart);
-            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.paddingTop = 12;
-            chart.responsive.enabled = true;
-            chart.data = state.chartData;
-
-            const series = chart.series.push(new am4charts.PieSeries());
-            series.labels.template.disabled = true;
-            series.ticks.template.disabled = true;
-            series.dataFields.value = 'count';
-            series.dataFields.category = 'status';
-
-            const slice: any = series.slices.template;
-            slice.togglable = false;
-            slice.clickable = false;
-            slice.stroke = am4core.color('#fff');
-            slice.tooltipText = '';
-            slice.strokeWidth = 1;
-            slice.states.getKey('hover').properties.scale = 1;
-            slice.adapter.add('fill', (fill, target) => {
-                if (target.dataItem) return am4core.color(STATUS_COLORS[target.dataItem.category]);
-                return fill;
-            });
-
-            // animation
-            series.hiddenState.properties.opacity = 1;
-            series.hiddenState.properties.endAngle = -90;
-            series.hiddenState.properties.startAngle = -90;
-
-            state.chart = chart;
-        };
-
-        /* Api */
-        const getOverallData = async () => {
-            state.loading = true;
-            try {
-                const { results } = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary(props.extraParams);
-                state.chartData = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.chartData = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* Init */
-        (async () => {
-            await getOverallData();
-        })();
-
-        /* Watcher */
-        watch([() => state.loading, () => state.chartRef], async ([loading, chartContext]) => {
-            if (!loading && chartContext) {
-                drawChart(chartContext);
-            }
-        }, { immediate: true });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
-
-        return {
-            ...toRefs(state),
-            overallLinkFormatter,
-        };
-    },
-};
-</script>
-
 <style lang="postcss" scoped>
 .trusted-advisor-overall {
     @apply col-span-3 grid grid-cols-12;
@@ -216,6 +217,7 @@ export default {
     }
     .chart-wrapper {
         @apply col-span-12;
+        height: 8.5rem;
 
         @screen mobile {
             @apply col-span-4;

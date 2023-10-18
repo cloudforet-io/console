@@ -52,7 +52,7 @@ import PersonalHealthDashboard
 import ResourceMap from '@/services/home-dashboard/modules/ResourceMap.vue';
 import ServiceAccounts from '@/services/home-dashboard/modules/ServiceAccounts.vue';
 import TopProjects from '@/services/home-dashboard/modules/TopProjects.vue';
-import TrustedAdvisor from '@/services/home-dashboard/modules/TrustedAdvisor.vue';
+import TrustedAdvisor from '@/services/home-dashboard/modules/trusted-advisor/TrustedAdvisor.vue';
 
 export default {
     name: 'HomeDashboard',
