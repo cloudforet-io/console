@@ -7,11 +7,10 @@ import {
 } from 'vue';
 
 import {
-    PSelectDropdown, PButton, PContextMenu, PIconButton, PPopover, PBadge,
+    PButton, PContextMenu, PIconButton, PPopover, PBadge,
     useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -28,9 +27,8 @@ import {
 } from '@/services/cost-explorer/cost-analysis/config';
 import { REQUEST_TYPE } from '@/services/cost-explorer/cost-analysis/lib/config';
 import CostAnalysisFiltersPopper from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisFiltersPopper.vue';
-import CostAnalysisPeriodSelectDropdown
-    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisPeriodSelectDropdown.vue';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
+import CostAnalysisGranularityPeriodDropdown
+    from '@/services/cost-explorer/cost-analysis/modules/CostAnalysisGranularityPeriodDropdown.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/type';
@@ -50,23 +48,6 @@ const { height: filtersPopperHeight } = useElementSize(filtersPopperRef);
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
     queryFormModalVisible: false,
-    granularityItems: computed<MenuItem[]>(() => ([
-        {
-            type: 'item',
-            name: GRANULARITY.DAILY,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY'),
-        },
-        {
-            type: 'item',
-            name: GRANULARITY.MONTHLY,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY'),
-        },
-        {
-            type: 'item',
-            name: GRANULARITY.YEARLY,
-            label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY'),
-        },
-    ])),
     saveDropdownMenuItems: computed<MenuItem[]>(() => ([
         {
             type: 'item',
@@ -89,19 +70,6 @@ const state = reactive({
         });
         return count;
     }),
-    showPeriodBadge: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
-    periodBadgeText: computed<string>(() => {
-        if (!costAnalysisPageState.period) return '';
-        let startDateFormat = 'MMM D';
-        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) startDateFormat = 'MMM YYYY';
-        else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) startDateFormat = 'YYYY';
-        const endDateFormat = costAnalysisPageState.granularity === GRANULARITY.DAILY ? 'MMM D, YYYY' : startDateFormat;
-        //
-        const start = dayjs.utc(costAnalysisPageState.period.start);
-        let end = dayjs.utc(costAnalysisPageState.period.end);
-        if (costAnalysisPageState.granularity === GRANULARITY.DAILY) end = dayjs.utc(costAnalysisPageState.period.end).endOf('month');
-        return `${start.format(startDateFormat)} ~ ${end.format(endDateFormat)}`;
-    }),
 });
 
 const {
@@ -118,10 +86,6 @@ const {
 onClickOutside(rightPartRef, hideContextMenu);
 
 /* event */
-const handleSelectGranularity = async (granularity: Granularity) => {
-    costAnalysisPageStore.$patch({ granularity });
-    state.granularity = granularity;
-};
 const handleSaveQuerySet = async () => {
     try {
         await SpaceConnector.client.costAnalysis.costQuerySet.update({
@@ -175,20 +139,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
              :style="{ 'margin-bottom': `${filtersPopperHeight ? filtersPopperHeight+40: 0}px` }"
         >
             <div class="left-part">
-                <p-select-dropdown :menu="state.granularityItems"
-                                   :selection-label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY')"
-                                   style-type="rounded"
-                                   :selected="costAnalysisPageState.granularity"
-                                   class="granularity-dropdown"
-                                   @select="handleSelectGranularity"
-                />
-                <cost-analysis-period-select-dropdown :local-granularity="state.granularity" />
-                <p-badge v-if="state.showPeriodBadge"
-                         badge-type="subtle"
-                         style-type="gray200"
-                >
-                    {{ state.periodBadgeText }}
-                </p-badge>
+                <cost-analysis-granularity-period-dropdown />
                 <p-popover :is-visible.sync="state.filtersPopoverVisible"
                            :class="{ 'open': state.filtersPopoverVisible }"
                            ignore-outside-click
