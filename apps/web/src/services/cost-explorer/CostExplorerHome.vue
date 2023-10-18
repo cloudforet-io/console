@@ -62,30 +62,46 @@ const SERVICE_CONTENTS = {
             </div>
             <div class="image-wrapper">
                 <img class="image"
-                     :src="`src/assets/images/landing/${SERVICE_CONTENTS.topic.thumbnail_url}`"
+                     src="@/assets/images/landing/img_landing_cost-explorer_hero.png"
                      :alt="SERVICE_CONTENTS.topic.description"
                 >
             </div>
         </div>
         <p-pane-layout class="sub-menu-list">
-            <div v-for="(submenu, index) in SERVICE_CONTENTS.sub_menu"
-                 :key="`${submenu}-${index}`"
-                 class="sub-menu-card"
-            >
+            <div class="sub-menu-card">
                 <div class="sub-menu-contents">
-                    <h3>{{ submenu.name }}</h3>
+                    <h3>{{ SERVICE_CONTENTS.sub_menu[0].name }}</h3>
                     <p class="description">
-                        {{ submenu.description }}
+                        {{ SERVICE_CONTENTS.sub_menu[0].description }}
                     </p>
-                    <p-link :text="submenu.link_text"
+                    <p-link :text="SERVICE_CONTENTS.sub_menu[0].link_text"
                             :action-icon="ACTION_ICON.EXTERNAL_LINK"
                             highlight
-                            :href="submenu.link"
+                            :href="SERVICE_CONTENTS.sub_menu[0].link"
                     />
                 </div>
                 <div class="image-wrapper">
-                    <img :src="`src/assets/images/landing/${submenu.thumbnail_url}`"
-                         :alt="submenu.description"
+                    <img src="@/assets/images/landing/img_landing_cost-explorer_cost-analysis.png"
+                         :alt="SERVICE_CONTENTS.sub_menu[0].description"
+                         class="image"
+                    >
+                </div>
+            </div>
+            <div class="sub-menu-card">
+                <div class="sub-menu-contents">
+                    <h3>{{ SERVICE_CONTENTS.sub_menu[1].name }}</h3>
+                    <p class="description">
+                        {{ SERVICE_CONTENTS.sub_menu[1].description }}
+                    </p>
+                    <p-link :text="SERVICE_CONTENTS.sub_menu[1].link_text"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                            highlight
+                            :href="SERVICE_CONTENTS.sub_menu[1].link"
+                    />
+                </div>
+                <div class="image-wrapper">
+                    <img src="@/assets/images/landing/img_landing_cost-explorer_budget.png"
+                         :alt="SERVICE_CONTENTS.sub_menu[1].description"
                          class="image"
                     >
                 </div>
