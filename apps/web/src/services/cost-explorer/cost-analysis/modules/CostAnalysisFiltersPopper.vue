@@ -36,7 +36,14 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: true,
-    enabledFilters: computed<MenuItem[]>(() => costAnalysisPageStore.defaultGroupByItems.filter((d) => costAnalysisPageState.enabledFiltersProperties?.includes(d.name))),
+    enabledFilters: computed<MenuItem[]>(() => {
+        if (!costAnalysisPageState.enabledFiltersProperties) return [];
+        return costAnalysisPageState.enabledFiltersProperties.map((d) => {
+            const targetItem = costAnalysisPageStore.defaultGroupByItems.find((item) => item.name === d);
+            if (targetItem) return targetItem;
+            return { name: d, label: d };
+        });
+    }),
     selectedFilterableItemsMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => {
         const _selectedItems = {} as Record<string, SelectDropdownMenuItem[]>;
         Object.entries(costAnalysisPageState.filters ?? {}).forEach(([groupBy, items]) => {
