@@ -33,7 +33,7 @@ export interface WidgetOptionsSchemaProperty {
         }
     };
 }
-export type WidgetOptionsSchema = WidgetOptionsSchemaProperty[];
+export type WidgetOptionsSchemaConfig = WidgetOptionsSchemaProperty[];
 
 /* example
 [
