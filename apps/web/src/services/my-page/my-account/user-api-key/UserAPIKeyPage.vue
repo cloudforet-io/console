@@ -1,28 +1,5 @@
-<template>
-    <section class="api-key-wrapper">
-        <p-heading :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                   :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')"
-                   class="page-title"
-        />
-        <user-a-p-i-key-table :user-id="userId" />
-        <p-pane-layout class="sub-table-wrapper">
-            <div class="sub-table-header">
-                {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
-            </div>
-            <p-data-table
-                :items="items"
-                :loading="loading"
-                :fields="fields"
-                :striped="false"
-            />
-        </p-pane-layout>
-    </section>
-</template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
 
 import {
     PDataTable, PHeading, PPaneLayout,
@@ -44,50 +21,56 @@ interface EndpointItem {
     version?: string;
 }
 
-export default {
-    name: 'UserAPIKeyPage',
-    components: {
-        UserAPIKeyTable,
-        PPaneLayout,
-        PDataTable,
-        PHeading,
-    },
-    setup() {
-        const state = reactive({
-            loading: true,
-            fields: [
-                { name: 'service', label: 'Service' },
-                { name: 'name', label: 'Name' },
-                { name: 'version', label: 'Version' },
-                { name: 'endpoint', label: 'Endpoint' },
-            ],
-            items: [] as EndpointItem[],
-            userId: computed(() => store.state.user.userId),
-        });
-        const listEndpoints = async () => {
-            state.loading = true;
-            try {
-                const { results } = await SpaceConnector.client.identity.endpoint.list();
-                state.items = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.items = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        (async () => {
-            await listEndpoints();
-        })();
-
-        return {
-            ...toRefs(state),
-        };
-    },
-
+const state = reactive({
+    loading: true,
+    fields: [
+        { name: 'service', label: 'Service' },
+        { name: 'name', label: 'Name' },
+        { name: 'version', label: 'Version' },
+        { name: 'endpoint', label: 'Endpoint' },
+    ],
+    items: [] as EndpointItem[],
+    userId: computed(() => store.state.user.userId),
+});
+const listEndpoints = async () => {
+    state.loading = true;
+    try {
+        const { results } = await SpaceConnector.client.identity.endpoint.list();
+        state.items = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.items = [];
+    } finally {
+        state.loading = false;
+    }
 };
+
+(async () => {
+    await listEndpoints();
+})();
+
 </script>
+
+<template>
+    <section class="api-key-wrapper">
+        <p-heading :title="$t('IDENTITY.USER.MAIN.API_KEY')"
+                   :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')"
+                   class="page-title"
+        />
+        <user-a-p-i-key-table :user-id="state.userId" />
+        <p-pane-layout class="sub-table-wrapper">
+            <div class="sub-table-header">
+                {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
+            </div>
+            <p-data-table
+                :items="state.items"
+                :loading="state.loading"
+                :fields="state.fields"
+                :striped="false"
+            />
+        </p-pane-layout>
+    </section>
+</template>
 
 <style lang="postcss" scoped>
 .page-title {
