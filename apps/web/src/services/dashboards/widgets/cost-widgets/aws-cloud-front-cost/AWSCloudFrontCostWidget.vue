@@ -32,7 +32,7 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type {
-    SelectorType, UsageType, WidgetEmit, WidgetExpose, WidgetProps,
+    SelectorType, WidgetEmit, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
@@ -265,7 +265,7 @@ const drawChart = (chartData) => {
         tooltip.label.adapters.add('text', (text, target) => {
             let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[groupBy]}[/]`;
             chart.series.each((s) => {
-                const fieldName = s.get('valueYField') || s.get('valueXField') || '' as UsageType;
+                const fieldName = s.get('valueYField') || s.get('valueXField') || '';
                 let value = target.dataItem?.dataContext?.[fieldName];
                 if (value === undefined) value = '--';
                 if (typeof value === 'number') {
