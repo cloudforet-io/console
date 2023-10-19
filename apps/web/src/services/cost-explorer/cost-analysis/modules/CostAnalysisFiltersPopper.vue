@@ -39,7 +39,8 @@ const state = reactive({
     enabledFilters: computed<MenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
         return costAnalysisPageState.enabledFiltersProperties.map((d) => {
-            if (costAnalysisPageStore.defaultGroupByItems.find((item) => item.name === d)) return { name: d, label: d };
+            const targetItem = costAnalysisPageStore.defaultGroupByItems.find((item) => item.name === d);
+            if (targetItem) return targetItem;
             return { name: d, label: d };
         });
     }),
