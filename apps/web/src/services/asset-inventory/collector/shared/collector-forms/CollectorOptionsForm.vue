@@ -89,7 +89,7 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;}>();
 
 const state = reactive({
-    isSchemaEmpty: computed<boolean>(() => isEmpty(state.schema)),
+    isSchemaEmpty: computed<boolean>(() => isEmpty(state.schema) && !state.isLoadFailed),
     loading: false,
     isLoadFailed: false,
     pluginId: computed<string|undefined>(() => collectorFormState.repositoryPlugin?.plugin_id),
@@ -131,7 +131,11 @@ const getPluginMetadata = async (provider: string|null) => {
 };
 
 const handleUpdateSchemaForm = (isValid:boolean, value) => {
-    emit('update:isValid', isValid);
+    if (state.isSchemaEmpty && !state.loading) {
+        emit('update:isValid', true);
+    } else {
+        emit('update:isValid', isValid);
+    }
     collectorFormStore.setOptions(value);
 };
 
