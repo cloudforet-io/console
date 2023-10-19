@@ -158,7 +158,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
             return {
                 ...properties[d],
                 propertyName: d,
-                description: managedDashboardVariablesSchema.properties[d].description ?? properties[d].description ?? '',
+                description: managedDashboardVariablesSchema.properties[d]?.description ?? properties[d].description ?? '',
             };
         }
         return {
