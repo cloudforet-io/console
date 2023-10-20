@@ -1,53 +1,27 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import {
-    PDataTable, PHeading, PPaneLayout,
-} from '@spaceone/design-system';
+import { PHeading, PTab } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
+import GRPCEndpointsTab from '@/services/my-page/my-account/user-api-key/modules/GRPCEndpointsTab.vue';
+import RestEndpointsTab from '@/services/my-page/my-account/user-api-key/modules/RestEndpointsTab.vue';
 
-interface EndpointItem {
-    endpoint: string;
-    name: string;
-    service: string;
-    state?: string;
-    version?: string;
-}
 
 const state = reactive({
-    loading: true,
-    fields: [
-        { name: 'service', label: 'Service' },
-        { name: 'name', label: 'Name' },
-        { name: 'version', label: 'Version' },
-        { name: 'endpoint', label: 'Endpoint' },
-    ],
-    items: [] as EndpointItem[],
+    tabs: [{
+        name: 'rest',
+        label: 'REST',
+    }, {
+        name: 'gRPC',
+        label: 'gRPC',
+    }],
+    activeTab: 'rest',
     userId: computed(() => store.state.user.userId),
 });
-const listEndpoints = async () => {
-    state.loading = true;
-    try {
-        const { results } = await SpaceConnector.client.identity.endpoint.list();
-        state.items = results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-    } finally {
-        state.loading = false;
-    }
-};
-
-(async () => {
-    await listEndpoints();
-})();
 
 </script>
 
@@ -58,29 +32,21 @@ const listEndpoints = async () => {
                    class="page-title"
         />
         <user-a-p-i-key-table :user-id="state.userId" />
-        <p-pane-layout class="sub-table-wrapper">
-            <div class="sub-table-header">
-                {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
-            </div>
-            <p-data-table
-                :items="state.items"
-                :loading="state.loading"
-                :fields="state.fields"
-                :striped="false"
-            />
-        </p-pane-layout>
+        <p-tab v-model="state.activeTab"
+               :tabs="state.tabs"
+        >
+            <template #rest>
+                <rest-endpoints-tab />
+            </template>
+            <template #gRPC>
+                <g-r-p-c-endpoints-tab />
+            </template>
+        </p-tab>
     </section>
 </template>
 
 <style lang="postcss" scoped>
 .page-title {
     align-items: center;
-}
-.sub-table-header {
-    padding-left: 1rem;
-    padding-top: 2rem;
-    margin-bottom: 1rem;
-    font-size: 1.375rem;
-    line-height: 145%;
 }
 </style>
