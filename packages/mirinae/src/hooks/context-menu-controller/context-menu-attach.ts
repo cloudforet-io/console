@@ -49,7 +49,7 @@ export const useContextMenuAttach = ({
         accumulatedItemsByAttachHandler.value.forEach((items, i) => {
             allItems.push(...items);
             if (hasNextItemsByAttachHandler.value[i]) {
-                allItems.push({ type: 'showMore', name: 'filterableDropdownShowMore', handlerRef: i });
+                allItems.push({ type: 'showMore', name: `contextMenuShowMore-${i}`, handlerRef: i });
             }
         });
         return allItems;
@@ -67,7 +67,7 @@ export const useContextMenuAttach = ({
     };
 
     const attachLoading = ref(false);
-    const filterItemsMap = computed(() => {
+    const filterItemsMap = computed<Record<string, MenuItem[]>>(() => {
         const result = {};
         if (!filterItems) return result;
         filterItems.value.forEach((item) => {
@@ -76,42 +76,47 @@ export const useContextMenuAttach = ({
         });
         return result;
     });
+    const getHandlerResults = async (handlerIndex?: number): Promise<HandlerRes[]> => {
+        if (handlerIndex === undefined) {
+            const handlerPromises = attachHandlers.value.map((handler, i) => {
+                const handlerRes = handler(searchText?.value ?? '', pageStart.value[i], pageLimit.value[i]);
+                if (handlerRes instanceof Promise) return handlerRes;
+                return Promise.resolve(handlerRes);
+            });
+            const promiseResults = await Promise.allSettled(handlerPromises);
+            return promiseResults.reduce((acc, result) => {
+                if (result.status === 'fulfilled') {
+                    acc.push(result.value);
+                }
+                return acc;
+            }, [] as HandlerRes[]);
+        }
+        const handlerRes = await attachHandlers.value[handlerIndex](searchText?.value ?? '', pageStart.value[handlerIndex], pageLimit.value[handlerIndex]);
+        if (handlerRes instanceof Promise) return [await handlerRes];
+        return [handlerRes];
+    };
     const attachMenuItems = async (handlerIndex?: number) => {
         if (attachLoading.value) return;
 
         attachLoading.value = true;
 
-        const handlerPromises = handlerIndex === undefined
-            ? attachHandlers.value.map((handler, i) => handler(
-                searchText?.value ?? '',
-                pageStart.value[i],
-                pageLimit.value[i],
-            ))
-            : [attachHandlers.value[handlerIndex](
-                searchText?.value ?? '',
-                pageStart.value[handlerIndex],
-                pageLimit.value[handlerIndex],
-            )];
-        const promiseResults = await Promise.allSettled(handlerPromises);
+        const handlerResults = await getHandlerResults(handlerIndex);
+        handlerResults.forEach(({ results, more }, i) => {
+            const targetIndex = handlerIndex ?? i;
+            hasNextItemsByAttachHandler.value.splice(targetIndex, 1, !!more);
 
-        promiseResults.forEach((result, i) => {
-            if (result.status === 'fulfilled') {
-                const { results, more } = result.value;
-                hasNextItemsByAttachHandler.value.splice(i, 1, !!more);
-
-                let refined = results;
-                if (filterItems) {
-                    refined = results.filter((item) => !item.name || !filterItemsMap.value[item.name]);
-                }
-
-                if (pageNumber.value[i] === 0) {
-                    accumulatedItemsByAttachHandler.value.splice(i, 1, refined);
-                } else {
-                    const merged = accumulatedItemsByAttachHandler.value[i].concat(refined);
-                    accumulatedItemsByAttachHandler.value.splice(i, 1, merged);
-                }
-                pageNumber.value.splice(i, 1, pageNumber.value[i] + 1); // increase page number for next handler's arguments - page start, page limit
+            let refined = results;
+            if (filterItems) {
+                refined = results.filter((item) => !item.name || !filterItemsMap.value[item.name]);
             }
+
+            if (pageNumber.value[targetIndex] === 0) {
+                accumulatedItemsByAttachHandler.value.splice(targetIndex, 1, refined);
+            } else {
+                const merged = accumulatedItemsByAttachHandler.value[targetIndex].concat(refined);
+                accumulatedItemsByAttachHandler.value.splice(targetIndex, 1, merged);
+            }
+            pageNumber.value.splice(targetIndex, 1, pageNumber.value[targetIndex] + 1); // increase page number for next handler's arguments - page start, page limit
         });
 
         attachLoading.value = false;

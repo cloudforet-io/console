@@ -163,7 +163,6 @@ export const useContextMenuController = ({
         }
     };
     const initiateMenu = async () => {
-        console.debug('initiateMenu');
         resetAttachedMenuAndPagination();
         capture();
         await attachMenuItems();
