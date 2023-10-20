@@ -54,7 +54,7 @@ interface SelectDropdownProps {
     indexMode?: boolean;
 
     /* others */
-    handler?: AutocompleteHandler|AutocompleteHandler[];
+    handler?: AutocompleteHandler; // or AutocompleteHandler[]
     disableHandler?: boolean;
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
@@ -244,6 +244,14 @@ watch(() => props.disabled, (disabled) => {
     if (disabled) hideMenu();
 });
 
+/* init */
+(() => {
+    if (!props.multiSelectable) return;
+    if (!props.selected) return;
+    if (Array.isArray(props.selected)) return;
+
+    throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
+})();
 watch(() => props.handler, async () => {
     if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
         // this is to refine selected items by handler's results whose label is fully set.
@@ -268,16 +276,6 @@ watch(() => props.handler, async () => {
         });
     }
 }, { immediate: true });
-
-/* init */
-(() => {
-    if (!props.multiSelectable) return;
-    if (!props.selected) return;
-    if (Array.isArray(props.selected)) return;
-
-    throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
-})();
-
 </script>
 
 <template>
