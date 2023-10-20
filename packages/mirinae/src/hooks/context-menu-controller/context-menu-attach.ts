@@ -91,7 +91,7 @@ export const useContextMenuAttach = ({
                 return acc;
             }, [] as HandlerRes[]);
         }
-        const handlerRes = await attachHandlers.value[handlerIndex](searchText?.value ?? '', pageStart.value[handlerIndex], pageLimit.value[handlerIndex]);
+        const handlerRes = attachHandlers.value[handlerIndex](searchText?.value ?? '', pageStart.value[handlerIndex], pageLimit.value[handlerIndex]);
         if (handlerRes instanceof Promise) return [await handlerRes];
         return [handlerRes];
     };
