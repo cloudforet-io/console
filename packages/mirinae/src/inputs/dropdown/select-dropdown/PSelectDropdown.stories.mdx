@@ -603,21 +603,21 @@ interface AutocompleteHandler {
                 <p-select-dropdown :loading="loading" :menu="menu"  />
                 <br/>
                 <p class="text-label-lg font-bold my-3">With custom handler</p>
-                <p-select-dropdown :handler="simpleHandler" />
+                <p-select-dropdown :handler="menuHandlers" />
                 <br/>
                 <p class="text-label-lg font-bold my-3">With custom handler and loading</p>
-                <p-select-dropdown :loading="loading" :handler="simpleHandler" />
+                <p-select-dropdown :loading="loading" :handler="menuHandlers" />
                 <br/>
                 <p class="text-label-lg font-bold my-3">With custom handler & init selected with handler</p>
                 With <span class="text-blue-700">initSelectedWithHandler</span> prop, the selected values' label will be initialized with the handler's result.<br/>
                 So you can see the selected values' label even if there is no label property in the given selected items.<br/>
                 <br/>
-                <p-filterable-dropdown :loading="loading" :handler="simpleHandler" :selected="selected" initSelectedWithHandler />
+                <p-select-dropdown :loading="loading" :handler="menuHandlers" :selected="selected" initSelectedWithHandler />
                 <br/>
             </div>
 `,
             setup() {
-                const menu = getFilterableDropdownMenuWithMultiTypes()
+                const menu = getSelectDropdownMenuWithMultiTypes()
                 const state = reactive({
                     loading: false,
                     selected: [{ name: menu[2].name }]
@@ -648,7 +648,7 @@ interface AutocompleteHandler {
                 }
                 return {
                     ...toRefs(state),
-                    simpleHandler
+                    menuHandlers: [simpleHandler, simpleHandler],
                 }
             }
         }}
