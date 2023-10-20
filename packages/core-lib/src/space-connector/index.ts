@@ -10,6 +10,7 @@ import ServiceAPI from './service-api';
 import TokenAPI from './token-api';
 
 const API_REFLECTION_URL = '/api/reflection';
+const API_REFLECTION_URL_V2 = '/console-api/api/reflection';
 
 const CHECK_TOKEN_TIME = 1000 * 30;
 
@@ -132,7 +133,7 @@ export class SpaceConnector {
 
             let response: AxiosPostResponse;
             if (version === 2) {
-                response = await reflectionApi.get(API_REFLECTION_URL);
+                response = await reflectionApi.get(API_REFLECTION_URL_V2);
             } else {
                 response = await reflectionApi.post(API_REFLECTION_URL);
             }
