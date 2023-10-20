@@ -9,7 +9,7 @@ import type {
 import ServiceAPI from './service-api';
 import TokenAPI from './token-api';
 
-const API_REFLECTION_URL = 'api/reflection';
+const API_REFLECTION_URL = '/api/reflection';
 const API_REFLECTION_URL_V2 = '/console-api/api/reflection';
 
 const CHECK_TOKEN_TIME = 1000 * 30;
