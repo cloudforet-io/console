@@ -27,7 +27,7 @@ export interface UseContextMenuControllerOptions {
     useReorderBySelection?: boolean;
     /* Required values when using the reorder by selection feature: menu or handler, selected */
     menu?: Ref<MenuItem[]>|MenuItem[]; // The original menu that serves as the basis for order when reordering menus
-    handler?: Ref<MenuAttachHandler|undefined>;
+    handler?: Ref<MenuAttachHandler|MenuAttachHandler[]|undefined>;
     selected?: Ref<MenuItem[]>|ComputedRef<MenuItem[]>|MenuItem[]; // Items to be displayed at the top of the menu
 
     /* Whether to automatically filtering menu by searchText  */

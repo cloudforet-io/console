@@ -13,7 +13,7 @@ export interface MenuAttachHandler {
 }
 
 interface UseContextMenuAttachOptions {
-    attachHandler?: Ref<MenuAttachHandler|undefined>; // custom handler
+    attachHandler?: Ref<MenuAttachHandler|MenuAttachHandler[]|undefined>; // custom handler
     menu?: Ref<MenuItem[]>;
     searchText?: Ref<string>;
     pageSize?: Ref<number|undefined>|number;
@@ -23,40 +23,6 @@ interface UseContextMenuAttachOptions {
 export const useContextMenuAttach = ({
     attachHandler, menu, searchText, pageSize: _pageSize, filterItems,
 }: UseContextMenuAttachOptions) => {
-    const accumulatedItemsByAttachHandler = ref<MenuItem[]>([]);
-    const hasNextItemsByAttachHandler = ref<boolean>(false);
-    const attachedMenu = computed<MenuItem[]>(() => {
-        if (hasNextItemsByAttachHandler.value) {
-            return [
-                ...accumulatedItemsByAttachHandler.value,
-                { type: 'showMore', name: 'filterableDropdownShowMore' },
-            ] as MenuItem[];
-        }
-        return accumulatedItemsByAttachHandler.value;
-    });
-
-    // pagination
-    const pageNumber = ref<number>(0);
-    const pageSize = isRef(_pageSize) ? _pageSize : ref(_pageSize);
-    const pageStart = computed(() => (pageNumber.value) * (pageSize?.value ?? 0) + 1);
-    const pageLimit = computed(() => (pageNumber.value + 1) * (pageSize?.value ?? 0));
-
-    const resetMenuAndPagination = () => {
-        accumulatedItemsByAttachHandler.value = [];
-        hasNextItemsByAttachHandler.value = false;
-        pageNumber.value = 0;
-    };
-
-    const attachLoading = ref(false);
-    const filterItemsMap = computed(() => {
-        const result = {};
-        if (!filterItems) return result;
-        filterItems.value.forEach((item) => {
-            if (!item.name) return;
-            result[item.name] = item;
-        });
-        return result;
-    });
     const defaultAttachHandler: MenuAttachHandler = (inputText, _pageStart, _pageLimit) => {
         const allItems = menu?.value ?? [];
         if (!pageSize?.value) { // do not need to slice filteredItems
@@ -71,30 +37,89 @@ export const useContextMenuAttach = ({
             more: allItems.length > _pageLimit,
         };
     };
-    const attachMenuItems = async () => {
-        if (attachLoading.value) {
-            return [];
+    const attachHandlers = computed<MenuAttachHandler[]>(() => {
+        if (!attachHandler?.value) return [defaultAttachHandler];
+        if (Array.isArray(attachHandler.value)) return attachHandler.value;
+        return [attachHandler.value];
+    });
+    const accumulatedItemsByAttachHandler = ref<MenuItem[][]>(attachHandlers.value.map(() => []));
+    const hasNextItemsByAttachHandler = ref<boolean[]>(attachHandlers.value.map(() => false));
+    const attachedMenu = computed<MenuItem[]>(() => {
+        const allItems: MenuItem[] = [];
+        accumulatedItemsByAttachHandler.value.forEach((items, i) => {
+            allItems.push(...items);
+            if (hasNextItemsByAttachHandler.value[i]) {
+                allItems.push({ type: 'showMore', name: `contextMenuShowMore-${i}`, handlerRef: i });
+            }
+        });
+        return allItems;
+    });
+
+    // pagination
+    const pageNumber = ref<number[]>(attachHandlers.value.map(() => 0));
+    const pageSize = isRef(_pageSize) ? _pageSize : ref(_pageSize);
+    const pageStart = computed<number[]>(() => attachHandlers.value.map((d, i) => (pageNumber.value[i]) * (pageSize?.value ?? 0) + 1));
+    const pageLimit = computed<number[]>(() => attachHandlers.value.map((d, i) => (pageNumber.value[i] + 1) * (pageSize?.value ?? 0)));
+    const resetMenuAndPagination = () => {
+        accumulatedItemsByAttachHandler.value = attachHandlers.value.map(() => []);
+        hasNextItemsByAttachHandler.value = attachHandlers.value.map(() => false);
+        pageNumber.value = attachHandlers.value.map(() => 0);
+    };
+
+    const attachLoading = ref(false);
+    const filterItemsMap = computed<Record<string, MenuItem[]>>(() => {
+        const result = {};
+        if (!filterItems) return result;
+        filterItems.value.forEach((item) => {
+            if (!item.name) return;
+            result[item.name] = item;
+        });
+        return result;
+    });
+    const getHandlerResults = async (handlerIndex?: number): Promise<HandlerRes[]> => {
+        if (handlerIndex === undefined) {
+            const handlerPromises = attachHandlers.value.map((handler, i) => {
+                const handlerRes = handler(searchText?.value ?? '', pageStart.value[i], pageLimit.value[i]);
+                if (handlerRes instanceof Promise) return handlerRes;
+                return Promise.resolve(handlerRes);
+            });
+            const promiseResults = await Promise.allSettled(handlerPromises);
+            return promiseResults.reduce((acc, result) => {
+                if (result.status === 'fulfilled') {
+                    acc.push(result.value);
+                }
+                return acc;
+            }, [] as HandlerRes[]);
         }
+        const handlerRes = attachHandlers.value[handlerIndex](searchText?.value ?? '', pageStart.value[handlerIndex], pageLimit.value[handlerIndex]);
+        if (handlerRes instanceof Promise) return [await handlerRes];
+        return [handlerRes];
+    };
+    const attachMenuItems = async (handlerIndex?: number) => {
+        if (attachLoading.value) return;
+
         attachLoading.value = true;
-        const handler = attachHandler?.value ?? defaultAttachHandler;
-        const { results, more } = await handler(searchText?.value ?? '', pageStart.value, pageLimit.value);
 
-        hasNextItemsByAttachHandler.value = !!more;
-        let refined = results;
-        if (filterItems) {
-            refined = results.filter((item) => !item.name || !filterItemsMap.value[item.name]);
-        }
+        const handlerResults = await getHandlerResults(handlerIndex);
+        handlerResults.forEach(({ results, more }, i) => {
+            const targetIndex = handlerIndex ?? i;
+            hasNextItemsByAttachHandler.value.splice(targetIndex, 1, !!more);
 
-        if (pageNumber.value === 0) {
-            accumulatedItemsByAttachHandler.value = refined;
-        } else {
-            accumulatedItemsByAttachHandler.value = accumulatedItemsByAttachHandler.value.concat(refined);
-        }
+            let refined = results;
+            if (filterItems) {
+                refined = results.filter((item) => !item.name || !filterItemsMap.value[item.name]);
+            }
+
+            if (pageNumber.value[targetIndex] === 0) {
+                accumulatedItemsByAttachHandler.value.splice(targetIndex, 1, refined);
+            } else {
+                const merged = accumulatedItemsByAttachHandler.value[targetIndex].concat(refined);
+                accumulatedItemsByAttachHandler.value.splice(targetIndex, 1, merged);
+            }
+            pageNumber.value.splice(targetIndex, 1, pageNumber.value[targetIndex] + 1); // increase page number for next handler's arguments - page start, page limit
+        });
 
         attachLoading.value = false;
-        pageNumber.value += 1; // increase page number for next handler's arguments - page start, page limit
-
-        return refined;
     };
 
     return {
