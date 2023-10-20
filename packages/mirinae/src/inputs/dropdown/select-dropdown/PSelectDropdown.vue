@@ -54,7 +54,7 @@ interface SelectDropdownProps {
     indexMode?: boolean;
 
     /* others */
-    handler?: AutocompleteHandler;
+    handler?: AutocompleteHandler|AutocompleteHandler[];
     disableHandler?: boolean;
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
@@ -244,19 +244,16 @@ watch(() => props.disabled, (disabled) => {
     if (disabled) hideMenu();
 });
 
-/* init */
-(() => {
-    if (!props.multiSelectable) return;
-    if (!props.selected) return;
-    if (Array.isArray(props.selected)) return;
-
-    throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
-})();
-(async () => {
+watch(() => props.handler, async () => {
     if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
         // this is to refine selected items by handler's results whose label is fully set.
         const handlers = Array.isArray(props.handler) ? props.handler : [props.handler];
-        const promiseResults = await Promise.allSettled(handlers.map((handler) => handler('', undefined, undefined, props.selected)));
+        const promiseResults = await Promise.allSettled(handlers.map((handler) => handler(
+            '',
+            undefined,
+            undefined,
+            Array.isArray(props.selected) ? props.selected : undefined,
+        )));
         promiseResults.forEach((result, idx) => {
             if (result.status === 'fulfilled') {
                 const results = result.value.results;
@@ -270,7 +267,17 @@ watch(() => props.disabled, (disabled) => {
             }
         });
     }
+}, { immediate: true });
+
+/* init */
+(() => {
+    if (!props.multiSelectable) return;
+    if (!props.selected) return;
+    if (Array.isArray(props.selected)) return;
+
+    throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
 })();
+
 </script>
 
 <template>

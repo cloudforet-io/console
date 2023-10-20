@@ -81,17 +81,17 @@ export const useContextMenuAttach = ({
 
         attachLoading.value = true;
 
-        const handlerPromises = handlerIndex
-            ? [attachHandlers.value[handlerIndex](
-                searchText?.value ?? '',
-                pageStart.value[handlerIndex],
-                pageLimit.value[handlerIndex],
-            )]
-            : attachHandlers.value.map((handler, i) => handler(
+        const handlerPromises = handlerIndex === undefined
+            ? attachHandlers.value.map((handler, i) => handler(
                 searchText?.value ?? '',
                 pageStart.value[i],
                 pageLimit.value[i],
-            ));
+            ))
+            : [attachHandlers.value[handlerIndex](
+                searchText?.value ?? '',
+                pageStart.value[handlerIndex],
+                pageLimit.value[handlerIndex],
+            )];
         const promiseResults = await Promise.allSettled(handlerPromises);
 
         promiseResults.forEach((result, i) => {
