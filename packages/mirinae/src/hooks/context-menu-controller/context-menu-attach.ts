@@ -60,10 +60,10 @@ export const useContextMenuAttach = ({
     const pageSize = isRef(_pageSize) ? _pageSize : ref(_pageSize);
     const pageStart = computed<number[]>(() => attachHandlers.value.map((d, i) => (pageNumber.value[i]) * (pageSize?.value ?? 0) + 1));
     const pageLimit = computed<number[]>(() => attachHandlers.value.map((d, i) => (pageNumber.value[i] + 1) * (pageSize?.value ?? 0)));
-    const resetMenuAndPagination = (handlerIndex = 0) => {
-        accumulatedItemsByAttachHandler.value.splice(handlerIndex, 1, []);
-        hasNextItemsByAttachHandler.value.splice(handlerIndex, 1, false);
-        pageNumber.value.splice(handlerIndex, 1, 0);
+    const resetMenuAndPagination = () => {
+        accumulatedItemsByAttachHandler.value = attachHandlers.value.map(() => []);
+        hasNextItemsByAttachHandler.value = attachHandlers.value.map(() => false);
+        pageNumber.value = attachHandlers.value.map(() => 0);
     };
 
     const attachLoading = ref(false);
