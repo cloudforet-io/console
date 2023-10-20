@@ -197,9 +197,9 @@ const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boole
         emit('select', item, isSelected);
     }
 };
-const handleClickShowMore = async () => {
+const handleClickShowMore = async (item: SelectDropdownMenuItem) => {
     if (!props.disableHandler) {
-        await showMoreMenu();
+        await showMoreMenu(item.handlerRef);
     }
     emit('click-show-more');
 };

@@ -45,13 +45,12 @@ export const useContextMenuAttach = ({
     const accumulatedItemsByAttachHandler = ref<MenuItem[][]>(attachHandlers.value.map(() => []));
     const hasNextItemsByAttachHandler = ref<boolean[]>(attachHandlers.value.map(() => false));
     const attachedMenu = computed<MenuItem[]>(() => {
-        let allItems: MenuItem[] = [];
+        const allItems: MenuItem[] = [];
         accumulatedItemsByAttachHandler.value.forEach((items, i) => {
+            allItems.push(...items);
             if (hasNextItemsByAttachHandler.value[i]) {
-                allItems = allItems.concat(items);
-                allItems.push({ type: 'showMore', name: 'filterableDropdownShowMore' });
+                allItems.push({ type: 'showMore', name: 'filterableDropdownShowMore', handlerRef: i });
             }
-            allItems = allItems.concat(items);
         });
         return allItems;
     });
@@ -77,16 +76,23 @@ export const useContextMenuAttach = ({
         });
         return result;
     });
-    const attachMenuItems = async () => {
+    const attachMenuItems = async (handlerIndex?: number) => {
         if (attachLoading.value) return;
 
         attachLoading.value = true;
 
-        const promiseResults = await Promise.allSettled(attachHandlers.value.map((handler, i) => handler(
-            searchText?.value ?? '',
-            pageStart.value[i],
-            pageLimit.value[i],
-        )));
+        const handlerPromises = handlerIndex
+            ? [attachHandlers.value[handlerIndex](
+                searchText?.value ?? '',
+                pageStart.value[handlerIndex],
+                pageLimit.value[handlerIndex],
+            )]
+            : attachHandlers.value.map((handler, i) => handler(
+                searchText?.value ?? '',
+                pageStart.value[i],
+                pageLimit.value[i],
+            ));
+        const promiseResults = await Promise.allSettled(handlerPromises);
 
         promiseResults.forEach((result, i) => {
             if (result.status === 'fulfilled') {
