@@ -260,7 +260,7 @@ watch(() => props.handler, async () => {
             '',
             undefined,
             undefined,
-            Array.isArray(props.selected) ? props.selected : undefined,
+            state.proxySelectedItem,
         )));
         promiseResults.forEach((result, idx) => {
             if (result.status === 'fulfilled') {
