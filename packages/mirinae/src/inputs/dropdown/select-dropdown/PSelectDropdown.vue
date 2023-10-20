@@ -255,11 +255,19 @@ watch(() => props.disabled, (disabled) => {
 (async () => {
     if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
         // this is to refine selected items by handler's results whose label is fully set.
-        const { results } = await props.handler('', undefined, undefined, state.proxySelectedItem);
-        state.proxySelectedItem = state.proxySelectedItem.map((item) => {
-            const found = results.find((d) => d.name === item.name);
-            if (found) return found;
-            return item;
+        const handlers = Array.isArray(props.handler) ? props.handler : [props.handler];
+        const promiseResults = await Promise.allSettled(handlers.map((handler) => handler('', undefined, undefined, props.selected)));
+        promiseResults.forEach((result, idx) => {
+            if (result.status === 'fulfilled') {
+                const results = result.value.results;
+                state.proxySelectedItem = state.proxySelectedItem.map((item) => {
+                    const found = results.find((d) => d.name === item.name);
+                    if (found) return found;
+                    return item;
+                });
+            } else {
+                console.error(`Failed to fetch data from handler: ${idx}`);
+            }
         });
     }
 })();
