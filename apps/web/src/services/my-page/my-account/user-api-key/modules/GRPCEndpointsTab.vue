@@ -48,7 +48,7 @@ const listEndpoints = async () => {
         class="sub-table-wrapper"
     >
         <div class="sub-table-header">
-            gRPC
+            gRPC {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
         </div>
         <p-data-table
             :items="state.items"

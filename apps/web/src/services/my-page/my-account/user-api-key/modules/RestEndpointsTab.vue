@@ -30,7 +30,7 @@ const state = reactive({
         class="sub-table-wrapper"
     >
         <div class="sub-table-header">
-            REST
+            REST {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
         </div>
         <p-data-table
             :items="state.items"
