@@ -1,24 +1,4 @@
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-
-interface BaseItemOptions {
-    label?: string;
-}
-export interface EnumOptions extends BaseItemOptions {
-    type: 'ENUM';
-    values: { key: string; label: string; }[];
-}
-export interface SearchResourceOptions extends BaseItemOptions {
-    type: 'SEARCH_RESOURCE';
-    resource_type: string;
-    reference_key?: string;
-    resource_key?: string;
-    default_path?: string|number;
-    filters?: ConsoleFilter[];
-}
-export interface ReferenceResourceOptions extends BaseItemOptions {
-    type: 'REFERENCE_RESOURCE',
-    reference_key: string;
-}
+import type { EnumModelOptions, SearchResourceModelOptions, ReferenceResourceModelOptions } from '@/models/widget';
 
 export interface WidgetOptionsSchemaProperty {
     key: string; // e.g. cost_data_source
@@ -27,7 +7,7 @@ export interface WidgetOptionsSchemaProperty {
     readonly?: boolean;
     fixed?: boolean;
     non_inheritable?: boolean;
-    item_options?: Array<EnumOptions|SearchResourceOptions|ReferenceResourceOptions>;
+    item_options?: Array<EnumModelOptions|ReferenceResourceModelOptions|SearchResourceModelOptions>;
     dependencies?: {
         [property: string]: { // e.g. 'cost_data_source'
             key: string; // e.g. 'data_source_id'
