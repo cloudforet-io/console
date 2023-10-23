@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { min } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,7 +12,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type {
     CloudServiceStatsModel, ComplianceStatus, Severity,
@@ -42,15 +40,11 @@ const BOX_MIN_WIDTH = 112;
 const SEVERITY_PRIORITY_MAP: Record<number, Severity> = {};
 Object.values(SEVERITY_STATUS_MAP).forEach((s) => { SEVERITY_PRIORITY_MAP[s.priority] = s.name; });
 
-const DATE_FORMAT = 'YYYY-MM';
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT),
-    })),
 });
 
 const state = reactive({
