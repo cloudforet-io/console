@@ -1,14 +1,31 @@
+<script setup lang="ts">
+import { useRouter } from 'vue-router/composables';
+
+import { PButton } from '@spaceone/design-system';
+
+interface Props {
+    statusCode: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    statusCode: '404',
+});
+
+const router = useRouter();
+</script>
+
 <template>
     <section class="page-wrapper">
         <article class="error-contents">
             <img class="error-img"
+                 alt="error-img"
                  src="/images/error-octos.gif"
             >
             <h2 class="error-code">
-                {{ statusCode }}
+                {{ props.statusCode }}
             </h2>
             <h3 class="error-message">
-                <template v-if="statusCode === '403'">
+                <template v-if="props.statusCode === '403'">
                     {{ $t('COMMON.ERROR.404_MSG') }}
                 </template>
                 <template v-else>
@@ -18,28 +35,13 @@
             <p-button class="go-back-button"
                       style-type="primary"
                       size="md"
-                      @click="$router.go(-1)"
+                      @click="router.go(-1)"
             >
                 {{ $t('COMMON.ERROR.GO_BACK') }}
             </p-button>
         </article>
     </section>
 </template>
-
-<script lang="ts">
-import { PButton } from '@spaceone/design-system';
-
-export default {
-    name: 'ErrorPage',
-    components: { PButton },
-    props: {
-        statusCode: {
-            type: String,
-            default: '404',
-        },
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .page-wrapper {
