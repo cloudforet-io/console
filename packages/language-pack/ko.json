@@ -1475,6 +1475,8 @@
 				"DESC": "클라우드 자원의 비용 추이 또는 서버, 데이터베이스, 스토리지 사용 추이를 빠르게 파악할 수 있는 위젯. "
 			},
 			"COMPLIANCE_STATUS": {
+				"COMPLIANCE_SCORE": "",
+				"COMPLIANCE_SCORE_TOOLTIP": "",
 				"DESC": "조회 기간동안 확인된 컴플라이언스 Pass/Fail 관련 전반적인 상태를 보여주는 위젯. ",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
 				"MORE_THAN_PREV_MONTH": "전월 대비 상승"

@@ -1475,6 +1475,8 @@
 				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
 			"COMPLIANCE_STATUS": {
+				"COMPLIANCE_SCORE": "",
+				"COMPLIANCE_SCORE_TOOLTIP": "",
 				"DESC": "選択した期間中のコンプライアンスのPass/Failの全体的な状態を表示するウィジェット",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
 				"MORE_THAN_PREV_MONTH": "前月よりも多い"

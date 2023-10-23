@@ -5,13 +5,15 @@ import {
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
-import { PDataLoader } from '@spaceone/design-system';
+import { PDataLoader, PTooltip, PI } from '@spaceone/design-system';
 import { isEmpty, sum } from 'lodash';
 
 import { commaFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { i18n } from '@/translations';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -126,6 +128,13 @@ const state = reactive({
         const totalScore = passScore + failScore;
         if (totalScore === 0) return 0;
         return Math.round((passScore / totalScore) * 100);
+    }),
+    tooltipText: computed<string>(() => {
+        let text: string = i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.COMPLIANCE_SCORE_TOOLTIP') as string;
+        Object.values(SEVERITY_STATUS_MAP).forEach((severity) => {
+            if (severity.level) text += `<br>· ${severity.label}: ${severity.level}`;
+        });
+        return text;
     }),
 });
 
@@ -325,6 +334,19 @@ defineExpose<WidgetExpose<Data[]>>({
                                 {{ commaFormatter(state.complianceCountMap[status.name] ?? 0) }}
                             </p>
                         </div>
+                        <div class="tooltip-wrapper">
+                            <p-tooltip :contents="state.tooltipText"
+                                       position="bottom"
+                            >
+                                <span>{{ $t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.COMPLIANCE_SCORE') }}</span>
+                                <p-i name="ic_info-circle"
+                                     width="1rem"
+                                     height="1rem"
+                                     color="inherit"
+                                     class="tooltip-icon"
+                                />
+                            </p-tooltip>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -387,6 +409,12 @@ defineExpose<WidgetExpose<Data[]>>({
                     }
                     .value {
                         @apply text-display-md;
+                    }
+                }
+                .tooltip-wrapper {
+                    padding-top: 1.5rem;
+                    .tooltip-icon {
+                        margin-left: 0.25rem;
                     }
                 }
             }
