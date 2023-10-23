@@ -18,6 +18,7 @@ const baseCountOfFindingsWidgetConfig: WidgetConfig = {
             enabled: true,
             page_size: 8,
         },
+        data_criteria: 'realtime',
     },
 };
 

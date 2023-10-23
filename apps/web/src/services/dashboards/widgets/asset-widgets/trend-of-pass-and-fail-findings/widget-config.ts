@@ -30,6 +30,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
             enabled: true,
             page_size: 5,
         },
+        data_criteria: 'realtime',
     },
     inherit_options: {
         ...getWidgetInheritOptions('asset_query_set'),
