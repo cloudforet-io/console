@@ -1477,6 +1477,8 @@
 				"DESC": "Displays the cost trend of cloud resources or the status of server, database, storage usage."
 			},
 			"COMPLIANCE_STATUS": {
+				"COMPLIANCE_SCORE": "Compliance score",
+				"COMPLIANCE_SCORE_TOOLTIP": "The score calculated based on each 'severity' level and corresponding weight.",
 				"DESC": "Displays an overall status of compliance Pass/Fail during the selected period.",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
 				"MORE_THAN_PREV_MONTH": "more than previous month"
