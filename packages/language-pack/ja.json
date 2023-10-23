@@ -1528,6 +1528,7 @@
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "最近発生したアラートによって、各プロジェクトの緊急度を表示します。"
 			},
+			"REALTIME": "",
 			"SEVERITY_STATUS_BY_SERVICE": {
 				"DESC": "選択した期間中に確認された各サービスのコンプライアンスFailureをヒートマップを使用して表示するウィジェット"
 			},
