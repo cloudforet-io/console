@@ -1528,6 +1528,7 @@
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "Displays the urgency of each project by recently occured alerts."
 			},
+			"REALTIME": "Real-time",
 			"SEVERITY_STATUS_BY_SERVICE": {
 				"DESC": "Displays the compliance failures for each service observed during the selected period using heatmap."
 			},

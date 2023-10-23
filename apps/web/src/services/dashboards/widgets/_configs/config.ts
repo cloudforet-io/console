@@ -171,6 +171,7 @@ export interface BaseWidgetOptions {
         page_size?: number;
     };
     filters?: WidgetFiltersMap;
+    data_criteria?: 'history'|'realtime';
 }
 export interface SelectorOptions {
     enabled?: boolean;

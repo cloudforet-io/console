@@ -24,6 +24,7 @@ const complianceStatusWidgetConfig: WidgetConfig = {
     sizes: ['md'],
     options: {
         granularity: GRANULARITY.YEARLY,
+        data_criteria: 'realtime',
     },
     inherit_options: {
         ...getWidgetInheritOptions('asset_query_set'),

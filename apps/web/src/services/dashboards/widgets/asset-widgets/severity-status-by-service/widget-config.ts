@@ -27,6 +27,7 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
             enabled: true,
             show_at: 'chart',
         },
+        data_criteria: 'realtime',
     },
     inherit_options: {
         ...getWidgetInheritOptions('asset_query_set'),

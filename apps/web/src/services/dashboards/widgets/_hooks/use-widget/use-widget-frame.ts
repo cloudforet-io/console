@@ -57,6 +57,7 @@ export const useWidgetFrame = (
         errorMode: props.errorMode,
         theme: props.theme,
         nonInheritOptionsTooltipText: nonInheritOptionsTooltipText.value,
+        dataCriteria: widgetState.widgetConfig.options?.data_criteria,
     }));
 
     const widgetFrameEventHandlers = {
