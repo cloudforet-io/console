@@ -52,6 +52,7 @@ export interface WidgetFrameProps {
     overflowY?: string;
     theme?: WidgetTheme;
     nonInheritOptionsTooltipText?: string;
+    dataCriteria?: 'history'|'realtime';
 }
 
 interface IconConfig {
@@ -72,6 +73,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     overflowY: undefined,
     theme: undefined,
     nonInheritOptionsTooltipText: undefined,
+    dataCriteria: 'history',
 });
 
 const emit = defineEmits<{(event: 'click-delete'): void;
@@ -82,6 +84,7 @@ const emit = defineEmits<{(event: 'click-delete'): void;
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
+        if (props.dataCriteria === 'realtime') return i18n.t('DASHBOARDS.WIDGET.REALTIME');
         const start = props.dateRange?.start;
         const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
         if (endDayjs) {
@@ -187,9 +190,13 @@ const handleClickViewModeButton = () => {
         <div class="widget-footer">
             <div class="widget-footer-wrapper">
                 <div class="footer-left">
-                    <label v-if="state.dateLabel"
-                           class="widget-footer-label"
-                    >{{ state.dateLabel }}</label>
+                    <template v-if="state.dateLabel">
+                        <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
+                             width="1rem"
+                             height="1rem"
+                        />
+                        <label class="widget-footer-label">{{ state.dateLabel }}</label>
+                    </template>
                     <p-divider v-if="state.isDivided"
                                :vertical="true"
                     />
