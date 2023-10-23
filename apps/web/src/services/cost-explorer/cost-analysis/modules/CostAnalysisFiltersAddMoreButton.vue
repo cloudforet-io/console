@@ -8,6 +8,13 @@ import {
     PButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import { debounce } from 'lodash';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
@@ -20,9 +27,19 @@ const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
 const state = reactive({
-    menuItems: computed<MenuItem[]>(() => costAnalysisPageStore.defaultGroupByItems),
+    menuItems: computed<MenuItem[]>(() => {
+        const tagsMenuItems = state.tagsMenuItems;
+        if (!tagsMenuItems.length) return costAnalysisPageStore.defaultGroupByItems;
+        return [
+            ...costAnalysisPageStore.defaultGroupByItems,
+            { type: 'header', label: 'Tags', name: 'tags' },
+            ...tagsMenuItems,
+        ];
+    }),
+    tagsMenuItems: [] as MenuItem[],
     selectedItems: [] as MenuItem[],
     searchText: '',
+    dataSourceId: computed<string>(() => costAnalysisPageStore.selectedDataSourceId ?? ''),
 });
 
 const containerRef = ref<HTMLElement|null>(null);
@@ -35,17 +52,43 @@ const {
     showContextMenu,
     hideContextMenu,
     initiateMenu,
+    reloadMenu,
+    showMoreMenu,
 } = useContextMenuController({
     useFixedStyle: true,
     targetRef,
     contextMenuRef,
+    useMenuFiltering: true,
     useReorderBySelection: true,
     menu: toRef(state, 'menuItems'),
     selected: toRef(state, 'selectedItems'),
     searchText: toRef(state, 'searchText'),
+    pageSize: 10,
 });
 onClickOutside(containerRef, hideContextMenu);
 
+/* Api */
+const resourceQueryHelper = new QueryHelper();
+const fetchSearchResources = getCancellableFetcher<{results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
+const getTagsResources = async (): Promise<{name: string; key: string}[]|undefined> => {
+    try {
+        resourceQueryHelper.setFilters([{ k: 'data_source_id', v: [state.dataSourceId], o: '=' }]);
+        const { status, response } = await fetchSearchResources({
+            resource_type: 'cost_analysis.Cost',
+            distinct_key: 'tags',
+            options: {
+                filter: resourceQueryHelper.apiQuery.filter,
+            },
+        });
+        if (status === 'succeed') return response.results;
+        return undefined;
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        return undefined;
+    }
+};
+
+/* Event */
 const handleClickAddMore = () => {
     if (visibleMenu.value) {
         hideContextMenu();
@@ -70,11 +113,24 @@ const handleClearAddMoreMenuItems = () => {
         emit('disable-all-filters');
     });
 };
+const handleUpdateSearchText = debounce((text: string) => {
+    state.searchText = text;
+    reloadMenu();
+}, 200);
+const handleClickShowMore = async () => {
+    await showMoreMenu();
+};
 
 watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProperties) => {
     if (_enabledFiltersProperties?.length) {
         state.selectedItems = state.menuItems.filter((d) => _enabledFiltersProperties.includes(d.name));
     }
+}, { immediate: true });
+
+watch(() => state.dataSourceId, async (dataSourceId) => {
+    if (!dataSourceId) return;
+    const tagsResources = await getTagsResources();
+    state.tagsMenuItems = tagsResources ? tagsResources.map((d) => ({ name: `tags.${d.key}`, label: d.name })) : [];
 }, { immediate: true });
 </script>
 
@@ -102,6 +158,8 @@ watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProp
                         show-clear-selection
                         @select="handleSelectAddMoreMenuItem"
                         @clear-selection="handleClearAddMoreMenuItems"
+                        @click-show-more="handleClickShowMore"
+                        @update:search-text="handleUpdateSearchText"
         />
     </div>
 </template>
