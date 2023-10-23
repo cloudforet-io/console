@@ -6,7 +6,6 @@ import {
 import { percent, array } from '@amcharts/amcharts5';
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader, PTextPagination } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -53,9 +52,6 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed(() => ({
-        end: dayjs(widgetState.settings?.date_range?.end).format('YYYY-MM'),
-    })),
 });
 
 const { pageSize, thisPage } = useWidgetPagination(widgetState);

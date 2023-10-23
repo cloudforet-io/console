@@ -6,7 +6,6 @@ import {
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { isEmpty, sum } from 'lodash';
 
 import { commaFormatter } from '@cloudforet/core-lib';
@@ -17,7 +16,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import {
@@ -61,7 +59,6 @@ interface InnerChartData {
 
 const COMPLIANCE_STATUS_MAP_VALUES = Object.values(COMPLIANCE_STATUS_MAP);
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
-const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -70,9 +67,6 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(widgetState.settings?.date_range?.start).format(DATE_FORMAT),
-    })),
 });
 const state = reactive({
     loading: true,
