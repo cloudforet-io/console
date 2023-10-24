@@ -1,34 +1,38 @@
 import { getTextHighlightRegex } from '@spaceone/design-system';
 
 import type {
-    BaseVariableModelConfig, Field,
-    ListResponse, BaseListOptions, VariableModelType,
-} from '@/lib/variable-models/_base/base-variable-model';
-import { BaseVariableModel } from '@/lib/variable-models/_base/base-variable-model';
+    ListResponse, ListOptions,
+    VariableModelLabel, IEnumVariableModel,
+} from '@/lib/variable-models/_base/types';
 
-export interface EnumVariableModelConfig extends BaseVariableModelConfig {
-    values: Field[];
-}
+export class EnumVariableModel implements IEnumVariableModel {
+    key = '';
 
-export class EnumVariableModel extends BaseVariableModel<EnumVariableModelConfig, BaseListOptions> {
-    modelType: VariableModelType = 'ENUM';
+    name = '';
 
-    values: EnumVariableModelConfig['values'];
+    labels: VariableModelLabel[] = [];
 
-    constructor(config: EnumVariableModelConfig) {
-        super(config);
+    values: IEnumVariableModel['values'] = [];
+
+    #response: ListResponse = { results: [] };
+
+    constructor(config?: IEnumVariableModel) {
+        if (!config) return;
         if (!config.values) throw new Error('VariableModelBaseConfig.values is required');
+        this.key = config.key;
+        this.name = config.name ?? config.key;
+        this.labels = config.labels ?? [];
         this.values = config.values;
     }
 
-    async list(options: BaseListOptions = {}): Promise<ListResponse> {
+    async list(options: ListOptions = {}): Promise<ListResponse> {
         if (!options.search) {
-            this.response = { results: this.values };
+            this.#response = { results: this.values };
         } else {
             const regex = getTextHighlightRegex(options.search);
             const results = this.values.filter((item) => regex.test(item.name));
-            this.response = { results };
+            this.#response = { results };
         }
-        return this.response;
+        return this.#response;
     }
 }
