@@ -183,10 +183,12 @@ const handleClickCheckId = async () => {
 watch(() => props.activeTab, (after) => {
     if (after) {
         state.selectedItems = [];
-        formState.userId = '';
-        formState.name = '';
-        validationState.proxyIsUserIdValid = undefined;
-        emit('change-input', { ...formState });
+        if (userPageState.visibleCreateModal) {
+            formState.userId = '';
+            formState.name = '';
+            validationState.proxyIsUserIdValid = undefined;
+            emit('change-input', { ...formState });
+        }
     }
 }, { immediate: true });
 watch(() => state.searchText, (searchText) => {

@@ -168,7 +168,9 @@ const initAuthTypeList = async () => {
                     :fade="true"
                     :backdrop="true"
                     :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
-                    :disabled="formState.userId === '' || (formState.passwordManual && formState.password === '') || !validationState.isUserIdValid"
+                    :disabled="formState.userId === ''
+                        || (formState.passwordManual && formState.password === '')
+                        || (userPageState.visibleCreateModal && !validationState.isUserIdValid)"
                     :loading="userPageState.modalLoading"
                     @confirm="confirm"
                     @cancel="handleClose"
