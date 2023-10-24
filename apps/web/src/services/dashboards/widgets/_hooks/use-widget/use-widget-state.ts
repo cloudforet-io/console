@@ -6,6 +6,7 @@ import {
 import dayjs from 'dayjs';
 import { flattenDeep, isEmpty } from 'lodash';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { CURRENCY } from '@/store/modules/settings/config';
@@ -21,7 +22,6 @@ import type {
     AssetGroupBy,
     CostGroupBy,
     Granularity,
-    WidgetFilter,
 } from '@/services/dashboards/widgets/_configs/config';
 import {
     GRANULARITY,
@@ -43,7 +43,9 @@ export interface WidgetState extends MergedWidgetState {
     consoleFilters: ComputedRef<ConsoleFilter[]>;
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
+    cloudServiceAnalyzeConsoleFilters: ComputedRef<ConsoleFilter[]>;
 }
+const queryHelper = new QueryHelper();
 export function useWidgetState(props: WidgetProps) {
     const state = useMergedWidgetState({
         inheritOptions: toRef(props, 'inheritOptions'),
@@ -80,17 +82,33 @@ export function useWidgetState(props: WidgetProps) {
             return undefined;
         }),
         // filters
-        consoleFilters: computed<WidgetFilter[]>(() => {
+        consoleFilters: computed<ConsoleFilter[]>(() => {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
-            return flattenDeep<WidgetFilter[]>(Object.values(state.options.filters));
+            return flattenDeep<ConsoleFilter[]>(Object.values(state.options.filters));
         }),
-        budgetConsoleFilters: computed(() => {
+        budgetConsoleFilters: computed<ConsoleFilter[]>(() => {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
             return getConvertedBudgetConsoleFilters(state.options.filters);
         }),
-        cloudServiceStatsConsoleFilters: computed(() => {
+        cloudServiceStatsConsoleFilters: computed<ConsoleFilter[]>(() => {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
             return getConvertedCloudServiceStatsConsoleFilters(state.options.filters);
+        }),
+        cloudServiceAnalyzeConsoleFilters: computed<ConsoleFilter[]>(() => {
+            // set filters from asset query set
+            const assetQuerySetId = state.options.asset_query_set;
+            if (assetQuerySetId) {
+                const assetQuerySet = props.allReferenceTypeInfo.assetQuerySet.referenceMap[assetQuerySetId];
+                queryHelper.setFilters([
+                    { k: 'provider', v: assetQuerySet.data?.provider, o: '=' },
+                    { k: 'cloud_service_group', v: assetQuerySet.data?.cloud_service_group, o: '=' },
+                    { k: 'cloud_service_type', v: assetQuerySet.data?.cloud_service_type, o: '=' },
+                ]);
+            }
+            return [
+                ...flattenDeep(Object.values(state.options.filters ?? {})),
+                ...queryHelper.filters,
+            ];
         }),
     }) as UnwrapRef<WidgetState>;
 }
