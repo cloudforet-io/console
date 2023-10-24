@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
     computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
@@ -10,8 +9,9 @@ import {
 } from '@amcharts/amcharts4/charts';
 import { create, color, LinearGradientModifier } from '@amcharts/amcharts4/core';
 import {
-    PSelectButton, PDataLoader, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton,
+    PSelectButton, PDataLoader, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
 
@@ -71,14 +71,14 @@ const state = reactive({
     ])),
     data: [],
     selectedDateType: DATE_TYPE.monthly,
-    // HACK: this is temp code for data_source_id parameter in analyze API
-    dataSourceId: computed(() => {
-        const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
-        const dataSourceKeys: string[] = Object.keys(dataSourceMap);
-        return dataSourceKeys.length > 0 ? dataSourceKeys[0] : '';
-    }),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource ?? {}),
+    dataSourceMenuItems: computed<MenuItem[]>(() => Object.entries(state.dataSourceMap).map(([key, value]) => ({
+        name: key,
+        label: value?.name,
+    }))),
+    selectedDataSourceId: undefined as undefined|string,
     currency: computed<Currency>(() => {
-        const targetDataSource = allReferenceStore.getters.costDataSource[state.dataSourceId ?? ''];
+        const targetDataSource = allReferenceStore.getters.costDataSource[state.selectedDataSourceId ?? ''];
         if (!targetDataSource) return CURRENCY.USD;
         const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
         return currentCurrency ?? CURRENCY.USD;
@@ -271,7 +271,7 @@ const drawChart = (_chartContext) => {
 
 /* Api */
 const costAnalyzeQueryHelper = new QueryHelper();
-const fetchTrendData = async () => {
+const fetchTrendData = async (dataSourceId: string) => {
     try {
         state.loading = true;
         let start = dayjs.utc().subtract(DAY_COUNT - 1, 'day').format('YYYY-MM-DD');
@@ -282,7 +282,7 @@ const fetchTrendData = async () => {
         }
         costAnalyzeQueryHelper.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            data_source_id: state.dataSourceId,
+            data_source_id: dataSourceId,
             query: {
                 granularity: state.selectedDateType,
                 fields: {
@@ -305,7 +305,7 @@ const fetchTrendData = async () => {
         state.loading = false;
     }
 };
-const fetchTableData = async () => {
+const fetchTableData = async (dataSourceId: string) => {
     try {
         tableState.loading = true;
         const today = tableState.endDate;
@@ -320,7 +320,7 @@ const fetchTableData = async () => {
         }
         costAnalyzeQueryHelper.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            data_source_id: state.dataSourceId,
+            data_source_id: dataSourceId,
             query: {
                 granularity: state.selectedDateType,
                 group_by: [GROUP_BY.PRODUCT],
@@ -410,23 +410,29 @@ const handleClickDateButton = (type) => {
     } else {
         tableState.endDate = tableState.endDate.add(DATA_TABLE_COLUMN, dateUnit);
     }
-    fetchTableData();
+    fetchTableData(state.selectedDataSourceId);
+};
+const handleChangeSelectedDataSourceId = (id: string) => {
+    state.selectedDataSourceId = id;
 };
 
 /* Watcher */
-watch([() => state.selectedDateType, () => state.dataSourceId], async ([, dataSourceId]) => {
+watch(() => state.dataSourceMap, (dataSourceMap) => {
+    if (dataSourceMap) {
+        state.selectedDataSourceId = Object.keys(dataSourceMap)[0];
+    }
+}, { immediate: true });
+watch([() => state.selectedDateType, () => state.selectedDataSourceId], async ([, dataSourceId]) => {
     if (dataSourceId) {
         await Promise.all([
-            fetchTrendData(),
-            fetchTableData(),
+            fetchTrendData(dataSourceId),
+            fetchTableData(dataSourceId),
         ]);
         setCountData(state.data);
     }
 }, { immediate: true });
-watch([() => chartState.data, () => chartContext.value], async ([data, _chartContext]) => {
-    if (data.length && chartContext) {
-        drawChart(_chartContext);
-    }
+watch([() => chartState.data, () => chartContext.value], async ([, _chartContext]) => {
+    if (_chartContext) drawChart(_chartContext);
 });
 
 onUnmounted(() => {
@@ -442,6 +448,13 @@ onUnmounted(() => {
         <div class="content-wrapper grid grid-cols-12 gap-2">
             <div class="col-span-12 title">
                 <span>{{ $t('COMMON.WIDGETS.BILLING.TREND_TITLE') }}</span>
+                <p-select-dropdown :menu="state.dataSourceMenuItems"
+                                   :selected="state.selectedDataSourceId"
+                                   style-type="gray"
+                                   size="sm"
+                                   class="data-source-dropdown"
+                                   @update:selected="handleChangeSelectedDataSourceId"
+                />
                 <div class="date-button-group">
                     <p-select-button v-for="(d, idx) in state.dateTypes"
                                      :key="`date-${d.name}-${idx}`"
@@ -581,6 +594,9 @@ onUnmounted(() => {
                 min-width: 2.4375rem;
             }
         }
+    }
+    .data-source-dropdown {
+        margin-left: 1rem;
     }
     .summary-group {
         grid-auto-rows: max-content;
