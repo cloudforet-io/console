@@ -2,7 +2,6 @@
 import {
     computed, reactive, ref, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import {
@@ -25,7 +24,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { primary } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Period } from '@/services/cost-explorer/type';
 import AllSummaryDataSummary from '@/services/home-dashboard/modules/all-summary/AllSummaryDataSummary.vue';
 import type { DateItem, DateType, DataType } from '@/services/home-dashboard/modules/type';
@@ -52,7 +50,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     extraParams: () => ({}),
 });
-const router = useRouter();
 
 const DAY_COUNT = 14;
 const MONTH_COUNT = 12;
@@ -101,10 +98,6 @@ const state = reactive({
         {
             name: DATA_TYPE.STORAGE,
             label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
-        },
-        {
-            name: DATA_TYPE.BILLING,
-            label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
         },
     ]),
 });
@@ -288,14 +281,8 @@ const getTrend = async (type) => {
 
 /* Event */
 const handleChangeTab = async (name) => {
-    if (name === DATA_TYPE.BILLING) {
-        await router.push({
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-        }).catch(() => {});
-    } else {
-        if (state.activeTab !== name) chartHelper.refreshRoot();
-        state.activeTab = name;
-    }
+    if (state.activeTab !== name) chartHelper.refreshRoot();
+    state.activeTab = name;
 };
 const handleChangeDateType = (type) => {
     state.selectedDateType = type;
@@ -345,8 +332,7 @@ watch(() => state.selectedDateType, async () => {
                                    size="xl"
                         />
                         <template v-else>
-                            <router-link v-if="name !== DATA_TYPE.BILLING"
-                                         :to="{
+                            <router-link :to="{
                                              name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                                              query: { service: name },
                                          }"
