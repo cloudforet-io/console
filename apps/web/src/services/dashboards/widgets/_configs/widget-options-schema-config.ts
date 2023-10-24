@@ -58,7 +58,7 @@ export const CostReferenceSchema:WidgetOptionsSchemaConfig = [
         name: COST_VARIABLE_TYPE_INFO.cost_product.name,
         selection_type: 'MULTI',
         item_options: [
-            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', resource_key: COST_VARIABLE_TYPE_INFO.cost_product.key },
+            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: COST_VARIABLE_TYPE_INFO.cost_product.key },
         ],
     },
     {
@@ -66,7 +66,7 @@ export const CostReferenceSchema:WidgetOptionsSchemaConfig = [
         name: COST_VARIABLE_TYPE_INFO.cost_usage_type.name,
         selection_type: 'MULTI',
         item_options: [
-            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', resource_key: COST_VARIABLE_TYPE_INFO.cost_usage_type.key },
+            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: COST_VARIABLE_TYPE_INFO.cost_usage_type.key },
         ],
     },
 ];
@@ -82,7 +82,7 @@ export const AssetReferenceSchema:WidgetOptionsSchemaConfig = [
         name: ASSET_VARIABLE_TYPE_INFO.asset_account.name,
         selection_type: 'MULTI',
         item_options: [
-            { type: 'SEARCH_RESOURCE', resource_type: 'inventory.CloudService', resource_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key },
+            { type: 'SEARCH_RESOURCE', resource_type: 'inventory.CloudService', reference_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key },
         ],
     },
 ];
@@ -95,7 +95,7 @@ export const AssetReferenceSchema:WidgetOptionsSchemaConfig = [
         selection_type: 'MULTI',
         fixed: true,
         item_options: [
-            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', resource_key: 'product' }
+            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: 'product' }
         ],
         dependencies: {
             'cost_data_source': { key: 'data_source_id' }
@@ -107,7 +107,7 @@ export const AssetReferenceSchema:WidgetOptionsSchemaConfig = [
         selection_type: 'SINGLE',
         fixed: true,
         item_options: [
-            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', resource_key: 'product' }
+            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: 'product' }
         ],
         dependencies: {
             'cost_data_source': { key: 'data_source_id' }

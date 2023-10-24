@@ -186,7 +186,7 @@ const handleSave = () => {
     } else {
         options = {
             type: 'SEARCH_RESOURCE',
-            resource_key: '',
+            reference_key: '',
             resource_type: '',
         } as SearchResourceModelOptions;
     }

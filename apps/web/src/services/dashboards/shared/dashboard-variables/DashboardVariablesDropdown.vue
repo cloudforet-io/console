@@ -167,7 +167,7 @@ const loadSearchResourceOptions = async () => {
         if (options?.type !== 'SEARCH_RESOURCE') throw new Error('Invalid options type');
         const { status, response } = await state.autocompleteApi({
             resource_type: options.resource_type ?? 'cost_analysis.Cost',
-            distinct_key: options.resource_key,
+            distinct_key: options.reference_key,
             options: {
                 filter: getFilters(state.variableProperty),
             },

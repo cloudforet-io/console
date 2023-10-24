@@ -11,7 +11,7 @@ export interface SearchResourceModelOptions extends BaseItemOptions {
     type: 'SEARCH_RESOURCE';
     resource_type: string;
     reference_key?: string;
-    resource_key?: string;
+    resource_id?: string;
     default_path?: string|number;
     filters?: ConsoleFilter[];
 }
