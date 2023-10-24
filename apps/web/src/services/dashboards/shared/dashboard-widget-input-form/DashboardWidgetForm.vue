@@ -6,12 +6,6 @@ import {
 import {
     PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import {
-    isEmpty,
-} from 'lodash';
-
-import { i18n } from '@/translations';
 
 import {
     useReferenceStore,
@@ -22,29 +16,18 @@ import {
 import {
     useWidgetTitleInput,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-title-input';
+import DashboardWidgetOptionsForm
+    from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionsForm.vue';
 import DashboardWidgetMoreOptions
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
-import DashboardWidgetSchemaForm
-    from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetSchemaForm.vue';
-import { getInitialFormData } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/form-data-helper';
 import {
-    getRefinedWidgetOptionsSchema, getWidgetOptionSchema,
+    getWidgetOptionSchema,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import {
     getVariableKeyFromWidgetSchemaProperty,
 } from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
-import type {
-    InheritOptions,
-} from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterSchemaPropertyName,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-import {
-    getWidgetInheritOptionsErrorMap,
-} from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
-
 
 interface Props {
     widgetConfigId?: string;
@@ -58,37 +41,11 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    widgetOptionsJsonSchema: {} as JsonSchema,
-    schemaFormData: {},
-    isInitialized: computed(() => !isEmpty(state.widgetOptionsJsonSchema)),
-    fixedProperties: computed<string[]>(() => {
-        const fixedProperties = widgetFormStore.widgetConfig?.options_schema?.fixed_properties ?? [];
-        if (dashboardDetailState.projectId) {
-            fixedProperties.push(getWidgetFilterSchemaPropertyName('project'));
-        }
-        return fixedProperties;
-    }),
-    inheritableProperties: computed(() => Object.entries<InheritOptions[string]>(widgetFormState.inheritOptions ?? {})
-        .filter(([, inheritOption]) => !!inheritOption.enabled)
-        .map(([propertyName]) => propertyName)),
-    inheritOptionsErrorMessageMap: computed<Record<string, string>>(() => {
-        const errorText = i18n.t('DASHBOARDS.WIDGET.VALIDATION_PROPERTY_NOT_EXIST') as string;
-        const errorMap = getWidgetInheritOptionsErrorMap(
-            widgetFormState.schemaProperties,
-            widgetFormStore.updatedWidgetInfo?.inherit_options ?? {}, // use updated inherit options not to show error message when updating widget info
-            widgetFormStore.widgetConfig?.options_schema?.schema,
-            dashboardDetailState.variablesSchema,
-        );
-        const errorMessageMap: Record<string, string> = {};
-        Object.keys(errorMap).forEach((propertyName) => {
-            errorMessageMap[propertyName] = errorText;
-        });
-        return errorMessageMap;
-    }),
+    widgetOptions: {},
     isFocused: false,
     // validation
-    isSchemaFormValid: undefined,
-    isAllValid: computed(() => state.isSchemaFormValid && isTitleValid.value),
+    isWidgetOptionsValid: undefined,
+    isAllValid: computed(() => state.isWidgetOptionsValid && isTitleValid.value),
 });
 
 
@@ -105,17 +62,11 @@ const { handleSelectWidgetOptions, handleDeleteProperty } = useWidgetMoreOptions
 
 /* validation */
 const handleFormValidate = (isValid) => {
-    state.isSchemaFormValid = isValid;
+    state.isWidgetOptionsValid = isValid;
 };
 watch(() => state.isAllValid, (_isAllValid) => {
     widgetFormStore.$patch({ isValid: _isAllValid });
 }, { immediate: true });
-
-/* reset */
-const handleInitSchemaForm = () => {
-    if (!widgetFormState.widgetConfigId) return;
-    initSchemaAndFormData(widgetFormState.widgetConfigId);
-};
 
 /* inherit */
 const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => {
@@ -139,11 +90,11 @@ const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => 
             [propertyName]: newPropertySchema,
         },
     };
-    const formData = { ...state.schemaFormData, [propertyName]: undefined };
+    const formData = { ...state.widgetOptions, [propertyName]: undefined };
 
     // set schema and form data
     state.widgetOptionsJsonSchema = schema;
-    state.schemaFormData = formData;
+    state.widgetOptions = formData;
 };
 
 
@@ -155,21 +106,9 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
     // init title
     updateTitle(widgetFormStore.mergedWidgetInfo?.title);
 
-    // get schema and form data
-    const schema = getRefinedWidgetOptionsSchema(
-        referenceStoreState,
-        widgetFormStore.widgetConfig?.options_schema ?? { schema: {} },
-        dashboardDetailState.variablesSchema,
-        widgetFormState.inheritOptions ?? {},
-        widgetFormState.schemaProperties ?? [],
-        dashboardDetailState.projectId,
-    );
-    const formData = getInitialFormData(widgetFormStore.mergedWidgetInfo, dashboardDetailState.variablesSchema);
 
-    // set schema and form data
-    // CAUTION: those two states must be set at the same time not to cause re-rendering of p-json-schema-form
-    state.widgetOptionsJsonSchema = schema;
-    state.schemaFormData = formData;
+    // TODO: update initial widget options after updating widget config options_schema
+    state.widgetOptions = {};
 };
 watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
     // do nothing if still loading
@@ -177,8 +116,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
 
     // reset states
     widgetFormStore.$reset();
-    state.widgetOptionsJsonSchema = {};
-    state.schemaFormData = {};
+    state.widgetOptions = {};
     resetTitle();
 
     initSchemaAndFormData(widgetConfigId, widgetKey);
@@ -211,16 +149,17 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
             {{ $t(widgetFormStore.widgetConfig.description.translation_id) }}
         </div>
 
-        <dashboard-widget-schema-form :loading="referenceStoreState.loading || !state.isInitialized"
-                                      :project-id="dashboardDetailState.projectId"
-                                      :variables-schema="dashboardDetailState.variablesSchema"
-                                      :schema="state.widgetOptionsJsonSchema"
-                                      :form-data="state.schemaFormData"
-                                      @delete-property="handleDeleteProperty"
-                                      @init-schema-form="handleInitSchemaForm"
-                                      @validate="handleFormValidate"
-                                      @toggle-inherit="handleChangeInheritToggle"
-                                      @update:form-data="state.schemaFormData = $event"
+        <!-- TODO: update props binding after updating widget config options_schema -->
+        <dashboard-widget-options-form :loading="referenceStoreState.loading"
+                                       :project-id="dashboardDetailState.projectId"
+                                       :variables-schema="dashboardDetailState.variablesSchema"
+                                       :options-schema="[]"
+                                       :widget-options="state.widgetOptions"
+                                       :inherit-options="widgetFormState.inheritOptions"
+                                       @delete-property="handleDeleteProperty"
+                                       @validate="handleFormValidate"
+                                       @toggle-inherit="handleChangeInheritToggle"
+                                       @update:widget-options="state.widgetOptions = $event"
         />
 
         <dashboard-widget-more-options class="more-option-container"
