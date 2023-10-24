@@ -17,6 +17,7 @@ import { i18n } from '@/translations';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type {
     Validation,
@@ -34,16 +35,20 @@ import type { ExternalMenuType } from '@/services/administration/type';
 interface Props {
     activeTab?: string;
     item?: User;
+    isUserIdValid?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     activeTab: '',
     item: undefined,
+    isUserIdValid: undefined,
 });
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
-const emit = defineEmits<{(e: 'change-input', formState): void}>();
+const emit = defineEmits<{(e: 'change-input', formState): void,
+    (e: 'update:is-user-id-valid', isUserIdValid: boolean): void,
+}>();
 
 const state = reactive({
     loading: false,
@@ -58,7 +63,7 @@ const formState = reactive({
     name: '',
 });
 const validationState = reactive({
-    isUserIdValid: undefined as undefined | boolean,
+    proxyIsUserIdValid: useProxyValue('isUserIdValid', props, emit),
     userIdInvalidText: '' as TranslateResult,
     userIdValidText: '' as TranslateResult,
 });
@@ -83,15 +88,21 @@ const setExternalMenuItems = (users) => {
 const handleDeleteSelectedExternalUser = () => {
     formState.userId = '';
     formState.name = '';
-    validationState.isUserIdValid = undefined;
+    validationState.proxyIsUserIdValid = undefined;
     validationState.userIdInvalidText = '';
 };
 const handleSelectExternalUser = async (userItem) => {
     await getExternalUser(userItem.name);
     await handleClickCheckId();
 };
-const handleChangeInput = () => {
+const handleChangeName = () => {
     emit('change-input', { ...formState, name: formState.name });
+};
+const handleChangeUserId = () => {
+    if (validationState.proxyIsUserIdValid) {
+        validationState.proxyIsUserIdValid = undefined;
+        validationState.userIdInvalidText = '';
+    }
 };
 const setForm = () => {
     formState.userId = props.item.user_id;
@@ -153,11 +164,11 @@ const handleClickCheckId = async () => {
         executeSpecificIDValidation()]);
     const invalidObj = validation.find((item) => item.invalidText.length > 0);
     if (!invalidObj) {
-        validationState.isUserIdValid = true;
+        validationState.proxyIsUserIdValid = true;
         validationState.userIdValidText = i18n.t('IDENTITY.USER.FORM.NAME_VALID');
         emit('change-input', { ...formState, userId: formState.userId });
     } else {
-        validationState.isUserIdValid = invalidObj.isValid;
+        validationState.proxyIsUserIdValid = invalidObj.isValid;
         validationState.userIdInvalidText = invalidObj.invalidText;
     }
 };
@@ -172,6 +183,12 @@ const handleClickCheckId = async () => {
 watch(() => props.activeTab, (after) => {
     if (after) {
         state.selectedItems = [];
+        if (userPageState.visibleCreateModal) {
+            formState.userId = '';
+            formState.name = '';
+            validationState.proxyIsUserIdValid = undefined;
+            emit('change-input', { ...formState });
+        }
     }
 }, { immediate: true });
 watch(() => state.searchText, (searchText) => {
@@ -187,9 +204,9 @@ watch(() => state.searchText, (searchText) => {
     <div class="user-info-form-wrapper">
         <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
                        :required="true"
-                       :invalid="validationState.isUserIdValid === false"
+                       :invalid="validationState.proxyIsUserIdValid === false"
                        :invalid-text="validationState.userIdInvalidText"
-                       :valid="validationState.isUserIdValid"
+                       :valid="validationState.proxyIsUserIdValid"
                        :valid-text="validationState.userIdValidText"
         >
             <template v-if="props.activeTab === 'external'
@@ -227,8 +244,9 @@ watch(() => state.searchText, (searchText) => {
                                   v-focus
                                   placeholder="user@spaceone.io"
                                   :invalid="invalid"
-                                  :valid="validationState.isUserIdValid"
+                                  :valid="validationState.proxyIsUserIdValid"
                                   :disabled="userPageState.visibleUpdateModal"
+                                  @update:value="handleChangeUserId"
                     />
                     <p-button v-if="!userPageState.visibleUpdateModal"
                               style-type="secondary"
@@ -245,7 +263,7 @@ watch(() => state.searchText, (searchText) => {
         >
             <p-text-input v-model="formState.name"
                           class="text-input"
-                          @update:value="handleChangeInput"
+                          @update:value="handleChangeName"
             />
         </p-field-group>
     </div>
