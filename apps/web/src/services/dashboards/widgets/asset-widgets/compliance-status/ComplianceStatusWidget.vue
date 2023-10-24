@@ -140,31 +140,25 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'additional_info.status', v: ['PASS', 'FAIL'], o: '=' });
-        const { status, response } = await fetchCloudServiceStatsAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+            .setFilters(widgetState.cloudServiceAnalyzeConsoleFilters)
+            .addFilter({ k: 'data.status', v: ['PASS', 'FAIL'], o: '=' });
+        const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                granularity: 'MONTHLY',
-                start: widgetState.dateRange.end,
-                end: widgetState.dateRange.end,
-                group_by: ['unit', 'additional_info.status', 'additional_info.severity'],
+                group_by: ['data.status', 'data.severity'],
                 fields: {
                     compliance_count: {
-                        key: 'values.compliance_count',
-                        operator: 'sum',
+                        operator: 'count',
                     },
                     pass_score: {
-                        key: 'values.pass_score',
+                        key: 'data.stats.score.pass',
                         operator: 'sum',
                     },
                     fail_score: {
-                        key: 'values.fail_score',
+                        key: 'data.stats.score.fail',
                         operator: 'sum',
                     },
                 },

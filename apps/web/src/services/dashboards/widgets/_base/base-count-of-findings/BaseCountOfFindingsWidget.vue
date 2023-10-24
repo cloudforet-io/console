@@ -92,29 +92,23 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         state.loading = true;
 
-        apiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        apiQueryHelper.setFilters(widgetState.cloudServiceAnalyzeConsoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
-        const { status, response } = await fetchCloudServiceStatsAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+        const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                granularity: 'MONTHLY',
-                start: widgetState.dateRange.end,
-                end: widgetState.dateRange.end,
                 group_by: [widgetState.groupBy],
                 fields: {
                     pass_finding_count: {
-                        key: 'values.pass_finding_count',
+                        key: 'data.stats.findings.pass',
                         operator: 'sum',
                     },
                     fail_finding_count: {
-                        key: 'values.fail_finding_count',
+                        key: 'data.stats.findings.fail',
                         operator: 'sum',
                     },
                 },

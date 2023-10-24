@@ -1,5 +1,4 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
     getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions,
@@ -23,7 +22,6 @@ const complianceStatusWidgetConfig: WidgetConfig = {
     },
     sizes: ['md'],
     options: {
-        granularity: GRANULARITY.YEARLY,
         data_criteria: 'realtime',
     },
     inherit_options: {
