@@ -74,7 +74,7 @@ watch(() => props.recentJobs, () => {
                     :contents="$t('INVENTORY.COLLECTOR.MAIN.RECENT_JOBS_TOOLTIP')"
                     position="top-start"
                 >
-                    <p-i name="ic_question-mark-circle"
+                    <p-i name="ic_info-circle"
                          class="title-tooltip"
                          height="0.875rem"
                          width="0.875rem"

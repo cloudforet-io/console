@@ -8,9 +8,11 @@
                        loader-type="skeleton"
         >
             <div class="summary-content-wrapper">
-                <router-link :to="getAllServiceLocation()"
-                             class="summary-row"
-                             :class="{'link-text': activeTab !== 'billing'}"
+                <router-link :to="{
+                                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                                 query: { service: activeTab },
+                             }"
+                             class="summary-row link-text"
                 >
                     <div class="text-group">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
@@ -58,10 +60,9 @@ import {
 import type { Location } from 'vue-router';
 
 import { PSkeleton, PDataLoader, PEmpty } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { range } from 'lodash';
 
-import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -70,14 +71,9 @@ import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/lib/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 
 interface SummaryData {
@@ -86,9 +82,6 @@ interface SummaryData {
     count: number | string;
     to: string | Location;
 }
-
-const DAY_COUNT = 14;
-const MONTH_COUNT = 12;
 
 export default {
     name: 'AllSummaryDataSummary',
@@ -122,10 +115,6 @@ export default {
             type: String,
             default: 'TB',
         },
-        dataSourceId: {
-            type: String,
-            default: '',
-        },
     },
     setup(props) {
         const state = reactive({
@@ -133,66 +122,11 @@ export default {
             skeletons: range(3),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             title: computed(() => {
-                let label = props.label;
-                if (props.activeTab === DATA_TYPE.BILLING) {
-                    label = i18n.t('COMMON.WIDGETS.ALL_SUMMARY.RESOURCE');
-                }
+                const label = props.label;
                 return i18n.t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: label });
             }),
             summaryData: [] as SummaryData[],
         });
-
-        /* Util */
-        const getBillingServiceLocation = (serviceCode?: string, disableFilter = false) => {
-            const period = {
-                start: dayjs.utc().subtract(DAY_COUNT, 'day').format('YYYY-MM-DD'),
-                end: dayjs.utc().subtract(1, 'day').format('YYYY-MM-DD'),
-            };
-            if (props.selectedDateType === 'MONTHLY') {
-                period.start = dayjs.utc().subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
-                period.end = dayjs.utc().format('YYYY-MM');
-            }
-            const location: any = {
-                name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-                params: {
-                    dataSourceId: props.dataSourceId,
-                    costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-                },
-                query: {
-                    granularity: primitiveToQueryString(props.selectedDateType),
-                    group_by: arrayToQueryString([GROUP_BY.PRODUCT]),
-                    period: objectToQueryString(period),
-                },
-            };
-            if (!disableFilter) {
-                location.query.filters = objectToQueryString([{ k: 'product', v: [serviceCode], o: '=' }]);
-            }
-            return location;
-        };
-        const getAllServiceLocation = (): Location => {
-            if (props.activeTab === DATA_TYPE.BILLING) {
-                return getBillingServiceLocation(undefined, true);
-            }
-            return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-                query: {
-                    service: props.activeTab,
-                },
-            };
-        };
-        const getServiceLocation = (data): Location => {
-            if (props.activeTab === DATA_TYPE.BILLING) {
-                return getBillingServiceLocation(data.product, false);
-            }
-            return {
-                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                params: {
-                    provider: data.provider,
-                    group: data.cloud_service_group,
-                    name: data.cloud_service_type,
-                },
-            };
-        };
 
         /* Api */
         const apiQueryHelper = new ApiQueryHelper();
@@ -254,43 +188,6 @@ export default {
                 state.loading = false;
             }
         };
-        const getBillingSummaryInfo = async () => {
-            try {
-                state.loading = true;
-                const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-                    ...props.extraParams,
-                    data_source_id: props.dataSourceId,
-                    query: {
-                        granularity: GRANULARITY.MONTHLY,
-                        group_by: [GROUP_BY.PRODUCT, GROUP_BY.PROVIDER],
-                        start: dayjs.utc().format('YYYY-MM'),
-                        end: dayjs.utc().format('YYYY-MM'),
-                        fields: {
-                            cost_sum: {
-                                key: 'cost',
-                                operator: 'sum',
-                            },
-                        },
-                    },
-                });
-                const summaryData: SummaryData[] = [];
-                results.forEach((d) => {
-                    if (numberFormatter(d.cost_sum) !== 0) {
-                        summaryData.push({
-                            provider: d.provider,
-                            type: d.product,
-                            count: numberFormatter(d.cost_sum),
-                            to: getServiceLocation(d),
-                        });
-                    }
-                });
-                state.summaryData = summaryData;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
 
         /* Init */
         (async () => {
@@ -302,16 +199,12 @@ export default {
 
         /* Watcher */
         watch(() => props.activeTab, (type) => {
-            if (type === DATA_TYPE.BILLING) {
-                getBillingSummaryInfo();
-            } else {
-                getSummaryInfo(type);
-            }
+            getSummaryInfo(type);
         }, { immediate: false });
 
         return {
             ...toRefs(state),
-            getAllServiceLocation,
+            ASSET_INVENTORY_ROUTE,
             DATA_TYPE,
         };
     },
