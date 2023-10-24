@@ -867,6 +867,7 @@
 			"404_GO_BACK_1": "Try going",
 			"404_MSG": "Sorry, we can’t seem to find what you’re looking for.",
 			"GO_BACK": "Go back",
+			"HOME": "Home",
 			"NO_RESOURCE_GO_MAIN": "Go To {service} Main",
 			"NO_RESOURCE_MSG": "There are no matching resources. ",
 			"NO_RESOURCE_TITLE": "No Resource"
