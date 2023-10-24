@@ -5,7 +5,7 @@
                     :fade="true"
                     :backdrop="true"
                     :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
-                    :disabled="formState.userId === '' || (formState.passwordManual && formState.password === '')"
+                    :disabled="formState.userId === '' || (formState.passwordManual && formState.password === '') || !validationState.isUserIdValid"
                     :loading="userPageState.modalLoading"
                     @confirm="confirm"
                     @cancel="handleClose"
@@ -20,6 +20,7 @@
             >
                 <div class="input-form-wrapper">
                     <user-info-form
+                        :is-user-id-valid.sync="validationState.isUserIdValid"
                         :active-tab="formState.activeTab"
                         @change-input="handleChangeInputs"
                     />
@@ -44,6 +45,7 @@
             <div v-else>
                 <div class="input-form-wrapper">
                     <user-info-form
+                        :is-user-id-valid.sync="validationState.isUserIdValid"
                         :active-tab="formState.activeTab"
                         :item="item"
                         @change-input="handleChangeInputs"
@@ -151,6 +153,10 @@ export default {
             tags: {},
         });
 
+        const validationState = reactive({
+            isUserIdValid: undefined as undefined | boolean,
+        });
+
         /* Components */
         const handleChangeInputs = (value) => {
             if (value.userId) {
@@ -255,6 +261,7 @@ export default {
             userPageState,
             state,
             formState,
+            validationState,
             confirm,
             handleClose,
             handleChangeInputs,
