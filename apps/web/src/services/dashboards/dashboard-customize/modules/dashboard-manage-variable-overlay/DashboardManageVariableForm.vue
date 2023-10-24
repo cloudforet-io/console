@@ -61,6 +61,7 @@ import {
     PButton, PFieldGroup, PSelectDropdown, PTextInput, useProxyValue,
 } from '@spaceone/design-system';
 
+import type { EnumModelOptions, SearchResourceModelOptions } from '@/models/widget';
 import { i18n } from '@/translations';
 
 import { getUUID } from '@/lib/component-util/getUUID';
@@ -68,7 +69,7 @@ import { getUUID } from '@/lib/component-util/getUUID';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type {
-    DashboardVariableSchemaProperty, EnumOptions, SearchResourceOptions,
+    DashboardVariableSchemaProperty,
 } from '@/services/dashboards/config';
 import DashboardManageVariableOptionsField
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOptionsField.vue';
@@ -181,13 +182,13 @@ const handleSave = () => {
         options = {
             type: 'ENUM',
             values: state.options.map((d) => ({ key: d.key, label: d.label })).filter(({ key, label }) => key !== '' && label !== ''),
-        } as EnumOptions;
+        } as EnumModelOptions;
     } else {
         options = {
             type: 'SEARCH_RESOURCE',
-            resource_key: '',
+            reference_key: '',
             resource_type: '',
-        } as SearchResourceOptions;
+        } as SearchResourceModelOptions;
     }
     const variableToSave = {
         variable_type: 'CUSTOM',
