@@ -17,13 +17,15 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { SearchResourceModelOptions } from '@/models/widget';
+
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DashboardVariableSchemaProperty, SearchResourceOptions } from '@/services/dashboards/config';
+import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
@@ -161,11 +163,11 @@ const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHe
 };
 const loadSearchResourceOptions = async () => {
     try {
-        const options = state.variableProperty?.options as SearchResourceOptions|undefined;
+        const options = state.variableProperty?.options as SearchResourceModelOptions|undefined;
         if (options?.type !== 'SEARCH_RESOURCE') throw new Error('Invalid options type');
         const { status, response } = await state.autocompleteApi({
             resource_type: options.resource_type ?? 'cost_analysis.Cost',
-            distinct_key: options.resource_key,
+            distinct_key: options.reference_key,
             options: {
                 filter: getFilters(state.variableProperty),
             },
@@ -181,8 +183,8 @@ const loadSearchResourceOptions = async () => {
 const initVariable = () => {
     const variableSchema = dashboardDetailState.variablesSchema.properties[props.propertyName];
     const existingVariableInfoValue = dashboardDetailState.dashboardInfo?.variables[props.propertyName];
-    if ((variableSchema.options as SearchResourceOptions)?.type === 'SEARCH_RESOURCE' && existingVariableInfoValue === undefined) {
-        const path = (variableSchema.options as SearchResourceOptions).default_path;
+    if ((variableSchema.options as SearchResourceModelOptions)?.type === 'SEARCH_RESOURCE' && existingVariableInfoValue === undefined) {
+        const path = (variableSchema.options as SearchResourceModelOptions).default_path;
         if (path !== undefined) {
             const found = get(state.searchResourceOptions, path, undefined);
             if (found) changeVariables([{ name: found.key, label: found.name }]);
