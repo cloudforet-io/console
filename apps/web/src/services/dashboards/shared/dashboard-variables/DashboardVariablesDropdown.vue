@@ -80,7 +80,7 @@ const state = reactive({
         return result ?? [];
     }),
     autocompleteApi: computed<ReturnType<typeof getCancellableFetcher>>(() => {
-        const api = state.variableProperty?.options?.resource_key
+        const api = (state.variableProperty?.options?.reference_key ?? state.variableProperty?.options?.resource_key) // NOTE: Compatibility code for version 1.12.
             ? SpaceConnector.client.addOns.autocomplete.distinct
             : SpaceConnector.client.addOns.autocomplete.resource;
         return getCancellableFetcher(api);
@@ -167,7 +167,7 @@ const loadSearchResourceOptions = async () => {
         if (options?.type !== 'SEARCH_RESOURCE') throw new Error('Invalid options type');
         const { status, response } = await state.autocompleteApi({
             resource_type: options.resource_type ?? 'cost_analysis.Cost',
-            distinct_key: options.reference_key,
+            distinct_key: options.reference_key ?? options.resource_key, // NOTE: Compatibility code for version 1.12.
             options: {
                 filter: getFilters(state.variableProperty),
             },

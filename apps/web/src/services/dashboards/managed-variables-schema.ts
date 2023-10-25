@@ -74,7 +74,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'cost_analysis.Cost',
-                resource_key: COST_VARIABLE_TYPE_INFO.cost_product.key,
+                reference_key: COST_VARIABLE_TYPE_INFO.cost_product.key,
             },
         },
         // Variable for Asset
@@ -87,7 +87,7 @@ export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
             options: {
                 type: 'SEARCH_RESOURCE',
                 resource_type: 'inventory.CloudService',
-                resource_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
+                reference_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
             },
         },
         [ASSET_VARIABLE_TYPE_INFO.asset_query_set.type]: {
