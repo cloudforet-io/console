@@ -77,6 +77,11 @@ const state = reactive({
         const totalCount = passCount + failCount;
         return totalCount ? Math.round((failCount / totalCount) * 100) : 0;
     }),
+    totalCount: computed<number>(() => {
+        const passCount = state.data?._total_pass_finding_count ?? 0;
+        const failCount = state.data?._total_fail_finding_count ?? 0;
+        return passCount + failCount;
+    }),
 });
 
 /* API */
@@ -105,14 +110,14 @@ const fetchRealtimeData = async (): Promise<Data> => {
             },
         });
         if (status === 'succeed' && response.results.length) {
+            state.loading = false;
             return response.results[0];
         }
         return state.data ?? {};
     } catch (e) {
         ErrorHandler.handleError(e);
-        return {};
-    } finally {
         state.loading = false;
+        return {};
     }
 };
 
@@ -169,17 +174,17 @@ defineExpose<WidgetExpose>({
                 </p>
                 <div class="count-wrapper">
                     <div class="left-part">
-                        {{ numberFormatter(state.data?._total_fail_finding_count) }}
+                        {{ commaFormatter(numberFormatter(state.data?._total_fail_finding_count)) }}
                     </div>
                     <div class="right-part">
                         <span class="text">out of </span>
-                        <span class="count">{{ commaFormatter(state.failureRate) }}%</span>
+                        <span class="count">{{ commaFormatter(numberFormatter(state.totalCount)) }}</span>
                     </div>
                 </div>
             </div>
             <p-progress-bar :percentage="state.failureRate"
                             height="1.5rem"
-                            :style="{ 'background-color': colorSet[0] }"
+                            :color="colorSet[0]"
             />
             <div class="rate-text">
                 {{ state.failureRate }}%
@@ -198,7 +203,7 @@ defineExpose<WidgetExpose>({
                             {{ data.label }}
                         </div>
                         <div class="count">
-                            {{ numberFormatter(data.value, 1) }}
+                            {{ commaFormatter(numberFormatter(data.value, 1)) }}
                         </div>
                     </div>
                 </div>
@@ -239,7 +244,6 @@ defineExpose<WidgetExpose>({
         }
         .rate-text {
             @apply text-display-md;
-            font-weight: 500;
             padding-top: 0.5rem;
         }
         .severity-wrapper {

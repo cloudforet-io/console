@@ -137,9 +137,7 @@ const fetchTableDataAnalyze = getCancellableFetcher<FullData['tableData']>(Space
 const fetchChartData = async (): Promise<FullData['chartData']> => {
     state.loading = true;
     try {
-        chartDataApiQueryHelper
-            .setFilters(widgetState.consoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        chartDataApiQueryHelper.setFilters(widgetState.consoleFilters);
         const { status, response } = await fetchChartDataAnalyze({
             query_set_id: widgetState.options.asset_query_set,
             query: {
