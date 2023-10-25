@@ -7,54 +7,31 @@ import {
 import {
     PButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import { isEmpty, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+import type { WidgetOptionsSchemaProperty } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 interface MenuItem {
     name: string;
     label: string;
 }
 
-const props = withDefaults(defineProps<{
-    widgetConfigId?: string;
-    selectedProperties?: string[];
-}>(), {
-    widgetConfigId: undefined,
-    selectedProperties: () => [],
-});
-
-const emit = defineEmits<{(e: 'update:selected-properties', properties: string[]): void}>();
+const widgetFormStore = useWidgetFormStore();
+const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    widgetConfig: computed(() => (props.widgetConfigId ? getWidgetConfig(props.widgetConfigId) : undefined)),
-    defaultProperties: computed<string[]>(() => state.widgetConfig?.options_schema?.default_properties ?? []),
-    propertiesOrder: computed<string[]>(() => state.widgetConfig?.options_schema?.schema?.order ?? []),
-    allProperties: computed<string[]>(() => Object.keys(state.widgetConfig?.options_schema?.schema.properties ?? {})),
-    schemaProperties: computed<JsonSchema['properties']>(() => state.widgetConfig?.options_schema?.schema?.properties ?? {}),
+    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? []),
+    defaultProperties: computed<string[]>(() => state.propertySchemaList.map((d) => d.key)),
     defaultIdxMap: computed<Record<string, number>>(() => {
         const defaultIdxMap = {};
         state.defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
         return defaultIdxMap;
     }),
-    orderIdxMap: computed<Record<string, number>>(() => {
-        const orderIdxMap = {};
-        state.propertiesOrder.forEach((name, idx) => { orderIdxMap[name] = idx; });
-        return orderIdxMap;
-    }),
 });
 
 /* sort */
 const sortItems = (items: MenuItem[]) => items.sort((a, b) => {
-    if (state.orderIdxMap[a.name] !== undefined) {
-        // if both are in order array, follow order array
-        if (state.orderIdxMap[b.name] !== undefined) return state.orderIdxMap[a.name] > state.orderIdxMap[b.name] ? 1 : -1;
-        // otherwise, the item in order array comes before
-        return -1;
-    }
-
-    // if both are not in order array
     if (state.defaultIdxMap[a.name] !== undefined) {
         // if both are default, follow default index order
         if (state.defaultIdxMap[b.name] !== undefined) return state.defaultIdxMap[a.name] > state.defaultIdxMap[b.name] ? 1 : -1;
@@ -69,16 +46,10 @@ const sortItems = (items: MenuItem[]) => items.sort((a, b) => {
 const targetRef = ref<any|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const selectedOptions = ref<MenuItem[]>([]);
-const optionsMenuItems = computed<MenuItem[]>(() => {
-    const menuItems: MenuItem[] = [];
-    if (isEmpty(state.schemaProperties)) return [];
-
-    Object.entries<JsonSchema>(state.schemaProperties).forEach(([key, val]) => {
-        menuItems.push({ name: key, label: val.title ?? key });
-    });
-
-    return sortItems(menuItems);
-});
+const optionsMenuItems = computed<MenuItem[]>(() => state.propertySchemaList.map((config) => ({
+    name: config.key,
+    label: config.name ?? config.key,
+})));
 
 /* context menu controller */
 const {
@@ -99,7 +70,7 @@ const {
 
 const handleUpdateSelectedOptions = (selected: MenuItem[]) => {
     const selectedProperties: string[] = sortItems(selected).map((item) => item.name);
-    emit('update:selected-properties', selectedProperties);
+    widgetFormStore.updateSchemaProperties(selectedProperties);
     hideContextMenu();
 };
 const handleClickAddOptions = () => {
@@ -108,11 +79,14 @@ const handleClickAddOptions = () => {
     else showContextMenu();
 };
 
-watch(() => props.selectedProperties, (selectedProperties) => {
+watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
     const current = selectedOptions.value.map((item) => item.name);
     if (isEqual(current, selectedProperties)) return;
 
-    const refined: MenuItem[] = selectedProperties.map((d) => ({ name: d, label: state.schemaProperties[d]?.title ?? d }));
+    const refined: MenuItem[] = selectedProperties.map((d) => {
+        const config = state.propertySchemaList.find((item) => item.key === d);
+        return { name: d, label: config?.name ?? d };
+    });
     selectedOptions.value = refined;
 }, { immediate: true });
 

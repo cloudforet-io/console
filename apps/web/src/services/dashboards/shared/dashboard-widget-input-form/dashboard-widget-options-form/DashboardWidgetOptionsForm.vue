@@ -17,58 +17,27 @@ import DashboardWidgetOptionDropdown
 import {
     getWidgetOptionMenuHandlers,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/helpers/widget-option-menu-handler';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import {
     getVariableKeyFromWidgetSchemaProperty,
 } from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
-import type { InheritOptions } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetOptionsSchemaProperty,
-} from '@/services/dashboards/widgets/_configs/widget-options-schema-config';
+} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
     getWidgetOptionName,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const props = defineProps<{
-    loading?: boolean;
     projectId?: string;
     variablesSchema?: DashboardVariablesSchema;
-    optionsSchema?: WidgetOptionsSchemaProperty[];
-    widgetOptions: Record<string, any>;
-    inheritOptions?: InheritOptions;
-    schemaProperties?: string[];
 }>();
 
-const emit = defineEmits<{(e: 'delete-property', propertyName: string): void;
-    (e: 'toggle-inherit', propertyName: string, isInherit: boolean): void;
-    (e: 'validate', isValid: boolean): void;
-    (e: 'update:widget-options', widgetOptions: Record<string, any>): void;
-}>();
+const widgetFormStore = useWidgetFormStore();
+const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    // TODO: update to use widget options schema
-    schemaList: computed<WidgetOptionsSchemaProperty[]>(() => [{
-        key: 'product',
-        name: 'Product',
-        selection_type: 'MULTI',
-        fixed: false,
-        item_options: [
-            { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: 'product' },
-        ],
-        dependencies: {
-            cost_data_source: { key: 'data_source_id' },
-        },
-    }, {
-        key: 'cost_data_type',
-        name: 'Data Type',
-        selection_type: 'SINGLE',
-        fixed: true,
-        item_options: [
-            { type: 'MANAGED_VARIABLE', variable_key: 'cost_data_type' },
-        ],
-        dependencies: {
-            cost_data_source: { key: 'data_source_id' },
-        },
-    }]),
+    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? []),
     selectedList: [] as SelectDropdownMenuItem[][],
 });
 
@@ -88,13 +57,27 @@ const getInheritOptionMenuHandler = (schema: WidgetOptionsSchemaProperty): Autoc
     };
 };
 const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandler[] => {
-    if (props.inheritOptions?.[schema.key]?.enabled) {
+    if (widgetFormState.inheritOptions?.[schema.key]?.enabled) {
         return [getInheritOptionMenuHandler(schema)];
     }
     return getWidgetOptionMenuHandlers(schema);
 };
-const updateWidgetOptions = (widgetOptions: Record<string, any>) => {
-    emit('update:widget-options', widgetOptions);
+const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
+    const widgetOptions = { ...widgetFormState.widgetOptions };
+    if (selected?.length) {
+        widgetOptions[propertyName] = selected.map((item) => item.name);
+    } else {
+        delete widgetOptions[propertyName];
+    }
+    widgetFormStore.$patch({ widgetOptions });
+};
+const updateSchemaProperties = (propertyName: string) => {
+    const schemaProperties = [...widgetFormState.schemaProperties];
+    const index = schemaProperties.findIndex((item) => item === propertyName);
+    if (index >= 0) {
+        schemaProperties.splice(index, 1);
+    }
+    widgetFormStore.$patch({ schemaProperties });
 };
 
 /* event handlers */
@@ -103,29 +86,39 @@ const handleReturnToInitialSettings = () => {
 };
 
 const handleUpdateSelected = (index: number, selected: SelectDropdownMenuItem[]) => {
-    const isInherit = !!props.inheritOptions?.[state.schemaList[index].key]?.enabled;
-    if (isInherit) {
-        // TODO: implement inherit case
-        return;
-    }
+    state.selectedList.splice(index, 1, selected);
 
-    const widgetOptions = { ...props.widgetOptions };
-    const propertyName = state.schemaList[index].key;
-    if (selected.length) {
-        widgetOptions[propertyName] = selected.map((item) => item.name);
+    const propertyName = state.propertySchemaList[index].key;
+    const isInherit = !!widgetFormState.inheritOptions?.[state.propertySchemaList[index].key]?.enabled;
+    if (isInherit) {
+        widgetFormStore.updateInheritOption(propertyName, true, selected[0]?.name);
+        updateWidgetOptionsBySelected(propertyName);
     } else {
-        delete widgetOptions[propertyName];
+        widgetFormStore.updateInheritOption(propertyName, false);
+        updateWidgetOptionsBySelected(propertyName, selected);
     }
-    updateWidgetOptions(widgetOptions);
 };
 const handleUpdateInherit = (index: number, isInherit: boolean) => {
-    emit('toggle-inherit', state.schemaList[index].key, isInherit);
-};
+    console.debug('handleUpdateInherit', index, isInherit);
+    state.selectedList.splice(index, 1, []);
 
+    const propertyName = state.propertySchemaList[index].key;
+    if (isInherit) {
+        widgetFormStore.updateInheritOption(propertyName, true);
+        updateWidgetOptionsBySelected(propertyName);
+    } else {
+        widgetFormStore.updateInheritOption(propertyName, false);
+    }
+};
+const handleDeleteProperty = (propertyName: string) => {
+    widgetFormStore.updateInheritOption(propertyName, false);
+    updateWidgetOptionsBySelected(propertyName);
+    updateSchemaProperties(propertyName);
+};
 
 /* Init */
 const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] => {
-    const isInherit = !!props.inheritOptions?.[propertyName]?.enabled;
+    const isInherit = !!widgetFormState.inheritOptions?.[propertyName]?.enabled;
     if (isInherit) {
         const variableKey = getVariableKeyFromWidgetSchemaProperty(propertyName);
         const variableSchema = props.variablesSchema?.properties?.[variableKey];
@@ -133,18 +126,18 @@ const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] =
             return [{ name: variableKey, label: variableSchema.name }];
         }
     }
-    const selected = props.widgetOptions[propertyName];
+    const selected = widgetFormState.widgetOptions[propertyName];
     if (selected) {
         return selected.map((item: string) => ({ name: item }));
     }
     return [];
 };
-state.selectedList = state.schemaList.map((schema) => initSelectedMenuItems(schema.key));
+state.selectedList = state.propertySchemaList.map((schema) => initSelectedMenuItems(schema.key));
 
 </script>
 
 <template>
-    <p-data-loader :loading="props.loading"
+    <p-data-loader :loading="false"
                    class="widget-options-form-wrapper"
     >
         <p-text-button icon-left="ic_refresh"
@@ -154,19 +147,19 @@ state.selectedList = state.schemaList.map((schema) => initSelectedMenuItems(sche
         >
             {{ $t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
         </p-text-button>
-        <dashboard-widget-option-dropdown v-for="(schema, i) in state.schemaList"
+        <dashboard-widget-option-dropdown v-for="(schema, i) in state.propertySchemaList"
                                           :key="schema.key"
                                           :label="schema.name ?? schema.key"
                                           :selected="state.selectedList[i]"
                                           :selection-type="schema.selection_type"
-                                          :inherit="props.inheritOptions?.[schema.key]?.enabled"
+                                          :inherit="widgetFormState.inheritOptions?.[schema.key]?.enabled"
                                           :non-inheritable="schema.non_inheritable"
                                           :deletable="!schema.fixed"
                                           :menu-handlers="getMenuHandlers(schema)"
                                           :variables-schema="props.variablesSchema"
                                           @update:selected="handleUpdateSelected(i, $event)"
                                           @update:inherit="handleUpdateInherit(i, $event)"
-                                          @delete="emit('delete-property', schema.key)"
+                                          @delete="handleDeleteProperty(schema.key)"
         />
     </p-data-loader>
 </template>

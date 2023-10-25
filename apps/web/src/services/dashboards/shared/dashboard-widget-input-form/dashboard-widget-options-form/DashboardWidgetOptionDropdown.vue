@@ -27,6 +27,7 @@ const emit = defineEmits<{(e: 'update:inherit', isInherit: boolean): void;
 }>();
 
 const state = reactive({
+    showErrorMessage: false,
     errorMessage: computed<string|undefined>(() => {
         if (props.inherit) {
             // TODO: implement inherit case
@@ -34,19 +35,30 @@ const state = reactive({
             return undefined;
         }
 
-        if (!props.selected?.length) {
+        if (state.showErrorMessage && !props.selected?.length) {
             // TODO: update message
             return 'No items are selected';
         }
 
         return undefined;
     }),
-    contextKey: Math.floor(Math.random() * Date.now()),
 });
 
-watch(() => props.menuHandlers, () => {
-    state.contextKey = Math.floor(Math.random() * Date.now());
+const handleUpdateVisibleMenu = (visible: boolean) => {
+    if (state.showErrorMessage || !visible) return;
+    state.showErrorMessage = true;
+    console.debug('handleUpdateVisible', visible);
+};
+const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
+    emit('update:selected', selected);
+};
+
+
+watch(() => props.inherit, () => {
+    console.debug('inherit changed', props.inherit);
+    state.showErrorMessage = false;
 });
+
 </script>
 
 <template>
@@ -73,7 +85,9 @@ watch(() => props.menuHandlers, () => {
                                    :multi-selectable="props.selectionType === 'multi'"
                                    :handler="props.menuHandlers"
                                    :selected="props.selected"
-                                   @update:selected="emit('update:selected', $event)"
+                                   :invalid="!!state.errorMessage"
+                                   @update:selected="handleUpdateSelected"
+                                   @update:visible-menu="handleUpdateVisibleMenu"
                 >
                     <template #dropdown-button>
                         <div v-if="!props.nonInheritable && props.inherit"

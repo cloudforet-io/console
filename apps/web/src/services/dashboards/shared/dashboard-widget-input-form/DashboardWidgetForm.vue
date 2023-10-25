@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    reactive, watch,
 } from 'vue';
 
 import {
@@ -8,25 +8,13 @@ import {
 } from '@spaceone/design-system';
 
 import {
-    useReferenceStore,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-reference-store';
-import {
-    useWidgetMoreOptions,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-more-options';
-import {
     useWidgetTitleInput,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-title-input';
 import DashboardWidgetOptionsForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionsForm.vue';
 import DashboardWidgetMoreOptions
     from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetMoreOptions.vue';
-import {
-    getWidgetOptionSchema,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/helpers/schema-helper';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import {
-    getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 
 interface Props {
@@ -38,64 +26,16 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    widgetOptions: {},
     isFocused: false,
-    // validation
-    isWidgetOptionsValid: undefined,
-    isAllValid: computed(() => state.isWidgetOptionsValid && isTitleValid.value),
 });
 
 
 /* title form validation */
 const {
-    title, resetTitle, updateTitle, isTitleValid, isTitleInvalid, titleInvalidText,
+    title, resetTitle, updateTitle, isTitleInvalid, titleInvalidText,
 } = useWidgetTitleInput();
-
-/* reference store */
-const { referenceStoreState } = useReferenceStore();
-
-/* more options */
-const { handleSelectWidgetOptions, handleDeleteProperty } = useWidgetMoreOptions(state);
-
-/* validation */
-const handleFormValidate = (isValid) => {
-    state.isWidgetOptionsValid = isValid;
-};
-watch(() => state.isAllValid, (_isAllValid) => {
-    widgetFormStore.$patch({ isValid: _isAllValid });
-}, { immediate: true });
-
-/* inherit */
-const handleChangeInheritToggle = (propertyName: string, isInherit: boolean) => {
-    widgetFormStore.$patch((_state) => {
-        _state.inheritOptions = {
-            ..._state.inheritOptions,
-            [propertyName]: {
-                enabled: isInherit,
-                variable_info: isInherit ? { key: getVariableKeyFromWidgetSchemaProperty(propertyName) } : undefined,
-            },
-        };
-    });
-
-    // update widget option schema and form data
-    const originPropertySchema = widgetFormStore.widgetConfig?.options_schema?.schema?.properties?.[propertyName] ?? {};
-    const newPropertySchema = getWidgetOptionSchema(propertyName, originPropertySchema, dashboardDetailState.variablesSchema, referenceStoreState, isInherit, dashboardDetailState.projectId);
-    const schema = {
-        ...state.widgetOptionsJsonSchema,
-        properties: {
-            ...state.widgetOptionsJsonSchema.properties,
-            [propertyName]: newPropertySchema,
-        },
-    };
-    const formData = { ...state.widgetOptions, [propertyName]: undefined };
-
-    // set schema and form data
-    state.widgetOptionsJsonSchema = schema;
-    state.widgetOptions = formData;
-};
 
 
 /* states init */
@@ -105,18 +45,13 @@ const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
 
     // init title
     updateTitle(widgetFormStore.mergedWidgetInfo?.title);
-
-
-    // TODO: update initial widget options after updating widget config options_schema
-    state.widgetOptions = {};
 };
-watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreState.loading], ([widgetConfigId, widgetKey, loading]) => {
+watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
     // do nothing if still loading
-    if (loading || !widgetConfigId) return;
+    if (!widgetConfigId) return;
 
     // reset states
     widgetFormStore.$reset();
-    state.widgetOptions = {};
     resetTitle();
 
     initSchemaAndFormData(widgetConfigId, widgetKey);
@@ -150,23 +85,11 @@ watch([() => props.widgetConfigId, () => props.widgetKey, () => referenceStoreSt
         </div>
 
         <!-- TODO: update props binding after updating widget config options_schema -->
-        <dashboard-widget-options-form :loading="referenceStoreState.loading"
-                                       :project-id="dashboardDetailState.projectId"
+        <dashboard-widget-options-form :project-id="dashboardDetailState.projectId"
                                        :variables-schema="dashboardDetailState.variablesSchema"
-                                       :options-schema="[]"
-                                       :widget-options="state.widgetOptions"
-                                       :inherit-options="widgetFormState.inheritOptions"
-                                       @delete-property="handleDeleteProperty"
-                                       @validate="handleFormValidate"
-                                       @toggle-inherit="handleChangeInheritToggle"
-                                       @update:widget-options="state.widgetOptions = $event"
         />
 
-        <dashboard-widget-more-options class="more-option-container"
-                                       :widget-config-id="widgetConfigId"
-                                       :selected-properties="widgetFormState.schemaProperties"
-                                       @update:selected-properties="handleSelectWidgetOptions"
-        />
+        <dashboard-widget-more-options class="more-option-container" />
     </div>
 </template>
 

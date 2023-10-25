@@ -15,6 +15,10 @@ import type {
     InheritOptions, UpdatableWidgetInfo, WidgetConfig,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
+import {
+    COMMON_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+    COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { useMergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
@@ -45,11 +49,28 @@ export const useWidgetFormStore = defineStore('widget-form', {
         widgetOptions: {} as WidgetOptions,
         schemaProperties: [] as string[],
         //
-        isValid: false, // schema validation result
+        isOptionsValid: false,
+        isTitleValid: false,
     }),
     getters: {
         widgetConfig(): WidgetConfig|undefined {
-            return this.widgetConfigId ? getWidgetConfig(this.widgetConfigId) : undefined;
+            if (this.widgetConfigId) {
+                const config = getWidgetConfig(this.widgetConfigId);
+                if (config) {
+                    return {
+                        ...config,
+                        options_schema: {
+                            properties: [
+                                ...COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+                                ...COMMON_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+                            ],
+                        },
+                    };
+                }
+            }
+            return undefined;
+            // TODO: change to use the code below after widget config is updated
+            // return this.widgetConfigId ? getWidgetConfig(this.widgetConfigId) : undefined;
         },
         originWidgetInfo(): DashboardLayoutWidgetInfo|undefined {
             if (!this.widgetKey) return undefined;
@@ -98,6 +119,9 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 schema_properties: this.schemaProperties,
             });
         },
+        isAllValid(): boolean {
+            return this.isOptionsValid && this.isTitleValid;
+        },
     },
     actions: {
         updateInheritOptionsAndWidgetOptionsByFormData(formData: any) {
@@ -141,6 +165,39 @@ export const useWidgetFormStore = defineStore('widget-form', {
             this.widgetOptions = widgetInfo?.widget_options ?? {};
             this.inheritOptions = widgetInfo?.inherit_options ?? {};
             this.schemaProperties = widgetInfo?.schema_properties ?? [];
+        },
+        updateInheritOption(propertyName: string, enabled: boolean, variableKey?: string) {
+            const inheritOptions = { ...this.inheritOptions };
+            if (enabled) {
+                inheritOptions[propertyName] = {
+                    enabled: true,
+                    variable_info: {
+                        key: variableKey ?? getVariableKeyFromWidgetSchemaProperty(propertyName),
+                    },
+                };
+            } else {
+                inheritOptions[propertyName] = {
+                    enabled: false,
+                };
+            }
+            this.inheritOptions = inheritOptions;
+        },
+        updateSchemaProperties(properties: string[]) {
+            this.schemaProperties = properties;
+
+            // update inherit options
+            const inheritOptions = { ...this.inheritOptions };
+            Object.keys(inheritOptions).forEach((name) => {
+                if (!properties.includes(name)) delete inheritOptions[name];
+            });
+            this.inheritOptions = inheritOptions;
+
+            // update widget options
+            const widgetOptions = { ...this.widgetOptions };
+            Object.keys(widgetOptions).forEach((name) => {
+                if (!properties.includes(name)) delete widgetOptions[name];
+            });
+            this.widgetOptions = widgetOptions;
         },
     },
 });
