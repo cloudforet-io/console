@@ -1,276 +1,146 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
+    computed, defineExpose, defineProps, reactive, toRef,
 } from 'vue';
 
 import {
-    PI, PDivider, PDataLoader,
+    PProgressBar,
 } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { cloneDeep, sum } from 'lodash';
+import { sortBy } from 'lodash';
 
 import { getRGBFromHex, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { i18n } from '@/translations';
-
-import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { red, green } from '@/styles/colors';
-
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
+import type { Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { XYChartData } from '@/services/dashboards/widgets/type';
 
 
-interface Data extends CloudServiceStatsModel {
-    pass_finding_count: number;
-    fail_finding_count: number;
+interface SubData {
     severity: Severity;
+    value: number;
 }
-interface FullData {
-    trendData?: Data[];
-    realtimeData?: Data[];
+interface Data {
+    pass_finding_count?: SubData[];
+    fail_finding_count?: SubData[];
+    _total_fail_finding_count?: number;
+    _total_pass_finding_count?: number;
 }
 interface SeverityData {
     name: string;
     label: string;
     color: string;
     rgb: string;
-    value?: number;
-    diff?: number;
+    value: number;
+    boxHeight?: number;
 }
 
 const SEVERITY_FAIL_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP).filter((status) => status.name !== 'PASS');
-const DATE_FORMAT = 'YYYY-MM';
-const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const chartContext = ref<HTMLElement|null>(null);
-const chartHelper = useAmcharts5(chartContext);
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+});
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
-    dataSize: computed(() => 1),
-});
-
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
-        const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
-        return { start, end };
-    }),
+    dataSize: computed(() => widgetState.widgetConfig.theme?.inherit_count ?? 0),
 });
 const state = reactive({
     loading: true,
-    data: null as FullData|null,
-    chartData: computed<XYChartData[]>(() => state.data?.trendData ?? []),
-    dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
-        const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
-        return { start, end };
-    }),
+    data: null as Data|null,
     severityData: computed<SeverityData[]>(() => {
-        if (!state.data?.realtimeData) return [];
+        if (!state.data?.fail_finding_count?.length) return [];
         const results: SeverityData[] = [];
-        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
         SEVERITY_FAIL_STATUS_MAP_VALUES.forEach((status) => {
-            const currValue = state.data.realtimeData.find((d) => d.severity === status.name && d.date === widgetState.dateRange.end)?.fail_finding_count;
-            const prevValue = state.data.realtimeData.find((d) => d.severity === status.name && d.date === prevMonth)?.fail_finding_count;
+            const targetSeverityValue = state.data.fail_finding_count?.find((severity) => severity.severity === status.name)?.value ?? 0;
             results.push({
-                name: status.name,
-                label: status.label,
-                color: status.color,
-                value: currValue ?? 0,
-                diff: (currValue && prevValue) ? currValue - prevValue : undefined,
+                ...status,
+                value: targetSeverityValue,
                 rgb: getRGBFromHex(status.color),
             });
         });
-        return results;
-    }),
-    prevTotalFailureCount: computed<number>(() => {
-        if (!state.data?.realtimeData) return 0;
-        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === prevMonth) ?? [];
-        return sum(targetDataList.map((d) => d.fail_finding_count));
-    }),
-    totalFailureCount: computed<number>(() => {
-        if (!state.data?.realtimeData) return 0;
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === widgetState.dateRange.end) ?? [];
-        return sum(targetDataList.map((d) => d.fail_finding_count));
-    }),
-    totalFailureComparingMessage: computed<string|undefined>(() => {
-        if (state.totalFailureCount === state.prevTotalFailureCount) return undefined;
-        if (state.prevTotalFailureCount < state.totalFailureCount) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.MORE_THAN_PREV_MONTH') as string;
-        }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_MONTH') as string;
-    }),
-    prevFailureRate: computed<number>(() => {
-        if (!state.data?.realtimeData?.length) return 0;
-        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === prevMonth) ?? [];
-        return getFailureRate(targetDataList);
+        return setBoxHeightByValue(results);
     }),
     failureRate: computed<number>(() => {
-        if (!state.data?.realtimeData?.length) return 0;
-        const targetDataList = state.data.realtimeData.filter((d) => d.date === widgetState.dateRange.end) ?? [];
-        return getFailureRate(targetDataList);
-    }),
-    failureRateComparingMessage: computed<string|undefined>(() => {
-        if (state.failureRate === state.prevFailureRate) return undefined;
-        if (state.prevFailureRate < state.failureRate) {
-            return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.MORE_THAN_PREV_MONTH') as string;
-        }
-        return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_MONTH') as string;
+        const passCount = state.data?._total_pass_finding_count ?? 0;
+        const failCount = state.data?._total_fail_finding_count ?? 0;
+        const totalCount = passCount + failCount;
+        return totalCount ? Math.round((failCount / totalCount) * 100) : 0;
     }),
 });
 
 /* API */
-const trendDataApiQueryHelper = new ApiQueryHelper();
-const realtimeDataApiQueryHelper = new ApiQueryHelper();
-const fetchTrendDataAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
-const fetchRealtimeDataAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
-const fetchTrendData = async (): Promise<Data[]> => {
+const apiQueryHelper = new ApiQueryHelper();
+const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+const fetchRealtimeData = async (): Promise<Data> => {
     try {
-        trendDataApiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        const { status, response } = await fetchTrendDataAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+        state.loading = true;
+        apiQueryHelper
+            .setFilters(widgetState.cloudServiceAnalyzeConsoleFilters);
+        const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                granularity: 'MONTHLY',
-                start: widgetState.dateRange.start,
-                end: widgetState.dateRange.end,
-                fields: {
-                    fail_finding_count: {
-                        key: 'values.fail_finding_count',
-                        operator: 'sum',
-                    },
-                },
-                sort: [{
-                    key: 'date',
-                    desc: false,
-                }],
-                ...trendDataApiQueryHelper.data,
-            },
-        });
-        if (status === 'succeed') {
-            return response.results;
-        }
-        return state.data?.trendData ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return [];
-    }
-};
-const fetchRealtimeData = async (): Promise<Data[]> => {
-    try {
-        realtimeDataApiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
-        // .addFilter({ k: 'key', v: ['fail_finding_count', 'pass_finding_count'], o: '' });
-        const prevMonth = dayjs.utc(widgetState.settings?.date_range?.end).subtract(1, 'month').format(DATE_FORMAT);
-        const { status, response } = await fetchRealtimeDataAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
-            query: {
-                granularity: 'MONTHLY',
-                start: prevMonth,
-                end: widgetState.dateRange.end,
-                group_by: ['additional_info.severity'],
+                group_by: ['data.severity'],
                 fields: {
                     pass_finding_count: {
-                        key: 'values.pass_finding_count',
+                        key: 'data.stats.findings.pass',
                         operator: 'sum',
                     },
                     fail_finding_count: {
-                        key: 'values.fail_finding_count',
+                        key: 'data.stats.findings.fail',
                         operator: 'sum',
                     },
                 },
-                ...realtimeDataApiQueryHelper.data,
+                field_group: ['severity'],
+                ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed') {
-            return response.results;
+        if (status === 'succeed' && response.results.length) {
+            return response.results[0];
         }
-        return state.data?.realtimeData ?? [];
+        return state.data ?? {};
     } catch (e) {
         ErrorHandler.handleError(e);
-        return [];
+        return {};
+    } finally {
+        state.loading = false;
     }
 };
 
 /* Util */
-const getFailureRate = (targetDataList: Data[]): number => {
-    const passCount = sum(targetDataList.map((d) => d.pass_finding_count));
-    const failCount = sum(targetDataList.map((d) => d.fail_finding_count));
-    const totalCount = passCount + failCount;
-    return totalCount ? Math.round((failCount / totalCount) * 100) : 0;
-};
-const drawChart = (chartData: XYChartData[]) => {
-    if (!chartData?.length) return;
-    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
-    xAxis.get('baseInterval').timeUnit = 'month';
-    chartHelper.setChartColors(chart, colorSet.value);
-    chart.get('cursor')?.lineX.setAll({
-        visible: true,
-    });
-
-    const seriesSettings = {
-        name: 'fail_finding_count',
-        valueYField: 'fail_finding_count',
-    };
-    const series = chartHelper.createXYLineSeries(chart, seriesSettings);
-    chart.series.push(series);
-    // set data processor
-    series.data.processor = chartHelper.createDataProcessor({
-        dateFormat: DATE_FORMAT,
-        dateFields: [DATE_FIELD_NAME],
-    });
-
-    const tooltip = chartHelper.createTooltip();
-    chartHelper.setXYSingleTooltipText(chart, tooltip);
-    series.set('tooltip', tooltip);
-
-    series.data.setAll(cloneDeep(chartData));
-};
-
-const initWidget = async (data?: FullData): Promise<FullData> => {
+const initWidget = async (data?: Data[]): Promise<Data[]> => {
     if (data) {
         state.data = data;
     } else {
-        state.loading = true;
-        const [trendData, realtimeData] = await Promise.all([fetchTrendData(), fetchRealtimeData()]);
-        state.data = { trendData, realtimeData };
-        state.loading = false;
+        state.data = await fetchRealtimeData();
     }
-    chartHelper.refreshRoot();
-    await nextTick();
-    if (chartHelper.root.value) drawChart(state.chartData);
     return state.data;
 };
-const refreshWidget = async (): Promise<FullData> => {
-    state.loading = true;
-    const [trendData, realtimeData] = await Promise.all([fetchTrendData(), fetchRealtimeData()]);
-    state.data = { trendData, realtimeData };
-    state.loading = false;
-    chartHelper.refreshRoot();
-    await nextTick();
-    if (chartHelper.root.value) drawChart(state.chartData);
+const refreshWidget = async (): Promise<Data[]> => {
+    state.data = await fetchRealtimeData();
     return state.data;
+};
+const setBoxHeightByValue = (severityDataList: SeverityData[]): SeverityData[] => {
+    const sortedResults = sortBy(severityDataList, 'value');
+    let boxHeight = 16;
+    let prevValue: number;
+    sortedResults.forEach((d) => {
+        if (prevValue && (prevValue < d.value)) {
+            boxHeight += 6;
+        }
+        prevValue = d.value;
+        d.boxHeight = boxHeight;
+    });
+    return sortBy(sortedResults, 'priority') as SeverityData[];
 };
 
 useWidgetLifecycle({
@@ -294,53 +164,25 @@ defineExpose<WidgetExpose>({
     >
         <div class="data-container">
             <div class="summary-wrapper">
-                <div class="left-wrapper">
-                    <p class="title">
-                        Total failure count
-                    </p>
-                    <p class="value">
-                        {{ numberFormatter(state.totalFailureCount) }}
-                    </p>
-                    <div v-if="state.totalFailureComparingMessage"
-                         class="diff-wrapper"
-                    >
-                        <p-i :name="state.prevTotalFailureCount < state.totalFailureCount ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                             :color="state.prevTotalFailureCount < state.totalFailureCount ? red[500] : green[500]"
-                        />
-                        <span class="diff-value">{{ numberFormatter(Math.abs(state.prevTotalFailureCount - state.totalFailureCount)) }}</span>
-                        <span class="diff-text">{{ state.totalFailureComparingMessage }}</span>
+                <p class="title">
+                    Total failure count
+                </p>
+                <div class="count-wrapper">
+                    <div class="left-part">
+                        {{ numberFormatter(state.data?._total_fail_finding_count) }}
                     </div>
-                </div>
-                <p-divider :vertical="true" />
-                <div class="right-wrapper">
-                    <p class="title">
-                        Failure rate
-                    </p>
-                    <p class="value">
-                        {{ commaFormatter(state.failureRate) }}%
-                    </p>
-                    <div v-if="state.failureRateComparingMessage"
-                         class="diff-wrapper"
-                    >
-                        <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                             :color="state.prevFailureRate < state.failureRate ? red[500] : green[500]"
-                        />
-                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevFailureRate - state.failureRate)) }}%</span>
-                        <span class="diff-text">{{ state.failureRateComparingMessage }}</span>
+                    <div class="right-part">
+                        <span class="text">out of </span>
+                        <span class="count">{{ commaFormatter(state.failureRate) }}%</span>
                     </div>
                 </div>
             </div>
-            <div class="chart-wrapper">
-                <p-data-loader class="chart-loader"
-                               :loading="props.loading || state.loading"
-                               :data="state.chartData"
-                               loader-type="skeleton"
-                               :loader-backdrop-opacity="1"
-                >
-                    <div ref="chartContext"
-                         class="chart"
-                    />
-                </p-data-loader>
+            <p-progress-bar :percentage="state.failureRate"
+                            height="1.5rem"
+                            :style="{ 'background-color': colorSet[0] }"
+            />
+            <div class="rate-text">
+                {{ state.failureRate }}%
             </div>
             <div class="severity-wrapper">
                 <p class="title">
@@ -350,25 +192,13 @@ defineExpose<WidgetExpose>({
                     <div v-for="(data, idx) in state.severityData"
                          :key="`severity-status-box-${idx}`"
                          class="severity-status-box"
-                         :style="{'background-color': `rgba(${data.rgb.r}, ${data.rgb.g}, ${data.rgb.b}, 0.4)`}"
+                         :style="{'background-color': `rgba(${data.rgb.r}, ${data.rgb.g}, ${data.rgb.b}, 0.7)`, 'height': `${data.boxHeight}%`}"
                     >
-                        <div class="content-wrapper">
-                            <p class="status-title">
-                                {{ data.label }}
-                            </p>
-                            <p class="status-content">
-                                <span class="status-value">{{ numberFormatter(data.value, 1) }}</span>
-                                <span v-if="data.diff"
-                                      class="status-rate"
-                                >
-                                    <p-i :name="data.diff > 0 ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
-                                         :color="data.diff > 0 ? red[500] : green[500]"
-                                         width="1.5rem"
-                                         height="1.5rem"
-                                    />
-                                    <span class="status-rate-value">{{ numberFormatter(Math.abs(data.diff)) }}</span>
-                                </span>
-                            </p>
+                        <div class="text">
+                            {{ data.label }}
+                        </div>
+                        <div class="count">
+                            {{ numberFormatter(data.value, 1) }}
                         </div>
                     </div>
                 </div>
@@ -381,84 +211,55 @@ defineExpose<WidgetExpose>({
 .total-fail-findings-status {
     .data-container {
         .summary-wrapper {
-            display: flex;
-            justify-content: space-between;
-            margin: 0;
-            .left-wrapper, .right-wrapper {
-                width: 50%;
-                flex: 1 1 auto;
-                position: relative;
-                padding: 0.375rem 1.5rem;
-                .title {
-                    padding-bottom: 0.25rem;
+            .title {
+                @apply text-label-lg;
+                padding-bottom: 0.25rem;
+            }
+            .count-wrapper {
+                display: flex;
+                justify-content: space-between;
+                padding-bottom: 0.5rem;
+                .left-part {
+                    @apply text-display-lg;
+                    font-weight: 700;
                 }
-                .value {
-                    @apply text-display-md;
-                }
-                .diff-wrapper {
-                    @screen mobile {
-                        .diff-text {
-                            display: none;
-                        }
-                    }
-
-                    @apply text-gray-700;
-                    .diff-value {
-                        @apply text-label-lg;
+                .right-part {
+                    display: flex;
+                    align-items: flex-end;
+                    .text {
+                        @apply text-gray-600 text-label-lg;
                         padding-right: 0.25rem;
                     }
-                    .diff-text {
-                        @apply text-label-sm;
+                    .count {
+                        @apply text-display-md;
+                        font-weight: 500;
                     }
                 }
             }
-            .left-wrapper {
-                padding-right: 2rem;
-            }
-            .right-wrapper {
-                padding-left: 2rem;
-            }
         }
-        .chart-wrapper {
-            height: 140px;
-            margin: 1rem 0;
-            .chart-loader {
-                height: 100%;
-                .chart {
-                    height: 100%;
-                }
-            }
+        .rate-text {
+            @apply text-display-md;
+            font-weight: 500;
+            padding-top: 0.5rem;
         }
         .severity-wrapper {
+            padding-top: 1rem;
             .title {
+                @apply text-label-lg;
                 padding-bottom: 0.25rem;
             }
             .box-wrapper {
-                @apply grid-cols-12;
-                display: grid;
-                height: 4.875rem;
+                height: 11.5rem;
                 .severity-status-box {
-                    @apply col-span-3;
                     display: flex;
+                    justify-content: space-between;
                     align-items: center;
-                    padding: 0.75rem 1rem;
-                    .status-title {
-                        @apply text-gray-700 text-label-lg;
-                        padding-bottom: 0.25rem;
+                    padding: 0 0.5rem;
+                    .text {
+                        @apply text-gray-800 text-label-md;
                     }
-                    .status-content {
-                        display: flex;
-                        align-items: flex-end;
-                        flex-wrap: wrap;
-                        .status-value {
-                            @apply text-display-md;
-                            padding-right: 0.25rem;
-                        }
-                        .status-rate {
-                            @apply text-gray-700 text-label-lg;
-                            display: inline-flex;
-                            align-items: center;
-                        }
+                    .count {
+                        @apply text-label-lg;
                     }
                 }
             }

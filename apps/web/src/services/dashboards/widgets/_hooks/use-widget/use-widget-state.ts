@@ -42,7 +42,6 @@ export interface WidgetState extends MergedWidgetState {
     // filters
     consoleFilters: ComputedRef<ConsoleFilter[]>;
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
-    cloudServiceStatsConsoleFilters: ComputedRef<ConsoleFilter[]>;
     cloudServiceAnalyzeConsoleFilters: ComputedRef<ConsoleFilter[]>;
 }
 const queryHelper = new QueryHelper();
@@ -90,10 +89,6 @@ export function useWidgetState(props: WidgetProps) {
             if (!state.options?.filters || isEmpty(state.options.filters)) return [];
             return getConvertedBudgetConsoleFilters(state.options.filters);
         }),
-        cloudServiceStatsConsoleFilters: computed<ConsoleFilter[]>(() => {
-            if (!state.options?.filters || isEmpty(state.options.filters)) return [];
-            return getConvertedCloudServiceStatsConsoleFilters(state.options.filters);
-        }),
         cloudServiceAnalyzeConsoleFilters: computed<ConsoleFilter[]>(() => {
             // set filters from asset query set
             const assetQuerySetId = state.options.asset_query_set;
@@ -131,17 +126,6 @@ const getConvertedBudgetConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): C
                 });
             });
         }
-    });
-    return results;
-};
-
-
-const getConvertedCloudServiceStatsConsoleFilters = (widgetFiltersMap: WidgetFiltersMap): ConsoleFilter[] => {
-    const results: ConsoleFilter[] = [];
-    Object.values(widgetFiltersMap).forEach((filterItems) => {
-        filterItems.forEach((d) => {
-            results.push(d);
-        });
     });
     return results;
 };
