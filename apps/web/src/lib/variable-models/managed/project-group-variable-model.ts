@@ -1,14 +1,14 @@
 import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
 import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
 
-export default class CostDataSourceVariableModel extends ResourceNameVariableModel {
-    key = 'cost_data_source';
+export default class ProjectGroupVariableModel extends ResourceNameVariableModel {
+    key = 'project_group';
 
-    name = 'Data Source';
+    name = 'Project Group';
 
     labels: VariableModelLabel[] = ['cost'];
 
-    resourceType = 'cost_analysis.DataSource';
+    resourceType = 'identity.ProjectGroup';
 
-    idKey = 'data_source_id';
+    idKey = 'project_group_id';
 }
