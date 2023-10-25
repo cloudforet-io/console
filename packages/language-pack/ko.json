@@ -793,6 +793,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"DOWNLOAD": "다운로드",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "데스크탑",
 				"SUPPORT_PDF_HELP_TEXT": "해당 기능을 지원하지 않는 브라우저 또는 디바이스입니다. {desktop} 환경의 {chrome} 또는 {edge} 브라우저에서 이용해주세요."
@@ -2039,6 +2040,10 @@
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "연관된 멤버"
+			},
+			"EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "",
+				"TITLE": ""
 			},
 			"HISTORY": {
 				"ALL_MONTH": "전체 월",

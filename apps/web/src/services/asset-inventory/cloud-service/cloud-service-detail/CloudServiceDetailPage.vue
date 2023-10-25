@@ -157,6 +157,9 @@
                             :is-server-page="isServerPage"
                             @complete="reloadTable"
         />
+        <excel-export-option-modal :visible="excelState.visible"
+                                   @update:visible="handleUpdateVisible"
+        />
     </div>
 </template>
 
@@ -191,8 +194,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
@@ -214,6 +215,8 @@ import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-
 import CloudServiceLogTab from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceLogTab.vue';
 import CloudServiceTagsPanel
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
+import ExcelExportOptionModal
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/ExcelExportOptionModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
 import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
@@ -225,6 +228,7 @@ import type { Period } from '@/services/cost-explorer/type';
 export default {
     name: 'CloudServiceDetailPage',
     components: {
+        ExcelExportOptionModal,
         CloudServiceLogTab,
         CloudServiceTagsPanel,
         CloudServicePeriodFilter,
@@ -474,21 +478,12 @@ export default {
             }
         });
 
-        const exportCloudServiceData = async () => {
-            await store.dispatch('file/downloadExcel', {
-                url: '/inventory/cloud-service/list',
-                param: {
-                    query: getQuery(),
-                    ...(overviewState.period && {
-                        date_range: {
-                            start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),
-                            end: dayjs.utc(overviewState.period.end).add(1, 'day').format('YYYY-MM-DD'),
-                        },
-                    }),
-                },
-                fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
-                file_name_prefix: FILE_NAME_PREFIX.cloudService,
-            });
+        // excel
+        const excelState = reactive({
+            visible: false,
+        });
+        const exportCloudServiceData = () => {
+            excelState.visible = true;
         };
 
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
@@ -575,6 +570,10 @@ export default {
 
         const checkIsEmpty = (data) => isEmpty(data);
 
+        const handleUpdateVisible = (visible) => {
+            excelState.visible = visible;
+        };
+
         /* Watchers */
         watch(() => keyItemSets.value, (after) => {
             // initiate queryTags with keyItemSets
@@ -626,6 +625,9 @@ export default {
             overviewState,
             handlePeriodUpdate,
             checkIsEmpty,
+
+            excelState,
+            handleUpdateVisible,
         };
     },
 };
