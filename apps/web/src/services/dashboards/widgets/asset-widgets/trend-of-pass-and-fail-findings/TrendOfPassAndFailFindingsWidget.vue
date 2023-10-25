@@ -138,7 +138,7 @@ const fetchChartData = async (): Promise<FullData['chartData']> => {
     state.loading = true;
     try {
         chartDataApiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.consoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         const { status, response } = await fetchChartDataAnalyze({
             query_set_id: widgetState.options.asset_query_set,
@@ -176,7 +176,7 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
         state.tableLoading = true;
 
         tableDataApiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.consoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         if (pageSize.value) tableDataApiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchTableDataAnalyze({

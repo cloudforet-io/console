@@ -1,5 +1,4 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
     getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter, getWidgetOptionsSchema,
@@ -21,9 +20,9 @@ const totalFailFindingsStatusWidgetConfig: WidgetConfig = {
         inherit: true,
         inherit_count: 1,
     },
-    sizes: ['lg'],
+    sizes: ['sm', 'full'],
     options: {
-        granularity: GRANULARITY.MONTHLY,
+        data_criteria: 'realtime',
     },
     inherit_options: {
         ...getWidgetInheritOptions('asset_query_set'),
