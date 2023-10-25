@@ -1538,6 +1538,9 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
 			},
+			"TOTAL_FAIL_FINDINGS_HISTORY": {
+				"DESC": "Displays the count, rate, and severity of compliance failures observed during the selected period."
+			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "Displays the count, rate, and severity of compliance failures observed during the selected period.",
 				"LESS_THAN_PREV_MONTH": "less than previous month",

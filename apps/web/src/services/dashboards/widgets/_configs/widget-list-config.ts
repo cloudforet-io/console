@@ -7,6 +7,7 @@ import complianceStatus from '@/services/dashboards/widgets/asset-widgets/compli
 import countOfFailFindings from '@/services/dashboards/widgets/asset-widgets/count-of-fail-findings/widget-config';
 import countOfPassAndFailFindings from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
 import severityStatusByService from '@/services/dashboards/widgets/asset-widgets/severity-status-by-service/widget-config';
+import totalFailFindingsHistory from '@/services/dashboards/widgets/asset-widgets/total-fail-findings-history/widget-config';
 import totalFailFindingsStatus from '@/services/dashboards/widgets/asset-widgets/total-fail-findings-status/widget-config';
 import trendOfPassAndFailFindings from '@/services/dashboards/widgets/asset-widgets/trend-of-pass-and-fail-findings/widget-config';
 import awsCloudFrontCost from '@/services/dashboards/widgets/cost-widgets/aws-cloud-front-cost/widget-config';
@@ -44,6 +45,7 @@ export const CONSOLE_WIDGET_LIST = [
     'countOfPassAndFailFindings',
     'trendOfPassAndFailFindings',
     'totalFailFindingsStatus',
+    'totalFailFindingsHistory',
     'complianceStatus',
 ] as const;
 
@@ -70,6 +72,7 @@ export const CONSOLE_WIDGET_CONFIGS: Record<WidgetKey, Partial<WidgetConfig>> = 
     countOfPassAndFailFindings,
     trendOfPassAndFailFindings,
     totalFailFindingsStatus,
+    totalFailFindingsHistory,
     complianceStatus,
 };
 
