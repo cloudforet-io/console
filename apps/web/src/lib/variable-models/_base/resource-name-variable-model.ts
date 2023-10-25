@@ -4,12 +4,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type {
-    ListResponse, VariableModelLabel, ListOptions, IResourceFieldVariableModel,
+    ListResponse, VariableModelLabel, ListQuery, IResourceNameVariableModel,
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-export class ResourceFieldVariableModel implements IResourceFieldVariableModel {
+export default class ResourceNameVariableModel implements IResourceNameVariableModel {
     key = '';
 
     name = '';
@@ -18,18 +18,20 @@ export class ResourceFieldVariableModel implements IResourceFieldVariableModel {
 
     resourceType = '';
 
-    resourceId = '';
+    idKey = '';
 
-    only: string[] = [];
+    nameKey = 'name';
 
-    searchTargets: string[] = [];
+    only: string[] = [this.idKey, this.nameKey];
+
+    searchTargets: string[] = [this.nameKey];
 
     #response: ListResponse = { results: [] };
 
     readonly #fetcher: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
 
     formatter(data: any): string {
-        return data[this.resourceId];
+        return data[this.nameKey];
     }
 
     #getFetcher(): ReturnType<typeof getCancellableFetcher<ListResponse>> {
@@ -41,20 +43,18 @@ export class ResourceFieldVariableModel implements IResourceFieldVariableModel {
         return getCancellableFetcher(api.list);
     }
 
-    #getParams(options: ListOptions = {}): Record<string, any> {
+    #getParams(options: ListQuery = {}): Record<string, any> {
         const query: Record<string, any> = {
+            ...options,
             filter: [
                 {
-                    key: this.resourceId,
+                    key: this.idKey,
                     value: null,
                     operator: 'not',
                 },
             ],
             only: this.only,
         };
-        if (options.filter) {
-            query.filter = query.filter.concat(options.filter);
-        }
         if (options.search) {
             query.filter_or = this.searchTargets.map((key) => ({
                 k: key,
@@ -72,14 +72,14 @@ export class ResourceFieldVariableModel implements IResourceFieldVariableModel {
         };
     }
 
-    async list(options: ListOptions = {}): Promise<ListResponse> {
+    async list(options: ListQuery = {}): Promise<ListResponse> {
         try {
             const { status, response } = await this.#fetcher(
                 this.#getParams(options),
             );
             if (status === 'succeed') {
                 response.results = response.results.map((d) => ({
-                    key: d[this.resourceId],
+                    key: d[this.idKey],
                     name: this.formatter(d),
                 }));
                 this.#response = response;

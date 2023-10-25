@@ -1,7 +1,7 @@
-import { ResourceFieldVariableModel } from '@/lib/variable-models/_base/resource-field-variable-model';
+import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
 import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
 
-export class CostDataSourceVariableModel extends ResourceFieldVariableModel {
+export default class CostDataSourceVariableModel extends ResourceNameVariableModel {
     key = 'cost_data_source';
 
     name = 'Cost Data Source';
@@ -10,14 +10,5 @@ export class CostDataSourceVariableModel extends ResourceFieldVariableModel {
 
     resourceType = 'cost_analysis.DataSource';
 
-    resourceId = 'data_source_id';
-
-    only = ['data_source_id', 'name'];
-
-    searchTargets = ['name'];
-
-    // eslint-disable-next-line class-methods-use-this
-    formatter(data: any) {
-        return data.name;
-    }
+    idKey = 'data_source_id';
 }

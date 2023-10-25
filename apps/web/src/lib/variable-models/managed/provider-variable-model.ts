@@ -1,7 +1,7 @@
-import { ResourceFieldVariableModel } from '@/lib/variable-models/_base/resource-field-variable-model';
+import ResourceNameVariableModel from '@/lib/variable-models/_base/resource-name-variable-model';
 import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
 
-export class ProviderVariableModel extends ResourceFieldVariableModel {
+export default class ProviderVariableModel extends ResourceNameVariableModel {
     key = 'provider';
 
     name = 'Provider';
@@ -10,14 +10,5 @@ export class ProviderVariableModel extends ResourceFieldVariableModel {
 
     resourceType = 'identity.Provider';
 
-    resourceId = 'provider';
-
-    only = ['provider', 'name'];
-
-    searchTargets = ['name'];
-
-    // eslint-disable-next-line class-methods-use-this
-    formatter(data: any) {
-        return data.name;
-    }
+    idKey = 'provider';
 }

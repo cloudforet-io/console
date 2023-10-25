@@ -1,11 +1,11 @@
 import { getTextHighlightRegex } from '@spaceone/design-system';
 
 import type {
-    ListResponse, ListOptions,
+    ListResponse, ListQuery,
     VariableModelLabel, IEnumVariableModel,
 } from '@/lib/variable-models/_base/types';
 
-export class EnumVariableModel implements IEnumVariableModel {
+export default class EnumVariableModel implements IEnumVariableModel {
     key = '';
 
     name = '';
@@ -25,7 +25,7 @@ export class EnumVariableModel implements IEnumVariableModel {
         this.values = config.values;
     }
 
-    async list(options: ListOptions = {}): Promise<ListResponse> {
+    async list(options: ListQuery = {}): Promise<ListResponse> {
         if (!options.search) {
             this.#response = { results: this.values };
         } else {

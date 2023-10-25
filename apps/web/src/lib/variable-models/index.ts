@@ -1,8 +1,7 @@
-import { ResourceValueVariableModel } from '@/lib/variable-models/_base/resource-value-variable-model';
-
-import { EnumVariableModel } from './_base/enum-variable-model';
+import EnumVariableModel from './_base/enum-variable-model';
+import ResourceValueVariableModel from './_base/resource-value-variable-model';
 import type {
-    IBaseVariableModel, ListOptions, ListResponse, VariableModelLabel,
+    IBaseVariableModel, ListQuery, ListResponse, VariableModelLabel,
     IEnumVariableModel, IResourceValueVariableModel,
 } from './_base/types';
 import MANAGED_VARIABLE_MODELS from './managed';
@@ -33,7 +32,7 @@ export class VariableModel implements IBaseVariableModel {
         if (config.key && MANAGED_VARIABLE_MODELS[config.key]) {
             this.#type = 'MANAGED';
             const Model = MANAGED_VARIABLE_MODELS[config.key];
-            this.#model = new Model({ key: config.key, name: config.key });
+            this.#model = new Model({ key: config.key });
         } else {
             this.#type = 'CUSTOM';
             if ((config as IResourceValueVariableModel).resourceType) {
@@ -45,7 +44,7 @@ export class VariableModel implements IBaseVariableModel {
             }
         }
         this.key = this.#model.key;
-        this.name = this.#model.name ?? this.#model.key;
+        this.name = config.name ?? (this.#model.name || this.#model.key);
         this.labels = this.#model.labels;
     }
 
@@ -53,11 +52,7 @@ export class VariableModel implements IBaseVariableModel {
         return this.#type;
     }
 
-    get dataSetKeys() {
-        return this.#model.dataSetKeys;
-    }
-
-    async list(options: ListOptions = {}): Promise<ListResponse> {
+    async list(options: ListQuery = {}): Promise<ListResponse> {
         return this.#model.list(options);
     }
 }

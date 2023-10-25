@@ -5,12 +5,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type {
-    ListResponse, VariableModelLabel, ListOptions, IResourceValueVariableModel,
+    ListResponse, VariableModelLabel, ListQuery, IResourceValueVariableModel,
 } from '@/lib/variable-models/_base/types';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-export class ResourceValueVariableModel implements IResourceValueVariableModel {
+export default class ResourceValueVariableModel implements IResourceValueVariableModel {
     key = '';
 
     name = '';
@@ -42,7 +42,7 @@ export class ResourceValueVariableModel implements IResourceValueVariableModel {
         return getCancellableFetcher(api.stat);
     }
 
-    #getParams(options: ListOptions = {}): Record<string, any> {
+    #getParams(options: ListQuery = {}): Record<string, any> {
         const query: Record<string, any> = {
             distinct: this.referenceKey,
             filter: [
@@ -66,7 +66,7 @@ export class ResourceValueVariableModel implements IResourceValueVariableModel {
         };
     }
 
-    async list(options: ListOptions = {}): Promise<ListResponse> {
+    async list(options: ListQuery = {}): Promise<ListResponse> {
         try {
             const { status, response } = await this.#fetcher(
                 this.#getParams(options),

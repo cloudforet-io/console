@@ -1,12 +1,9 @@
-import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
-
 // base variable model
 export interface IBaseVariableModel {
     key: string;
     name: string;
     labels: VariableModelLabel[];
-    list(options?: ListOptions): Promise<ListResponse>;
-    dataSetKeys?: string[]; // for multiple list case
+    list(options?: ListQuery): Promise<ListResponse>;
 }
 
 // enum variable model
@@ -15,9 +12,10 @@ export interface IEnumVariableModel extends IBaseVariableModel {
 }
 
 // resource field variable model
-export interface IResourceFieldVariableModel extends IBaseVariableModel {
+export interface IResourceNameVariableModel extends IBaseVariableModel {
     resourceType: string;
-    resourceId: string;
+    idKey: string;
+    nameKey: string;
     only: string[];
     searchTargets: string[];
     formatter: (data: any) => string;
@@ -31,13 +29,12 @@ export interface IResourceValueVariableModel extends IBaseVariableModel {
 
 // related types
 export type VariableModelLabel = 'cost'|'asset';
-export interface ListOptions {
+export interface ListQuery {
     search?: string;
+    start?: number;
     limit?: number;
-    values?: Value[];
-    filter?: ApiFilter[];
-    only?: string[];
-    dataSetKey?: string; // for compound variable model
+    filters?: string[]; // to filter selected items
+    options?: Record<string, any>; // for custom options by config
 }
 export interface ListResponse {
     results: Value[];
