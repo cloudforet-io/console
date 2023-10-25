@@ -2,6 +2,7 @@ import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import {
     computed, reactive, toRef, toRefs,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import dayjs from 'dayjs';
 import { flattenDeep, isEmpty } from 'lodash';
@@ -14,6 +15,7 @@ import type { Currency } from '@/store/modules/settings/type';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type {
     WidgetProps,
@@ -43,6 +45,8 @@ export interface WidgetState extends MergedWidgetState {
     consoleFilters: ComputedRef<ConsoleFilter[]>;
     budgetConsoleFilters: ComputedRef<ConsoleFilter[]>;
     cloudServiceAnalyzeConsoleFilters: ComputedRef<ConsoleFilter[]>;
+    // location
+    assetWidgetLocation: ComputedRef<Location|null>;
 }
 const queryHelper = new QueryHelper();
 export function useWidgetState(props: WidgetProps) {
@@ -104,6 +108,24 @@ export function useWidgetState(props: WidgetProps) {
                 ...flattenDeep(Object.values(state.options.filters ?? {})),
                 ...queryHelper.filters,
             ];
+        }),
+        // location
+        assetWidgetLocation: computed<Location|null>(() => {
+            const assetQuerySetId = state.options.asset_query_set;
+            if (!assetQuerySetId) return null;
+            const assetQuerySet = props.allReferenceTypeInfo.assetQuerySet.referenceMap[assetQuerySetId];
+            const consoleFilters = flattenDeep(Object.values(state.options.filters ?? {}));
+            return {
+                name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
+                params: {
+                    provider: assetQuerySet.data?.provider,
+                    group: assetQuerySet.data?.cloud_service_group,
+                    name: assetQuerySet.data?.cloud_service_type,
+                },
+                query: {
+                    filters: queryHelper.setFilters(consoleFilters).rawQueryStrings,
+                },
+            };
         }),
     }) as UnwrapRef<WidgetState>;
 }
