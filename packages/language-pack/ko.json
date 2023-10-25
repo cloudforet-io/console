@@ -1539,8 +1539,11 @@
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
+			"TOTAL_FAIL_FINDINGS_HISTORY": {
+				"DESC": "조회 기간동안 확인된 컴플라이언스 Failure 개수, 비율과 심각도를 보여주는 위젯. "
+			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
-				"DESC": "조회 기간동안 확인된 컴플라이언스 Failure 개수, 비율과 심각도를 보여주는 위젯. ",
+				"DESC": "",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
 				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
 			},
