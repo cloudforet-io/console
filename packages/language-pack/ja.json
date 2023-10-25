@@ -793,6 +793,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"DOWNLOAD": "ダウンロード",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
 				"SUPPORT_PDF_HELP_TEXT": "この機能は、ご使用のブラウザまたはデバイスではサポートされていません。 {desktop}で{chrome}または{edge}ブラウザを使用して再試行してください。"
@@ -2039,6 +2040,10 @@
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "関連するメンバー"
+			},
+			"EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "",
+				"TITLE": ""
 			},
 			"HISTORY": {
 				"ALL_MONTH": "全体月",

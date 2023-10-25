@@ -793,6 +793,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"DOWNLOAD": "Download",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "desktop",
 				"SUPPORT_PDF_HELP_TEXT": "This feature is not supported on your browser or device. Try again with {chrome} or {edge} browser on {desktop}."
@@ -2039,6 +2040,10 @@
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "Related Member"
+			},
+			"EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "Selected data table(s) will be included as multiple sheets.",
+				"TITLE": "Select Export Options"
 			},
 			"HISTORY": {
 				"ALL_MONTH": "All Month",
