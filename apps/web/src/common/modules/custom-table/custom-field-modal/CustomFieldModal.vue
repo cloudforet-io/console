@@ -79,7 +79,7 @@
                             </p-button>
                         </h3>
                         <keep-alive>
-                            <select-cloud-service-tag-columns v-if="resourceType === 'inventory.CloudService'"
+                            <select-cloud-service-tag-columns v-if="isResourceTypeCloudService"
                                                               :options="options"
                                                               :is-server-page="isServerPage"
                                                               :selected-tag-keys="selectedTagKeys"
@@ -228,6 +228,7 @@ export default defineComponent<Props>({
                 return orderMap;
             }),
             isValid: computed(() => state.loading || state.selectedColumns.length > 0),
+            isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
         });
 
         const sortByRecommendation = () => {
@@ -326,7 +327,17 @@ export default defineComponent<Props>({
 
         const updateSelectedKeys = (keys: string[]) => {
             state.selectedColumns = keys.map((key) => {
-                if (key.startsWith(TAGS_PREFIX)) return { key, name: key.slice(TAGS_PREFIX.length), options: TAGS_OPTIONS } as DynamicField;
+                if (key.startsWith(TAGS_PREFIX)) {
+                    const name = key.slice(TAGS_PREFIX.length);
+                    return {
+                        key,
+                        name,
+                        options: {
+                            ...TAGS_OPTIONS,
+                            ...(!state.isResourceTypeCloudService && { key_depth: name.split('.').length }),
+                        },
+                    } as DynamicField;
+                }
                 return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
             });
         };
