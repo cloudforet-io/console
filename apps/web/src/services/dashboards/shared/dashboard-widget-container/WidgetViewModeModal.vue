@@ -199,6 +199,7 @@ watch(() => props.visible, async (visible) => {
                                :dashboard-variables-schema="dashboardDetailState.variablesSchema"
                                :dashboard-variables="dashboardDetailState.variables"
                                :loading="state.loadingWidget"
+                               disable-view-mode
                                @mounted="state.loadingWidget = false"
                                @update-widget-info="handleUpdateWidgetInfo(props.widgetKey, $event)"
                                @update-widget-validation="handleUpdateValidation(props.widgetKey, $event)"

@@ -50,6 +50,8 @@ export interface User extends UserData {
 	api_key_count?: number;
 	roles?: string[];
 	user_type?: UserType;
+	domain_role?: string;
+	password?: string;
 }
 
 export const USER_TYPE_LABEL = Object.freeze({

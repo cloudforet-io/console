@@ -2,7 +2,6 @@
 import {
     computed, reactive, ref, watch,
 } from 'vue';
-import type { Location } from 'vue-router';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import {
@@ -19,27 +18,16 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-
-import { objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import {
-    primary, primary1,
-} from '@/styles/colors';
+import { primary } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { GRANULARITY } from '@/services/cost-explorer/lib/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Period } from '@/services/cost-explorer/type';
 import AllSummaryDataSummary from '@/services/home-dashboard/modules/all-summary/AllSummaryDataSummary.vue';
 import type { DateItem, DateType, DataType } from '@/services/home-dashboard/modules/type';
-import {
-    DATA_TYPE,
-} from '@/services/home-dashboard/modules/type';
+import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 
 
 /* type */
@@ -47,8 +35,6 @@ type Unit = 'b' | 'gb' | 'kb' | 'mb' | 'pb' | 'tb' | 'B' | 'GB' | 'KB' | 'MB' | 
 interface ChartData {
     date: string;
     count: number | null;
-    fillOpacity?: number;
-    bulletColor?: string;
     bulletText?: string | number;
     tooltipText?: string | number;
 }
@@ -68,7 +54,6 @@ const props = withDefaults(defineProps<Props>(), {
 const DAY_COUNT = 14;
 const MONTH_COUNT = 12;
 
-const allReferenceStore = useAllReferenceStore();
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 const state = reactive({
@@ -97,7 +82,6 @@ const state = reactive({
         [DATA_TYPE.SERVER]: 0,
         [DATA_TYPE.DATABASE]: 0,
         [DATA_TYPE.STORAGE]: 0,
-        [DATA_TYPE.BILLING]: 0,
     } as CountMap,
     storageBoxSuffix: 'TB' as Unit,
     storageTrendSuffix: 'TB' as Unit,
@@ -115,18 +99,7 @@ const state = reactive({
             name: DATA_TYPE.STORAGE,
             label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
         },
-        {
-            name: DATA_TYPE.BILLING,
-            label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
-        },
     ]),
-    //
-    // HACK: this is temp code for data_source_id parameter in analyze API
-    dataSourceId: computed(() => {
-        const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
-        const dataSourceKeys: string[] = Object.keys(dataSourceMap);
-        return dataSourceKeys.length > 0 ? dataSourceKeys[0] : '';
-    }),
 });
 const chartState = reactive({
     loading: true,
@@ -237,10 +210,7 @@ const getChartData = (data): ChartData[] => {
 
     // fill default value
     forEach(range(0, dateRange), (i) => {
-        let date = dayjs.utc().subtract(i, dateUnit);
-        if (state.activeTab === DATA_TYPE.BILLING && state.selectedDateType === 'DAILY') {
-            date = date.subtract(1, 'day');
-        }
+        const date = dayjs.utc().subtract(i, dateUnit);
         if (formattedData.find((d) => date.format(dateFormat) === d.date)) {
             chartData.push(formattedData.find((d) => date.format(dateFormat) === d.date));
         } else {
@@ -250,17 +220,10 @@ const getChartData = (data): ChartData[] => {
 
     const orderedData = orderBy(chartData, ['date'], ['asc']);
     return orderedData.map((d, idx) => {
-        const tooltipText = state.activeTab === DATA_TYPE.BILLING ? numberFormatter(d.count) : d.count || '';
+        const tooltipText = d.count || '';
         let bulletText;
         if ((dateType === 'DAILY' && idx % 3 === 1) || (dateType === 'MONTHLY' && idx % 3 === 2)) {
             bulletText = tooltipText;
-        }
-
-        let fillOpacity = 1;
-        let bulletColor = primary;
-        if (state.activeTab === DATA_TYPE.BILLING && idx === orderedData.length - 1) {
-            fillOpacity = 0.5;
-            bulletColor = primary1;
         }
 
         const date = dayjs.utc(d.date).format(dateFormat);
@@ -268,59 +231,13 @@ const getChartData = (data): ChartData[] => {
         return {
             date,
             count: d.count,
-            fillOpacity,
-            bulletColor,
             bulletText,
             tooltipText,
         };
     });
 };
-const getAllSummaryTabLocation = (type: DataType): Location => {
-    if (type === DATA_TYPE.BILLING) {
-        const _period = {
-            start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
-            end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
-        };
-        return {
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
-            query: {
-                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                period: objectToQueryString(_period),
-            },
-        };
-    }
-    return {
-        name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-        query: {
-            service: type,
-        },
-    };
-};
 
 /* Api */
-const getBillingCount = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            ...props.extraParams,
-            data_source_id: state.dataSourceId,
-            query: {
-                granularity: GRANULARITY.MONTHLY,
-                start: dayjs.utc().format('YYYY-MM'),
-                end: dayjs.utc().format('YYYY-MM'),
-                fields: {
-                    cost_sum: {
-                        key: 'cost',
-                        operator: 'sum',
-                    },
-                },
-            },
-        });
-        const costSum = results[0]?.cost_sum ?? 0;
-        state.count[DATA_TYPE.BILLING] = commaFormatter(numberFormatter(costSum));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 const getCount = async () => {
     try {
         const { results } = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
@@ -347,32 +264,12 @@ const getCount = async () => {
 const getTrend = async (type) => {
     try {
         chartState.loading = true;
-        let data = [];
-        if (type === DATA_TYPE.BILLING) {
-            const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-                ...props.extraParams,
-                data_source_id: state.dataSourceId,
-                query: {
-                    granularity: state.selectedDateType,
-                    start: state.period.start,
-                    end: state.period.end,
-                    fields: {
-                        total: {
-                            key: 'cost',
-                            operator: 'sum',
-                        },
-                    },
-                },
-            });
-            if (results.length) data = results;
-        } else {
-            const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
-                ...props.extraParams,
-                label: type,
-                granularity: state.selectedDateType,
-            });
-            data = res.results;
-        }
+        const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
+            ...props.extraParams,
+            label: type,
+            granularity: state.selectedDateType,
+        });
+        const data = res.results;
         chartState.data = getChartData(data);
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -383,8 +280,7 @@ const getTrend = async (type) => {
 };
 
 /* Event */
-const handleChangeTab = (name) => {
-    // if (state.activeTab !== name) disposeChart(chartContext.value);
+const handleChangeTab = async (name) => {
     if (state.activeTab !== name) chartHelper.refreshRoot();
     state.activeTab = name;
 };
@@ -406,7 +302,6 @@ init();
 watch([() => chartState.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) {
         drawChart();
-        // requestIdleCallback(() => drawChart(_chartContext));
     }
 }, { immediate: false });
 watch(() => state.activeTab, async (type) => {
@@ -417,14 +312,11 @@ watch(() => state.selectedDateType, async () => {
     await getTrend(state.activeTab);
     drawChart();
 }, { immediate: false });
-watch(() => state.dataSourceId, (dataSourceId) => {
-    if (dataSourceId) getBillingCount();
-}, { immediate: true });
 </script>
 
 <template>
     <div class="all-summary">
-        <p-balloon-tab v-model="state.activeTab"
+        <p-balloon-tab :active-tab="state.activeTab"
                        :tabs="state.tabs"
                        tail
                        stretch
@@ -440,13 +332,13 @@ watch(() => state.dataSourceId, (dataSourceId) => {
                                    size="xl"
                         />
                         <template v-else>
-                            <router-link :to="getAllSummaryTabLocation(name)"
+                            <router-link :to="{
+                                             name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                                             query: { service: name },
+                                         }"
                                          class="anchor"
                             >
                                 <span class="number">
-                                    <span v-if="name === DATA_TYPE.BILLING"
-                                          class="dollar-sign"
-                                    >$</span>
                                     <span class="value">{{ state.count[name] }}</span>
                                 </span>
                             </router-link>
@@ -467,9 +359,6 @@ watch(() => state.dataSourceId, (dataSourceId) => {
                         <span v-if="state.activeTab === 'storage'"
                               class="suffix"
                         >({{ state.storageTrendSuffix }})</span>
-                        <span v-if="state.activeTab === 'billing'"
-                              class="suffix"
-                        >(USD)</span>
                     </div>
                     <div class="toggle-button-group">
                         <p-select-button v-for="(d, idx) in state.dateTypes"
@@ -540,9 +429,6 @@ watch(() => state.dataSourceId, (dataSourceId) => {
         line-height: 2rem;
         &:hover {
             .anchor {
-                &.billing {
-                    border: none;
-                }
                 .value {
                     border-bottom: 2px solid;
                 }

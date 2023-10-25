@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import {
     computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
@@ -10,8 +9,9 @@ import {
 } from '@amcharts/amcharts4/charts';
 import { create, color, LinearGradientModifier } from '@amcharts/amcharts4/core';
 import {
-    PSelectButton, PDataLoader, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton,
+    PSelectButton, PDataLoader, PCollapsibleToggle, PDataTable, PI, PIconButton, PSkeleton, PSelectDropdown, PLazyImg,
 } from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
 
@@ -20,6 +20,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -61,6 +62,10 @@ const props = defineProps<Props>();
 
 const allReferenceStore = useAllReferenceStore();
 const chartContext = ref<HTMLElement | null>(null);
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource ?? {}),
+});
 const state = reactive({
     loading: true,
     chart: null as XYChart | null,
@@ -71,14 +76,14 @@ const state = reactive({
     ])),
     data: [],
     selectedDateType: DATE_TYPE.monthly,
-    // HACK: this is temp code for data_source_id parameter in analyze API
-    dataSourceId: computed(() => {
-        const dataSourceMap: CostDataSourceReferenceMap = allReferenceStore.getters.costDataSource;
-        const dataSourceKeys: string[] = Object.keys(dataSourceMap);
-        return dataSourceKeys.length > 0 ? dataSourceKeys[0] : '';
-    }),
+    dataSourceMenuItems: computed<MenuItem[]>(() => Object.entries(storeState.dataSourceMap).map(([key, value]) => ({
+        name: key,
+        label: value?.name,
+        imageUrl: storeState.plugins[value.data.plugin_info?.plugin_id]?.icon ? storeState.plugins[value.data.plugin_info?.plugin_id]?.icon : 'error',
+    }))),
+    selectedDataSourceId: undefined as undefined|string,
     currency: computed<Currency>(() => {
-        const targetDataSource = allReferenceStore.getters.costDataSource[state.dataSourceId ?? ''];
+        const targetDataSource = allReferenceStore.getters.costDataSource[state.selectedDataSourceId ?? ''];
         if (!targetDataSource) return CURRENCY.USD;
         const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
         return currentCurrency ?? CURRENCY.USD;
@@ -271,7 +276,7 @@ const drawChart = (_chartContext) => {
 
 /* Api */
 const costAnalyzeQueryHelper = new QueryHelper();
-const fetchTrendData = async () => {
+const fetchTrendData = async (dataSourceId: string) => {
     try {
         state.loading = true;
         let start = dayjs.utc().subtract(DAY_COUNT - 1, 'day').format('YYYY-MM-DD');
@@ -282,7 +287,7 @@ const fetchTrendData = async () => {
         }
         costAnalyzeQueryHelper.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            data_source_id: state.dataSourceId,
+            data_source_id: dataSourceId,
             query: {
                 granularity: state.selectedDateType,
                 fields: {
@@ -305,7 +310,7 @@ const fetchTrendData = async () => {
         state.loading = false;
     }
 };
-const fetchTableData = async () => {
+const fetchTableData = async (dataSourceId: string) => {
     try {
         tableState.loading = true;
         const today = tableState.endDate;
@@ -320,7 +325,7 @@ const fetchTableData = async () => {
         }
         costAnalyzeQueryHelper.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
         const { results } = await SpaceConnector.clientV2.costAnalysis.cost.analyze({
-            data_source_id: state.dataSourceId,
+            data_source_id: dataSourceId,
             query: {
                 granularity: state.selectedDateType,
                 group_by: [GROUP_BY.PRODUCT],
@@ -410,23 +415,29 @@ const handleClickDateButton = (type) => {
     } else {
         tableState.endDate = tableState.endDate.add(DATA_TABLE_COLUMN, dateUnit);
     }
-    fetchTableData();
+    fetchTableData(state.selectedDataSourceId);
+};
+const handleChangeSelectedDataSourceId = (id: string) => {
+    state.selectedDataSourceId = id;
 };
 
 /* Watcher */
-watch([() => state.selectedDateType, () => state.dataSourceId], async ([, dataSourceId]) => {
+watch(() => storeState.dataSourceMap, (dataSourceMap) => {
+    if (dataSourceMap) {
+        state.selectedDataSourceId = Object.keys(dataSourceMap)[0];
+    }
+}, { immediate: true });
+watch([() => state.selectedDateType, () => state.selectedDataSourceId], async ([, dataSourceId]) => {
     if (dataSourceId) {
         await Promise.all([
-            fetchTrendData(),
-            fetchTableData(),
+            fetchTrendData(dataSourceId),
+            fetchTableData(dataSourceId),
         ]);
         setCountData(state.data);
     }
 }, { immediate: true });
-watch([() => chartState.data, () => chartContext.value], async ([data, _chartContext]) => {
-    if (data.length && chartContext) {
-        drawChart(_chartContext);
-    }
+watch([() => chartState.data, () => chartContext.value], async ([, _chartContext]) => {
+    if (_chartContext) drawChart(_chartContext);
 });
 
 onUnmounted(() => {
@@ -440,9 +451,30 @@ onUnmounted(() => {
             <span>{{ $t('COMMON.WIDGETS.BILLING.TITLE') }}</span>
         </div>
         <div class="content-wrapper grid grid-cols-12 gap-2">
-            <div class="col-span-12 title">
-                <span>{{ $t('COMMON.WIDGETS.BILLING.TREND_TITLE') }}</span>
-                <div class="date-button-group">
+            <div class="col-span-12 title-wrapper">
+                <div class="left-part">
+                    <span class="title">{{ $t('COMMON.WIDGETS.BILLING.TREND_TITLE') }}</span>
+                    <p-select-dropdown :menu="state.dataSourceMenuItems"
+                                       :selected="state.selectedDataSourceId"
+                                       style-type="transparent"
+                                       size="sm"
+                                       class="data-source-dropdown"
+                                       @update:selected="handleChangeSelectedDataSourceId"
+                    >
+                        <template #dropdown-button="item">
+                            <div class="selected-wrapper">
+                                <p-lazy-img v-if="item && item.imageUrl"
+                                            class="selected-icon"
+                                            :src="item.imageUrl"
+                                            width="1rem"
+                                            height="1rem"
+                                />
+                                {{ item?.label }}
+                            </div>
+                        </template>
+                    </p-select-dropdown>
+                </div>
+                <div class="right-part">
                     <p-select-button v-for="(d, idx) in state.dateTypes"
                                      :key="`date-${d.name}-${idx}`"
                                      :class="{'selected': state.selectedDateType === d.name}"
@@ -567,18 +599,32 @@ onUnmounted(() => {
 .content-wrapper {
     @apply border border-gray-200 rounded-md;
     padding: 1rem;
-    .title {
+    .title-wrapper {
         position: relative;
-        font-size: 0.875rem;
-        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         margin-bottom: 1rem;
-        .date-button-group {
-            position: absolute;
-            right: 0.5rem;
-            top: 0;
+        .title {
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        .right-part {
             .p-select-button {
                 margin-right: 0.375rem;
                 min-width: 2.4375rem;
+            }
+        }
+    }
+    .data-source-dropdown {
+        margin-left: 1rem;
+        .selected-wrapper {
+            @apply flex items-center;
+
+            .selected-icon {
+                margin-right: 0.25rem;
+                margin-top: 0.125rem;
+                flex-shrink: 0;
             }
         }
     }

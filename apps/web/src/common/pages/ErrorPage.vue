@@ -1,45 +1,86 @@
+<script lang="ts">
+// eslint-disable-next-line import/order
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+    beforeRouteEnter(to, from, next) {
+        next((vm) => {
+            vm.$router.replace({
+                query: { previousPage: from.fullPath },
+            }).catch(() => {});
+        });
+    },
+});
+</script>
+
+<script setup lang="ts">
+/* eslint-disable import/first */
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import { PButton } from '@spaceone/design-system';
+
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+
+interface Props {
+    statusCode: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    statusCode: '404',
+});
+
+const route = useRoute();
+const router = useRouter();
+
+const handleClickBack = () => {
+    const previousPage = route.query.previousPage as string;
+    if (previousPage === '/') {
+        handleClickHome();
+    } else {
+        router.go(-1);
+    }
+};
+const handleClickHome = () => {
+    router.push({ name: HOME_DASHBOARD_ROUTE._NAME });
+};
+</script>
+
 <template>
     <section class="page-wrapper">
         <article class="error-contents">
             <img class="error-img"
+                 alt="error-img"
                  src="/images/error-octos.gif"
             >
             <h2 class="error-code">
-                {{ statusCode }}
+                {{ props.statusCode }}
             </h2>
             <h3 class="error-message">
-                <template v-if="statusCode === '403'">
+                <template v-if="props.statusCode === '403'">
                     {{ $t('COMMON.ERROR.404_MSG') }}
                 </template>
                 <template v-else>
                     {{ $t('COMMON.ERROR.404_MSG') }}
                 </template>
             </h3>
-            <p-button class="go-back-button"
-                      style-type="primary"
-                      size="md"
-                      @click="$router.go(-1)"
-            >
-                {{ $t('COMMON.ERROR.GO_BACK') }}
-            </p-button>
+            <div class="utils-button">
+                <p-button style-type="transparent"
+                          size="lg"
+                          icon-left="ic_arrow-left"
+                          @click="handleClickBack"
+                >
+                    {{ $t('COMMON.ERROR.GO_BACK') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="lg"
+                          @click="handleClickHome"
+                >
+                    {{ $t('COMMON.ERROR.HOME') }}
+                </p-button>
+            </div>
         </article>
     </section>
 </template>
-
-<script lang="ts">
-import { PButton } from '@spaceone/design-system';
-
-export default {
-    name: 'ErrorPage',
-    components: { PButton },
-    props: {
-        statusCode: {
-            type: String,
-            default: '404',
-        },
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .page-wrapper {
@@ -63,13 +104,13 @@ export default {
             padding-bottom: 0.5rem;
         }
         .error-message {
-            @apply text-gray-500;
-            font-size: 1rem;
-            line-height: 150%;
+            @apply text-violet-400 text-display-sm m-auto;
+            width: 18rem;
             padding-bottom: 2.25rem;
         }
-        .go-back-button {
-            height: 2.5rem;
+        .utils-button {
+            @apply flex items-center justify-center;
+            gap: 1rem;
         }
     }
 }
