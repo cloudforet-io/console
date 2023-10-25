@@ -2,6 +2,7 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import { percent, array } from '@amcharts/amcharts5';
 import type * as am5xy from '@amcharts/amcharts5/xy';
@@ -52,6 +53,7 @@ const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    widgetLocation: computed<Location>(() => widgetState.assetWidgetLocation),
 });
 
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
