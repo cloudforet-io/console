@@ -2,6 +2,7 @@
 import {
     computed, defineExpose, defineProps, reactive, toRef,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import {
     PProgressBar,
@@ -50,6 +51,7 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    widgetLocation: computed<Location>(() => widgetState.assetWidgetLocation),
 });
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),

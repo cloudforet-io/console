@@ -2,6 +2,7 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
@@ -69,6 +70,7 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
+    widgetLocation: computed<Location>(() => widgetState.assetWidgetLocation),
 });
 const state = reactive({
     loading: true,
