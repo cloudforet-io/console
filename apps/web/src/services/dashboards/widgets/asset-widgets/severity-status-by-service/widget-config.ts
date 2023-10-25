@@ -1,5 +1,4 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import {
     getWidgetFilterOptionsSchema,
     getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter, getWidgetOptionsSchema,
@@ -22,11 +21,6 @@ const severityStatusByServiceWidgetConfig: WidgetConfig = {
     },
     sizes: ['full'],
     options: {
-        granularity: GRANULARITY.YEARLY,
-        legend_options: {
-            enabled: true,
-            show_at: 'chart',
-        },
         data_criteria: 'realtime',
     },
     inherit_options: {

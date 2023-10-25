@@ -62,35 +62,30 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'additional_info.status', v: ['PASS', 'FAIL'], o: '=' });
-        const { status, response } = await fetchCloudServiceStatsAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+            .setFilters(widgetState.cloudServiceAnalyzeConsoleFilters)
+            .addFilter({ k: 'data.status', v: ['PASS', 'FAIL'], o: '=' });
+        const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                group_by: ['additional_info.service'],
-                granularity: 'MONTHLY',
-                start: widgetState.dateRange.end,
-                end: widgetState.dateRange.end,
+                group_by: ['data.service'],
                 fields: {
                     pass_finding_count: {
-                        key: 'values.pass_finding_count',
+                        key: 'data.stats.findings.pass',
                         operator: 'sum',
                     },
                     fail_finding_count: {
-                        key: 'values.fail_finding_count',
+                        key: 'data.stats.findings.fail',
                         operator: 'sum',
                     },
                     status: {
-                        key: 'additional_info.status',
+                        key: 'data.status',
                         operator: 'add_to_set',
                     },
                     severity: {
-                        key: 'additional_info.severity',
+                        key: 'data.severity',
                         operator: 'add_to_set',
                     },
                 },

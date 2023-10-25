@@ -38,7 +38,7 @@ export interface QuerySetModel {
     last_synchronized_at: string;
 }
 
-type PickedQuerySetModel = Pick<QuerySetModel, 'query_set_id'|'name'>;
+type PickedQuerySetModel = Pick<QuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
 export type QuerySetItems = Required<Pick<ReferenceItem<PickedQuerySetModel>, 'key'|'label'|'name'|'data'>>;
 export type AssetQuerySetReferenceMap = ReferenceMap<QuerySetItems>;
 
