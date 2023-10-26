@@ -146,7 +146,7 @@ const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> =
     promiseResults.forEach((result) => {
         if (result.status === 'fulfilled') {
             const { results } = result.value;
-            foundItems = foundItems.concat(results.map((item) => ({ name: item.key, label: item.name })));
+            foundItems = foundItems.concat(results);
         }
     });
     return foundItems;
