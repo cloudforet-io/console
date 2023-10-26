@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PButtonModal, PI, PLink, PToolboxTable, PTextPagination,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PCollapsibleToggle,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
@@ -173,6 +173,7 @@ const tableState = reactive({
     thisPage: 1,
     pageSize: 15,
     more: false,
+    showFormattedData: true,
 });
 
 /* util */
@@ -427,6 +428,13 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
             <template #toolbox-left>
                 <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
                 <usage-type-additional-filter-selector @update-filter="handleUpdateUsageTypeAdditionalFilterSelected" />
+                <div class="toggle-wrapper">
+                    <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
+                    <p-collapsible-toggle :toggle-type="'switch'"
+                                          :is-collapsed.sync="tableState.showFormattedData"
+                                          class="collapsible-toggle"
+                    />
+                </div>
             </template>
             <template #th-format="{field}">
                 {{ field.label }}
@@ -479,7 +487,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                         </template>
                         <template v-else>
                             <span class="usage-wrapper">
-                                {{ usageUnitFormatter(value, {unit: item.usage_unit}) }}
+                                {{ tableState.showFormattedData ? usageUnitFormatter(value, {unit: item.usage_unit}) : value }}
                             </span>
                         </template>
                     </p-link>
@@ -513,6 +521,16 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
     .cell-text {
         &.raised {
             @apply text-alert;
+        }
+    }
+    .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        padding-left: 1rem;
+        .label {
+            @apply text-label-md;
+            font-weight: 700;
+            padding-right: 0.5rem;
         }
     }
     .usage-wrapper {
