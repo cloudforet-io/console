@@ -11,12 +11,11 @@ import type {
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
+import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
+
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionDropdown.vue';
-import {
-    getWidgetOptionMenuHandlers,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/helpers/widget-option-menu-handler';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import {
     getVariableKeyFromWidgetSchemaProperty,
@@ -60,7 +59,7 @@ const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandl
     if (widgetFormState.inheritOptions?.[schema.key]?.enabled) {
         return [getInheritOptionMenuHandler(schema)];
     }
-    return getWidgetOptionMenuHandlers(schema);
+    return schema.item_options?.map((options) => getVariableModelMenuHandler(options)) ?? [];
 };
 const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
     const widgetOptions = { ...widgetFormState.widgetOptions };
