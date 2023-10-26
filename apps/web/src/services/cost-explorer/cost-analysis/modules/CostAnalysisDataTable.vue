@@ -286,6 +286,14 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
     });
     return refinedTableData;
 };
+const getCommaFormattedValue = (value: number): string|number => {
+    if (value) {
+        return Intl.NumberFormat('en', {
+            maximumFractionDigits: 20, minimumFractionDigits: undefined, notation: 'standard', style: 'decimal',
+        }).format(value);
+    }
+    return value;
+};
 
 
 /* api */
@@ -487,7 +495,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                         </template>
                         <template v-else>
                             <span class="usage-wrapper">
-                                {{ tableState.showFormattedData ? usageUnitFormatter(value, {unit: item.usage_unit}) : value }}
+                                {{ tableState.showFormattedData ? usageUnitFormatter(value, {unit: item.usage_unit}) : getCommaFormattedValue(value) }}
                             </span>
                         </template>
                     </p-link>
