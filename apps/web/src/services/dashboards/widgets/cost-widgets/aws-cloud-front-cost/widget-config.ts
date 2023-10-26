@@ -1,13 +1,7 @@
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsCloudFrontCost',
@@ -46,38 +40,17 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
             cost_product: [{ k: 'product', v: 'AmazonCloudFront', o: '=' }],
         },
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'service_account',
-            'region',
-        ),
-    },
-    options_schema: {
-        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
-            'cost_product',
-            'project',
-            'service_account',
-            'region',
-        )],
-        fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
-        non_inheritable_properties: ['cost_group_by'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
-                ...getWidgetFilterOptionsSchema(
-                    'cost_product',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'region',
-                ),
-            },
-            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product', 'project', 'service_account', 'project_group', 'region')],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'cost_group_by',
+        'cost_product',
+        'project',
+        'service_account',
+        'project_group',
+        'region',
+    ]),
+    // fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
+    // non_inheritable_properties: ['cost_group_by'],
 };
 
 export default awsCloudFrontCostWidgetConfig;

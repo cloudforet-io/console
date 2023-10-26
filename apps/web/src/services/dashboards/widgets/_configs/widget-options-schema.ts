@@ -156,7 +156,14 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchem
     //         { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: COST_VARIABLE_TYPE_INFO.cost_usage_type.key },
     //     ],
     // },
+};
 
+// TODO: will be updated
+export const getWidgetOptionsSchema = (optionNames: string[]) => {
+    console.log(optionNames);
+    const properties: Record<string, WidgetOptionsSchemaProperty> = {};
+    const order: string[] = [];
+    return { properties, order };
 };
 
 
