@@ -9,24 +9,21 @@ import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import {
-    cloneDeep, debounce, flattenDeep, get,
+    cloneDeep, debounce, flattenDeep,
 } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import type { SearchResourceModelOptions } from '@/models/widget';
-
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
-import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
+
 
 interface Props {
     propertyName: string;
@@ -45,47 +42,22 @@ const state = reactive({
     searchText: '',
     variableProperty: computed<DashboardVariableSchemaProperty|undefined>(() => dashboardDetailState.variablesSchema.properties[props.propertyName]),
     variableName: computed<string|undefined>(() => state.variableProperty?.name),
-    selected: computed<MenuItem[]>(() => {
-        // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
-        const arrayOfSelectedOptions = flattenDeep([dashboardDetailState.variables[props.propertyName] ?? []]);
-
-        if (state.variableProperty?.options?.type === 'REFERENCE_RESOURCE') {
-            return arrayOfSelectedOptions.map((d) => ({ name: d, label: props.referenceMap[d]?.label ?? props.referenceMap[d]?.name ?? d }));
-        }
-        if (state.variableProperty?.options?.type === 'SEARCH_RESOURCE') {
-            if (state.searchResourceOptions.length) {
-                return arrayOfSelectedOptions.map((d) => ({
-                    name: d,
-                    label: state.searchResourceOptions.find((optionItem) => optionItem.key === d)?.name ?? d,
-                }));
-            }
-            return arrayOfSelectedOptions.map((d) => ({ name: d, label: d }));
-        }
-        return arrayOfSelectedOptions.map((d) => ({ name: d, label: state.options.find((optionItem) => optionItem.name === d).label }));
-    }),
+    selected: [] as MenuItem[],
     // Options State
     searchResourceOptions: []as {key: string; name: string}[],
-    options: computed<MenuItem[]>(() => {
-        let result;
-
-        if (state.variableProperty?.options?.type === 'REFERENCE_RESOURCE') {
-            result = Object.entries(props.referenceMap).map(([referenceKey, referenceItem]) => ({
-                name: referenceKey, label: referenceItem?.label ?? referenceItem?.name ?? referenceKey,
-            }));
-        } else if (state.variableProperty?.options?.type === 'SEARCH_RESOURCE') {
-            result = state.searchResourceOptions.map((d) => ({ name: d.key, label: d.name }));
-        } else if (state.variableProperty?.options?.type === 'ENUM') {
-            result = state.variableProperty?.options.values.map((d) => ({ name: d.key, label: d.label }));
-        }
-        return result ?? [];
-    }),
     autocompleteApi: computed<ReturnType<typeof getCancellableFetcher>>(() => {
         const api = (state.variableProperty?.options?.reference_key ?? state.variableProperty?.options?.resource_key) // NOTE: Compatibility code for version 1.12.
             ? SpaceConnector.client.addOns.autocomplete.distinct
             : SpaceConnector.client.addOns.autocomplete.resource;
         return getCancellableFetcher(api);
     }),
+    menuHandlers: computed<AutocompleteHandler[]>(() => {
+        const options = state.variableProperty?.options;
+        if (!Array.isArray(options)) return [];
+        return options.map((config) => getVariableModelMenuHandler(config));
+    }),
 });
+
 
 const {
     visibleMenu,
@@ -103,7 +75,7 @@ const {
     useReorderBySelection: true,
     searchText: toRef(state, 'searchText'),
     selected: toRef(state, 'selected'),
-    menu: toRef(state, 'options'),
+    handler: toRef(state, 'menuHandlers'),
     pageSize: 10,
 });
 
@@ -145,54 +117,54 @@ const handleUpdateSearchText = debounce((text: string) => {
     reloadMenu();
 }, 200);
 
-const filtersHelper = new QueryHelper();
+// TODO: apply filters to variable model referencing code below.
+// const filtersHelper = new QueryHelper();
+// const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHelper['apiQuery']['filter']|undefined => {
+//     filtersHelper.setFilters([]);
+//
+//     // NOTE: Some variables(asset) require specific API filters.
+//     if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_query_set.name) {
+//         filtersHelper.setFilters([{ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' }]);
+//     } else if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
+//         filtersHelper.setFilters([{ k: 'provider', o: '=', v: 'aws' }]);
+//     }
+//
+//     const filters = filtersHelper.apiQuery.filter;
+//     if (filters.length) return filters;
+//     return undefined;
+// };
 
-const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHelper['apiQuery']['filter']|undefined => {
-    filtersHelper.setFilters([]);
-
-    // NOTE: Some variables(asset) require specific API filters.
-    if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_query_set.name) {
-        filtersHelper.setFilters([{ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' }]);
-    } else if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
-        filtersHelper.setFilters([{ k: 'provider', o: '=', v: 'aws' }]);
-    }
-
-    const filters = filtersHelper.apiQuery.filter;
-    if (filters.length) return filters;
-    return undefined;
-};
-const loadSearchResourceOptions = async () => {
-    try {
-        const options = state.variableProperty?.options as SearchResourceModelOptions|undefined;
-        if (options?.type !== 'SEARCH_RESOURCE') throw new Error('Invalid options type');
-        const { status, response } = await state.autocompleteApi({
-            resource_type: options.resource_type ?? 'cost_analysis.Cost',
-            distinct_key: options.reference_key ?? options.resource_key, // NOTE: Compatibility code for version 1.12.
-            options: {
-                filter: getFilters(state.variableProperty),
-            },
-        });
-        if (status === 'succeed') {
-            state.searchResourceOptions = response.results;
+const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {
+    let foundItems: MenuItem[] = [];
+    const handlerPromises = state.menuHandlers.map((handler: AutocompleteHandler) => handler(
+        state.searchText,
+        undefined,
+        undefined,
+        selectedValues?.map((d) => ({ name: d, label: d })),
+    ));
+    const promiseResults = await Promise.allSettled(handlerPromises);
+    promiseResults.forEach((result) => {
+        if (result.status === 'fulfilled') {
+            const { results } = result.value;
+            foundItems = foundItems.concat(results.map((item) => ({ name: item.key, label: item.name })));
         }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-const initVariable = () => {
-    const variableSchema = dashboardDetailState.variablesSchema.properties[props.propertyName];
-    const existingVariableInfoValue = dashboardDetailState.dashboardInfo?.variables[props.propertyName];
-    if ((variableSchema.options as SearchResourceModelOptions)?.type === 'SEARCH_RESOURCE' && existingVariableInfoValue === undefined) {
-        const path = (variableSchema.options as SearchResourceModelOptions).default_path;
-        if (path !== undefined) {
-            const found = get(state.searchResourceOptions, path, undefined);
-            if (found) changeVariables([{ name: found.key, label: found.name }]);
-        }
-    }
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: true };
     });
+    return foundItems;
+};
+const initVariableAndSelected = async () => {
+    const items = await loadOptionItems();
+    const found = items[0];
+    if (found) {
+        state.selected = [found];
+        changeVariables([found]);
+    }
+};
+const initSelected = async (value: any) => {
+    // Selected options data from backend can be undefined or string not string[]. Convert them to Array.
+    const selectedValues = flattenDeep([value ?? []]);
+    const items = await loadOptionItems(selectedValues);
+    const selectedItems = items.filter((item) => selectedValues.includes(item.name));
+    state.selected = selectedItems;
 };
 
 watch(visibleMenu, (_visibleMenu) => {
@@ -205,8 +177,17 @@ watch(() => state.variableProperty, async (property) => {
     dashboardDetailStore.$patch((_state) => {
         _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: false };
     });
-    if (property.options?.type === 'SEARCH_RESOURCE') await loadSearchResourceOptions();
-    initVariable();
+
+    const value = dashboardDetailState.variables[props.propertyName];
+    if (property.required && value === undefined) {
+        await initVariableAndSelected();
+    } else if (value) {
+        await initSelected(value);
+    }
+
+    dashboardDetailStore.$patch((_state) => {
+        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: true };
+    });
 }, { immediate: true });
 
 
@@ -227,7 +208,7 @@ const {
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
-                :disabled="state.variableProperty?.disabled || props.disabled"
+                :disabled="state.variableProperty?.readonly || props.disabled"
                 @click="toggleMenu"
         >
             <span class="variable-contents">
@@ -244,7 +225,7 @@ const {
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-                <button v-if="!state.variableProperty?.disabled && !state.variableProperty?.required"
+                <button v-if="!state.variableProperty?.readonly && !state.variableProperty?.fixed"
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
@@ -274,7 +255,7 @@ const {
                         :selected="state.selected"
                         :multi-selectable="variableProperty?.selection_type === 'MULTI'"
                         show-select-marker
-                        :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.required"
+                        :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.fixed"
                         @click-show-more="showMoreMenu"
                         @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectOption"

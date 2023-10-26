@@ -6,11 +6,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
 import type {
     DashboardSettings, DashboardVariables, DashboardVariablesSchema,
+    DashboardVariableSchemaProperty,
 } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type { DashboardLayoutWidgetInfo, UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
@@ -52,9 +55,9 @@ export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>(
 });
 
 const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
-    let projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
+    let projectPropertySchema = { ...MANAGED_DASH_VAR_SCHEMA.properties.project, disabled: true };
     if (labels?.includes('Asset')) {
-        projectPropertySchema = { ...managedDashboardVariablesSchema.properties.project, disabled: true };
+        projectPropertySchema = { ...MANAGED_DASH_VAR_SCHEMA.properties.project, disabled: true };
     }
     const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };
 
@@ -267,18 +270,28 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         convertDashboardInfoByChangedVariableSchema(dashboardInfo: DashboardModel) {
             const _dashboardInfo = cloneDeep(dashboardInfo);
             if (isEmpty(_dashboardInfo.variables_schema)) return _dashboardInfo;
-            Object.entries(_dashboardInfo.variables_schema.properties).forEach(([k, v]) => {
-                if (!v.options) {
+
+            // NOTE: This is conversion from old dashboard variable schema to new one which is stored to database before version 2.0(<=1.12).
+            Object.entries(_dashboardInfo.variables_schema.properties).forEach(([k, property]) => {
+                if (property.variable_type === 'MANAGED') {
+                    if (MANAGED_DASH_VAR_SCHEMA.properties[k]) {
+                        _dashboardInfo.variables_schema.properties[k] = {
+                            ...MANAGED_DASH_VAR_SCHEMA.properties[k],
+                            use: property.use,
+                        };
+                    } else if (k === 'asset_query_set') {
+                        _dashboardInfo.variables_schema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = {
+                            ...MANAGED_DASH_VAR_SCHEMA.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key],
+                            use: property.use,
+                        };
+                        delete _dashboardInfo.variables_schema.properties[k];
+                    } else {
+                        console.error('convertDashboardInfoByChangedVariableSchema: conversion failed', property);
+                    }
+                } else {
+                    const options = getConvertedCustomOptions(property.options);
                     _dashboardInfo.variables_schema.properties[k] = {
-                        ...managedDashboardVariablesSchema.properties[k],
-                    };
-                } else if (Array.isArray(v.options)) {
-                    _dashboardInfo.variables_schema.properties[k] = {
-                        ...v,
-                        options: {
-                            type: 'ENUM',
-                            values: v.options.map((d) => ({ key: d, label: d })),
-                        },
+                        ...property, options,
                     };
                 }
             });
@@ -287,3 +300,29 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     },
 });
 
+
+const getConvertedCustomOptions = (storedOptions?: DeprecatedCustomVariableOptions|DashboardVariableSchemaProperty['options']): DashboardVariableSchemaProperty['options']|undefined => {
+    // early return if storedOptions is empty or already in the new format.
+    if (!storedOptions || Array.isArray(storedOptions)) return storedOptions;
+
+    const options = storedOptions as DeprecatedCustomVariableOptions;
+
+    // only ENUM type was supported for custom options in old dashboard variable schema.
+    if (options.type === 'ENUM') {
+        if (options.values[0]?.label) {
+            return [{
+                type: 'ENUM',
+                values: options.values.map((value) => ({ key: value.key, name: value.label })),
+            }];
+        }
+    }
+
+    console.error('getConvertedCustomOptions: conversion failed', storedOptions);
+    return undefined;
+};
+
+// only ENUM type was supported for custom options in old dashboard variable schema.
+type DeprecatedCustomVariableOptions = {
+    type: 'ENUM';
+    values: { key: string; label: string; }[];
+};

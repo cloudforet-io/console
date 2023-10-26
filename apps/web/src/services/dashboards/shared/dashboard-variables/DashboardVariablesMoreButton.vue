@@ -154,9 +154,9 @@ const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string
 
     dashboardDetailState.dashboardWidgetInfoList.forEach((widgetInfo) => {
         const widgetConfig = getWidgetConfig(widgetInfo.widget_name);
-        const mergedInheritOptions = merge({}, widgetConfig?.inherit_options ?? {}, widgetInfo.inherit_options);
+        const inheritOptions = merge({}, widgetInfo.inherit_options);
 
-        const widgetInheritVariableKeys = Object.values(mergedInheritOptions).filter((d) => d.enabled).map((d) => d.variable_info?.key);
+        const widgetInheritVariableKeys = Object.values(inheritOptions).filter((d) => d.enabled).map((d) => d.variable_info?.key);
         if (widgetInheritVariableKeys.includes(targetProperty)) {
             widgetTitles.push(widgetInfo.title ?? widgetConfig.title as string);
         }
