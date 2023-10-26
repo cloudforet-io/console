@@ -24,7 +24,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     only: string[] = [this.idKey, this.nameKey];
 
-    searchTargets: string[] = [this.nameKey];
+    searchTargets: string[] = [this.idKey, this.nameKey];
 
     #response: ListResponse = { results: [] };
 
