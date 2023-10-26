@@ -136,30 +136,16 @@ export const WIDGET_FILTER_KEYS = [
 export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
-
 /* widget schema */
 export type WidgetFiltersSchema = {
     [K in WidgetFilterKey as `filters.${K}`]: JsonSchema['properties']
 };
 export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
-export type WidgetOptionsSchemaProperty = 'cost_group_by'|'asset_group_by'|WidgetFiltersSchemaProperty|string;
-export type CostWidgetOptionsSchemaProperty = 'cost_group_by'|WidgetFiltersSchemaProperty|string;
-export type AssetWidgetOptionsSchemaProperty = 'asset_group_by'|WidgetFiltersSchemaProperty|string;
-export interface BaseWidgetOptionsSchema<T extends string> {
-    default_properties?: T[];
-    fixed_properties?: T[];
-    non_inheritable_properties?: T[];
-    schema: JsonSchema;
-}
-export type WidgetOptionsSchema =
-     | BaseWidgetOptionsSchema<CostWidgetOptionsSchemaProperty>
-     | BaseWidgetOptionsSchema<AssetWidgetOptionsSchemaProperty>;
 
 /* widget options */
 export interface BaseWidgetOptions {
     // group_by?: GroupBy | string;
     granularity?: Granularity;
-    stacked?: boolean;
     legend_options?: LegendOptions;
     chart_type?: ChartType;
     // selector_options?: {
@@ -177,12 +163,12 @@ export interface SelectorOptions {
     enabled?: boolean;
     type: 'cost-usage'|'days';
 }
-export interface CostWidgetOptions extends BaseWidgetOptions {
+interface CostWidgetOptions extends BaseWidgetOptions {
     cost_data_source?: string;
     cost_group_by?: CostGroupBy | string;
     selector_options?: SelectorOptions;
 }
-export interface AssetWidgetOptions extends BaseWidgetOptions {
+interface AssetWidgetOptions extends BaseWidgetOptions {
     asset_query_set?: string;
     asset_group_by?: AssetGroupBy | string;
 }
