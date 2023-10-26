@@ -9,11 +9,15 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
     WidgetFilterKey,
     WidgetFiltersSchemaProperty,
-    WidgetOptionsSchemaProperty,
     InheritOptions,
-    WidgetConfig, WidgetOptionsSchema, WidgetOptions,
+    WidgetConfig,
+    WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/config';
+import type {
+    WidgetOptionsSchema,
+    WidgetOptionsSchemaProperty,
+} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
     ASSET_GROUP_BY_SCHEMA, ASSET_REFERENCE_SCHEMA,
     COST_REFERENCE_SCHEMA, COST_GROUP_BY_SCHEMA,
@@ -24,14 +28,14 @@ export const getWidgetOptionsSchema = (...optionNames: WidgetOptionsSchemaProper
     const result: JsonSchema['properties'] = {};
 
     optionNames.forEach((optionName) => {
-        if (optionName === 'cost_data_source') result.cost_data_source = COST_DATA_SOURCE_SCHEMA;
-        else if (optionName === 'asset_query_set') result.asset_query_set = ASSET_COMPLIANCE_FRAMEWORK_SCHEMA;
-        else if (optionName === 'cost_group_by') result.cost_group_by = COST_GROUP_BY_SCHEMA;
-        else if (optionName === 'asset_group_by') result.asset_group_by = ASSET_GROUP_BY_SCHEMA;
-        else if (optionName.startsWith('filters.')) {
-            const filterKey = optionName.replace('filters.', '');
+        if (optionName.key === 'cost_data_source') result.cost_data_source = COST_DATA_SOURCE_SCHEMA;
+        else if (optionName.key === 'asset_query_set') result.asset_query_set = ASSET_COMPLIANCE_FRAMEWORK_SCHEMA;
+        else if (optionName.key === 'cost_group_by') result.cost_group_by = COST_GROUP_BY_SCHEMA;
+        else if (optionName.key === 'asset_group_by') result.asset_group_by = ASSET_GROUP_BY_SCHEMA;
+        else if (optionName.key.startsWith('filters.')) {
+            const filterKey = optionName.key.replace('filters.', '');
             const filterSchema = getWidgetFilterOptionsSchema(filterKey as WidgetFilterKey);
-            if (filterSchema[optionName]) result[optionName] = filterSchema[optionName];
+            if (filterSchema[optionName.key]) result[optionName.key] = filterSchema[optionName.key];
         } else {
             console.error(`No matched option schema for ${optionName}`);
         }
