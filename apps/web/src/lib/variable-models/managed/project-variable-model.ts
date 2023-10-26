@@ -12,7 +12,7 @@ export default class ProjectVariableModel extends ResourceNameVariableModel {
 
     idKey = 'project_id';
 
-    only = ['project_id', 'name', 'project_group_info'];
+    #only = ['project_id', 'name', 'project_group_info'];
 
     formatter(data: any): string {
         return `${data.project_group_info.name} > ${this.nameKey}`;

@@ -22,9 +22,9 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     nameKey = 'name';
 
-    only: string[] = [this.idKey, this.nameKey];
+    #only?: string[];
 
-    searchTargets: string[] = [this.idKey, this.nameKey];
+    #searchTargets?: string[];
 
     #response: ListResponse = { results: [] };
 
@@ -32,6 +32,16 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     formatter(data: any): string {
         return data[this.nameKey];
+    }
+
+    get only(): string[] {
+        if (this.#only) return this.#only;
+        return [this.idKey, this.nameKey];
+    }
+
+    get searchTargets(): string[] {
+        if (this.#searchTargets) return this.#searchTargets;
+        return [this.idKey, this.nameKey];
     }
 
     #getFetcher(): ReturnType<typeof getCancellableFetcher<ListResponse>>|undefined {

@@ -12,9 +12,9 @@ export default class CloudServiceTypeVariableModel extends ResourceNameVariableM
 
     idKey = 'cloud_service_type_id';
 
-    only = ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'];
+    #only = ['cloud_service_type_id', 'name', 'group', 'provider', 'tags'];
 
-    searchTargets = ['cloud_service_type_id', 'name', 'group'];
+    #searchTargets = ['cloud_service_type_id', 'name', 'group'];
 
     formatter(data: any): string {
         return `${data.group} > ${data[this.nameKey]}`;

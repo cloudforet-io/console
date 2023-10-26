@@ -12,7 +12,7 @@ export default class RegionVariableModel extends ResourceNameVariableModel {
 
     idKey = 'region_code';
 
-    searchTargets = ['name', 'provider', 'region_code'];
+    #searchTargets = ['name', 'provider', 'region_code'];
 
     formatter(data: any): string {
         return `[${data.provider}] ${this.nameKey} | ${this.idKey}`;
