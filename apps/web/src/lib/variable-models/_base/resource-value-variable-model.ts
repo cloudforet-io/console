@@ -24,7 +24,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
 
     #response: ListResponse = { results: [] };
 
-    readonly #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
+    #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
 
     constructor(config?: ResourceValueVariableModelConfig) {
         if (!config) return;
@@ -46,8 +46,8 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
         return getCancellableFetcher(api.stat);
     }
 
-    #getParams(options: ListQuery = {}): Record<string, any> {
-        const query: Record<string, any> = {
+    #getParams(query: ListQuery = {}): Record<string, any> {
+        const _query: Record<string, any> = {
             distinct: this.referenceKey,
             filter: [
                 {
@@ -57,21 +57,25 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
                 },
             ],
         };
-        if (options.limit) {
-            query.page = {
-                limit: options.limit,
+        if (query.limit) {
+            _query.page = {
+                start: query.start,
+                limit: query.limit,
             };
         }
         return {
-            query,
+            query: _query,
         };
     }
 
-    async list(options: ListQuery = {}): Promise<ListResponse> {
+    async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            if (!this.#fetcher) throw new Error('No fetcher');
+            if (!this.#fetcher) {
+                this.#fetcher = this.#getFetcher();
+                if (!this.#fetcher) return this.#response;
+            }
             const { status, response } = await this.#fetcher(
-                this.#getParams(options),
+                this.#getParams(query),
             );
             if (status === 'succeed') {
                 this.#response = response;

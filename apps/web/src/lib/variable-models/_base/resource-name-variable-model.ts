@@ -28,7 +28,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     #response: ListResponse = { results: [] };
 
-    readonly #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
+    #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
 
     formatter(data: any): string {
         return data[this.nameKey];
@@ -44,9 +44,9 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
         return getCancellableFetcher(api.list);
     }
 
-    #getParams(options: ListQuery = {}): Record<string, any> {
-        const query: Record<string, any> = {
-            ...options,
+    #getParams(query: ListQuery = {}): Record<string, any> {
+        const _query: Record<string, any> = {
+            ...(query.options ?? {}),
             filter: [
                 {
                     key: this.idKey,
@@ -56,28 +56,31 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
             ],
             only: this.only,
         };
-        if (options.search) {
-            query.filter_or = this.searchTargets.map((key) => ({
+        if (query.search) {
+            _query.filter_or = this.searchTargets.map((key) => ({
                 k: key,
-                v: options.search,
+                v: query.search,
                 o: 'contain',
             }));
         }
-        if (options.limit) {
-            query.page = {
-                limit: options.limit,
+        if (query.limit) {
+            _query.page = {
+                limit: query.limit,
             };
         }
         return {
-            query,
+            query: _query,
         };
     }
 
-    async list(options: ListQuery = {}): Promise<ListResponse> {
+    async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            if (!this.#fetcher) throw new Error('No fetcher');
+            if (!this.#fetcher) {
+                this.#fetcher = this.#getFetcher();
+                if (!this.#fetcher) return this.#response;
+            }
             const { status, response } = await this.#fetcher(
-                this.#getParams(options),
+                this.#getParams(query),
             );
             if (status === 'succeed') {
                 response.results = response.results.map((d) => ({
