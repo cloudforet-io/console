@@ -1,118 +1,115 @@
-import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 
 
-export const managedDashboardVariablesSchema: DashboardVariablesSchema = {
+export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
     properties: {
-        [REFERENCE_TYPE_INFO.project.type]: {
-            name: REFERENCE_TYPE_INFO.project.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.project.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROJECT',
-            options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.project.type,
-            },
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
+            }],
         },
-        [REFERENCE_TYPE_INFO.provider.type]: {
-            name: REFERENCE_TYPE_INFO.provider.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.provider.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PROVIDER',
-            options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.provider.type,
-            },
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
+            }],
         },
-        [REFERENCE_TYPE_INFO.service_account.type]: {
-            name: REFERENCE_TYPE_INFO.service_account.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_SERVICE_ACCOUNT',
-            options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.service_account.type,
-            },
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
+            }],
         },
-        [REFERENCE_TYPE_INFO.region.type]: {
-            name: REFERENCE_TYPE_INFO.region.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.region.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
             variable_type: 'MANAGED',
             use: true,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_REGION',
-            options: {
-                type: 'REFERENCE_RESOURCE',
-                reference_key: REFERENCE_TYPE_INFO.region.type,
-            },
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
+            }],
         },
         // Variable for Cost Dashboard
-        [COST_VARIABLE_TYPE_INFO.cost_data_source.type]: {
-            name: REFERENCE_TYPE_INFO.cost_data_source.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'SINGLE',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
-            options: {
-                type: 'SEARCH_RESOURCE',
-                resource_type: 'cost_analysis.DataSource',
-                default_path: 0,
-            },
+            fixed: true,
             required: true,
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
+            }],
         },
-        [COST_VARIABLE_TYPE_INFO.cost_product.type]: {
-            name: COST_VARIABLE_TYPE_INFO.cost_product.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_PRODUCT',
-            options: {
-                type: 'SEARCH_RESOURCE',
-                resource_type: 'cost_analysis.Cost',
-                reference_key: COST_VARIABLE_TYPE_INFO.cost_product.key,
-            },
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
+            }],
         },
         // Variable for Asset
-        [ASSET_VARIABLE_TYPE_INFO.asset_account.type]: {
-            name: ASSET_VARIABLE_TYPE_INFO.asset_account.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'MULTI',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_ACCOUNT',
-            options: {
-                type: 'SEARCH_RESOURCE',
-                resource_type: 'inventory.CloudService',
-                reference_key: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
-            },
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
+            }],
         },
-        [ASSET_VARIABLE_TYPE_INFO.asset_query_set.type]: {
-            name: ASSET_VARIABLE_TYPE_INFO.asset_query_set.name,
+        [MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.name,
             variable_type: 'MANAGED',
             use: false,
             selection_type: 'SINGLE',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK',
-            options: {
-                type: 'SEARCH_RESOURCE',
-                resource_type: 'inventory.CloudServiceQuerySet',
-                default_path: 0,
-            },
+            fixed: true,
+            required: true,
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+            }],
         },
     },
     order: [
-        COST_VARIABLE_TYPE_INFO.cost_data_source.type,
-        ASSET_VARIABLE_TYPE_INFO.asset_query_set.type,
-        REFERENCE_TYPE_INFO.project.type,
-        REFERENCE_TYPE_INFO.provider.type,
-        REFERENCE_TYPE_INFO.service_account.type,
-        REFERENCE_TYPE_INFO.region.type,
-        COST_VARIABLE_TYPE_INFO.cost_product.type,
-        ASSET_VARIABLE_TYPE_INFO.asset_account.type,
+        MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
     ],
 };
 
-export const managedVariablesPropertiesMap = new Map(Object.entries(managedDashboardVariablesSchema.properties));
+export const managedVariablesPropertiesMap = new Map(Object.entries(MANAGED_DASH_VAR_SCHEMA.properties));

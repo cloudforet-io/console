@@ -8,7 +8,7 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 import type { DashboardLabel, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
-import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
+import { MANAGED_DASH_VAR_SCHEMA, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
@@ -50,7 +50,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
 );
 
 export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVariablesSchema => {
-    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
+    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASH_VAR_SCHEMA);
     if (label === DASHBOARD_LABEL.ASSET) {
         managedVariablesPropertiesMap.forEach((value, key) => {
             if (Object.keys(ASSET_VARIABLE_TYPE_INFO).includes(key)) {

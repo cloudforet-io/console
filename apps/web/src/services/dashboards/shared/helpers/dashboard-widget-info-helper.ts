@@ -16,15 +16,14 @@ import { getWidgetOptionName } from '@/services/dashboards/widgets/_helpers/widg
  * @param mergedWidgetInfo
  */
 export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInfo: UpdatableWidgetInfo): UpdatableWidgetInfo => {
-    const configInheritOptions = widgetConfig.inherit_options ?? {};
     const configWidgetOptions = widgetConfig.options ?? {};
-    const mergedInheritOptions = mergedWidgetInfo.inherit_options ?? {};
-    const updatedInheritOptions: InheritOptions = cloneDeep(mergedInheritOptions);
+    const inheritOptions = mergedWidgetInfo.inherit_options ?? {};
+    const updatedInheritOptions: InheritOptions = cloneDeep(inheritOptions) ?? {};
     const updatedWidgetOptions: WidgetOptions = cloneDeep(mergedWidgetInfo.widget_options) ?? {};
     const schemaProperties = mergedWidgetInfo.schema_properties ?? [];
 
-    Object.entries(updatedInheritOptions).forEach(([key, inheritOption]) => {
-        if (!schemaProperties.includes(key) || isObjectEqual(inheritOption, configInheritOptions[key])) {
+    Object.entries(updatedInheritOptions).forEach(([key]) => {
+        if (!schemaProperties.includes(key)) {
             delete updatedInheritOptions[key];
         }
     });
@@ -66,6 +65,5 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
         inherit_options: isEmpty(updatedInheritOptions) ? undefined : updatedInheritOptions,
         widget_options: isEmpty(updatedWidgetOptions) ? undefined : updatedWidgetOptions,
         schema_properties: schemaProperties.length ? schemaProperties : undefined,
-        size: mergedWidgetInfo.size === widgetConfig.sizes?.[0] ? undefined : mergedWidgetInfo.size,
     };
 };

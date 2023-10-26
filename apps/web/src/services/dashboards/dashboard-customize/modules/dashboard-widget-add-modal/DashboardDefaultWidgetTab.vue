@@ -36,8 +36,8 @@
                 <span class="title">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED') }}</span>
                 <span class="text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NO_SELECTED_HELP_TEXT') }}</span>
             </div>
-            <dashboard-widget-input-form v-else
-                                         :widget-config-id="selectedWidgetConfigId"
+            <dashboard-widget-form v-else
+                                   :widget-config-id="selectedWidgetConfigId"
             />
         </div>
     </div>
@@ -51,14 +51,14 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 
 import { i18n } from '@/translations';
 
-import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import DashboardWidgetForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetForm.vue';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
 
 export default {
     name: 'DashboardDefaultWidgetTab',
     components: {
-        DashboardWidgetInputForm,
+        DashboardWidgetForm,
         PLazyImg,
         PButtonTab,
     },

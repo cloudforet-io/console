@@ -15,8 +15,8 @@ import { getUUID } from '@/lib/component-util/getUUID';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import DashboardWidgetInputForm
-    from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import DashboardWidgetForm
+    from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetForm.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
@@ -126,9 +126,9 @@ watch(() => props.visible, (value) => {
             </template>
             <template #sidebar>
                 <div class="sidebar-contents">
-                    <dashboard-widget-input-form :key="state.contextKey"
-                                                 :widget-config-id="props.widgetConfigId"
-                                                 :widget-key="props.widgetKey"
+                    <dashboard-widget-form :key="state.contextKey"
+                                           :widget-config-id="props.widgetConfigId"
+                                           :widget-key="props.widgetKey"
                     />
                 </div>
             </template>

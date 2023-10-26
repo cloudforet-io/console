@@ -1,5 +1,3 @@
-import { merge } from 'lodash';
-
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import {
     getVariableKeyFromWidgetSchemaProperty,
@@ -7,22 +5,23 @@ import {
 import type { InheritOptions, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 
 export const getInitialWidgetInheritOptions = (widgetConfig?: WidgetConfig, storedInheritOptions?: InheritOptions, variablesSchema?: DashboardVariablesSchema): InheritOptions => {
-    const merged = merge({}, widgetConfig?.inherit_options ?? {}, storedInheritOptions);
-
     const refined: InheritOptions = {};
-    Object.entries(merged).forEach(([property, inheritOption]) => {
-        if (inheritOption.enabled === false && inheritOption.variable_info) {
-            refined[property] = { enabled: false };
+
+    widgetConfig?.options_schema?.properties?.forEach((property) => {
+        if (property.non_inheritable) return;
+
+        const inheritOption = storedInheritOptions?.[property.key];
+        if (inheritOption && inheritOption.enabled === false && inheritOption.variable_info) {
+            refined[property.key] = { enabled: false };
             return;
         }
 
-        const variableKey = getVariableKeyFromWidgetSchemaProperty(property);
+        const variableKey = getVariableKeyFromWidgetSchemaProperty(property.key);
         if (variablesSchema && !variablesSchema?.properties[variableKey]?.use) {
-            refined[property] = { enabled: false };
-            return;
+            refined[property.key] = { enabled: false };
         }
 
-        refined[property] = inheritOption;
+        refined[property.key] = inheritOption;
     });
 
     return refined;
