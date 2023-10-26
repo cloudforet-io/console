@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import { describe, expect, it } from 'vitest';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
 import type { WidgetConfig, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
 import {
     getInitialSchemaProperties, getRefinedSchemaProperties,
@@ -32,11 +32,11 @@ const widgetConfigMock: WidgetConfig = {
 const variablesSchemaMock: DashboardVariablesSchema = {
     properties: {
         project: {
-            ...managedDashboardVariablesSchema.properties.project,
+            ...MANAGED_DASH_VAR_SCHEMA.properties.project,
             use: true,
         },
         service_account: {
-            ...managedDashboardVariablesSchema.properties.service_account,
+            ...MANAGED_DASH_VAR_SCHEMA.properties.service_account,
             use: true,
         },
     },
@@ -55,7 +55,7 @@ describe('[Widget Schema Helper] getInitialSchemaProperties', () => {
     });
     it('should not include used variables if it is not in widget config schema properties', () => {
         const variablesSchema = cloneDeep(variablesSchemaMock);
-        variablesSchema.properties.abc = { ...managedDashboardVariablesSchema.properties.project, use: true };
+        variablesSchema.properties.abc = { ...MANAGED_DASH_VAR_SCHEMA.properties.project, use: true };
 
         const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchema);
         expect(refined).not.toEqual(expect.arrayContaining(['filters.abc']));

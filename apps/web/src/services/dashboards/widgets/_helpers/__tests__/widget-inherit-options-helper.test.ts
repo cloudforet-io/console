@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import { describe, expect, it } from 'vitest';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import { managedDashboardVariablesSchema } from '@/services/dashboards/managed-variables-schema';
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
 import type { InheritOptions, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 
@@ -11,32 +11,22 @@ const widgetConfigMock: WidgetConfig = {
     widget_config_id: 'test',
     scopes: ['DOMAIN', 'PROJECT', 'WORKSPACE'],
     sizes: ['sm'],
-    inherit_options: {
-        'filters.provider': {
-            enabled: true,
-            variable_info: {
-                key: 'provider',
-            },
-        },
-    },
     options_schema: {
-        non_inheritable_properties: ['cost_group_by'],
-        schema: {
-        },
+        properties: [],
     },
 };
 const variablesSchemaMock: DashboardVariablesSchema = {
     properties: {
         provider: {
-            ...managedDashboardVariablesSchema.properties.provider,
+            ...MANAGED_DASH_VAR_SCHEMA.properties.provider,
             use: true,
         },
         project: {
-            ...managedDashboardVariablesSchema.properties.project,
+            ...MANAGED_DASH_VAR_SCHEMA.properties.project,
             use: true,
         },
         service_account: {
-            ...managedDashboardVariablesSchema.properties.service_account,
+            ...MANAGED_DASH_VAR_SCHEMA.properties.service_account,
             use: true,
         },
     },
@@ -96,45 +86,10 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
             },
         });
     });
-    // unused variables
-    it('should be disabled if variable is not used even if it is enabled in widget config', () => {
+    // unused variables;
+    it('should be disabled if variable is not used even if it is enabled in stored data', () => {
         const widgetConfig = cloneDeep(widgetConfigMock);
         const variablesSchema = cloneDeep(variablesSchemaMock);
-        if (widgetConfig.inherit_options) {
-            widgetConfig.inherit_options['filters.project'] = {
-                enabled: true,
-                variable_info: {
-                    key: 'project',
-                },
-            };
-        }
-        variablesSchema.properties.project.use = false;
-        const storedInheritOptions: InheritOptions = {};
-
-        const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
-        expect(refined).toEqual({
-            'filters.provider': {
-                enabled: true,
-                variable_info: {
-                    key: 'provider',
-                },
-            },
-            'filters.project': {
-                enabled: false,
-            },
-        });
-    });
-    it('should be disabled if variable is not used even if it is enabled in both widget config and stored data', () => {
-        const widgetConfig = cloneDeep(widgetConfigMock);
-        const variablesSchema = cloneDeep(variablesSchemaMock);
-        if (widgetConfig.inherit_options) {
-            widgetConfig.inherit_options['filters.project'] = {
-                enabled: true,
-                variable_info: {
-                    key: 'project',
-                },
-            };
-        }
         const storedInheritOptions: InheritOptions = {
             'filters.project': {
                 enabled: true,
