@@ -1,24 +1,8 @@
 import type { NumberFormatOptions } from 'vue-i18n';
 
-import { convert as cashifyConvert } from 'cashify';
-
 import { CURRENCY } from '@/store/modules/settings/config';
-import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/settings/type';
 
-/** cashify library: https://www.npmjs.com/package/cashify */
-
-/**
- * @param money
- * @param currency
- * @param rates
- * @description Converts US Dollars to a given currency based on a given exchange rate.
- */
-export const convertUSDToCurrency = (money: number, currency: Currency, rates: CurrencyRates): number => cashifyConvert(money, {
-    base: CURRENCY.USD,
-    rates,
-    from: CURRENCY.USD,
-    to: currency,
-});
 
 /*
   IANA Language Subtag Registry: https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
@@ -38,9 +22,7 @@ const currencyToMinimumFractionDigitsMap: Record<Currency, number> = {
  * @name currencyMoneyFormatter
  * @param value
  * @param options
- * @description Convert given value with given currency and exchange rates, and format into money format.
- If given value is number, it treats it in US dollars and converts it to a given currency based on the given exchange rate.
- It's convert logic follows convertUSDToCurrency function.
+ * @description Get formatted currency string.
  If given value is undefined, returns '--'.
  */
 export const currencyMoneyFormatter = (
@@ -57,7 +39,6 @@ export const currencyMoneyFormatter = (
             maximumFractionDigits: _shorten ? 2 : _digit,
             minimumFractionDigits: _shorten ? 0 : _digit,
             style: 'currency',
-            currencyDisplay: 'narrowSymbol',
             currency: options?.currency ?? CURRENCY.USD,
             ...options,
         };
