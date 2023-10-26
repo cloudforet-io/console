@@ -21,7 +21,7 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? []),
+    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(widgetFormStore.widgetConfig?.options_schema?.properties ?? {})),
     defaultProperties: computed<string[]>(() => state.propertySchemaList.map((d) => d.key)),
     defaultIdxMap: computed<Record<string, number>>(() => {
         const defaultIdxMap = {};

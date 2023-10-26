@@ -60,10 +60,11 @@ export const useWidgetFormStore = defineStore('widget-form', {
                     return {
                         ...config,
                         options_schema: {
-                            properties: [
+                            properties: {
                                 ...COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
                                 ...COMMON_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-                            ],
+                            },
+                            order: [],
                         },
                     };
                 }
