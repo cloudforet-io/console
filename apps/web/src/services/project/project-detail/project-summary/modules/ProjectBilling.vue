@@ -488,7 +488,9 @@ onUnmounted(() => {
             </div>
             <div class="col-span-12 md:col-span-9">
                 <div class="chart-wrapper">
-                    <p-data-loader :loading="state.loading">
+                    <p-data-loader :loading="state.loading"
+                                   :data="chartState.data"
+                    >
                         <template #loader>
                             <p-skeleton width="100%"
                                         height="100%"
@@ -676,6 +678,11 @@ onUnmounted(() => {
         min-height: 13rem;
         margin-bottom: 1rem;
         .chart {
+            height: 13rem;
+        }
+
+        /* custom design-system component - p-data-loader */
+        :deep(.p-data-loader) {
             height: 13rem;
         }
     }
