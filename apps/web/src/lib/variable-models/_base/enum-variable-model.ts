@@ -1,8 +1,9 @@
 import { getTextHighlightRegex } from '@spaceone/design-system';
 
 import type {
-    ListResponse, ListQuery,
-    VariableModelLabel, IEnumVariableModel,
+    ListResponse, ListQuery, IEnumVariableModel,
+    EnumVariableModelConfig,
+    VariableModelLabel,
 } from '@/lib/variable-models/_base/types';
 
 export default class EnumVariableModel implements IEnumVariableModel {
@@ -16,12 +17,10 @@ export default class EnumVariableModel implements IEnumVariableModel {
 
     #response: ListResponse = { results: [] };
 
-    constructor(config?: IEnumVariableModel) {
+    constructor(config?: EnumVariableModelConfig) {
         if (!config) return;
-        if (!config.values) throw new Error('VariableModelBaseConfig.values is required');
-        this.key = config.key;
-        this.name = config.name ?? config.key;
-        this.labels = config.labels ?? [];
+        if (!config.values) throw new Error('values is required');
+        if (config.name) this.name = config.name;
         this.values = config.values;
     }
 

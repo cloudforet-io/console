@@ -28,13 +28,14 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     #response: ListResponse = { results: [] };
 
-    readonly #fetcher: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
+    readonly #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
 
     formatter(data: any): string {
         return data[this.nameKey];
     }
 
-    #getFetcher(): ReturnType<typeof getCancellableFetcher<ListResponse>> {
+    #getFetcher(): ReturnType<typeof getCancellableFetcher<ListResponse>>|undefined {
+        if (!this.resourceType) return undefined;
         const apiPath = this.resourceType.split('.').map((d) => camelCase(d));
 
         const api = get(SpaceConnector.clientV2, apiPath);
@@ -74,6 +75,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     async list(options: ListQuery = {}): Promise<ListResponse> {
         try {
+            if (!this.#fetcher) throw new Error('No fetcher');
             const { status, response } = await this.#fetcher(
                 this.#getParams(options),
             );

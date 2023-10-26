@@ -1,17 +1,13 @@
-// base variable model
+// variable models
 export interface IBaseVariableModel {
     key: string;
     name: string;
     labels: VariableModelLabel[];
     list(options?: ListQuery): Promise<ListResponse>;
 }
-
-// enum variable model
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];
 }
-
-// resource field variable model
 export interface IResourceNameVariableModel extends IBaseVariableModel {
     resourceType: string;
     idKey: string;
@@ -20,11 +16,22 @@ export interface IResourceNameVariableModel extends IBaseVariableModel {
     searchTargets: string[];
     formatter: (data: any) => string;
 }
-
-// resource value variable model
 export interface IResourceValueVariableModel extends IBaseVariableModel {
     resourceType: string;
     referenceKey: string;
+}
+
+// variable model configs
+export interface EnumVariableModelConfig {
+    type: 'ENUM';
+    name?: string;
+    values: Value[];
+}
+export interface ResourceValueVariableModelConfig {
+    type: 'RESOURCE_VALUE',
+    name?: string;
+    resource_type: string;
+    reference_key: string;
 }
 
 // related types
