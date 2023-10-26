@@ -4,7 +4,7 @@ import type { IPieChartSettings } from '@amcharts/amcharts5/.internal/charts/pie
 import type { IPieSeriesSettings } from '@amcharts/amcharts5/percent';
 import * as am5percent from '@amcharts/amcharts5/percent';
 
-import type { Currency, CurrencyRates } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -41,7 +41,7 @@ export const createPieSeries = (root: Root, settings?: IPieSeriesSettings): am5p
     return series;
 };
 
-export const setPieTooltipText = (series: am5percent.PieSeries, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
+export const setPieTooltipText = (series: am5percent.PieSeries, tooltip: am5.Tooltip, currency?: Currency): void => {
     tooltip.label.setAll({
         fill: am5.color(gray[900]),
         fontSize: 14,
@@ -52,7 +52,7 @@ export const setPieTooltipText = (series: am5percent.PieSeries, tooltip: am5.Too
 
     series.slices.template.adapters.add('tooltipText', (_, target) => {
         let value = target.dataItem?.dataContext?.[valueFieldName];
-        if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
+        if (currency) value = currencyMoneyFormatter(value, { currency });
         const colorHex = target.get('fill')?.toString() ?? target.get('stroke')?.toString();
         return `[${colorHex}; fontSize: 10px]●[/] {${categoryFieldName}}: [bold]${value}[/] ({valuePercentTotal.formatNumber("0.00")}%)`;
     });
