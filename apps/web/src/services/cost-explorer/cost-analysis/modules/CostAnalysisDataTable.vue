@@ -526,6 +526,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
     .toggle-wrapper {
         display: flex;
         align-items: center;
+        padding-left: 1rem;
         .label {
             @apply text-label-md;
             font-weight: 700;
