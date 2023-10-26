@@ -6,7 +6,7 @@ export default class ProviderVariableModel extends ResourceNameVariableModel {
 
     name = 'Provider';
 
-    labels: VariableModelLabel[] = ['cost'];
+    labels: VariableModelLabel[] = ['cost', 'asset'];
 
     resourceType = 'identity.Provider';
 
