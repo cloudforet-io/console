@@ -565,6 +565,7 @@
 				"NAME_LABEL": "이름",
 				"NO_FILTERS": "필터 없음",
 				"NO_ITEMS": "아이템이 없습니다",
+				"ORIGINAL_DATA": "원본데이터",
 				"PDF": {
 					"CANCEL": "취소",
 					"DOWNLOAD_PDF": "PDF 저장",
