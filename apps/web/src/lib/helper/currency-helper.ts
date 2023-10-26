@@ -37,10 +37,7 @@ const currencyToMinimumFractionDigitsMap: Record<Currency, number> = {
 /**
  * @name currencyMoneyFormatter
  * @param value
- * @param currency
- * @param rates
- * @param disableSymbol
- * @param transitionValue
+ * @param options
  * @description Convert given value with given currency and exchange rates, and format into money format.
  If given value is number, it treats it in US dollars and converts it to a given currency based on the given exchange rate.
  It's convert logic follows convertUSDToCurrency function.
@@ -48,26 +45,24 @@ const currencyToMinimumFractionDigitsMap: Record<Currency, number> = {
  */
 export const currencyMoneyFormatter = (
     value?: number,
-    currency: Currency = CURRENCY.USD,
-    rates?: CurrencyRates,
-    disableSymbol = false,
-    transitionValue = 10000,
+    options: NumberFormatOptions = {},
 ): string => {
     if (typeof value === 'number') {
-        const money = (currency && rates) ? convertUSDToCurrency(value, currency, rates) : value;
+        const _shorten = Math.abs(value) >= 10000;
+        const _currency = options?.currency ?? CURRENCY.USD;
+        const _digit = currencyToMinimumFractionDigitsMap[_currency];
 
-        const shorten: boolean = Math.abs(money) >= transitionValue;
-        const digit = currencyToMinimumFractionDigitsMap[currency];
-        const options: NumberFormatOptions = {
-            notation: shorten ? 'compact' : 'standard',
-            maximumFractionDigits: shorten ? 2 : digit,
-            minimumFractionDigits: shorten ? 0 : digit,
-            style: disableSymbol ? 'decimal' : 'currency',
-            currency,
+        const _options: NumberFormatOptions = {
+            notation: _shorten ? 'compact' : 'standard',
+            maximumFractionDigits: _shorten ? 2 : _digit,
+            minimumFractionDigits: _shorten ? 0 : _digit,
+            style: 'currency',
             currencyDisplay: 'narrowSymbol',
+            currency: options?.currency ?? CURRENCY.USD,
+            ...options,
         };
 
-        return Intl.NumberFormat(currencyToLocaleMap[currency], options).format(money);
+        return Intl.NumberFormat(currencyToLocaleMap[_currency], _options).format(value);
     }
 
     return '--';
