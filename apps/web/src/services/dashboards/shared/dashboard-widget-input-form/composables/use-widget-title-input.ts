@@ -1,4 +1,4 @@
-import { toRef } from 'vue';
+import { toRef, watch } from 'vue';
 
 import { i18n } from '@/translations';
 
@@ -21,6 +21,10 @@ export const useWidgetTitleInput = () => {
     };
     const isTitleInvalid = toRef(invalidState, 'title');
     const titleInvalidText = toRef(invalidTexts, 'title');
+
+    watch(isTitleValid, (val) => {
+        widgetFormStore.$patch({ isTitleValid: val });
+    });
 
     return {
         title,

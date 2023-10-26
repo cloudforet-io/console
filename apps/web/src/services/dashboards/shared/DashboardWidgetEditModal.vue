@@ -5,7 +5,7 @@ import {
     PButtonModal,
 } from '@spaceone/design-system';
 
-import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import DashboardWidgetForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetForm.vue';
 import {
     useWidgetFormStore,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
@@ -44,8 +44,8 @@ const handleEditModalConfirm = () => {
                     @close="handleEditModalCancel"
     >
         <template #body>
-            <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
-                                         :widget-key="props.widgetKey"
+            <dashboard-widget-form :widget-config-id="props.widgetConfigId"
+                                   :widget-key="props.widgetKey"
             />
         </template>
     </p-button-modal>

@@ -14,6 +14,7 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 
 export const WIDGET_SIZE = {
@@ -92,7 +93,6 @@ export interface BaseWidgetConfig {
         inherit_count?: number;
     };
     sizes: WidgetSize[];
-    inherit_options?: InheritOptions;
     options_schema?: WidgetOptionsSchema;
 }
 

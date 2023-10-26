@@ -2,20 +2,20 @@ import EnumVariableModel from './_base/enum-variable-model';
 import ResourceValueVariableModel from './_base/resource-value-variable-model';
 import type {
     IBaseVariableModel, ListQuery, ListResponse, VariableModelLabel,
-    IEnumVariableModel, IResourceValueVariableModel,
+    EnumVariableModelConfig, ResourceValueVariableModelConfig,
 } from './_base/types';
+import type { ManagedVariableModelKey } from './managed';
 import MANAGED_VARIABLE_MODELS from './managed';
-
-export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;
 
 // config
 export interface ManagedVariableModelConfig {
+    type: 'MANAGED';
     key: ManagedVariableModelKey;
     name?: string;
 }
-export type CustomVariableModelConfig = IEnumVariableModel|IResourceValueVariableModel;
+export type CustomVariableModelConfig = EnumVariableModelConfig|ResourceValueVariableModelConfig;
 export type VariableModelConfig = ManagedVariableModelConfig|CustomVariableModelConfig;
-
+export type VariableModelConfigType = 'MANAGED'|'ENUM'|'RESOURCE_VALUE';
 
 export class VariableModel implements IBaseVariableModel {
     key: string;
@@ -26,26 +26,25 @@ export class VariableModel implements IBaseVariableModel {
 
     #model: IBaseVariableModel;
 
-    #type: 'MANAGED'|'CUSTOM';
+    #type: VariableModelConfigType;
 
     constructor(config: VariableModelConfig) {
-        if (config.key && MANAGED_VARIABLE_MODELS[config.key]) {
-            this.#type = 'MANAGED';
+        if (config.type === 'MANAGED') {
+            if (!config.key) throw new Error('key is required');
             const Model = MANAGED_VARIABLE_MODELS[config.key];
-            this.#model = new Model({ key: config.key });
+            this.#model = new Model();
+        } else if (config.type === 'RESOURCE_VALUE') {
+            this.#model = new ResourceValueVariableModel(config);
+        } else if (config.type === 'ENUM') {
+            this.#model = new EnumVariableModel(config);
         } else {
-            this.#type = 'CUSTOM';
-            if ((config as IResourceValueVariableModel).resourceType) {
-                this.#model = new ResourceValueVariableModel(config as IResourceValueVariableModel);
-            } else if ((config as IEnumVariableModel).values) {
-                this.#model = new EnumVariableModel(config as IEnumVariableModel);
-            } else {
-                throw new Error('Invalid config');
-            }
+            throw new Error(`Invalid config type for VariableModel: ${(config as any).type}`);
         }
+
         this.key = this.#model.key;
         this.name = config.name ?? (this.#model.name || this.#model.key);
         this.labels = this.#model.labels;
+        this.#type = config.type;
     }
 
     get type() {
