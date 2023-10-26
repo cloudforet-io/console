@@ -4,8 +4,7 @@ import { reactive, computed, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PTab, PDynamicLayout,
-    PHeading, PEmpty, PTableCheckModal, PButton,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions,
@@ -24,9 +23,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
@@ -36,17 +33,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useQueryTags } from '@/common/composables/query-tags';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
-import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
-import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
 import CloudServiceUsageOverview
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverview.vue';
-import CloudServiceAdmin from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceAdmin.vue';
-import CloudServiceDetail from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceDetail.vue';
-import CloudServiceHistory from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceHistory.vue';
-import CloudServiceLogTab from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceLogTab.vue';
-import CloudServiceTagsPanel
-    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceTagsPanel.vue';
+import CloudServiceDetailTabs
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceDetailTabs.vue';
 import ExcelExportOptionModal
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/ExcelExportOptionModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
@@ -136,16 +127,6 @@ const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSea
             { k: 'cloud_service_type', o: '=', v: props.name },
         ]).apiQuery.filter)),
 );
-
-const checkTableModalState = reactive({
-    visible: false,
-    item: null,
-    title: '',
-    subTitle: '',
-    themeColor: undefined as string | undefined,
-    api: null as any,
-    params: null as any,
-});
 
 const hiddenFilterHelper = new QueryHelper();
 const hiddenFilters = computed<ConsoleFilter[]>(() => {
@@ -309,64 +290,10 @@ const handleClickSettings = () => {
     tableState.visibleCustomFieldModal = true;
 };
 
-/* Tabs */
-const singleItemTabState = reactive({
-    tabs: computed(() => ([
-        { name: 'detail', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_DETAILS') },
-        { name: 'tag', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_TAG') },
-        { name: 'member', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
-        { name: 'history', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_HISTORY') },
-        { name: 'log', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_LOG') },
-        { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
-    ])),
-    activeTab: 'detail',
-});
-
-const multiItemTabState = reactive({
-    tabs: computed(() => ([
-        { name: 'data', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
-        { name: 'monitoring', label: i18n.t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
-    ])),
-    activeTab: 'data',
-});
 
 /* Actions */
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
 
-const checkModalConfirm = async () => {
-    const resetCheckTableModalState = () => {
-        checkTableModalState.visible = false;
-        checkTableModalState.title = '';
-        checkTableModalState.subTitle = '';
-        checkTableModalState.themeColor = undefined;
-        checkTableModalState.api = null;
-        checkTableModalState.params = null;
-    };
-    try {
-        await checkTableModalState.api({
-            ...checkTableModalState.params,
-            cloud_services: tableState.selectedItems.map((item) => item.cloud_service_id),
-        });
-        showSuccessMessage(i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }));
-    } finally {
-        typeOptionState.selectIndex = [];
-        resetCheckTableModalState();
-        await fetchTableData();
-        // await listCloudServiceTableData();
-    }
-};
-
-/* Monitoring Tab */
-const monitoringState: MonitoringProps = reactive({
-    resourceType: 'inventory.CloudService',
-    resources: computed(() => tableState.selectedItems.map((d) => ({
-        id: get(d, 'cloud_service_id'),
-        name: d.name,
-        provider: d.provider,
-    }))) as unknown as MonitoringResourceType[],
-});
 
 /* Usage Overview */
 const handlePeriodUpdate = (period?: Period) => {
@@ -474,82 +401,14 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                 </template>
             </template>
         </p-horizontal-layout>
-        <p-tab v-if="tableState.selectedItems.length === 1"
-               :tabs="singleItemTabState.tabs"
-               :active-tab.sync="singleItemTabState.activeTab"
-               :class="singleItemTabState.activeTab"
-        >
-            <template #detail>
-                <cloud-service-detail
-                    :cloud-service-id="tableState.selectedCloudServiceIds[0]"
-                    :cloud-service-group="props.group"
-                    :cloud-service-type="props.name"
-                    :is-server-page="props.isServerPage"
-                />
-            </template>
-
-            <template #tag>
-                <cloud-service-tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
-                                          :disabled="!tableState.hasManagePermission"
-                                          :provider="tableState.selectedItems[0].provider"
-                />
-            </template>
-            <template #member>
-                <cloud-service-admin :cloud-service-project-id="tableState.selectedItems[0].project_id" />
-            </template>
-            <template #history>
-                <cloud-service-history :cloud-service-item="tableState.selectedItems[0]"
-                                       :provider="tableState.selectedItems[0].provider"
-                />
-            </template>
-            <template #log>
-                <cloud-service-log-tab :cloud-service-id="tableState.selectedItems[0].cloud_service_id"
-                                       :provider="tableState.selectedItems[0].provider"
-                />
-            </template>
-            <template #monitoring>
-                <monitoring :resources="monitoringState.resources" />
-            </template>
-        </p-tab>
-        <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
-               :tabs="multiItemTabState.tabs"
-               :active-tab.sync="multiItemTabState.activeTab"
-               :class="multiItemTabState.activeTab"
-        >
-            <template #data>
-                <p-dynamic-layout v-if="tableState.multiSchema"
-                                  type="simple-table"
-                                  :options="tableState.multiSchema.options"
-                                  :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
-                                  :data="tableState.selectedItems"
-                                  :field-handler="fieldHandler"
-                                  class="selected-data-tab"
-                />
-            </template>
-            <template #monitoring>
-                <monitoring :resources="monitoringState.resources" />
-            </template>
-        </p-tab>
-        <p-empty v-else
-                 style="height: auto; margin-top: 4rem;"
-        >
-            {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
-        </p-empty>
-        <p-table-check-modal v-if="checkTableModalState.visible"
-                             :visible.sync="checkTableModalState.visible"
-                             :header-title="checkTableModalState.title"
-                             :sub-title="checkTableModalState.subTitle"
-                             :theme-color="checkTableModalState.themeColor"
-                             modal-size="lg"
-                             @confirm="checkModalConfirm"
-        >
-            <p-dynamic-layout v-if="tableState.multiSchema"
-                              type="simple-table"
-                              :options="tableState.multiSchema.options"
-                              :data="tableState.selectedItems"
-                              :field-handler="fieldHandler"
-            />
-        </p-table-check-modal>
+        <cloud-service-detail-tabs :table-state="tableState"
+                                   :field-handler="fieldHandler"
+                                   :group="props.group"
+                                   :name="props.name"
+                                   :is-server-page="props.isServerPage"
+                                   :selected-index="typeOptionState.selectIndex.length ?? 0"
+                                   :timezone="typeOptionState.timezone ?? 'UTC'"
+        />
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="inventory.CloudService"
                             :options="{provider: props.provider, cloudServiceGroup: props.group, cloudServiceType: props.name}"
