@@ -55,7 +55,7 @@ export function useMergedWidgetState(
     const optionsErrorMap = computed(() => getWidgetInheritOptionsErrorMap(
         optionState.schemaProperties ?? [],
         optionState.inheritOptions,
-        state.widgetConfig?.options_schema?.schema,
+        state.widgetConfig?.options_schema,
         optionState.dashboardVariablesSchema,
     ));
 

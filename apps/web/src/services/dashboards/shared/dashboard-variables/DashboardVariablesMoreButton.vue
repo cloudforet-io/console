@@ -156,7 +156,7 @@ const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string
         const widgetConfig = getWidgetConfig(widgetInfo.widget_name);
         const inheritOptions = merge({}, widgetInfo.inherit_options);
 
-        const widgetInheritVariableKeys = Object.values(inheritOptions).filter((d) => d.enabled).map((d) => d.variable_info?.key);
+        const widgetInheritVariableKeys = Object.values(inheritOptions).filter((d) => d.enabled).map((d) => d.variable_key);
         if (widgetInheritVariableKeys.includes(targetProperty)) {
             widgetTitles.push(widgetInfo.title ?? widgetConfig.title as string);
         }

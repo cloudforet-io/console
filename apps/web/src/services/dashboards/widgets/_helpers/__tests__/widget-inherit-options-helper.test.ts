@@ -45,9 +45,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
     //     expect(refined).toEqual({
     //         'filters.provider': {
     //             enabled: true,
-    //             variable_info: {
-    //                 key: 'provider',
-    //             },
+    //             variable_key: 'provider',
     //         },
     //     });
     // });
@@ -69,24 +67,18 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
     //     const storedInheritOptions: InheritOptions = {
     //         'filters.project': {
     //             enabled: true,
-    //             variable_info: {
-    //                 key: 'project',
-    //             },
+    //             variable_key: 'project',
     //         },
     //     };
     //     const refined = getInitialWidgetInheritOptions(widgetConfigMock, storedInheritOptions);
     //     expect(refined).toEqual({
     //         'filters.provider': {
     //             enabled: true,
-    //             variable_info: {
-    //                 key: 'provider',
-    //             },
+    //             variable_key: 'provider',
     //         },
     //         'filters.project': {
     //             enabled: true,
-    //             variable_info: {
-    //                 key: 'project',
-    //             },
+    //             variable_key: 'project',
     //         },
     //     });
     // });
@@ -97,9 +89,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
     //     const storedInheritOptions: InheritOptions = {
     //         'filters.project': {
     //             enabled: true,
-    //             variable_info: {
-    //                 key: 'project',
-    //             },
+    //             variable_key: 'project',
     //         },
     //     };
     //     variablesSchema.properties.project.use = false;
@@ -108,9 +98,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
     //     expect(refined).toEqual({
     //         'filters.provider': {
     //             enabled: true,
-    //             variable_info: {
-    //                 key: 'provider',
-    //             },
+    //             variable_key: 'provider',
     //         },
     //         'filters.project': {
     //             enabled: false,

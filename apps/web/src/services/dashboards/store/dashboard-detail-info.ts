@@ -15,7 +15,11 @@ import type {
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
-import type { DashboardLayoutWidgetInfo, UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import type {
+    DashboardLayoutWidgetInfo,
+    InheritOptions,
+    UpdatableWidgetInfo,
+} from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
@@ -190,7 +194,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 } else {
                     result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: this.dashboardId });
                 }
-                const resultWithConvertedVariableSchema = this.convertDashboardInfoByChangedVariableSchema(result);
+                const resultWithConvertedVariableSchema = this.convertDashboardInfo(result);
                 this.setDashboardInfo(resultWithConvertedVariableSchema);
             } catch (e) {
                 this.resetDashboardData();
@@ -267,40 +271,83 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             this.widgetValidMap[widgetKey] = isValid;
         },
         // This action is for handling dashboard data that does not reflect schema changes.
-        convertDashboardInfoByChangedVariableSchema(dashboardInfo: DashboardModel) {
-            const _dashboardInfo = cloneDeep(dashboardInfo);
-            if (isEmpty(_dashboardInfo.variables_schema)) return _dashboardInfo;
-
-            // NOTE: This is conversion from old dashboard variable schema to new one which is stored to database before version 2.0(<=1.12).
-            Object.entries(_dashboardInfo.variables_schema.properties).forEach(([k, property]) => {
-                if (property.variable_type === 'MANAGED') {
-                    if (MANAGED_DASH_VAR_SCHEMA.properties[k]) {
-                        _dashboardInfo.variables_schema.properties[k] = {
-                            ...MANAGED_DASH_VAR_SCHEMA.properties[k],
-                            use: property.use,
-                        };
-                    } else if (k === 'asset_query_set') {
-                        _dashboardInfo.variables_schema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = {
-                            ...MANAGED_DASH_VAR_SCHEMA.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key],
-                            use: property.use,
-                        };
-                        delete _dashboardInfo.variables_schema.properties[k];
-                    } else {
-                        console.error('convertDashboardInfoByChangedVariableSchema: conversion failed', property);
-                    }
-                } else {
-                    const options = getConvertedCustomOptions(property.options);
-                    _dashboardInfo.variables_schema.properties[k] = {
-                        ...property, options,
-                    };
-                }
-            });
-            return _dashboardInfo;
+        convertDashboardInfo(dashboardInfo: DashboardModel): DashboardModel {
+            // NOTE: This is for conversion from old dashboard variable schema to new one which is stored to database before version 2.0(<=1.12).
+            const convertedVariablesSchema = getConvertedVariablesSchema(dashboardInfo.variables_schema);
+            // NOTE: This is for conversion from old widget info spec to new one which is stored to database before version 2.0(<=1.12).
+            const convertedWidgetLayouts = getConvertedWidgetLayouts(dashboardInfo.layouts);
+            return {
+                ...dashboardInfo,
+                variables_schema: convertedVariablesSchema,
+                layouts: convertedWidgetLayouts,
+            };
         },
     },
 });
 
+const getConvertedWidgetLayouts = (storedWidgetLayouts: DashboardModel['layouts']): DashboardModel['layouts'] => {
+    if (!storedWidgetLayouts?.length) return storedWidgetLayouts;
 
+    return storedWidgetLayouts.map((layout) => layout.map((widgetInfo) => {
+        const convertedInheritOptions = getConvertedWidgetInheritOptions(widgetInfo.inherit_options);
+        return {
+            ...widgetInfo,
+            inherit_options: convertedInheritOptions,
+        };
+    }));
+};
+const getConvertedWidgetInheritOptions = (storedInheritOptions?: InheritOptions|DeprecatedInheritOptions): InheritOptions|undefined => {
+    if (isEmpty(storedInheritOptions)) return storedInheritOptions;
+
+    const inheritOptions = cloneDeep(storedInheritOptions);
+    Object.entries(inheritOptions).forEach(([k, inheritOption]) => {
+        const variableKey = inheritOption.variable_info?.key;
+        if (variableKey) {
+            inheritOptions[k] = {
+                enabled: inheritOptions[k].enabled,
+                variable_key: variableKey,
+            };
+            delete (inheritOptions[k] as DeprecatedInheritOptions).variable_info;
+        }
+    });
+    return inheritOptions;
+};
+type DeprecatedInheritOptions = Record<string, {
+    enabled?: boolean;
+    variable_info?: {
+        key: string;
+    },
+}>;
+
+const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSchema): DashboardVariablesSchema => {
+    if (isEmpty(storedVariablesSchema)) return storedVariablesSchema;
+
+    const variablesSchema = cloneDeep(storedVariablesSchema);
+    Object.entries(variablesSchema.properties).forEach(([k, property]) => {
+        if (property.variable_type === 'MANAGED') {
+            if (MANAGED_DASH_VAR_SCHEMA.properties[k]) {
+                variablesSchema.properties[k] = {
+                    ...MANAGED_DASH_VAR_SCHEMA.properties[k],
+                    use: property.use,
+                };
+            } else if (k === 'asset_query_set') {
+                variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = {
+                    ...MANAGED_DASH_VAR_SCHEMA.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key],
+                    use: property.use,
+                };
+                delete variablesSchema.properties[k];
+            } else {
+                console.error(new Error(`conversion failed: ${property}`));
+            }
+        } else {
+            const options = getConvertedCustomOptions(property.options);
+            variablesSchema.properties[k] = {
+                ...property, options,
+            };
+        }
+    });
+    return variablesSchema;
+};
 const getConvertedCustomOptions = (storedOptions?: DeprecatedCustomVariableOptions|DashboardVariableSchemaProperty['options']): DashboardVariableSchemaProperty['options']|undefined => {
     // early return if storedOptions is empty or already in the new format.
     if (!storedOptions || Array.isArray(storedOptions)) return storedOptions;
@@ -320,7 +367,6 @@ const getConvertedCustomOptions = (storedOptions?: DeprecatedCustomVariableOptio
     console.error('getConvertedCustomOptions: conversion failed', storedOptions);
     return undefined;
 };
-
 // only ENUM type was supported for custom options in old dashboard variable schema.
 type DeprecatedCustomVariableOptions = {
     type: 'ENUM';
