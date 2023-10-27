@@ -1,12 +1,6 @@
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageByTarget',
@@ -28,40 +22,11 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
         granularity: GRANULARITY.MONTHLY,
         cost_group_by: 'budget_id',
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'cost_product',
-        ),
-    },
-    options_schema: {
-        default_properties: [
-            'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames(
-                'project',
-                'service_account',
-            ),
-        ],
-        fixed_properties: ['cost_data_source'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source'),
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    'service_account',
-                ),
-            },
-            order: [
-                'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames(
-                    'project',
-                    'service_account',
-                ),
-            ],
-        },
-    },
-} as WidgetConfig;
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'project',
+        'service_account',
+    ]),
+};
 
 export default budgetUsageByTargetWidgetConfig;

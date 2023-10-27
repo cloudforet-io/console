@@ -1,12 +1,7 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+
 
 const monthlyCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'monthlyCost',
@@ -28,55 +23,16 @@ const monthlyCostWidgetConfig: WidgetConfig = {
     options: {
         granularity: GRANULARITY.MONTHLY,
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'provider',
-            'project',
-            'service_account',
-            'region',
-            'cost_product',
-        ),
-    },
-    options_schema: {
-        default_properties: [
-            'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'region',
-                'cost_product',
-            ),
-        ],
-        fixed_properties: ['cost_data_source'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source'),
-                ...getWidgetFilterOptionsSchema(
-                    'provider',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'cost_product',
-                    'region',
-                    'cost_usage_type',
-                ),
-            },
-            order: [
-                'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames(
-                    'provider',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'cost_product',
-                    'region',
-                    'cost_usage_type',
-                )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'provider',
+        'project',
+        'service_account',
+        'project_group',
+        'cost_product',
+        'region',
+        'cost_usage_type',
+    ]),
 };
 
 export default monthlyCostWidgetConfig;

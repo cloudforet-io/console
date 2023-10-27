@@ -1,13 +1,6 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'awsDataTransferByRegion',
@@ -45,49 +38,15 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
             cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
         },
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'service_account',
-            'project_group',
-            'region',
-        ),
-    },
-    options_schema: {
-        default_properties: [
-            'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames(
-                'cost_product',
-                'project',
-                'service_account',
-            ),
-        ],
-        fixed_properties: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames('cost_product')],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source'),
-                ...getWidgetFilterOptionsSchema(
-                    'cost_product',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'region',
-                ),
-            },
-            order: [
-                'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames(
-                    'cost_product',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'region',
-                ),
-            ],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'cost_product',
+        'project',
+        'service_account',
+        'project_group',
+        'region',
+    ]),
+    // fixed_properties: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames('cost_product')],
 };
 
 export default awsDataTransferByRegionWidgetConfig;

@@ -1,12 +1,6 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const costByRegionWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegion',
@@ -37,53 +31,15 @@ const costByRegionWidgetConfig: WidgetConfig = {
             page_size: 10,
         },
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'provider',
-            'project',
-            'service_account',
-            'region',
-            'cost_product',
-        ),
-    },
-    options_schema: {
-        default_properties: [
-            'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'region',
-                'cost_product',
-            ),
-        ],
-        fixed_properties: ['cost_data_source'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source'),
-                ...getWidgetFilterOptionsSchema(
-                    'provider',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'cost_product',
-                    'region',
-                ),
-            },
-            order: [
-                'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames(
-                    'provider',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'cost_product',
-                    'region',
-                )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'provider',
+        'project',
+        'service_account',
+        'project_group',
+        'cost_product',
+        'region',
+    ]),
 };
 
 export default costByRegionWidgetConfig;

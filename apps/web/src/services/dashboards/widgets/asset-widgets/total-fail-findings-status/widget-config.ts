@@ -1,8 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter, getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const totalFailFindingsStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'totalFailFindingsStatus',
@@ -24,39 +21,14 @@ const totalFailFindingsStatusWidgetConfig: WidgetConfig = {
     options: {
         data_criteria: 'realtime',
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('asset_query_set'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'provider',
-            'region',
-            'asset_account',
-        ),
-    },
-    options_schema: {
-        default_properties: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames('provider', 'project', 'region', 'asset_account')],
-        fixed_properties: ['asset_query_set'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('asset_query_set'),
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    // 'service_account', HACK: Re-enable it after backend is ready
-                    'provider',
-                    'region',
-                    'asset_account',
-                ),
-            },
-            order: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames(
-                'project',
-                // 'service_account',
-                'provider',
-                'region',
-                'asset_account',
-            )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'asset_query_set',
+        'project',
+        // 'service_account', HACK: Re-enable it after backend is ready
+        'provider',
+        'region',
+        'asset_account',
+    ]),
 };
 
 export default totalFailFindingsStatusWidgetConfig;

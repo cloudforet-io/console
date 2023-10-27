@@ -1,6 +1,7 @@
 import type { VariableModelConfig } from '@/lib/variable-models';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
+import { ASSET_GROUP_BY_ITEM_MAP, COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetFilterKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 export interface WidgetOptionsSchemaProperty {
@@ -24,7 +25,7 @@ export type WidgetOptionsSchema = {
     order: string[];
 };
 
-export const COMMON_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchemaProperty> = {
+export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchemaProperty> = {
     [MANAGED_VARIABLE_MODEL_CONFIGS.provider.key]: {
         key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.provider.key),
         name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
@@ -65,8 +66,17 @@ export const COMMON_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptio
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key },
         ],
     },
+    [MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key]: {
+        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key),
+        name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.name,
+        selection_type: 'MULTI',
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key },
+        ],
+    },
 };
-export const COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchemaProperty> = {
+
+export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchemaProperty> = {
     [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
@@ -77,8 +87,8 @@ export const COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptions
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key },
         ],
     },
-    dost_data_type: {
-        key: 'dost_data_type',
+    cost_data_type: {
+        key: 'cost_data_type',
         name: 'Data Type',
         selection_type: 'SINGLE',
         required: true,
@@ -90,26 +100,16 @@ export const COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptions
             [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
         },
     },
-    [MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key]: {
-        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key),
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.name,
+    [MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key]: {
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key,
+        name: 'Group by (Cost)',
         selection_type: 'MULTI',
+        required: true,
+        fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key },
+            { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
     },
-    // TODO: update
-    // {
-    //     key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.type),
-    //     name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.name,
-    //     selection_type: 'MULTI',
-    //     item_options: [
-    //         { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: COST_VARIABLE_TYPE_INFO.cost_usage_type.key },
-    //     ],
-    // },
-};
-
-export const ASSET_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchemaProperty> = {
     [MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]: {
         // TODO: add conversion code for key changing from asset_query_set to cloud_service_query_set
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
@@ -127,5 +127,43 @@ export const ASSET_WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOption
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key },
         ],
     },
+    asset_default_field: {
+        key: 'asset_default_field',
+        name: 'Group by (Asset)',
+        selection_type: 'MULTI',
+        required: true,
+        fixed: true,
+        item_options: [
+            { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+        ],
+    },
+    [MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]: {
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+        name: 'Compliance Framework',
+        selection_type: 'MULTI',
+        required: true,
+        fixed: true,
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
+        ],
+    },
+    // TODO: update
+    // {
+    //     key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.type),
+    //     name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.name,
+    //     selection_type: 'MULTI',
+    //     item_options: [
+    //         { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: COST_VARIABLE_TYPE_INFO.cost_usage_type.key },
+    //     ],
+    // },
 };
+
+// TODO: will be updated
+export const getWidgetOptionsSchema = (optionNames: string[]) => {
+    console.log(optionNames);
+    const properties: Record<string, WidgetOptionsSchemaProperty> = {};
+    const order: string[] = [];
+    return { properties, order };
+};
+
 

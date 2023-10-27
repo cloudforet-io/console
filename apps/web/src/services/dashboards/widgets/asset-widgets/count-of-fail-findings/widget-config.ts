@@ -1,11 +1,6 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const countOfFailFindingsWidgetConfig: WidgetConfig = {
     widget_config_id: 'countOfFailFindings',
@@ -29,45 +24,16 @@ const countOfFailFindingsWidgetConfig: WidgetConfig = {
             page_size: 8,
         },
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('asset_query_set'),
-        ...getWidgetInheritOptionsForFilter(
-            'provider',
-            'project',
-            'region',
-            'asset_account',
-        ),
-    },
-    options_schema: {
-        default_properties: ['asset_query_set', 'asset_group_by', ...getWidgetFilterSchemaPropertyNames(
-            'provider',
-            'project',
-            'region',
-            'asset_account',
-        )],
-        fixed_properties: ['asset_query_set', 'asset_group_by'],
-        non_inheritable_properties: ['asset_group_by'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('asset_query_set', 'asset_group_by'),
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    // 'service_account', HACK: Re-enable it after backend is ready
-                    'provider',
-                    'region',
-                    'asset_account',
-                ),
-            },
-            order: ['asset_query_set', 'asset_group_by', ...getWidgetFilterSchemaPropertyNames(
-                'project',
-                // 'service_account',
-                'provider',
-                'region',
-                'asset_account',
-            )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'asset_query_set',
+        'asset_group_by',
+        'project',
+        // 'service_account', HACK: Re-enable it after backend is ready
+        'provider',
+        'region',
+        'asset_account',
+    ]),
+    // non_inheritable_properties: ['asset_group_by'],
 };
 
 export default countOfFailFindingsWidgetConfig;
