@@ -157,7 +157,7 @@ watch([() => props.projectId, () => props.dataSourceId, () => props.projectGroup
               :key="index"
               class="data"
         >
-            {{ month }}: {{ currencyMoneyFormatter(cost, state.currency) }}
+            {{ month }}: {{ currencyMoneyFormatter(cost, { currency: state.currency }) }}
         </span>
     </div>
 </template>
