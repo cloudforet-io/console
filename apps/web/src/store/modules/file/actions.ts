@@ -6,7 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
 
-import type { ExcelDataField, FileState } from '@/store/modules/file/type';
+import type { ExcelDataField, ExportResponse, FileState } from '@/store/modules/file/type';
 
 import config from '@/lib/config';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
@@ -114,5 +114,17 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
     } catch (error) {
         ErrorHandler.handleRequestError(error, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
         dispatch('display/finishLoading', {}, { root: true });
+    }
+};
+
+export const downloadByFileUrl: Action<ExportResponse, any> = async (_, downloadUrl): Promise<void> => {
+    try {
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.target = '_self';
+        link.click();
+        link.remove();
+    } catch (error) {
+        ErrorHandler.handleRequestError(error, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
     }
 };

@@ -17,3 +17,7 @@ export interface ExcelDataField {
     reference?: Reference;
     options?: Options;
 }
+
+export interface ExportResponse {
+    download_url: string;
+}
