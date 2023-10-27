@@ -152,7 +152,7 @@ state.selectedList = state.propertySchemaList.map((schema) => initSelectedMenuIt
                                           :selected="state.selectedList[i]"
                                           :selection-type="schema.selection_type"
                                           :inherit="widgetFormState.inheritOptions?.[schema.key]?.enabled"
-                                          :non-inheritable="schema.non_inheritable"
+                                          :inheritance-mode="schema.inheritance_mode"
                                           :deletable="!schema.fixed"
                                           :menu-handlers="getMenuHandlers(schema)"
                                           :variables-schema="props.variablesSchema"

@@ -96,11 +96,11 @@ export interface BaseWidgetConfig {
     options_schema?: WidgetOptionsSchema;
 }
 
-export interface CostWidgetConfig extends BaseWidgetConfig {
+interface CostWidgetConfig extends BaseWidgetConfig {
     labels?: Array<'Cost'|string>;
     options?: CostWidgetOptions;
 }
-export interface AssetWidgetConfig extends BaseWidgetConfig {
+interface AssetWidgetConfig extends BaseWidgetConfig {
     labels?: Array<'Asset'|string>;
     options?: AssetWidgetOptions;
 }

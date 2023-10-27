@@ -4,6 +4,14 @@ import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { ASSET_GROUP_BY_ITEM_MAP, COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetFilterKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
+/*
+ * inheritance_mode: how to inherit widget options from dashboard variables.
+ *      NONE: no inheritance
+ *      KEY_MATCHING: inherit by key matching
+ *      SELECTION_TYPE_MATCHING: inherit by selection type matching
+ */
+export type InheritanceMode = 'NONE'|'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
+
 export interface WidgetOptionsSchemaProperty {
     key: string; // e.g. cost_data_source
     name: string; // e.g. Data Source
@@ -11,8 +19,7 @@ export interface WidgetOptionsSchemaProperty {
     readonly?: boolean;
     fixed?: boolean;
     required?: boolean;
-    non_inheritable?: boolean;
-    inheritance_mode?: 'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
+    inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
     dependencies?: {
         [property: string]: { // e.g. 'cost_data_source'
@@ -27,7 +34,7 @@ export type WidgetOptionsSchema = {
 
 export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchemaProperty> = {
     [MANAGED_VARIABLE_MODEL_CONFIGS.provider.key]: {
-        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.provider.key),
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
         selection_type: 'MULTI',
         item_options: [
@@ -35,7 +42,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchem
         ],
     },
     [MANAGED_VARIABLE_MODEL_CONFIGS.project.key]: {
-        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.project.key),
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
         selection_type: 'MULTI',
         item_options: [
@@ -43,7 +50,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchem
         ],
     },
     [MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key]: {
-        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key),
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
         selection_type: 'MULTI',
         item_options: [
@@ -51,7 +58,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchem
         ],
     },
     [MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key]: {
-        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key),
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.name,
         selection_type: 'MULTI',
         item_options: [
@@ -59,7 +66,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchem
         ],
     },
     [MANAGED_VARIABLE_MODEL_CONFIGS.region.key]: {
-        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.region.key),
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
         selection_type: 'MULTI',
         item_options: [
@@ -67,7 +74,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchem
         ],
     },
     [MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key]: {
-        key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key),
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.name,
         selection_type: 'MULTI',
         item_options: [
@@ -160,9 +167,14 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Record<string, WidgetOptionsSchem
 
 // TODO: will be updated
 export const getWidgetOptionsSchema = (optionNames: string[]) => {
-    console.log(optionNames);
     const properties: Record<string, WidgetOptionsSchemaProperty> = {};
     const order: string[] = [];
+    optionNames.forEach((optionName) => {
+        const propertyName = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName] ? getWidgetFilterKey(optionName) : optionName;
+        const property = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName] ?? WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName];
+        properties[propertyName] = property;
+        order.push(propertyName);
+    });
     return { properties, order };
 };
 
