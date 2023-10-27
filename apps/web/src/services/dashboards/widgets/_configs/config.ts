@@ -188,9 +188,7 @@ export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inher
 
 export type InheritOptions = Record<string, {
     enabled?: boolean;
-    variable_info?: {
-        key: string;
-    },
+    variable_key?: string;
 }>;
 
 export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {

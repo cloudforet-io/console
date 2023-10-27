@@ -139,9 +139,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 if (_inheritOptions?.[key]?.enabled && val) {
                     _inheritOptions[key] = {
                         enabled: true,
-                        variable_info: {
-                            key: val as string,
-                        },
+                        variable_key: val as string,
                     };
                 // widget option filters case
                 } else if (key.startsWith('filters.')) {
@@ -175,9 +173,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
             if (enabled) {
                 inheritOptions[propertyName] = {
                     enabled: true,
-                    variable_info: {
-                        key: variableKey ?? getVariableKeyFromWidgetSchemaProperty(propertyName),
-                    },
+                    variable_key: variableKey ?? getVariableKeyFromWidgetSchemaProperty(propertyName),
                 };
             } else {
                 inheritOptions[propertyName] = {
