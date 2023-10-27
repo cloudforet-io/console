@@ -16,8 +16,7 @@ import type {
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import {
-    WIDGET_FILTERS_SCHEMA_PROPERTIES,
-    WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+    getWidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -59,13 +58,17 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 if (config) {
                     return {
                         ...config,
-                        options_schema: {
-                            properties: {
-                                ...WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-                                ...WIDGET_FILTERS_SCHEMA_PROPERTIES,
-                            },
-                            order: [],
-                        },
+                        options_schema: getWidgetOptionsSchema([
+                            'cost_data_source',
+                            'cost_group_by',
+                            'provider',
+                            'project',
+                            'service_account',
+                            'project_group',
+                            'cost_product',
+                            'region',
+                            'cost_usage_type',
+                        ]),
                     };
                 }
             }
