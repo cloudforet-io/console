@@ -9,7 +9,7 @@ import {
 } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
-import { getRGBFromHex, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { getRGBFromHex, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -176,11 +176,11 @@ defineExpose<WidgetExpose>({
                 </p>
                 <div class="count-wrapper">
                     <div class="left-part">
-                        {{ commaFormatter(numberFormatter(state.data?._total_fail_finding_count)) }}
+                        {{ numberFormatter(state.data?._total_fail_finding_count) }}
                     </div>
                     <div class="right-part">
                         <span class="text">out of </span>
-                        <span class="count">{{ commaFormatter(numberFormatter(state.totalCount)) }}</span>
+                        <span class="count">{{ numberFormatter(state.totalCount) }}</span>
                     </div>
                 </div>
             </div>
@@ -205,7 +205,7 @@ defineExpose<WidgetExpose>({
                             {{ data.label }}
                         </div>
                         <div class="count">
-                            {{ commaFormatter(numberFormatter(data.value, 1)) }}
+                            {{ numberFormatter(data.value) }}
                         </div>
                     </div>
                 </div>

@@ -17,7 +17,7 @@
                               class="increase-text"
                               :class="[item.increase > 0 ? 'increase' : item.increase < 0 ? 'decrease' : '']"
                         >
-                            <span>{{ commaFormatter(Math.abs(item.increase)) }}</span>
+                            <span>{{ numberFormatter(Math.abs(item.increase)) }}</span>
                             <p-i v-if="item.increase !== 0"
                                  :name="item.increase > 0 ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
                                  height="0.75rem"
@@ -27,8 +27,8 @@
                         </span>
                     </template>
                     <div class="count-wrapper">
-                        <span>{{ commaFormatter(item.dailyAverage) }}</span>
-                        <span>{{ commaFormatter(item.monthlyTotal) }}</span>
+                        <span>{{ numberFormatter(item.dailyAverage) }}</span>
+                        <span>{{ numberFormatter(item.monthlyTotal) }}</span>
                     </div>
                     <div class="label-wrapper">
                         <span>{{ $t('MONITORING.ALERT.DASHBOARD.DAILY_AVERAGE') }}</span>
@@ -46,7 +46,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     reactive, toRefs, watch, watchEffect,
 } from 'vue';
@@ -57,7 +56,7 @@ import {
 import dayjs from 'dayjs';
 import { find } from 'lodash';
 
-import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -150,7 +149,6 @@ export default {
                 const { results } = await SpaceConnector.client.monitoring.dashboard.alertHistorySummary({
                     start: current.subtract(1, 'month').format('YYYY-MM-01'),
                     end: current.add(1, 'month').format('YYYY-MM-01'),
-                    // eslint-disable-next-line camelcase
                     activated_projects: props.activatedProjects,
                 });
                 setSummaryData(current, results);
@@ -173,7 +171,7 @@ export default {
         return {
             ...toRefs(state),
             ALERT_STATE,
-            commaFormatter,
+            numberFormatter,
         };
     },
 };

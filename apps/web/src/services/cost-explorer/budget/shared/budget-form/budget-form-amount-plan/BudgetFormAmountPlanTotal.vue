@@ -4,7 +4,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
+import { getNumberFromString, numberFormatter } from '@cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 
@@ -24,7 +24,7 @@ const {
 
 const state = reactive({
     formattedAmount: computed<string>({
-        get: () => commaFormatter(amount.value),
+        get: () => numberFormatter(amount.value),
         set: (val: string) => { setForm('amount', getNumberFromString(val)); },
     }),
 });

@@ -69,7 +69,7 @@
                              style-type="primary3"
                              badge-type="subtle"
                     >
-                        {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}
+                        {{ numberFormatter(counts[ALERT_STATE.TRIGGERED]) }}
                     </p-badge>
                     <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
                 </template>
@@ -120,7 +120,7 @@ import {
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
-import { commaFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -345,7 +345,7 @@ export default {
             onCreateMaintenanceWindow,
             ALERT_STATE,
             FAVORITE_TYPE,
-            commaFormatter,
+            numberFormatter,
             BACKGROUND_COLOR,
         };
     },

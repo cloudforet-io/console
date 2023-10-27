@@ -15,7 +15,8 @@
             >
                 <template #tab="{label, name}">
                     <div class="tab-button">
-                        {{ label }} <span class="count">{{ commaFormatter(tabState.tabItems[name].count) }}</span>
+                        {{ label }}
+                        <span class="count">{{ numberFormatter(tabState.tabItems[name].count) }}</span>
                     </div>
                 </template>
             </p-balloon-tab>
@@ -26,7 +27,7 @@
                            :style-type="tabState.tabItems[tabState.activeTab].styleType"
             >
                 <template #tab="{label, name}">
-                    <span>{{ label }} <strong>{{ commaFormatter(tabState.tabItems[name].count) }}</strong></span>
+                    <span>{{ label }} <strong>{{ numberFormatter(tabState.tabItems[name].count) }}</strong></span>
                 </template>
             </p-balloon-tab>
             <!--tab content-->
@@ -117,7 +118,7 @@ import {
 } from '@spaceone/design-system';
 import { find, sum } from 'lodash';
 
-import { commaFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -336,7 +337,7 @@ export default {
             onSelectAssignedState,
             onClickRefresh,
             listAlerts,
-            commaFormatter,
+            numberFormatter,
             red,
             ALERT_URGENCY,
         };

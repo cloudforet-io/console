@@ -62,7 +62,7 @@ import type { Location } from 'vue-router';
 import { PSkeleton, PDataLoader, PEmpty } from '@spaceone/design-system';
 import { range } from 'lodash';
 
-import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -177,7 +177,7 @@ export default {
                     summaryData.push({
                         provider: d.provider,
                         type: d.display_name || d.cloud_service_group,
-                        count: type === DATA_TYPE.STORAGE ? byteFormatter(d.size) : commaFormatter(d.count),
+                        count: type === DATA_TYPE.STORAGE ? byteFormatter(d.size) : numberFormatter(d.count),
                         to: detailLocation,
                     });
                 });

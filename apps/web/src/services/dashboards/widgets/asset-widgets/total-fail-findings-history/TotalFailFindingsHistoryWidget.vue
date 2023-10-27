@@ -9,7 +9,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -267,11 +267,11 @@ defineExpose<WidgetExpose>({
                 </p>
                 <div class="count-wrapper">
                     <div class="left-part">
-                        {{ commaFormatter(numberFormatter(state.currTotalFailureCount)) }}
+                        {{ numberFormatter(state.currTotalFailureCount) }}
                     </div>
                     <div class="right-part">
                         <span class="text">out of </span>
-                        <span class="count">{{ commaFormatter(numberFormatter(state.currTotalCount)) }}</span>
+                        <span class="count">{{ numberFormatter(state.currTotalCount) }}</span>
                     </div>
                 </div>
             </div>
