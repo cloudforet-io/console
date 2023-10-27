@@ -16,8 +16,8 @@ import type {
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import {
-    COMMON_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-    COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+    WIDGET_FILTERS_SCHEMA_PROPERTIES,
+    WIDGET_OPTIONS_SCHEMA_PROPERTIES,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -61,8 +61,8 @@ export const useWidgetFormStore = defineStore('widget-form', {
                         ...config,
                         options_schema: {
                             properties: {
-                                ...COST_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
-                                ...COMMON_WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+                                ...WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+                                ...WIDGET_FILTERS_SCHEMA_PROPERTIES,
                             },
                             order: [],
                         },
