@@ -48,7 +48,7 @@ class ApiQueryHelper extends QueryHelper {
     setSort(key: string, desc?: boolean): ApiQueryHelper {
         this._data.sort = {
             key,
-            desc: desc ?? this._data.sort?.desc ?? false,
+            desc: desc ?? (this._data.sort as Sort)?.desc ?? false,
         };
         return this;
     }
@@ -61,12 +61,21 @@ class ApiQueryHelper extends QueryHelper {
         return this;
     }
 
+    // This method is temporarily added for v2 api.
+    setMultiSortV2(sortList: Sort[]): ApiQueryHelper {
+        if (!this._data.sort) {
+            this._data.sort = {};
+        }
+        this._data.sort = sortList;
+        return this;
+    }
+
     setSortDesc(desc = false): ApiQueryHelper {
         if (!this._data.sort) {
             this._data.sort = {};
         }
 
-        this._data.sort.desc = desc;
+        (this._data.sort as Sort).desc = desc;
         return this;
     }
 
