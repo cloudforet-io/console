@@ -285,7 +285,7 @@ const drawChart = (chartData: ChartData[]) => {
                 (value) => usageUnitFormatter(value, { unit: state.usageUnit }),
             );
         } else {
-            chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
+            chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, { currency: widgetState.currency }));
         }
         (series as any).set('tooltip', tooltip);
         series.data.setAll(cloneDeep(chartData));

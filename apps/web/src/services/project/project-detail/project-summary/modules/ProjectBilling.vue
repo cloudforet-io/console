@@ -145,13 +145,13 @@ const tableState = reactive({
             // const pastDate = dayjs.utc(d.date).subtract(1, timeUnit).format(dateFormat);
             // const pastCost = results.find((bd) => bd.date === pastDate)?.cost_sum || 0;
             // costData[d.date] = {
-            //     cost: currencyMoneyFormatter(d.value, state.currency),
+            //     cost: currencyMoneyFormatter(d.value, { currency: state.currency }),
             // };
             // if (pastCost && pastCost < d.cost_sum && (d.cost_sum - pastCost) / Math.abs(pastCost) > 0.5) {
             //     costData[d.date].color = 'red';
             // }
             d.cost_sum.forEach((cost) => {
-                costData[cost.date] = currencyMoneyFormatter(cost.value, state.currency);
+                costData[cost.date] = currencyMoneyFormatter(cost.value, { currency: state.currency });
             });
 
             data.push({

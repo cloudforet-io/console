@@ -27,7 +27,7 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
                  class="total-wrapper"
             >
                 <p class="total-data">
-                    {{ currencyMoneyFormatter(props.budgetData.limit, props.budgetData?.currency, undefined, false, 1000000000) }}
+                    {{ currencyMoneyFormatter(props.budgetData.limit, { currency: props.budgetData?.currency, notation: 'standard' }) }}
                 </p>
             </div>
             <template v-else>
@@ -41,7 +41,7 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
                                 {{ dateFormatter(date) }}
                             </span>
                             <br>
-                            <span>{{ currencyMoneyFormatter(limit, props.budgetData?.currency, undefined, false, 1000000000) }}</span>
+                            <span>{{ currencyMoneyFormatter(limit, { currency: props.budgetData?.currency, notation: 'standard' }) }}</span>
                         </span>
                     </p>
                 </div>

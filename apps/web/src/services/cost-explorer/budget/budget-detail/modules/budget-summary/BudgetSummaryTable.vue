@@ -200,20 +200,20 @@ setTableKeysAndItems();
         >
             <template #col-format="{field, value}">
                 <template v-if="field.name && value.path === 'limit'">
-                    {{
-                        state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetData?.currency)
-                        : currencyMoneyFormatter(value[value.path], state.budgetData?.currency, undefined, false, 1000000000)
-                    }}
+                    {{ currencyMoneyFormatter(
+                        value[value.path],
+                        { currency: state.budgetData?.currency, notation: state.showFormattedBudgetData ? 'compact': 'standard' }
+                    ) }}
                 </template>
                 <template v-else-if="field.name && value.path === 'cost'">
                     <p-link v-if="dayjs.utc(value.date).isSameOrBefore(dayjs.utc())"
                             :to="value.link"
                             highlight
                     >
-                        {{
-                            state.showFormattedBudgetData ? currencyMoneyFormatter(value[value.path], state.budgetData?.currency)
-                            : currencyMoneyFormatter(value[value.path], state.budgetData?.currency, undefined, false, 1000000000)
-                        }}
+                        {{ currencyMoneyFormatter(
+                            value[value.path],
+                            { currency: state.budgetData?.currency, notation: state.showFormattedBudgetData ? 'compact': 'standard' }
+                        ) }}
                     </p-link>
                     <span v-else>--</span>
                 </template>
