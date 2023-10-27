@@ -18,7 +18,7 @@ import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboard
 import type {
     DashboardLayoutWidgetInfo,
     InheritOptions,
-    UpdatableWidgetInfo,
+    UpdatableWidgetInfo, WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
@@ -290,9 +290,11 @@ const getConvertedWidgetLayouts = (storedWidgetLayouts: DashboardModel['layouts'
 
     return storedWidgetLayouts.map((layout) => layout.map((widgetInfo) => {
         const convertedInheritOptions = getConvertedWidgetInheritOptions(widgetInfo.inherit_options);
+        const convertedWidgetOptions = getConvertedWidgetOptions(widgetInfo.widget_options);
         return {
             ...widgetInfo,
             inherit_options: convertedInheritOptions,
+            widget_options: convertedWidgetOptions,
         };
     }));
 };
@@ -318,6 +320,18 @@ type DeprecatedInheritOptions = Record<string, {
         key: string;
     },
 }>;
+const getConvertedWidgetOptions = (storedWidgetOptions?: WidgetOptions): WidgetOptions|undefined => {
+    const widgetOptions = cloneDeep(storedWidgetOptions);
+    if (isEmpty(widgetOptions)) return widgetOptions;
+
+    Object.entries(widgetOptions).forEach(([k, v]) => {
+        if (k === 'cost_group_by') {
+            (widgetOptions as any).data_field = v;
+            delete widgetOptions[k];
+        }
+    });
+    return widgetOptions;
+};
 
 const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSchema): DashboardVariablesSchema => {
     if (isEmpty(storedVariablesSchema)) return storedVariablesSchema;
