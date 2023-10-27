@@ -4,6 +4,14 @@ import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { ASSET_GROUP_BY_ITEM_MAP, COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetFilterKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
+/*
+ * inheritance_mode: how to inherit widget options from dashboard variables.
+ *      NONE: no inheritance
+ *      KEY_MATCHING: inherit by key matching
+ *      SELECTION_TYPE_MATCHING: inherit by selection type matching
+ */
+export type InheritanceMode = 'NONE'|'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
+
 export interface WidgetOptionsSchemaProperty {
     key: string; // e.g. cost_data_source
     name: string; // e.g. Data Source
@@ -11,8 +19,7 @@ export interface WidgetOptionsSchemaProperty {
     readonly?: boolean;
     fixed?: boolean;
     required?: boolean;
-    non_inheritable?: boolean;
-    inheritance_mode?: 'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
+    inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
     dependencies?: {
         [property: string]: { // e.g. 'cost_data_source'
