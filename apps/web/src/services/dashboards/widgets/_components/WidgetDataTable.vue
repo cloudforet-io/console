@@ -96,7 +96,7 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions'], c
         return value;
     }
     if (textOptions?.type === 'cost') {
-        return currencyMoneyFormatter(value, props.currency);
+        return currencyMoneyFormatter(value, { currency: props.currency });
     } if (textOptions?.type === 'number') {
         return numberFormatter(value);
     } if (textOptions?.type === 'percent') {

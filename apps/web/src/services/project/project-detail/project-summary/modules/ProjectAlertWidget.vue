@@ -11,7 +11,7 @@
                              class="button"
                              :style="{ color: alertState.color }"
                 >
-                    <strong>{{ commaFormatter(counts[alertState.name]) }}</strong> {{ alertState.label }}
+                    <strong>{{ numberFormatter(counts[alertState.name]) }}</strong> {{ alertState.label }}
                 </router-link>
             </div>
             <p-list-card :items="items"
@@ -20,7 +20,7 @@
             >
                 <template #header>
                     <p class="left-part">
-                        <strong>{{ $t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ commaFormatter(totalCount) }})
+                        <strong>{{ $t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ numberFormatter(totalCount) }})
                     </p>
                     <p class="right-part">
                         <p-select-button v-for="(state, idx) in assignedStateList"
@@ -65,7 +65,7 @@ import {
 } from '@spaceone/design-system';
 import { find } from 'lodash';
 
-import { commaFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -215,7 +215,7 @@ export default {
             ...toRefs(state),
             listAlerts,
             alertLinkFormatter,
-            commaFormatter,
+            numberFormatter,
         };
     },
 };

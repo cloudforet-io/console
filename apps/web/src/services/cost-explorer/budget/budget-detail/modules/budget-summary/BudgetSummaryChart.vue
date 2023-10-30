@@ -7,7 +7,7 @@ import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 
@@ -79,7 +79,7 @@ const drawChart = () => {
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
-            return commaFormatter(numberFormatter(Number(convertedText)));
+            return numberFormatter(Number(convertedText));
         }
         return text;
     });

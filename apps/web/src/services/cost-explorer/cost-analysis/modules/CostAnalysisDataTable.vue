@@ -9,7 +9,6 @@ import type { DataTableFieldType } from '@spaceone/design-system/types/data-disp
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -287,14 +286,6 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
     });
     return refinedTableData;
 };
-const getCommaFormattedValue = (value: number): string|number => {
-    if (value) {
-        return Intl.NumberFormat('en', {
-            maximumFractionDigits: 20, minimumFractionDigits: undefined, notation: 'standard', style: 'decimal',
-        }).format(value);
-    }
-    return value;
-};
 
 
 /* api */
@@ -487,18 +478,16 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                     <p-link :to="value ? getLink(item, field.name) : undefined"
                             class="!align-middle"
                     >
-                        <template v-if="isIncreasedByHalfOrMore(item, field.name)">
-                            <span class="cell-text raised">{{ numberFormatter(value) }}</span>
-                            <p-i name="ic_arrow-up-bold-alt"
+                        <span class="usage-wrapper">
+                            <span :class="isIncreasedByHalfOrMore(item, field.name) ? 'cell-text raised' : undefined">
+                                {{ usageUnitFormatter(value, {unit: item.usage_unit}, tableState.showFormattedData) ?? '--' }}
+                            </span>
+                            <p-i v-if="isIncreasedByHalfOrMore(item, field.name)"
+                                 name="ic_arrow-up-bold-alt"
                                  width="0.75rem"
                                  height="0.75rem"
                             />
-                        </template>
-                        <template v-else>
-                            <span class="usage-wrapper">
-                                {{ tableState.showFormattedData ? usageUnitFormatter(value, {unit: item.usage_unit}) : getCommaFormattedValue(value) }}
-                            </span>
-                        </template>
+                        </span>
                     </p-link>
                 </span>
             </template>
