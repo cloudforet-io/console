@@ -7,6 +7,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 
+import config from '@/lib/config';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AdminRole from '@/services/administration/iam/user/modules/user-management-modal/modules/AdminRole.vue';
@@ -35,6 +37,7 @@ const userPageState = userPageStore.$state;
 const state = reactive({
     data: {} as User,
     selectedId: computed(() => props.item?.user_id),
+    smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
 
 const emit = defineEmits<{(e: 'confirm', data: UserManagementData, roleId: string|null): void; }>();
@@ -190,7 +193,7 @@ const initAuthTypeList = async () => {
                         @change-input="handleChangeInputs"
                     />
                     <notification-email-form
-                        v-if="formState.activeTab !== 'apiOnly'"
+                        v-if="formState.activeTab !== 'apiOnly' && state.smtpEnabled"
                         :email="formState.email"
                         @change-input="handleChangeInputs"
                     />
@@ -216,6 +219,7 @@ const initAuthTypeList = async () => {
                         @change-input="handleChangeInputs"
                     />
                     <notification-email-form
+                        v-if="state.smtpEnabled"
                         :is-valid-email="state.data.email_verified"
                         :email="formState.email"
                         :item="state.data"
