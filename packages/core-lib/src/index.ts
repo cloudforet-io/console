@@ -37,8 +37,8 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
  * @param value
  * @param options
  * @description For detailed information on the types of options, please refer to the following link.
- * { notation: 'compact' }: 10000 => 10K (default)
- * { notation: 'standard' }: 10000 => 10,000
+ * { notation: 'standard' }: 10000 => 10,000 (default)
+ * { notation: 'compact' }: 10000 => 10K
  * { maximumFractionDigits: 2 }: 0.1234 => 0.12 (default)
  * { maximumFractionDigits: 21 }: 0.14324234234 => 0.14324234234
  * { minimumFractionDigits: 2 }: 0 => 0.00
