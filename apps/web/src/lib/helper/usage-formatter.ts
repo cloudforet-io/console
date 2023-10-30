@@ -38,5 +38,5 @@ export const usageUnitFormatter = (value: number, options?: UsageUnitFormatterOp
         if (options?.unit === 'Count') return numberFormatter(value);
         return currencyMoneyFormatter(value, { style: 'decimal' });
     }
-    return numberFormatter(value, { notation: 'standard' });
+    return numberFormatter(value);
 };
