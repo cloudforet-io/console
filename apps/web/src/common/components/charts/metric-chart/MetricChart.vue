@@ -13,7 +13,7 @@ import {
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 
-import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 
 import config from '@/lib/config';
 
@@ -226,7 +226,7 @@ onUnmounted(() => {
                             <span class="circle"
                                   :style="{ 'background-color': legend.color }"
                             />
-                            <span class="count">{{ legend.count ? commaFormatter(numberFormatter(legend.count)) : 0 }}</span>
+                            <span class="count">{{ legend.count ? numberFormatter(legend.count) : 0 }}</span>
                         </td>
                         <td>
                             <p v-if="legend.serverName">

@@ -5,7 +5,7 @@ import type { IDateAxisSettings, IXYChartSettings, IXYSeriesSettings } from '@am
 import * as am5xy from '@amcharts/amcharts5/xy';
 import bytes from 'bytes';
 
-import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 
 import type { Currency } from '@/store/modules/settings/type';
 
@@ -272,10 +272,10 @@ export const setXYSharedTooltipTextWithRate = (chart: am5xy.XYChart, tooltip: am
                 value: value ?? 0,
             });
         });
-        let _text = `Total: [bold; fontSize: 14px]${commaFormatter(totalValue)}[/]`;
+        let _text = `Total: [bold; fontSize: 14px]${numberFormatter(totalValue)}[/]`;
         seriesList.forEach((s) => {
             const rate = Math.round((s.value / totalValue) * 100);
-            _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${commaFormatter(s.value)}[/] (${rate}%)`;
+            _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${numberFormatter(s.value)}[/] (${rate}%)`;
         });
         return _text;
     });
@@ -294,7 +294,7 @@ export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
     });
     tooltip.label.adapters.add('text', (_, target) => {
         let value = target.dataItem?.dataContext?.[fieldName];
-        if (currency) value = currencyMoneyFormatter(value, { currency });
+        if (currency) value = currencyMoneyFormatter(value, { currency, notation: 'standard' });
         return `[${strokeColor};fontSize: 10px]●[/] {valueX}: [bold]${value}[/]`;
     });
 };

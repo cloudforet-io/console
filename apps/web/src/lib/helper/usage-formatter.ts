@@ -1,6 +1,6 @@
 import bytes from 'bytes';
 
-import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -35,8 +35,8 @@ export const usageUnitFormatter = (value: number, options?: UsageUnitFormatterOp
             const parsedValue = bytes.parse(`${value}${SIZE_UNIT_MAP[sizeOptions.unit]}`); // 1KB -> 1024
             return byteFormatter(parsedValue, { unit: sizeOptions.outputUnit });
         }
-        if (options?.unit === 'Count') return commaFormatter(value);
+        if (options?.unit === 'Count') return numberFormatter(value);
         return currencyMoneyFormatter(value, { style: 'decimal' });
     }
-    return commaFormatter(value);
+    return numberFormatter(value);
 };

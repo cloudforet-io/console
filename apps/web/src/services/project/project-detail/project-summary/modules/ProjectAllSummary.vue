@@ -16,7 +16,7 @@ import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
 import { forEach, orderBy, range } from 'lodash';
 
-import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -318,7 +318,7 @@ const getSummaryInfo = async (type) => {
                 provider: d.provider,
                 label: storeState.providers[d.provider]?.label,
                 type: d.display_name || d.cloud_service_group,
-                count: type === SERVICE_CATEGORY.STORAGE ? byteFormatter(d.size) : commaFormatter(d.count),
+                count: type === SERVICE_CATEGORY.STORAGE ? byteFormatter(d.size) : numberFormatter(d.count),
                 to: {
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
@@ -410,7 +410,7 @@ onUnmounted(() => {
                     />
                     <span v-else
                           class="count"
-                    > {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(state.countMap[name]).split(' ')[0] : commaFormatter(state.countMap[name]) }}</span>
+                    > {{ name === SERVICE_CATEGORY.STORAGE ? byteFormatter(state.countMap[name]).split(' ')[0] : numberFormatter(state.countMap[name]) }}</span>
                 </div>
             </template>
         </p-balloon-tab>
@@ -458,7 +458,7 @@ onUnmounted(() => {
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                                 </div>
                                 <span class="count">
-                                    {{ state.activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(state.countMap[state.activeTab]) : commaFormatter(state.countMap[state.activeTab]) }}
+                                    {{ state.activeTab === SERVICE_CATEGORY.STORAGE ? byteFormatter(state.countMap[state.activeTab]) : numberFormatter(state.countMap[state.activeTab]) }}
                                 </span>
                             </router-link>
                             <router-link v-for="(data, idx) of state.summaryData"

@@ -2,7 +2,6 @@
 import {
     computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
-import type { NumberFormatOptions } from 'vue-i18n';
 
 import {
     XYChart, CategoryAxis, ValueAxis, LineSeries, CircleBullet, XYCursor,
@@ -15,6 +14,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
 
+import { numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -176,21 +176,6 @@ const chartState = reactive({
 });
 
 /* util */
-const commaFormatter = (num) => {
-    if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return num;
-};
-const numberFormatter = (num) => {
-    if (Math.abs(num) < 10000) {
-        return Math.round(num * 10) / 10;
-    }
-    const options: NumberFormatOptions = {
-        notation: 'compact',
-        signDisplay: 'auto',
-        maximumFractionDigits: 1,
-    };
-    return Intl.NumberFormat('en', options).format(num);
-};
 const disposeChart = (_chartContext) => {
     if (chartState.registry[_chartContext]) {
         chartState.registry[_chartContext].dispose();
@@ -238,7 +223,7 @@ const drawChart = (_chartContext) => {
 
     series.adapter.add('tooltipText', (text, target) => {
         if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-            return `[bold]$${commaFormatter(numberFormatter(target.tooltipDataItem.dataContext.value))}`;
+            return `[bold]$${numberFormatter(target.tooltipDataItem.dataContext.value)}`;
         }
         return text;
     });
@@ -363,8 +348,8 @@ const setCountData = (results) => {
         start = utcToday.subtract(2, 'day').format('YYYY-MM-DD');
         end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
     }
-    summaryState.pastCost = commaFormatter(numberFormatter(results.find((d) => d.date === start)?.cost_sum || 0)) ?? 0;
-    summaryState.currentCost = commaFormatter(numberFormatter(results.find((d) => d.date === end)?.cost_sum || 0)) ?? 0;
+    summaryState.pastCost = numberFormatter(results.find((d) => d.date === start)?.cost_sum || 0) ?? 0;
+    summaryState.currentCost = numberFormatter(results.find((d) => d.date === end)?.cost_sum || 0) ?? 0;
 };
 const getRefinedChartData = (results): ChartData[] => {
     const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';

@@ -12,7 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -98,7 +98,7 @@ const drawChart = () => {
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
-            return commaFormatter(numberFormatter(Number(convertedText), 1, 0));
+            return numberFormatter(Number(convertedText));
         }
         return text;
     });
