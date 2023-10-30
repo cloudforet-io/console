@@ -9,21 +9,22 @@ import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { downloadByFileUrl } from '@cloudforet/core-lib/file-download';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { CloudServiceExportParameter, ExportOption } from '@/models/export/index';
+import { QueryType } from '@/models/export/index';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ExcelPayload } from '@/store/modules/file/actions';
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/component-util/dynamic-layout';
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,12 +41,6 @@ interface Props {
     queryTags?: QueryTag[];
 }
 
-const CLOUD_SERVICE_RESOURCES_EXCEL_FIELDS = [
-    { key: 'provider', name: 'Provider', reference: { reference_key: 'provider', resource_type: 'identity.Provider' } },
-    { key: 'cloud_service_group', name: 'Cloud Service Group' },
-    { key: 'cloud_service_type', name: 'Cloud Service Type' },
-    { key: 'count', name: 'Count' },
-];
 
 const props = withDefaults(defineProps<Props>(), {
     totalCount: 0,
@@ -79,6 +74,17 @@ const state = reactive({
         return countLabels.join(', ');
     }),
     keyItemSets: computed(() => props.handlers?.keyItemSets ?? []),
+});
+
+const excelState = reactive({
+    cloudServiceFilters: computed(() => cloudServicePageStore.allFilters.filter((f: any) => ![
+        'service_code',
+    ].includes(f.k)).map((f) => {
+        if (f.k === 'labels') {
+            return { ...f, k: 'ref_cloud_service_type.labels' };
+        }
+        return ({ ...f });
+    })),
 });
 
 /* excel */
@@ -140,44 +146,40 @@ const getExcelFields = async (data): Promise<ExcelDataField[]> => {
     return excelField;
 };
 const excelApiQueryHelper = new ApiQueryHelper();
-const getExcelQuery = (data, field) => {
+const getExcelQuery = (data) => {
     excelApiQueryHelper
-        .setFilters(state.cloudServiceFilters)
+        .setFilters(excelState.cloudServiceFilters)
         .addFilter({ k: 'provider', o: '=', v: data.provider })
         .addFilter({ k: 'cloud_service_group', o: '=', v: data.cloud_service_group })
         .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type })
-        .setMultiSort([
+        .setMultiSortV2([
             { key: 'provider', desc: false },
             { key: 'cloud_service_group', desc: false },
             { key: 'cloud_service_type', desc: false },
         ]);
-    const fields = field;
-    if (fields) {
-        excelApiQueryHelper.setOnly(...fields.map((d) => d.key));
-    }
     return excelApiQueryHelper.data;
 };
-const getCloudServiceResourcesPayload = (): ExcelPayload => {
-    excelApiQueryHelper.setFilters(state.cloudServiceFilters).setMultiSort([
+const getCloudServiceResourcesPayload = (): ExportOption => {
+    excelApiQueryHelper.setFilters(excelState.cloudServiceFilters).setMultiSortV2([
         { key: 'provider', desc: true },
         { key: 'cloud_service_group', desc: true },
     ]);
-    return {
-        url: '/statistics/topic/cloud-service-resources',
-        param: {
-            query: excelApiQueryHelper.data,
-            labels: cloudServicePageStore.selectedCategories,
+    return ({
+        name: 'Summary',
+        query_type: QueryType.ANALYZE,
+        analyze_query: {
+            ...excelApiQueryHelper.data,
+            group_by: ['provider', 'cloud_service_group', 'cloud_service_type'],
+            fields: {
+                total_count: {
+                    operator: 'count',
+                },
+            },
         },
-        fields: CLOUD_SERVICE_RESOURCES_EXCEL_FIELDS,
-        sheet_name: 'Summary',
-        header_message: {
-            title: 'Summary',
-        },
-        file_name_prefix: FILE_NAME_PREFIX.cloudService,
-    };
+    });
 };
-const getExcelPayloadList = async (): Promise<ExcelPayload[]> => {
-    const excelPayloadList: ExcelPayload[] = [];
+const getExcelPayloadList = async (): Promise<ExportOption[]> => {
+    const excelPayloadList: ExportOption[] = [];
     const excelItems = await getCloudServiceResources();
     const excelFieldList: Array<ExcelDataField[]> = await Promise.all(excelItems.map((d) => getExcelFields(d)));
 
@@ -190,8 +192,8 @@ const getExcelPayloadList = async (): Promise<ExcelPayload[]> => {
         });
         return result;
     };
-    const checkSameSheetNameExist = (list: ExcelPayload[], sheetName: string):string => {
-        const index = list.filter((d) => ((typeof d.sheet_name === 'string') ? d.sheet_name.includes(sheetName) : false)).length;
+    const checkSameSheetNameExist = (list: ExportOption[], sheetName: string):string => {
+        const index = list.filter((d) => ((typeof d.name === 'string') ? d.name.includes(sheetName) : false)).length;
         return index ? `${sheetName}${index}` : sheetName;
     };
     excelFieldList.forEach((excelField, idx) => {
@@ -199,27 +201,17 @@ const getExcelPayloadList = async (): Promise<ExcelPayload[]> => {
         const providerName = state.providers[provider]?.label || provider;
         let sheetName = `${providerName}.${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
         sheetName = removeErrorString(sheetName);
-        const headerMessage = {
-            title: `[${providerName}] ${excelItems[idx].cloud_service_group} ${excelItems[idx].cloud_service_type}`,
-        };
         if (sheetName.length > 29) sheetName = sheetName.substr(0, 29);
         const checkedSheetName = checkSameSheetNameExist(excelPayloadList, sheetName);
         if (checkedSheetName !== sheetName) sheetName = checkedSheetName;
 
-        let excelApiUrl;
-        if (excelItems[idx].resource_type === 'inventory.Server') {
-            excelApiUrl = '/inventory/server/list';
-        } else {
-            excelApiUrl = '/inventory/cloud-service/list';
-        }
         excelPayloadList.push({
-            url: excelApiUrl,
-            param: {
-                query: getExcelQuery(excelItems[idx], excelField),
+            name: sheetName,
+            query_type: QueryType.SEARCH,
+            search_query: {
+                ...getExcelQuery(excelItems[idx]),
+                fields: excelField,
             },
-            fields: excelField,
-            sheet_name: sheetName,
-            header_message: headerMessage,
         });
     });
     return excelPayloadList;
@@ -242,15 +234,17 @@ const handleClickSet = () => {
 const handleExport = async () => {
     try {
         await store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
-
-        const cloudServiceResourcesPayload = getCloudServiceResourcesPayload();
         const excelPayloadList = await getExcelPayloadList();
-        await store.dispatch('file/downloadExcel', [
-            cloudServiceResourcesPayload,
-            ...excelPayloadList,
-        ]);
+        const cloudServiceExcelExportParams:CloudServiceExportParameter = {
+            options: [
+                getCloudServiceResourcesPayload(),
+                ...excelPayloadList,
+            ],
+        };
+        const data = await SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+        await downloadByFileUrl(data.download_url);
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
     } finally {
         await store.dispatch('display/finishLoading');
     }
@@ -292,7 +286,7 @@ const handleExport = async () => {
                    exportable
                    search-type="query"
                    :total-count="props.totalCount"
-                   :query-tags="props.queryTags"
+                   :query-tags="state.queryTags"
                    :key-item-sets="state.keyItemSets"
                    :value-handler-map="props.handlers?.valueHandlerMap ?? {}"
                    @change="handleChange"
