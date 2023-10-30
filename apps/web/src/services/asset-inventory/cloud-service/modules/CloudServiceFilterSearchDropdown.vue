@@ -51,10 +51,14 @@ const cloudServicePageState = cloudServicePageStore.$state;
 
 const state = reactive({
     searchTerm: '',
-    selectedItems: computed<SelectDropdownMenuItem[]>(() => props.selected.map((selectedName) => ({
-        name: selectedName,
-        label: state.menuItems.find((d) => d.name === selectedName)?.label || selectedName,
-    }))),
+    selectedItems: computed<SelectDropdownMenuItem[]>(() => props.selected.map((selectedName) => {
+        const selected = state.menuItems.find((d) => d.name === selectedName);
+        return {
+            name: selectedName,
+            label: selected?.label || selectedName,
+            ...selected,
+        };
+    })),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     sortedRegions: computed<SortedRegionReferenceItem[]>(() => {
         const regions: SortedRegionReferenceItem[] = store.getters['reference/region/regionsSortedByProvider'];
