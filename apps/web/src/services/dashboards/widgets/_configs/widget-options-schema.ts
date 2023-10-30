@@ -121,6 +121,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         name: 'Data Type',
         selection_type: 'SINGLE',
         required: true,
+        inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_field.key },
