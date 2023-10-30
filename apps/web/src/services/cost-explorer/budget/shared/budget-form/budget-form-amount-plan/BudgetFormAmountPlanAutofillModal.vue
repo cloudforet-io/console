@@ -6,7 +6,7 @@ import {
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
+import { getNumberFromString, numberFormatter } from '@cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 
@@ -40,7 +40,7 @@ const {
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     formattedStartBudget: computed({
-        get: () => commaFormatter(start.value),
+        get: () => numberFormatter(start.value),
         set: (val: string) => { setForm('start', getNumberFromString(val)); },
     }),
 });

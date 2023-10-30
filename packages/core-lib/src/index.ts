@@ -32,16 +32,32 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
     return null;
 };
 
-export const numberFormatter = (num, digits = 1, targetMin = 10000) => {
-    if (Math.abs(num) < targetMin) {
-        return Math.round(num * 100) / 100;
+/**
+ * @name numberFormatter
+ * @param value
+ * @param options
+ * @description For detailed information on the types of options, please refer to the following link.
+ * { notation: 'standard' }: 10000 => 10,000 (default)
+ * { notation: 'compact' }: 10000 => 10K
+ * { maximumFractionDigits: 2 }: 0.1234 => 0.12 (default)
+ * { maximumFractionDigits: 21 }: 0.14324234234 => 0.14324234234
+ * { minimumFractionDigits: 2 }: 0 => 0.00
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat
+ */
+export const numberFormatter = (value?: number, options?: Intl.NumberFormatOptions) => {
+    if (typeof value === 'number') {
+        let _value = value;
+        if (!options?.maximumFractionDigits) {
+            _value = Math.ceil(value * 100) / 100;
+        }
+        return Intl.NumberFormat('en', {
+            notation: 'standard',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+            ...options,
+        }).format(_value);
     }
-
-    return Intl.NumberFormat('en', { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: digits }).format(num);
-};
-export const commaFormatter = (num) => {
-    if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return num;
+    return value;
 };
 export const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
 

@@ -6,7 +6,7 @@ import {
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { commaFormatter, getNumberFromString } from '@cloudforet/core-lib';
+import { getNumberFromString, numberFormatter } from '@cloudforet/core-lib';
 
 import { i18n } from '@/translations';
 
@@ -53,7 +53,7 @@ const setAmount = (amount?: number) => {
 const state = reactive({
     formattedMonth: computed(() => i18nDayjs.value.utc(props.month).format('MMMM YYYY')),
     formattedAmount: computed<string>({
-        get: () => commaFormatter(_amount.value),
+        get: () => numberFormatter(_amount.value),
         set: (val: string) => { setAmount(getNumberFromString(val)); },
     }),
 });

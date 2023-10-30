@@ -7,11 +7,13 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { commaFormatter } from '@cloudforet/core-lib';
-
 import { i18n } from '@/translations';
 
+import { CURRENCY } from '@/store/modules/settings/config';
+import type { Currency } from '@/store/modules/settings/type';
+
 import { getUUID } from '@/lib/component-util/getUUID';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -24,12 +26,15 @@ import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/store/budget-detail-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
+
 interface Props {
     manageDisabled?: boolean;
+    currency?: Currency;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     manageDisabled: false,
+    currency: CURRENCY.USD,
 });
 
 const budgetPageStore = useBudgetDetailPageStore();
@@ -120,7 +125,8 @@ const handleBudgetNotifications = () => {
                                         {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
                                     </p-badge>
                                     <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">
-                                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ACTUAL_COST') }} > ${{ commaFormatter(item.threshold) }}
+                                        {{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MODAL.ACTUAL_COST') }} >
+                                        <span>{{ currencyMoneyFormatter(item.threshold, { currency: props.currency }) }}</span>
                                     </span>
                                     <span v-else>% of budget > {{ item.threshold }}%</span>
                                 </li>
