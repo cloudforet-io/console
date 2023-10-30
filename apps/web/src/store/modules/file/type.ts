@@ -18,6 +18,3 @@ export interface ExcelDataField {
     options?: Options;
 }
 
-export interface ExportResponse {
-    download_url: string;
-}

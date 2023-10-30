@@ -9,12 +9,13 @@ import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
+import { downloadByFileUrl } from '@cloudforet/core-lib/file-download';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { CloudServiceExportParameter, ExportOption } from '@/models/inventory/cloud-service';
-import { QueryType } from '@/models/inventory/cloud-service';
+import type { CloudServiceExportParameter, ExportOption } from '@/models/export/index';
+import { QueryType } from '@/models/export/index';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -241,9 +242,9 @@ const handleExport = async () => {
             ],
         };
         const data = await SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
-        await store.dispatch('file/downloadByFileUrl', data.download_url);
+        await downloadByFileUrl(data.download_url);
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
     } finally {
         await store.dispatch('display/finishLoading');
     }

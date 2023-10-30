@@ -1,7 +1,4 @@
-/* eslint-disable camelcase */
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
-
-
 
 
 // excel Export
@@ -49,4 +46,8 @@ export interface CloudServiceExportParameter {
     options: ExportOption[]
     timezone?: string;
     file_format?: 'Excel' | 'CSV'; // default: Excel
+}
+
+export interface ExportResponse {
+    download_url: string;
 }
