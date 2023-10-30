@@ -234,7 +234,7 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
         },
     };
 };
-const getIsRaised = (item: CostAnalyzeRawData, fieldName: string): boolean => {
+const isIncreasedByHalfOrMore = (item: CostAnalyzeRawData, fieldName: string): boolean => {
     const currIndex = Number(fieldName.split('.')[1]); // value_sum.0.value -> 0
     if (currIndex === 0) return false;
 
@@ -487,7 +487,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                     <p-link :to="value ? getLink(item, field.name) : undefined"
                             class="!align-middle"
                     >
-                        <template v-if="getIsRaised(item, field.name)">
+                        <template v-if="isIncreasedByHalfOrMore(item, field.name)">
                             <span class="cell-text raised">{{ numberFormatter(value) }}</span>
                             <p-i name="ic_arrow-up-bold-alt"
                                  width="0.75rem"
