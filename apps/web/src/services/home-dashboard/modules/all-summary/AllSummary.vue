@@ -13,7 +13,7 @@ import {
     cloneDeep, forEach, orderBy, range,
 } from 'lodash';
 
-import { byteFormatter, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { i18n } from '@/translations';
@@ -251,7 +251,7 @@ const getCount = async () => {
             if (label === DATA_TYPE.STORAGE) {
                 state.storageBoxSuffix = byteFormatter(result.total).split(' ')[1] as Unit;
                 count = parseFloat(byteFormatter(result.total).split(' ')[0]);
-                count = commaFormatter(count);
+                count = numberFormatter(count);
             } else {
                 count = numberFormatter(result.total);
             }

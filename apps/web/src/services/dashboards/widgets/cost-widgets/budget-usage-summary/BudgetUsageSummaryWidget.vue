@@ -213,8 +213,8 @@ const drawChart = (chartData: ChartData[]) => {
     tooltip.label.adapters.add('text', (_, target) => {
         const data = target.dataItem?.dataContext as ChartData;
         if (!data) return '';
-        const spent = currencyMoneyFormatter(data.spent, widgetState.currency);
-        const budget = currencyMoneyFormatter(data.budget, widgetState.currency);
+        const spent = currencyMoneyFormatter(data.spent, { currency: widgetState.currency });
+        const budget = currencyMoneyFormatter(data.budget, { currency: widgetState.currency });
         let text = `[${dataColor(data)};fontSize: 10px]●[/] {valueX}\n`;
         text += `spent: [bold]${spent}[/]\n`;
         text += `budget: [bold]${budget}[/]`;
@@ -298,14 +298,15 @@ defineExpose<WidgetExpose<Data[]>>({
                     </div>
                     <div class="row-wrapper">
                         <span class="spent-cost">
-                            <span class="currency-symbol">{{ displayState.currencySymbol }}</span>{{ currencyMoneyFormatter(displayState.recentSpent, undefined, undefined, true) }}
+                            <span class="currency-symbol">{{ displayState.currencySymbol }}</span>
+                            {{ currencyMoneyFormatter(displayState.recentSpent, { style: 'decimal' }) }}
                         </span>
                         <i18n path="DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.OUT_OF"
                               class="recent-budget"
                         >
                             <template #value>
                                 <span class="currency-symbol">{{ displayState.currencySymbol }}</span>
-                                <span class="value">{{ currencyMoneyFormatter(displayState.recentBudget, undefined, undefined, true) }}</span>
+                                <span class="value">{{ currencyMoneyFormatter(displayState.recentBudget, { style: 'decimal' }) }}</span>
                             </template>
                         </i18n>
                     </div>
@@ -319,8 +320,8 @@ defineExpose<WidgetExpose<Data[]>>({
                         </i18n>
                         <span class="budget-left">
                             ({{ displayState.isSpentOverBudget ?
-                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEED', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, widgetState.currency) }) :
-                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.LEFT', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, widgetState.currency) })
+                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.EXCEED', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, { currency: widgetState.currency }) }) :
+                                $t('DASHBOARDS.WIDGET.BUDGET_USAGE_SUMMARY.LEFT', { value: currencyMoneyFormatter(displayState.recentBudgetLeft, { currency: widgetState.currency }) })
                             }})
                         </span>
                     </div>

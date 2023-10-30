@@ -113,6 +113,7 @@ const handleConfirmDelete = () => {
             />
             <budget-notifications class="alert"
                                   :manage-disabled="!state.hasManagePermission"
+                                  :currency="state.budgetData?.currency"
             />
             <!--            <budget-billing-admin class="budget" />-->
         </section>
