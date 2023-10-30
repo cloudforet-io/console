@@ -7,7 +7,7 @@ import bytes from 'bytes';
 
 import { byteFormatter, commaFormatter } from '@cloudforet/core-lib';
 
-import type { CurrencyRates, Currency } from '@/store/modules/settings/type';
+import type { Currency } from '@/store/modules/settings/type';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -281,7 +281,7 @@ export const setXYSharedTooltipTextWithRate = (chart: am5xy.XYChart, tooltip: am
     });
 };
 
-export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency, currencyRate?: CurrencyRates): void => {
+export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Tooltip, currency?: Currency): void => {
     let strokeColor;
     let fieldName;
     chart.series.each((series) => {
@@ -294,7 +294,7 @@ export const setXYSingleTooltipText = (chart: am5xy.XYChart, tooltip: am5.Toolti
     });
     tooltip.label.adapters.add('text', (_, target) => {
         let value = target.dataItem?.dataContext?.[fieldName];
-        if (currency) value = currencyMoneyFormatter(value, currency, currencyRate);
+        if (currency) value = currencyMoneyFormatter(value, { currency });
         return `[${strokeColor};fontSize: 10px]●[/] {valueX}: [bold]${value}[/]`;
     });
 };

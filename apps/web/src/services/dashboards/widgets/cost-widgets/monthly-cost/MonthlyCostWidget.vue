@@ -323,7 +323,7 @@ defineExpose<WidgetExpose<Data[]>>({
                 >
                     <div class="current-month-cost">
                         <span class="currency-symbol">{{ displayState.currencySymbol }}</span>
-                        {{ currencyMoneyFormatter(displayState.costOfCurrentMonth, widgetState.currency, undefined, true) }}
+                        {{ currencyMoneyFormatter(displayState.costOfCurrentMonth, { currency: widgetState.currency, style: 'decimal' }) }}
                     </div>
                     <div class="cost-diff"
                          :style="{color: displayState.diffColor}"
@@ -336,7 +336,7 @@ defineExpose<WidgetExpose<Data[]>>({
                              color="inherit"
                              original
                         />
-                        <strong>{{ currencyMoneyFormatter(displayState.costDiff, widgetState.currency) }}</strong>
+                        <strong>{{ currencyMoneyFormatter(displayState.costDiff, { currency: widgetState.currency }) }}</strong>
                         <span class="cost-diff-rate">({{ displayState.costDiffRate }})</span>
                     </div>
                     <template #loader>
@@ -368,7 +368,7 @@ defineExpose<WidgetExpose<Data[]>>({
                 >
                     <div class="previous-month-cost">
                         <span class="currency-symbol">{{ displayState.currencySymbol }}</span>
-                        {{ currencyMoneyFormatter(displayState.costOfPreviousMonth, widgetState.currency, undefined, true) }}
+                        {{ currencyMoneyFormatter(displayState.costOfPreviousMonth, { currency: widgetState.currency, style: 'decimal' }) }}
                     </div>
                     <template #loader>
                         <div class="skeleton-wrapper">
