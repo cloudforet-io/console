@@ -27,7 +27,7 @@ const currencyToMinimumFractionDigitsMap: Record<Currency, number> = {
 export const currencyMoneyFormatter = (
     value?: number,
     options: Intl.NumberFormatOptions = {},
-): string => {
+): string|undefined => {
     if (typeof value === 'number') {
         const _value = Math.ceil(value * 100) / 100;
         const _shorten = Math.abs(_value) >= 10000;
@@ -45,6 +45,5 @@ export const currencyMoneyFormatter = (
 
         return Intl.NumberFormat(currencyToLocaleMap[_currency], _options).format(_value);
     }
-
-    return '--';
+    return value;
 };

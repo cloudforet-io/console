@@ -479,7 +479,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                     >
                         <span class="usage-wrapper">
                             <span :class="getIsRaised(item, field.name) ? 'cell-text raised' : undefined">
-                                {{ usageUnitFormatter(value, {unit: item.usage_unit}, tableState.showFormattedData) }}
+                                {{ usageUnitFormatter(value, {unit: item.usage_unit}, tableState.showFormattedData) ?? '--' }}
                             </span>
                             <p-i v-if="getIsRaised(item, field.name)"
                                  name="ic_arrow-up-bold-alt"
