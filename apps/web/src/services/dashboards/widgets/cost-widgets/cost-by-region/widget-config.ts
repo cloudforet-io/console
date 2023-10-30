@@ -33,6 +33,8 @@ const costByRegionWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
+        'cost_data_field',
+        'cost_data_type',
         'filters.provider',
         'filters.project',
         'filters.service_account',

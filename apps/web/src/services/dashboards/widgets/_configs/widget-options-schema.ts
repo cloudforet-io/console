@@ -141,6 +141,17 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
             { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
     },
+    cost_secondary_data_field: {
+        key: 'cost_secondary_data_field',
+        name: 'Data Field (Cost)',
+        selection_type: 'MULTI',
+        required: true,
+        inheritance_mode: 'NONE',
+        fixed: true,
+        item_options: [
+            { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+        ],
+    },
     cloud_service_query_set: {
         // TODO: add conversion code for key changing from asset_query_set to cloud_service_query_set
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
@@ -162,6 +173,17 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
     },
     asset_data_field: {
         key: 'asset_data_field',
+        name: 'Data Field (Asset)',
+        selection_type: 'MULTI',
+        required: true,
+        inheritance_mode: 'NONE',
+        fixed: true,
+        item_options: [
+            { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+        ],
+    },
+    asset_secondary_data_field: {
+        key: 'asset_secondary_data_field',
         name: 'Data Field (Asset)',
         selection_type: 'MULTI',
         required: true,
