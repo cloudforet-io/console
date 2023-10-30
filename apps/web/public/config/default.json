@@ -30,5 +30,6 @@
     { "label": "API Guide", "link": "https://cloudforet-io.github.io/api-doc/" },
     { "label": "GitHub", "link": "https://github.com/cloudforet-io" }
   ],
-  "CONTACT_LINK": ""
+  "CONTACT_LINK": "",
+  "SMTP_ENABLED": false
 }
