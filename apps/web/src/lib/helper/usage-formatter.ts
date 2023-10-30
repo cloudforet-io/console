@@ -28,7 +28,7 @@ type UsageUnitFormatterOptions = BasicUsageUnitFormatterOptions | SizeUsageUnitF
 
 const isSizeUnit = (unit: string): boolean => unit in SIZE_UNIT_MAP;
 
-export const usageUnitFormatter = (value: number, options?: UsageUnitFormatterOptions, showFormattedData = true): string => {
+export const usageUnitFormatter = (value: number, options?: UsageUnitFormatterOptions, showFormattedData = true): string|undefined => {
     if (showFormattedData) {
         if (options?.unit && isSizeUnit(options.unit)) {
             const sizeOptions = options as SizeUsageUnitFormatterOptions;
@@ -38,5 +38,5 @@ export const usageUnitFormatter = (value: number, options?: UsageUnitFormatterOp
         if (options?.unit === 'Count') return numberFormatter(value);
         return currencyMoneyFormatter(value, { style: 'decimal' });
     }
-    return numberFormatter(value);
+    return numberFormatter(value, { minimumFractionDigits: 2 });
 };

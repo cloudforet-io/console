@@ -44,7 +44,7 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
  * { minimumFractionDigits: 2 }: 0 => 0.00
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat
  */
-export const numberFormatter = (value?: number, options?: Intl.NumberFormatOptions) => {
+export const numberFormatter = (value?: number, options?: Intl.NumberFormatOptions): string|undefined => {
     if (typeof value === 'number') {
         let _value = value;
         if (!options?.maximumFractionDigits) {
