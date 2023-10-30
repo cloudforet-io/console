@@ -22,11 +22,11 @@ const totalFailFindingsStatusWidgetConfig: WidgetConfig = {
         data_criteria: 'realtime',
     },
     options_schema: getWidgetOptionsSchema([
-        'asset_query_set',
-        'project',
-        // 'service_account', HACK: Re-enable it after backend is ready
-        'provider',
-        'region',
+        'cloud_service_query_set',
+        'filters.project',
+        // 'filters.service_account', HACK: Re-enable it after backend is ready
+        'filters.provider',
+        'filters.region',
         'asset_account',
     ]),
 };

@@ -42,15 +42,13 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        'cost_group_by',
-        'cost_product',
-        'project',
-        'service_account',
-        'project_group',
-        'region',
+        'cost_data_field',
+        { key: 'filters.cost_product', fixed: true },
+        'filters.project',
+        'filters.service_account',
+        'filters.project_group',
+        'filters.region',
     ]),
-    // fixed_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames('cost_product')],
-    // non_inheritable_properties: ['cost_group_by'],
 };
 
 export default awsCloudFrontCostWidgetConfig;
