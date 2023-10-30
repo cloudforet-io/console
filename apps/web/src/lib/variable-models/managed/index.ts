@@ -5,8 +5,8 @@ import CloudServiceQuerySetVariableModel from './cloud-service-query-set-variabl
 import CloudServiceTypeVariableModel from './cloud-service-type-variable-model';
 import CollectorVariableModel from './collector-variable-model';
 import CostAdditionalInfoKeyVariableModel from './cost-additional-info-key-variable-model';
+import CostDataFieldVariableModel from './cost-data-field-variable-model';
 import CostDataSourceVariableModel from './cost-data-source-variable-model';
-import CostDefaultFieldVariableModel from './cost-default-field-variable-model';
 import CostProductVariableModel from './cost-product-variable-model';
 import CostTagKeyVariableModel from './cost-tag-key-variable-model';
 import ProjectGroupVariableModel from './project-group-variable-model';
@@ -20,7 +20,7 @@ import WebhookVariableModel from './webhook-variable-model';
 
 const MANAGED_VARIABLE_MODELS = {
     // enum variable model
-    cost_default_field: CostDefaultFieldVariableModel,
+    cost_data_field: CostDataFieldVariableModel,
     // resource name variable model
     cost_data_source: CostDataSourceVariableModel,
     provider: ProviderVariableModel,

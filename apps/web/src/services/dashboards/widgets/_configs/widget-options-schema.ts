@@ -123,14 +123,14 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         required: true,
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_field.key },
         ],
         dependencies: {
             [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
         },
     },
     cost_data_field: {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key,
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_field.key,
         name: 'Data Field (Cost)',
         selection_type: 'MULTI',
         required: true,
