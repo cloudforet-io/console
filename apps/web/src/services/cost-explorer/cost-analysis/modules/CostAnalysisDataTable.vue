@@ -234,13 +234,14 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
         },
     };
 };
-const getIsRaised = (item: CostAnalyzeRawData, fieldName: string): boolean => {
-    const currDate: string = fieldName.split('.')[1]; // cost.2022-01-04 -> 2022-01-04
-    const prevDate: string = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
-    const currValue: number|undefined = item.cost_sum?.find(({ date }) => date === currDate)?.value;
-    const prevValue: number|undefined = item.cost_sum?.find(({ date }) => date === prevDate)?.value;
+const isIncreasedByHalfOrMore = (item: CostAnalyzeRawData, fieldName: string): boolean => {
+    const currIndex = Number(fieldName.split('.')[1]); // value_sum.0.value -> 0
+    if (currIndex === 0) return false;
 
-    if (prevValue === undefined || currValue === undefined) return false;
+    const prevIndex = currIndex - 1;
+    const currValue = item.value_sum?.[currIndex]?.value ?? 0;
+    const prevValue = item.value_sum?.[prevIndex]?.value ?? 0;
+
     if (currValue < prevValue) return false;
     if (currValue > 0) {
         if (prevValue < 0) return true;
@@ -486,7 +487,7 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                     <p-link :to="value ? getLink(item, field.name) : undefined"
                             class="!align-middle"
                     >
-                        <template v-if="getIsRaised(item, field.name)">
+                        <template v-if="isIncreasedByHalfOrMore(item, field.name)">
                             <span class="cell-text raised">{{ numberFormatter(value) }}</span>
                             <p-i name="ic_arrow-up-bold-alt"
                                  width="0.75rem"
