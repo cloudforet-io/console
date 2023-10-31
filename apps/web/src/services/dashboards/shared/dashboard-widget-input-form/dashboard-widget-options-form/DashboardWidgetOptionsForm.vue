@@ -17,9 +17,6 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import {
-    getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import type {
     WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
@@ -127,7 +124,7 @@ const handleDeleteProperty = (propertyName: string) => {
 const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] => {
     const isInherit = !!widgetFormState.inheritOptions?.[propertyName]?.enabled;
     if (isInherit) {
-        const variableKey = getVariableKeyFromWidgetSchemaProperty(propertyName);
+        const variableKey = state.properties[propertyName]?.key;
         const variableSchema = props.variablesSchema?.properties?.[variableKey];
         if (variableSchema?.use) {
             return [{ name: variableKey, label: variableSchema.name }];

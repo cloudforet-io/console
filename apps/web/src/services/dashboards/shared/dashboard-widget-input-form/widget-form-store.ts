@@ -5,9 +5,6 @@ import { defineStore } from 'pinia';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
-import {
-    getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
@@ -120,7 +117,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
                 // widget option filters case
                 } else if (key.startsWith('filters.')) {
                     if (val) {
-                        const variableKey = getVariableKeyFromWidgetSchemaProperty(key); // variable key is the same with the options.filters property name
+                        const variableKey = this.widgetConfig?.options_schema?.properties?.[key]?.key ?? '';
                         const filterDataKey = getWidgetFilterDataKey(variableKey);
                         _widgetFilters[variableKey] = [{ k: filterDataKey, v: val, o: '=' }];
                     }
@@ -149,7 +146,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
             if (enabled) {
                 inheritOptions[propertyName] = {
                     enabled: true,
-                    variable_key: variableKey ?? getVariableKeyFromWidgetSchemaProperty(propertyName),
+                    variable_key: variableKey ?? this.widgetConfig?.options_schema?.properties?.[propertyName]?.key,
                 };
             } else {
                 inheritOptions[propertyName] = {

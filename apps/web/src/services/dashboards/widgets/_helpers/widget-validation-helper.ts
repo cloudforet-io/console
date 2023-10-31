@@ -3,9 +3,6 @@ import {
 } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import {
-    getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
     InheritOptions, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
@@ -31,7 +28,7 @@ export const getWidgetInheritOptionsErrorMap = (
     schemaProperties.forEach((propertyName) => {
         if (!inheritOptions[propertyName]?.enabled) return;
 
-        const variableKey = inheritOptions[propertyName]?.variable_key ?? getVariableKeyFromWidgetSchemaProperty(propertyName);
+        const variableKey = inheritOptions[propertyName]?.variable_key;
         if (!variableKey) return;
         if (!dashboardVariablesSchema?.properties?.[variableKey]?.use) {
             errorMap[propertyName] = true;
