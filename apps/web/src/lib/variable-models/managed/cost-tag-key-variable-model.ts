@@ -19,11 +19,12 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
 
     #fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
-    async list(options: ListQuery = {}): Promise<ListResponse> {
+    async list(query: ListQuery = {}): Promise<ListResponse> {
+        if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
+        // TODO: change from filters(string[]) to api filters
         try {
-            const query: Record<string, any> = {
-                ...options,
-                distinct_key: 'cost_tag_keys',
+            const _query: Record<string, any> = {
+                only: ['cost_tag_keys'],
                 filter: [
                     {
                         key: 'cost_tag_keys',
@@ -32,22 +33,22 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
                     },
                 ],
             };
-            if (options.search) {
-                query.filter.push({
+            if (query.search) {
+                _query.filter.push({
                     key: 'cost_tag_keys',
-                    value: options.search,
+                    value: query.search,
                     operator: 'contain',
                 });
             }
-            if (options.start) {
-                query.start = options.start;
-            }
-            if (options.limit) {
-                query.limit = options.limit;
-            }
-            const { status, response } = await this.#fetcher({ query });
+            const { status, response } = await this.#fetcher({
+                data_source_id: query.options.data_source_id, // TODO: check its working
+                query: _query,
+            });
             if (status === 'succeed') {
-                this.#response = response;
+                const target = response.results[0]?.cost_tag_keys ?? [];
+                this.#response = {
+                    results: target.map((d) => ({ key: d })),
+                };
             }
             return this.#response;
         } catch (e) {
