@@ -1,3 +1,5 @@
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
@@ -20,13 +22,16 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: 'budget_id',
+        cost_data_field: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
         'cost_data_field',
+        'filters.provider',
         'filters.project',
         'filters.service_account',
+        'filters.region',
+        'filters.cost_product',
     ]),
 };
 

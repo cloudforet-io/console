@@ -22,12 +22,14 @@ const budgetStatusWidgetConfig: WidgetConfig = {
     options: {
         chart_type: CHART_TYPE.WAFFLE,
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: 'budget_id',
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
+        'filters.provider',
         'filters.project',
         'filters.service_account',
+        'filters.region',
+        'filters.cost_product',
     ]),
 };
 

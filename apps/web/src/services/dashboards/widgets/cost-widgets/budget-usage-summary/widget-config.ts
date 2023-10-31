@@ -24,8 +24,11 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
+        'filters.provider',
         'filters.project',
         'filters.service_account',
+        'filters.region',
+        'filters.cost_product',
     ]),
 };
 

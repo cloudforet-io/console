@@ -1,3 +1,5 @@
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
@@ -19,6 +21,7 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
             enabled: true,
             show_at: 'table',
         },
+        cost_data_field: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
@@ -27,9 +30,9 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
         'filters.provider',
         'filters.project',
         'filters.service_account',
+        'filters.region',
         'filters.project_group',
         'filters.cost_product',
-        'filters.region',
         'cost_usage_type',
     ]),
 };
