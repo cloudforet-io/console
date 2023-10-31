@@ -1,5 +1,6 @@
 import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
 import CostDefaultDataTypeVariableModel from '@/lib/variable-models/managed/cost-default-data-type-variable-model';
+import CostUsageTypeVariableModel from '@/lib/variable-models/managed/cost-usage-type-variable-model';
 
 import AssetAccountVariableModel from './asset-account-variable-model';
 import CloudServiceQuerySetDataKeyVariableModel from './cloud-service-query-set-data-key-variable-model';
@@ -41,6 +42,7 @@ const MANAGED_VARIABLE_MODELS = {
     // resource value variable model
     asset_account: AssetAccountVariableModel,
     cost_product: CostProductVariableModel,
+    cost_usage_type: CostUsageTypeVariableModel,
     // custom resource variable model
     cost_additional_info_key: CostAdditionalInfoKeyVariableModel,
     cost_tag_key: CostTagKeyVariableModel,
