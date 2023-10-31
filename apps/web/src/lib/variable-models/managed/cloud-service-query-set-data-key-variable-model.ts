@@ -8,8 +8,8 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export default class CloudServiceQuerySetKeyVariableModel implements IBaseVariableModel {
-    key = 'cloud_service_query_set_key';
+export default class CloudServiceQuerySetDataKeyVariableModel implements IBaseVariableModel {
+    key = 'cloud_service_query_set_data_key';
 
     name = 'Data Type (Asset)';
 
@@ -24,10 +24,10 @@ export default class CloudServiceQuerySetKeyVariableModel implements IBaseVariab
         // TODO: change from filters(string[]) to api filters
         try {
             const _query: Record<string, any> = {
-                only: ['keys'],
+                only: ['data_keys'],
                 filter: [
                     {
-                        key: 'keys',
+                        key: 'data_keys',
                         value: null,
                         operator: 'not',
                     },
@@ -35,13 +35,13 @@ export default class CloudServiceQuerySetKeyVariableModel implements IBaseVariab
             };
             if (query.search) {
                 _query.filter.push({
-                    key: 'keys',
+                    key: 'data_keys',
                     value: query.search,
                     operator: 'contain',
                 });
             }
             const { status, response } = await this.#fetcher({
-                // query_set_id: ?? TODO: set query_set_id
+                query_set_id: query.options.query_set_id, // TODO: check its working
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {

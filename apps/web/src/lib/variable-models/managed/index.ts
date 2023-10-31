@@ -2,12 +2,12 @@ import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
 import CostDefaultDataTypeVariableModel from '@/lib/variable-models/managed/cost-default-data-type-variable-model';
 
 import AssetAccountVariableModel from './asset-account-variable-model';
-import CloudServiceQuerySetKeyVariableModel from './cloud-service-query-set-key-variable-model';
+import CloudServiceQuerySetDataKeyVariableModel from './cloud-service-query-set-data-key-variable-model';
 import CloudServiceQuerySetVariableModel from './cloud-service-query-set-variable-model';
 import CloudServiceTypeVariableModel from './cloud-service-type-variable-model';
 import CollectorVariableModel from './collector-variable-model';
 import CostAdditionalInfoKeyVariableModel from './cost-additional-info-key-variable-model';
-import CostDataSourceKeyVariableModel from './cost-data-source-key-variable-model';
+import CostDataSourceDataKeyVariableModel from './cost-data-source-data-key-variable-model';
 import CostDataSourceVariableModel from './cost-data-source-variable-model';
 import CostDefaultFieldVariableModel from './cost-default-field-variable-model';
 import CostProductVariableModel from './cost-product-variable-model';
@@ -44,8 +44,8 @@ const MANAGED_VARIABLE_MODELS = {
     // custom resource variable model
     cost_additional_info_key: CostAdditionalInfoKeyVariableModel,
     cost_tag_key: CostTagKeyVariableModel,
-    cost_data_source_key: CostDataSourceKeyVariableModel,
-    cloud_service_query_set_key: CloudServiceQuerySetKeyVariableModel,
+    cost_data_source_data_key: CostDataSourceDataKeyVariableModel,
+    cloud_service_query_set_data_key: CloudServiceQuerySetDataKeyVariableModel,
 };
 
 export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;

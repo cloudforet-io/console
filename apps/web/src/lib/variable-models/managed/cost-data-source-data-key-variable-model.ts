@@ -8,8 +8,8 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export default class CostDataSourceKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_data_source_key';
+export default class CostDataSourceDataKeyVariableModel implements IBaseVariableModel {
+    key = 'cost_data_source_data_key';
 
     name = 'Data Type (Cost)';
 
@@ -24,10 +24,10 @@ export default class CostDataSourceKeyVariableModel implements IBaseVariableMode
         // TODO: change from filters(string[]) to api filters
         try {
             const _query: Record<string, any> = {
-                only: ['keys'],
+                only: ['cost_data_keys'],
                 filter: [
                     {
-                        key: 'keys',
+                        key: 'cost_data_keys',
                         value: null,
                         operator: 'not',
                     },
@@ -35,7 +35,7 @@ export default class CostDataSourceKeyVariableModel implements IBaseVariableMode
             };
             if (query.search) {
                 _query.filter.push({
-                    key: 'keys',
+                    key: 'cost_data_keys',
                     value: query.search,
                     operator: 'contain',
                 });
