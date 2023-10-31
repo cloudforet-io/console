@@ -223,7 +223,7 @@ const drawChart = (_chartContext) => {
 
     series.adapter.add('tooltipText', (text, target) => {
         if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-            return `[bold]$${numberFormatter(target.tooltipDataItem.dataContext.value)}`;
+            return `[bold]${currencyMoneyFormatter(target.tooltipDataItem.dataContext.value, { notation: 'standard' })}`;
         }
         return text;
     });
@@ -348,8 +348,8 @@ const setCountData = (results) => {
         start = utcToday.subtract(2, 'day').format('YYYY-MM-DD');
         end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
     }
-    summaryState.pastCost = numberFormatter(results.find((d) => d.date === start)?.cost_sum || 0) ?? 0;
-    summaryState.currentCost = numberFormatter(results.find((d) => d.date === end)?.cost_sum || 0) ?? 0;
+    summaryState.pastCost = results.find((d) => d.date === start)?.cost_sum || 0;
+    summaryState.currentCost = results.find((d) => d.date === end)?.cost_sum || 0;
 };
 const getRefinedChartData = (results): ChartData[] => {
     const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
@@ -492,7 +492,7 @@ onUnmounted(() => {
                     <span class="label">{{ summaryState.pastDateText }}</span>
                     <span class="date">({{ summaryState.pastDate }})</span>
                     <span class="cost">
-                        <span v-if="summaryState.pastCost !== 0">${{ summaryState.pastCost }}</span>
+                        <span v-if="summaryState.pastCost !== 0">{{ currencyMoneyFormatter(summaryState.pastCost, { currency: state.currency }) }}</span>
                         <span v-else
                               class="empty"
                         />
@@ -503,7 +503,7 @@ onUnmounted(() => {
                     <span class="date">({{ summaryState.currentDate }})</span>
                     <div class="cost in-process">
                         <template v-if="summaryState.currentCost !== 0">
-                            <span>${{ summaryState.currentCost }}</span>
+                            <span>{{ currencyMoneyFormatter(summaryState.currentCost, { currency: state.currency }) }}</span>
                             <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
                             <div class="help">
                                 <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
