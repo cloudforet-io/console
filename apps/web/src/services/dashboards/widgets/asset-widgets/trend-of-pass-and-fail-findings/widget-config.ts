@@ -33,7 +33,7 @@ const trendOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         // 'filters.service_account',
         'filters.provider',
         'filters.region',
-        'asset_account',
+        'filters.asset_account',
     ]),
 };
 
