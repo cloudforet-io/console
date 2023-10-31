@@ -8,12 +8,12 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export default class CostTagKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_tag_key';
+export default class CostDataSourceDataKeyVariableModel implements IBaseVariableModel {
+    key = 'cost_data_source_data_key';
 
-    name = 'Cost Tags';
+    name = 'Data Type (Cost)';
 
-    labels = ['cost'] as VariableModelLabel[];
+    labels: VariableModelLabel[] = ['cost'];
 
     #response: ListResponse = { results: [] };
 
@@ -24,10 +24,10 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
         // TODO: change from filters(string[]) to api filters
         try {
             const _query: Record<string, any> = {
-                only: ['cost_tag_keys'],
+                only: ['cost_data_keys'],
                 filter: [
                     {
-                        key: 'cost_tag_keys',
+                        key: 'cost_data_keys',
                         value: null,
                         operator: 'not',
                     },
@@ -35,7 +35,7 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
             };
             if (query.search) {
                 _query.filter.push({
-                    key: 'cost_tag_keys',
+                    key: 'cost_data_keys',
                     value: query.search,
                     operator: 'contain',
                 });
@@ -44,8 +44,8 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
                 data_source_id: query.options.data_source_id, // TODO: check its working
                 query: _query,
             });
-            if (status === 'succeed') {
-                const target = response.results[0]?.cost_tag_keys ?? [];
+            if (status === 'succeed' && response.results?.length) {
+                const target = response.results[0]?.keys ?? [];
                 this.#response = {
                     results: target.map((d) => ({ key: d })),
                 };

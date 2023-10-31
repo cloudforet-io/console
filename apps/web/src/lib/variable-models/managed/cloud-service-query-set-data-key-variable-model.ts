@@ -8,26 +8,26 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export default class CostTagKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_tag_key';
+export default class CloudServiceQuerySetDataKeyVariableModel implements IBaseVariableModel {
+    key = 'cloud_service_query_set_data_key';
 
-    name = 'Cost Tags';
+    name = 'Data Type (Asset)';
 
-    labels = ['cost'] as VariableModelLabel[];
+    labels: VariableModelLabel[] = ['asset'];
 
     #response: ListResponse = { results: [] };
 
-    #fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
+    #fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
-        if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
+        if (!query.options?.query_set_id) throw new Error('No \'query_set_id\'');
         // TODO: change from filters(string[]) to api filters
         try {
             const _query: Record<string, any> = {
-                only: ['cost_tag_keys'],
+                only: ['data_keys'],
                 filter: [
                     {
-                        key: 'cost_tag_keys',
+                        key: 'data_keys',
                         value: null,
                         operator: 'not',
                     },
@@ -35,17 +35,17 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
             };
             if (query.search) {
                 _query.filter.push({
-                    key: 'cost_tag_keys',
+                    key: 'data_keys',
                     value: query.search,
                     operator: 'contain',
                 });
             }
             const { status, response } = await this.#fetcher({
-                data_source_id: query.options.data_source_id, // TODO: check its working
+                query_set_id: query.options.query_set_id, // TODO: check its working
                 query: _query,
             });
-            if (status === 'succeed') {
-                const target = response.results[0]?.cost_tag_keys ?? [];
+            if (status === 'succeed' && response.results?.length) {
+                const target = response.results[0]?.keys ?? [];
                 this.#response = {
                     results: target.map((d) => ({ key: d })),
                 };

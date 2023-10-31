@@ -19,10 +19,12 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
 
     #fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
-    async list(options: ListQuery = {}): Promise<ListResponse> {
+    async list(query: ListQuery = {}): Promise<ListResponse> {
+        if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
+        // TODO: change from filters(string[]) to api filters
         try {
-            const query: Record<string, any> = {
-                ...options,
+            const _query: Record<string, any> = {
+                only: ['cost_additional_info_keys'],
                 filter: [
                     {
                         key: 'cost_additional_info_keys',
@@ -31,16 +33,22 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
                     },
                 ],
             };
-            if (options.search) {
-                query.filter.push({
+            if (query.search) {
+                _query.filter.push({
                     key: 'cost_additional_info_keys',
-                    value: options.search,
+                    value: query.search,
                     operator: 'contain',
                 });
             }
-            const { status, response } = await this.#fetcher({ query });
-            if (status === 'succeed') {
-                this.#response = response;
+            const { status, response } = await this.#fetcher({
+                data_source_id: query.options.data_source_id, // TODO: check its working
+                query: _query,
+            });
+            if (status === 'succeed' && response.results?.length) {
+                const target = response.results[0]?.cost_additional_info_keys ?? [];
+                this.#response = {
+                    results: target.map((d) => ({ key: d })),
+                };
             }
             return this.#response;
         } catch (e) {
