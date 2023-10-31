@@ -25,15 +25,14 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
         },
     },
     options_schema: getWidgetOptionsSchema([
-        'asset_query_set',
-        'asset_group_by',
-        'project',
-        // 'service_account', HACK: Re-enable it after backend is ready
-        'provider',
-        'region',
+        'cloud_service_query_set',
+        'asset_data_field',
+        'filters.project',
+        // 'filters.service_account', HACK: Re-enable it after backend is ready
+        'filters.provider',
+        'filters.region',
         'asset_account',
     ]),
-    // non_inheritable_properties: ['asset_group_by'],
 };
 
 export default countOfPassAndFailFindingsWidgetConfig;

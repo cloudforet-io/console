@@ -25,12 +25,12 @@ const monthlyCostWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        'provider',
-        'project',
-        'service_account',
-        'project_group',
-        'cost_product',
-        'region',
+        'filters.provider',
+        'filters.project',
+        'filters.service_account',
+        'filters.project_group',
+        'filters.cost_product',
+        'filters.region',
         'cost_usage_type',
     ]),
 };

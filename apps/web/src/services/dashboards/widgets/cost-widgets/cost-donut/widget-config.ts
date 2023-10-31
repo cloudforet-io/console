@@ -16,16 +16,16 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        'cost_group_by',
-        'provider',
-        'project',
-        'service_account',
-        'project_group',
-        'cost_product',
-        'region',
+        'cost_data_field',
+        'cost_data_type',
+        'filters.provider',
+        'filters.project',
+        'filters.service_account',
+        'filters.project_group',
+        'filters.cost_product',
+        'filters.region',
         'cost_usage_type',
     ]),
-    // non_inheritable_properties: ['cost_group_by'],
 };
 
 export default costDonutWidgetConfig;

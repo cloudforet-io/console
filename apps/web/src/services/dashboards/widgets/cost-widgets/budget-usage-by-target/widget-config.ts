@@ -24,8 +24,9 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        'project',
-        'service_account',
+        'cost_data_field',
+        'filters.project',
+        'filters.service_account',
     ]),
 };
 

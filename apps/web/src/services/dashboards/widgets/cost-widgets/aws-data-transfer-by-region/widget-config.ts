@@ -40,13 +40,15 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        'cost_product',
-        'project',
-        'service_account',
-        'project_group',
-        'region',
+        { key: 'cost_data_field', name: 'Row Field' },
+        { key: 'cost_secondary_data_field', name: 'Column Field' },
+        'cost_data_type',
+        { key: 'filters.cost_product', fixed: true },
+        'filters.project',
+        'filters.service_account',
+        'filters.project_group',
+        'filters.region',
     ]),
-    // fixed_properties: ['cost_data_source', ...getWidgetFilterSchemaPropertyNames('cost_product')],
 };
 
 export default awsDataTransferByRegionWidgetConfig;
