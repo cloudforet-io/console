@@ -84,7 +84,7 @@ watch(() => props.inherit, () => {
             <div class="select-form-wrapper">
                 <p-select-dropdown use-fixed-menu-style
                                    :is-filterable="!props.inherit"
-                                   :multi-selectable="props.selectionType === 'multi'"
+                                   :multi-selectable="props.selectionType === 'MULTI'"
                                    :handler="props.menuHandlers"
                                    :selected="props.selected"
                                    :invalid="!!state.errorMessage"
