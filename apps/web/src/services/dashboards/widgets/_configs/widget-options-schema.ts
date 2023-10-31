@@ -115,13 +115,13 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: 'cost_tag_value',
         name: 'Cost Tag',
         selection_type: 'MULTI',
-        inheritance_mode: 'KEY_MATCHING',
+        inheritance_mode: 'NONE',
     },
     'filters.cost_additional_info_value': {
         key: 'cost_additional_info_value',
         name: 'Cost Additional Info',
         selection_type: 'MULTI',
-        inheritance_mode: 'KEY_MATCHING',
+        inheritance_mode: 'NONE',
     },
 };
 
