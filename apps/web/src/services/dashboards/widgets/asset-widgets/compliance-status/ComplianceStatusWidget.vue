@@ -9,7 +9,7 @@ import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 import { isEmpty, sum } from 'lodash';
 
-import { commaFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -300,7 +300,7 @@ defineExpose<WidgetExpose<Data[]>>({
                             Total number of requirements
                         </p>
                         <p class="value">
-                            {{ commaFormatter(state.complianceCount) }}
+                            {{ numberFormatter(state.complianceCount) }}
                         </p>
                     </div>
                 </div>
@@ -328,7 +328,7 @@ defineExpose<WidgetExpose<Data[]>>({
                                 <span class="text">{{ status.label }}</span>
                             </div>
                             <p class="value">
-                                {{ commaFormatter(state.complianceCountMap[status.name] ?? 0) }}
+                                {{ numberFormatter(state.complianceCountMap[status.name] ?? 0) }}
                             </p>
                         </div>
                     </div>

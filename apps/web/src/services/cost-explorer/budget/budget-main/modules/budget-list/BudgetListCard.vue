@@ -157,7 +157,7 @@ const state = reactive({
                         <div class="amount-used-wrapper"
                              :class="state.progressStatus"
                         >
-                            <span class="cost">{{ currencyMoneyFormatter(state.cost, state.currency) }}</span>
+                            <span class="cost">{{ currencyMoneyFormatter(state.cost, { currency: state.currency }) }}</span>
                             <span class="percent">(<template v-if="state.percentage < 0">0.00</template>
                                 <template v-else>{{ state.percentage.toFixed(2) }}</template>%)</span>
                         </div>
@@ -167,7 +167,7 @@ const state = reactive({
                             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                         </p>
                         <div class="cost">
-                            {{ currencyMoneyFormatter(state.limit, state.currency) }}
+                            {{ currencyMoneyFormatter(state.limit, { currency: state.currency }) }}
                         </div>
                     </div>
                 </div>

@@ -2,7 +2,6 @@
 import {
     computed, onUnmounted, reactive, ref, watch,
 } from 'vue';
-import type { NumberFormatOptions } from 'vue-i18n';
 
 import {
     XYChart, CategoryAxis, ValueAxis, LineSeries, CircleBullet, XYCursor,
@@ -15,6 +14,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
 
+import { numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -145,13 +145,13 @@ const tableState = reactive({
             // const pastDate = dayjs.utc(d.date).subtract(1, timeUnit).format(dateFormat);
             // const pastCost = results.find((bd) => bd.date === pastDate)?.cost_sum || 0;
             // costData[d.date] = {
-            //     cost: currencyMoneyFormatter(d.value, state.currency),
+            //     cost: currencyMoneyFormatter(d.value, { currency: state.currency }),
             // };
             // if (pastCost && pastCost < d.cost_sum && (d.cost_sum - pastCost) / Math.abs(pastCost) > 0.5) {
             //     costData[d.date].color = 'red';
             // }
             d.cost_sum.forEach((cost) => {
-                costData[cost.date] = currencyMoneyFormatter(cost.value, state.currency);
+                costData[cost.date] = currencyMoneyFormatter(cost.value, { currency: state.currency });
             });
 
             data.push({
@@ -176,21 +176,6 @@ const chartState = reactive({
 });
 
 /* util */
-const commaFormatter = (num) => {
-    if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return num;
-};
-const numberFormatter = (num) => {
-    if (Math.abs(num) < 10000) {
-        return Math.round(num * 10) / 10;
-    }
-    const options: NumberFormatOptions = {
-        notation: 'compact',
-        signDisplay: 'auto',
-        maximumFractionDigits: 1,
-    };
-    return Intl.NumberFormat('en', options).format(num);
-};
 const disposeChart = (_chartContext) => {
     if (chartState.registry[_chartContext]) {
         chartState.registry[_chartContext].dispose();
@@ -238,7 +223,7 @@ const drawChart = (_chartContext) => {
 
     series.adapter.add('tooltipText', (text, target) => {
         if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
-            return `[bold]$${commaFormatter(numberFormatter(target.tooltipDataItem.dataContext.value))}`;
+            return `[bold]${currencyMoneyFormatter(target.tooltipDataItem.dataContext.value, { notation: 'standard' })}`;
         }
         return text;
     });
@@ -363,8 +348,8 @@ const setCountData = (results) => {
         start = utcToday.subtract(2, 'day').format('YYYY-MM-DD');
         end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
     }
-    summaryState.pastCost = commaFormatter(numberFormatter(results.find((d) => d.date === start)?.cost_sum || 0)) ?? 0;
-    summaryState.currentCost = commaFormatter(numberFormatter(results.find((d) => d.date === end)?.cost_sum || 0)) ?? 0;
+    summaryState.pastCost = results.find((d) => d.date === start)?.cost_sum || 0;
+    summaryState.currentCost = results.find((d) => d.date === end)?.cost_sum || 0;
 };
 const getRefinedChartData = (results): ChartData[] => {
     const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
@@ -488,7 +473,9 @@ onUnmounted(() => {
             </div>
             <div class="col-span-12 md:col-span-9">
                 <div class="chart-wrapper">
-                    <p-data-loader :loading="state.loading">
+                    <p-data-loader :loading="state.loading"
+                                   :data="chartState.data"
+                    >
                         <template #loader>
                             <p-skeleton width="100%"
                                         height="100%"
@@ -505,7 +492,7 @@ onUnmounted(() => {
                     <span class="label">{{ summaryState.pastDateText }}</span>
                     <span class="date">({{ summaryState.pastDate }})</span>
                     <span class="cost">
-                        <span v-if="summaryState.pastCost !== 0">${{ summaryState.pastCost }}</span>
+                        <span v-if="summaryState.pastCost !== 0">{{ currencyMoneyFormatter(summaryState.pastCost, { currency: state.currency }) }}</span>
                         <span v-else
                               class="empty"
                         />
@@ -516,7 +503,7 @@ onUnmounted(() => {
                     <span class="date">({{ summaryState.currentDate }})</span>
                     <div class="cost in-process">
                         <template v-if="summaryState.currentCost !== 0">
-                            <span>${{ summaryState.currentCost }}</span>
+                            <span>{{ currencyMoneyFormatter(summaryState.currentCost, { currency: state.currency }) }}</span>
                             <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
                             <div class="help">
                                 <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
@@ -676,6 +663,11 @@ onUnmounted(() => {
         min-height: 13rem;
         margin-bottom: 1rem;
         .chart {
+            height: 13rem;
+        }
+
+        /* custom design-system component - p-data-loader */
+        :deep(.p-data-loader) {
             height: 13rem;
         }
     }

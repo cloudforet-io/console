@@ -33,7 +33,9 @@
             </p-field-group>
         </form>
         <div class="util-wrapper">
-            <p class="reset-pw-button">
+            <p v-if="smtpEnabled"
+               class="reset-pw-button"
+            >
                 <router-link id="reset-pw-button"
                              :to="{ name: AUTH_ROUTE.PASSWORD.STATUS.FIND._NAME, query: { status: 'find' } }"
                 >
@@ -70,6 +72,7 @@ import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import config from '@/lib/config';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 
@@ -97,6 +100,7 @@ export default defineComponent({
             userId: '' as string | undefined,
             password: '',
             loading: computed(() => store.state.user.isSignInLoading),
+            smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
         });
 
         const validationState = reactive({

@@ -12,7 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -98,7 +98,7 @@ const drawChart = () => {
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
-            return commaFormatter(numberFormatter(Number(convertedText), 1, 0));
+            return numberFormatter(Number(convertedText));
         }
         return text;
     });
@@ -146,7 +146,7 @@ const drawChart = () => {
             if (dataContext) {
                 const date = dayjs.utc(dataContext.date).format(_tooltipDateFormat);
                 let value = dataContext[legend.name];
-                value = currencyMoneyFormatter(value, costAnalysisPageStore.currency, undefined, true);
+                value = currencyMoneyFormatter(value, { currency: costAnalysisPageStore.currency, style: 'decimal' });
                 return `${date}\n[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
             return text;

@@ -3,13 +3,12 @@ import { computed, reactive, watch } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PButtonModal, PI, PLink, PToolboxTable, PTextPagination,
+    PButtonModal, PI, PLink, PToolboxTable, PTextPagination, PCollapsibleToggle,
 } from '@spaceone/design-system';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 import { cloneDeep, find, sortBy } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -173,6 +172,7 @@ const tableState = reactive({
     thisPage: 1,
     pageSize: 15,
     more: false,
+    showFormattedData: true,
 });
 
 /* util */
@@ -233,13 +233,14 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
         },
     };
 };
-const getIsRaised = (item: CostAnalyzeRawData, fieldName: string): boolean => {
-    const currDate: string = fieldName.split('.')[1]; // cost.2022-01-04 -> 2022-01-04
-    const prevDate: string = dayjs.utc(currDate).subtract(1, state.timeUnit).format(state.dateFormat);
-    const currValue: number|undefined = item.cost_sum?.find(({ date }) => date === currDate)?.value;
-    const prevValue: number|undefined = item.cost_sum?.find(({ date }) => date === prevDate)?.value;
+const isIncreasedByHalfOrMore = (item: CostAnalyzeRawData, fieldName: string): boolean => {
+    const currIndex = Number(fieldName.split('.')[1]); // value_sum.0.value -> 0
+    if (currIndex === 0) return false;
 
-    if (prevValue === undefined || currValue === undefined) return false;
+    const prevIndex = currIndex - 1;
+    const currValue = item.value_sum?.[currIndex]?.value ?? 0;
+    const prevValue = item.value_sum?.[prevIndex]?.value ?? 0;
+
     if (currValue < prevValue) return false;
     if (currValue > 0) {
         if (prevValue < 0) return true;
@@ -427,6 +428,13 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
             <template #toolbox-left>
                 <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
                 <usage-type-additional-filter-selector @update-filter="handleUpdateUsageTypeAdditionalFilterSelected" />
+                <div class="toggle-wrapper">
+                    <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
+                    <p-collapsible-toggle :toggle-type="'switch'"
+                                          :is-collapsed.sync="tableState.showFormattedData"
+                                          class="collapsible-toggle"
+                    />
+                </div>
             </template>
             <template #th-format="{field}">
                 {{ field.label }}
@@ -470,18 +478,16 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
                     <p-link :to="value ? getLink(item, field.name) : undefined"
                             class="!align-middle"
                     >
-                        <template v-if="getIsRaised(item, field.name)">
-                            <span class="cell-text raised">{{ numberFormatter(value) }}</span>
-                            <p-i name="ic_arrow-up-bold-alt"
+                        <span class="usage-wrapper">
+                            <span :class="isIncreasedByHalfOrMore(item, field.name) ? 'cell-text raised' : undefined">
+                                {{ usageUnitFormatter(value, {unit: item.usage_unit}, tableState.showFormattedData) }}
+                            </span>
+                            <p-i v-if="isIncreasedByHalfOrMore(item, field.name)"
+                                 name="ic_arrow-up-bold-alt"
                                  width="0.75rem"
                                  height="0.75rem"
                             />
-                        </template>
-                        <template v-else>
-                            <span class="usage-wrapper">
-                                {{ usageUnitFormatter(value, {unit: item.usage_unit}) }}
-                            </span>
-                        </template>
+                        </span>
                     </p-link>
                 </span>
             </template>
@@ -513,6 +519,16 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
     .cell-text {
         &.raised {
             @apply text-alert;
+        }
+    }
+    .toggle-wrapper {
+        display: flex;
+        align-items: center;
+        padding-left: 1rem;
+        .label {
+            @apply text-label-md;
+            font-weight: 700;
+            padding-right: 0.5rem;
         }
     }
     .usage-wrapper {

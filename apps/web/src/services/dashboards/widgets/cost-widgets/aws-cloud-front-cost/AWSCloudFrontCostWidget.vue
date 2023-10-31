@@ -270,7 +270,7 @@ const drawChart = (chartData) => {
                 if (value === undefined) value = '--';
                 if (typeof value === 'number') {
                     if (selectedSelectorType.value === 'cost') {
-                        if (widgetState.currency) value = currencyMoneyFormatter(value, widgetState.currency);
+                        if (widgetState.currency) value = currencyMoneyFormatter(value, { currency: widgetState.currency });
                     } else {
                         value = usageUnitFormatter(value, { unit: state.usageUnit });
                     }

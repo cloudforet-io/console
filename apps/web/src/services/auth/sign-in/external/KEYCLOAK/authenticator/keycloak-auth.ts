@@ -14,20 +14,28 @@ class KeycloakAuth extends Authenticator {
     private static init() {
         /* keycloak init options */
         const authOptions = store.state.domain.authOptions;
-        const issuer = authOptions.issuer;
-        const parsedIssuer = issuer.split('/');
-        const authIndex = parsedIssuer.indexOf('auth');
-        const baseUrl = parsedIssuer[authIndex - 1];
+        const authorizationEndpoint = authOptions.authorization_endpoint;
+        if (!KeycloakAuth.isValidAuthorizationEndpoint(authorizationEndpoint)) {
+            throw new Error('authorizationEndpoint is not valid: please check your keycloak configuration.'
+                + ' It should be like "https://{keycloak-server}/realms/{your-realm}/protocol/openid-connect/auth"');
+        }
+        const parsedIssuer = authorizationEndpoint.split('/realms');
+        const baseUrl = parsedIssuer[0];
         const realm = authOptions.realm;
         const clientId = authOptions.client_id;
 
         const initOptions = {
-            url: `https://${baseUrl}/auth`,
+            url: baseUrl,
             realm,
             clientId,
             'enable-cors': true,
         };
         KeycloakAuth.keycloak = Keycloak(initOptions);
+    }
+
+    private static isValidAuthorizationEndpoint(url:string) {
+        const keycloakAuthUrlPattern = /^https:\/\/[^/]+(\/auth)?\/realms\/[^/]+\/protocol\/openid-connect\/auth$/;
+        return keycloakAuthUrlPattern.test(url);
     }
 
     private static async onSignInFail() {

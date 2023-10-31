@@ -231,7 +231,7 @@ const drawChart = (chartData: ChartData[]) => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, widgetState.currency));
+        chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, { currency: widgetState.currency }));
         (series as Series).set('tooltip', tooltip);
 
         // set data on series

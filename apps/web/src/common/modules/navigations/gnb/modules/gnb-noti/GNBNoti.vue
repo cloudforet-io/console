@@ -25,7 +25,7 @@
                          :style-type="tab.name === activeTab ? 'primary3' : 'gray200'"
                          badge-type="subtle"
                 >
-                    {{ commaFormatter(count[tab.name]) }}
+                    {{ numberFormatter((count[tab.name])) }}
                 </p-badge>
             </template>
             <template #notifications>
@@ -54,7 +54,7 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import { commaFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/core-lib';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
@@ -167,7 +167,7 @@ export default defineComponent<Props>({
             showNotiMenu,
             hideNotiMenu,
             handleNotiButtonClick,
-            commaFormatter,
+            numberFormatter,
             unreadNoticeCount,
         };
     },

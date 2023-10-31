@@ -9,7 +9,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep, sum } from 'lodash';
 
-import { getRGBFromHex, commaFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { getRGBFromHex, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -317,7 +317,7 @@ defineExpose<WidgetExpose>({
                         Failure rate
                     </p>
                     <p class="value">
-                        {{ commaFormatter(state.failureRate) }}%
+                        {{ numberFormatter(state.failureRate) }}%
                     </p>
                     <div v-if="state.failureRateComparingMessage"
                          class="diff-wrapper"
@@ -325,7 +325,7 @@ defineExpose<WidgetExpose>({
                         <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
                              :color="state.prevFailureRate < state.failureRate ? red[500] : green[500]"
                         />
-                        <span class="diff-value">{{ commaFormatter(Math.abs(state.prevFailureRate - state.failureRate)) }}%</span>
+                        <span class="diff-value">{{ numberFormatter(Math.abs(state.prevFailureRate - state.failureRate)) }}%</span>
                         <span class="diff-text">{{ state.failureRateComparingMessage }}</span>
                     </div>
                 </div>
