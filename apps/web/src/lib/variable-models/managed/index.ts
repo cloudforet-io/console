@@ -1,4 +1,5 @@
 import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
+import CostDefaultDataTypeVariableModel from '@/lib/variable-models/managed/cost-default-data-type-variable-model';
 
 import AssetAccountVariableModel from './asset-account-variable-model';
 import CloudServiceQuerySetKeyVariableModel from './cloud-service-query-set-key-variable-model';
@@ -23,6 +24,7 @@ import WebhookVariableModel from './webhook-variable-model';
 const MANAGED_VARIABLE_MODELS = {
     // enum variable model
     cost_default_field: CostDefaultFieldVariableModel,
+    cost_default_data_type: CostDefaultDataTypeVariableModel,
     // resource name variable model
     cost_data_source: CostDataSourceVariableModel,
     provider: ProviderVariableModel,
