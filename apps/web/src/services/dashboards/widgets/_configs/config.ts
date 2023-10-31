@@ -145,14 +145,19 @@ export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
 
 /* widget options */
 export interface BaseWidgetOptions {
-    // group_by?: GroupBy | string;
+    // cost
+    cost_data_source?: string;
+    cost_data_type?: string;
+    cost_data_field?: string;
+    cost_secondary_data_field?: string;
+    // asset
+    cloud_service_query_set?: string;
+    asset_data_field?: string;
+    asset_secondary_data_field?: string;
+    // common
     granularity?: Granularity;
-    legend_options?: LegendOptions;
     chart_type?: ChartType;
-    // selector_options?: {
-    //     enabled?: boolean;
-    //     type: 'cost-usage'|'days';
-    // };
+    legend_options?: LegendOptions;
     pagination_options?: {
         enabled?: boolean;
         page_size?: number;
