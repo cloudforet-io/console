@@ -3,8 +3,8 @@ import type {
     VariableModelLabel,
 } from '@/lib/variable-models/_base/types';
 
-export default class CostDataFieldVariableModel extends EnumVariableModel {
-    key = 'cost_data_field';
+export default class CostDefaultFieldVariableModel extends EnumVariableModel {
+    key = 'cost_default_field';
 
     name = 'Data Field (Cost)';
 
