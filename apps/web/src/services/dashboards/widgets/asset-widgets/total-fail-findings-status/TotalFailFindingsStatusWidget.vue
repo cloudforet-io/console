@@ -178,9 +178,23 @@ defineExpose<WidgetExpose>({
                     <div class="left-part">
                         {{ numberFormatter(state.data?._total_fail_finding_count) }}
                     </div>
-                    <div class="right-part">
-                        <span class="text">out of </span>
-                        <span class="count">{{ numberFormatter(state.totalCount) }}</span>
+                </div>
+                <p-divider :vertical="true" />
+                <div class="right-wrapper">
+                    <p class="title">
+                        Failure rate
+                    </p>
+                    <p class="value">
+                        {{ numberFormatter(state.failureRate) }}%
+                    </p>
+                    <div v-if="state.failureRateComparingMessage"
+                         class="diff-wrapper"
+                    >
+                        <p-i :name="state.prevFailureRate < state.failureRate ? 'ic_caret-up-filled' : 'ic_caret-down-filled'"
+                             :color="state.prevFailureRate < state.failureRate ? red[500] : green[500]"
+                        />
+                        <span class="diff-value">{{ numberFormatter(Math.abs(state.prevFailureRate - state.failureRate)) }}%</span>
+                        <span class="diff-text">{{ state.failureRateComparingMessage }}</span>
                     </div>
                 </div>
             </div>

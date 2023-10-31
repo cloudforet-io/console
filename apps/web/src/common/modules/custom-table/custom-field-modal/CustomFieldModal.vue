@@ -334,7 +334,7 @@ export default defineComponent<Props>({
                         name,
                         options: {
                             ...TAGS_OPTIONS,
-                            ...(!state.isResourceTypeCloudService && { key_depth: name.split('.').length }),
+                            ...(!state.isResourceTypeCloudService && { key_depth: 1 }),
                         },
                     } as DynamicField;
                 }
