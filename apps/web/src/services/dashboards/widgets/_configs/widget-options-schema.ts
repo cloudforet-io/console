@@ -17,7 +17,7 @@ export interface WidgetOptionsSchemaProperty {
     selection_type?: 'SINGLE'|'MULTI';
     readonly?: boolean;
     fixed?: boolean;
-    required?: boolean;
+    optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
     dependencies?: {
@@ -59,6 +59,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key },
         ],
@@ -67,6 +68,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key },
         ],
@@ -75,6 +77,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key },
         ],
@@ -83,6 +86,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key },
         ],
@@ -91,6 +95,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.region.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key },
         ],
@@ -99,6 +104,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key },
         ],
@@ -110,7 +116,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
         selection_type: 'SINGLE',
-        required: true,
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key },
@@ -120,7 +125,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: 'cost_data_type',
         name: 'Data Type',
         selection_type: 'SINGLE',
-        required: true,
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
@@ -134,30 +138,34 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_field.key,
         name: 'Data Field (Cost)',
         selection_type: 'MULTI',
-        required: true,
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
             { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
+        dependencies: {
+            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+        },
     },
     cost_secondary_data_field: {
         key: 'cost_secondary_data_field',
         name: 'Data Field (Cost)',
         selection_type: 'MULTI',
-        required: true,
+        readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
             { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
+        dependencies: {
+            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+        },
     },
     cloud_service_query_set: {
         // TODO: add conversion code for key changing from asset_query_set to cloud_service_query_set
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
         name: 'Compliance Framework',
         selection_type: 'MULTI',
-        required: true,
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
@@ -175,23 +183,28 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         key: 'asset_data_field',
         name: 'Data Field (Asset)',
         selection_type: 'MULTI',
-        required: true,
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
             { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
+        dependencies: {
+            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+        },
     },
     asset_secondary_data_field: {
         key: 'asset_secondary_data_field',
         name: 'Data Field (Asset)',
         selection_type: 'MULTI',
-        required: true,
+        readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
             { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
+        dependencies: {
+            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+        },
     },
     // TODO: update
     // {
