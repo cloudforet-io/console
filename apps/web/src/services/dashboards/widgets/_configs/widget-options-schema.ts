@@ -11,6 +11,11 @@ import { ASSET_GROUP_BY_ITEM_MAP, COST_GROUP_BY_ITEM_MAP } from '@/services/dash
  */
 export type InheritanceMode = 'NONE'|'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
 
+type WidgetOptionPropertyDependency = Partial<{
+    [property in WidgetOptionKey]: { // e.g. 'cost_data_source'
+        reference_key: string; // e.g. 'data_source_id'
+    }
+}>;
 export interface WidgetOptionsSchemaProperty {
     key: string; // e.g. cost_data_source
     name?: string; // e.g. Data Source
@@ -20,11 +25,7 @@ export interface WidgetOptionsSchemaProperty {
     optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
-    dependencies?: {
-        [property: string]: { // e.g. 'cost_data_source'
-            reference_key: string; // e.g. 'data_source_id'
-        }
-    };
+    dependencies?: WidgetOptionPropertyDependency;
 }
 export type WidgetOptionsSchema = {
     properties: Record<string, WidgetOptionsSchemaProperty>;
@@ -246,7 +247,7 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
                 properties[optionName] = {
                     ...filterProperty,
                     dependencies: {
-                        [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+                        cost_data_source: { reference_key: 'data_source_id' },
                     },
                 } as WidgetOptionsSchemaProperty;
             } else {
@@ -256,7 +257,7 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
             console.error(new Error(`No matched option schema for ${optionName}`));
         }
 
-        if (typeof option !== 'string') {
+        if (Array.isArray(option) && option[1]) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { key: _, ...additionalProperties } = option[1];
 
@@ -273,7 +274,7 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
                     item_options: undefined,
                 };
             }
-        }
+        } else if (typeof option !== 'string') console.error(new Error(`Wrong format of argument ${option}`));
 
         order.push(optionName);
     });
