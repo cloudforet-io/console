@@ -22,17 +22,11 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: 'budget_id',
+        cost_data_field: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        {
-            key: 'cost_data_field',
-            item_options: [
-                { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key },
-                { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key },
-            ],
-        },
+        'cost_data_field',
         'filters.provider',
         'filters.project',
         'filters.service_account',

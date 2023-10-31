@@ -21,15 +21,11 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
             enabled: true,
             show_at: 'table',
         },
+        cost_data_field: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        {
-            key: 'cost_data_field',
-            item_options: [
-                { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key },
-            ],
-        },
+        'cost_data_field',
         'cost_data_type',
         'filters.provider',
         'filters.project',

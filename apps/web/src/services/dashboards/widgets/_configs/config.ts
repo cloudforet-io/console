@@ -11,6 +11,7 @@ import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store
 import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
 import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
 
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
@@ -165,7 +166,7 @@ export interface SelectorOptions {
 }
 interface CostWidgetOptions extends BaseWidgetOptions {
     cost_data_source?: string;
-    cost_group_by?: CostGroupBy | string;
+    cost_data_field?: ManagedVariableModelKey | string;
     selector_options?: SelectorOptions;
 }
 interface AssetWidgetOptions extends BaseWidgetOptions {
