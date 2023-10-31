@@ -50,8 +50,8 @@ const WIDGET_OPTION_KEYS = {
     'filters.project_group': 'filters.project_group',
     'filters.region': 'filters.region',
     'filters.cost_product': 'filters.cost_product',
-    'filters.cost_tag_value': 'filters.cost_tag',
-    'filters.cost_additional_info_value': 'filters.cost_additional_info',
+    'filters.cost_tag_value': 'filters.cost_tag_value',
+    'filters.cost_additional_info_value': 'filters.cost_additional_info_value',
 } as const;
 
 type widgetOptionKey = keyof typeof WIDGET_OPTION_KEYS;
