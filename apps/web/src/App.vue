@@ -17,6 +17,7 @@ import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import { getRouteAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
+import config from '@/lib/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
@@ -40,6 +41,7 @@ const state = reactive({
     email: computed<string>(() => store.state.user.email),
     domainId: computed<string>(() => store.state.domain.domainId),
     notificationEmailModalVisible: false,
+    smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
 
 const goToSignIn = async () => {
@@ -130,6 +132,7 @@ watch(() => state.userId, (userId) => {
                           @clickButton="goToSignIn"
             />
             <notification-email-modal
+                v-if="state.smtpEnabled"
                 :domain-id="state.domainId"
                 :user-id="state.userId"
                 :visible.sync="state.notificationEmailModalVisible"

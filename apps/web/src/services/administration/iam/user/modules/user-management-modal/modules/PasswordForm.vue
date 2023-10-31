@@ -82,6 +82,7 @@ import {
 
 import { i18n } from '@/translations';
 
+import config from '@/lib/config';
 import {
     oneLowerCaseValidator,
     oneNumberValidator,
@@ -111,19 +112,24 @@ const userPageState = userPageStore.$state;
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
+    smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     passwordStatus: 0,
     passwordTypeArr: computed(() => {
+        const additionalItems: any = [];
+        if (state.smtpEnabled) {
+            additionalItems.push({
+                name: PASSWORD_TYPE.RESET,
+                label: i18n.t('COMMON.PROFILE.SEND_LINK'),
+                disabled: userPageState.visibleUpdateModal ? !props.isValidEmail : false,
+            });
+        }
         if (userPageState.visibleUpdateModal) {
             return [
                 {
                     name: PASSWORD_TYPE.KEEP,
                     label: i18n.t('COMMON.PROFILE.KEEP_PASSWORD'),
                 },
-                {
-                    name: PASSWORD_TYPE.RESET,
-                    label: i18n.t('COMMON.PROFILE.SEND_LINK'),
-                    disabled: !props.isValidEmail,
-                },
+                ...additionalItems,
                 {
                     name: PASSWORD_TYPE.MANUALLY,
                     label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
@@ -131,10 +137,7 @@ const state = reactive({
             ];
         }
         return [
-            {
-                name: PASSWORD_TYPE.RESET,
-                label: i18n.t('COMMON.PROFILE.SEND_LINK'),
-            },
+            ...additionalItems,
             {
                 name: PASSWORD_TYPE.MANUALLY,
                 label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
