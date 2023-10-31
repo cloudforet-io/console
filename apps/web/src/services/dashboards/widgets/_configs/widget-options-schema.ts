@@ -50,6 +50,8 @@ const WIDGET_OPTION_KEYS = {
     'filters.project_group': 'filters.project_group',
     'filters.region': 'filters.region',
     'filters.cost_product': 'filters.cost_product',
+    'filters.cost_tag_value': 'filters.cost_tag',
+    'filters.cost_additional_info_value': 'filters.cost_additional_info',
 } as const;
 
 type widgetOptionKey = keyof typeof WIDGET_OPTION_KEYS;
@@ -108,6 +110,18 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key },
         ],
+    },
+    'filters.cost_tag_value': {
+        key: 'cost_tag_value',
+        name: 'Cost Tag',
+        selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
+    },
+    'filters.cost_additional_info_value': {
+        key: 'cost_additional_info_value',
+        name: 'Cost Additional Info',
+        selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
     },
 };
 
@@ -171,6 +185,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
         ],
     },
+    //
     asset_account: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
