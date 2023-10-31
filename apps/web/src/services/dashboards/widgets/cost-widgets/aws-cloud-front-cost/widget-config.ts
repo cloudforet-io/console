@@ -1,3 +1,5 @@
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
@@ -42,14 +44,22 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        { key: 'cost_data_field', name: 'Row Field' },
+        {
+            key: 'cost_data_field',
+            name: 'Row Field',
+            item_options: [
+                { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key },
+            ],
+        },
         { key: 'cost_secondary_data_field', name: 'Column Field' },
         'cost_data_type',
         { key: 'filters.cost_product', fixed: true },
+        'filters.provider',
         'filters.project',
         'filters.service_account',
         'filters.project_group',
         'filters.region',
+        'cost_usage_type',
     ]),
 };
 

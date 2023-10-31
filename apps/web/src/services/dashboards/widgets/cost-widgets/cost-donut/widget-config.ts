@@ -1,3 +1,5 @@
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
@@ -16,7 +18,12 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        'cost_data_field',
+        {
+            key: 'cost_data_field',
+            item_options: [
+                { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key },
+            ],
+        },
         'cost_data_type',
         'filters.provider',
         'filters.project',
