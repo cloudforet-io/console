@@ -24,7 +24,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: string[] }>> = this.#getFetcher();
 
     constructor(config?: ResourceValueVariableModelConfig) {
         if (!config) return;
@@ -36,7 +36,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
         this.#fetcher = this.#getFetcher();
     }
 
-    #getFetcher(): ReturnType<typeof getCancellableFetcher<ListResponse>>|undefined {
+    #getFetcher(): ReturnType<typeof getCancellableFetcher<{ results: string[] }>>|undefined {
         if (!this.resourceType) return undefined;
         const apiPath = this.resourceType.split('.').map((d) => camelCase(d));
 
@@ -78,7 +78,11 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
                 this.#getParams(query),
             );
             if (status === 'succeed') {
-                this.#response = response;
+                this.#response = {
+                    results: response.results.map((value) => ({
+                        key: value, name: value,
+                    })),
+                };
             }
             return this.#response;
         } catch (e) {
