@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
@@ -22,7 +22,6 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     options: {
         chart_type: CHART_TYPE.LINE,
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: COST_GROUP_BY.USAGE_TYPE,
         legend_options: {
             enabled: true,
             show_at: 'table',
@@ -41,7 +40,9 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        { key: 'filters.cost_product', fixed: true },
+        'cost_data_type',
+        ['cost_data_field', { name: 'Data Field' }],
+        'filters.cost_product',
         'filters.project',
         'filters.service_account',
         'filters.project_group',

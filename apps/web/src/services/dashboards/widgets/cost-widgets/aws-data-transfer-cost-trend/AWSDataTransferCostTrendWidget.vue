@@ -28,9 +28,8 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type {
-    WidgetProps, WidgetExpose, SelectorType, WidgetEmit,
+    WidgetProps, WidgetExpose, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
 import { CHART_TYPE, COST_GROUP_BY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
@@ -42,9 +41,6 @@ import {
     getRefinedDateTableData,
     getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import {
-    useCostWidgetFrameHeaderDropdown,
-} from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
@@ -53,19 +49,17 @@ import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-w
 import type { CostAnalyzeResponse, Legend } from '@/services/dashboards/widgets/type';
 
 
-const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
-const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
 interface SubData { date: string; value: number }
 interface Data {
     value_sum: SubData[];
     _total_value_sum: number;
-    [USAGE_TYPE_VALUE_KEY]: string;
+    [dataField: string]: string|any;
     usage_unit: string|null;
 }
 interface ChartData {
     date: string;
     value: number;
-    [USAGE_TYPE_VALUE_KEY]: string;
+    [dataField: string]: string|any;
     usage_unit?: string|null;
 }
 type FullData = CostAnalyzeResponse<Data>;
@@ -112,12 +106,16 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
 const state = reactive({
     loading: true,
     data: null as FullData | null,
-    fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
+    dataType: computed<'cost'|'usage_quantity'>(() => (widgetState.options.cost_data_type === 'cost' ? 'cost' : 'usage_quantity')),
+    dataFieldKey: computed<string>(() => {
+        if (!widgetState.options.cost_data_field) return '';
+        return widgetState.options.cost_data_field.split('.').pop() ?? '';
+    }),
     chartData: computed<ChartData[]>(() => {
         if (!state.data?.results) return [];
 
         const chartData: ChartData[] = getRefinedXYChartData<Data, ChartData>(state.data.results, {
-            groupBy: USAGE_TYPE_VALUE_KEY,
+            groupBy: state.dataFieldKey,
             arrayDataKey: 'value_sum',
             categoryKey: DATE_FIELD_NAME,
             valueKey: 'value',
@@ -125,7 +123,7 @@ const state = reactive({
         return sortBy(chartData, widgetState.dateRange, DATE_FIELD_NAME);
     }),
     tableFields: computed<Field[]>(() => {
-        const _textOptions: Field['textOptions'] = state.fieldsKey === 'cost' ? {
+        const _textOptions: Field['textOptions'] = state.dataType === 'cost' ? {
             type: 'cost',
         } : {
             type: 'usage',
@@ -139,8 +137,8 @@ const state = reactive({
         const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
 
         const groupByField: Field = {
-            label: USAGE_TYPE_VALUE_KEY,
-            name: USAGE_TYPE_VALUE_KEY,
+            label: state.dataFieldKey,
+            name: state.dataFieldKey,
             width: groupByFieldWidth,
         };
         return [
@@ -154,11 +152,11 @@ const state = reactive({
             DATE_FIELD_NAME,
             ['value_sum'],
         ).map((data) => {
-            let value = data[USAGE_TYPE_VALUE_KEY] ?? 'Unknown';
+            let value = data[state.dataFieldKey] ?? 'Unknown';
             if (state.fieldsKey === 'usage_quantity') value = `${value}${data.usage_unit ? ` (${data.usage_unit})` : ''}`;
             return {
                 ...data,
-                [USAGE_TYPE_VALUE_KEY]: value,
+                [state.dataFieldKey]: value,
             };
         });
 
@@ -166,10 +164,10 @@ const state = reactive({
     }),
     legends: computed<Legend[]>(() => {
         const data = state.data?.results ?? [];
-        const legends: Legend[] = getXYChartLegends(data, USAGE_TYPE_VALUE_KEY)
+        const legends: Legend[] = getXYChartLegends(data, state.dataFieldKey)
             .map((l, i) => {
                 let label = l.label;
-                if (state.fieldsKey === 'usage_quantity') label = `${label}${data[i]?.usage_unit ? ` (${data[i]?.usage_unit})` : ''}`;
+                if (state.dataType === 'usage_quantity') label = `${label}${data[i]?.usage_unit ? ` (${data[i]?.usage_unit})` : ''}`;
                 return { ...l, label };
             });
         return legends;
@@ -177,16 +175,13 @@ const state = reactive({
     showLegendsOnTable: computed(() => widgetState.options.legend_options?.enabled && widgetState.options.legend_options.show_at === 'table'),
     chart: null as XYChart | null,
     showChart: computed(() => {
-        if (state.fieldsKey === 'cost') return true;
+        if (state.dataType === 'cost') return true;
         if (!state.data?.results) return true;
         // hide chart when there are different usage_unit in data or usage_unit is null
-        if (state.data.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
+        if (state.data.results[0]?.value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
         return uniqBy(state.data.results, 'usage_unit').length === 1;
     }),
     usageUnit: computed(() => state.data?.results?.[0]?.usage_unit),
-});
-const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown({
-    selectorOptions: computed(() => widgetState.options?.selector_options),
 });
 
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
@@ -204,11 +199,12 @@ const fetchData = async (): Promise<FullData|null> => {
             ...widgetState.consoleFilters]);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        const groupBy = [USAGE_TYPE_QUERY_KEY, 'date'];
-        if (state.fieldsKey === 'usage_quantity') {
+        const groupBy = [widgetState.options.cost_data_field, 'date'];
+        if (state.dataType === 'usage_quantity') {
             groupBy.push('usage_unit');
         }
 
+        console.debug('widgetState.options.cost_data_source', widgetState.options.cost_data_source);
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
@@ -218,11 +214,11 @@ const fetchData = async (): Promise<FullData|null> => {
                 end: widgetState.dateRange.end,
                 fields: {
                     value_sum: {
-                        key: state.fieldsKey,
+                        key: state.dataType,
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: USAGE_TYPE_VALUE_KEY, desc: true }],
+                sort: [{ key: state.dataFieldKey, desc: true }],
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
@@ -278,7 +274,7 @@ const drawChart = (chartData: ChartData[]) => {
             dateFields: [DATE_FIELD_NAME],
         });
         const tooltip = chartHelper.createTooltip();
-        if (selectedSelectorType.value === 'usage') {
+        if (state.dataType === 'usage_quantity') {
             chartHelper.setXYSharedTooltipText(
                 chart,
                 tooltip,
@@ -317,10 +313,6 @@ const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
 };
 
 /* Event */
-const handleSelectSelectorType = async (selected: SelectorType) => {
-    selectedSelectorType.value = selected;
-    await refreshWidget();
-};
 const handleToggleLegend = (index: number) => {
     chartHelper.toggleSeries(state.chart, index);
 };
@@ -358,14 +350,6 @@ defineExpose<WidgetExpose<FullData>>({
                   class="aws-data-transfer-cost-trend"
                   v-on="widgetFrameEventHandlers"
     >
-        <template v-if="selectorItems.length"
-                  #header-right
-        >
-            <widget-frame-header-dropdown :items="selectorItems"
-                                          :selected="selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
         <div class="data-container">
             <div v-if="state.showChart"
                  class="chart-wrapper"
