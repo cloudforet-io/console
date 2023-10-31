@@ -10,12 +10,15 @@ import type {
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import type { InheritanceMode } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import type {
+    InheritanceMode,
+    WidgetOptionsSchemaProperty,
+} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const props = defineProps<{
     label: string;
     selected?: SelectDropdownMenuItem[];
-    selectionType?: 'SINGLE' | 'MULTI';
+    selectionType?: WidgetOptionsSchemaProperty['selection_type'];
     inherit?: boolean;
     inheritanceMode?: InheritanceMode;
     deletable?: boolean;
