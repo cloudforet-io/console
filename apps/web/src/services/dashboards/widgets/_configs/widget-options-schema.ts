@@ -1,6 +1,8 @@
 import type { VariableModelConfig } from '@/lib/variable-models';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
+import { ASSET_GROUP_BY_ITEM_MAP, COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+
 /*
  * inheritance_mode: how to inherit widget options from dashboard variables.
  *      NONE: no inheritance
@@ -152,6 +154,9 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
         fixed: true,
+        item_options: [
+            { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+        ],
         dependencies: {
             [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
         },
@@ -163,6 +168,9 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
+        item_options: [
+            { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+        ],
         dependencies: {
             [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
         },
@@ -192,6 +200,9 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
         fixed: true,
+        item_options: [
+            { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+        ],
         dependencies: {
             [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
         },
@@ -203,6 +214,9 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
+        item_options: [
+            { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+        ],
         dependencies: {
             [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
         },
@@ -247,10 +261,19 @@ export const getWidgetOptionsSchema = (options: (string|WidgetOptionsSchemaPrope
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const { key: _, ...additionalProperties } = option;
 
-            properties[optionName] = {
+            const defaultProperties = {
                 ...properties[optionName],
                 ...additionalProperties,
             };
+
+            if (!option.readonly) {
+                properties[optionName] = defaultProperties;
+            } else {
+                properties[optionName] = {
+                    ...defaultProperties,
+                    item_options: undefined,
+                };
+            }
         }
 
         order.push(optionName);
