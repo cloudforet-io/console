@@ -227,7 +227,17 @@ export const getWidgetOptionsSchema = (options: (string|WidgetOptionsSchemaPrope
         if (WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName]) {
             properties[optionName] = WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName];
         } else if (WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName]) {
-            properties[optionName] = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName];
+            const filterProperty = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName];
+            if (properties.cost_data_source) {
+                properties[optionName] = {
+                    ...filterProperty,
+                    dependencies: {
+                        [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+                    },
+                };
+            } else {
+                properties[optionName] = filterProperty;
+            }
         } else {
             console.error(`No matched filter option schema for ${optionName}`);
         }
