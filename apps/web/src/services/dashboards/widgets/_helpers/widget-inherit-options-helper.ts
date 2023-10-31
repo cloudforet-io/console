@@ -49,7 +49,7 @@ export const getInitialWidgetInheritOptions = (
 
 /**
  * @description get all inheriting properties from inheritOptions.
- * it returns option properties whose inheritOption is enabled and variable_info.key is same with given variableKey.
+ * it returns option properties whose inheritOption is enabled and variable_key is same with given variableKey.
  * @param variableKey
  * @param inheritOptions
  */

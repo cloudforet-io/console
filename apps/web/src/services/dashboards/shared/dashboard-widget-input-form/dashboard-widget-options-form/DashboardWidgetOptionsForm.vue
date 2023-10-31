@@ -36,7 +36,7 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? []),
+    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(widgetFormStore.widgetConfig?.options_schema?.properties ?? {})),
     selectedList: [] as SelectDropdownMenuItem[][],
 });
 
