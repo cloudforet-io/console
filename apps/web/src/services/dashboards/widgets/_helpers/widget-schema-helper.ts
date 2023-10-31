@@ -42,19 +42,26 @@ export const getInitialSchemaProperties = (
     const widgetOptionsSchema = widgetConfig?.options_schema ?? {} as WidgetOptionsSchema;
     const allVariableProperties = Object.keys(variablesSchema?.properties ?? {});
     const allOptionProperties = Object.keys(widgetOptionsSchema?.properties ?? {});
-    const fixedProperties = allOptionProperties.filter((key) => !widgetOptionsSchema?.properties?.[key]?.optional);
+    const fixedProperties = allOptionProperties.filter((key) => widgetOptionsSchema?.properties?.[key]?.fixed);
     const order: string[] = widgetOptionsSchema?.order ?? [];
+
+    // get variable key to option name map
+    const variableKeyToOptionNameMap = {};
+    Object.entries(widgetConfig?.options_schema?.properties ?? {}).forEach(([optionName, property]) => {
+        const variableKey = property.key;
+        if (variableKey) variableKeyToOptionNameMap[variableKey] = optionName;
+    });
 
     return chain(allVariableProperties) // get all possible properties from variables schema
         .filter((key) => !!variablesSchema?.properties?.[key]?.use) // get only used variables
-        .map((key) => getWidgetOptionName(key)) // convert variable key to widget option name
+        .map((key) => variableKeyToOptionNameMap[key]) // convert variable key to option name
         .intersection(allOptionProperties) // intersect with all possible properties from widget options schema
         .union(fixedProperties) // union with fixed properties
         .sortBy((key) => {
             const idx = order.indexOf(key);
-            if (idx >= 0) return idx;
-            if (fixedProperties.includes(key)) return -1;
-            return 9999;
+            if (idx < 0) return 9999;
+            if (fixedProperties.includes(key)) return idx;
+            return 1000 + idx;
         }) // sort by order and fixedProperties
         .value();
 };

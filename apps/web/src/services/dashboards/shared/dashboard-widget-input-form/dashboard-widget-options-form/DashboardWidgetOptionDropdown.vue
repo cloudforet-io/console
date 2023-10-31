@@ -51,7 +51,6 @@ const state = reactive({
 const handleUpdateVisibleMenu = (visible: boolean) => {
     if (state.showErrorMessage || !visible) return;
     state.showErrorMessage = true;
-    console.debug('handleUpdateVisible', visible);
 };
 const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     emit('update:selected', selected);
@@ -59,7 +58,6 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
 
 
 watch(() => props.inherit, () => {
-    console.debug('inherit changed', props.inherit);
     state.showErrorMessage = false;
 });
 

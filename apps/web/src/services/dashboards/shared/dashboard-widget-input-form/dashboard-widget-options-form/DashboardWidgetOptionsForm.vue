@@ -21,6 +21,7 @@ import {
     getVariableKeyFromWidgetSchemaProperty,
 } from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import type {
+    WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
@@ -36,8 +37,11 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    properties: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(widgetFormStore.widgetConfig?.options_schema?.properties ?? {})),
-    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(state.properties)),
+    properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? {}),
+    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => {
+        const schemaProperties = widgetFormState.schemaProperties.filter((propertyName) => !!state.properties[propertyName]);
+        return schemaProperties.map((propertyName) => state.properties[propertyName]);
+    }),
     selectedList: [] as SelectDropdownMenuItem[][],
 });
 
@@ -103,7 +107,6 @@ const handleUpdateSelected = (index: number, selected: SelectDropdownMenuItem[])
     }
 };
 const handleUpdateInherit = (index: number, isInherit: boolean) => {
-    console.debug('handleUpdateInherit', index, isInherit);
     state.selectedList.splice(index, 1, []);
 
     const propertyName = state.propertySchemaList[index].key;
