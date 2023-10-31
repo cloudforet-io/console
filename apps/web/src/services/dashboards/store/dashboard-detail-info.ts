@@ -326,7 +326,7 @@ const getConvertedWidgetOptions = (storedWidgetOptions?: WidgetOptions): WidgetO
 
     Object.entries(widgetOptions).forEach(([k, v]) => {
         if (k === 'cost_group_by') {
-            (widgetOptions as any).data_field = v;
+            (widgetOptions as any).cost_data_field = v;
             delete widgetOptions[k];
         }
     });
