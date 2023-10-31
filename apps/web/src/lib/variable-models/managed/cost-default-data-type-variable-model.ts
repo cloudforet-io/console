@@ -12,6 +12,6 @@ export default class CostDefaultDataTypeVariableModel extends EnumVariableModel 
 
     values = [
         { key: 'cost', name: 'Cost' },
-        { key: 'usage', name: 'Usage' },
+        { key: 'usage_quantity', name: 'Usage' },
     ];
 }
