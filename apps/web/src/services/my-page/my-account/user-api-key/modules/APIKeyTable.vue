@@ -93,7 +93,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import {
-    showSuccessMessage, showLoadingMessage, hideLoadingMessage,
+    showSuccessMessage, showLoadingMessage, hideLoadingMessageByGroup,
 } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -240,7 +240,7 @@ export default {
                 ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'));
             } finally {
                 modalState.loading = false;
-                hideLoadingMessage(vm.$root);
+                hideLoadingMessageByGroup();
                 await listAPIKey(state.user);
             }
         };

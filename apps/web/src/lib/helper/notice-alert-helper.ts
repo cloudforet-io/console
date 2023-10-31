@@ -48,12 +48,15 @@ export const showSuccessMessage = (successTitle, successMessage) => {
  *   @name showLoadingMessage
  *   @param loadingTitle
  *   @param loadingMessage
+ *   @parma id
+ *   @param group
  *   @returns
  */
-export const showLoadingMessage = (loadingTitle, loadingMessage) => {
+export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 'toastTopCenter') => {
     if (Vue) {
         (Vue as any).notify({
-            group: 'toastTopCenter',
+            ...(id && { id }),
+            group,
             type: 'loading',
             title: loadingTitle,
             text: loadingMessage,
@@ -65,15 +68,22 @@ export const showLoadingMessage = (loadingTitle, loadingMessage) => {
 
 
 /** * @function
- *   @name hideLoadingMessage
+ *   @name hideLoadingMessageByGroup
+ *   @param group
  *   @returns
  */
-export const hideLoadingMessage = () => {
+export const hideLoadingMessageByGroup = (group = 'toastTopCenter') => {
     if (Vue) {
         Vue.notify({
-            group: 'toastTopCenter',
+            group,
             clean: true,
         });
+    }
+};
+
+export const hideLoadingMessageById = (id?) => {
+    if (Vue) {
+        if (id) (Vue.notify as any)?.close(id);
     }
 };
 
