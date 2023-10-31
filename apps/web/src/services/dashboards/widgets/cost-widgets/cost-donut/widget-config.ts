@@ -27,7 +27,7 @@ const costDonutWidgetConfig: Partial<WidgetConfig> = {
         'filters.project_group',
         'filters.cost_product',
         'filters.region',
-        'cost_usage_type',
+        'filters.cost_usage_type',
     ]),
 };
 

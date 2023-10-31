@@ -31,7 +31,7 @@ const monthlyCostWidgetConfig: WidgetConfig = {
         'filters.region',
         'filters.project_group',
         'filters.cost_product',
-        'cost_usage_type',
+        'filters.cost_usage_type',
     ]),
 };
 

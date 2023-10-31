@@ -44,16 +44,16 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        { key: 'cost_data_field', name: 'Row Field' },
-        { key: 'cost_secondary_data_field', name: 'Column Field' },
+        ['cost_data_field', { name: 'Row Field' }],
+        ['cost_secondary_data_field', { name: 'Column Field' }],
         'cost_data_type',
-        { key: 'filters.cost_product', fixed: true },
+        ['filters.cost_product', { fixed: true }],
         'filters.provider',
         'filters.project',
         'filters.service_account',
         'filters.project_group',
         'filters.region',
-        'cost_usage_type',
+        'filters.cost_usage_type',
     ]),
 };
 

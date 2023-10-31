@@ -35,7 +35,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        { key: 'cost_data_field', readonly: true },
+        ['cost_data_field', { readonly: true }],
         'cost_data_type',
         'filters.provider',
         'filters.project',
@@ -43,7 +43,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
         'filters.region',
         'filters.project_group',
         'filters.cost_product',
-        'cost_usage_type',
+        'filters.cost_usage_type',
     ]),
 };
 
