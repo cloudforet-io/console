@@ -20,21 +20,20 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
+        cost_data_type: 'cost',
+        cost_data_field: 'additional_info.Usage Type Details',
         chart_type: CHART_TYPE.LINE,
         granularity: GRANULARITY.MONTHLY,
         legend_options: {
             enabled: true,
             show_at: 'table',
         },
-        selector_options: {
-            enabled: true,
-            type: 'cost-usage',
-        },
         pagination_options: {
             enabled: true,
             page_size: 5,
         },
         filters: {
+            // TODO: must be updated to string[] type
             cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
         },
     },
@@ -42,7 +41,7 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
         'cost_data_source',
         'cost_data_type',
         ['cost_data_field', { name: 'Data Field' }],
-        'filters.cost_product',
+        ['filters.cost_product', { fixed: true }],
         'filters.project',
         'filters.service_account',
         'filters.project_group',

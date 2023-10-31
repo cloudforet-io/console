@@ -204,7 +204,6 @@ const fetchData = async (): Promise<FullData|null> => {
             groupBy.push('usage_unit');
         }
 
-        console.debug('widgetState.options.cost_data_field', widgetState.options.cost_data_field);
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
