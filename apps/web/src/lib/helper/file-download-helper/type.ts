@@ -1,3 +1,5 @@
+import type { DynamicFieldOptions } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
+
 import type { Reference } from '@/lib/reference/type';
 
 interface Options {
@@ -11,7 +13,7 @@ export interface ExcelDataField {
     type?: 'datetime'|'enum'|'currency';
     enum_items?: any;
     reference?: Reference;
-    options?: Options;
+    options?: DynamicFieldOptions | Options;
 }
 
 interface HeaderMessage {
