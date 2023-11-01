@@ -62,7 +62,13 @@ const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandl
     if (widgetFormState.inheritOptions?.[schema.key]?.enabled) {
         return [getInheritOptionMenuHandler(schema)];
     }
-    return schema.item_options?.map((options) => getVariableModelMenuHandler(options)) ?? [];
+    return schema.item_options?.map((conf) => {
+        const options = {}; // e.g. data_source_id: 'ds-1'
+        Object.entries(schema.dependencies ?? {})?.forEach(([optionName, reference]) => {
+            options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
+        });
+        return getVariableModelMenuHandler(conf, options);
+    }) ?? [];
 };
 const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
     const widgetOptions = { ...widgetFormState.widgetOptions };

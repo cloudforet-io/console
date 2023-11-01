@@ -3,7 +3,7 @@ import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/d
 import type { VariableModelConfig } from '@/lib/variable-models/index';
 import { VariableModel } from '@/lib/variable-models/index';
 
-export const getVariableModelMenuHandler = (config: VariableModelConfig): AutocompleteHandler => {
+export const getVariableModelMenuHandler = (config: VariableModelConfig, options?: Record<string, any>): AutocompleteHandler => {
     const variableModel = new VariableModel(config);
     return async (inputText: string, pageStart, pageLimit, filters) => {
         const responses = await variableModel.list({
@@ -11,6 +11,7 @@ export const getVariableModelMenuHandler = (config: VariableModelConfig): Autoco
             limit: pageLimit ?? 10,
             search: inputText,
             filters: filters?.length ? filters.map((f) => f.name as string) : undefined,
+            options,
         });
         return {
             results: responses.results.map((result) => ({
