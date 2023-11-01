@@ -66,8 +66,8 @@ export function useWidgetState(props: WidgetProps) {
         granularity: computed(() => state.options?.granularity),
         chartType: computed<ChartType|undefined>(() => state.options?.chart_type),
         groupBy: computed(() => {
-            if (state.widgetConfig.labels?.includes('Cost')) return state.options?.cost_group_by;
-            if (state.widgetConfig.labels?.includes('Asset')) return state.options?.asset_group_by;
+            if (state.widgetConfig.labels?.includes('Cost')) return state.options?.cost_data_field;
+            if (state.widgetConfig.labels?.includes('Asset')) return state.options?.asset_data_field;
             return undefined;
         }),
         dateRange: computed<DateRange>(() => {

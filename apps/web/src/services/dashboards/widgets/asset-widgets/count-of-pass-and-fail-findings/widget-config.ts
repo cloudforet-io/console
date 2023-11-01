@@ -18,7 +18,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.YEARLY,
-        asset_group_by: ASSET_GROUP_BY.REGION,
+        asset_data_field: ASSET_GROUP_BY.REGION,
         pagination_options: {
             enabled: true,
             page_size: 8,

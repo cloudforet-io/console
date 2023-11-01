@@ -176,7 +176,7 @@ interface CostWidgetOptions extends BaseWidgetOptions {
 }
 interface AssetWidgetOptions extends BaseWidgetOptions {
     asset_query_set?: string;
-    asset_group_by?: AssetGroupBy | string;
+    asset_data_field?: AssetGroupBy | string;
 }
 export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 
