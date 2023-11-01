@@ -13,7 +13,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { CloudServiceExportParameter, ExportOption } from '@/models/export/index';
+import type { ExportParameter, ExportOption } from '@/models/export/index';
 import { QueryType } from '@/models/export/index';
 import { store } from '@/store';
 
@@ -23,7 +23,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/component-util/dynamic-layout';
-import { downloadExcelByUrl } from '@/lib/helper/file-download-helper';
+import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -231,17 +231,17 @@ const handleClickSet = () => {
     state.visibleSetFilterModal = true;
 };
 const handleExport = () => {
-    downloadExcelByUrl(async () => {
+    const excelExportFetcher = async () => {
         const excelPayloadList = await getExcelPayloadList();
-        const cloudServiceExcelExportParams:CloudServiceExportParameter = {
+        const cloudServiceExcelExportParams:ExportParameter = {
             options: [
                 getCloudServiceResourcesPayload(),
                 ...excelPayloadList,
             ],
         };
-        const data = await SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
-        return data.download_url;
-    });
+        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+    };
+    downloadExcelByExportFetcher(excelExportFetcher);
 };
 
 /* Init */

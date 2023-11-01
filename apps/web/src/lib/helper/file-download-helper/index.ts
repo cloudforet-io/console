@@ -3,6 +3,7 @@ import axios from 'axios';
 import { downloadByFileUrl } from '@cloudforet/core-lib/file-download';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ExportResponse } from '@/models/export';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -103,13 +104,13 @@ export const downloadExcel = async (payload: ExcelPayload[] | ExcelPayload): Pro
     }
 };
 
-export const downloadExcelByUrl = async (callback:() => Promise<string>) => {
+export const downloadExcelByExportFetcher = async (excelExportFetcher:() => Promise<ExportResponse>) => {
     const loadingMessageId = showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '');
-    let downloadUrl: string;
+    let exportResponse: ExportResponse;
     try {
-        downloadUrl = await callback();
-        if (downloadUrl) {
-            await downloadByFileUrl(downloadUrl);
+        exportResponse = await excelExportFetcher();
+        if (exportResponse) {
+            await downloadByFileUrl(exportResponse.download_url);
             setTimeout(() => {
                 showSuccessMessage(i18n.t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS'), '');
             }, 500);
