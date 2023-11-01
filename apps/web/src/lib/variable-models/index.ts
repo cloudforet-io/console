@@ -51,8 +51,8 @@ export class VariableModel implements IBaseVariableModel {
         return this.#type;
     }
 
-    async list(options: ListQuery = {}): Promise<ListResponse> {
-        return this.#model.list(options);
+    async list(query: ListQuery = {}): Promise<ListResponse> {
+        return this.#model.list(query);
     }
 }
 

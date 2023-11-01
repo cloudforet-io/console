@@ -3,7 +3,7 @@ export interface IBaseVariableModel {
     key: string;
     name: string;
     labels: VariableModelLabel[];
-    list(options?: ListQuery): Promise<ListResponse>;
+    list(query?: ListQuery): Promise<ListResponse>;
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];
