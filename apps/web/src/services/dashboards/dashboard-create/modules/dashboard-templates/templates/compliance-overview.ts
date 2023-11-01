@@ -11,19 +11,19 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['countOfPassAndFailFindings', {
         title: 'Count of Pass and Fail Findings by Region',
         widget_options: {
-            asset_group_by: ASSET_GROUP_BY.REGION,
+            asset_data_field: ASSET_GROUP_BY.REGION,
         },
     }],
     ['countOfFailFindings', {
         title: 'Count of Fail Findings by Service',
         widget_options: {
-            asset_group_by: ASSET_GROUP_BY.SERVICE,
+            asset_data_field: ASSET_GROUP_BY.SERVICE,
         },
     }],
     ['trendOfPassAndFailFindings', {
         title: 'Trend of Pass and Fail Findings by Service',
         widget_options: {
-            asset_group_by: ASSET_GROUP_BY.SERVICE,
+            asset_data_field: ASSET_GROUP_BY.SERVICE,
         },
     }],
     ['severityStatusByService'],
