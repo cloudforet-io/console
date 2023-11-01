@@ -9,7 +9,6 @@
         <template #body="{item, close}">
             <div class="alert-contents"
                  :class="item.type"
-                 @click="close"
             >
                 <div class="icon-wrapper">
                     <p-i v-if="item.type === 'success'"
@@ -52,6 +51,7 @@
                          width="1.5rem"
                          height="1.5rem"
                          color="inherit"
+                         @click="close"
                     />
                 </div>
             </div>
@@ -76,10 +76,10 @@ import { safe } from '@/styles/colors.cjs';
  * https://www.npmjs.com/package/vue-notification
  */
 
-interface NoticeAlertProps {
+interface ToastAlertProps {
     group: ToastGroup;
 }
-const props = withDefaults(defineProps<NoticeAlertProps>(), {
+const props = withDefaults(defineProps<ToastAlertProps>(), {
     group: TOAST_GROUP.toastTopCenter,
 });
 const state = reactive({
