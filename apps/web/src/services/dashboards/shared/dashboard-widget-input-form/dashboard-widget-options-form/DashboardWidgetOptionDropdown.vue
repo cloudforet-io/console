@@ -51,7 +51,6 @@ const state = reactive({
 const handleUpdateVisibleMenu = (visible: boolean) => {
     if (state.showErrorMessage || !visible) return;
     state.showErrorMessage = true;
-    console.debug('handleUpdateVisible', visible);
 };
 const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     emit('update:selected', selected);
@@ -59,7 +58,6 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
 
 
 watch(() => props.inherit, () => {
-    console.debug('inherit changed', props.inherit);
     state.showErrorMessage = false;
 });
 
@@ -86,7 +84,7 @@ watch(() => props.inherit, () => {
             <div class="select-form-wrapper">
                 <p-select-dropdown use-fixed-menu-style
                                    :is-filterable="!props.inherit"
-                                   :multi-selectable="props.selectionType === 'multi'"
+                                   :multi-selectable="props.selectionType === 'MULTI'"
                                    :handler="props.menuHandlers"
                                    :selected="props.selected"
                                    :invalid="!!state.errorMessage"

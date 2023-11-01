@@ -10,6 +10,7 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { get } from 'lodash';
 
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
@@ -17,10 +18,8 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import {
-    getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import type {
+    WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
@@ -36,8 +35,11 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    properties: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(widgetFormStore.widgetConfig?.options_schema?.properties ?? {})),
-    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(state.properties)),
+    properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? {}),
+    propertySchemaTuples: computed<[propertyName: string, schema: WidgetOptionsSchemaProperty][]>(() => {
+        const schemaProperties = widgetFormState.schemaProperties.filter((propertyName) => !!state.properties[propertyName]);
+        return schemaProperties.map((propertyName) => [propertyName, state.properties[propertyName]]);
+    }),
     selectedList: [] as SelectDropdownMenuItem[][],
 });
 
@@ -60,7 +62,13 @@ const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandl
     if (widgetFormState.inheritOptions?.[schema.key]?.enabled) {
         return [getInheritOptionMenuHandler(schema)];
     }
-    return schema.item_options?.map((options) => getVariableModelMenuHandler(options)) ?? [];
+    return schema.item_options?.map((conf) => {
+        const options = {}; // e.g. data_source_id: 'ds-1'
+        Object.entries(schema.dependencies ?? {})?.forEach(([optionName, reference]) => {
+            options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
+        });
+        return getVariableModelMenuHandler(conf, options);
+    }) ?? [];
 };
 const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
     const widgetOptions = { ...widgetFormState.widgetOptions };
@@ -92,8 +100,8 @@ const handleReturnToInitialSettings = () => {
 const handleUpdateSelected = (index: number, selected: SelectDropdownMenuItem[]) => {
     state.selectedList.splice(index, 1, selected);
 
-    const propertyName = state.propertySchemaList[index].key;
-    const isInherit = !!widgetFormState.inheritOptions?.[state.propertySchemaList[index].key]?.enabled;
+    const propertyName = state.propertySchemaTuples[index][0];
+    const isInherit = !!widgetFormState.inheritOptions?.[propertyName]?.enabled;
     if (isInherit) {
         widgetFormStore.updateInheritOption(propertyName, true, selected[0]?.name);
         updateWidgetOptionsBySelected(propertyName);
@@ -103,10 +111,9 @@ const handleUpdateSelected = (index: number, selected: SelectDropdownMenuItem[])
     }
 };
 const handleUpdateInherit = (index: number, isInherit: boolean) => {
-    console.debug('handleUpdateInherit', index, isInherit);
     state.selectedList.splice(index, 1, []);
 
-    const propertyName = state.propertySchemaList[index].key;
+    const propertyName = state.propertySchemaTuples[index][0];
     if (isInherit) {
         widgetFormStore.updateInheritOption(propertyName, true);
         updateWidgetOptionsBySelected(propertyName);
@@ -122,17 +129,40 @@ const handleDeleteProperty = (propertyName: string) => {
 
 /* Init */
 const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] => {
-    const isInherit = !!widgetFormState.inheritOptions?.[propertyName]?.enabled;
-    if (isInherit) {
-        const variableKey = getVariableKeyFromWidgetSchemaProperty(propertyName);
-        const variableSchema = props.variablesSchema?.properties?.[variableKey];
-        if (variableSchema?.use) {
-            return [{ name: variableKey, label: variableSchema.name }];
+    const inheritOption = widgetFormStore.inheritOptions?.[propertyName];
+    const optionSchema = state.properties[propertyName];
+
+    // inherit case
+    if (inheritOption?.enabled) {
+        const variableKey = inheritOption.variable_key;
+        if (variableKey) {
+            const variableSchema = props.variablesSchema?.properties?.[variableKey];
+            if (variableSchema?.use) {
+                return [{ name: variableKey, label: variableSchema.name }];
+            }
         }
+
+        // TODO: implement no variable_key or not used case
+        return [];
     }
-    const selected = widgetFormState.widgetOptions[propertyName];
+
+    const selected = get(widgetFormState.widgetOptions, propertyName);
+    console.debug('selected', selected);
     if (Array.isArray(selected)) {
-        return selected.map((item: string) => ({ name: item }));
+        let values = selected.map((item) => {
+            if (typeof item === 'string') {
+                return { name: item };
+            }
+            // TODO: remove after updating filter type
+            return Array.isArray(item.v) ? item.v.map((v) => ({ name: v })) : { name: item.v };
+        });
+        if (Array.isArray(values[0])) values = values.flat();
+
+        if (!optionSchema.optional) {
+            // TODO: init validation state
+        }
+
+        return values;
     } if (typeof selected !== 'object') {
         return [{ name: selected }];
     }
@@ -140,7 +170,7 @@ const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] =
 
     return [];
 };
-state.selectedList = state.propertySchemaList.map((schema) => initSelectedMenuItems(schema.key));
+state.selectedList = state.propertySchemaTuples.map(([propertyName]) => initSelectedMenuItems(propertyName));
 
 </script>
 
@@ -155,19 +185,19 @@ state.selectedList = state.propertySchemaList.map((schema) => initSelectedMenuIt
         >
             {{ $t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
         </p-text-button>
-        <dashboard-widget-option-dropdown v-for="(schema, i) in state.propertySchemaList"
-                                          :key="schema.key"
-                                          :label="schema.name ?? schema.key"
+        <dashboard-widget-option-dropdown v-for="([propertyName, schema], i) in state.propertySchemaTuples"
+                                          :key="propertyName"
+                                          :label="schema.name ?? propertyName"
                                           :selected="state.selectedList[i]"
                                           :selection-type="schema.selection_type"
-                                          :inherit="widgetFormState.inheritOptions?.[schema.key]?.enabled"
+                                          :inherit="widgetFormState.inheritOptions?.[propertyName]?.enabled"
                                           :inheritance-mode="schema.inheritance_mode"
                                           :deletable="!schema.fixed"
                                           :menu-handlers="getMenuHandlers(schema)"
                                           :variables-schema="props.variablesSchema"
                                           @update:selected="handleUpdateSelected(i, $event)"
                                           @update:inherit="handleUpdateInherit(i, $event)"
-                                          @delete="handleDeleteProperty(schema.key)"
+                                          @delete="handleDeleteProperty(propertyName)"
         />
     </p-data-loader>
 </template>

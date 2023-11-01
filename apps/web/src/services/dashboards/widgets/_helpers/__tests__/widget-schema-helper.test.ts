@@ -1,109 +1,188 @@
 import { describe, expect, it } from 'vitest';
 
-// import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-// import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
-// import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
+import type { WidgetConfig, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import {
+    getInitialSchemaProperties,
+    getRefinedSchemaProperties,
+} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
-
-// const widgetConfigMock: WidgetConfig = {
-//     widget_config_id: 'test',
-//     scopes: ['DOMAIN', 'PROJECT', 'WORKSPACE'],
-//     sizes: ['sm'],
-//     options_schema: [],
-//     // options_schema: {
-//     //     fixed_properties: ['filters.provider'],
-//     //     schema: {
-//     //         type: 'object',
-//     //         properties: {
-//     //             'filters.provider': getWidgetFilterOptionsSchema('provider'),
-//     //             'filters.project': getWidgetFilterOptionsSchema('project'),
-//     //             'filters.service_account': getWidgetFilterOptionsSchema('service_account'),
-//     //             'filters.region': getWidgetFilterOptionsSchema('region'),
-//     //             'filters.cost_product': getWidgetFilterOptionsSchema('cost_product'),
-//     //         },
-//     //         order: ['filters.project', 'filters.cost_product', 'filters.service_account', 'filters.region'],
-//     //     },
-//     // },
-// };
-// const variablesSchemaMock: DashboardVariablesSchema = {
-//     properties: {
-//         project: {
-//             ...MANAGED_DASH_VAR_SCHEMA.properties.project,
-//             use: true,
-//         },
-//         service_account: {
-//             ...MANAGED_DASH_VAR_SCHEMA.properties.service_account,
-//             use: true,
-//         },
-//     },
-//     order: ['project', 'service_account'],
-// };
+const DEFAULT_WIDGET_CONFIG = {
+    widget_config_id: 'test',
+    scopes: ['DOMAIN', 'PROJECT', 'WORKSPACE'],
+    sizes: ['sm'],
+} as WidgetConfig;
+const DEFAULT_VARIABLE_PROPERTY = {
+    name: 'Test',
+    variable_type: 'MANAGED',
+    selection_type: 'SINGLE',
+} as DashboardVariableSchemaProperty;
 
 describe('[Widget Schema Helper] getInitialSchemaProperties', () => {
-    it('test', () => {
-        expect(true).toBe(true);
-    });
-    // TODO: update
     // used variables
-    // it('should include used variables', () => {
-    //     const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchemaMock);
-    //     expect(refined).toEqual(expect.arrayContaining(['filters.project', 'filters.service_account']));
-    // });
-    // it('should not include unused variables', () => {
-    //     const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchemaMock);
-    //     expect(refined).not.toEqual(expect.arrayContaining(['filters.cost_product', 'filters.region']));
-    // });
-    // it('should not include used variables if it is not in widget config schema properties', () => {
-    //     const variablesSchema = cloneDeep(variablesSchemaMock);
-    //     variablesSchema.properties.abc = { ...MANAGED_DASH_VAR_SCHEMA.properties.project, use: true };
-    //
-    //     const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchema);
-    //     expect(refined).not.toEqual(expect.arrayContaining(['filters.abc']));
-    // });
-    // // fixed properties
-    // it('should include fixed properties', () => {
-    //     const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchemaMock);
-    //     expect(refined).toEqual(expect.arrayContaining(['filters.provider']));
-    // });
+    it('should include used variables only', () => {
+        const widgetConfig = {
+            ...DEFAULT_WIDGET_CONFIG,
+            options_schema: {
+                properties: {
+                    'filters.provider': {
+                        key: 'provider',
+                    },
+                    'filters.service_account': {
+                        key: 'service_account',
+                    },
+                    'filters.region': {
+                        key: 'region',
+                    },
+                },
+                order: [],
+            },
+        };
+        const variablesSchema = {
+            properties: {
+                provider: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+                service_account: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+                region: { ...DEFAULT_VARIABLE_PROPERTY, use: false },
+            },
+            order: [],
+        };
+        const refined = getInitialSchemaProperties(widgetConfig, variablesSchema);
+        expect(refined).toEqual(expect.arrayContaining(['filters.provider', 'filters.service_account']));
+        expect(refined).not.toEqual(expect.arrayContaining(['filters.region']));
+    });
+    it('should not include properties if it is not in widget config schema properties even if it is used variable', () => {
+        const widgetConfig = {
+            ...DEFAULT_WIDGET_CONFIG,
+            options_schema: {
+                properties: {
+                    'filters.provider': {
+                        key: 'provider',
+                    },
+                },
+                order: [],
+            },
+        };
+        const variablesSchema = {
+            properties: {
+                provider: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+                service_account: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+            },
+            order: [],
+        };
+
+        const refined = getInitialSchemaProperties(widgetConfig, variablesSchema);
+        expect(refined).not.toEqual(expect.arrayContaining(['filters.service_account']));
+    });
+    // fixed properties
+    it('should include fixed properties even if it is not used variables schema', () => {
+        const widgetConfig = {
+            ...DEFAULT_WIDGET_CONFIG,
+            options_schema: {
+                properties: {
+                    'filters.provider': {
+                        key: 'provider',
+                        fixed: true,
+                    },
+                },
+                order: [],
+            },
+        };
+        const variablesSchema = {
+            properties: {
+                provider: { ...DEFAULT_VARIABLE_PROPERTY, use: false },
+            },
+            order: [],
+        };
+        const refined = getInitialSchemaProperties(widgetConfig, variablesSchema);
+        expect(refined).toEqual(expect.arrayContaining(['filters.provider']));
+    });
     // // ordering
-    // it('should be ordered by schema.order', () => {
-    //     const widgetConfig = cloneDeep(widgetConfigMock);
-    //     if (widgetConfig.options_schema) widgetConfig.options_schema.fixed_properties = undefined;
-    //
-    //     const refined = getInitialSchemaProperties(widgetConfig, variablesSchemaMock);
-    //     expect(refined).toEqual(['filters.project', 'filters.service_account']);
-    // });
-    // it('should be ordered by schema.order and fixed properties', () => {
-    //     const refined = getInitialSchemaProperties(widgetConfigMock, variablesSchemaMock);
-    //     expect(refined).toEqual(['filters.provider', 'filters.project', 'filters.service_account']);
-    // });
+    it('should be ordered by order if there is no fixed property', () => {
+        const widgetConfig = {
+            ...DEFAULT_WIDGET_CONFIG,
+            options_schema: {
+                properties: {
+                    'filters.provider': {
+                        key: 'provider',
+                    },
+                    'filters.service_account': {
+                        key: 'service_account',
+                    },
+                    'filters.region': {
+                        key: 'region',
+                    },
+                },
+                order: ['filters.service_account', 'filters.provider', 'filters.region'],
+            },
+        };
+        const variablesSchema = {
+            properties: {
+                provider: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+                service_account: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+                region: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+            },
+            order: [],
+        };
+        const refined = getInitialSchemaProperties(widgetConfig, variablesSchema);
+        expect(refined).toEqual(['filters.service_account', 'filters.provider', 'filters.region']);
+    });
+    it('should be ordered by schema.order but fixed properties have higher priority', () => {
+        const widgetConfig = {
+            ...DEFAULT_WIDGET_CONFIG,
+            options_schema: {
+                properties: {
+                    'filters.provider': {
+                        key: 'provider',
+                    },
+                    'filters.service_account': {
+                        key: 'service_account',
+                    },
+                    'filters.region': {
+                        key: 'region',
+                        fixed: true,
+                    },
+                },
+                order: ['filters.service_account', 'filters.provider', 'filters.region'],
+            },
+        };
+        const variablesSchema = {
+            properties: {
+                provider: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+                service_account: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+                region: { ...DEFAULT_VARIABLE_PROPERTY, use: true },
+            },
+            order: [],
+        };
+        const refined = getInitialSchemaProperties(widgetConfig, variablesSchema);
+        expect(refined).toEqual(['filters.region', 'filters.service_account', 'filters.provider']);
+    });
 });
 
 
-// describe('[Widget Schema Helper] getRefinedSchemaProperties', () => {
-// it('should be the same as initial schema properties if stored properties are empty', () => {
-//     const initialProperties = ['filters.provider', 'filters.project', 'filters.service_account'];
-//     const storedProperties = [];
-//     const widgetOptions = {};
-//     const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
-//     expect(refined).toEqual(['filters.provider', 'filters.project', 'filters.service_account']);
-// });
-// it('should be not exist if the value is not set in widget options and it is not in initial schema properties even if it is in stored properties', () => {
-//     const initialProperties = ['filters.project', 'filters.service_account'];
-//     const storedProperties = ['filters.provider'];
-//     const widgetOptions = {};
-//     const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
-//     expect(refined).toEqual(['filters.project', 'filters.service_account']);
-// });
-// it('should be exist if the value is set in widget options, stored properties even if it is not in initial schema properties.', () => {
-//     const initialProperties = ['filters.project', 'filters.service_account'];
-//     const storedProperties = ['filters.provider'];
-//     const widgetOptions: WidgetOptions = {
-//         filters: {
-//             provider: [{ k: 'provider', v: 'aws' }],
-//         },
-//     };
-//     const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
-//     expect(refined).toEqual(['filters.project', 'filters.service_account', 'filters.provider']);
-// });
-// });
+describe('[Widget Schema Helper] getRefinedSchemaProperties', () => {
+    it('should be the same as initial schema properties if stored properties are empty', () => {
+        const initialProperties = ['filters.provider', 'filters.project', 'filters.service_account'];
+        const storedProperties = [];
+        const widgetOptions = {};
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
+        expect(refined).toEqual(['filters.provider', 'filters.project', 'filters.service_account']);
+    });
+    it('should be not exist if the value is not set in widget options and it is not in initial schema properties even if it is in stored properties', () => {
+        const initialProperties = ['filters.project', 'filters.service_account'];
+        const storedProperties = ['filters.provider'];
+        const widgetOptions = {};
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
+        expect(refined).toEqual(['filters.project', 'filters.service_account']);
+    });
+    it('should be exist if the value is set in widget options, stored properties even if it is not in initial schema properties.', () => {
+        const initialProperties = ['filters.project', 'filters.service_account'];
+        const storedProperties = ['filters.provider'];
+        const widgetOptions: WidgetOptions = {
+            filters: {
+                provider: [{ k: 'provider', v: 'aws' }],
+            },
+        };
+        const refined = getRefinedSchemaProperties(storedProperties, initialProperties, widgetOptions);
+        expect(refined).toEqual(['filters.project', 'filters.service_account', 'filters.provider']);
+    });
+});
