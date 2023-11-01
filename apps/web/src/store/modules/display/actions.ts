@@ -9,13 +9,11 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import {
-    SIDEBAR_TYPE,
-} from '@/store/modules/display/config';
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type { DisplayState } from '@/store/modules/display/type';
 
 import {
-    hideLoadingMessage, showLoadingMessage, showSuccessMessage,
+    hideLoadingMessageByGroup, showLoadingMessage, showSuccessMessage,
 } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -58,7 +56,7 @@ export const startLoading = ({ state, commit }, { loadingMessage }: StartLoading
 interface FinishLoadingPayload { successMessage?: string}
 export const finishLoading = ({ commit }, { successMessage }: FinishLoadingPayload = {}): void => {
     commit('setIsLoading', false);
-    hideLoadingMessage();
+    hideLoadingMessageByGroup();
     if (successMessage) {
         setTimeout(() => {
             showSuccessMessage(successMessage, '');
