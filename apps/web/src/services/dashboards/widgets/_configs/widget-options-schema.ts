@@ -160,7 +160,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, W
     cost_data_field: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key,
         name: 'Data Field (Cost)',
-        selection_type: 'MULTI',
+        selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
@@ -173,7 +173,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, W
     cost_secondary_data_field: {
         key: 'cost_secondary_data_field',
         name: 'Data Field (Cost)',
-        selection_type: 'MULTI',
+        selection_type: 'SINGLE',
         readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
@@ -187,7 +187,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, W
     cloud_service_query_set: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
         name: 'Compliance Framework',
-        selection_type: 'MULTI',
+        selection_type: 'SINGLE',
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
