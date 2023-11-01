@@ -87,6 +87,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -175,6 +176,7 @@ export default defineComponent({
             isSelected: computed(() => rolePageState.selectedIndices.length > 0),
             tags: roleListApiQueryHelper.setKeyItemSets(roleSearchHandler.keyItemSets).queryTags,
             sortBy: 'name',
+            timezone: computed(() => store.state.user.timezone ?? 'UTC'),
         });
         let roleListApiQuery = roleListApiQueryHelper.data;
 
@@ -208,13 +210,14 @@ export default defineComponent({
         };
         const handleExport = async () => {
             try {
-                await store.dispatch('file/downloadExcel', {
+                await downloadExcel({
                     url: '/identity/role/list',
                     param: {
                         query: roleListApiQueryHelper.data,
                     },
                     fields: state.excelFields,
                     file_name_prefix: FILE_NAME_PREFIX.role,
+                    timezone: state.timezone,
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);

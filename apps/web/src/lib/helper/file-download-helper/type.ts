@@ -21,8 +21,8 @@ interface HeaderMessage {
 }
 
 export interface ExcelPayload {
-    url: string;
-    param: any;
+    url?: string;
+    param?: any;
     data?: any[];
     fields: ExcelDataField[];
     sheet_name?: string;

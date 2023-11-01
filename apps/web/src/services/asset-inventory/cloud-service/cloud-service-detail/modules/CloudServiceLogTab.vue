@@ -93,6 +93,7 @@ import { i18n } from '@/translations';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -159,6 +160,7 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone ?? 'UTC'),
             schemaLoading: true,
             loading: true,
             searchText: '',
@@ -321,7 +323,7 @@ export default defineComponent<Props>({
             async export() {
                 const fields = state.currentLayout?.options?.fields;
                 if (!fields) return;
-                await store.dispatch('file/downloadExcel', {
+                await downloadExcel({
                     url: '/monitoring/log/list',
                     param: {
                         data_source_id: state.activeTab,
@@ -333,6 +335,7 @@ export default defineComponent<Props>({
                     },
                     fields: dynamicFieldsToExcelDataFields(fields),
                     file_name_prefix: FILE_NAME_PREFIX.cloudServiceLog,
+                    timezone: state.timezone,
                 });
             },
         };

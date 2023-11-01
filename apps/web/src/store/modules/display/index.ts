@@ -9,7 +9,6 @@ const state: DisplayState = {
     visibleSidebar: false,
     sidebarType: SIDEBAR_TYPE.info,
     isInitialized: false,
-    isLoading: false,
     uncheckedNotificationCount: 0,
     isSignInFailed: false,
     visibleMobileGuideModal: false,
