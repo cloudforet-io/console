@@ -45,6 +45,18 @@ const state = reactive({
     variableModelMap: {} as Record<string, IBaseVariableModel>,
 });
 
+const _getVariableModel = (conf: VariableModelConfig): IBaseVariableModel => {
+    let variableModel: IBaseVariableModel;
+    // get variableModel from variableModelMap or create new one
+    const managedVariableModelKey: string|undefined = get(conf, 'key');
+    if (managedVariableModelKey) {
+        variableModel = state.variableModelMap[managedVariableModelKey] ?? new VariableModel(conf);
+        state.variableModelMap[managedVariableModelKey] = variableModel;
+    } else {
+        variableModel = new VariableModel(conf);
+    }
+    return variableModel;
+};
 const getInheritOptionMenuHandler = (schema: WidgetOptionsSchemaProperty): AutocompleteHandler => {
     const selectableVariableMenuItems: {name: string; label: string;}[] = [];
     Object.entries(props.variablesSchema?.properties ?? {}).forEach(([propertyName, property]) => {
@@ -65,15 +77,7 @@ const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandl
         return [getInheritOptionMenuHandler(schema)];
     }
     return schema.item_options?.map((conf: VariableModelConfig) => {
-        let variableModel: IBaseVariableModel;
-        // get variableModel from variableModelMap or create new one
-        const managedVariableModelKey: string|undefined = get(conf, 'key');
-        if (managedVariableModelKey) {
-            variableModel = state.variableModelMap[managedVariableModelKey] ?? new VariableModel(conf);
-            state.variableModelMap[managedVariableModelKey] = variableModel;
-        } else {
-            variableModel = new VariableModel(conf);
-        }
+        const variableModel = _getVariableModel(conf);
         const options = {}; // e.g. { data_source_id: 'ds-1' }
         Object.entries(schema.dependencies ?? {})?.forEach(([optionName, reference]) => {
             options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
