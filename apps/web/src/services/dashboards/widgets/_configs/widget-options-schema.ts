@@ -164,7 +164,9 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, W
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
         ],
         dependencies: {
             cost_data_source: { reference_key: 'data_source_id' },
