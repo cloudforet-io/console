@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 
 import {
@@ -12,7 +11,8 @@ import type {
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { get } from 'lodash';
 
-import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
+import { VariableModel } from '@/lib/variable-models';
+import type { IBaseVariableModel } from '@/lib/variable-models/_base/types';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
@@ -63,11 +63,8 @@ const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandl
         return [getInheritOptionMenuHandler(schema)];
     }
     return schema.item_options?.map((conf) => {
-        const options = {}; // e.g. data_source_id: 'ds-1'
-        Object.entries(schema.dependencies ?? {})?.forEach(([optionName, reference]) => {
-            options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
-        });
-        return getVariableModelMenuHandler(conf, options);
+        const variableModel = new VariableModel(conf);
+        return getVariableModelMenuHandler(variableModel);
     }) ?? [];
 };
 const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
@@ -90,6 +87,21 @@ const updateSchemaProperties = (propertyName: string) => {
         schemaProperties.splice(index, 1);
     }
     widgetFormStore.$patch({ schemaProperties });
+};
+const getVariableModelMenuHandler = (variableModel: IBaseVariableModel): AutocompleteHandler => async (inputText: string, pageStart, pageLimit, filters) => {
+    const responses = await variableModel.list({
+        start: pageStart,
+        limit: pageLimit ?? 10,
+        search: inputText,
+        filters: filters?.length ? filters.map((f) => f.name as string) : undefined,
+        options: widgetFormState.widgetOptions,
+    });
+    return {
+        results: responses.results.map((result) => ({
+            name: result.key, label: result.name,
+        })),
+        more: responses.more,
+    };
 };
 
 /* event handlers */
