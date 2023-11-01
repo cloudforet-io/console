@@ -28,7 +28,7 @@ const totalFailFindingsHistoryWidgetConfig: WidgetConfig = {
         // 'filters.service_account', HACK: Re-enable it after backend is ready
         'filters.provider',
         'filters.region',
-        'asset_account',
+        'filters.asset_account',
     ]),
 };
 

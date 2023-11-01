@@ -148,7 +148,7 @@ const checkRefreshableByDashboardVariables = (
     let _refresh = false;
     Object.values(inheritOptions).forEach((inheritOption) => {
         if (_refresh) return;
-        const _variableKey = inheritOption.variable_info?.key ?? '';
+        const _variableKey = inheritOption.variable_key ?? '';
         const _after = after?.[_variableKey];
         const _before = before?.[_variableKey];
         if (!_variableKey || (!_after && !_before)) return;

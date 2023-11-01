@@ -11,6 +11,11 @@ import { ASSET_GROUP_BY_ITEM_MAP, COST_GROUP_BY_ITEM_MAP } from '@/services/dash
  */
 export type InheritanceMode = 'NONE'|'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
 
+type WidgetOptionPropertyDependency = Partial<{
+    [property in WidgetOptionKey]: { // e.g. 'cost_data_source'
+        reference_key: string; // e.g. 'data_source_id'
+    }
+}>;
 export interface WidgetOptionsSchemaProperty {
     key: string; // e.g. cost_data_source
     name?: string; // e.g. Data Source
@@ -20,11 +25,7 @@ export interface WidgetOptionsSchemaProperty {
     optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
-    dependencies?: {
-        [property: string]: { // e.g. 'cost_data_source'
-            reference_key: string; // e.g. 'data_source_id'
-        }
-    };
+    dependencies?: WidgetOptionPropertyDependency;
 }
 export type WidgetOptionsSchema = {
     properties: Record<string, WidgetOptionsSchemaProperty>;
@@ -32,18 +33,18 @@ export type WidgetOptionsSchema = {
 };
 
 const WIDGET_OPTION_KEYS = {
-    // option
+    // cost option keys
     cost_data_source: 'cost_data_source',
     cost_data_type: 'cost_data_type',
-    asset_account: 'asset_account',
-    cost_usage_type: 'cost_usage_type',
-    cloud_service_query_set: 'cloud_service_query_set',
-
     cost_data_field: 'cost_data_field',
     cost_secondary_data_field: 'cost_secondary_data_field',
+    // asset option keys
+    cloud_service_query_set: 'cloud_service_query_set',
     asset_data_field: 'asset_data_field',
     asset_secondary_data_field: 'asset_secondary_data_field',
     // option filters
+    'filters.asset_account': 'asset_account',
+    'filters.cost_usage_type': 'cost_usage_type',
     'filters.provider': 'filters.provider',
     'filters.project': 'filters.project',
     'filters.service_account': 'filters.service_account',
@@ -54,9 +55,9 @@ const WIDGET_OPTION_KEYS = {
     'filters.cost_additional_info_value': 'filters.cost_additional_info_value',
 } as const;
 
-type widgetOptionKey = keyof typeof WIDGET_OPTION_KEYS;
+type WidgetOptionKey = keyof typeof WIDGET_OPTION_KEYS;
 
-export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, WidgetOptionsSchemaProperty>> = {
+export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>> = {
     'filters.provider': {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
@@ -123,9 +124,17 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
     },
+    'filters.cost_usage_type': {
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key,
+        name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.name,
+        selection_type: 'MULTI',
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key },
+        ],
+    },
 };
 
-export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, WidgetOptionsSchemaProperty>> = {
+export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>> = {
     cost_data_source: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
@@ -142,10 +151,10 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key },
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_data_type.key },
         ],
         dependencies: {
-            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+            cost_data_source: { reference_key: 'data_source_id' },
         },
     },
     cost_data_field: {
@@ -158,7 +167,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
             { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
         dependencies: {
-            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+            cost_data_source: { reference_key: 'data_source_id' },
         },
     },
     cost_secondary_data_field: {
@@ -172,11 +181,10 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
             { type: 'ENUM', values: Object.entries(COST_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
         dependencies: {
-            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+            cost_data_source: { reference_key: 'data_source_id' },
         },
     },
     cloud_service_query_set: {
-        // TODO: add conversion code for key changing from asset_query_set to cloud_service_query_set
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
         name: 'Compliance Framework',
         selection_type: 'MULTI',
@@ -186,7 +194,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
         ],
     },
     //
-    asset_account: {
+    'filters.asset_account': {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
         selection_type: 'MULTI',
@@ -204,7 +212,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
             { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
         dependencies: {
-            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+            cost_data_source: { reference_key: 'data_source_id' },
         },
     },
     asset_secondary_data_field: {
@@ -218,55 +226,47 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<widgetOptionKey, W
             { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
         dependencies: {
-            [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+            cost_data_source: { reference_key: 'data_source_id' },
         },
     },
-    // TODO: update
-    // {
-    //     key: getWidgetFilterKey(MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.type),
-    //     name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.name,
-    //     selection_type: 'MULTI',
-    //     item_options: [
-    //         { type: 'SEARCH_RESOURCE', resource_type: 'cost_analysis.Cost', reference_key: COST_VARIABLE_TYPE_INFO.cost_usage_type.key },
-    //     ],
-    // },
 };
 
-export const getWidgetOptionsSchema = (options: (string|WidgetOptionsSchemaProperty)[]): WidgetOptionsSchema => {
-    const properties: Record<string, WidgetOptionsSchemaProperty> = {};
+type CustomOptionTuple = [WidgetOptionKey, Partial<WidgetOptionsSchemaProperty>];
+export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTuple)[]): WidgetOptionsSchema => {
+    const properties = {} as Record<WidgetOptionKey, WidgetOptionsSchemaProperty>;
     const order: string[] = [];
 
     options.forEach((option) => {
-        const optionName = typeof option === 'string' ? option : option.key;
+        const optionName = typeof option === 'string' ? option : option[0];
 
         if (WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName]) {
-            properties[optionName] = WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName];
+            properties[optionName] = WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName] as WidgetOptionsSchemaProperty;
         } else if (WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName]) {
             const filterProperty = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName];
             if (properties.cost_data_source) {
                 properties[optionName] = {
                     ...filterProperty,
                     dependencies: {
-                        [MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]: { reference_key: 'data_source_id' },
+                        cost_data_source: { reference_key: 'data_source_id' },
                     },
-                };
+                } as WidgetOptionsSchemaProperty;
             } else {
-                properties[optionName] = filterProperty;
+                properties[optionName] = filterProperty as WidgetOptionsSchemaProperty;
             }
         } else {
-            console.error(`No matched filter option schema for ${optionName}`);
+            console.error(new Error(`No matched option schema for ${optionName}`));
         }
 
-        if (typeof option !== 'string') {
+        if (Array.isArray(option) && option[1]) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { key: _, ...additionalProperties } = option;
+            const { key: _, ...additionalProperties } = option[1];
 
             const defaultProperties = {
                 ...properties[optionName],
                 ...additionalProperties,
             };
 
-            if (!option.readonly) {
+            if (!option[1].readonly) {
                 properties[optionName] = defaultProperties;
             } else {
                 properties[optionName] = {
@@ -274,7 +274,7 @@ export const getWidgetOptionsSchema = (options: (string|WidgetOptionsSchemaPrope
                     item_options: undefined,
                 };
             }
-        }
+        } else if (typeof option !== 'string') console.error(new Error(`Wrong format of argument ${option}`));
 
         order.push(optionName);
     });

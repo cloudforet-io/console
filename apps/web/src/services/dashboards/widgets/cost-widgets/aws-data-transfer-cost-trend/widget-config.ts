@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
@@ -20,28 +20,28 @@ const awsDataTransferCostTrendWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
+        cost_data_type: 'cost',
+        cost_data_field: 'additional_info.Usage Type Details',
         chart_type: CHART_TYPE.LINE,
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: COST_GROUP_BY.USAGE_TYPE,
         legend_options: {
             enabled: true,
             show_at: 'table',
-        },
-        selector_options: {
-            enabled: true,
-            type: 'cost-usage',
         },
         pagination_options: {
             enabled: true,
             page_size: 5,
         },
         filters: {
+            // TODO: must be updated to string[] type
             cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
         },
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
-        { key: 'filters.cost_product', fixed: true },
+        'cost_data_type',
+        ['cost_data_field', { name: 'Data Field' }],
+        ['filters.cost_product', { fixed: true }],
         'filters.project',
         'filters.service_account',
         'filters.project_group',

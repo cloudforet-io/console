@@ -36,7 +36,8 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? []),
+    properties: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(widgetFormStore.widgetConfig?.options_schema?.properties ?? {})),
+    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(state.properties)),
     selectedList: [] as SelectDropdownMenuItem[][],
 });
 
@@ -64,7 +65,11 @@ const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandl
 const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
     const widgetOptions = { ...widgetFormState.widgetOptions };
     if (selected?.length) {
-        widgetOptions[propertyName] = selected.map((item) => item.name);
+        if (state.properties[propertyName].selection_type === 'SINGLE') {
+            widgetOptions[propertyName] = selected[0].name;
+        } else {
+            widgetOptions[propertyName] = selected.map((item) => item.name);
+        }
     } else {
         delete widgetOptions[propertyName];
     }
@@ -126,9 +131,13 @@ const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] =
         }
     }
     const selected = widgetFormState.widgetOptions[propertyName];
-    if (selected) {
+    if (Array.isArray(selected)) {
         return selected.map((item: string) => ({ name: item }));
+    } if (typeof selected !== 'object') {
+        return [{ name: selected }];
     }
+    console.warn(new Error(`Invalid selected value: ${selected}`));
+
     return [];
 };
 state.selectedList = state.propertySchemaList.map((schema) => initSelectedMenuItems(schema.key));

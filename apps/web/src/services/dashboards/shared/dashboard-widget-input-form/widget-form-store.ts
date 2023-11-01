@@ -15,9 +15,6 @@ import type {
     InheritOptions, UpdatableWidgetInfo, WidgetConfig,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { useMergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
@@ -53,28 +50,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
     }),
     getters: {
         widgetConfig(): WidgetConfig|undefined {
-            if (this.widgetConfigId) {
-                const config = getWidgetConfig(this.widgetConfigId);
-                if (config) {
-                    return {
-                        ...config,
-                        options_schema: getWidgetOptionsSchema([
-                            'cost_data_source',
-                            'cost_group_by',
-                            'provider',
-                            'project',
-                            'service_account',
-                            'project_group',
-                            'cost_product',
-                            'region',
-                            'cost_usage_type',
-                        ]),
-                    };
-                }
-            }
-            return undefined;
-            // TODO: change to use the code below after widget config is updated
-            // return this.widgetConfigId ? getWidgetConfig(this.widgetConfigId) : undefined;
+            return this.widgetConfigId ? getWidgetConfig(this.widgetConfigId) : undefined;
         },
         originWidgetInfo(): DashboardLayoutWidgetInfo|undefined {
             if (!this.widgetKey) return undefined;

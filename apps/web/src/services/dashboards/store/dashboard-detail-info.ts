@@ -344,14 +344,14 @@ const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSc
                     ...MANAGED_DASH_VAR_SCHEMA.properties[k],
                     use: property.use,
                 };
-            } else if (k === 'asset_query_set') {
+            } else if (k === 'asset_query_set' || k === 'asset_compliance_type') { // NOTE: asset_compliance_type was used only in development environment.
                 variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = {
                     ...MANAGED_DASH_VAR_SCHEMA.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key],
                     use: property.use,
                 };
                 delete variablesSchema.properties[k];
             } else {
-                console.error(new Error(`conversion failed: ${property}`));
+                console.error(new Error(`conversion failed: ${k}: ${JSON.stringify(property)}`));
             }
         } else {
             const options = getConvertedCustomOptions(property.options);
@@ -378,7 +378,7 @@ const getConvertedCustomOptions = (storedOptions?: DeprecatedCustomVariableOptio
         }
     }
 
-    console.error('getConvertedCustomOptions: conversion failed', storedOptions);
+    console.error(new Error(`getConvertedCustomOptions: conversion failed ${JSON.stringify(storedOptions)}`));
     return undefined;
 };
 // only ENUM type was supported for custom options in old dashboard variable schema.

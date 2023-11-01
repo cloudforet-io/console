@@ -41,7 +41,7 @@ const getRefinedParentOptions = (
     Object.entries(inheritOptions).forEach(([filterKey, inheritOption]) => {
         if (optionsErrorMap?.[filterKey]) return;
 
-        const variableKey = inheritOption?.variable_info?.key;
+        const variableKey = inheritOption?.variable_key;
         if (!inheritOption?.enabled || !variableKey) return;
 
         const variableValue = dashboardVariables[variableKey];
