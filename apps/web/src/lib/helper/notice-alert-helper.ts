@@ -54,9 +54,9 @@ export const showSuccessMessage = (successTitle, successMessage) => {
  *   @param group
  *   @returns
  */
-export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 'toastTopCenter'):string|null => {
+export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 'toastTopCenter'):string => {
+    const uuid = getUUID();
     if (Vue) {
-        const uuid = getUUID();
         (Vue as any).notify({
             id: id ?? uuid,
             group,
@@ -66,9 +66,8 @@ export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 't
             duration: -1,
             speed: 500,
         });
-        return uuid;
     }
-    return null;
+    return uuid;
 };
 
 
@@ -77,17 +76,20 @@ export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 't
  *   @param group
  *   @returns
  */
-export const hideLoadingMessage = (id?:string, group = 'toastTopCenter') => {
+export const hideLoadingMessage = (id:string) => {
     if (Vue) {
         if (id) (Vue.notify as any)?.close(id);
-        else {
-            Vue.notify({
-                group,
-                clean: true,
-            });
-        }
     }
 };
+
+// export const hideLoadingMessageByGroup = (group = 'toastTopCenter') => {
+//     if (Vue) {
+//         Vue.notify({
+//             group,
+//             clean: true,
+//         });
+//     }
+// };
 
 export const showInfoMessage = (infoTitle, infoText) => {
     if (Vue) {
