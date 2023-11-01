@@ -328,6 +328,9 @@ const getConvertedWidgetOptions = (storedWidgetOptions?: WidgetOptions): WidgetO
         if (k === 'cost_group_by') {
             (widgetOptions as any).cost_data_field = v;
             delete widgetOptions[k];
+        } else if (k === 'asset_group_by') {
+            (widgetOptions as any).asset_data_field = v;
+            delete widgetOptions[k];
         }
     });
     return widgetOptions;
