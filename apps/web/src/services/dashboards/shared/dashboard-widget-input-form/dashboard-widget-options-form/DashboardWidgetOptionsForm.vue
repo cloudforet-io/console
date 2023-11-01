@@ -11,6 +11,7 @@ import type {
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { get } from 'lodash';
 
+import type { VariableModelConfig } from '@/lib/variable-models';
 import { VariableModel } from '@/lib/variable-models';
 import type { IBaseVariableModel } from '@/lib/variable-models/_base/types';
 
@@ -41,6 +42,7 @@ const state = reactive({
         return schemaProperties.map((propertyName) => [propertyName, state.properties[propertyName]]);
     }),
     selectedList: [] as SelectDropdownMenuItem[][],
+    variableModelMap: {} as Record<string, IBaseVariableModel>,
 });
 
 const getInheritOptionMenuHandler = (schema: WidgetOptionsSchemaProperty): AutocompleteHandler => {
@@ -62,9 +64,21 @@ const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandl
     if (widgetFormState.inheritOptions?.[schema.key]?.enabled) {
         return [getInheritOptionMenuHandler(schema)];
     }
-    return schema.item_options?.map((conf) => {
-        const variableModel = new VariableModel(conf);
-        return getVariableModelMenuHandler(variableModel);
+    return schema.item_options?.map((conf: VariableModelConfig) => {
+        let variableModel: IBaseVariableModel;
+        // get variableModel from variableModelMap or create new one
+        const managedVariableModelKey: string|undefined = get(conf, 'key');
+        if (managedVariableModelKey) {
+            variableModel = state.variableModelMap[managedVariableModelKey] ?? new VariableModel(conf);
+            state.variableModelMap[managedVariableModelKey] = variableModel;
+        } else {
+            variableModel = new VariableModel(conf);
+        }
+        const options = {}; // e.g. { data_source_id: 'ds-1' }
+        Object.entries(schema.dependencies ?? {})?.forEach(([optionName, reference]) => {
+            options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
+        });
+        return getVariableModelMenuHandler(variableModel, options);
     }) ?? [];
 };
 const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
@@ -88,13 +102,13 @@ const updateSchemaProperties = (propertyName: string) => {
     }
     widgetFormStore.$patch({ schemaProperties });
 };
-const getVariableModelMenuHandler = (variableModel: IBaseVariableModel): AutocompleteHandler => async (inputText: string, pageStart, pageLimit, filters) => {
+const getVariableModelMenuHandler = (variableModel: IBaseVariableModel, options?: Record<string, any>): AutocompleteHandler => async (inputText: string, pageStart, pageLimit, filters) => {
     const responses = await variableModel.list({
         start: pageStart,
         limit: pageLimit ?? 10,
         search: inputText,
         filters: filters?.length ? filters.map((f) => f.name as string) : undefined,
-        options: widgetFormState.widgetOptions,
+        options,
     });
     return {
         results: responses.results.map((result) => ({
