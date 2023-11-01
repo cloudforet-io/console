@@ -1,5 +1,7 @@
 import Vue from 'vue';
 
+import { getUUID } from '@/lib/component-util/getUUID';
+
 
 /** * @function
  *   @name showErrorMessage
@@ -48,12 +50,16 @@ export const showSuccessMessage = (successTitle, successMessage) => {
  *   @name showLoadingMessage
  *   @param loadingTitle
  *   @param loadingMessage
+ *   @parma id
+ *   @param group
  *   @returns
  */
-export const showLoadingMessage = (loadingTitle, loadingMessage) => {
+export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 'toastTopCenter'):string => {
+    const uuid = getUUID();
     if (Vue) {
         (Vue as any).notify({
-            group: 'toastTopCenter',
+            id: id ?? uuid,
+            group,
             type: 'loading',
             title: loadingTitle,
             text: loadingMessage,
@@ -61,21 +67,29 @@ export const showLoadingMessage = (loadingTitle, loadingMessage) => {
             speed: 500,
         });
     }
+    return uuid;
 };
 
 
 /** * @function
  *   @name hideLoadingMessage
+ *   @param group
  *   @returns
  */
-export const hideLoadingMessage = () => {
+export const hideLoadingMessage = (id:string) => {
     if (Vue) {
-        Vue.notify({
-            group: 'toastTopCenter',
-            clean: true,
-        });
+        if (id) (Vue.notify as any)?.close(id);
     }
 };
+
+// export const hideLoadingMessageByGroup = (group = 'toastTopCenter') => {
+//     if (Vue) {
+//         Vue.notify({
+//             group,
+//             clean: true,
+//         });
+//     }
+// };
 
 export const showInfoMessage = (infoTitle, infoText) => {
     if (Vue) {
