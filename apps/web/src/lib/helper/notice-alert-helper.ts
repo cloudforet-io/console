@@ -1,5 +1,7 @@
 import Vue from 'vue';
 
+import { getUUID } from '@/lib/component-util/getUUID';
+
 
 /** * @function
  *   @name showErrorMessage
@@ -52,10 +54,11 @@ export const showSuccessMessage = (successTitle, successMessage) => {
  *   @param group
  *   @returns
  */
-export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 'toastTopCenter') => {
+export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 'toastTopCenter'):string|null => {
     if (Vue) {
+        const uuid = getUUID();
         (Vue as any).notify({
-            ...(id && { id }),
+            id: id ?? uuid,
             group,
             type: 'loading',
             title: loadingTitle,
@@ -63,27 +66,26 @@ export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 't
             duration: -1,
             speed: 500,
         });
+        return uuid;
     }
+    return null;
 };
 
 
 /** * @function
- *   @name hideLoadingMessageByGroup
+ *   @name hideLoadingMessage
  *   @param group
  *   @returns
  */
-export const hideLoadingMessageByGroup = (group = 'toastTopCenter') => {
-    if (Vue) {
-        Vue.notify({
-            group,
-            clean: true,
-        });
-    }
-};
-
-export const hideLoadingMessageById = (id?) => {
+export const hideLoadingMessage = (id?:string, group = 'toastTopCenter') => {
     if (Vue) {
         if (id) (Vue.notify as any)?.close(id);
+        else {
+            Vue.notify({
+                group,
+                clean: true,
+            });
+        }
     }
 };
 
