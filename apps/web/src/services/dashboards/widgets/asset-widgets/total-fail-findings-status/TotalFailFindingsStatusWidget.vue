@@ -5,7 +5,7 @@ import {
 import type { Location } from 'vue-router/types/router';
 
 import {
-    PProgressBar,
+    PProgressBar, PDivider,
 } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 

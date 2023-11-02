@@ -19,6 +19,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
+import { VariableModel } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
@@ -54,7 +55,10 @@ const state = reactive({
     menuHandlers: computed<AutocompleteHandler[]>(() => {
         const options = state.variableProperty?.options;
         if (!Array.isArray(options)) return [];
-        return options.map((config) => getVariableModelMenuHandler(config));
+        return options.map((config) => {
+            const variableModel = new VariableModel(config);
+            return getVariableModelMenuHandler(variableModel);
+        });
     }),
 });
 
