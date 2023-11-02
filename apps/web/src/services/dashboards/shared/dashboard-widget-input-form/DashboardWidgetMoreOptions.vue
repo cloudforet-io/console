@@ -7,7 +7,7 @@ import {
 import {
     PButton, PContextMenu, useContextMenuController,
 } from '@spaceone/design-system';
-import { isEqual } from 'lodash';
+import { chain, isEqual } from 'lodash';
 
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import type { WidgetOptionsSchemaProperty } from '@/services/dashboards/widgets/_configs/widget-options-schema';
@@ -21,34 +21,19 @@ const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
 const state = reactive({
-    propertySchemaList: computed<WidgetOptionsSchemaProperty[]>(() => Object.values(widgetFormStore.widgetConfig?.options_schema?.properties ?? {})),
-    defaultProperties: computed<string[]>(() => state.propertySchemaList.map((d) => d.key)),
-    defaultIdxMap: computed<Record<string, number>>(() => {
-        const defaultIdxMap = {};
-        state.defaultProperties.forEach((name, idx) => { defaultIdxMap[name] = idx; });
-        return defaultIdxMap;
+    propertySchemaTuples: computed<[optionKey: string, schema: WidgetOptionsSchemaProperty][]>(() => {
+        const properties = widgetFormStore.widgetConfig?.options_schema?.properties ?? {};
+        return Object.entries(properties);
     }),
-});
-
-/* sort */
-const sortItems = (items: MenuItem[]) => items.sort((a, b) => {
-    if (state.defaultIdxMap[a.name] !== undefined) {
-        // if both are default, follow default index order
-        if (state.defaultIdxMap[b.name] !== undefined) return state.defaultIdxMap[a.name] > state.defaultIdxMap[b.name] ? 1 : -1;
-        // otherwise, default item comes before
-        return -1;
-    }
-    // otherwise, sort by alphabetical
-    return a.label > b.label ? 1 : -1;
 });
 
 /* refs */
 const targetRef = ref<any|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const selectedOptions = ref<MenuItem[]>([]);
-const optionsMenuItems = computed<MenuItem[]>(() => state.propertySchemaList.map((config) => ({
-    name: config.key,
-    label: config.name ?? config.key,
+const optionsMenuItems = computed<MenuItem[]>(() => state.propertySchemaTuples.map(([optionKey, config]) => ({
+    name: optionKey,
+    label: config.name ?? optionKey,
 })));
 
 /* context menu controller */
@@ -69,7 +54,17 @@ const {
 });
 
 const handleUpdateSelectedOptions = (selected: MenuItem[]) => {
-    const selectedProperties: string[] = sortItems(selected).map((item) => item.name);
+    const order = widgetFormStore.widgetConfig?.options_schema?.order ?? [];
+    const schemaProperties = widgetFormStore.widgetConfig?.options_schema?.properties ?? {};
+    const selectedProperties: string[] = chain(selected)
+        .map((item) => item.name)
+        .sortBy((optionKey) => {
+            const idx = order.indexOf(optionKey);
+            if (idx < 0) return 9999;
+            if (schemaProperties[optionKey]?.fixed) return idx;
+            return 1000 + idx;
+        })
+        .value();
     widgetFormStore.updateSchemaProperties(selectedProperties);
     hideContextMenu();
 };
@@ -84,7 +79,7 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
     if (isEqual(current, selectedProperties)) return;
 
     const refined: MenuItem[] = selectedProperties.map((d) => {
-        const config = state.propertySchemaList.find((item) => item.key === d);
+        const config = widgetFormStore.widgetConfig?.options_schema?.properties?.[d];
         return { name: d, label: config?.name ?? d };
     });
     selectedOptions.value = refined;
