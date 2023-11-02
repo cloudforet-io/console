@@ -7,8 +7,8 @@ import type {
     WidgetConfig, WidgetFiltersMap,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getInheritingProperties } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
-import { getWidgetOptionName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
+import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 /**
  * @description get updated widget info. if the property is not changed, it will be declared as undefined.
@@ -33,8 +33,8 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
         if (key === 'filters') {
             if (!val) return;
             Object.entries(val).forEach(([filterKey, filterVal]) => {
-                const optionKey = getWidgetOptionName(filterKey);
-                const isInherited = getInheritingProperties(filterKey, updatedInheritOptions).length > 0;
+                const optionKey = getWidgetOptionKeyByVariableKey(filterKey);
+                const isInherited = getInheritingOptionKeys(filterKey, updatedInheritOptions).length > 0;
                 // if the filter is not in the schemaProperties or inherited, it will be deleted.
                 if (!schemaProperties.includes(optionKey)) {
                     delete (updatedWidgetOptions.filters as WidgetFiltersMap)[filterKey];
@@ -47,7 +47,7 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
             });
         // other widget option case
         } else {
-            const isInherited = getInheritingProperties(key, updatedInheritOptions).length > 0;
+            const isInherited = getInheritingOptionKeys(key, updatedInheritOptions).length > 0;
             // if the widget option is not in the schemaProperties or inherited, it will be deleted.
             if (!schemaProperties.includes(key)) {
                 delete updatedWidgetOptions[key];
