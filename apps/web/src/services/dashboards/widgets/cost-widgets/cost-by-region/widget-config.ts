@@ -44,6 +44,8 @@ const costByRegionWidgetConfig: WidgetConfig = {
         'filters.project_group',
         'filters.cost_product',
         'filters.cost_usage_type',
+        'filters.cost_additional_info_value',
+        'filters.cost_tag_value',
     ]),
 };
 
