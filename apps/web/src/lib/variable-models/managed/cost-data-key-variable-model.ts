@@ -10,12 +10,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 const apiQueryHelper = new ApiQueryHelper();
-export default class CostTagKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_tag_key';
+export default class CostDataKeyVariableModel implements IBaseVariableModel {
+    key = 'cost_data_key';
 
-    name = 'Cost Tags';
+    name = 'Data Type (Cost)';
 
-    labels = ['cost'] as VariableModelLabel[];
+    labels: VariableModelLabel[] = ['cost'];
 
     #response: ListResponse = { results: [] };
 
@@ -25,22 +25,22 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
         if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
         try {
             const _query: Record<string, any> = {
-                only: ['cost_tag_keys'],
+                only: ['cost_data_keys'],
                 filter: [
                     {
-                        key: 'cost_tag_keys',
+                        key: 'cost_data_keys',
                         value: null,
                         operator: 'not',
                     },
                 ],
             };
             if (query.filters?.length) {
-                apiQueryHelper.setFilters([{ k: 'cost_tag_keys', v: query.filters, o: '=' }]);
+                apiQueryHelper.setFilters([{ k: 'cost_data_keys', v: query.filters, o: '=' }]);
                 _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
             }
             if (query.search) {
                 _query.filter.push({
-                    key: 'cost_tag_keys',
+                    key: 'cost_data_keys',
                     value: query.search,
                     operator: 'contain',
                 });
@@ -50,9 +50,9 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {
-                const target = response.results[0]?.cost_tag_keys ?? [];
+                const target = response.results[0]?.keys ?? [];
                 this.#response = {
-                    results: target.map((d) => ({ key: d, name: `[Tag] ${d}` })),
+                    results: target.map((d) => ({ key: d, name: d })),
                 };
             }
             return this.#response;

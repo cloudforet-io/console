@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
@@ -8,46 +9,50 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export default class CostDataSourceDataKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_data_source_data_key';
+const apiQueryHelper = new ApiQueryHelper();
+export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariableModel {
+    key = 'asset_additional_info_key';
 
-    name = 'Data Type (Cost)';
+    name = 'Asset Additional Info';
 
-    labels: VariableModelLabel[] = ['cost'];
+    labels = ['asset'] as VariableModelLabel[];
 
     #response: ListResponse = { results: [] };
 
-    #fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
+    #fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
-        if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
-        // TODO: change from filters(string[]) to api filters
+        if (!query.options?.query_set_id) throw new Error('No \'query_set_id\''); // TODO: check its working
         try {
             const _query: Record<string, any> = {
-                only: ['cost_data_keys'],
+                only: ['additional_info_keys'],
                 filter: [
                     {
-                        key: 'cost_data_keys',
+                        key: 'additional_info_keys',
                         value: null,
                         operator: 'not',
                     },
                 ],
             };
+            if (query.filters?.length) {
+                apiQueryHelper.setFilters([{ k: 'additional_info_keys', v: query.filters, o: '=' }]);
+                _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
+            }
             if (query.search) {
                 _query.filter.push({
-                    key: 'cost_data_keys',
+                    key: 'additional_info_keys',
                     value: query.search,
                     operator: 'contain',
                 });
             }
             const { status, response } = await this.#fetcher({
-                data_source_id: query.options.data_source_id, // TODO: check its working
+                query_set_id: query.options.query_set_id,
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {
-                const target = response.results[0]?.keys ?? [];
+                const target = response.results[0]?.additional_info_keys ?? [];
                 this.#response = {
-                    results: target.map((d) => ({ key: d })),
+                    results: target.map((d) => ({ key: d, name: d })),
                 };
             }
             return this.#response;

@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
@@ -8,8 +9,9 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export default class CloudServiceQuerySetDataKeyVariableModel implements IBaseVariableModel {
-    key = 'cloud_service_query_set_data_key';
+const apiQueryHelper = new ApiQueryHelper();
+export default class AssetDataKeyVariableModel implements IBaseVariableModel {
+    key = 'asset_data_key';
 
     name = 'Data Type (Asset)';
 
@@ -21,7 +23,6 @@ export default class CloudServiceQuerySetDataKeyVariableModel implements IBaseVa
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         if (!query.options?.query_set_id) throw new Error('No \'query_set_id\'');
-        // TODO: change from filters(string[]) to api filters
         try {
             const _query: Record<string, any> = {
                 only: ['data_keys'],
@@ -33,6 +34,10 @@ export default class CloudServiceQuerySetDataKeyVariableModel implements IBaseVa
                     },
                 ],
             };
+            if (query.filters?.length) {
+                apiQueryHelper.setFilters([{ k: 'data_keys', v: query.filters, o: '=' }]);
+                _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
+            }
             if (query.search) {
                 _query.filter.push({
                     key: 'data_keys',
@@ -47,7 +52,7 @@ export default class CloudServiceQuerySetDataKeyVariableModel implements IBaseVa
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.keys ?? [];
                 this.#response = {
-                    results: target.map((d) => ({ key: d })),
+                    results: target.map((d) => ({ key: d, name: d })),
                 };
             }
             return this.#response;
