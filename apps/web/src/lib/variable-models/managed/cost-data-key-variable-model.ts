@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
@@ -8,8 +9,9 @@ import type {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export default class CostDataSourceDataKeyVariableModel implements IBaseVariableModel {
-    key = 'cost_data_source_data_key';
+const apiQueryHelper = new ApiQueryHelper();
+export default class CostDataKeyVariableModel implements IBaseVariableModel {
+    key = 'cost_data_key';
 
     name = 'Data Type (Cost)';
 
@@ -21,7 +23,6 @@ export default class CostDataSourceDataKeyVariableModel implements IBaseVariable
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
-        // TODO: change from filters(string[]) to api filters
         try {
             const _query: Record<string, any> = {
                 only: ['cost_data_keys'],
@@ -33,6 +34,10 @@ export default class CostDataSourceDataKeyVariableModel implements IBaseVariable
                     },
                 ],
             };
+            if (query.filters?.length) {
+                apiQueryHelper.setFilters([{ k: 'cost_data_keys', v: query.filters, o: '=' }]);
+                _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
+            }
             if (query.search) {
                 _query.filter.push({
                     key: 'cost_data_keys',
@@ -41,13 +46,13 @@ export default class CostDataSourceDataKeyVariableModel implements IBaseVariable
                 });
             }
             const { status, response } = await this.#fetcher({
-                data_source_id: query.options.data_source_id, // TODO: check its working
+                data_source_id: query.options.data_source_id,
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.keys ?? [];
                 this.#response = {
-                    results: target.map((d) => ({ key: d })),
+                    results: target.map((d) => ({ key: d, name: d })),
                 };
             }
             return this.#response;
