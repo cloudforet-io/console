@@ -4,35 +4,50 @@ import {
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
-    WidgetFilterKey,
     InheritOptions,
     WidgetConfig,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_FILTER_KEYS } from '@/services/dashboards/widgets/_configs/config';
 import type {
+    WidgetFilterKey,
     WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import {
+    WIDGET_FILTERS_SCHEMA_PROPERTIES,
+    WIDGET_OPTIONS_SCHEMA_PROPERTIES,
+} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
-export const getWidgetOptionName = (key: string): string => {
-    if (WIDGET_FILTER_KEYS.includes(key as WidgetFilterKey)) return `filters.${key}`;
-    return key;
-};
+const VAR_KEY_TO_OPTION_KEY_MAP = {};
+Object.entries(WIDGET_FILTERS_SCHEMA_PROPERTIES).forEach(([optionKey, property]) => {
+    const variableKey = property.key;
+    if (variableKey) VAR_KEY_TO_OPTION_KEY_MAP[variableKey] = optionKey;
+});
+Object.entries(WIDGET_OPTIONS_SCHEMA_PROPERTIES).forEach(([optionKey, property]) => {
+    const variableKey = property.key;
+    if (variableKey) VAR_KEY_TO_OPTION_KEY_MAP[variableKey] = optionKey;
+});
+
+export const getWidgetOptionKeyByVariableKey = (key: string): WidgetFilterKey|undefined => VAR_KEY_TO_OPTION_KEY_MAP[key];
 
 export const getNonInheritedWidgetOptionsAmongUsedVariables = (
     variablesSchema: DashboardVariablesSchema,
     widgetInheritOptions: InheritOptions = {},
     schemaProperties: string[] = [],
 ): string[] => {
-    const nonInheritedOptions: string[] = [];
-    const enabledInheritedOptions = Object.entries(widgetInheritOptions).filter(([, inheritOption]) => inheritOption?.enabled).map(([key, inheritOption]) => inheritOption?.variable_key ?? key);
+    const nonInheritedOptionKeys: string[] = [];
+    const enabledInheritedOptionKeys = Object.values(widgetInheritOptions)
+        .filter((inheritOption) => inheritOption?.enabled)
+        .map((inheritOption) => inheritOption?.variable_key);
     if (variablesSchema?.properties) {
         Object.entries(variablesSchema.properties).forEach(([key, property]) => {
-            const optionName = getWidgetOptionName(key);
-            if (property.use && schemaProperties.includes(optionName) && !enabledInheritedOptions.includes(key)) nonInheritedOptions.push(optionName);
+            const optionKey = getWidgetOptionKeyByVariableKey(key);
+            if (optionKey
+                && property.use
+                && schemaProperties.includes(optionKey)
+                && !enabledInheritedOptionKeys.includes(optionKey)) nonInheritedOptionKeys.push(optionKey);
         });
     }
-    return nonInheritedOptions;
+    return nonInheritedOptionKeys;
 };
 
 export const getInitialSchemaProperties = (

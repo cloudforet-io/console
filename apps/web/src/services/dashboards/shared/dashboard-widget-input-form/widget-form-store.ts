@@ -3,8 +3,6 @@ import {
 } from 'lodash';
 import { defineStore } from 'pinia';
 
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
-
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
@@ -177,7 +175,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
 
 const getProjectCaseInheritOptions = (inheritOptions: InheritOptions): InheritOptions => ({
     ...inheritOptions,
-    [`filters.${REFERENCE_TYPE_INFO.project.type}`]: {
+    'filters.project': {
         enabled: true,
     },
 });

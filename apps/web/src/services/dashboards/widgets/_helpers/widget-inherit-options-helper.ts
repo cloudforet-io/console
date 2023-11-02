@@ -53,11 +53,11 @@ export const getInitialWidgetInheritOptions = (
  * @param variableKey
  * @param inheritOptions
  */
-export const getInheritingProperties = (variableKey: string, inheritOptions: InheritOptions) => {
-    const properties: string[] = [];
-    Object.entries(inheritOptions).forEach(([property, inheritOption]) => {
+export const getInheritingOptionKeys = (variableKey: string, inheritOptions: InheritOptions) => {
+    const optionKeys: string[] = [];
+    Object.entries(inheritOptions).forEach(([optionKey, inheritOption]) => {
         if (!inheritOption.enabled) return;
-        if (inheritOption.variable_key === variableKey) properties.push(property);
+        if (inheritOption.variable_key === variableKey) optionKeys.push(optionKey);
     });
-    return properties;
+    return optionKeys;
 };

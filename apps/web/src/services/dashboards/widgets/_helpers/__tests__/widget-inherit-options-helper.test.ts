@@ -5,7 +5,7 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { InheritOptions, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
-    getInheritingProperties,
+    getInheritingOptionKeys,
     getInitialWidgetInheritOptions,
 } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 
@@ -226,7 +226,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
 describe('[Widget Inherit Options Helper] getInheritingProperties', () => {
     it('should return empty array if there is no property in inheritOptions', () => {
         const inheritOptions: InheritOptions = {};
-        const properties = getInheritingProperties('filters.region', inheritOptions);
+        const properties = getInheritingOptionKeys('filters.region', inheritOptions);
         expect(properties).toEqual([]);
     });
     it('should return empty array if there is no property in inheritOptions whose enabled is true', () => {
@@ -236,7 +236,7 @@ describe('[Widget Inherit Options Helper] getInheritingProperties', () => {
                 variable_key: 'region',
             },
         };
-        const properties = getInheritingProperties('region', inheritOptions);
+        const properties = getInheritingOptionKeys('region', inheritOptions);
         expect(properties).toEqual([]);
     });
     it('should return empty array if there is no property in inheritOptions whose variable_key is same with given variableKey', () => {
@@ -246,7 +246,7 @@ describe('[Widget Inherit Options Helper] getInheritingProperties', () => {
                 variable_key: 'region',
             },
         };
-        const properties = getInheritingProperties('provider', inheritOptions);
+        const properties = getInheritingOptionKeys('provider', inheritOptions);
         expect(properties).toEqual([]);
     });
     it('should return array of property names if there are properties in inheritOptions whose enabled is true and variable_key is same with given variableKey', () => {
@@ -260,7 +260,7 @@ describe('[Widget Inherit Options Helper] getInheritingProperties', () => {
                 variable_key: 'provider',
             },
         };
-        const properties = getInheritingProperties('region', inheritOptions);
+        const properties = getInheritingOptionKeys('region', inheritOptions);
         expect(properties).toEqual(['filters.region']);
     });
 });

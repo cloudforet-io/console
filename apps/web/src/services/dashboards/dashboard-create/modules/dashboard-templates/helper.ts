@@ -12,24 +12,6 @@ import { MANAGED_DASH_VAR_SCHEMA, managedVariablesPropertiesMap } from '@/servic
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
-export const getDefaultWidgetFormData = (widgetId: string): Record<string, string> => {
-    const widgetConfig = getWidgetConfig(widgetId);
-    const fixedProperties: string[] = widgetConfig.options_schema?.fixed_properties ?? [];
-    const defaultProperties: string[] = widgetConfig.options_schema?.default_properties?.filter((d) => !fixedProperties.includes(d)) ?? [];
-    const schemaFormData = {};
-
-    // set default value to fixed properties
-    fixedProperties.forEach((propertyName) => {
-        schemaFormData[propertyName] = widgetConfig?.options?.[propertyName];
-    });
-    // set default value to default properties
-    defaultProperties.forEach((propertyName) => {
-        schemaFormData[propertyName] = propertyName.replace('filters.', '');
-    });
-
-    return schemaFormData;
-};
-
 type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<Pick<DashboardLayoutWidgetInfo, 'title'|'widget_options'|'size'|'inherit_options'|'schema_properties'>>];
 export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): DashboardLayoutWidgetInfo[] => widgetList.map(
     ([widgetId, customInfo]) => {
@@ -51,6 +33,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
 
 export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVariablesSchema => {
     const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASH_VAR_SCHEMA);
+
     if (label === DASHBOARD_LABEL.ASSET) {
         managedVariablesPropertiesMap.forEach((value, key) => {
             if (Object.keys(ASSET_VARIABLE_TYPE_INFO).includes(key)) {

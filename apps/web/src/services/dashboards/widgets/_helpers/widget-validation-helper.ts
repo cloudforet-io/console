@@ -5,13 +5,13 @@ import {
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
-    InheritOptions, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
+    InheritOptions, DashboardLayoutWidgetInfo, WidgetConfig,
     UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
-import { getInheritingProperties } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
+import type { WidgetFilterKey, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {
-    getWidgetOptionName,
+    getWidgetOptionKeyByVariableKey,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
@@ -148,7 +148,8 @@ const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
     const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.properties ?? {});
     let isAffected = false;
     addedVariables.forEach((variableKey) => {
-        const property = getWidgetOptionName(variableKey);
+        const property = getWidgetOptionKeyByVariableKey(variableKey);
+        if (!property) return; // no widget option matched by variable key
 
         const isInWidgetOptionsSchema = optionsSchemaProperties.some((d) => d.includes(property));
         if (!isInWidgetOptionsSchema) return; // not exist in widget options schema
@@ -184,21 +185,23 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
 
     // delete or update options using deleted variables
     dashboardVariables.forEach((variableKey) => {
-        const inheritingProperties = getInheritingProperties(variableKey, _inheritOptions);
+        const inheritingOptionKeys = getInheritingOptionKeys(variableKey, _inheritOptions);
 
         // do nothing if inheriting properties are not exist
-        if (!inheritingProperties.length) return;
-        inheritingProperties.forEach((property) => {
+        if (!inheritingOptionKeys.length) return;
+        inheritingOptionKeys.forEach((property) => {
             delete _inheritOptions[property];
         });
 
-        const targetProperty = getWidgetOptionName(variableKey);
-        const isFixedProperty: boolean = widgetConfig.options_schema?.properties?.[targetProperty]?.fixed ?? false;
+        const targetOptionKey = getWidgetOptionKeyByVariableKey(variableKey);
+        if (!targetOptionKey) return; // no widget option matched by variable key
+
+        const isFixedProperty: boolean = widgetConfig.options_schema?.properties?.[targetOptionKey]?.fixed ?? false;
         if (!isFixedProperty) {
             // remove from schemaProperties if it is not fixed property
-            const propertyIdx = _schemaProperties.indexOf(targetProperty);
+            const propertyIdx = _schemaProperties.indexOf(targetOptionKey);
             if (propertyIdx > -1) {
-                _schemaProperties.splice(_schemaProperties.indexOf(targetProperty), 1);
+                _schemaProperties.splice(_schemaProperties.indexOf(targetOptionKey), 1);
             }
         }
 

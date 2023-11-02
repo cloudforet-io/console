@@ -21,7 +21,7 @@ import type {
     WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
-import { getWidgetOptionName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const props = defineProps<{
     projectId?: string;
@@ -59,7 +59,7 @@ const getInheritOptionMenuHandler = (schema: WidgetOptionsSchemaProperty): Autoc
     const selectableVariableMenuItems: {name: string; label: string;}[] = [];
     Object.entries(props.variablesSchema?.properties ?? {}).forEach(([propertyName, property]) => {
         if (property.use && property.selection_type === schema.selection_type) {
-            selectableVariableMenuItems.push({ name: getWidgetOptionName(propertyName), label: property.name });
+            selectableVariableMenuItems.push({ name: getWidgetOptionKeyByVariableKey(propertyName), label: property.name });
         }
     });
     return (inputText) => {

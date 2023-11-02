@@ -32,32 +32,41 @@ export type WidgetOptionsSchema = {
     order: string[];
 };
 
-const WIDGET_OPTION_KEYS = {
+export const WIDGET_FILTER_KEYS = [
+    // common
+    'filters.provider',
+    'filters.project',
+    'filters.service_account',
+    'filters.project_group',
+    'filters.region',
+    // 'filters.cloud_service_type': 'filters.cloud_service_type',
+    // 'filters.user': 'filters.user',
+    // cost
+    'filters.cost_product',
+    'filters.cost_usage_type',
+    'filters.cost_tag_value',
+    'filters.cost_additional_info_value',
+    // asset
+    'filters.asset_account',
+] as const;
+export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
+
+export const WIDGET_OPTION_KEYS = [
     // cost option keys
-    cost_data_source: 'cost_data_source',
-    cost_data_type: 'cost_data_type',
-    cost_data_field: 'cost_data_field',
-    cost_secondary_data_field: 'cost_secondary_data_field',
+    'cost_data_source',
+    'cost_data_type',
+    'cost_data_field',
+    'cost_secondary_data_field',
     // asset option keys
-    cloud_service_query_set: 'cloud_service_query_set',
-    asset_data_field: 'asset_data_field',
-    asset_secondary_data_field: 'asset_secondary_data_field',
+    'cloud_service_query_set',
+    'asset_data_field',
+    'asset_secondary_data_field',
     // option filters
-    'filters.asset_account': 'asset_account',
-    'filters.cost_usage_type': 'cost_usage_type',
-    'filters.provider': 'filters.provider',
-    'filters.project': 'filters.project',
-    'filters.service_account': 'filters.service_account',
-    'filters.project_group': 'filters.project_group',
-    'filters.region': 'filters.region',
-    'filters.cost_product': 'filters.cost_product',
-    'filters.cost_tag_value': 'filters.cost_tag_value',
-    'filters.cost_additional_info_value': 'filters.cost_additional_info_value',
-} as const;
+    ...WIDGET_FILTER_KEYS,
+] as const;
+export type WidgetOptionKey = typeof WIDGET_OPTION_KEYS[number];
 
-type WidgetOptionKey = keyof typeof WIDGET_OPTION_KEYS;
-
-export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>> = {
+export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterKey, WidgetOptionsSchemaProperty> = {
     'filters.provider': {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
@@ -132,9 +141,17 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, W
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key },
         ],
     },
+    'filters.asset_account': {
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
+        name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
+        selection_type: 'MULTI',
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key },
+        ],
+    },
 };
 
-export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>> = {
+export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>, WidgetFilterKey> = {
     cost_data_source: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
@@ -196,14 +213,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Partial<Record<WidgetOptionKey, W
         ],
     },
     //
-    'filters.asset_account': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
-        selection_type: 'MULTI',
-        item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key },
-        ],
-    },
     asset_data_field: {
         key: 'asset_data_field',
         name: 'Data Field (Asset)',
