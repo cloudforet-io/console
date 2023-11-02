@@ -11,13 +11,13 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costTrend', {
         title: 'Cost Trend By Project',
         widget_options: {
-            cost_group_by: COST_GROUP_BY.PROJECT,
+            cost_data_field: COST_GROUP_BY.PROJECT,
         },
     }],
     ['costTrendStacked', {
         title: 'Cost Trend By Product',
         widget_options: {
-            cost_group_by: COST_GROUP_BY.PRODUCT,
+            cost_data_field: COST_GROUP_BY.PRODUCT,
         },
     }],
     ['costDonut', { title: 'Cost By Provider' }],

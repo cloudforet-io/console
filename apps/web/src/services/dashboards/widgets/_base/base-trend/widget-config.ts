@@ -13,7 +13,7 @@ const baseTrendWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: 'MONTHLY',
-        cost_group_by: COST_GROUP_BY.PROVIDER,
+        cost_data_field: COST_GROUP_BY.PROVIDER,
         pagination_options: {
             enabled: true,
             page_size: 5,
