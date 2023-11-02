@@ -23,6 +23,8 @@ const getFileName = (contentDisposition:string) => {
         .map((ele) => ele.replace(/"/g, '').split('=')[1]);
     return fileName[0];
 };
+
+// This helper will be removed when all legacy excel download features are replaced with v2 export features.
 export const downloadExcel = async (payload: ExcelPayload[] | ExcelPayload): Promise<void> => {
     const loadingMessageId = showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '');
     try {
@@ -104,11 +106,11 @@ export const downloadExcel = async (payload: ExcelPayload[] | ExcelPayload): Pro
     }
 };
 
+// This helper helps the excel file download flow. Pass the export API as a callback function.
 export const downloadExcelByExportFetcher = async (excelExportFetcher:() => Promise<ExportResponse>) => {
     const loadingMessageId = showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '');
-    let exportResponse: ExportResponse;
     try {
-        exportResponse = await excelExportFetcher();
+        const exportResponse:ExportResponse = await excelExportFetcher();
         if (exportResponse) {
             await downloadByFileUrl(exportResponse.download_url);
             setTimeout(() => {
