@@ -29,6 +29,8 @@ const budgetUsageSummaryConfig: WidgetConfig = {
         'filters.service_account',
         'filters.region',
         'filters.cost_product',
+        'filters.cost_additional_info_value',
+        'filters.cost_tag_value',
     ]),
 };
 
