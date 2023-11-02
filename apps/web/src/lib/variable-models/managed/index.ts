@@ -1,4 +1,11 @@
-import type { VariableModelLabel } from '@/lib/variable-models/_base/types';
+import type {
+    IEnumVariableModel,
+    IResourceNameVariableModel,
+    VariableModelLabel,
+    Value,
+} from '@/lib/variable-models/_base/types';
+import CostDefaultDataTypeVariableModel from '@/lib/variable-models/managed/cost-default-data-type-variable-model';
+import CostUsageTypeVariableModel from '@/lib/variable-models/managed/cost-usage-type-variable-model';
 
 import AssetAccountVariableModel from './asset-account-variable-model';
 import AssetAdditionalInfoKeyVariableModel from './asset-additional-info-key-variable-model';
@@ -10,11 +17,9 @@ import CollectorVariableModel from './collector-variable-model';
 import CostAdditionalInfoKeyVariableModel from './cost-additional-info-key-variable-model';
 import CostDataKeyVariableModel from './cost-data-key-variable-model';
 import CostDataSourceVariableModel from './cost-data-source-variable-model';
-import CostDefaultDataTypeVariableModel from './cost-default-data-type-variable-model';
 import CostDefaultFieldVariableModel from './cost-default-field-variable-model';
 import CostProductVariableModel from './cost-product-variable-model';
 import CostTagKeyVariableModel from './cost-tag-key-variable-model';
-import CostUsageTypeVariableModel from './cost-usage-type-variable-model';
 import ProjectGroupVariableModel from './project-group-variable-model';
 import ProjectVariableModel from './project-variable-model';
 import ProviderVariableModel from './provider-variable-model';
@@ -55,12 +60,15 @@ const MANAGED_VARIABLE_MODELS = {
 };
 
 export type ManagedVariableModelKey = keyof typeof MANAGED_VARIABLE_MODELS;
-interface ManagedVariableModelConfig {
+interface ModelConfig {
     key: ManagedVariableModelKey;
     name: string;
     labels: VariableModelLabel[];
+    values?: Value[];
+    resourceType?: string;
+    idKey?: string;
 }
-export const MANAGED_VARIABLE_MODEL_CONFIGS: Record<ManagedVariableModelKey, ManagedVariableModelConfig> = {} as any;
+export const MANAGED_VARIABLE_MODEL_CONFIGS: Record<ManagedVariableModelKey, ModelConfig> = {} as any;
 Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
     const model = new MANAGED_VARIABLE_MODELS[key]();
     Object.defineProperty(MANAGED_VARIABLE_MODEL_CONFIGS, key, {
@@ -70,6 +78,9 @@ Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
             key: model.key,
             name: model.name,
             labels: model.labels,
+            values: (model as IEnumVariableModel).values,
+            resourceType: (model as IResourceNameVariableModel).resourceType,
+            idKey: (model as IResourceNameVariableModel).idKey,
         },
     });
 });
