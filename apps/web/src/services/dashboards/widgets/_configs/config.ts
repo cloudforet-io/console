@@ -15,7 +15,7 @@ import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
 
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import type { WidgetFilterKey, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 
 export const WIDGET_SIZE = {
@@ -119,22 +119,6 @@ export interface WidgetFilter {
     v: null|string|boolean|number|Array<null|string|boolean|number>;
     o?: ConsoleFilterOperator;
 }
-export const WIDGET_FILTER_KEYS = [
-    // resource reference type
-    REFERENCE_TYPE_INFO.provider.type,
-    REFERENCE_TYPE_INFO.project.type,
-    REFERENCE_TYPE_INFO.service_account.type,
-    REFERENCE_TYPE_INFO.project_group.type,
-    REFERENCE_TYPE_INFO.user.type,
-    REFERENCE_TYPE_INFO.cloud_service_type.type,
-    REFERENCE_TYPE_INFO.region.type,
-    // cost reference
-    COST_VARIABLE_TYPE_INFO.cost_product.type,
-    COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
-    // asset reference
-    ASSET_VARIABLE_TYPE_INFO.asset_account.type,
-] as const;
-export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
 /* widget schema */
