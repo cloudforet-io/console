@@ -28,7 +28,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>> = this.#getFetcher();
+    #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>>;
 
     formatter(data: any): string {
         return data[this.nameKey];

@@ -19,11 +19,16 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
 
     #response: ListResponse = { results: [] };
 
-    #fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{
+        results: { cost_tag_keys: string[] }[];
+    }>>;
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
-        if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
         try {
+            if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
+
+            if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
+
             const _query: Record<string, any> = {
                 only: ['cost_tag_keys'],
                 filter: [
