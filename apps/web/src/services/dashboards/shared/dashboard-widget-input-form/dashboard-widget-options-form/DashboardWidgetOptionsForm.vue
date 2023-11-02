@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import {
-    getTextHighlightRegex,
-    PDataLoader, PTextButton,
-} from '@spaceone/design-system';
+import { getTextHighlightRegex, PDataLoader, PTextButton } from '@spaceone/design-system';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
@@ -14,6 +11,7 @@ import { get } from 'lodash';
 import type { VariableModelConfig } from '@/lib/variable-models';
 import { VariableModel } from '@/lib/variable-models';
 import type { IBaseVariableModel } from '@/lib/variable-models/_base/types';
+import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
@@ -23,9 +21,7 @@ import type {
     WidgetOptionsSchema,
     WidgetOptionsSchemaProperty,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
-import {
-    getWidgetOptionName,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const props = defineProps<{
     projectId?: string;
@@ -42,20 +38,22 @@ const state = reactive({
         return schemaProperties.map((propertyName) => [propertyName, state.properties[propertyName]]);
     }),
     selectedList: [] as SelectDropdownMenuItem[][],
-    variableModelMap: {} as Record<string, IBaseVariableModel>,
+    variableModelsMap: computed<Record<string, IBaseVariableModel[]>>(() => {
+        const _result: Record<string, IBaseVariableModel[]> = {};
+        state.propertySchemaTuples.forEach(([propertyName, schema]) => {
+            _result[propertyName] = getVariableModels(schema);
+        });
+        return _result;
+    }),
 });
 
-const _getVariableModel = (conf: VariableModelConfig): IBaseVariableModel => {
-    let variableModel: IBaseVariableModel;
-    // get variableModel from variableModelMap or create new one
-    const managedVariableModelKey: string|undefined = get(conf, 'key');
-    if (managedVariableModelKey) {
-        variableModel = state.variableModelMap[managedVariableModelKey] ?? new VariableModel(conf);
-        state.variableModelMap[managedVariableModelKey] = variableModel;
-    } else {
-        variableModel = new VariableModel(conf);
-    }
-    return variableModel;
+const getVariableModels = (schema): IBaseVariableModel[] => {
+    const variableModels: IBaseVariableModel[] = [];
+    schema.item_options?.forEach((conf: VariableModelConfig) => {
+        const variableModel = new VariableModel(conf);
+        variableModels.push(variableModel);
+    });
+    return variableModels;
 };
 const getInheritOptionMenuHandler = (schema: WidgetOptionsSchemaProperty): AutocompleteHandler => {
     const selectableVariableMenuItems: {name: string; label: string;}[] = [];
@@ -72,18 +70,20 @@ const getInheritOptionMenuHandler = (schema: WidgetOptionsSchemaProperty): Autoc
         };
     };
 };
-const getMenuHandlers = (schema: WidgetOptionsSchemaProperty): AutocompleteHandler[] => {
+const getMenuHandlers = (index: number, schema: WidgetOptionsSchemaProperty): AutocompleteHandler[] => {
     if (widgetFormState.inheritOptions?.[schema.key]?.enabled) {
         return [getInheritOptionMenuHandler(schema)];
     }
-    return schema.item_options?.map((conf: VariableModelConfig) => {
-        const variableModel = _getVariableModel(conf);
-        const options = {}; // e.g. { data_source_id: 'ds-1' }
-        Object.entries(schema.dependencies ?? {})?.forEach(([optionName, reference]) => {
-            options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
-        });
-        return getVariableModelMenuHandler(variableModel, options);
-    }) ?? [];
+
+    // get options from schema dependencies
+    const options = {}; // e.g. { data_source_id: 'ds-1' }
+    Object.entries(schema.dependencies ?? {})?.forEach(([optionName, reference]) => {
+        options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
+    });
+
+    const propertyName = state.propertySchemaTuples[index][0];
+    const variableModels = state.variableModelsMap[propertyName];
+    return variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, options));
 };
 const updateWidgetOptionsBySelected = (propertyName: string, selected?: SelectDropdownMenuItem[]) => {
     const widgetOptions = { ...widgetFormState.widgetOptions };
@@ -105,21 +105,6 @@ const updateSchemaProperties = (propertyName: string) => {
         schemaProperties.splice(index, 1);
     }
     widgetFormStore.$patch({ schemaProperties });
-};
-const getVariableModelMenuHandler = (variableModel: IBaseVariableModel, options?: Record<string, any>): AutocompleteHandler => async (inputText: string, pageStart, pageLimit, filters) => {
-    const responses = await variableModel.list({
-        start: pageStart,
-        limit: pageLimit ?? 10,
-        search: inputText,
-        filters: filters?.length ? filters.map((f) => f.name as string) : undefined,
-        options,
-    });
-    return {
-        results: responses.results.map((result) => ({
-            name: result.key, label: result.name,
-        })),
-        more: responses.more,
-    };
 };
 
 /* event handlers */
@@ -194,7 +179,7 @@ const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] =
 
         return values;
     } if (typeof selected !== 'object') {
-        return [{ name: selected }];
+        return [{ name: selected }]; // TODO: have to initialize label
     }
     console.warn(new Error(`Invalid selected value: ${selected}`));
 
@@ -223,7 +208,7 @@ state.selectedList = state.propertySchemaTuples.map(([propertyName]) => initSele
                                           :inherit="widgetFormState.inheritOptions?.[propertyName]?.enabled"
                                           :inheritance-mode="schema.inheritance_mode"
                                           :deletable="!schema.fixed"
-                                          :menu-handlers="getMenuHandlers(schema)"
+                                          :menu-handlers="getMenuHandlers(i, schema)"
                                           :variables-schema="props.variablesSchema"
                                           @update:selected="handleUpdateSelected(i, $event)"
                                           @update:inherit="handleUpdateInherit(i, $event)"
