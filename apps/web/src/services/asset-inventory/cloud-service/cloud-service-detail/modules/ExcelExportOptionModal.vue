@@ -1,13 +1,13 @@
-
 <script lang="ts" setup>
-import { defineProps, defineEmits, reactive } from 'vue';
+import {
+    defineProps, defineEmits, reactive, computed,
+} from 'vue';
 
 import { PButtonModal, PCheckboxGroup, PCheckbox } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -26,25 +26,26 @@ const state = reactive({
     loading: false,
     subDataList: ['Main Table', 'AWS EC2', 'Disk', 'NIC', 'Security Groups'] as string[], // TODO: dummy data
     selectedSubData: [] as string[],
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 
 const handleConfirm = async () => {
     try {
         state.loading = true;
-        await store.dispatch('file/downloadExcel', {
-            url: '/inventory/cloud-service/list',
-            // param: {
-            //     query: getQuery(),
-            //     ...(overviewState.period && {
-            //         date_range: {
-            //             start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),
-            //             end: dayjs.utc(overviewState.period.end).add(1, 'day').format('YYYY-MM-DD'),
-            //         },
-            //     }),
-            // },
-            // fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
-            file_name_prefix: FILE_NAME_PREFIX.cloudService,
-        });
+        // await downloadExcel({
+        //     url: '/inventory/cloud-service/list',
+        //     param: {
+        //         query: getQuery(),
+        //         ...(overviewState.period && {
+        //             date_range: {
+        //                 start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),
+        //                 end: dayjs.utc(overviewState.period.end).add(1, 'day').format('YYYY-MM-DD'),
+        //             },
+        //         }),
+        //     },
+        //     fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+        //     file_name_prefix: FILE_NAME_PREFIX.cloudService,
+        // });
         emits('update:visible', false);
         showSuccessMessage(i18n.t(''), '');
     } catch (e) {

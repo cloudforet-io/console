@@ -42,7 +42,7 @@ export interface ExportOption {
     analyze_query?: AnalyzeQuery;
 }
 
-export interface CloudServiceExportParameter {
+export interface ExportParameter {
     options: ExportOption[]
     timezone?: string;
     file_format?: 'Excel' | 'CSV'; // default: Excel

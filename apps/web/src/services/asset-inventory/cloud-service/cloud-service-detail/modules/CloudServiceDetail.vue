@@ -23,6 +23,7 @@ import {
     getApiActionByLayoutType,
 } from '@/lib/component-util/dynamic-layout';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
@@ -176,11 +177,12 @@ const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     async export() {
         const fields = state.currentLayout?.options?.fields;
         if (!fields) return;
-        await store.dispatch('file/downloadExcel', {
+        await downloadExcel({
             url: '/inventory/cloud-service/get-data',
             param: getParams(),
             fields: dynamicFieldsToExcelDataFields(fields),
             file_name_prefix: FILE_NAME_PREFIX.cloudService,
+            timezone: state.timezone,
         });
     },
 };

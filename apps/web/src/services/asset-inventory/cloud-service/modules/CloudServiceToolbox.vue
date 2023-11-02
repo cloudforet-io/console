@@ -9,15 +9,13 @@ import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
-import { downloadByFileUrl } from '@cloudforet/core-lib/file-download';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { CloudServiceExportParameter, ExportOption } from '@/models/export/index';
+import type { ExportParameter, ExportOption } from '@/models/export/index';
 import { QueryType } from '@/models/export/index';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -25,6 +23,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/component-util/dynamic-layout';
+import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -231,23 +230,18 @@ const handleChange = (options: ToolboxOptions = {}) => {
 const handleClickSet = () => {
     state.visibleSetFilterModal = true;
 };
-const handleExport = async () => {
-    try {
-        await store.dispatch('display/startLoading', { loadingMessage: i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD') });
+const handleExport = () => {
+    const excelExportFetcher = async () => {
         const excelPayloadList = await getExcelPayloadList();
-        const cloudServiceExcelExportParams:CloudServiceExportParameter = {
+        const cloudServiceExcelExportParams:ExportParameter = {
             options: [
                 getCloudServiceResourcesPayload(),
                 ...excelPayloadList,
             ],
         };
-        const data = await SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
-        await downloadByFileUrl(data.download_url);
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('COMMON.EXCEL.ALT_E_DOWNLOAD'));
-    } finally {
-        await store.dispatch('display/finishLoading');
-    }
+        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+    };
+    downloadExcelByExportFetcher(excelExportFetcher);
 };
 
 /* Init */

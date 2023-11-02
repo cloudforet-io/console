@@ -161,6 +161,7 @@ import { i18n } from '@/translations';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -390,7 +391,7 @@ export default {
             }
         };
         const onExport = async () => {
-            await store.dispatch('file/downloadExcel', {
+            await downloadExcel({
                 url: '/monitoring/webhook/list',
                 param: { project_id: props.id, query: webhookListApiQuery },
                 fields: [
@@ -401,6 +402,7 @@ export default {
                     { name: 'Created', key: 'created_at', type: 'datetime' },
                 ],
                 file_name_prefix: FILE_NAME_PREFIX.projectWebhook,
+                timezone: state.timezone,
             });
         };
         const onChange = async (options: any = {}) => {

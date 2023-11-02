@@ -47,6 +47,7 @@ import { store } from '@/store';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -82,6 +83,7 @@ export default {
                 pageLimit: 15,
                 searchText: '',
             },
+            timezone: computed(() => store.state.user.timezone ?? 'UTC'),
         });
 
         const apiQuery = new ApiQueryHelper();
@@ -124,7 +126,7 @@ export default {
         };
 
         const onExport = async () => {
-            await store.dispatch('file/downloadExcel', {
+            await downloadExcel({
                 url: '/inventory/cloud-service/member/list',
                 param: {
                     cloud_services: props.cloudServiceProjectId,
@@ -137,6 +139,7 @@ export default {
                     { name: 'Labels', key: 'labels' },
                 ],
                 file_name_prefix: FILE_NAME_PREFIX.cloudService,
+                timezone: state.timezone,
             });
         };
 

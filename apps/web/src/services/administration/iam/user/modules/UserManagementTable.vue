@@ -111,6 +111,8 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
+import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -169,7 +171,7 @@ export default {
             { name: 'timezone', label: 'Timezone' },
         ];
 
-        const excelFields = [
+        const excelFields:ExcelDataField[] = [
             { key: 'user_id', name: 'User ID' },
             { key: 'name', name: 'Name' },
             { key: 'state', name: 'State' },
@@ -204,6 +206,7 @@ export default {
             keyItemSets: userSearchHandlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: userSearchHandlers.valueHandlerMap,
             tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets).queryTags,
+            timezone: computed(() => store.state.user.timezone ?? 'UTC'),
         });
 
         const modalState = reactive({
@@ -244,7 +247,7 @@ export default {
         };
 
         const handleExport = async () => {
-            await store.dispatch('file/downloadExcel', {
+            await downloadExcel({
                 url: '/identity/user/list',
                 param: {
                     query: userListApiQuery,
@@ -252,6 +255,7 @@ export default {
                 },
                 fields: excelFields,
                 file_name_prefix: FILE_NAME_PREFIX.user,
+                timezone: state.timezone,
             });
         };
 
