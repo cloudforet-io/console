@@ -60,6 +60,7 @@ export const WIDGET_OPTION_KEYS = [
     // asset option keys
     'cloud_service_query_set',
     'asset_data_field',
+    'asset_data_type',
     'asset_secondary_data_field',
     // option filters
     ...WIDGET_FILTER_KEYS,
@@ -214,6 +215,19 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         ],
     },
     //
+    asset_data_type: {
+        key: 'asset_data_type',
+        name: 'Data Type',
+        selection_type: 'SINGLE',
+        inheritance_mode: 'NONE',
+        fixed: true,
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_data_key.key },
+        ],
+        dependencies: {
+            cloud_service_query_set: { reference_key: 'query_set_id' },
+        },
+    },
     asset_data_field: {
         key: 'asset_data_field',
         name: 'Data Field (Asset)',
@@ -225,7 +239,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_additional_info_key.key },
         ],
         dependencies: {
-            cost_data_source: { reference_key: 'data_source_id' },
+            cloud_service_query_set: { reference_key: 'query_set_id' },
         },
     },
     asset_secondary_data_field: {
@@ -239,7 +253,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'ENUM', values: Object.entries(ASSET_GROUP_BY_ITEM_MAP).map(([key, { name }]) => ({ key, name })) },
         ],
         dependencies: {
-            cost_data_source: { reference_key: 'data_source_id' },
+            cloud_service_query_set: { reference_key: 'query_set_id' },
         },
     },
 };
