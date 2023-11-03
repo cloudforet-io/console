@@ -23,9 +23,8 @@ import { gray } from '@/styles/colors';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
@@ -75,12 +74,12 @@ const state = reactive({
     }),
     tableFields: computed<Field[]>(() => {
         if (!widgetState.groupBy) return [];
-        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
+        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.groupBy)?.label ?? widgetState.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
         return [
             {
                 name: widgetState.groupBy,
-                label: groupByLabel,
+                label: dataFieldLabel,
                 textOptions: { type: 'reference', referenceType },
             },
             {

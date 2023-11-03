@@ -34,8 +34,7 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type {
     SelectorType, WidgetEmit, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
@@ -96,7 +95,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                group_by: arrayToQueryString([widgetState.groupBy, COST_GROUP_BY.USAGE_TYPE]),
+                group_by: arrayToQueryString([widgetState.groupBy, COST_DATA_FIELD_MAP.USAGE_TYPE.name]),
                 period: objectToQueryString(_period),
                 filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
@@ -162,12 +161,12 @@ const state = reactive({
         const groupByFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
         const otherFieldWidth = dynamicTableFields.length > 4 ? '18%' : '22%';
 
-        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
+        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.groupBy)?.label ?? widgetState.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
 
         const fixedFields: Field[] = [{
             name: widgetState.groupBy,
-            label: groupByLabel,
+            label: dataFieldLabel,
             textOptions: { type: 'reference', referenceType },
             width: groupByFieldWidth,
         }];

@@ -23,9 +23,8 @@ import type { DateRange } from '@/services/dashboards/config';
 import type {
     WidgetProps,
     WidgetFiltersMap,
-
-    AssetGroupBy,
-    CostGroupBy,
+    CostDataField,
+    AssetDataField,
     Granularity,
 } from '@/services/dashboards/widgets/_configs/config';
 import {
@@ -47,9 +46,9 @@ export interface WidgetState extends MergedWidgetState {
     granularity: ComputedRef<Granularity|undefined>;
     chartType: ComputedRef<ChartType|undefined>;
     // TODO: remove groupBy
-    groupBy: ComputedRef<CostGroupBy|AssetGroupBy|undefined>;
-    dataField: ComputedRef<CostGroupBy|AssetGroupBy|undefined>;
-    secondaryDataField: ComputedRef<CostGroupBy|AssetGroupBy|undefined>;
+    groupBy: ComputedRef<CostDataField|AssetDataField|undefined>;
+    dataField: ComputedRef<CostDataField|AssetDataField|undefined>;
+    secondaryDataField: ComputedRef<CostDataField|AssetDataField|undefined>;
     parsedDataField: ComputedRef<string>; // remove dots from dataField e.g. additional_info.Usage Type Details -> Usage Type Details
     parsedSecondaryDataField: ComputedRef<string>; // remove dots from secondaryDataField
     dateRange: ComputedRef<DateRange>;

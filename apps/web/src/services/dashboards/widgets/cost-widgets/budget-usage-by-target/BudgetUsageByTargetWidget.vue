@@ -20,7 +20,7 @@ import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_comp
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
@@ -88,7 +88,7 @@ const fetchData = async (): Promise<Response> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: ['budget_id', 'name', COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
+                group_by: ['budget_id', 'name', COST_DATA_FIELD_MAP.PROJECT_GROUP.name, COST_DATA_FIELD_MAP.PROJECT.name],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -104,8 +104,8 @@ const fetchData = async (): Promise<Response> => {
                 select: {
                     budget_id: 'budget_id',
                     name: 'name',
-                    [COST_GROUP_BY.PROJECT_GROUP]: COST_GROUP_BY.PROJECT_GROUP,
-                    [COST_GROUP_BY.PROJECT]: COST_GROUP_BY.PROJECT,
+                    [COST_DATA_FIELD_MAP.PROJECT_GROUP.name]: COST_DATA_FIELD_MAP.PROJECT_GROUP.name,
+                    [COST_DATA_FIELD_MAP.PROJECT.name]: COST_DATA_FIELD_MAP.PROJECT.name,
                     total_spent: 'total_spent',
                     total_budget: 'total_budget',
                     budget_usage: {

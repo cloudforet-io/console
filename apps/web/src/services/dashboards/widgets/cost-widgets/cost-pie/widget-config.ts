@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const costPieWidgetConfig: Partial<WidgetConfig> = {
@@ -13,7 +13,7 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
     },
     options: {
         chart_type: CHART_TYPE.PIE,
-        cost_data_field: COST_GROUP_BY.PROVIDER,
+        cost_data_field: COST_DATA_FIELD_MAP.PROVIDER.name,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',

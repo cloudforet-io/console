@@ -2,7 +2,7 @@ import type { DashboardConfig } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
-import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['complianceStatus'],
@@ -11,19 +11,19 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['countOfPassAndFailFindings', {
         title: 'Count of Pass and Fail Findings by Region',
         widget_options: {
-            asset_data_field: ASSET_GROUP_BY.REGION,
+            asset_data_field: ASSET_DATA_FIELD_MAP.REGION.name,
         },
     }],
     ['countOfFailFindings', {
         title: 'Count of Fail Findings by Service',
         widget_options: {
-            asset_data_field: ASSET_GROUP_BY.SERVICE,
+            asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
         },
     }],
     ['trendOfPassAndFailFindings', {
         title: 'Trend of Pass and Fail Findings by Service',
         widget_options: {
-            asset_data_field: ASSET_GROUP_BY.SERVICE,
+            asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
         },
     }],
     ['severityStatusByService'],

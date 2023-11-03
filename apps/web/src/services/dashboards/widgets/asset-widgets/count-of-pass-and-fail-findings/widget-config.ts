@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { ASSET_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
@@ -18,7 +18,7 @@ const countOfPassAndFailFindingsWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.YEARLY,
-        asset_data_field: ASSET_GROUP_BY.REGION,
+        asset_data_field: ASSET_DATA_FIELD_MAP.REGION.name,
         pagination_options: {
             enabled: true,
             page_size: 8,
