@@ -12,7 +12,6 @@ import totalFailFindingsStatus from '@/services/dashboards/widgets/asset-widgets
 import trendOfPassAndFailFindings from '@/services/dashboards/widgets/asset-widgets/trend-of-pass-and-fail-findings/widget-config';
 import awsCloudFrontCost from '@/services/dashboards/widgets/cost-widgets/aws-cloud-front-cost/widget-config';
 import awsDataTransferByRegion from '@/services/dashboards/widgets/cost-widgets/aws-data-transfer-by-region/widget-config';
-import awsDataTransferCostTrend from '@/services/dashboards/widgets/cost-widgets/aws-data-transfer-cost-trend/widget-config';
 import budgetStatus from '@/services/dashboards/widgets/cost-widgets/budget-status/widget-config';
 import budgetUsageByTarget from '@/services/dashboards/widgets/cost-widgets/budget-usage-by-target/widget-config';
 import budgetUsageSummary from '@/services/dashboards/widgets/cost-widgets/budget-usage-summary/widget-config';
@@ -31,7 +30,6 @@ export const CONSOLE_WIDGET_LIST = [
     'budgetUsageSummary',
     'costMap',
     'costTrend',
-    'awsDataTransferCostTrend',
     'costTrendStacked',
     'awsCloudFrontCost',
     'costPie',
@@ -57,7 +55,6 @@ export const CONSOLE_WIDGET_CONFIGS: Record<WidgetKey, Partial<WidgetConfig>> = 
     budgetUsageSummary,
     costMap,
     costTrend,
-    awsDataTransferCostTrend,
     costTrendStacked,
     awsCloudFrontCost,
     costPie,
