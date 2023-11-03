@@ -10,6 +10,8 @@ import type {
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import DashboardCostWidgetValueOptionDropdown
+    from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardCostWidgetValueOptionDropdown.vue';
 import type {
     InheritanceMode,
     WidgetOptionsSchemaProperty,
@@ -73,39 +75,53 @@ watch(() => props.inherit, () => {
             <template #label-extra>
                 <div class="inherit-toggle-button-wrapper">
                     <span class="text"
-                          :class="{inherit: !props.inherit}"
+                          :class="{inherit: props.inheritanceMode !== 'NONE'}"
                     >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                     <p-toggle-button :value="props.inherit"
-                                     :disabled="props.nonInheritable"
+                                     :disabled="props.inheritanceMode === 'NONE'"
                                      @change-toggle="emit('update:inherit', $event)"
                     />
                 </div>
             </template>
-            <div class="select-form-wrapper">
-                <p-select-dropdown use-fixed-menu-style
-                                   :is-filterable="!props.inherit"
-                                   :multi-selectable="props.selectionType === 'MULTI'"
-                                   :handler="props.menuHandlers"
-                                   :selected="props.selected"
-                                   :invalid="!!state.errorMessage"
-                                   @update:selected="handleUpdateSelected"
-                                   @update:visible-menu="handleUpdateVisibleMenu"
+            <div>
+                <!-- HACK: Modeling it like any other option thereafter -->
+                <div v-if="props.label !== 'Cost Tag' || props.label !== 'Cost Additional Info'"
+                     class="select-form-wrapper"
                 >
-                    <template #dropdown-button>
-                        <div v-if="!props.nonInheritable && props.inherit"
-                             class="dropdown-inner"
-                        >
-                            <span class="item-label">{{ props.selected?.[0]?.label }}</span>
-                            <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
-                        </div>
-                    </template>
-                </p-select-dropdown>
-                <p-icon-button v-if="props.deletable"
-                               class="delete-button"
-                               shape="square"
-                               style-type="negative-secondary"
-                               name="ic_delete"
-                               @click="emit('delete')"
+                    <p-select-dropdown use-fixed-menu-style
+                                       :is-filterable="!props.inherit"
+                                       :multi-selectable="props.selectionType === 'MULTI'"
+                                       :handler="props.menuHandlers"
+                                       :selected="props.selected"
+                                       :invalid="!!state.errorMessage"
+                                       @update:selected="handleUpdateSelected"
+                                       @update:visible-menu="handleUpdateVisibleMenu"
+                    >
+                        <template #dropdown-button>
+                            <div v-if="props.inheritanceMode !== 'NONE' && props.inherit"
+                                 class="dropdown-inner"
+                            >
+                                <span class="item-label">{{ props.selected?.[0]?.label }}</span>
+                                <span class="suffix-text">{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.FROM_DASHBOARD') }}</span>
+                            </div>
+                        </template>
+                    </p-select-dropdown>
+                    <p-icon-button v-if="props.deletable"
+                                   class="delete-button"
+                                   shape="square"
+                                   style-type="negative-secondary"
+                                   name="ic_delete"
+                                   @click="emit('delete')"
+                    />
+                </div>
+                <!-- TODO: will be updated-->
+                <dashboard-cost-widget-value-option-dropdown
+                    v-else
+                    :selected="props.selected"
+                    :handler="props.menuHandlers"
+                    :invalid="!!state.errorMessage"
+                    @update:selected="handleUpdateSelected"
+                    @delete="emit('delete')"
                 />
             </div>
         </p-field-group>
