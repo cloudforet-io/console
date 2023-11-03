@@ -291,8 +291,10 @@ const getConvertedWidgetLayouts = (storedWidgetLayouts: DashboardModel['layouts'
     return storedWidgetLayouts.map((layout) => layout.map((widgetInfo) => {
         const convertedInheritOptions = getConvertedWidgetInheritOptions(widgetInfo.inherit_options);
         const convertedWidgetOptions = getConvertedWidgetOptions(widgetInfo.widget_options);
+        const convertedWidgetName = getConvertedWidgetName(widgetInfo.widget_name);
         return {
             ...widgetInfo,
+            widget_name: convertedWidgetName,
             inherit_options: convertedInheritOptions,
             widget_options: convertedWidgetOptions,
         };
@@ -334,6 +336,12 @@ const getConvertedWidgetOptions = (storedWidgetOptions?: WidgetOptions): WidgetO
         }
     });
     return widgetOptions;
+};
+const getConvertedWidgetName = (storedWidgetName: string): string => {
+    if (storedWidgetName === 'awsDataTransferCostTrend') {
+        return 'costTrend';
+    }
+    return storedWidgetName;
 };
 
 const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSchema): DashboardVariablesSchema => {
