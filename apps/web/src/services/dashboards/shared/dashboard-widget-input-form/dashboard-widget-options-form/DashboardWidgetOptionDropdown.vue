@@ -84,6 +84,7 @@ watch(() => props.inherit, () => {
                 </div>
             </template>
             <div>
+                <!-- HACK: Modeling it like any other option thereafter -->
                 <div v-if="props.label !== 'Cost Tag' || props.label !== 'Cost Additional Info'"
                      class="select-form-wrapper"
                 >
