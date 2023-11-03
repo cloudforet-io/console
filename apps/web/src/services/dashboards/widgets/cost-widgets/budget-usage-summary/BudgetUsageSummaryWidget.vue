@@ -117,7 +117,7 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
-        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {

@@ -18,7 +18,7 @@ import type { MergedWidgetState } from '@/services/dashboards/widgets/_hooks/use
 export interface WidgetFrameOptions {
     dateRange?: DateRange|ComputedRef<DateRange>;
     currency?: Currency|ComputedRef<Currency>;
-    widgetLocation?: Location|ComputedRef<Location>;
+    widgetLocation?: Location|ComputedRef<Location|undefined>;
 }
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,

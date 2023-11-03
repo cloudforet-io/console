@@ -4,7 +4,27 @@ import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashbo
 import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
-    ['awsDataTransferCostTrend'],
+    ['costTrend', {
+        title: 'AWS Data-Transfer Cost Trend',
+        widget_options: {
+            cost_data_type: 'cost',
+            cost_data_field: 'additional_info.Usage Type Details',
+            filters: {
+                // TODO: must be updated to string[] type
+                'filters.cost_product': [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
+            },
+        },
+        schema_properties: [
+            'cost_data_source',
+            'cost_data_field',
+            'cost_data_type',
+            'filters.cost_product',
+            'filters.project',
+            'filters.service_account',
+            'filters.project_group',
+            'filters.region',
+        ],
+    }],
     ['awsDataTransferByRegion'],
     ['awsCloudFrontCost', { title: 'AWS CloudFront Cost by Project' }],
 ];

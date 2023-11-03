@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const costTrendWidgetConfig: Partial<WidgetConfig> = {
@@ -13,7 +13,7 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     options: {
-        granularity: 'MONTHLY',
+        granularity: GRANULARITY.MONTHLY,
         chart_type: CHART_TYPE.LINE,
         legend_options: {
             enabled: true,

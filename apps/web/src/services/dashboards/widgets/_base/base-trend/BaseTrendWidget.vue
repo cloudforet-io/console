@@ -8,10 +8,10 @@ import type { Series } from '@amcharts/amcharts5';
 import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, sortBy, uniqBy } from 'lodash';
 
-import { sortArrayInObjectArray } from '@cloudforet/core-lib';
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
+import { sortArrayInObjectArray } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -19,6 +19,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -30,12 +31,10 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import { CHART_TYPE, GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
     WidgetEmit,
-    SelectorType,
 } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
@@ -47,9 +46,6 @@ import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers
 import {
     getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import {
-    useCostWidgetFrameHeaderDropdown,
-} from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
@@ -58,14 +54,15 @@ import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-w
 import type { CostAnalyzeResponse, Legend } from '@/services/dashboards/widgets/type';
 
 
+interface SubData { date: string; value: number }
 interface Data {
-    cost_sum: { date: string; value: number }[];
-    _total_cost_sum: number;
-    [groupBy: string]: any;
+    value_sum: SubData[];
+    _total_value_sum: number;
+    [dataFieldKey: string]: any; // provider: aws or provider: azure
 }
 interface ChartData {
-    date?: string;
-    [groupBy: string]: number | any; // aws: 12333
+    date: string;
+    [dataField: string]: any; // e.g. aws: 12333 or azure: 1234
 }
 type Response = CostAnalyzeResponse<Data>;
 
@@ -89,7 +86,8 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    widgetLocation: computed<Location>(() => {
+    assetWidgetLocation: undefined,
+    costWidgetLocation: computed<Location>(() => {
         const end = dayjs.utc(widgetState.settings?.date_range?.end);
         const _period = {
             start: end.subtract(5, 'month').format('YYYY-MM'),
@@ -103,85 +101,131 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                group_by: arrayToQueryString([widgetState.groupBy]),
+                group_by: arrayToQueryString([widgetState.dataField]),
                 period: objectToQueryString(_period),
                 filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
         };
     }),
 });
+
 const state = reactive({
     loading: true,
     data: null as Response | null,
     chart: null as null | XYChart,
+    dataType: computed<string|undefined>(() => (widgetState.options.cost_data_type)),
     chartData: computed<ChartData[]>(() => {
-        const data = getRefinedXYChartData<Data, ChartData>(state.data?.results, {
-            groupBy: widgetState.groupBy,
-            arrayDataKey: 'cost_sum',
+        if (!state.data?.results) return [];
+
+        const chartData: ChartData[] = getRefinedXYChartData<Data, ChartData>(state.data.results, {
+            groupBy: widgetState.parsedDataField,
+            arrayDataKey: 'value_sum',
             categoryKey: DATE_FIELD_NAME,
             valueKey: 'value',
         });
-        return data;
+        return sortBy(chartData, widgetState.dateRange, DATE_FIELD_NAME);
     }),
     tableFields: computed<Field[]>(() => {
-        if (!widgetState.groupBy) return [];
-        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, { type: 'cost' });
-        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+        let _textOptions: Field['textOptions'];
+        if (state.dataType === 'cost') {
+            _textOptions = { type: 'cost' };
+        } else if (state.dataType === 'usage_quantity') {
+            _textOptions = { type: 'usage', unitPath: 'usage_unit' };
+        }
+        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.parsedDataField]?.label ?? widgetState.parsedDataField;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.parsedDataField) as ReferenceType;
 
         // set width of table fields
         const groupByFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
         const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
 
+        const groupByField: Field = {
+            label: groupByLabel,
+            name: widgetState.parsedDataField,
+            textOptions: referenceType ? { type: 'reference', referenceType } : undefined,
+            width: groupByFieldWidth,
+        };
         return [
-            {
-                label: groupByLabel,
-                name: widgetState.groupBy,
-                textOptions: { type: 'reference', referenceType },
-                width: groupByFieldWidth,
-            },
+            groupByField,
             ...refinedFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
-    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, widgetState.groupBy, props.allReferenceTypeInfo, state.disableReferenceColor)),
+    tableData: computed<Data[]>(() => {
+        const tableData: Data[] = sortArrayInObjectArray<Data>(
+            getRefinedDateTableData(state.data?.results, widgetState.dateRange, ['value_sum']),
+            DATE_FIELD_NAME,
+            ['value_sum'],
+        ).map((data) => {
+            let value = data[widgetState.parsedDataField] ?? 'Unknown';
+            if (state.dataType === 'usage_quantity') value = `${value}${data.usage_unit ? ` (${data.usage_unit})` : ''}`;
+            return {
+                ...data,
+                [widgetState.parsedDataField]: value,
+            };
+        });
+        return tableData;
+    }),
+    legends: computed<Legend[]>(() => {
+        const data = state.data?.results ?? [];
+        const legends: Legend[] = getXYChartLegends(data, widgetState.parsedDataField, props.allReferenceTypeInfo)
+            .map((l, i) => {
+                let label = l.label;
+                if (state.dataType === 'usage_quantity') label = `${label}${data[i]?.usage_unit ? ` (${data[i]?.usage_unit})` : ''}`;
+                return { ...l, label };
+            });
+        return legends;
+    }),
+    showLegendsOnTable: computed(() => widgetState.options.legend_options?.enabled && widgetState.options.legend_options.show_at === 'table'),
+    showChart: computed(() => {
+        if (state.dataType !== 'usage_quantity') return true;
+        if (!state.data?.results) return true;
+        // hide chart when there are different usage_unit in data or usage_unit is null
+        if (state.data.results[0]?.value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
+        return uniqBy(state.data.results, 'usage_unit').length === 1;
+    }),
+    usageUnit: computed(() => state.data?.results?.[0]?.usage_unit),
     disableReferenceColor: computed<boolean>(() => !!props.theme),
 });
 
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
-const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown({
-    selectorOptions: computed(() => widgetState.options?.selector_options ?? {}),
-});
-
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
-const fetchData = async (): Promise<Response> => {
+const fetchData = async (): Promise<Response|null> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+
+        const groupBy = [widgetState.dataField, 'date'];
+        if (state.dataType === 'usage_quantity') {
+            groupBy.push('usage_unit');
+        }
+
+        console.debug('groupBy', groupBy);
+
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy],
+                group_by: groupBy,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_cost_sum', desc: true }],
+                sort: [{ key: '_total_value_sum', desc: true }],
                 field_group: ['date'],
                 ...apiQueryHelper.data,
             },
         });
         if (status === 'succeed') {
-            const refinedData = getRefinedDateTableData(response.results, widgetState.dateRange);
             return {
-                results: sortArrayInObjectArray(refinedData, 'date', ['cost_sum']),
+                results: response.results,
                 more: response.more,
             };
         }
@@ -203,6 +247,9 @@ const drawChart = (chartData: ChartData[]) => {
     // set chart colors
     chartHelper.setChartColors(chart, colorSet.value);
 
+    // hide zoom button
+    chart.zoomOutButton.set('forceHidden', true);
+
     // set cursor if line chart
     if (isLineChart) {
         chart.get('cursor')?.lineX.setAll({
@@ -213,7 +260,7 @@ const drawChart = (chartData: ChartData[]) => {
     // set series
     state.legends.forEach((legend) => {
         const seriesSettings = {
-            name: legend.label,
+            name: legend.label as string,
             valueYField: legend.name,
         };
 
@@ -231,11 +278,23 @@ const drawChart = (chartData: ChartData[]) => {
 
         // create tooltip and set on series
         const tooltip = chartHelper.createTooltip();
-        chartHelper.setXYSharedTooltipText(chart, tooltip, (value) => currencyMoneyFormatter(value, { currency: widgetState.currency }));
+        let valueFormatter: ((value: any) => string)|undefined;
+        if (state.dataType === 'usage_quantity') {
+            valueFormatter = (value) => usageUnitFormatter(value, { unit: state.usageUnit }) ?? '';
+        } else if (state.dataType === 'cost') {
+            valueFormatter = (value) => currencyMoneyFormatter(value, { currency: widgetState.currency }) ?? '';
+        }
+        chartHelper.setXYSharedTooltipText(
+            chart,
+            tooltip,
+            valueFormatter,
+        );
         (series as Series).set('tooltip', tooltip);
 
         // set data on series
         series.data.setAll(cloneDeep(chartData));
+
+        state.chart = chart;
     });
 
     // set chart legends if enabled
@@ -271,10 +330,6 @@ const refreshWidget = async (_thisPage = 1): Promise<Response> => {
 };
 
 /* Event */
-const handleSelectSelectorType = (selected: SelectorType) => {
-    selectedSelectorType.value = selected;
-    refreshWidget();
-};
 const handleToggleLegend = (index: number) => {
     chartHelper.toggleSeries(state.chart, index);
 };
@@ -311,16 +366,10 @@ defineExpose<WidgetExpose<Response>>({
                   class="base-trend-widget"
                   v-on="widgetFrameEventHandlers"
     >
-        <template v-if="selectorItems.length"
-                  #header-right
-        >
-            <widget-frame-header-dropdown :items="selectorItems"
-                                          :selected="selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
         <div class="data-container">
-            <div class="chart-wrapper">
+            <div v-if="state.showChart"
+                 class="chart-wrapper"
+            >
                 <p-data-loader class="chart-loader"
                                :loading="props.loading || state.loading"
                                :data="state.chartData"
@@ -336,14 +385,14 @@ defineExpose<WidgetExpose<Response>>({
             </div>
             <widget-data-table :loading="props.loading || state.loading"
                                :fields="state.tableFields"
-                               :items="state.data ? state.data.results : []"
+                               :items="state.tableData"
                                :currency="widgetState.currency"
                                :all-reference-type-info="props.allReferenceTypeInfo"
-                               :legends="state.legends"
-                               :color-set="colorSet"
                                :this-page="thisPage"
                                :show-next-page="state.data ? state.data.more : false"
-                               show-legend
+                               :legends="state.legends"
+                               :color-set="colorSet"
+                               :show-legend="state.showLegendsOnTable"
                                @toggle-legend="handleToggleLegend"
                                @update:thisPage="handleUpdateThisPage"
             />
@@ -372,6 +421,9 @@ defineExpose<WidgetExpose<Response>>({
         }
     }
     &.full {
+        .data-container {
+            min-height: 21rem;
+        }
         .widget-data-table {
             height: auto;
         }

@@ -4,7 +4,6 @@ import {
     defineExpose,
     defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import { color } from '@amcharts/amcharts5';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
@@ -16,25 +15,20 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -66,21 +60,7 @@ const { colorSet } = useWidgetColorSet({
     dataSize: computed(() => state.chartData?.length ?? 0),
 });
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(GRANULARITY.DAILY),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-        },
-    })),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const { pageSize, thisPage } = useWidgetPagination(widgetState);
 

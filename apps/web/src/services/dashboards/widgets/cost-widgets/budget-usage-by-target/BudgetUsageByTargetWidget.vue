@@ -2,14 +2,12 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import {
     PProgressBar,
 } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -18,7 +16,6 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
@@ -42,22 +39,11 @@ interface Data {
 }
 type Response = BudgetUsageAnalyzeResponse<Data>;
 
-const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => {
-        const dataSourceId = widgetState.options.cost_data_source;
-        return {
-            name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-            params: {},
-            query: {
-                filters: budgetQueryHelper.setFilters([{ k: 'data_source_id', v: [dataSourceId], o: '=' }]).rawQueryStrings,
-            },
-        };
-    }),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
+
 const state = reactive({
     loading: true,
     data: undefined as Response | undefined,
@@ -96,7 +82,7 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Response> => {
     try {
-        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,

@@ -9,7 +9,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-widgets/budget-usage-by-target/BudgetUsageByTargetWidget.vue'),
     }),
-    labels: ['Cost'],
+    labels: ['Cost', 'Budget'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BUDGET_USAGE_WITH_FORECAST.DESC',
         preview_image: 'widget-img_budgetUsageWithForecast--thumbnail.png',

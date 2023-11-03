@@ -2,12 +2,10 @@
 import {
     computed, defineExpose, defineProps, reactive,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import { range } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -18,7 +16,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, red, yellow } from '@/styles/colors';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 // eslint-disable-next-line import/no-cycle
@@ -37,22 +34,10 @@ interface Data {
 }
 type Response = BudgetUsageAnalyzeResponse<Data>;
 
-const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => {
-        const dataSourceId = widgetState.options.cost_data_source;
-        return {
-            name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-            params: {},
-            query: {
-                filters: budgetQueryHelper.setFilters([{ k: 'data_source_id', v: [dataSourceId], o: '=' }]).rawQueryStrings,
-            },
-        };
-    }),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const state = reactive({
     loading: true,
@@ -93,7 +78,7 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Response|undefined> => {
     try {
-        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
@@ -153,7 +138,7 @@ const refreshWidget = async (): Promise<Response|undefined> => {
     return state.data;
 };
 
-useWidgetLifecycle({
+useWidgetLifecycle<Response|undefined>({
     disposeWidget: undefined,
     initWidget,
     refreshWidget,
