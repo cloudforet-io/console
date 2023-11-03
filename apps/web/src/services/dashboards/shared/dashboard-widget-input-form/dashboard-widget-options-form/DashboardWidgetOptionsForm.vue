@@ -214,9 +214,6 @@ const initSelectedMenuItems = async (index: number, propertyName: string): Promi
     return [];
 };
 
-
-// state.selectedList = state.propertySchemaTuples.map(([propertyName]) => initSelectedMenuItems(propertyName));
-
 (async () => {
     // init state.selectedList
     const selectedListTuples: Array<[number, SelectDropdownMenuItem[]]> = [];
