@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { CostDataField } from '@/services/dashboards/widgets/_configs/config';
+import type { DataField } from '@/services/dashboards/widgets/_configs/config';
 import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import type {
     Legend,
@@ -21,25 +21,25 @@ interface RawData {
  */
 export const getXYChartLegends = <T = Record<string, any>>(
     rawData?: T[],
-    groupBy?: string,
+    dataField?: string,
     allReferenceTypeInfo?: AllReferenceTypeInfo,
     disableReferenceColor = false,
 ): Legend[] => {
-    if (!rawData || !groupBy) return [];
+    if (!rawData || !dataField) return [];
     const legends: Legend[] = [];
     rawData.forEach((d) => {
-        let _name = d[groupBy];
-        let _label = d[groupBy];
+        let _name = d[dataField];
+        let _label = d[dataField];
         let _color;
-        const referenceTypeInfo = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === groupBy);
+        const referenceTypeInfo = Object.values(allReferenceTypeInfo ?? {}).find((info) => info.key === dataField);
         if (_name && referenceTypeInfo) {
             const referenceMap = referenceTypeInfo.referenceMap;
             _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-            if (groupBy === COST_DATA_FIELD_MAP.PROVIDER.name && !disableReferenceColor) {
+            if (dataField === COST_DATA_FIELD_MAP.PROVIDER.name && !disableReferenceColor) {
                 _color = referenceMap[_name]?.color;
             }
         } else if (!_name) {
-            _name = `no_${groupBy}`;
+            _name = `no_${dataField}`;
             _label = 'Unknown';
         }
         legends.push({
@@ -52,9 +52,9 @@ export const getXYChartLegends = <T = Record<string, any>>(
     return legends;
 };
 
-export const getPieChartLegends = (rawData: RawData[], groupBy?: string): Legend[] => {
-    if (!rawData || !groupBy) return [];
-    return rawData.map((d) => ({ name: d[groupBy], disabled: false }));
+export const getPieChartLegends = (rawData: RawData[], dataField?: string): Legend[] => {
+    if (!rawData || !dataField) return [];
+    return rawData.map((d) => ({ name: d[dataField], disabled: false }));
 };
 
 export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSettings<any>> => {
@@ -68,7 +68,7 @@ export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSett
 
 
 type AppendedData<T> = T & {
-    [groupBy: string]: string | any;
+    [dataField: string]: string | any;
 };
 /**
  * @name getRefinedPieChartData
@@ -78,15 +78,15 @@ type AppendedData<T> = T & {
  */
 export const getRefinedPieChartData = <T extends RawData = RawData>(
     rawData: T[],
-    groupBy: CostDataField,
+    dataField: DataField,
     allReferenceTypeInfo: AllReferenceTypeInfo,
 ): AppendedData<T>[] => {
-    if (!rawData || !groupBy) return [];
+    if (!rawData || !dataField) return [];
 
     const chartData: AppendedData<T>[] = [];
     rawData.forEach((d) => {
-        let _name = d[groupBy];
-        const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+        let _name = d[dataField];
+        const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField);
         if (_name && referenceTypeInfo) {
             const referenceMap = referenceTypeInfo.referenceMap;
             _name = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
@@ -95,7 +95,7 @@ export const getRefinedPieChartData = <T extends RawData = RawData>(
         }
         chartData.push({
             ...d,
-            [groupBy]: _name,
+            [dataField]: _name,
         } as AppendedData<T>);
     });
     return chartData;

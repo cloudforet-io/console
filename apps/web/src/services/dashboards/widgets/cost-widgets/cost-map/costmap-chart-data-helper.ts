@@ -7,16 +7,16 @@ import type { CostDataField } from '@/services/dashboards/widgets/_configs/confi
  * @name getRefinedTreemapChartData
  * @description Convert raw data to TreemapChart data.
  */
-export const getRefinedTreemapChartData = (rawDataList: AnalyzeRawData[], groupBy: CostDataField|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
+export const getRefinedTreemapChartData = (rawDataList: AnalyzeRawData[], dataField: CostDataField|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
     const chartData: TreemapChartData[] = [{
         children: [],
     }];
-    if (!rawDataList || !groupBy) return [];
+    if (!rawDataList || !dataField) return [];
 
-    const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy)?.referenceMap;
+    const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField)?.referenceMap;
     rawDataList.forEach((rawData) => {
-        const groupByValue = rawData[groupBy];
-        const label = convertValueToLabel(groupByValue, referenceMap);
+        const dataFieldValue = rawData[dataField];
+        const label = convertValueToLabel(dataFieldValue, referenceMap);
 
         chartData[0].children.push({
             ...rawData,
