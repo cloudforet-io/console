@@ -19,11 +19,16 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
 
     #response: ListResponse = { results: [] };
 
-    #fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{
+        results: { keys: string[] }[];
+    }>>;
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
-        if (!query.options?.query_set_id) throw new Error('No \'query_set_id\'');
         try {
+            if (!query.options?.query_set_id) throw new Error('No \'query_set_id\'');
+
+            if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
+
             const _query: Record<string, any> = {
                 only: ['data_keys'],
                 filter: [

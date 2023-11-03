@@ -19,11 +19,16 @@ export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariabl
 
     #response: ListResponse = { results: [] };
 
-    #fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{
+        results: { additional_info_keys: string[] }[];
+    }>>;
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
-        if (!query.options?.query_set_id) throw new Error('No \'query_set_id\''); // TODO: check its working
         try {
+            if (!query.options?.query_set_id) throw new Error('No \'query_set_id\''); // TODO: check its working
+
+            if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
+
             const _query: Record<string, any> = {
                 only: ['additional_info_keys'],
                 filter: [

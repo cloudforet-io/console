@@ -24,7 +24,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: string[] }>> = this.#getFetcher();
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: string[] }>>;
 
     constructor(config?: ResourceValueVariableModelConfig) {
         if (!config) return;
