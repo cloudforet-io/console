@@ -143,7 +143,33 @@ const handleDeleteProperty = (propertyName: string) => {
 };
 
 /* Init */
-const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] => {
+const getInitialSelectedItemByHandlers = async (
+    handlers: AutocompleteHandler[],
+    selected: SelectDropdownMenuItem|SelectDropdownMenuItem[],
+): Promise<SelectDropdownMenuItem[]> => {
+    if (!selected) return [];
+    let _selected = Array.isArray(selected) ? selected : [selected];
+    const promiseResults = await Promise.allSettled(handlers.map((handler) => handler(
+        '',
+        undefined,
+        undefined,
+        _selected,
+    )));
+    promiseResults.forEach((result, idx) => {
+        if (result.status === 'fulfilled') {
+            const results = result.value.results;
+            _selected = _selected.map((item) => {
+                const found = results.find((d) => d.name === item.name);
+                if (found) return found;
+                return item;
+            });
+        } else {
+            console.error(new Error(`Failed to fetch data from handler: ${idx}`));
+        }
+    });
+    return _selected;
+};
+const initSelectedMenuItems = async (index: number, propertyName: string): Promise<SelectDropdownMenuItem[]> => {
     const inheritOption = widgetFormStore.inheritOptions?.[propertyName];
     const optionSchema = state.properties[propertyName];
 
@@ -179,13 +205,25 @@ const initSelectedMenuItems = (propertyName: string): SelectDropdownMenuItem[] =
 
         return values;
     } if (typeof selected !== 'object') {
-        return [{ name: selected }]; // TODO: have to initialize label
+        const menuHandlers = getMenuHandlers(index, optionSchema);
+        const _selected = await getInitialSelectedItemByHandlers(menuHandlers, [{ name: selected }]);
+        return _selected;
     }
     console.warn(new Error(`Invalid selected value: ${selected}`));
 
     return [];
 };
-state.selectedList = state.propertySchemaTuples.map(([propertyName]) => initSelectedMenuItems(propertyName));
+
+(async () => {
+    // init state.selectedList
+    const selectedListTuples: Array<[number, SelectDropdownMenuItem[]]> = [];
+    await Promise.all(state.propertySchemaTuples.map(async ([propertyName], idx) => {
+        const selected = await initSelectedMenuItems(idx, propertyName);
+        selectedListTuples.push([idx, selected]);
+    }));
+    state.selectedList = selectedListTuples.sort((a, b) => a[0] - b[0]).map(([, selected]) => selected);
+})();
+
 
 </script>
 
