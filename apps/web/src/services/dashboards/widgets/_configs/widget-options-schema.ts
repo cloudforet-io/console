@@ -30,24 +30,27 @@ export type WidgetOptionsSchema = {
     order: string[];
 };
 
-export const WIDGET_FILTER_KEYS = [
+export const WIDGET_OPTION_FILTER_KEY_MAP = {
     // common
-    'filters.provider',
-    'filters.project',
-    'filters.service_account',
-    'filters.project_group',
-    'filters.region',
+    provider: 'filters.provider',
+    project: 'filters.project',
+    service_account: 'filters.service_account',
+    project_group: 'filters.project_group',
+    region: 'filters.region',
     // 'filters.cloud_service_type': 'filters.cloud_service_type',
     // 'filters.user': 'filters.user',
     // cost
-    'filters.cost_product',
-    'filters.cost_usage_type',
-    'filters.cost_tag_value',
-    'filters.cost_additional_info_value',
+    cost_product: 'filters.cost_product',
+    cost_usage_type: 'filters.cost_usage_type',
+    cost_tag_value: 'filters.cost_tag_value',
+    cost_additional_info_value: 'filters.cost_additional_info_value',
     // asset
-    'filters.asset_account',
-] as const;
-export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
+    asset_account: 'filters.asset_account',
+} as const;
+export type WidgetFilterKey = keyof typeof WIDGET_OPTION_FILTER_KEY_MAP;
+export type WidgetFilterOptionKey = typeof WIDGET_OPTION_FILTER_KEY_MAP[keyof typeof WIDGET_OPTION_FILTER_KEY_MAP];
+
+const WIDGET_FILTER_OPTION_KEYS = Object.values(WIDGET_OPTION_FILTER_KEY_MAP);
 
 export const WIDGET_OPTION_KEYS = [
     // cost option keys
@@ -61,11 +64,11 @@ export const WIDGET_OPTION_KEYS = [
     'asset_data_type',
     'asset_secondary_data_field',
     // option filters
-    ...WIDGET_FILTER_KEYS,
+    ...WIDGET_FILTER_OPTION_KEYS,
 ] as const;
 export type WidgetOptionKey = typeof WIDGET_OPTION_KEYS[number];
 
-export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterKey, WidgetOptionsSchemaProperty> = {
+export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, WidgetOptionsSchemaProperty> = {
     'filters.provider': {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
@@ -150,7 +153,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterKey, WidgetOpt
     },
 };
 
-export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>, WidgetFilterKey> = {
+export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>, WidgetFilterOptionKey> = {
     cost_data_source: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,

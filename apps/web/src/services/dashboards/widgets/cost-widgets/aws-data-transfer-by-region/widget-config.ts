@@ -3,7 +3,7 @@ import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboa
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
-    widget_config_id: 'awsDataTransferByRegion',
+    widget_config_id: 'costByRegionMultiFields',
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-widgets/aws-data-transfer-by-region/AWSDataTransferByRegionWidget.vue'),
     }),

@@ -9,7 +9,7 @@ import type {
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    WidgetFilterKey,
+    WidgetFilterOptionKey,
     WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
@@ -27,7 +27,7 @@ Object.entries(WIDGET_OPTIONS_SCHEMA_PROPERTIES).forEach(([optionKey, property])
     if (variableKey) VAR_KEY_TO_OPTION_KEY_MAP[variableKey] = optionKey;
 });
 
-export const getWidgetOptionKeyByVariableKey = (key: string): WidgetFilterKey|undefined => VAR_KEY_TO_OPTION_KEY_MAP[key];
+export const getWidgetOptionKeyByVariableKey = (key: string): WidgetFilterOptionKey|undefined => VAR_KEY_TO_OPTION_KEY_MAP[key];
 
 export const getNonInheritedWidgetOptionsAmongUsedVariables = (
     variablesSchema: DashboardVariablesSchema,
