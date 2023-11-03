@@ -38,7 +38,7 @@ import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
-import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import {
     useCostWidgetFrameHeaderDropdown,
 } from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
@@ -62,11 +62,11 @@ interface Data {
     value_sum: SubData[];
     _total_value_sum: number;
     date: string;
-    [groupBy: string]: string | any; // product: 'AmazonCloudFront'
+    [parsedDataField: string]: string | any; // product: 'AmazonCloudFront'
 }
 type Response = CostAnalyzeResponse<Data>;
 interface TableData extends WidgetTableData {
-    [groupBy: string]: string | any;
+    [parsedDataField: string]: string | any;
 }
 interface ChartData {
     [key: string]: number | any; // // project_id: 'project-1', HTTP Requests: 0.0, HTTPS Requests: 0.0, TransferOut: 0, ...
@@ -95,7 +95,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                group_by: arrayToQueryString([widgetState.groupBy, COST_DATA_FIELD_MAP.USAGE_TYPE.name]),
+                group_by: arrayToQueryString([widgetState.dataField, COST_DATA_FIELD_MAP.USAGE_TYPE.name]),
                 period: objectToQueryString(_period),
                 filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
@@ -115,10 +115,10 @@ const state = reactive({
     loading: true,
     data: null as Response | null,
     fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
-    legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo) : [])),
+    legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.parsedDataField, props.allReferenceTypeInfo) : [])),
     chartData: computed<ChartData[]>(() => {
         const _chartData = getRefinedXYChartData<Data, ChartData>(state.data?.results, {
-            groupBy: widgetState.groupBy,
+            dataField: widgetState.parsedDataField,
             allReferenceTypeInfo: props.allReferenceTypeInfo,
             arrayDataKey: 'value_sum',
             categoryKey: USAGE_TYPE_VALUE_KEY,
@@ -128,11 +128,10 @@ const state = reactive({
         return _chartData.reverse();
     }),
     tableData: computed<TableData[]>(() => {
-        const groupBy = widgetState.groupBy;
-        if (!state.data?.results?.length || !groupBy) return [];
+        if (!widgetState.dataField || !state.data?.results?.length) return [];
         return state.data.results.map((d: Data) => {
             const row: TableData = {
-                [groupBy]: d[groupBy] ?? 'Unknown',
+                [widgetState.parsedDataField]: d[widgetState.parsedDataField] ?? 'Unknown',
             } as TableData;
             d.value_sum?.forEach((subData: SubData) => {
                 const rowKey = state.fieldsKey === 'usage_quantity' ? `${subData[USAGE_TYPE_VALUE_KEY]}_${subData.usage_unit}` : subData[USAGE_TYPE_VALUE_KEY];
@@ -142,7 +141,7 @@ const state = reactive({
         });
     }),
     tableFields: computed<Field[]>(() => {
-        if (!widgetState.groupBy) return [];
+        if (!widgetState.dataField) return [];
         const textOptions: Field['textOptions'] = {
             type: state.fieldsKey === 'cost' ? 'cost' : 'usage',
         };
@@ -158,17 +157,17 @@ const state = reactive({
         });
 
         // set width of table fields
-        const groupByFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
+        const dataFieldTableFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
         const otherFieldWidth = dynamicTableFields.length > 4 ? '18%' : '22%';
 
-        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.groupBy)?.label ?? widgetState.groupBy;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
+        const referenceType = getReferenceTypeOfDataField(props.allReferenceTypeInfo, widgetState.dataField) as ReferenceType;
 
         const fixedFields: Field[] = [{
-            name: widgetState.groupBy,
+            name: widgetState.parsedDataField,
             label: dataFieldLabel,
             textOptions: { type: 'reference', referenceType },
-            width: groupByFieldWidth,
+            width: dataFieldTableFieldWidth,
         }];
         return [
             ...fixedFields,
@@ -186,7 +185,7 @@ const state = reactive({
     usageUnit: computed<string|null>(() => state.data?.results?.[0]?.value_sum[0]?.usage_unit),
     chartSeriesList: computed<string[]>(() => {
         if (!state.chartData?.length) return [];
-        return Object.keys(state.chartData[0]).filter((d) => d !== widgetState.groupBy);
+        return Object.keys(state.chartData[0]).filter((d) => d !== widgetState.parsedDataField);
     }),
 });
 
@@ -196,19 +195,19 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Response> => {
-    if (!widgetState.groupBy) return { results: [], more: false };
+    if (!widgetState.dataField) return { results: [], more: false };
     apiQueryHelper.setFilters(widgetState.consoleFilters);
     if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
     try {
-        const groupBy = [widgetState.groupBy, USAGE_TYPE_QUERY_KEY];
+        const dataField = [widgetState.dataField, USAGE_TYPE_QUERY_KEY];
         if (state.fieldsKey === 'usage_quantity') {
-            groupBy.push('usage_unit');
+            dataField.push('usage_unit');
         }
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: groupBy,
+                group_by: dataField,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -236,11 +235,10 @@ const fetchData = async (): Promise<Response> => {
 
 const drawChart = (chartData) => {
     if (!state.showChart) return;
-    const groupBy = widgetState.groupBy;
-    if (!groupBy) return;
+    if (!widgetState.parsedDataField) return;
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
     chartHelper.setChartColors(chart, colorSet.value);
-    yAxis.set('categoryField', groupBy);
+    yAxis.set('categoryField', widgetState.parsedDataField);
     yAxis.data.setAll(cloneDeep(chartData));
     // legend
     const legend = chartHelper.createLegend({
@@ -252,7 +250,7 @@ const drawChart = (chartData) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: d,
             valueXField: d,
-            categoryYField: groupBy,
+            categoryYField: widgetState.parsedDataField,
             xAxis,
             yAxis,
             baseAxis: yAxis,
@@ -264,7 +262,7 @@ const drawChart = (chartData) => {
 
         const tooltip = chartHelper.createTooltip();
         tooltip.label.adapters.add('text', (text, target) => {
-            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[groupBy]}[/]`;
+            let _text = `[${gray[700]}]${target.dataItem?.dataContext?.[widgetState.parsedDataField]}[/]`;
             chart.series.each((s) => {
                 const fieldName = s.get('valueYField') || s.get('valueXField') || '';
                 let value = target.dataItem?.dataContext?.[fieldName];

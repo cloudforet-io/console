@@ -83,7 +83,7 @@ const fetchData = async (): Promise<Response|undefined> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy, 'name'],
+                group_by: [widgetState.dataField, 'name'],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {

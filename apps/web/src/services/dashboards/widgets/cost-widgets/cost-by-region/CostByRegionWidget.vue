@@ -63,7 +63,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.DAILY),
-                group_by: arrayToQueryString([widgetState.groupBy]),
+                group_by: arrayToQueryString([widgetState.dataField]),
                 period: objectToQueryString(widgetState.dateRange),
                 filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
@@ -112,7 +112,7 @@ const fetchData = async (): Promise<FullData> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy, COST_DATA_FIELD_MAP.PROVIDER.name],
+                group_by: [widgetState.dataField, COST_DATA_FIELD_MAP.PROVIDER.name],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {

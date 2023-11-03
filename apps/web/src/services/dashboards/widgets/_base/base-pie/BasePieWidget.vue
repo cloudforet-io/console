@@ -28,7 +28,7 @@ import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboard
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { getReferenceTypeOfGroupBy } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
@@ -45,7 +45,7 @@ interface Data {
 }
 type FullData = CostAnalyzeResponse<Data>;
 interface ChartData extends Data {
-    [groupBy: string]: string | any;
+    [parsedDataField: string]: string | any;
 }
 
 const chartContext = ref<HTMLElement|null>(null);
@@ -69,16 +69,16 @@ const state = reactive({
     chart: null as null|ReturnType<typeof chartHelper.createPieChart | typeof chartHelper.createDonutChart>,
     series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
     chartData: computed<ChartData[]>(() => {
-        if (!state.data?.results?.length) return [];
-        return getRefinedPieChartData(state.data.results, widgetState.groupBy, props.allReferenceTypeInfo);
+        if (!widgetState.dataField || !state.data?.results?.length) return [];
+        return getRefinedPieChartData(state.data.results, widgetState.parsedDataField, props.allReferenceTypeInfo);
     }),
     tableFields: computed<Field[]>(() => {
-        if (!widgetState.groupBy) return [];
-        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.groupBy)?.label ?? widgetState.groupBy;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+        if (!widgetState.dataField) return [];
+        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
+        const referenceType = getReferenceTypeOfDataField(props.allReferenceTypeInfo, widgetState.dataField) as ReferenceType;
         return [
             {
-                name: widgetState.groupBy,
+                name: widgetState.parsedDataField,
                 label: dataFieldLabel,
                 textOptions: { type: 'reference', referenceType },
             },
@@ -104,7 +104,7 @@ const fetchData = async (): Promise<FullData> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy],
+                group_by: [widgetState.dataField],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -132,7 +132,7 @@ const drawChart = (chartData: ChartData[]) => {
     if (widgetState.chartType === CHART_TYPE.DONUT) chart = chartHelper.createDonutChart();
     else chart = chartHelper.createPieChart();
     const seriesSettings = {
-        categoryField: widgetState.groupBy,
+        categoryField: widgetState.parsedDataField,
         valueField: 'cost_sum',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
@@ -164,7 +164,7 @@ const drawChart = (chartData: ChartData[]) => {
 const initWidget = async (data?: FullData): Promise<FullData> => {
     state.loading = true;
     state.data = data ?? await fetchData();
-    state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
+    state.legends = getPieChartLegends(state.data.results, widgetState.parsedDataField);
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
     state.loading = false;
@@ -176,7 +176,7 @@ const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
     state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
-    state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
+    state.legends = getPieChartLegends(state.data.results, widgetState.parsedDataField);
     chartHelper.refreshRoot();
     await nextTick();
     if (chartHelper.root.value) drawChart(state.chartData);
@@ -203,7 +203,7 @@ useWidgetLifecycle({
     widgetState,
     onCurrencyUpdate: async () => {
         if (!state.data) return;
-        state.legends = getPieChartLegends(state.data.results, widgetState.groupBy);
+        state.legends = getPieChartLegends(state.data.results, widgetState.parsedDataField);
         chartHelper.refreshRoot();
         await nextTick();
         if (chartHelper.root.value) drawChart(state.chartData);

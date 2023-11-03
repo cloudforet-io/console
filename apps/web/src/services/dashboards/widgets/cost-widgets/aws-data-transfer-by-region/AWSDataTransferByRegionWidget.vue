@@ -104,7 +104,7 @@ const state = reactive({
     loading: true,
     data: null as FullData | null,
     fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
-    legends: computed<Legend[]>(() => (state.data?.results ? getPieChartLegends(state.data.results, widgetState.groupBy) : [])),
+    legends: computed<Legend[]>(() => (state.data?.results ? getPieChartLegends(state.data.results, widgetState.parsedDataField) : [])),
     chartData: computed<CircleData[]>(() => getRefinedCircleData(state.data?.results, props.allReferenceTypeInfo?.region?.referenceMap as RegionReferenceMap)),
     tableData: computed<TableData[]>(() => {
         if (!state.data?.results?.length) return [];
@@ -136,14 +136,14 @@ const state = reactive({
         });
 
         // set width of table fields
-        const groupByFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
+        const dataFieldTableFieldWidth = dynamicTableFields.length > 4 ? '28%' : '34%';
         const otherFieldWidth = dynamicTableFields.length > 4 ? '18%' : '22%';
 
         const fixedFields: Field[] = [{
             label: 'Region',
             name: COST_DATA_FIELD_MAP.REGION.name,
             textOptions: { type: 'reference', referenceType: 'region' },
-            width: groupByFieldWidth,
+            width: dataFieldTableFieldWidth,
         }];
         return [
             ...fixedFields,
@@ -196,16 +196,16 @@ const fetchData = async (): Promise<FullData> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        const groupBy = [COST_DATA_FIELD_MAP.REGION.name, USAGE_TYPE_QUERY_KEY];
+        const dataField = [COST_DATA_FIELD_MAP.REGION.name, USAGE_TYPE_QUERY_KEY];
         if (state.fieldsKey === 'usage_quantity') {
-            groupBy.push('usage_unit');
+            dataField.push('usage_unit');
         }
 
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: groupBy,
+                group_by: dataField,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {

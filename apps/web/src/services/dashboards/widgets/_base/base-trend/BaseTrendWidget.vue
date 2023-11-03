@@ -45,7 +45,7 @@ import {
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
-    getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
+    getReferenceTypeOfDataField, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -59,11 +59,11 @@ interface SubData { date: string; value: number }
 interface Data {
     value_sum: SubData[];
     _total_value_sum: number;
-    [dataFieldKey: string]: any; // provider: aws or provider: azure
+    [parsedDataField: string]: any; // provider: aws or provider: azure
 }
 interface ChartData {
     date: string;
-    [dataField: string]: any; // e.g. aws: 12333 or azure: 1234
+    [parsedDataField: string]: any; // e.g. aws: 12333 or azure: 1234
 }
 type Response = CostAnalyzeResponse<Data>;
 
@@ -119,7 +119,7 @@ const state = reactive({
         if (!state.data?.results) return [];
 
         const chartData: ChartData[] = getRefinedXYChartData<Data, ChartData>(state.data.results, {
-            groupBy: widgetState.parsedDataField,
+            dataField: widgetState.parsedDataField,
             arrayDataKey: 'value_sum',
             categoryKey: DATE_FIELD_NAME,
             valueKey: 'value',
@@ -134,21 +134,21 @@ const state = reactive({
             _textOptions = { type: 'usage', unitPath: 'usage_unit' };
         }
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
-        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.parsedDataField)?.label ?? widgetState.parsedDataField;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.parsedDataField) as ReferenceType;
+        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
+        const referenceType = getReferenceTypeOfDataField(props.allReferenceTypeInfo, widgetState.dataField) as ReferenceType;
 
         // set width of table fields
-        const groupByFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
+        const dataFieldTableFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
         const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
 
-        const groupByField: Field = {
+        const dataFieldTableField: Field = {
             label: dataFieldLabel,
             name: widgetState.parsedDataField,
             textOptions: referenceType ? { type: 'reference', referenceType } : undefined,
-            width: groupByFieldWidth,
+            width: dataFieldTableFieldWidth,
         };
         return [
-            groupByField,
+            dataFieldTableField,
             ...refinedFields.map((field) => ({ ...field, width: otherFieldWidth })),
         ];
     }),
@@ -199,18 +199,16 @@ const fetchData = async (): Promise<Response|null> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        const groupBy = [widgetState.dataField, 'date'];
+        const dataField = [widgetState.dataField, 'date'];
         if (state.dataType === 'usage_quantity') {
-            groupBy.push('usage_unit');
+            dataField.push('usage_unit');
         }
-
-        console.debug('groupBy', groupBy);
 
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: groupBy,
+                group_by: dataField,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
