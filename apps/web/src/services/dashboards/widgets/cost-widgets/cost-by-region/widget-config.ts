@@ -1,7 +1,5 @@
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const costByRegionWidgetConfig: WidgetConfig = {
@@ -22,7 +20,7 @@ const costByRegionWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        cost_data_field: MANAGED_VARIABLE_MODEL_CONFIGS.region.key,
+        cost_data_field: COST_GROUP_BY.REGION,
         chart_type: CHART_TYPE.MAP,
         legend_options: {
             enabled: true,

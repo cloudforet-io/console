@@ -1,7 +1,5 @@
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
-
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const costTrendWidgetConfig: Partial<WidgetConfig> = {
@@ -21,7 +19,7 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
             enabled: true,
             show_at: 'table',
         },
-        cost_data_field: MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
+        cost_data_field: COST_GROUP_BY.PROJECT,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
