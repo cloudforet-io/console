@@ -28,7 +28,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -76,16 +76,16 @@ const state = reactive({
     data: null as FullData | null,
     tableFields: computed<Field[]>(() => [
         {
-            label: 'Provider', name: COST_GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
+            label: 'Provider', name: COST_DATA_FIELD_MAP.PROVIDER.name, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
         },
         {
-            label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
+            label: 'Region', name: COST_DATA_FIELD_MAP.REGION.name, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
             label: 'Cost', name: 'cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
-    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo)),
+    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_DATA_FIELD_MAP.PROVIDER.name, props.allReferenceTypeInfo)),
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
     chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results, storeState.regions, storeState.providers)),
 });
@@ -112,7 +112,7 @@ const fetchData = async (): Promise<FullData> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy, COST_GROUP_BY.PROVIDER],
+                group_by: [widgetState.groupBy, COST_DATA_FIELD_MAP.PROVIDER.name],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {

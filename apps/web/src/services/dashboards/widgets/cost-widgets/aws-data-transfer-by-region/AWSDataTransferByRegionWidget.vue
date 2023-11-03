@@ -30,7 +30,7 @@ import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components
 import type {
     WidgetExpose, WidgetProps, SelectorType, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
@@ -56,17 +56,17 @@ interface Data {
     date: string;
     value_sum: SubData[];
     _total_value_sum: number;
-    [COST_GROUP_BY.REGION]: string;
+    [COST_DATA_FIELD_MAP.REGION.name]: string;
 }
 
 interface TableData extends WidgetTableData {
-    [COST_GROUP_BY.REGION]: string;
+    [COST_DATA_FIELD_MAP.REGION.name]: string;
 }
 
 type FullData = CostAnalyzeResponse<Data>;
 
 interface CircleData {
-    [COST_GROUP_BY.REGION]: string;
+    [COST_DATA_FIELD_MAP.REGION.name]: string;
     latitude: number;
     longitude: number;
     _total_value_sum?: number;
@@ -92,7 +92,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.DAILY),
-                group_by: arrayToQueryString([COST_GROUP_BY.REGION, COST_GROUP_BY.USAGE_TYPE]),
+                group_by: arrayToQueryString([COST_DATA_FIELD_MAP.REGION.name, COST_DATA_FIELD_MAP.USAGE_TYPE.name]),
                 period: objectToQueryString(widgetState.dateRange),
                 filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
@@ -110,7 +110,7 @@ const state = reactive({
         if (!state.data?.results?.length) return [];
         const tableData: TableData[] = state.data.results.map((d: Data) => {
             const row: TableData = {
-                [COST_GROUP_BY.REGION]: d.region_code ?? 'Unknown',
+                [COST_DATA_FIELD_MAP.REGION.name]: d.region_code ?? 'Unknown',
             };
             d.value_sum.forEach((subData: SubData) => {
                 const rowKey = state.fieldsKey === 'usage_quantity' ? `${subData[USAGE_TYPE_VALUE_KEY]}_${subData.usage_unit}` : subData[USAGE_TYPE_VALUE_KEY];
@@ -141,7 +141,7 @@ const state = reactive({
 
         const fixedFields: Field[] = [{
             label: 'Region',
-            name: COST_GROUP_BY.REGION,
+            name: COST_DATA_FIELD_MAP.REGION.name,
             textOptions: { type: 'reference', referenceType: 'region' },
             width: groupByFieldWidth,
         }];
@@ -196,7 +196,7 @@ const fetchData = async (): Promise<FullData> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        const groupBy = [COST_GROUP_BY.REGION, USAGE_TYPE_QUERY_KEY];
+        const groupBy = [COST_DATA_FIELD_MAP.REGION.name, USAGE_TYPE_QUERY_KEY];
         if (state.fieldsKey === 'usage_quantity') {
             groupBy.push('usage_unit');
         }

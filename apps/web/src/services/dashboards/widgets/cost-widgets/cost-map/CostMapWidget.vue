@@ -21,7 +21,7 @@ import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-ana
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type {
-    WidgetExpose, WidgetProps, WidgetEmit, CostGroupBy,
+    WidgetExpose, WidgetProps, WidgetEmit, CostDataField,
 } from '@/services/dashboards/widgets/_configs/config';
 import { GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
@@ -74,7 +74,7 @@ const state = reactive({
     data: null as AnalyzeRawData[] | null,
     chartData: computed<TreemapChartData[]>(() => {
         if (!state.data) return [];
-        return getRefinedTreemapChartData(state.data, widgetState.groupBy as CostGroupBy, props.allReferenceTypeInfo);
+        return getRefinedTreemapChartData(state.data, widgetState.groupBy as CostDataField, props.allReferenceTypeInfo);
     }),
 });
 

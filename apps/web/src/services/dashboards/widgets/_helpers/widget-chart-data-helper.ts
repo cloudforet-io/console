@@ -4,7 +4,7 @@ import {
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
+import type { CostDataField } from '@/services/dashboards/widgets/_configs/config';
 
 interface RawData {
     [key: string]: any;
@@ -39,10 +39,10 @@ export const getRefinedXYChartData = <T extends RawData, S extends RawData>(
 
     let chartData: S[] = [];
     rawData.forEach((data) => {
-        const groupByLabel = groupBy ? getGroupByLabel<T, S>(data, groupBy, allReferenceTypeInfo) : undefined;
+        const dataFieldLabel = groupBy ? getGroupByLabel<T, S>(data, groupBy, allReferenceTypeInfo) : undefined;
         chartData = isHorizontal
-            ? mergeRefinedHorizontalXYChartData(chartData, data, options, groupByLabel)
-            : mergeRefinedXYChartData(chartData, data, options, groupByLabel);
+            ? mergeRefinedHorizontalXYChartData(chartData, data, options, dataFieldLabel)
+            : mergeRefinedXYChartData(chartData, data, options, dataFieldLabel);
     });
     return sortBy(chartData, categoryKey);
 };
@@ -129,7 +129,7 @@ type AppendedData<T> = T & {
  */
 export const getRefinedPieChartData = <T extends RawData = RawData>(
     rawData: T[],
-    groupBy: CostGroupBy,
+    groupBy: CostDataField,
     allReferenceTypeInfo: AllReferenceTypeInfo,
 ): AppendedData<T>[] => {
     if (!rawData || !groupBy) return [];

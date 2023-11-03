@@ -4,8 +4,8 @@ import dayjs from 'dayjs';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import type { CostDataField } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import type {
     Legend,
 } from '@/services/dashboards/widgets/type';
@@ -35,7 +35,7 @@ export const getXYChartLegends = <T = Record<string, any>>(
         if (_name && referenceTypeInfo) {
             const referenceMap = referenceTypeInfo.referenceMap;
             _label = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-            if (groupBy === COST_GROUP_BY.PROVIDER && !disableReferenceColor) {
+            if (groupBy === COST_DATA_FIELD_MAP.PROVIDER.name && !disableReferenceColor) {
                 _color = referenceMap[_name]?.color;
             }
         } else if (!_name) {
@@ -78,7 +78,7 @@ type AppendedData<T> = T & {
  */
 export const getRefinedPieChartData = <T extends RawData = RawData>(
     rawData: T[],
-    groupBy: CostGroupBy,
+    groupBy: CostDataField,
     allReferenceTypeInfo: AllReferenceTypeInfo,
 ): AppendedData<T>[] => {
     if (!rawData || !groupBy) return [];

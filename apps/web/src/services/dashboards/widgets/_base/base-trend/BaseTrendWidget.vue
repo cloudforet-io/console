@@ -31,12 +31,13 @@ import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import { CHART_TYPE, GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import {
+    CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY, WIDGET_SIZE,
+} from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
     WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import {
     getDateAxisSettings,
@@ -133,7 +134,7 @@ const state = reactive({
             _textOptions = { type: 'usage', unitPath: 'usage_unit' };
         }
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
-        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.parsedDataField]?.label ?? widgetState.parsedDataField;
+        const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.parsedDataField)?.label ?? widgetState.parsedDataField;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.parsedDataField) as ReferenceType;
 
         // set width of table fields
@@ -141,7 +142,7 @@ const state = reactive({
         const otherFieldWidth = refinedFields.length > 4 ? '18%' : '22%';
 
         const groupByField: Field = {
-            label: groupByLabel,
+            label: dataFieldLabel,
             name: widgetState.parsedDataField,
             textOptions: referenceType ? { type: 'reference', referenceType } : undefined,
             width: groupByFieldWidth,

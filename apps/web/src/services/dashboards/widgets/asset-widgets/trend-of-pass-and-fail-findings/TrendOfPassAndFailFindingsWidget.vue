@@ -25,12 +25,11 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_DATA_FIELD_MAP, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
     WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { ASSET_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getDateAxisSettings,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
@@ -107,11 +106,11 @@ const state = reactive({
             label: `${field.label}\nFailure count`,
             width: props.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
         }));
-        const groupByLabel = ASSET_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
+        const dataFieldLabel = Object.values(ASSET_DATA_FIELD_MAP).find((d) => d.name === widgetState.groupBy)?.label ?? widgetState.groupBy;
         const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
         return [
             {
-                label: groupByLabel,
+                label: dataFieldLabel,
                 name: state.groupByKey,
                 textOptions: { type: 'reference', referenceType },
                 width: props.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,

@@ -8,8 +8,6 @@ import type { Tags } from '@/models';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
-
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import type {
@@ -33,28 +31,26 @@ export const GRANULARITY = {
     YEARLY: 'YEARLY',
 } as const;
 
-export const COST_GROUP_BY = {
+export const COST_DATA_FIELD_MAP = {
     // resource reference type
-    PROVIDER: 'provider',
-    PROJECT: 'project_id',
-    SERVICE_ACCOUNT: 'service_account_id',
-    PROJECT_GROUP: 'project_group_id',
-    REGION: 'region_code',
+    PROJECT_GROUP: { name: 'project_group_id', label: 'Project Group' },
+    PROJECT: { name: 'project_id', label: 'Project' },
+    PROVIDER: { name: 'provider', label: 'Provider' },
+    SERVICE_ACCOUNT: { name: 'service_account_id', label: 'Service Account' },
+    REGION: { name: 'region_code', label: 'Region' },
     // cost reference
-    USAGE_TYPE: 'usage_type',
-    PRODUCT: 'product',
+    USAGE_TYPE: { name: 'usage_type', label: 'Type' },
+    PRODUCT: { name: 'product', label: 'Product' },
 } as const;
-
-export const ASSET_GROUP_BY = {
+export const ASSET_DATA_FIELD_MAP = {
     // resource reference type
-    PROJECT: 'project_id',
-    PROVIDER: 'provider',
-    REGION: 'region_code',
+    PROJECT: { name: 'project_id', label: 'Project' },
+    PROVIDER: { name: 'provider', label: 'Provider' },
+    REGION: { name: 'region_code', label: 'Region' },
     // asset reference
-    // REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
-    SERVICE: 'additional_info.service',
-    COMPLIANCE_FRAMEWORK: 'cloud_service_type',
-    ACCOUNT: 'account',
+    SERVICE: { name: 'additional_info.service', label: 'Service' },
+    COMPLIANCE_FRAMEWORK: { name: 'cloud_service_type', label: 'Compliance Framework' },
+    ACCOUNT: { name: 'account', label: 'Account' },
 };
 
 export const CHART_TYPE = {
@@ -69,9 +65,9 @@ export const CHART_TYPE = {
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
-export type CostGroupBy = typeof COST_GROUP_BY[keyof typeof COST_GROUP_BY];
-export type AssetGroupBy = typeof ASSET_GROUP_BY[keyof typeof ASSET_GROUP_BY];
-export type GroupBy = CostGroupBy|AssetGroupBy;
+export type CostDataField = typeof COST_DATA_FIELD_MAP[keyof typeof COST_DATA_FIELD_MAP]['name'];
+export type AssetDataField = typeof ASSET_DATA_FIELD_MAP[keyof typeof ASSET_DATA_FIELD_MAP]['name'];
+export type DataField = CostDataField|AssetDataField;
 type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
 
 export interface BaseConfigInfo {
@@ -156,12 +152,12 @@ export interface SelectorOptions {
 }
 interface CostWidgetOptions extends BaseWidgetOptions {
     cost_data_source?: string;
-    cost_data_field?: ManagedVariableModelKey | string;
+    cost_data_field?: CostDataField | string;
     selector_options?: SelectorOptions;
 }
 interface AssetWidgetOptions extends BaseWidgetOptions {
     asset_query_set?: string;
-    asset_data_field?: AssetGroupBy | string;
+    asset_data_field?: AssetDataField | string;
 }
 export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 

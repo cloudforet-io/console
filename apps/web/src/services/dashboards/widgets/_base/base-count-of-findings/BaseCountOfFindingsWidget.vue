@@ -24,7 +24,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
@@ -137,7 +137,7 @@ const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMa
         let refinedValue: string|null|undefined;
 
         // google_cloud -> Google Cloud
-        if (groupByKey === ASSET_GROUP_BY.REGION) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
+        if (groupByKey === ASSET_DATA_FIELD_MAP.REGION.name) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
         else refinedValue = referenceMap[rawValue]?.label ?? rawValue;
 
         refinedChartData.push({

@@ -8,7 +8,7 @@ import type { AllReferenceTypeInfo, ReferenceType } from '@/store/reference/all-
 import { getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
-import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_configs/config';
+import type { Granularity, DataField } from '@/services/dashboards/widgets/_configs/config';
 
 /**
  * @name getWidgetTableDateFields
@@ -99,7 +99,7 @@ export const sortTableData = <Data extends RawData = RawData>(
     targetFieldKeys: string[] = ['cost_sum', 'usage_quantity_sum'],
 ): Data[] => sortArrayInObjectArray<Data>(rawData, sortKey, targetFieldKeys);
 
-export const getReferenceTypeOfGroupBy = (allReferenceTypeInfo: AllReferenceTypeInfo, groupBy: GroupBy): ReferenceType | undefined => {
+export const getReferenceTypeOfGroupBy = (allReferenceTypeInfo: AllReferenceTypeInfo, groupBy: DataField): ReferenceType | undefined => {
     const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
     if (referenceTypeInfo) return referenceTypeInfo.type;
     return undefined;

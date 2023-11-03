@@ -1,6 +1,6 @@
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const budgetUsageByTargetWidgetConfig: WidgetConfig = {
@@ -21,7 +21,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        cost_data_field: COST_GROUP_BY.PROJECT,
+        cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
