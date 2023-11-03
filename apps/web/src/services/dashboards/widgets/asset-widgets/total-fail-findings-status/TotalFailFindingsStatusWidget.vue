@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, defineProps, reactive, toRef,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import {
     PProgressBar,
@@ -50,9 +49,7 @@ const SEVERITY_FAIL_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP).filte
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => widgetState.assetWidgetLocation),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
     dataSize: computed(() => widgetState.widgetConfig.theme?.inherit_count ?? 0),
@@ -93,7 +90,7 @@ const fetchRealtimeData = async (): Promise<Data> => {
     try {
         state.loading = true;
         apiQueryHelper
-            .setFilters(widgetState.cloudServiceAnalyzeConsoleFilters);
+            .setFilters(widgetState.consoleFilters);
         const { status, response } = await fetchCloudServiceAnalyze({
             query: {
                 group_by: ['data.severity'],

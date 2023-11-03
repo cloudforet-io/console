@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, defineProps, reactive,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import { min } from 'lodash';
@@ -45,9 +44,7 @@ const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => widgetState.assetWidgetLocation),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const state = reactive({
     loading: true,
@@ -68,7 +65,7 @@ const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceC
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(widgetState.cloudServiceAnalyzeConsoleFilters)
+            .setFilters(widgetState.consoleFilters)
             .addFilter({ k: 'data.status', v: ['PASS', 'FAIL'], o: '=' });
         const { status, response } = await fetchCloudServiceAnalyze({
             query: {

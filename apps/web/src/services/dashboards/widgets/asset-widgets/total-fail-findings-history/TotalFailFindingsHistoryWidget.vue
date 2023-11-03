@@ -73,6 +73,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
+    widgetLocation: undefined,
 });
 const state = reactive({
     loading: true,

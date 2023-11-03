@@ -9,7 +9,7 @@ const budgetStatusWidgetConfig: WidgetConfig = {
         component: import('@/services/dashboards/widgets/cost-widgets/budget-status/BudgetStatusWidget.vue'),
     }),
     title: 'Budget Status',
-    labels: ['Cost'],
+    labels: ['Cost', 'Budget'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BUDGET_STATUS.DESC',
         preview_image: 'widget-img_budgetStatus--thumbnail.png',

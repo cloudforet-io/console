@@ -80,7 +80,9 @@ const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => {
+    // TODO: reconsider to remove it
+    widgetLocation: computed<Location|undefined>(() => {
+        if (!widgetState.options.cost_data_source) return undefined;
         const end = dayjs.utc(widgetState.settings?.date_range?.end);
         const _period = {
             start: end.subtract(5, 'month').format('YYYY-MM'),

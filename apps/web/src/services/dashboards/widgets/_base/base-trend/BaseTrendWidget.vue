@@ -86,7 +86,8 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
-    widgetLocation: computed<Location>(() => {
+    assetWidgetLocation: undefined,
+    costWidgetLocation: computed<Location>(() => {
         const end = dayjs.utc(widgetState.settings?.date_range?.end);
         const _period = {
             start: end.subtract(5, 'month').format('YYYY-MM'),
@@ -100,28 +101,24 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                group_by: arrayToQueryString([widgetState.groupBy]),
+                group_by: arrayToQueryString([widgetState.dataField]),
                 period: objectToQueryString(_period),
                 filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
         };
     }),
 });
+
 const state = reactive({
     loading: true,
     data: null as Response | null,
     chart: null as null | XYChart,
     dataType: computed<string|undefined>(() => (widgetState.options.cost_data_type)),
-    dataFieldKey: computed<string>(() => {
-        if (!widgetState.groupBy) return '';
-        const split = widgetState.groupBy.split('.');
-        return split.length > 0 ? split.pop() : widgetState.groupBy;
-    }),
     chartData: computed<ChartData[]>(() => {
         if (!state.data?.results) return [];
 
         const chartData: ChartData[] = getRefinedXYChartData<Data, ChartData>(state.data.results, {
-            groupBy: state.dataFieldKey,
+            groupBy: widgetState.parsedDataField,
             arrayDataKey: 'value_sum',
             categoryKey: DATE_FIELD_NAME,
             valueKey: 'value',
@@ -136,8 +133,8 @@ const state = reactive({
             _textOptions = { type: 'usage', unitPath: 'usage_unit' };
         }
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
-        const groupByLabel = COST_GROUP_BY_ITEM_MAP[state.dataFieldKey]?.label ?? state.dataFieldKey;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, state.dataFieldKey) as ReferenceType;
+        const groupByLabel = COST_GROUP_BY_ITEM_MAP[widgetState.parsedDataField]?.label ?? widgetState.parsedDataField;
+        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.parsedDataField) as ReferenceType;
 
         // set width of table fields
         const groupByFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
@@ -145,7 +142,7 @@ const state = reactive({
 
         const groupByField: Field = {
             label: groupByLabel,
-            name: state.dataFieldKey,
+            name: widgetState.parsedDataField,
             textOptions: referenceType ? { type: 'reference', referenceType } : undefined,
             width: groupByFieldWidth,
         };
@@ -160,18 +157,18 @@ const state = reactive({
             DATE_FIELD_NAME,
             ['value_sum'],
         ).map((data) => {
-            let value = data[state.dataFieldKey] ?? 'Unknown';
+            let value = data[widgetState.parsedDataField] ?? 'Unknown';
             if (state.dataType === 'usage_quantity') value = `${value}${data.usage_unit ? ` (${data.usage_unit})` : ''}`;
             return {
                 ...data,
-                [state.dataFieldKey]: value,
+                [widgetState.parsedDataField]: value,
             };
         });
         return tableData;
     }),
     legends: computed<Legend[]>(() => {
         const data = state.data?.results ?? [];
-        const legends: Legend[] = getXYChartLegends(data, state.dataFieldKey, props.allReferenceTypeInfo)
+        const legends: Legend[] = getXYChartLegends(data, widgetState.parsedDataField, props.allReferenceTypeInfo)
             .map((l, i) => {
                 let label = l.label;
                 if (state.dataType === 'usage_quantity') label = `${label}${data[i]?.usage_unit ? ` (${data[i]?.usage_unit})` : ''}`;
@@ -201,10 +198,12 @@ const fetchData = async (): Promise<Response|null> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        const groupBy = [widgetState.groupBy, 'date'];
+        const groupBy = [widgetState.dataField, 'date'];
         if (state.dataType === 'usage_quantity') {
             groupBy.push('usage_unit');
         }
+
+        console.debug('groupBy', groupBy);
 
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,

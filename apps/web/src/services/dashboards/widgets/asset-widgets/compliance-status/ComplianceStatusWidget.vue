@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
@@ -69,9 +68,7 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => widgetState.assetWidgetLocation),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 const state = reactive({
     loading: true,
     data: null as Data[]|null,
@@ -146,7 +143,7 @@ const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceC
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(widgetState.cloudServiceAnalyzeConsoleFilters)
+            .setFilters(widgetState.consoleFilters)
             .addFilter({ k: 'data.status', v: ['PASS', 'FAIL'], o: '=' });
         const { status, response } = await fetchCloudServiceAnalyze({
             query: {
