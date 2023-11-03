@@ -20,6 +20,7 @@ const costTrendWidgetConfig: Partial<WidgetConfig> = {
             show_at: 'table',
         },
         cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+        cost_data_type: 'cost',
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',

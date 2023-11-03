@@ -11,7 +11,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             cost_data_field: 'additional_info.Usage Type Details',
             filters: {
                 // TODO: must be updated to string[] type
-                'filters.cost_product': [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
+                cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
             },
         },
         schema_properties: [

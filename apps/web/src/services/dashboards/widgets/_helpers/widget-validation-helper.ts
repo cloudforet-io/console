@@ -8,7 +8,7 @@ import type {
     InheritOptions, DashboardLayoutWidgetInfo, WidgetConfig,
     UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetFilterKey, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import type { WidgetFilterOptionKey, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {
     getWidgetOptionKeyByVariableKey,
@@ -118,27 +118,27 @@ export const validateWidgetByVariablesSchemaUpdate = ({
 const getUpdatedDashboardVariableSchemaProperties = (
     after?: DashboardVariablesSchema,
     before?: DashboardVariablesSchema,
-): [WidgetFilterKey[], WidgetFilterKey[], WidgetFilterKey[]] => {
-    const added: WidgetFilterKey[] = [];
-    const deleted: WidgetFilterKey[] = [];
-    const changed: WidgetFilterKey[] = [];
+): [WidgetFilterOptionKey[], WidgetFilterOptionKey[], WidgetFilterOptionKey[]] => {
+    const added: WidgetFilterOptionKey[] = [];
+    const deleted: WidgetFilterOptionKey[] = [];
+    const changed: WidgetFilterOptionKey[] = [];
     const afterVariables = Object.keys(after?.properties ?? {});
     const beforeVariables = Object.keys(before?.properties ?? {});
     union(afterVariables, beforeVariables).forEach((variable) => {
         if (!after?.properties[variable].use && !before?.properties[variable].use) return;
         if (after?.properties[variable].use && before?.properties[variable].use) {
             if (isEqual(after?.properties[variable], before?.properties[variable])) return; /* Not changed variable */
-            changed.push(variable as WidgetFilterKey);
+            changed.push(variable as WidgetFilterOptionKey);
         } else if (after?.properties[variable].use && !before?.properties[variable].use) {
-            added.push(variable as WidgetFilterKey);
+            added.push(variable as WidgetFilterOptionKey);
         } else {
-            deleted.push(variable as WidgetFilterKey);
+            deleted.push(variable as WidgetFilterOptionKey);
         }
     });
     return [added, deleted, changed];
 };
 const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
-    addedVariables: WidgetFilterKey[],
+    addedVariables: WidgetFilterOptionKey[],
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
@@ -174,7 +174,7 @@ const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
     } : undefined;
 };
 const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
-    dashboardVariables: WidgetFilterKey[],
+    dashboardVariables: WidgetFilterOptionKey[],
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
@@ -221,7 +221,7 @@ const isAffectedByChangedVariableSchemaProperties = (
 ): boolean => {
     const enabledInheritOptions = Object.entries(widgetInfo.inherit_options ?? {})
         .filter(([, v]) => v.enabled)
-        .map(([, v]) => v.variable_key as WidgetFilterKey);
+        .map(([, v]) => v.variable_key as WidgetFilterOptionKey);
     if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) return false;
     return true;
 };

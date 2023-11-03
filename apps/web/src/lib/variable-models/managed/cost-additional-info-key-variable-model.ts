@@ -54,10 +54,10 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
                 data_source_id: query.options.data_source_id,
                 query: _query,
             });
-            if (status === 'succeed' && response.results?.length) {
+            if (status === 'succeed') {
                 const target = response.results[0]?.cost_additional_info_keys ?? [];
                 this.#response = {
-                    results: target.map((d) => ({ key: d, name: d })),
+                    results: target.map((d) => ({ key: `additional_info.${d}`, name: d })),
                 };
             }
             return this.#response;

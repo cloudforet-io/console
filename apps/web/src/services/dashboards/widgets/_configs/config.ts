@@ -1,7 +1,5 @@
 import type { AsyncComponent } from 'vue';
 
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { Tags } from '@/models';
@@ -116,13 +114,8 @@ export interface WidgetFilter {
     v: null|string|boolean|number|Array<null|string|boolean|number>;
     o?: ConsoleFilterOperator;
 }
-export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
-/* widget schema */
-export type WidgetFiltersSchema = {
-    [K in WidgetFilterKey as `filters.${K}`]: JsonSchema['properties']
-};
-export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
+export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
 /* widget options */
 export interface BaseWidgetOptions {
