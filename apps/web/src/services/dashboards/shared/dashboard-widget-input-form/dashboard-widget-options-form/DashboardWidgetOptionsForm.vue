@@ -164,7 +164,7 @@ const getInitialSelectedItemByHandlers = async (
                 return item;
             });
         } else {
-            console.error(`Failed to fetch data from handler: ${idx}`);
+            console.error(new Error(`Failed to fetch data from handler: ${idx}`));
         }
     });
     return _selected;
