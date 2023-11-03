@@ -52,19 +52,23 @@ const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(GRANULARITY.DAILY),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-        },
-    })),
+    // TODO: reconsider to remove it
+    widgetLocation: computed<Location|undefined>(() => {
+        if (!widgetState.options.cost_data_source) return undefined;
+        return {
+            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+            params: {
+                dataSourceId: widgetState.options.cost_data_source,
+                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
+            },
+            query: {
+                granularity: primitiveToQueryString(GRANULARITY.DAILY),
+                group_by: arrayToQueryString([widgetState.groupBy]),
+                period: objectToQueryString(widgetState.dateRange),
+                filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
+            },
+        };
+    }),
 });
 
 const state = reactive({
