@@ -88,7 +88,8 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         return { start, end };
     }),
     assetWidgetLocation: undefined,
-    costWidgetLocation: computed<Location>(() => {
+    costWidgetLocation: computed<Location|undefined>(() => {
+        if (!widgetState.options.cost_data_source) return undefined;
         const end = dayjs.utc(widgetState.settings?.date_range?.end);
         const _period = {
             start: end.subtract(5, 'month').format('YYYY-MM'),
@@ -124,7 +125,7 @@ const state = reactive({
             categoryKey: DATE_FIELD_NAME,
             valueKey: 'value',
         });
-        return sortBy(chartData, widgetState.dateRange, DATE_FIELD_NAME);
+        return sortBy<ChartData>(chartData, widgetState.dateRange, DATE_FIELD_NAME);
     }),
     tableFields: computed<Field[]>(() => {
         let _textOptions: Field['textOptions'];
