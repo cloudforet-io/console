@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import {
-    defineProps, defineEmits, reactive, computed,
+    defineProps, defineEmits, reactive, computed, watch,
 } from 'vue';
 
 import { PButtonModal, PCheckboxGroup, PCheckbox } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -16,17 +18,26 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const props = defineProps<{
     visible: boolean;
+    cloudServiceId?: string;
+    isServerPage: boolean;
 }>();
 
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
+interface CloudServiceDetailSchema {
+    name: string;
+    type: string;
+    options: any;
+}
+
 const state = reactive({
     isValid: false,
     loading: false,
-    subDataList: ['Main Table', 'AWS EC2', 'Disk', 'NIC', 'Security Groups'] as string[], // TODO: dummy data
+    subDataList: computed(() => state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name)),
     selectedSubData: [] as string[],
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    detailSchema: [] as CloudServiceDetailSchema[],
 });
 
 const handleConfirm = async () => {
@@ -57,6 +68,32 @@ const handleConfirm = async () => {
 const handleUpdateVisible = (visible: boolean) => {
     emits('update:visible', visible);
 };
+
+const getSchema = async () => {
+    try {
+        const params: Record<string, any> = {
+            schema: 'details',
+            options: {
+                cloud_service_id: props.cloudServiceId,
+            },
+        };
+        if (props.isServerPage) {
+            params.resource_type = 'inventory.Server';
+        } else {
+            params.resource_type = 'inventory.CloudService';
+        }
+        const res = await SpaceConnector.client.addOns.pageSchema.get(params);
+
+        state.detailSchema = res.details;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+
+watch(() => props.visible, () => {
+    if (props.cloudServiceId && !state.detailSchema.length) getSchema();
+});
 
 
 </script>

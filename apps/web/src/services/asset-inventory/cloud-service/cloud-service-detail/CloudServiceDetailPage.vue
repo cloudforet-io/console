@@ -416,6 +416,8 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                             @complete="reloadTable"
         />
         <excel-export-option-modal :visible="excelState.visible"
+                                   :cloud-service-id="tableState.items[0]?.cloud_service_id"
+                                   :is-server-page="props.isServerPage"
                                    @update:visible="handleUpdateVisible"
         />
     </div>
