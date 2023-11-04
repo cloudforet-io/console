@@ -3,7 +3,9 @@ import {
     defineProps, defineEmits, reactive, computed, watch,
 } from 'vue';
 
-import { PButtonModal, PCheckboxGroup, PCheckbox } from '@spaceone/design-system';
+import {
+    PButtonModal, PCheckboxGroup, PCheckbox, PDataLoader,
+} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -33,7 +35,8 @@ interface CloudServiceDetailSchema {
 
 const state = reactive({
     isValid: false,
-    loading: false,
+    downloadLoading: false,
+    isSubDataLoading: false,
     subDataList: computed(() => state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name)),
     selectedSubData: [] as string[],
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
@@ -42,7 +45,7 @@ const state = reactive({
 
 const handleConfirm = async () => {
     try {
-        state.loading = true;
+        state.downloadLoading = true;
         // await downloadExcel({
         //     url: '/inventory/cloud-service/list',
         //     param: {
@@ -62,7 +65,7 @@ const handleConfirm = async () => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t(''));
     } finally {
-        state.loading = false;
+        state.downloadLoading = false;
     }
 };
 const handleUpdateVisible = (visible: boolean) => {
@@ -70,6 +73,7 @@ const handleUpdateVisible = (visible: boolean) => {
 };
 
 const getSchema = async () => {
+    state.isSubDataLoading = true;
     try {
         const params: Record<string, any> = {
             schema: 'details',
@@ -87,6 +91,8 @@ const getSchema = async () => {
         state.detailSchema = res.details;
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.isSubDataLoading = false;
     }
 };
 
@@ -102,7 +108,7 @@ watch(() => props.visible, () => {
                     :header-title="$t('INVENTORY.CLOUD_SERVICE.EXCEL_EXPORT_MODAL.TITLE')"
                     :disabled="!state.isValid"
                     size="sm"
-                    :loading="state.loading"
+                    :loading="state.downloadLoading"
                     @confirm="handleConfirm"
                     @update:visible="handleUpdateVisible"
     >
@@ -110,18 +116,30 @@ watch(() => props.visible, () => {
             <p class="mb-4">
                 {{ i18n.t('INVENTORY.CLOUD_SERVICE.EXCEL_EXPORT_MODAL.DESCRIPTION') }}
             </p>
-            <p-checkbox-group direction="vertical">
-                <p-checkbox v-for="value in state.subDataList"
-                            :key="value"
-                            v-model="state.selectedSubData"
-                            :value="value"
-                >
-                    {{ value }}
-                </p-checkbox>
-            </p-checkbox-group>
+            <p-data-loader class="sub-data-section"
+                           :loading="state.isSubDataLoading"
+                           :data="state.detailSchema"
+            >
+                <p-checkbox-group direction="vertical">
+                    <p-checkbox v-for="value in state.subDataList"
+                                :key="value"
+                                v-model="state.selectedSubData"
+                                :value="value"
+                    >
+                        {{ value }}
+                    </p-checkbox>
+                </p-checkbox-group>
+            </p-data-loader>
         </template>
         <template #confirm-button>
             {{ i18n.t('COMMON.BUTTONS.DOWNLOAD') }}
         </template>
     </p-button-modal>
 </template>
+
+<style scoped lang="postcss">
+.sub-data-section {
+    display: inline-block;
+    min-height: 3rem;
+}
+</style>
