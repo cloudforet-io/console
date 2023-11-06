@@ -1,6 +1,6 @@
-import type { DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardTemplate } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
-import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
+import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import { ASSET_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 
@@ -29,7 +29,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['severityStatusByService'],
 ];
 
-export const complianceOverviewDashboardPreview: DefaultDashboardPreviewConfig = {
+export const complianceOverviewDashboardPreview: DefaultDashboardPreviewTemplate = {
     name: 'Compliance Overview',
     labels: [DASHBOARD_LABEL.ASSET, DASHBOARD_LABEL.COMPLIANCE, DASHBOARD_LABEL.SECURITY],
     version: '1',
@@ -39,7 +39,7 @@ export const complianceOverviewDashboardPreview: DefaultDashboardPreviewConfig =
     },
 };
 
-export const complianceOverviewDashboard: DashboardConfig = {
+export const complianceOverviewDashboard: DashboardTemplate = {
     ...complianceOverviewDashboardPreview,
     settings: {
         date_range: {

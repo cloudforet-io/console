@@ -55,7 +55,7 @@ export interface DashboardSettings {
     refresh_interval_option: RefreshIntervalOption;
 }
 
-export interface DashboardConfig {
+export interface DashboardTemplate {
     name: string;
     layouts: DashboardLayoutWidgetInfo[][];
     settings: DashboardSettings;

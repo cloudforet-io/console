@@ -30,7 +30,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>>;
 
-    formatter(data: any): string {
+    nameFormatter(data: any): string {
         return data[this.nameKey];
     }
 
@@ -95,7 +95,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
             if (status === 'succeed') {
                 response.results = response.results.map((d) => ({
                     key: d[this.idKey],
-                    name: this.formatter(d),
+                    name: this.nameFormatter(d),
                 }));
                 this.#response = response;
             }

@@ -40,7 +40,8 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
                 ],
             };
             if (query.filters?.length) {
-                apiQueryHelper.setFilters([{ k: 'cost_additional_info_keys', v: query.filters, o: '=' }]);
+                const filters = query.filters.map((f) => (f.startsWith('additional_info.') ? f.replace('additional_info.', '') : f));
+                apiQueryHelper.setFilters([{ k: 'cost_additional_info_keys', v: filters, o: '=' }]);
                 _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
             }
             if (query.search) {

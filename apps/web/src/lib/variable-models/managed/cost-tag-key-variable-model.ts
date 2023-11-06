@@ -23,6 +23,11 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
         results: { cost_tag_keys: string[] }[];
     }>>;
 
+    // eslint-disable-next-line class-methods-use-this
+    nameFormatter(data: any) {
+        return `[Tag] ${data}`;
+    }
+
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
             if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
@@ -57,7 +62,7 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_tag_keys ?? [];
                 this.#response = {
-                    results: target.map((d) => ({ key: d, name: `[Tag] ${d}` })),
+                    results: target.map((d) => ({ key: `tags.${d}`, name: `[Tag] ${d}` })),
                 };
             }
             return this.#response;

@@ -1,6 +1,6 @@
-import type { DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardTemplate } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
-import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
+import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
@@ -29,7 +29,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['awsCloudFrontCost', { title: 'AWS CloudFront Cost by Project' }],
 ];
 
-export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = {
+export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewTemplate = {
     name: 'CDN & Traffic Cost',
     labels: [DASHBOARD_LABEL.COST],
     version: '1',
@@ -39,7 +39,7 @@ export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewConfig = 
     },
 };
 
-export const cdnAndTrafficCostDashboard: DashboardConfig = {
+export const cdnAndTrafficCostDashboard: DashboardTemplate = {
     ...cdnAndTrafficCostDashboardPreview,
     settings: {
         date_range: {

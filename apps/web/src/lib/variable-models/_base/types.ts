@@ -4,6 +4,7 @@ export interface IBaseVariableModel {
     name: string;
     labels: VariableModelLabel[];
     list(query?: ListQuery): Promise<ListResponse>;
+    nameFormatter?: (data: any) => string;
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];
@@ -14,7 +15,7 @@ export interface IResourceNameVariableModel extends IBaseVariableModel {
     nameKey: string;
     only: string[];
     searchTargets: string[];
-    formatter: (data: any) => string;
+    nameFormatter: (data: any) => string;
 }
 export interface IResourceValueVariableModel extends IBaseVariableModel {
     resourceType: string;

@@ -43,7 +43,7 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
-    DashboardConfig,
+    DashboardTemplate,
 } from '@/services/dashboards/config';
 import DashboardCustomizePageName
     from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizePageName.vue';
@@ -71,7 +71,7 @@ const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     name: dashboardDetailState.name,
-    apiParam: computed<Partial<DashboardConfig>>(() => ({
+    apiParam: computed<Partial<DashboardTemplate>>(() => ({
         name: dashboardDetailState.name,
         labels: dashboardDetailState.labels,
         settings: dashboardDetailState.settings,

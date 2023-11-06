@@ -130,7 +130,7 @@ import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
-import type { DashboardConfig, DashboardScope } from '@/services/dashboards/config';
+import type { DashboardTemplate, DashboardScope } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/template-list';
 import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
@@ -139,7 +139,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 const DOMAIN_SCOPE_NAME = 'Workspace';
 const emit = defineEmits(['set-template']);
 
-type DashboardTemplateBoardSet = DashboardConfig & { value: string };
+type DashboardTemplateBoardSet = DashboardTemplate & { value: string };
 
 const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
 type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
@@ -161,7 +161,7 @@ const defaultTemplateState = reactive({
     boardSets: computed<DashboardTemplateBoardSet[]>(() => {
         const regex = getTextHighlightRegex(state.searchValue);
         return Object.values(DASHBOARD_TEMPLATES)
-            .map((d: DashboardConfig) => ({
+            .map((d: DashboardTemplate) => ({
                 ...d,
                 // below values are used only for render
                 value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,

@@ -12,7 +12,7 @@ export default class WebhookVariableModel extends ResourceNameVariableModel {
 
     idKey = 'webhook_id';
 
-    formatter(): string {
+    nameFormatter(): string {
         return this.nameKey || this.idKey;
     }
 }

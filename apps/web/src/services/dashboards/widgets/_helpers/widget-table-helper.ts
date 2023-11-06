@@ -16,7 +16,7 @@ import type { Granularity, DataField } from '@/services/dashboards/widgets/_conf
  * @example [{ name: 'cost_sum.0.value', label: '2022-09' }, ...]
  */
 export const getWidgetTableDateFields = (
-    granularity: Granularity,
+    granularity: Granularity|undefined,
     dateRange: DateRange,
     textOptions: Field['textOptions'],
     fieldsKey = 'cost_sum',

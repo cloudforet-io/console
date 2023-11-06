@@ -2,12 +2,12 @@ import { computed, reactive } from 'vue';
 
 import { i18n } from '@/translations';
 
-import type { DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardTemplate } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
-import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
+import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 
-export const blankPreview: DefaultDashboardPreviewConfig = reactive({
+export const blankPreview: DefaultDashboardPreviewTemplate = reactive({
     name: 'Blank',
     labels: [],
     version: '1',
@@ -18,7 +18,7 @@ export const blankPreview: DefaultDashboardPreviewConfig = reactive({
     },
 });
 
-export const blankDashboard: DashboardConfig = {
+export const blankDashboard: DashboardTemplate = {
     ...blankPreview,
     settings: {
         date_range: {
