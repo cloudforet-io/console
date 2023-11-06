@@ -86,7 +86,7 @@ const fetchData = async (): Promise<Data[]> => {
     try {
         state.loading = true;
 
-        apiQueryHelper.setFilters(widgetState.cloudServiceAnalyzeConsoleFilters);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCloudServiceAnalyze({
             query: {
