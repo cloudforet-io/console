@@ -1526,6 +1526,7 @@
 				"SELECTED_MONTH": "選択した月"
 			},
 			"NO_DATA": "データがありません",
+			"NO_SELECTED_ITEM": "オプションのうちの一つを選択する必要があります。",
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "各プロジェクト別のトリガー、認知、安全などを素早く確認できます。"
 			},

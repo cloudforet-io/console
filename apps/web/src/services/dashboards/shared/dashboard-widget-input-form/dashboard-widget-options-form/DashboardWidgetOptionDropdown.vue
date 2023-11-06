@@ -9,6 +9,8 @@ import type {
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
+import { i18n } from '@/translations';
+
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardCostWidgetValueOptionDropdown.vue';
@@ -42,8 +44,7 @@ const state = reactive({
         }
 
         if (state.showErrorMessage && !props.selected?.length) {
-            // TODO: update message
-            return 'No items are selected';
+            return i18n.t('DASHBOARDS.WIDGET.NO_SELECTED_ITEM') as string;
         }
 
         return undefined;
