@@ -12,7 +12,7 @@ export default class UserVariableModel extends ResourceNameVariableModel {
 
     idKey = 'user_id';
 
-    formatter(): string {
+    nameFormatter(): string {
         return this.nameKey || this.idKey;
     }
 }

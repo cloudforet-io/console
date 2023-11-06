@@ -14,7 +14,7 @@ export default class ProjectVariableModel extends ResourceNameVariableModel {
 
     #only = ['project_id', 'name', 'project_group_info'];
 
-    formatter(data: any): string {
+    nameFormatter(data: any): string {
         if (data.project_group_info?.name) {
             return `${data.project_group_info.name} > ${data[this.nameKey]}`;
         }
