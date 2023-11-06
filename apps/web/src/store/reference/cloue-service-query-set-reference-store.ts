@@ -40,24 +40,24 @@ export interface QuerySetModel {
 
 type PickedQuerySetModel = Pick<QuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
 export type QuerySetItems = Required<Pick<ReferenceItem<PickedQuerySetModel>, 'key'|'label'|'name'|'data'>>;
-export type AssetQuerySetReferenceMap = ReferenceMap<QuerySetItems>;
+export type CloudServiceQuerySetReferenceMap = ReferenceMap<QuerySetItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 const lastLoadedTime = 0;
 
-export const useAssetQuerySetReferenceStore = defineStore('asset-query-set-reference-store', () => {
+export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-query-set-reference-store', () => {
     const state = reactive({
-        items: null as AssetQuerySetReferenceMap|null,
+        items: null as CloudServiceQuerySetReferenceMap|null,
     });
 
     const getters = reactive({
-        assetQuerySetItems: asyncComputed<AssetQuerySetReferenceMap>(async () => {
+        cloudServiceQuerySetItems: asyncComputed<CloudServiceQuerySetReferenceMap>(async () => {
             await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),
-        assetQuerySetTypeInfo: computed<ReferenceTypeInfo>(() => ({
-            ...REFERENCE_TYPE_INFO.asset_query_set,
-            referenceMap: getters.assetQuerySetItems,
+        cloudServiceQuerySetTypeInfo: computed<ReferenceTypeInfo>(() => ({
+            ...REFERENCE_TYPE_INFO.cloud_service_query_set,
+            referenceMap: getters.cloudServiceQuerySetItems,
         })),
     });
 
@@ -80,7 +80,7 @@ export const useAssetQuerySetReferenceStore = defineStore('asset-query-set-refer
                     },
                 });
                 if (status === 'succeed') {
-                    const items: AssetQuerySetReferenceMap = {};
+                    const items: CloudServiceQuerySetReferenceMap = {};
                     response.results.forEach((item: QuerySetModel) => {
                         items[item.query_set_id] = {
                             key: item.query_set_id,
