@@ -173,7 +173,7 @@ export class SpaceConnector {
             Usually in the development environment, the mock endpoint exists, so it is necessary to check. (if statement)
             In the production environment, the mock endpoint does not exist, so it is not necessary to check. (else statement)
          */
-        if (mockEndpoint) {
+        if (mockEndpoint && SpaceConnector.mockInfo.reflection) {
             return async (params: object = {}, config: MockRequestConfig = DEFAULT_MOCK_CONFIG): Promise<any> => {
                 const mockConfig = { ...config };
                 let url = path;
