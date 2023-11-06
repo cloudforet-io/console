@@ -245,7 +245,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
     asset_data_field: {
         key: 'asset_data_field',
         name: 'Data Field (Asset)',
-        selection_type: 'MULTI',
+        selection_type: 'SINGLE',
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
@@ -259,7 +259,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
     asset_secondary_data_field: {
         key: 'asset_secondary_data_field',
         name: 'Data Field (Asset)',
-        selection_type: 'MULTI',
+        selection_type: 'SINGLE',
         readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
