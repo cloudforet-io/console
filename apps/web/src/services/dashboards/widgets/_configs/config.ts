@@ -115,7 +115,7 @@ export interface WidgetOptions {
     cost_data_field?: string[];
     cost_secondary_data_field?: string[];
     // asset
-    asset_query_set?: string;
+    cloud_service_query_set?: string;
     asset_data_field?: string[];
     asset_secondary_data_field?: string[];
     // common
