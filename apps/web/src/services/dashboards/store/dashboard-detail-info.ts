@@ -158,9 +158,14 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
             };
 
+            // NOTE: This is for conversion from old dashboard variable schema to new one which is stored to database before version 2.0(<=1.12).
+            const _convertedOrder = _dashboardInfo.variables_schema?.order?.map((d) => {
+                if (d === 'asset_query_set') return MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key;
+                return d;
+            }) ?? [];
             let _variablesSchema = {
                 properties: _dashboardInfo.variables_schema?.properties ?? {},
-                order: _dashboardInfo.variables_schema?.order ?? [],
+                order: _convertedOrder,
             };
             let _variables = _dashboardInfo.variables ?? {};
             if (this.projectId) {
