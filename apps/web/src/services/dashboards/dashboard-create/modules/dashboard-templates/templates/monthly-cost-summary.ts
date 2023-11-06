@@ -1,6 +1,6 @@
-import type { DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardTemplate } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
-import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
+import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
 import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 
@@ -25,7 +25,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costByRegion'],
 ];
 
-export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig = {
+export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewTemplate = {
     name: 'Monthly Cost Summary',
     labels: [DASHBOARD_LABEL.COST],
     version: '1',
@@ -35,7 +35,7 @@ export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewConfig =
     },
 };
 
-export const monthlyCostSummaryDashboard: DashboardConfig = {
+export const monthlyCostSummaryDashboard: DashboardTemplate = {
     ...monthlyCostSummaryDashboardPreview,
     settings: {
         date_range: {
