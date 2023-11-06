@@ -1440,12 +1440,6 @@
 			"ASSET_SUMMARY_BY_REGIONS": {
 				"DESC": "クラウドプロバイダのRegion別クラウドサービスの使用状況を要約して表示します。"
 			},
-			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "選択した期間のAWS CloudFrontのデータ使用量とコストを、'Group by'オプションで集計して表示します。"
-			},
-			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": "選択した期間の AWS Data-TransferのRegion別のデータ使用量とコストを表示します。"
-			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "選択した期間のAWS Data-Transferのコスト推移を表示します。"
 			},
@@ -1486,6 +1480,9 @@
 			"COST_BY_REGION": {
 				"DESC": "選択された期間のRegion別コスト合計を表示します。"
 			},
+			"COST_BY_REGION_MULTI_FIELDS": {
+				"DESC": ""
+			},
 			"COST_DONUT": {
 				"DESC": "選択された期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
 			},
@@ -1494,6 +1491,9 @@
 			},
 			"COST_PIE": {
 				"DESC": "選択した期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
+			},
+			"COST_SUMMARY_MULTI_FIELDS": {
+				"DESC": ""
 			},
 			"COST_TREND": {
 				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"

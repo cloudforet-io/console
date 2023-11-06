@@ -214,7 +214,7 @@ const fetchData = async (): Promise<Response|null> => {
                 end: widgetState.dateRange.end,
                 fields: {
                     value_sum: {
-                        key: 'cost',
+                        key: state.dataType,
                         operator: 'sum',
                     },
                 },

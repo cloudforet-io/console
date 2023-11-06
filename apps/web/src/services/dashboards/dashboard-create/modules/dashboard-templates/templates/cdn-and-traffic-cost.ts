@@ -2,6 +2,7 @@ import type { DashboardTemplate } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['costTrend', {
@@ -25,8 +26,27 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             'filters.region',
         ],
     }],
-    ['awsDataTransferByRegion'],
-    ['awsCloudFrontCost', { title: 'AWS CloudFront Cost by Project' }],
+    ['costByRegionMultiFields', {
+        title: 'AWS Data-Transfer by Region',
+        widget_options: {
+            cost_secondary_data_field: 'additional_info.Usage Type Details',
+            filters: {
+                // TODO: must be updated to string[] type
+                cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
+            },
+        },
+    }],
+    ['costSummaryMultiFields', {
+        title: 'AWS CloudFront Cost',
+        widget_options: {
+            cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+            cost_secondary_data_field: 'additional_info.Usage Type Details',
+            filters: {
+                // TODO: must be updated to string[] type
+                cost_product: [{ k: 'product', v: 'AmazonCloudFront', o: '=' }],
+            },
+        },
+    }],
 ];
 
 export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewTemplate = {

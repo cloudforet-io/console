@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { DataField } from '@/services/dashboards/widgets/_configs/config';
 import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import type {
     Legend,
@@ -77,8 +76,8 @@ type AppendedData<T> = T & {
  * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
  */
 export const getRefinedPieChartData = <T extends RawData = RawData>(
-    rawData: T[],
-    dataField: DataField,
+    rawData: T[]|undefined,
+    dataField: string|undefined,
     allReferenceTypeInfo: AllReferenceTypeInfo,
 ): AppendedData<T>[] => {
     if (!rawData || !dataField) return [];

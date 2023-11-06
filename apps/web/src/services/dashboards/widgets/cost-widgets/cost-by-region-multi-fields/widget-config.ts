@@ -3,14 +3,14 @@ import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboa
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
-    widget_config_id: 'awsDataTransferByRegion',
+    widget_config_id: 'costByRegionMultiFields',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/aws-data-transfer-by-region/AWSDataTransferByRegionWidget.vue'),
+        component: import('@/services/dashboards/widgets/cost-widgets/cost-by-region-multi-fields/CostByRegionMultiFieldsWidget.vue'),
     }),
-    title: 'AWS Data-Transfer by Region',
+    title: 'Cost & Usage Trend By Region',
     labels: ['Cost'],
     description: {
-        translation_id: 'DASHBOARDS.WIDGET.AWS_DATA_TRANSFER_BY_REGION.DESC',
+        translation_id: 'DASHBOARDS.WIDGET.COST_BY_REGION_MULTI_FIELDS.DESC',
         preview_image: 'widget-img_awsDataTransferByRegion--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
@@ -19,6 +19,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
+        cost_data_type: 'cost',
         granularity: GRANULARITY.MONTHLY,
         cost_data_field: COST_DATA_FIELD_MAP.REGION.name,
         chart_type: CHART_TYPE.MAP,
@@ -26,16 +27,9 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
             enabled: true,
             show_at: 'table',
         },
-        selector_options: {
-            enabled: true,
-            type: 'cost-usage',
-        },
         pagination_options: {
             enabled: true,
             page_size: 5,
-        },
-        filters: {
-            cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
         },
     },
     options_schema: getWidgetOptionsSchema([

@@ -1440,12 +1440,6 @@
 			"ASSET_SUMMARY_BY_REGIONS": {
 				"DESC": "Summarizes cloud service usage by region from cloud providers."
 			},
-			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "Displays the data usage and costs from AWS CloudFront for the selected period, aggregated by 'Group by' option. "
-			},
-			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": "Displays the data usage and costs by Region from AWS Data-Transfer for the selected period."
-			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "Displays AWS Data-Transfer cost trend during the selected period. "
 			},
@@ -1486,6 +1480,9 @@
 			"COST_BY_REGION": {
 				"DESC": "Displays the total costs by Region for the selected period. "
 			},
+			"COST_BY_REGION_MULTI_FIELDS": {
+				"DESC": "Displays cost and usage trends for a specific Product by Region during the selected period."
+			},
 			"COST_DONUT": {
 				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
 			},
@@ -1494,6 +1491,9 @@
 			},
 			"COST_PIE": {
 				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
+			},
+			"COST_SUMMARY_MULTI_FIELDS": {
+				"DESC": "Displays cost and usage trends for a specific Product along with 'Group By' option during the selected period."
 			},
 			"COST_TREND": {
 				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
