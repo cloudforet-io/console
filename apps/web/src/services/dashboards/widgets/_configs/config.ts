@@ -72,35 +72,25 @@ export interface BaseConfigInfo {
     config_id: string;
     version?: string;
 }
-export interface BaseWidgetConfig {
+export interface WidgetConfig {
     widget_config_id: string;
     widget_component?: AsyncComponent;
     base_configs?: BaseConfigInfo[];
     title?: string;
-
+    labels?: Array<'Cost'|'Asset'|'Budget'|string>;
     description?: {
         translation_id?: string;
         preview_image?: string;
     };
     scopes: WidgetScope[];
-
     theme?: {
         inherit?: boolean;
         inherit_count?: number;
     };
     sizes: WidgetSize[];
+    options: WidgetOptions;
     options_schema?: WidgetOptionsSchema;
 }
-
-interface CostWidgetConfig extends BaseWidgetConfig {
-    labels?: Array<'Cost'|string>;
-    options?: CostWidgetOptions;
-}
-interface AssetWidgetConfig extends BaseWidgetConfig {
-    labels?: Array<'Asset'|string>;
-    options?: AssetWidgetOptions;
-}
-export type WidgetConfig = CostWidgetConfig|AssetWidgetConfig;
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 interface LegendOptions {
@@ -118,16 +108,16 @@ export interface WidgetFilter {
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
 /* widget options */
-export interface BaseWidgetOptions {
+export interface WidgetOptions {
     // cost
     cost_data_source?: string;
     cost_data_type?: string;
-    cost_data_field?: string;
-    cost_secondary_data_field?: string;
+    cost_data_field?: string[];
+    cost_secondary_data_field?: string[];
     // asset
-    cloud_service_query_set?: string;
-    asset_data_field?: string;
-    asset_secondary_data_field?: string;
+    asset_query_set?: string;
+    asset_data_field?: string[];
+    asset_secondary_data_field?: string[];
     // common
     granularity?: Granularity;
     chart_type?: ChartType;
@@ -136,23 +126,13 @@ export interface BaseWidgetOptions {
         enabled?: boolean;
         page_size?: number;
     };
-    filters?: WidgetFiltersMap;
     data_criteria?: 'history'|'realtime';
+    filters?: WidgetFiltersMap;
 }
 export interface SelectorOptions {
     enabled?: boolean;
     type: 'cost-usage'|'days';
 }
-interface CostWidgetOptions extends BaseWidgetOptions {
-    cost_data_source?: string;
-    cost_data_field?: CostDataField | string;
-    selector_options?: SelectorOptions;
-}
-interface AssetWidgetOptions extends BaseWidgetOptions {
-    cloud_service_query_set?: string;
-    asset_data_field?: AssetDataField | string;
-}
-export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
