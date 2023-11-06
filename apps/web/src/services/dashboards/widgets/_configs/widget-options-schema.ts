@@ -68,7 +68,7 @@ export const WIDGET_OPTION_KEYS = [
 ] as const;
 export type WidgetOptionKey = typeof WIDGET_OPTION_KEYS[number];
 
-export const COST_WIDGET_VALUE_OPTION_KEYS = {
+export const COST_VALUE_WIDGET_OPTION_CONFIGS = {
     cost_tag_value: {
         key: 'cost_tag_value',
         name: 'Cost Tag',
@@ -135,14 +135,14 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
         ],
     },
     'filters.cost_tag_value': {
-        key: COST_WIDGET_VALUE_OPTION_KEYS.cost_tag_value.key,
-        name: COST_WIDGET_VALUE_OPTION_KEYS.cost_tag_value.name,
+        key: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.key,
+        name: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.name,
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
     },
     'filters.cost_additional_info_value': {
-        key: COST_WIDGET_VALUE_OPTION_KEYS.cost_additional_info_value.key,
-        name: COST_WIDGET_VALUE_OPTION_KEYS.cost_additional_info_value.name,
+        key: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.key,
+        name: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.name,
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
     },
