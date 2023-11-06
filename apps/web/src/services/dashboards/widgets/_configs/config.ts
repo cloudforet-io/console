@@ -149,7 +149,7 @@ interface CostWidgetOptions extends BaseWidgetOptions {
     selector_options?: SelectorOptions;
 }
 interface AssetWidgetOptions extends BaseWidgetOptions {
-    asset_query_set?: string;
+    cloud_service_query_set?: string;
     asset_data_field?: AssetDataField | string;
 }
 export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;

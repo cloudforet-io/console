@@ -71,16 +71,16 @@ export function useWidgetState(props: WidgetProps) {
     const localState = reactive({
         // locations
         assetWidgetLocation: computed<Location|undefined>(() => {
-            const assetQuerySetId = baseState.options.asset_query_set;
-            if (!assetQuerySetId) return undefined;
-            const assetQuerySet = props.allReferenceTypeInfo.assetQuerySet.referenceMap[assetQuerySetId];
+            const cloudServiceQuerySetId = baseState.options.cloud_service_query_set;
+            if (!cloudServiceQuerySetId) return undefined;
+            const cloudServiceQuerySet = props.allReferenceTypeInfo.cloudServiceQuerySet.referenceMap[cloudServiceQuerySetId];
             const consoleFilters = flattenDeep(Object.values(baseState.options.filters ?? {}));
             return {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
-                    provider: assetQuerySet.data?.provider,
-                    group: assetQuerySet.data?.cloud_service_group,
-                    name: assetQuerySet.data?.cloud_service_type,
+                    provider: cloudServiceQuerySet.data?.provider,
+                    group: cloudServiceQuerySet.data?.cloud_service_group,
+                    name: cloudServiceQuerySet.data?.cloud_service_type,
                 },
                 query: {
                     filters: queryHelper.setFilters(consoleFilters).rawQueryStrings,
@@ -123,14 +123,14 @@ export function useWidgetState(props: WidgetProps) {
             return getConvertedBudgetConsoleFilters(baseState.options.filters);
         }),
         cloudServiceAnalyzeConsoleFilters: computed<ConsoleFilter[]>(() => {
-            // set filters from asset query set
-            const assetQuerySetId = baseState.options.asset_query_set;
-            if (assetQuerySetId) {
-                const assetQuerySet = props.allReferenceTypeInfo.assetQuerySet.referenceMap[assetQuerySetId];
+            // set filters from cloud service query set
+            const cloudServiceQuerySetId = baseState.options.cloud_service_query_set;
+            if (cloudServiceQuerySetId) {
+                const cloudServiceQuerySet = props.allReferenceTypeInfo.cloudServiceQuerySet.referenceMap[cloudServiceQuerySetId];
                 queryHelper.setFilters([
-                    { k: 'provider', v: assetQuerySet.data?.provider, o: '=' },
-                    { k: 'cloud_service_group', v: assetQuerySet.data?.cloud_service_group, o: '=' },
-                    { k: 'cloud_service_type', v: assetQuerySet.data?.cloud_service_type, o: '=' },
+                    { k: 'provider', v: cloudServiceQuerySet.data?.provider, o: '=' },
+                    { k: 'cloud_service_group', v: cloudServiceQuerySet.data?.cloud_service_group, o: '=' },
+                    { k: 'cloud_service_type', v: cloudServiceQuerySet.data?.cloud_service_type, o: '=' },
                 ]);
             }
             return [

@@ -65,8 +65,8 @@ export const REFERENCE_TYPE_INFO = {
         name: 'Data Source',
         resourceType: 'cost_analysis.DataSource',
     },
-    asset_query_set: {
-        type: 'asset_query_set',
+    cloud_service_query_set: {
+        type: 'cloud_service_query_set',
         key: 'query_set_id',
         name: 'Query Set',
         resourceType: 'inventory.CloudServiceQuerySet',

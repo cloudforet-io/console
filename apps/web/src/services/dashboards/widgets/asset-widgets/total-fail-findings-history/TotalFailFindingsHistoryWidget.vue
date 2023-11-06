@@ -116,7 +116,7 @@ const fetchTrendData = async (): Promise<Data[]> => {
         state.loading = true;
         trendDataApiQueryHelper.setFilters(widgetState.consoleFilters);
         const { status, response } = await fetchTrendDataAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+            query_set_id: widgetState.options.cloud_service_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
