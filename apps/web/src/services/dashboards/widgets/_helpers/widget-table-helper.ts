@@ -99,8 +99,8 @@ export const sortTableData = <Data extends RawData = RawData>(
     targetFieldKeys: string[] = ['cost_sum', 'usage_quantity_sum'],
 ): Data[] => sortArrayInObjectArray<Data>(rawData, sortKey, targetFieldKeys);
 
-export const getReferenceTypeOfGroupBy = (allReferenceTypeInfo: AllReferenceTypeInfo, groupBy: DataField): ReferenceType | undefined => {
-    const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+export const getReferenceTypeOfDataField = (allReferenceTypeInfo: AllReferenceTypeInfo, dataField: DataField): ReferenceType | undefined => {
+    const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField);
     if (referenceTypeInfo) return referenceTypeInfo.type;
     return undefined;
 };

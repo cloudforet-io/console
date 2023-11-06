@@ -61,7 +61,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(GRANULARITY.DAILY),
-                group_by: arrayToQueryString([widgetState.groupBy]),
+                group_by: arrayToQueryString([widgetState.dataField]),
                 period: objectToQueryString(widgetState.dateRange),
                 filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
@@ -74,7 +74,7 @@ const state = reactive({
     data: null as AnalyzeRawData[] | null,
     chartData: computed<TreemapChartData[]>(() => {
         if (!state.data) return [];
-        return getRefinedTreemapChartData(state.data, widgetState.groupBy as CostDataField, props.allReferenceTypeInfo);
+        return getRefinedTreemapChartData(state.data, widgetState.parsedDataField as CostDataField, props.allReferenceTypeInfo);
     }),
 });
 
@@ -91,7 +91,7 @@ const fetchData = async (): Promise<AnalyzeRawData[]|null> => {
                 granularity: widgetState.granularity,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
-                group_by: [widgetState.groupBy],
+                group_by: [widgetState.dataField],
                 fields: {
                     cost_sum: {
                         key: 'cost',

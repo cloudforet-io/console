@@ -45,8 +45,6 @@ import type { ChartType } from '@/services/dashboards/widgets/type';
 export interface WidgetState extends MergedWidgetState {
     granularity: ComputedRef<Granularity|undefined>;
     chartType: ComputedRef<ChartType|undefined>;
-    // TODO: remove groupBy
-    groupBy: ComputedRef<CostDataField|AssetDataField|undefined>;
     dataField: ComputedRef<CostDataField|AssetDataField|undefined>;
     secondaryDataField: ComputedRef<CostDataField|AssetDataField|undefined>;
     parsedDataField: ComputedRef<string>; // remove dots from dataField e.g. additional_info.Usage Type Details -> Usage Type Details
@@ -101,9 +99,9 @@ export function useWidgetState(props: WidgetProps) {
             };
         }),
         costWidgetLocation: computed<Location|undefined>(() => {
-            const groupBy: string[] = [];
-            if (state.dataField) groupBy.push(state.dataField);
-            if (state.secondaryDataField) groupBy.push(state.secondaryDataField);
+            const dataField: string[] = [];
+            if (state.dataField) dataField.push(state.dataField);
+            if (state.secondaryDataField) dataField.push(state.secondaryDataField);
             const location: Location = {
                 name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                 params: {
@@ -112,7 +110,7 @@ export function useWidgetState(props: WidgetProps) {
                 },
                 query: {
                     granularity: primitiveToQueryString(state.granularity),
-                    group_by: arrayToQueryString(groupBy),
+                    group_by: arrayToQueryString(dataField),
                     period: objectToQueryString(state.dateRange),
                     filters: arrayToQueryString(getWidgetLocationFilters(baseState.options.filters)),
                 },
@@ -146,11 +144,6 @@ export function useWidgetState(props: WidgetProps) {
         ...toRefs(baseState) as MergedWidgetState,
         granularity: computed(() => baseState.options?.granularity),
         chartType: computed<ChartType|undefined>(() => baseState.options?.chart_type),
-        groupBy: computed(() => {
-            if (baseState.widgetConfig.labels?.includes('Cost')) return baseState.options?.cost_data_field;
-            if (baseState.widgetConfig.labels?.includes('Asset')) return baseState.options?.asset_data_field;
-            return undefined;
-        }),
         dataField: computed(() => {
             if (baseState.widgetConfig.labels?.includes('Cost')) return baseState.options?.cost_data_field;
             if (baseState.widgetConfig.labels?.includes('Asset')) return baseState.options?.asset_data_field;

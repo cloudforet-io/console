@@ -35,7 +35,7 @@ import type { Legend } from '@/services/dashboards/widgets/type';
 
 
 interface Data extends CloudServiceStatsModel {
-    [groupBy: string]: string | null | any;
+    [parsedDataField: string]: string | null | any;
     pass_finding_count: number;
     fail_finding_count: number;
 }
@@ -58,19 +58,9 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 const state = reactive({
     loading: true,
     data: null as Data[]|null,
-    groupByKey: computed<string|undefined>(() => {
-        // NOTE: When a dot(".") is included in the groupBy field, the API return value will only include the portion of the field that appears after the dot.
-        // ex. additional_info.service -> service
-        if (!widgetState.groupBy) return undefined;
-        const dotIndex = widgetState.groupBy.indexOf('.');
-        if (dotIndex !== -1) {
-            return widgetState.groupBy.slice(dotIndex + 1);
-        }
-        return widgetState.groupBy;
-    }),
-    groupByReferenceMap: computed<ReferenceMap>(() => {
-        if (!state.groupByKey || !props.allReferenceTypeInfo) return {};
-        return Object.values(props.allReferenceTypeInfo).find((info) => info.key === state.groupByKey)?.referenceMap ?? {};
+    dataFieldReferenceMap: computed<ReferenceMap>(() => {
+        if (!widgetState.dataField || !props.allReferenceTypeInfo) return {};
+        return Object.values(props.allReferenceTypeInfo).find((info) => info.key === widgetState.dataField)?.referenceMap ?? {};
     }),
     legends: computed<Legend[]>(() => {
         if (state.showPassFindings) {
@@ -84,7 +74,7 @@ const state = reactive({
         ];
     }),
     noData: computed(() => !state.data?.length),
-    chartData: computed<ChartData[]>(() => refineChartData(state.data, state.groupByKey, state.groupByReferenceMap)),
+    chartData: computed<ChartData[]>(() => refineChartData(state.data, widgetState.parsedDataField, state.dataFieldReferenceMap)),
     showPassFindings: computed(() => props.widgetConfigId === countOfPassAndFailFindingsWidgetConfig.widget_config_id),
     showNextPage: computed(() => !!state.data?.more),
 });
@@ -100,7 +90,7 @@ const fetchData = async (): Promise<Data[]> => {
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                group_by: [widgetState.groupBy],
+                group_by: [widgetState.dataField],
                 fields: {
                     pass_finding_count: {
                         key: 'data.stats.findings.pass',
@@ -128,34 +118,34 @@ const fetchData = async (): Promise<Data[]> => {
 };
 
 /* Util */
-const refineChartData = (data: Data[], groupByKey: string|undefined, referenceMap: ReferenceMap): ChartData[] => {
-    if (!data?.length || !groupByKey) return [];
+const refineChartData = (data: Data[], parsedDataField: string|undefined, referenceMap: ReferenceMap): ChartData[] => {
+    if (!data?.length || !parsedDataField) return [];
 
     const refinedChartData: ChartData[] = [];
     data.forEach((d) => {
-        const rawValue = d[groupByKey];
+        const rawValue = d[parsedDataField];
         let refinedValue: string|null|undefined;
 
         // google_cloud -> Google Cloud
-        if (groupByKey === ASSET_DATA_FIELD_MAP.REGION.name) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
+        if (parsedDataField === ASSET_DATA_FIELD_MAP.REGION.name) refinedValue = referenceMap[rawValue]?.name ?? rawValue;
         else refinedValue = referenceMap[rawValue]?.label ?? rawValue;
 
         refinedChartData.push({
             ...d,
-            [groupByKey]: refinedValue ?? `no_${groupByKey}`,
+            [parsedDataField]: refinedValue ?? `no_${parsedDataField}`,
         });
     });
     return refinedChartData;
 };
 const drawChart = (chartData: ChartData[]) => {
-    if (!state.groupByKey) {
-        console.error(new Error('groupByKey is undefined'));
+    if (!widgetState.parsedDataField) {
+        console.error(new Error('parsedDataField is undefined'));
         return;
     }
 
     // create chart and axis
     const { chart, xAxis, yAxis } = chartHelper.createXYHorizontalChart();
-    yAxis.set('categoryField', state.groupByKey);
+    yAxis.set('categoryField', widgetState.parsedDataField);
     yAxis.data.setAll(cloneDeep(chartData));
 
     // create legends
@@ -172,7 +162,7 @@ const drawChart = (chartData: ChartData[]) => {
         const seriesSettings: Partial<am5xy.IXYSeriesSettings> = {
             name: legend.label as string,
             valueXField: legend.name,
-            categoryYField: state.groupByKey,
+            categoryYField: widgetState.parsedDataField,
             xAxis,
             yAxis,
             baseAxis: yAxis,
