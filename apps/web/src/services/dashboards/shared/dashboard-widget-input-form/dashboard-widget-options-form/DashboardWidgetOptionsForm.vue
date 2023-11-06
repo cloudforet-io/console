@@ -240,6 +240,7 @@ const initSelectedMenuItems = async (index: number, propertyName: string): Promi
         </p-text-button>
         <dashboard-widget-option-dropdown v-for="([propertyName, schema], i) in state.propertySchemaTuples"
                                           :key="propertyName"
+                                          :schema-key="schema.key"
                                           :label="schema.name ?? propertyName"
                                           :selected="state.selectedList[i]"
                                           :selection-type="schema.selection_type"

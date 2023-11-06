@@ -16,8 +16,10 @@ import type {
     InheritanceMode,
     WidgetOptionsSchemaProperty,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import { COST_WIDGET_VALUE_OPTION_KEYS } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const props = defineProps<{
+    schemaKey?: string;
     label: string;
     selected?: SelectDropdownMenuItem[];
     selectionType?: WidgetOptionsSchemaProperty['selection_type'];
@@ -85,7 +87,7 @@ watch(() => props.inherit, () => {
             </template>
             <div>
                 <!-- HACK: Modeling it like any other option thereafter -->
-                <div v-if="props.label !== 'Cost Tag' || props.label !== 'Cost Additional Info'"
+                <div v-if="props.schemaKey !== COST_WIDGET_VALUE_OPTION_KEYS.cost_tag_value.key || props.schemaKey !== COST_WIDGET_VALUE_OPTION_KEYS.cost_additional_info_value.key"
                      class="select-form-wrapper"
                 >
                     <p-select-dropdown use-fixed-menu-style
