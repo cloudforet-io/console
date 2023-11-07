@@ -129,10 +129,6 @@ export interface WidgetOptions {
     data_criteria?: 'history'|'realtime';
     filters?: WidgetFiltersMap;
 }
-export interface SelectorOptions {
-    enabled?: boolean;
-    type: 'cost-usage'|'days';
-}
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
@@ -213,4 +209,3 @@ export interface WidgetExpose<Data = any> {
     refreshWidget: () => Promise<Data>;
 }
 
-export type SelectorType = 'cost' | 'usage' | 'day' | 'month';
