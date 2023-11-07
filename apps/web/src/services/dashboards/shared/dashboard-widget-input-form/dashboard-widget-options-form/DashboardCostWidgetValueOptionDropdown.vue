@@ -4,28 +4,26 @@ import {
 } from 'vue';
 
 import { PIconButton, PSelectDropdown, PBadge } from '@spaceone/design-system';
-import type { KeyItem } from '@spaceone/design-system/src/inputs/search/query-search/type';
 import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { ValueHandler } from '@cloudforet/core-lib/component-util/query-search/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { COST_VALUE_WIDGET_OPTION_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 
 interface Props {
-    schemaKey?: string;
+    optionKey?: string;
     selected?: SelectDropdownMenuItem[];
-    handler?: AutocompleteHandler[];
     invalid?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    schemaKey: '',
+    optionKey: '',
     selected: undefined,
-    handler: undefined,
     invalid: false,
 });
 
@@ -33,25 +31,77 @@ const emit = defineEmits<{(e: 'update:selected', selected: SelectDropdownMenuIte
     (e: 'delete'): void;
 }>();
 
+const widgetFormStore = useWidgetFormStore();
+const widgetFormState = widgetFormStore.$state;
+
 const state = reactive({
     visibleMenu: false,
     reloadOnMenuHandlerUpdate: false,
-    valueTarget: props.schemaKey === COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.key ? 'tags' : 'additional_info',
-    handler: props.handler[0] as ValueHandler|AutocompleteHandler|undefined,
+    selectedKey: {} as SelectDropdownMenuItem,
+    valueTarget: props.optionKey === 'cost_tag_value' ? 'tags' : 'additional_info',
     selectedItems: [] as SelectDropdownMenuItem[],
-    selectedItem: {} as SelectDropdownMenuItem,
-    selectedKey: {} as KeyItem,
 });
 
+const variableModelKeys = {
+    cost_tag_value: 'cost_tag_keys',
+    cost_additional_info_value: 'cost_additional_info_keys',
+} as const;
+
+const menuHandler: AutocompleteHandler = async () => {
+    // key handler
+    if (Object.keys(state.selectedKey).length === 0) {
+        const param = {
+            data_source_id: widgetFormState.widgetOptions.cost_data_source,
+            query: {
+                only: [variableModelKeys[props.optionKey]],
+                filter: [
+                    {
+                        key: 'cost_tag_keys',
+                        value: null,
+                        operator: 'not',
+                    },
+                ],
+            },
+        };
+        const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list(param);
+        return {
+            results: results[0][variableModelKeys[props.optionKey]].map((result) => (
+                { label: result, name: `${state.valueTarget}.${result}` }
+            )),
+        };
+    }
+    // value handler
+    const param = {
+        resource_type: 'cost_analysis.Cost',
+        options: { limit: 10, search_type: 'value' },
+        distinct_key: state.selectedKey.name,
+    };
+    try {
+        const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
+        return {
+            results: res.results.reduce((results, d) => {
+                if (d.name !== '' && d.name !== undefined && d.name !== null) results.push({ label: d.name, name: `${state.selectedKey.name}.${d.key}` });
+                return results;
+            }, [{ label: state.selectedKey.label, type: 'header' }]),
+            totalCount: res.total_count,
+        };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {
+            results: [],
+            totalCount: 0,
+        };
+    }
+};
+
 const handleUpdateSelected = (selected: SelectDropdownMenuItem) => {
-    if (!state.reloadOnMenuHandlerUpdate) {
-        const displayKey = selected.name?.split('.')[1].replace(' ', '_') as string;
-        state.selectedKey = { name: selected.name as string, label: displayKey };
-        state.handler = makeDistinctValueHandler('cost_analysis.Cost', state.selectedKey.name);
+    if (Object.keys(state.selectedKey).length === 0) {
+        state.selectedKey = selected;
         state.reloadOnMenuHandlerUpdate = true;
+        menuHandler('');
     } else {
-        state.selectedItem = { name: `${state.selectedKey.name}.${selected.name}`, label: `${state.selectedKey.label}: ${selected.label}`, target: 'value' };
-        emit('update:selected', [...state.selectedItems, state.selectedItem]);
+        const selectedItem = { name: selected.name, label: `${state.selectedKey.label}: ${selected.label}`, target: 'value' };
+        emit('update:selected', [...state.selectedItems, selectedItem]);
         initMenu();
     }
 };
@@ -63,9 +113,7 @@ const handleDeleteButton = () => {
 const initMenu = () => {
     state.visibleMenu = false;
     state.reloadOnMenuHandlerUpdate = false;
-    state.handler = props.handler[0];
-    state.selectedItem = {} as SelectDropdownMenuItem;
-    state.selectedKey = {} as KeyItem;
+    state.selectedKey = {};
 };
 
 watch(() => state.visibleMenu, (visibleMenu) => {
@@ -98,10 +146,10 @@ watch(() => props.selected, (selected) => {
                            is-fixed-width
                            multi-selectable
                            :visible-menu.sync="state.visibleMenu"
-                           :handler="state.handler"
+                           :handler="menuHandler"
+                           :reload-on-menu-handler-update="state.reloadOnMenuHandlerUpdate"
                            :selected="state.selectedItems"
                            :invalid="props.invalid"
-                           :reload-on-menu-handler-update="state.reloadOnMenuHandlerUpdate"
                            @select="handleUpdateSelected"
         >
             <template #dropdown-button="item">
@@ -122,12 +170,7 @@ watch(() => props.selected, (selected) => {
                 >{{ $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}</span>
             </template>
             <template #menu-item--format="{item}">
-                <span>{{ state.reloadOnMenuHandlerUpdate ? item.label : item.name.split('.')[1] }}</span>
-            </template>
-            <template v-if="state.selectedItem.label"
-                      #menu-header
-            >
-                <span class="key-item-header">{{ state.selectedItem.label }}</span>
+                <span>{{ item.label }}</span>
             </template>
         </p-select-dropdown>
         <p-icon-button class="delete-button"

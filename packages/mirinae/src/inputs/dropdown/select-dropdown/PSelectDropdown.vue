@@ -277,11 +277,16 @@ watch(() => props.handler, async () => {
                     console.error(`Failed to fetch data from handler: ${idx}`);
                 }
             });
-        } else if (props.reloadOnMenuHandlerUpdate) {
-            await reloadMenu();
         }
     }
 }, { immediate: true });
+
+// HACK: Will be Remove reloadOnMenuHandlerUpdate after Modeling at Console's dashboard cost widget filter options.
+watch(() => props.reloadOnMenuHandlerUpdate, async (reloadOnMenuHandlerUpdate) => {
+    if (reloadOnMenuHandlerUpdate) {
+        await reloadMenu();
+    }
+});
 </script>
 
 <template>

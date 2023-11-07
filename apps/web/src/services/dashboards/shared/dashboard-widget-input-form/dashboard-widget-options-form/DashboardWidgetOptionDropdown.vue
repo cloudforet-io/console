@@ -319,8 +319,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                 <dashboard-cost-widget-value-option-dropdown
                     v-else
                     :selected="state.selected"
-                    :schema-key="state.schemaProperty?.key"
-                    :handler="menuState.menuHandlers"
+                    :option-key="state.schemaProperty?.key"
                     :invalid="!!state.errorMessage"
                     @update:selected="handleUpdateSelected"
                     @delete="handleDeleteProperty"

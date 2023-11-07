@@ -68,6 +68,7 @@ export const WIDGET_OPTION_KEYS = [
 ] as const;
 export type WidgetOptionKey = typeof WIDGET_OPTION_KEYS[number];
 
+// HACK: Modeling it like any other option thereafter
 export const COST_VALUE_WIDGET_OPTION_CONFIGS = {
     cost_tag_value: {
         key: 'cost_tag_value',
