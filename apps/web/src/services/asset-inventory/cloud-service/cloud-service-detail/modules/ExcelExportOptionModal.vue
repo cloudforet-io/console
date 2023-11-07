@@ -41,12 +41,17 @@ interface CloudServiceDetailSchema {
     options: any;
 }
 
+const MAIN_TABLE = 'Main Table';
+
 const state = reactive({
-    isValid: true,
+    isValid: computed<boolean>(() => !!state.selectedSubData.length),
     downloadLoading: false,
     isSubDataLoading: false,
-    subDataList: computed(() => state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name)),
-    selectedSubData: [] as string[],
+    subDataList: computed(() => [
+        MAIN_TABLE,
+        ...state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name),
+    ]),
+    selectedSubData: [MAIN_TABLE] as string[],
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     detailSchema: [] as CloudServiceDetailSchema[],
 });
@@ -62,21 +67,21 @@ const getCloudServiceListQuery = () => {
 const handleConfirm = async () => {
     state.downloadLoading = true;
     const excelExportFetcher = () => {
-        const cloudServiceListSheetQuery: ExportOption = {
+        const cloudServiceListSheetQuery: ExportOption|undefined = (state.selectedSubData.includes('Main Table')) ? ({
             name: 'Cloud Service List',
             query_type: QueryType.SEARCH,
             search_query: {
                 ...getCloudServiceListQuery(),
                 fields: dynamicFieldsToExcelDataFields(props.cloudServiceListFields),
             },
-        };
+        }) : undefined;
 
         const cloudServiceExcelExportParams: ExportParameter = {
             options: [
-                cloudServiceListSheetQuery,
                 // will be added more sheet query
             ],
         };
+        if (cloudServiceListSheetQuery) cloudServiceExcelExportParams.options.push(cloudServiceListSheetQuery);
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);
