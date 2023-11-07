@@ -179,7 +179,7 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     }
 
     // 2-2) selected case
-    // 2-2-1) array case
+    // 2-2-1) array case (e.g. ['aws', 'gcp'] or [{k: 'product', v: ['AWSDataTransfer'], o: '='}])
     if (Array.isArray(selected)) {
         let values: SelectDropdownMenuItem[] = selected.map((item) => {
             // string[] case
@@ -196,7 +196,7 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
         }
         return values;
     }
-    // 2-2-2) string case
+    // 2-2-2) string case (e.g. 'aws')
     if (typeof selected !== 'object') {
         if (menuState.menuHandlers) {
             const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, [{ name: selected }]);
