@@ -17,13 +17,13 @@ import type { ExportParameter, ExportOption } from '@/models/export/index';
 import { QueryType } from '@/models/export/index';
 import { store } from '@/store';
 
-import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import {
     dynamicFieldsToExcelDataFields,
 } from '@/lib/component-util/dynamic-layout';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
+import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
