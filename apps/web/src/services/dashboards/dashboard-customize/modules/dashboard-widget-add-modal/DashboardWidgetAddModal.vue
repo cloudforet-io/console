@@ -25,7 +25,9 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
     (e: 'add-widget', dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo): void;
 }>();
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.state;
+const widgetFormGetters = widgetFormStore.getters;
+
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
 });
@@ -38,14 +40,14 @@ const tabState = reactive({
 });
 
 const handleConfirm = () => {
-    if (!widgetFormState.widgetConfigId || !widgetFormState.widgetTitle) return;
+    if (!widgetFormState.widgetConfigId || !widgetFormGetters.title) return;
     const widgetConfig = getWidgetConfig(widgetFormState.widgetConfigId);
     const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
         widget_key: uuidv4(),
         widget_name: widgetFormState.widgetConfigId,
         size: widgetConfig.sizes[0],
         version: '1', // TODO: auto?
-        ...widgetFormStore.updatedWidgetInfo,
+        ...widgetFormGetters.updatedWidgetInfo,
     };
     emit('add-widget', dashboardLayoutWidgetInfo);
     state.proxyVisible = false;
@@ -58,7 +60,7 @@ const handleConfirm = () => {
                     :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
-                    :disabled="!widgetFormStore.isAllValid"
+                    :disabled="!widgetFormGetters.isAllValid"
                     @confirm="handleConfirm"
     >
         <template #body>

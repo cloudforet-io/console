@@ -42,10 +42,12 @@ const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
 }>();
 
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.state;
+const widgetFormGetters = widgetFormStore.getters;
+
 const state = reactive({
     // property schema
-    schemaProperty: computed<WidgetOptionsSchemaProperty|undefined>(() => widgetFormStore.widgetConfig?.options_schema?.properties?.[props.propertyName]),
+    schemaProperty: computed<WidgetOptionsSchemaProperty|undefined>(() => widgetFormGetters.widgetConfig?.options_schema?.properties?.[props.propertyName]),
     label: computed(() => state.schemaProperty?.name ?? props.propertyName),
     selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => state.schemaProperty?.selection_type),
     inherit: computed<boolean>(() => !!widgetFormState.inheritOptions?.[props.propertyName]?.enabled),
@@ -137,7 +139,7 @@ const getRefinedSelectedItemByHandlers = async (
 };
 // init selected menu items on init or inherit changed
 const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
-    const inheritOption = widgetFormStore.inheritOptions?.[props.propertyName];
+    const inheritOption = widgetFormState.inheritOptions?.[props.propertyName];
 
     // 1) inherit case
     if (state.inherit) {
@@ -219,7 +221,7 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     } else {
         delete widgetOptions[propertyName];
     }
-    widgetFormStore.$patch({ widgetOptions });
+    widgetFormStore.updateOptions(widgetOptions);
 };
 const updateWidgetSchemaProperties = () => {
     const schemaProperties = [...widgetFormState.schemaProperties];
@@ -227,7 +229,7 @@ const updateWidgetSchemaProperties = () => {
     if (index >= 0) {
         schemaProperties.splice(index, 1);
     }
-    widgetFormStore.$patch({ schemaProperties });
+    widgetFormStore.updateSchemaProperties(schemaProperties);
 };
 
 /* Event */

@@ -20,11 +20,11 @@ const props = defineProps<{
 }>();
 
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const widgetFormState = widgetFormStore.state;
+const widgetFormGetters = widgetFormStore.getters;
+
 const state = reactive({
-    properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormStore.widgetConfig?.options_schema?.properties ?? {}),
+    properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormGetters.widgetConfig?.options_schema?.properties ?? {}),
     optionsValidMap: {} as Record<string, boolean>,
     uuid: uuidv4(),
 });
@@ -52,15 +52,11 @@ const handleReturnToInitialSettings = () => {
 const handleDeleteProperty = (propertyName: string) => {
     widgetFormStore.updateInheritOption(propertyName, false);
     delete state.optionsValidMap[propertyName];
-    widgetFormStore.$patch({
-        isOptionsValid: Object.values(state.optionsValidMap).every((valid) => valid),
-    });
+    widgetFormStore.updateOptionsValid(Object.values(state.optionsValidMap).every((valid) => valid));
 };
 const handleUpdateIsValid = (propertyName: string, isValid: boolean) => {
     state.optionsValidMap[propertyName] = isValid;
-    widgetFormStore.$patch({
-        isOptionsValid: Object.values(state.optionsValidMap).every((valid) => valid),
-    });
+    widgetFormStore.updateOptionsValid(Object.values(state.optionsValidMap).every((valid) => valid));
 };
 </script>
 

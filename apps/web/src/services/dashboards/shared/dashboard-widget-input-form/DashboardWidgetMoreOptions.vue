@@ -18,11 +18,12 @@ interface MenuItem {
 }
 
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.state;
+const widgetFormGetters = widgetFormStore.getters;
 
 const state = reactive({
     propertySchemaTuples: computed<[optionKey: string, schema: WidgetOptionsSchemaProperty][]>(() => {
-        const properties = widgetFormStore.widgetConfig?.options_schema?.properties ?? {};
+        const properties = widgetFormGetters.widgetConfig?.options_schema?.properties ?? {};
         return Object.entries(properties);
     }),
 });
@@ -54,8 +55,8 @@ const {
 });
 
 const handleUpdateSelectedOptions = (selected: MenuItem[]) => {
-    const order = widgetFormStore.widgetConfig?.options_schema?.order ?? [];
-    const schemaProperties = widgetFormStore.widgetConfig?.options_schema?.properties ?? {};
+    const order = widgetFormGetters.widgetConfig?.options_schema?.order ?? [];
+    const schemaProperties = widgetFormGetters.widgetConfig?.options_schema?.properties ?? {};
     const selectedProperties: string[] = chain(selected)
         .map((item) => item.name)
         .sortBy((optionKey) => {
@@ -79,7 +80,7 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
     if (isEqual(current, selectedProperties)) return;
 
     const refined: MenuItem[] = selectedProperties.map((d) => {
-        const config = widgetFormStore.widgetConfig?.options_schema?.properties?.[d];
+        const config = widgetFormGetters.widgetConfig?.options_schema?.properties?.[d];
         return { name: d, label: config?.name ?? d };
     });
     selectedOptions.value = refined;
