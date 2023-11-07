@@ -17,7 +17,6 @@ import { i18n } from '@/translations';
 
 import type { VariableModelConfig } from '@/lib/variable-models';
 import { VariableModel } from '@/lib/variable-models';
-import type { IBaseVariableModel } from '@/lib/variable-models/_base/types';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
@@ -62,7 +61,7 @@ const state = reactive({
     }),
 });
 const menuState = reactive({
-    variableModels: computed<IBaseVariableModel[]>(() => getVariableModels(state.schemaProperty)),
+    variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
     menuHandlers: computed(() => {
         if (!state.schemaProperty) return [];
@@ -82,10 +81,10 @@ const menuState = reactive({
 });
 
 /* Util */
-const getVariableModels = (schema?: WidgetOptionsSchemaProperty): IBaseVariableModel[] => {
+const getVariableModels = (schema?: WidgetOptionsSchemaProperty): VariableModel[] => {
     if (!schema?.item_options) return [];
 
-    const variableModels: IBaseVariableModel[] = [];
+    const variableModels: VariableModel[] = [];
     schema.item_options?.forEach((conf: VariableModelConfig) => {
         const variableModel = new VariableModel(conf);
         variableModels.push(variableModel);
@@ -142,11 +141,26 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
 
     // 1) inherit case
     if (state.inherit) {
+        const variableKey = inheritOption.variable_key;
+        const variableProperty = props.variablesSchema?.properties?.[variableKey];
         if (!state.inheritanceMode || state.inheritanceMode === 'KEY_MATCHING') {
-            const variableKey = inheritOption.variable_key;
-            const variableSchema = props.variablesSchema?.properties?.[variableKey];
-            if (!variableKey || !variableSchema?.use) return [];
-            return [{ name: variableKey, label: variableSchema.name }];
+            if (!variableKey || !variableProperty?.use) return [];
+            return [{ name: variableKey, label: variableProperty.name }];
+        }
+        if (state.inheritanceMode === 'SELECTION_TYPE_MATCHING') {
+            // if variable is available, use it
+            if (variableKey && variableProperty?.use) {
+                return [{ name: variableKey, label: variableProperty.name }];
+            }
+
+            // find variable key from variables schema by selection type
+            const matchedPropertyTuples = Object.entries(props.variablesSchema?.properties ?? {})
+                .find(([, d]) => d.use && d.selection_type === state.schemaProperty?.selection_type);
+            if (matchedPropertyTuples) {
+                const matchedVariableKey = matchedPropertyTuples[0];
+                const matchedVariableProperty = props.variablesSchema?.properties?.[matchedVariableKey];
+                return [{ name: matchedVariableKey, label: matchedVariableProperty?.name }];
+            }
         }
         return [];
     }
