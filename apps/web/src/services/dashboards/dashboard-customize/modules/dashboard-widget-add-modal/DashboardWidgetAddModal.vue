@@ -58,7 +58,7 @@ const handleConfirm = () => {
                     :header-title="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.TITLE')"
                     size="lg"
                     class="dashboard-add-widget-modal"
-                    :disabled="!widgetFormState.isValid"
+                    :disabled="!widgetFormStore.isAllValid"
                     @confirm="handleConfirm"
     >
         <template #body>
