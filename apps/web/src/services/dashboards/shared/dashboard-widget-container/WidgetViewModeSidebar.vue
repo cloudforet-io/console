@@ -140,7 +140,7 @@ watch(() => props.visible, (value) => {
                         {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!widgetFormState.isValid"
+                              :disabled="!widgetFormStore.isAllValid"
                               @click="handleClickSaveButton"
                     >
                         {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
