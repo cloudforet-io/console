@@ -100,9 +100,7 @@ const getSchema = async () => {
             },
         };
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-        const filteredDetailSchema = filterForExcelSchema(res.details);
-
-        state.detailSchema = filteredDetailSchema;
+        state.detailSchema = filterForExcelSchema(res.details);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

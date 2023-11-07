@@ -32,7 +32,7 @@ export const makeCustomValueHandler = (distinctKey: string, cloudServiceId: stri
 };
 
 // This is a helper function that extracts only the schema required for excel download from the metadata of the cloudService type.
-export const filterForExcelSchema = (schemaList: CloudServiceDetailSchema[]) => schemaList.filter((schema: CloudServiceDetailSchema) => {
+export const filterForExcelSchema = (schemaList: CloudServiceDetailSchema[]):CloudServiceDetailSchema[] => schemaList.filter((schema: CloudServiceDetailSchema) => {
     if (schema.name === 'Base Information') return true;
     return getApiActionByLayoutType(schema.type) === 'getData';
 });
