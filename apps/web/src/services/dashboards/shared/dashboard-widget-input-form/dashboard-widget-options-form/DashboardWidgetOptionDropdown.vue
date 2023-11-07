@@ -166,7 +166,7 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     }
 
     // 2) non-inherit case
-    const selected: Array<ConsoleFilter|string>|string = get(widgetFormState.widgetOptions, props.propertyName);
+    const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormState.widgetOptions, props.propertyName);
 
     // 2-1) no selected case
     if (!selected) {
