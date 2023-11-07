@@ -90,11 +90,14 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
     assetWidgetLocation: undefined,
     costWidgetLocation: computed<Location|undefined>(() => {
         if (!widgetState.options.cost_data_source) return undefined;
-        const end = dayjs.utc(widgetState.settings?.date_range?.end);
+        if (!widgetState.dataField) return undefined;
+
+        const end = dayjs.utc(widgetState.dateRange.end);
         const _period = {
             start: end.subtract(5, 'month').format('YYYY-MM'),
             end: end.format('YYYY-MM'),
         };
+
         return {
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
