@@ -6,13 +6,19 @@ import {
 import {
     PButtonModal, PCheckboxGroup, PCheckbox, PDataLoader,
 } from '@spaceone/design-system';
+import type { DynamicField } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ExportOption, ExportParameter } from '@/models/export';
+import { QueryType } from '@/models/export';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
+import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -22,6 +28,8 @@ const props = defineProps<{
     visible: boolean;
     cloudServiceId?: string;
     isServerPage: boolean;
+    hiddenFilters: ConsoleFilter[]; // for server tab
+    cloudServiceListFields: DynamicField[];
 }>();
 
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
@@ -34,7 +42,7 @@ interface CloudServiceDetailSchema {
 }
 
 const state = reactive({
-    isValid: false,
+    isValid: true,
     downloadLoading: false,
     isSubDataLoading: false,
     subDataList: computed(() => state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name)),
@@ -43,30 +51,37 @@ const state = reactive({
     detailSchema: [] as CloudServiceDetailSchema[],
 });
 
+
+const apiQuery = new ApiQueryHelper();
+const getCloudServiceListQuery = () => {
+    apiQuery.setMultiSortV2([{ key: 'created_at', desc: true }])
+        .setFilters(props.hiddenFilters);
+    return apiQuery.data;
+};
+
 const handleConfirm = async () => {
-    try {
-        state.downloadLoading = true;
-        // await downloadExcel({
-        //     url: '/inventory/cloud-service/list',
-        //     param: {
-        //         query: getQuery(),
-        //         ...(overviewState.period && {
-        //             date_range: {
-        //                 start: dayjs.utc(overviewState.period.start).format('YYYY-MM-DD'),
-        //                 end: dayjs.utc(overviewState.period.end).add(1, 'day').format('YYYY-MM-DD'),
-        //             },
-        //         }),
-        //     },
-        //     fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
-        //     file_name_prefix: FILE_NAME_PREFIX.cloudService,
-        // });
-        emits('update:visible', false);
-        showSuccessMessage(i18n.t(''), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t(''));
-    } finally {
-        state.downloadLoading = false;
-    }
+    state.downloadLoading = true;
+    const excelExportFetcher = () => {
+        const cloudServiceListSheetQuery: ExportOption = {
+            name: 'Cloud Service List',
+            query_type: QueryType.SEARCH,
+            search_query: {
+                ...getCloudServiceListQuery(),
+                fields: dynamicFieldsToExcelDataFields(props.cloudServiceListFields),
+            },
+        };
+
+        const cloudServiceExcelExportParams: ExportParameter = {
+            options: [
+                cloudServiceListSheetQuery,
+                // will be added more sheet query
+            ],
+        };
+        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+    };
+    await downloadExcelByExportFetcher(excelExportFetcher);
+    emits('update:visible', false);
+    state.downloadLoading = false;
 };
 const handleUpdateVisible = (visible: boolean) => {
     emits('update:visible', visible);

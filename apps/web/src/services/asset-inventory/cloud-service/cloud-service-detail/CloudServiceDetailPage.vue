@@ -17,6 +17,7 @@ import type {
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 
+import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -111,6 +112,10 @@ const tableState = reactive({
     selectedCloudServiceIds: computed(() => tableState.selectedItems.map((d) => d.cloud_service_id)),
     tableHeight: tableHeight > TABLE_MIN_HEIGHT ? tableHeight : TABLE_MIN_HEIGHT,
     visibleCustomFieldModal: false,
+    dynamicTableFields: computed<DynamicField[]>(() => {
+        if (!tableState.schema) return [];
+        return tableState.schema.options.fields ?? [];
+    }),
 });
 
 const schemaQueryHelper = new QueryHelper();
@@ -418,6 +423,8 @@ debouncedWatch([() => props.group, () => props.name], async () => {
         <excel-export-option-modal :visible="excelState.visible"
                                    :cloud-service-id="tableState.items[0]?.cloud_service_id"
                                    :is-server-page="props.isServerPage"
+                                   :hidden-filters="hiddenFilters"
+                                   :cloud-service-list-fields="tableState.dynamicTableFields"
                                    @update:visible="handleUpdateVisible"
         />
     </div>
