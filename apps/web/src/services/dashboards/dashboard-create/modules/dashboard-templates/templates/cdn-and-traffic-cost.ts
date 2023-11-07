@@ -12,7 +12,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             cost_data_field: 'additional_info.Usage Type Details',
             filters: {
                 // TODO: must be updated to string[] type
-                cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
+                cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
             },
         },
         schema_properties: [
@@ -32,7 +32,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             cost_secondary_data_field: 'additional_info.Usage Type Details',
             filters: {
                 // TODO: must be updated to string[] type
-                cost_product: [{ k: 'product', v: 'AWSDataTransfer', o: '=' }],
+                cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
             },
         },
     }],
@@ -43,7 +43,7 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             cost_secondary_data_field: 'additional_info.Usage Type Details',
             filters: {
                 // TODO: must be updated to string[] type
-                cost_product: [{ k: 'product', v: 'AmazonCloudFront', o: '=' }],
+                cost_product: [{ k: 'product', v: ['AmazonCloudFront'], o: '=' }],
             },
         },
     }],
