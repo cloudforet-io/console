@@ -30,7 +30,6 @@ import type { CloudServiceDetailSchema } from '@/services/asset-inventory/cloud-
 const props = defineProps<{
     visible: boolean;
     cloudServiceId?: string;
-    isServerPage: boolean;
     hiddenFilters: ConsoleFilter[]; // for server tab
     cloudServiceListFields: DynamicField[];
 }>();
@@ -95,15 +94,11 @@ const getSchema = async () => {
     try {
         const params: Record<string, any> = {
             schema: 'details',
+            resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceId,
             },
         };
-        if (props.isServerPage) {
-            params.resource_type = 'inventory.Server';
-        } else {
-            params.resource_type = 'inventory.CloudService';
-        }
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
         const filteredDetailSchema = filterForExcelSchema(res.details);
 
