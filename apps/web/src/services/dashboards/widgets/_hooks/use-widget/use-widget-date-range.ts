@@ -11,8 +11,9 @@ import type { BaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-w
 import type { AdditionalState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 export const useWidgetDateRange = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: AdditionalState = {}): ComputedRef<DateRange> => {
+    if (isRef(overrides.dateRange)) return overrides.dateRange;
     const dateRange = computed<DateRange>(() => {
-        if (overrides.dateRange) return isRef(overrides.dateRange) ? overrides.dateRange.value : overrides.dateRange;
+        if (overrides.dateRange) return overrides.dateRange as DateRange;
         const dateRangeFormat = widgetState.options.granularity === GRANULARITY.YEARLY ? 'YYYY' : 'YYYY-MM';
         const end = dayjs.utc(widgetState.settings?.date_range?.end).format(dateRangeFormat);
         const start = dayjs.utc(widgetState.settings?.date_range?.start).format(dateRangeFormat);
