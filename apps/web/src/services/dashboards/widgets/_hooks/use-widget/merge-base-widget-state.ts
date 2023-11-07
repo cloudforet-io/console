@@ -19,7 +19,7 @@ import {
 import { getWidgetInheritOptionsErrorMap } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
 
 
-export interface MergedWidgetState {
+export interface MergedBaseWidgetState {
     widgetConfig: ComputedRef<WidgetConfig>;
     options: ComputedRef<WidgetOptions>;
     settings: ComputedRef<DashboardSettings|undefined>;
@@ -27,7 +27,7 @@ export interface MergedWidgetState {
     title: ComputedRef<string>;
     schemaProperties: ComputedRef<string[]>;
 }
-interface UseMergedWidgetStateOptions {
+interface MergeBaseWidgetStateOptions {
     inheritOptions: InheritOptions|undefined|Ref<InheritOptions|undefined>; // inherit information from the dashboard widget layout info.
     widgetOptions: WidgetOptions|undefined|Ref<WidgetOptions|undefined>; // widget options from the dashboard widget layout info.
     widgetName: string|Ref<string>; // widget config name
@@ -37,10 +37,10 @@ interface UseMergedWidgetStateOptions {
     title?: string|Ref<string|undefined>; // widget title from the dashboard widget layout info.
     schemaProperties?: string[]|Ref<string[]|undefined>; // widget schema properties from the dashboard widget layout info.
 }
-export function useMergedWidgetState(
+export function mergeBaseWidgetState(
     {
         inheritOptions, widgetOptions, widgetName, dashboardSettings, dashboardVariablesSchema, dashboardVariables, title, schemaProperties,
-    }: UseMergedWidgetStateOptions,
+    }: MergeBaseWidgetStateOptions,
 ) {
     const optionState = reactive({
         inheritOptions,
@@ -59,7 +59,7 @@ export function useMergedWidgetState(
         optionState.dashboardVariablesSchema,
     ));
 
-    const state = reactive<MergedWidgetState>({
+    const state = reactive<MergedBaseWidgetState>({
         widgetConfig: computed<WidgetConfig>(() => getWidgetConfig(optionState.widgetName)),
         options: computed<WidgetOptions>(() => getRefinedWidgetOptions(
             state.widgetConfig,
@@ -87,7 +87,7 @@ export function useMergedWidgetState(
             if (!optionState.schemaProperties) return initialSchemaProperties;
             return getRefinedSchemaProperties(optionState.schemaProperties, initialSchemaProperties, optionState.widgetOptions);
         }),
-    }) as UnwrapRef<MergedWidgetState>;
+    }) as UnwrapRef<MergedBaseWidgetState>;
 
     return state;
 }

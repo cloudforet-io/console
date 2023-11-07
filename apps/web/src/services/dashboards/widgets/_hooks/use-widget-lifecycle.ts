@@ -22,7 +22,7 @@ import type {
 import {
     validateWidgetByVariablesSchemaUpdate,
 } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
-import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-state';
+import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 
 interface UseWidgetLifecycleOptions<Data> {
