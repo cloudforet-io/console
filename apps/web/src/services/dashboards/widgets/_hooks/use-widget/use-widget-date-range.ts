@@ -8,9 +8,9 @@ import type { DateRange } from '@/services/dashboards/config';
 import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-base-widget-state';
-import type { AdditionalState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import type { OverridableWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
-export const useWidgetDateRange = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: AdditionalState = {}): ComputedRef<DateRange> => {
+export const useWidgetDateRange = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: OverridableWidgetState = {}): ComputedRef<DateRange> => {
     if (isRef(overrides.dateRange)) return overrides.dateRange;
     const dateRange = computed<DateRange>(() => {
         if (overrides.dateRange) return overrides.dateRange as DateRange;

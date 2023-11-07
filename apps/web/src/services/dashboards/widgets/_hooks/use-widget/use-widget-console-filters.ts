@@ -10,9 +10,9 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { WidgetFiltersMap, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-base-widget-state';
-import type { AdditionalState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import type { OverridableWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
-export const useWidgetConsoleFilters = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: AdditionalState = {}): ComputedRef<ConsoleFilter[]> => {
+export const useWidgetConsoleFilters = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: OverridableWidgetState = {}): ComputedRef<ConsoleFilter[]> => {
     const queryHelper = new QueryHelper();
     const localState = reactive({
         budgetConsoleFilters: computed<ConsoleFilter[]>(() => {

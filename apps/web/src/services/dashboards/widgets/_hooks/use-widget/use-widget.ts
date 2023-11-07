@@ -21,19 +21,19 @@ import { useWidgetDateRange } from '@/services/dashboards/widgets/_hooks/use-wid
 import { useWidgetFrame } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-frame';
 import { useWidgetLocation } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget-location';
 
-export interface AdditionalState {
-    dateRange?: DateRange|ComputedRef<DateRange>; // overwrites dateRange
-    widgetLocation?: ComputedRef<Location|undefined>; // overwrites whole widgetLocation. undefined means no link
-    consoleFilters?: ComputedRef<ConsoleFilter[]>; // overwrites whole consoleFilters
+export interface OverridableWidgetState {
+    dateRange?: DateRange|ComputedRef<DateRange>; // overrides dateRange
+    widgetLocation?: ComputedRef<Location|undefined>; // overrides whole widgetLocation. undefined means no link
+    consoleFilters?: ComputedRef<ConsoleFilter[]>; // overrides whole consoleFilters
 
     // use belows if you want to overwrite specific cases (useful in base widget)
     // location
-    assetWidgetLocation?: Location|ComputedRef<Location|undefined>; // overwrites widgetLocation for 'Asset' label. undefined means no link
-    costWidgetLocation?: Location|ComputedRef<Location|undefined>; // overwrites widgetLocation for 'Cost' label. undefined means no link
-    budgetWidgetLocation?: Location|ComputedRef<Location|undefined>; // overwrites widgetLocation for 'Budget' label. undefined means no link
+    assetWidgetLocation?: Location|ComputedRef<Location|undefined>; // overrides widgetLocation for 'Asset' label. undefined means no link
+    costWidgetLocation?: Location|ComputedRef<Location|undefined>; // overrides widgetLocation for 'Cost' label. undefined means no link
+    budgetWidgetLocation?: Location|ComputedRef<Location|undefined>; // overrides widgetLocation for 'Budget' label. undefined means no link
     // filters
-    budgetConsoleFilters?: ComputedRef<ConsoleFilter[]>; // overwrites consoleFilters for 'Budget' label
-    cloudServiceAnalyzeConsoleFilters?: ComputedRef<ConsoleFilter[]>; // overwrites consoleFilters for both 'Asset' label and 'realtime' data criteria
+    budgetConsoleFilters?: ComputedRef<ConsoleFilter[]>; // overrides consoleFilters for 'Budget' label
+    cloudServiceAnalyzeConsoleFilters?: ComputedRef<ConsoleFilter[]>; // overrides consoleFilters for both 'Asset' label and 'realtime' data criteria
 }
 export interface WidgetState extends BaseWidgetState {
     dateRange: ComputedRef<DateRange>;
@@ -54,13 +54,13 @@ export interface WidgetState extends BaseWidgetState {
     assetWidgetLocation: undefined,
  });
  */
-export const useWidget = (props: WidgetProps, emit: WidgetEmit, additionalState: AdditionalState = {}) => {
+export const useWidget = (props: WidgetProps, emit: WidgetEmit, overrides: OverridableWidgetState = {}) => {
     const baseState = useBaseWidgetState(props);
 
     // additional states that can be overwritten by each widget
-    const dateRange = useWidgetDateRange(props, baseState, additionalState);
-    const widgetLocation = useWidgetLocation(props, baseState, dateRange, additionalState);
-    const consoleFilters = useWidgetConsoleFilters(props, baseState, additionalState);
+    const dateRange = useWidgetDateRange(props, baseState, overrides);
+    const widgetLocation = useWidgetLocation(props, baseState, dateRange, overrides);
+    const consoleFilters = useWidgetConsoleFilters(props, baseState, overrides);
 
     const widgetState = reactive({
         ...toRefs(baseState),

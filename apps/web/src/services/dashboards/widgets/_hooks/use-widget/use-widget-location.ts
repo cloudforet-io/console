@@ -15,9 +15,9 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { WidgetFiltersMap, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-base-widget-state';
-import type { AdditionalState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import type { OverridableWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
-export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseWidgetState>, dateRange: ComputedRef<DateRange>, overrides: AdditionalState = {}) => {
+export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseWidgetState>, dateRange: ComputedRef<DateRange>, overrides: OverridableWidgetState = {}) => {
     const assetQueryHelper = new QueryHelper();
     const budgetQueryHelper = new QueryHelper();
 
