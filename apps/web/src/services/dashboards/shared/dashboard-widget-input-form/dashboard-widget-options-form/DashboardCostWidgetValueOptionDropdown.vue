@@ -92,6 +92,7 @@ watch(() => props.selected, (selected) => {
 
 <template>
     <div class="select-form-wrapper">
+        <!-- TODO: Applying selection list and 'Show more' button soon -->
         <p-select-dropdown class="select-dropdown"
                            use-fixed-menu-style
                            is-fixed-width
