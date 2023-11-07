@@ -65,7 +65,7 @@ export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
 export type CostDataField = typeof COST_DATA_FIELD_MAP[keyof typeof COST_DATA_FIELD_MAP]['name'];
 export type AssetDataField = typeof ASSET_DATA_FIELD_MAP[keyof typeof ASSET_DATA_FIELD_MAP]['name'];
-export type DataField = CostDataField|AssetDataField;
+export type DataField = CostDataField|AssetDataField|string;
 type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
 
 export interface BaseConfigInfo {
@@ -112,12 +112,12 @@ export interface WidgetOptions {
     // cost
     cost_data_source?: string;
     cost_data_type?: string;
-    cost_data_field?: string[];
-    cost_secondary_data_field?: string[];
+    cost_data_field?: string;
+    cost_secondary_data_field?: string;
     // asset
-    asset_query_set?: string;
-    asset_data_field?: string[];
-    asset_secondary_data_field?: string[];
+    cloud_service_query_set?: string;
+    asset_data_field?: string;
+    asset_secondary_data_field?: string;
     // common
     granularity?: Granularity;
     chart_type?: ChartType;

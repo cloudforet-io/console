@@ -30,18 +30,14 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import WidgetFrameHeaderDropdown from '@/services/dashboards/widgets/_components/WidgetFrameHeaderDropdown.vue';
 import type {
-    SelectorType, WidgetEmit, WidgetExpose, WidgetProps,
+    WidgetEmit, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
 import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import {
-    useCostWidgetFrameHeaderDropdown,
-} from '@/services/dashboards/widgets/_hooks/use-cost-widget-frame-header-dropdown';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -51,12 +47,10 @@ import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { CostAnalyzeResponse, Legend } from '@/services/dashboards/widgets/type';
 
-const USAGE_TYPE_QUERY_KEY = 'additional_info.Usage Type Details';
-const USAGE_TYPE_VALUE_KEY = 'Usage Type Details';
 interface SubData {
-    [USAGE_TYPE_VALUE_KEY]: string;
     value: number;
     usage_unit: string | null;
+    [secondaryParsedDataField: string]: any;
 }
 interface Data {
     value_sum: SubData[];
@@ -107,21 +101,18 @@ const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
     dataSize: computed(() => state.chartData?.length ?? 0),
 });
-const { selectorItems, selectedSelectorType } = useCostWidgetFrameHeaderDropdown({
-    selectorOptions: computed(() => widgetState.options?.selector_options),
-});
 
 const state = reactive({
     loading: true,
     data: null as Response | null,
-    fieldsKey: computed<'cost'|'usage_quantity'>(() => (selectedSelectorType.value === 'cost' ? 'cost' : 'usage_quantity')),
+    dataType: computed<string|undefined>(() => (widgetState.options.cost_data_type)),
     legends: computed<Legend[]>(() => (state.data?.results ? getXYChartLegends(state.data.results, widgetState.parsedDataField, props.allReferenceTypeInfo) : [])),
     chartData: computed<ChartData[]>(() => {
         const _chartData = getRefinedXYChartData<Data, ChartData>(state.data?.results, {
             dataField: widgetState.parsedDataField,
             allReferenceTypeInfo: props.allReferenceTypeInfo,
             arrayDataKey: 'value_sum',
-            categoryKey: USAGE_TYPE_VALUE_KEY,
+            categoryKey: widgetState.parsedSecondaryDataField,
             valueKey: 'value',
             isHorizontal: true,
         });
@@ -134,7 +125,7 @@ const state = reactive({
                 [widgetState.parsedDataField]: d[widgetState.parsedDataField] ?? 'Unknown',
             } as TableData;
             d.value_sum?.forEach((subData: SubData) => {
-                const rowKey = state.fieldsKey === 'usage_quantity' ? `${subData[USAGE_TYPE_VALUE_KEY]}_${subData.usage_unit}` : subData[USAGE_TYPE_VALUE_KEY];
+                const rowKey = state.dataType === 'usage_quantity' ? `${subData[widgetState.parsedSecondaryDataField]}_${subData.usage_unit}` : subData[widgetState.parsedSecondaryDataField];
                 row[rowKey] = subData.value;
             });
             return row;
@@ -142,15 +133,18 @@ const state = reactive({
     }),
     tableFields: computed<Field[]>(() => {
         if (!widgetState.dataField) return [];
-        const textOptions: Field['textOptions'] = {
-            type: state.fieldsKey === 'cost' ? 'cost' : 'usage',
-        };
+        let textOptions: Field['textOptions'];
+        if (state.dataType === 'cost') {
+            textOptions = { type: 'cost' };
+        } else if (state.dataType === 'usage_quantity') {
+            textOptions = { type: 'usage', unitPath: 'usage_unit' };
+        }
 
         const dynamicTableFields: Field[] = [];
         state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
             dynamicTableFields.push({
-                label: d[USAGE_TYPE_VALUE_KEY] ?? 'Unknown',
-                name: state.fieldsKey === 'usage_quantity' ? `${d[USAGE_TYPE_VALUE_KEY]}_${d.usage_unit}` : d[USAGE_TYPE_VALUE_KEY], // HTTP Requests_Bytes
+                label: d[widgetState.parsedSecondaryDataField] ?? 'Unknown',
+                name: state.dataType === 'usage_quantity' ? `${d[widgetState.parsedSecondaryDataField]}_${d.usage_unit}` : d[widgetState.parsedSecondaryDataField], // HTTP Requests_Bytes
                 textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
                 textAlign: 'right',
             });
@@ -166,7 +160,7 @@ const state = reactive({
         const fixedFields: Field[] = [{
             name: widgetState.parsedDataField,
             label: dataFieldLabel,
-            textOptions: { type: 'reference', referenceType },
+            textOptions: referenceType ? { type: 'reference', referenceType } : undefined,
             width: dataFieldTableFieldWidth,
         }];
         return [
@@ -176,8 +170,8 @@ const state = reactive({
     }),
     //
     showChart: computed<boolean>(() => {
-        if (state.fieldsKey === 'cost') return true;
-        if (!state.data?.results) return true;
+        if (state.dataType !== 'usage_quantity') return true;
+        if (!state.data?.results?.length) return true;
         // hide chart when there are different usage_unit in data or usage_unit is null
         if (state.data.results[0].value_sum.map((d) => d.usage_unit).some((d) => d === null)) return false;
         return uniqBy(state.data.results[0].value_sum, 'usage_unit').length === 1;
@@ -199,8 +193,8 @@ const fetchData = async (): Promise<Response> => {
     apiQueryHelper.setFilters(widgetState.consoleFilters);
     if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
     try {
-        const dataField = [widgetState.dataField, USAGE_TYPE_QUERY_KEY];
-        if (state.fieldsKey === 'usage_quantity') {
+        const dataField = [widgetState.dataField, widgetState.secondaryDataField];
+        if (state.dataType === 'usage_quantity') {
             dataField.push('usage_unit');
         }
         const { status, response } = await fetchCostAnalyze({
@@ -212,12 +206,12 @@ const fetchData = async (): Promise<Response> => {
                 end: widgetState.dateRange.end,
                 fields: {
                     value_sum: {
-                        key: state.fieldsKey,
+                        key: state.dataType,
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_value_sum', desc: true }, { key: USAGE_TYPE_QUERY_KEY, desc: false }],
-                field_group: ['usage_unit', USAGE_TYPE_VALUE_KEY],
+                sort: [{ key: '_total_value_sum', desc: true }, { key: widgetState.secondaryDataField, desc: false }],
+                field_group: ['usage_unit', widgetState.parsedSecondaryDataField],
                 ...apiQueryHelper.data,
             },
         });
@@ -268,7 +262,7 @@ const drawChart = (chartData) => {
                 let value = target.dataItem?.dataContext?.[fieldName];
                 if (value === undefined) value = '--';
                 if (typeof value === 'number') {
-                    if (selectedSelectorType.value === 'cost') {
+                    if (state.dataType === 'cost') {
                         if (widgetState.currency) value = currencyMoneyFormatter(value, { currency: widgetState.currency });
                     } else {
                         value = usageUnitFormatter(value, { unit: state.usageUnit });
@@ -307,10 +301,6 @@ const refreshWidget = async (_thisPage = 1): Promise<Response> => {
 };
 
 /* Event */
-const handleSelectSelectorType = (selected?: SelectorType) => {
-    selectedSelectorType.value = selected;
-    refreshWidget();
-};
 const handleUpdateThisPage = (_thisPage: number) => {
     thisPage.value = _thisPage;
     state.data = undefined;
@@ -343,14 +333,6 @@ defineExpose<WidgetExpose<Response>>({
                   class="aws-cloud-front-cost"
                   v-on="widgetFrameEventHandlers"
     >
-        <template v-if="selectorItems.length"
-                  #header-right
-        >
-            <widget-frame-header-dropdown :items="selectorItems"
-                                          :selected="selectedSelectorType"
-                                          @select="handleSelectSelectorType"
-            />
-        </template>
         <div class="data-container">
             <div v-if="state.showChart"
                  class="chart-wrapper"

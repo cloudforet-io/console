@@ -1440,12 +1440,6 @@
 			"ASSET_SUMMARY_BY_REGIONS": {
 				"DESC": "클라우드 프로바이더의 Region별 클라우드 서비스 사용 현황을 요약해서 보여주는 위젯. "
 			},
-			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안의 AWS CloudFront 사용량과 비용을 보여주는 위젯. "
-			},
-			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": "조회 기간동안 발생한 Region별 AWS Data-Transfer 사용량과 비용을 보여주는 위젯. "
-			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "조회 기간 동안 발생한 AWS Data-Transfer 비용 추이를 보여주는 위젯. "
 			},
@@ -1486,6 +1480,9 @@
 			"COST_BY_REGION": {
 				"DESC": "조회 기간동안 발생한 Region별 총 비용 데이터를 보여주는 위젯. "
 			},
+			"COST_BY_REGION_MULTI_FIELDS": {
+				"DESC": "특정 Product과 기준으로 조회 기간 동안 발생한 Region별 비용 및 사용량 추이를 보여주는 위젯."
+			},
 			"COST_DONUT": {
 				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안 각각의 총 비용 데이터를 보여주는 위젯."
 			},
@@ -1494,6 +1491,9 @@
 			},
 			"COST_PIE": {
 				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안 각각의 총 비용 데이터를 보여주는 위젯. "
+			},
+			"COST_SUMMARY_MULTI_FIELDS": {
+				"DESC": "특정 Product과  'Group By' 옵션을 기준으로 조회 기간 동안 발생한 비용 및 사용량 추이를 보여주는 위젯."
 			},
 			"COST_TREND": {
 				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안의 월별 비용 데이터를 보여주는 위젯. "

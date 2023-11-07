@@ -1,43 +1,35 @@
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsCloudFrontCostWidgetConfig: WidgetConfig = {
-    widget_config_id: 'awsCloudFrontCost',
+    widget_config_id: 'costSummaryMultiFields',
     widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/aws-cloud-front-cost/AWSCloudFrontCostWidget.vue'),
+        component: import('@/services/dashboards/widgets/cost-widgets/cost-summary-multi-fields/CostSummaryMultiFieldsWidget.vue'),
     }),
-    title: 'AWS CloudFront Cost',
+    title: 'Cost & Usage Trend (Bar Chart)',
     labels: ['Cost'],
     description: {
-        translation_id: 'DASHBOARDS.WIDGET.AWS_CLOUD_FRONT_COST.DESC',
+        translation_id: 'DASHBOARDS.WIDGET.COST_SUMMARY_MULTI_FIELDS.DESC',
         preview_image: 'widget-img_awsCloudFrontCost--thumbnail.png',
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {
         inherit: true,
-        inherit_count: 3,
     },
     sizes: ['lg', 'full'],
     options: {
-        cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+        cost_data_type: 'cost',
         chart_type: CHART_TYPE.STACKED_COLUMN,
         granularity: GRANULARITY.YEARLY,
         legend_options: {
             enabled: true,
             show_at: 'chart',
         },
-        selector_options: {
-            enabled: true,
-            type: 'cost-usage',
-        },
         pagination_options: {
             enabled: true,
             page_size: 5,
-        },
-        filters: {
-            cost_product: [{ k: 'product', v: 'AmazonCloudFront', o: '=' }],
         },
     },
     options_schema: getWidgetOptionsSchema([
