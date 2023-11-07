@@ -139,12 +139,18 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
         name: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.name,
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
+        ],
     },
     'filters.cost_additional_info_value': {
         key: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.key,
         name: COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.name,
         selection_type: 'MULTI',
         inheritance_mode: 'NONE',
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
+        ],
     },
     'filters.cost_usage_type': {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key,
