@@ -297,6 +297,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                                        :handler="menuState.menuHandlers"
                                        :selected="state.selected"
                                        :invalid="!!state.errorMessage"
+                                       :disabled="state.inheritanceMode === 'KEY_MATCHING' && state.inherit"
                                        @update:selected="handleUpdateSelected"
                     >
                         <template #dropdown-button>
