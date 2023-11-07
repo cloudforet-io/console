@@ -11,6 +11,8 @@ import type {
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { get } from 'lodash';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+
 import { i18n } from '@/translations';
 
 import type { VariableModelConfig } from '@/lib/variable-models';
@@ -150,7 +152,7 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     }
 
     // 2) non-inherit case
-    const selected = get(widgetFormState.widgetOptions, props.propertyName);
+    const selected: Array<ConsoleFilter|string>|string = get(widgetFormState.widgetOptions, props.propertyName);
 
     // 2-1) no selected case
     if (!selected) {
@@ -163,26 +165,27 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     }
 
     // 2-2) selected case
-    let refinedSelected: SelectDropdownMenuItem[] = [];
     // 2-2-1) array case
     if (Array.isArray(selected)) {
-        let values = selected.map((item) => {
+        let values: SelectDropdownMenuItem[] = selected.map((item) => {
+            // string[] case
             if (typeof item === 'string') {
                 return [{ name: item }];
             }
+            // ConsoleFilter[] case
             return Array.isArray(item.v) ? item.v.map((v) => ({ name: v })) : { name: item.v };
-        });
+        }) as SelectDropdownMenuItem[];
         if (Array.isArray(values[0])) values = values.flat();
         if (menuState.menuHandlers) {
-            refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, values);
+            const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, values);
             return refinedSelected;
         }
         return values;
     }
-    // 2-2-2) object case
+    // 2-2-2) string case
     if (typeof selected !== 'object') {
         if (menuState.menuHandlers) {
-            refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, [{ name: selected }]);
+            const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, [{ name: selected }]);
             return refinedSelected;
         }
         return [{ name: selected }];
