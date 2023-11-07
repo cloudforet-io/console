@@ -59,7 +59,7 @@ interface SelectDropdownProps {
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
     initSelectedWithHandler?: boolean;
-    replaceHandler?: boolean;
+    reloadOnMenuHandlerUpdate?: boolean;
 }
 
 const props = withDefaults(defineProps<SelectDropdownProps>(), {
@@ -83,7 +83,7 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     pageSize: undefined,
     resetSelectedOnUnmounted: false,
     initSelectedWithHandler: false,
-    replaceHandler: false,
+    reloadOnMenuHandlerUpdate: false,
 });
 
 /* event emits */
@@ -277,7 +277,7 @@ watch(() => props.handler, async () => {
                     console.error(`Failed to fetch data from handler: ${idx}`);
                 }
             });
-        } else if (props.replaceHandler) {
+        } else if (props.reloadOnMenuHandlerUpdate) {
             await reloadMenu();
         }
     }

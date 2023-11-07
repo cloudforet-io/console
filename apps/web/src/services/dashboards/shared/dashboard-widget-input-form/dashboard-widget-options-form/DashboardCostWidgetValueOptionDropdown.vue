@@ -35,7 +35,7 @@ const emit = defineEmits<{(e: 'update:selected', selected: SelectDropdownMenuIte
 
 const state = reactive({
     visibleMenu: false,
-    replaceHandler: false,
+    reloadOnMenuHandlerUpdate: false,
     valueTarget: props.schemaKey === COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.key ? 'tags' : 'additional_info',
     handler: props.handler[0] as ValueHandler|AutocompleteHandler|undefined,
     selectedItems: [] as SelectDropdownMenuItem[],
@@ -44,11 +44,11 @@ const state = reactive({
 });
 
 const handleUpdateSelected = (selected: SelectDropdownMenuItem) => {
-    if (!state.replaceHandler) {
+    if (!state.reloadOnMenuHandlerUpdate) {
         const displayKey = selected.name?.split('.')[1].replace(' ', '_') as string;
         state.selectedKey = { name: selected.name as string, label: displayKey };
         state.handler = makeDistinctValueHandler('cost_analysis.Cost', state.selectedKey.name);
-        state.replaceHandler = true;
+        state.reloadOnMenuHandlerUpdate = true;
     } else {
         state.selectedItem = { name: `${state.selectedKey.name}.${selected.name}`, label: `${state.selectedKey.label}: ${selected.label}`, target: 'value' };
         emit('update:selected', [...state.selectedItems, state.selectedItem]);
@@ -62,7 +62,7 @@ const handleDeleteButton = () => {
 };
 const initMenu = () => {
     state.visibleMenu = false;
-    state.replaceHandler = false;
+    state.reloadOnMenuHandlerUpdate = false;
     state.handler = props.handler[0];
     state.selectedItem = {} as SelectDropdownMenuItem;
     state.selectedKey = {} as KeyItem;
@@ -101,7 +101,7 @@ watch(() => props.selected, (selected) => {
                            :handler="state.handler"
                            :selected="state.selectedItems"
                            :invalid="props.invalid"
-                           :replace-handler="state.replaceHandler"
+                           :reload-on-menu-handler-update="state.reloadOnMenuHandlerUpdate"
                            @select="handleUpdateSelected"
         >
             <template #dropdown-button="item">
@@ -122,7 +122,7 @@ watch(() => props.selected, (selected) => {
                 >{{ $t('COMPONENT.SELECT_DROPDOWN.SELECT') }}</span>
             </template>
             <template #menu-item--format="{item}">
-                <span>{{ state.replaceHandler ? item.label : item.name.split('.')[1] }}</span>
+                <span>{{ state.reloadOnMenuHandlerUpdate ? item.label : item.name.split('.')[1] }}</span>
             </template>
             <template v-if="state.selectedItem.label"
                       #menu-header
