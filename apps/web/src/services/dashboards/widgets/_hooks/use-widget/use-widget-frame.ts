@@ -13,7 +13,7 @@ import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-import type { MergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
+import type { MergedBaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/merge-base-widget-state';
 
 export interface WidgetFrameOptions {
     dateRange?: DateRange|ComputedRef<DateRange>;
@@ -23,7 +23,7 @@ export interface WidgetFrameOptions {
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,
     emit: WidgetEmit,
-    widgetState: UnwrapRef<MergedWidgetState & WidgetFrameOptions>,
+    widgetState: UnwrapRef<MergedBaseWidgetState & WidgetFrameOptions>,
 ) => {
     const title = computed(() => props.title ?? widgetState.widgetConfig.title);
     const size = computed(() => {

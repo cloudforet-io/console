@@ -12,7 +12,7 @@ import type {
 } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-import { useMergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
+import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/merge-base-widget-state';
 
 /* Description
     * This store is used to get/manage 'a' widget data.
@@ -56,7 +56,7 @@ export const useWidgetFormStore = defineStore('widget-form', {
             if (!this.widgetConfigId) return undefined;
             const widgetInfo = this.originWidgetInfo;
 
-            const mergedWidgetState = useMergedWidgetState({
+            const mergedWidgetState = mergeBaseWidgetState({
                 inheritOptions: widgetInfo?.inherit_options,
                 widgetOptions: widgetInfo?.widget_options,
                 widgetName: this.widgetConfigId,
