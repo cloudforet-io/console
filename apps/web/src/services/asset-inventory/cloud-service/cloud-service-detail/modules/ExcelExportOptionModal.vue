@@ -22,6 +22,9 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { filterForExcelSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
+import type { CloudServiceDetailSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/type';
+
 
 
 const props = defineProps<{
@@ -35,11 +38,6 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
-interface CloudServiceDetailSchema {
-    name: string;
-    type: string;
-    options: any;
-}
 
 const MAIN_TABLE = 'Main Table';
 
@@ -107,8 +105,9 @@ const getSchema = async () => {
             params.resource_type = 'inventory.CloudService';
         }
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
+        const filteredDetailSchema = filterForExcelSchema(res.details);
 
-        state.detailSchema = res.details;
+        state.detailSchema = filteredDetailSchema;
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
