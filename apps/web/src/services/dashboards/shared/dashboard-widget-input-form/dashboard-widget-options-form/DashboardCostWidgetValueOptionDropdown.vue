@@ -43,7 +43,7 @@ const state = reactive({
     selectedKey: undefined as SelectDropdownMenuItem|undefined,
     valueTarget: props.optionKey === 'cost_tag_value' ? 'tags' : 'additional_info',
     selectedItems: [] as SelectDropdownMenuItem[],
-    selectedMenuList: computed(() => {
+    selectedMenuList: computed<string[]>(() => {
         const selectedMenuListName = state.selectedItems.map((d) => d.name);
         return state.selectedItems.length > 0 ? selectedMenuListName : [] as string[];
     }),
