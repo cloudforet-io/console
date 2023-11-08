@@ -194,6 +194,10 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchCostAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Response|null> => {
     try {
+        if (!state.dataType) {
+            throw new Error('data type is not defined');
+        }
+
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 

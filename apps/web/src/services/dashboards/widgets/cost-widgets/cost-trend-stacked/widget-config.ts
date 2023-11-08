@@ -13,13 +13,13 @@ const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {
     },
     scopes: ['PROJECT', 'WORKSPACE'],
     options: {
-        granularity: 'MONTHLY',
         chart_type: CHART_TYPE.STACKED_COLUMN,
         legend_options: {
             enabled: true,
             show_at: 'table',
         },
         cost_data_field: COST_DATA_FIELD_MAP.PROVIDER.name,
+        cost_data_type: 'cost',
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
