@@ -218,7 +218,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         key: 'cost_secondary_data_field',
         name: 'Data Field (Cost)',
         selection_type: 'SINGLE',
-        readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
