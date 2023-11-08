@@ -288,6 +288,7 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
+    await nextTick();
     thisPage.value = _thisPage;
     const [chartData, tableData] = await Promise.all([fetchChartData(), fetchTableData()]);
     state.data = { chartData, tableData };

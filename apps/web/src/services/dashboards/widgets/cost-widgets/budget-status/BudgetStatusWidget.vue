@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, reactive,
+    computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
 
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
@@ -132,6 +132,7 @@ const initWidget = async (data?: Response): Promise<Response|undefined> => {
     return state.data;
 };
 const refreshWidget = async (): Promise<Response|undefined> => {
+    await nextTick();
     state.loading = true;
     state.data = await fetchData();
     state.loading = false;
