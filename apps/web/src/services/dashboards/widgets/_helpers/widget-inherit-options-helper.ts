@@ -10,7 +10,10 @@ export const getInitialWidgetInheritOptions = (
 
     Object.entries(widgetConfig?.options_schema?.properties ?? {}).forEach(([optionName, property]) => {
         const inheritOption = storedInheritOptions?.[optionName];
-        if (!inheritOption?.enabled) return;
+        if (typeof inheritOption?.enabled === 'boolean' && !inheritOption?.enabled) {
+            refined[optionName] = { ...inheritOption };
+            return;
+        }
 
         const inheritanceMode = property.inheritance_mode;
         if (inheritanceMode === 'NONE') return;
