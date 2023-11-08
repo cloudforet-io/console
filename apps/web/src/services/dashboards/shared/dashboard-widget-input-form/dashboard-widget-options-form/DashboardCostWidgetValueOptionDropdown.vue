@@ -32,7 +32,7 @@ const emit = defineEmits<{(e: 'update:selected', selected: SelectDropdownMenuIte
 }>();
 
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.state;
 
 const selectDropdownRef = ref<null|HTMLElement>(null);
 
