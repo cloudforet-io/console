@@ -23,13 +23,14 @@ interface EmitFn {
 const emit = defineEmits<EmitFn>();
 const props = defineProps<Props>();
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.state;
+const widgetFormGetters = widgetFormStore.getters;
 
 const handleEditModalCancel = () => {
     emit('cancel');
 };
 const handleEditModalConfirm = () => {
-    emit('confirm', widgetFormStore.updatedWidgetInfo);
+    emit('confirm', widgetFormGetters.updatedWidgetInfo);
 };
 </script>
 

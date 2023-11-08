@@ -7,9 +7,6 @@ import {
     PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
-import {
-    useWidgetTitleInput,
-} from '@/services/dashboards/shared/dashboard-widget-input-form/composables/use-widget-title-input';
 import DashboardWidgetOptionsForm
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionsForm.vue';
 import DashboardWidgetMoreOptions
@@ -26,6 +23,7 @@ const props = defineProps<Props>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
+const widgetFormGetters = widgetFormStore.getters;
 
 const state = reactive({
     isFocused: false,
@@ -33,26 +31,21 @@ const state = reactive({
 
 
 /* title form validation */
-const {
-    title, resetTitle, updateTitle, isTitleInvalid, titleInvalidText,
-} = useWidgetTitleInput();
-
+const handleUpdateTitle = (value: string) => {
+    if (value === widgetFormGetters.title) return;
+    widgetFormStore.updateTitle(value);
+};
 
 /* states init */
 const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
-    // init widgetInfo - refined widget info
     widgetFormStore.initWidgetForm(widgetKey, widgetConfigId);
-
-    // init title
-    updateTitle(widgetFormStore.mergedWidgetInfo?.title);
 };
 watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
     // do nothing if still loading
     if (!widgetConfigId) return;
 
     // reset states
-    widgetFormStore.$reset();
-    resetTitle();
+    widgetFormStore.resetAll();
 
     initSchemaAndFormData(widgetConfigId, widgetKey);
 
@@ -65,23 +58,23 @@ watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, wid
 <template>
     <div class="dashboard-widget-input-form">
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
-                       :invalid="isTitleInvalid"
-                       :invalid-text="titleInvalidText"
+                       :invalid="widgetFormGetters.isTitleInvalid"
+                       :invalid-text="widgetFormGetters.titleInvalidText"
                        class="name-field"
                        required
         >
-            <p-text-input :value="title"
+            <p-text-input :value="widgetFormGetters.title"
                           :is-focused.sync="state.isFocused"
-                          :invalid="isTitleInvalid"
+                          :invalid="widgetFormGetters.isTitleInvalid"
                           :placeholder="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_PLACEHOLDER')"
                           class="input"
-                          @update:value="updateTitle"
+                          @update:value="handleUpdateTitle"
             />
         </p-field-group>
-        <div v-if="widgetFormStore.widgetConfig?.description?.translation_id"
+        <div v-if="widgetFormGetters.widgetConfig?.description?.translation_id"
              class="description-text"
         >
-            {{ $t(widgetFormStore.widgetConfig.description.translation_id) }}
+            {{ $t(widgetFormGetters.widgetConfig.description.translation_id) }}
         </div>
 
         <!-- TODO: update props binding after updating widget config options_schema -->

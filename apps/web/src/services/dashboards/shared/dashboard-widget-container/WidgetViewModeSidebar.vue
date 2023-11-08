@@ -41,7 +41,9 @@ const emit = defineEmits<{(e: 'close', save: boolean): void;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.state;
+const widgetFormGetters = widgetFormStore.getters;
+
 const state = reactive({
     nonInheritedOptionModalVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
@@ -58,7 +60,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    if (widgetFormStore.updatedWidgetInfo) dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
+    if (widgetFormGetters.updatedWidgetInfo) dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormGetters.updatedWidgetInfo);
 };
 
 /* Api */
@@ -95,7 +97,7 @@ const handleCloseSidebar = () => {
     emit('close', false);
 };
 
-debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
+debouncedWatch(() => widgetFormGetters.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
     emit('update:widget-info', after as UpdatableWidgetInfo);
 }, { debounce: 150 });
@@ -140,7 +142,7 @@ watch(() => props.visible, (value) => {
                         {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
                     </p-button>
                     <p-button style-type="primary"
-                              :disabled="!widgetFormStore.isAllValid"
+                              :disabled="!widgetFormGetters.isAllValid"
                               @click="handleClickSaveButton"
                     >
                         {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
