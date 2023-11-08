@@ -5,6 +5,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
+import { getRefinedDependencyOptions } from '@/lib/variable-models/dependency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -16,6 +17,10 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
     name = 'Cost Tags';
 
     labels = ['cost'] as VariableModelLabel[];
+
+    dependencies = {
+        cost_data_source: 'data_source_id',
+    };
 
     #response: ListResponse = { results: [] };
 
@@ -30,7 +35,7 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
+            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
@@ -56,7 +61,7 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
                 });
             }
             const { status, response } = await this.#fetcher({
-                data_source_id: query.options.data_source_id,
+                ...dependencyOptions,
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {

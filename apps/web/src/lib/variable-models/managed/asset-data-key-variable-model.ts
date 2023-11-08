@@ -5,6 +5,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
+import { getRefinedDependencyOptions } from '@/lib/variable-models/dependency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -17,6 +18,10 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
 
     labels: VariableModelLabel[] = ['asset'];
 
+    dependencies = {
+        cloud_service_query_set: 'query_set_id',
+    };
+
     #response: ListResponse = { results: [] };
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<{
@@ -25,7 +30,7 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            if (!query.options?.query_set_id) throw new Error('No \'query_set_id\'');
+            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
 
@@ -51,7 +56,7 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
                 });
             }
             const { status, response } = await this.#fetcher({
-                query_set_id: query.options.query_set_id, // TODO: check its working
+                ...dependencyOptions, // TODO: check its working
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {

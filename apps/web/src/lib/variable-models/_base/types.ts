@@ -5,6 +5,9 @@ export interface IBaseVariableModel {
     labels: VariableModelLabel[];
     list(query?: ListQuery): Promise<ListResponse>;
     nameFormatter?: (data: any) => string;
+    dependencies?: {
+        [variableModelKey: string]: string;
+    }
 }
 export interface IEnumVariableModel extends IBaseVariableModel {
     values: Value[];

@@ -56,7 +56,6 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     #getParams(query: ListQuery = {}): Record<string, any> {
         const _query: Record<string, any> = {
-            ...(query.options ?? {}),
             filter: [
                 {
                     key: this.idKey,

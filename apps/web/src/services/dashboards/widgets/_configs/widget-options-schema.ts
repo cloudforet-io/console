@@ -9,11 +9,6 @@ import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
  */
 export type InheritanceMode = 'NONE'|'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
 
-type WidgetOptionPropertyDependency = Partial<{
-    [property in WidgetOptionKey]: { // e.g. 'cost_data_source'
-        reference_key: string; // e.g. 'data_source_id'
-    }
-}>;
 export interface WidgetOptionsSchemaProperty {
     key: string; // e.g. cost_data_source
     name?: string; // e.g. Data Source
@@ -23,7 +18,7 @@ export interface WidgetOptionsSchemaProperty {
     optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
-    dependencies?: WidgetOptionPropertyDependency;
+    dependent_properties?: WidgetOptionKey[];
 }
 export type WidgetOptionsSchema = {
     properties: Record<string, WidgetOptionsSchemaProperty>;
@@ -184,9 +179,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_data_type.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_key.key },
         ],
-        dependencies: {
-            cost_data_source: { reference_key: 'data_source_id' },
-        },
+        dependent_properties: ['cost_data_source'],
     },
     cost_data_field: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key,
@@ -199,9 +192,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
         ],
-        dependencies: {
-            cost_data_source: { reference_key: 'data_source_id' },
-        },
+        dependent_properties: ['cost_data_source'],
     },
     cost_secondary_data_field: {
         key: 'cost_secondary_data_field',
@@ -215,9 +206,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
         ],
-        dependencies: {
-            cost_data_source: { reference_key: 'data_source_id' },
-        },
+        dependent_properties: ['cost_data_source'],
     },
     cloud_service_query_set: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
@@ -238,9 +227,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_data_key.key },
         ],
-        dependencies: {
-            cloud_service_query_set: { reference_key: 'query_set_id' },
-        },
+        dependent_properties: ['cloud_service_query_set'],
     },
     asset_data_field: {
         key: 'asset_data_field',
@@ -252,9 +239,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_default_field.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_additional_info_key.key },
         ],
-        dependencies: {
-            cloud_service_query_set: { reference_key: 'query_set_id' },
-        },
+        dependent_properties: ['cloud_service_query_set'],
     },
     asset_secondary_data_field: {
         key: 'asset_secondary_data_field',
@@ -267,9 +252,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_default_field.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_additional_info_key.key },
         ],
-        dependencies: {
-            cloud_service_query_set: { reference_key: 'query_set_id' },
-        },
+        dependent_properties: ['cloud_service_query_set'],
     },
 };
 
@@ -288,9 +271,7 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
             if (properties.cost_data_source) {
                 properties[optionName] = {
                     ...filterProperty,
-                    dependencies: {
-                        cost_data_source: { reference_key: 'data_source_id' },
-                    },
+                    dependent_properties: ['cost_data_source'],
                 } as WidgetOptionsSchemaProperty;
             } else {
                 properties[optionName] = filterProperty as WidgetOptionsSchemaProperty;
