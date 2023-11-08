@@ -27,11 +27,8 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
         'cost_data_source',
         'cost_data_field',
         ['granularity', { fixed: true, readonly: true }],
-        'filters.provider',
         'filters.project',
-        'filters.service_account',
-        'filters.region',
-        'filters.cost_product',
+        'filters.project_group',
     ]),
 };
 
