@@ -4,8 +4,6 @@ import type {
     VariableModelLabel,
     Value,
 } from '@/lib/variable-models/_base/types';
-import CostDefaultDataTypeVariableModel from '@/lib/variable-models/managed/cost-default-data-type-variable-model';
-import CostUsageTypeVariableModel from '@/lib/variable-models/managed/cost-usage-type-variable-model';
 
 import AssetAccountVariableModel from './asset-account-variable-model';
 import AssetAdditionalInfoKeyVariableModel from './asset-additional-info-key-variable-model';
@@ -17,9 +15,12 @@ import CollectorVariableModel from './collector-variable-model';
 import CostAdditionalInfoKeyVariableModel from './cost-additional-info-key-variable-model';
 import CostDataKeyVariableModel from './cost-data-key-variable-model';
 import CostDataSourceVariableModel from './cost-data-source-variable-model';
+import CostDefaultDataTypeVariableModel from './cost-default-data-type-variable-model';
 import CostDefaultFieldVariableModel from './cost-default-field-variable-model';
 import CostProductVariableModel from './cost-product-variable-model';
 import CostTagKeyVariableModel from './cost-tag-key-variable-model';
+import CostUsageTypeVariableModel from './cost-usage-type-variable-model';
+import GranularityVariableModel from './granularity-variable-model';
 import ProjectGroupVariableModel from './project-group-variable-model';
 import ProjectVariableModel from './project-variable-model';
 import ProviderVariableModel from './provider-variable-model';
@@ -31,6 +32,7 @@ import WebhookVariableModel from './webhook-variable-model';
 
 const MANAGED_VARIABLE_MODELS = {
     // enum variable model
+    granularity: GranularityVariableModel,
     cost_default_field: CostDefaultFieldVariableModel,
     cost_default_data_type: CostDefaultDataTypeVariableModel,
     asset_default_field: AssetDefaultFieldVariableModel,
