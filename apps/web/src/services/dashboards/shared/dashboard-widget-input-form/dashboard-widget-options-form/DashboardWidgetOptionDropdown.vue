@@ -73,12 +73,12 @@ const menuState = reactive({
         }
 
         // get options from schema dependencies
-        const options = {}; // e.g. { data_source_id: 'ds-1' }
-        Object.entries(state.schemaProperty.dependencies ?? {})?.forEach(([optionName, reference]) => {
-            options[reference.reference_key] = widgetFormState.widgetOptions[optionName];
+        const modelOptions: Record<string, any> = {}; // e.g. { cost_data_source: 'ds-1' }
+        state.schemaProperty.dependent_properties?.forEach((property) => {
+            modelOptions[property] = widgetFormState.widgetOptions[property];
         });
 
-        return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, options));
+        return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, modelOptions));
     }),
 });
 
