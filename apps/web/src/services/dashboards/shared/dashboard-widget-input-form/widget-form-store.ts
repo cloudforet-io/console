@@ -207,7 +207,22 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             });
             state.widgetOptions = widgetOptions;
         },
-
+        returnToInitialSettings() {
+            const mergedWidgetState = mergeBaseWidgetState({
+                inheritOptions: getters.originWidgetInfo?.inherit_options,
+                widgetOptions: getters.originWidgetInfo?.widget_options,
+                widgetName: getters.originWidgetInfo?.widget_name ?? '',
+                dashboardSettings: dashboardDetailState.settings,
+                dashboardVariablesSchema: dashboardDetailState.variablesSchema,
+                dashboardVariables: dashboardDetailState.variables,
+                title: getters.originWidgetInfo?.title,
+                schemaProperties: getters.originWidgetInfo?.schema_properties,
+            });
+            updateTitle(mergedWidgetState.title ?? '');
+            state.widgetOptions = mergedWidgetState.options ?? {};
+            state.schemaProperties = mergedWidgetState.schemaProperties ?? [];
+            state.inheritOptions = mergedWidgetState.inheritOptions ?? {};
+        },
     };
 
     return {
