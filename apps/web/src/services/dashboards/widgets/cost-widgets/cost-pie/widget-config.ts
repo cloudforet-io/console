@@ -13,14 +13,12 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
     },
     options: {
         cost_data_field: COST_DATA_FIELD_MAP.PROVIDER.name,
-        cost_data_type: 'cost',
         granularity: GRANULARITY.MONTHLY,
         chart_type: CHART_TYPE.PIE,
     },
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
         'cost_data_field',
-        'cost_data_type',
         ['granularity', { fixed: true, readonly: true }],
         'filters.provider',
         'filters.project',
