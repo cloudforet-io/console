@@ -41,6 +41,7 @@ interface Getters {
     title: ComputedRef<string>;
     isTitleValid: ComputedRef<boolean|undefined>;
     titleInvalidText: ComputedRef<string|undefined>;
+    isOptionsValid: ComputedRef<boolean>;
     isAllValid: ComputedRef<boolean>;
 }
 
@@ -59,7 +60,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         widgetOptions: {} as WidgetOptions,
         schemaProperties: [] as string[],
         //
-        isOptionsValid: false,
+        optionsValidMap: {} as Record<string, boolean>,
     };
 
     const state = reactive(initialState);
@@ -118,14 +119,15 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         title,
         isTitleValid,
         titleInvalidText: titleInvalidText as ComputedRef<string|undefined>,
-        isAllValid: computed<boolean>(() => !!(state.isOptionsValid && getters.isTitleValid)),
+        isOptionsValid: computed<boolean>(() => Object.values(state.optionsValidMap).every((valid) => valid)),
+        isAllValid: computed<boolean>(() => !!(getters.isOptionsValid && getters.isTitleValid)),
     });
 
     const actions = {
         resetTitle,
         updateTitle,
-        updateOptionsValid(isValid: boolean) {
-            state.isOptionsValid = isValid;
+        updateOptionsValidMap(optionsValidMap: Record<string, boolean>) {
+            state.optionsValidMap = optionsValidMap;
         },
         updateOptions(options: WidgetOptions) {
             state.widgetOptions = options;

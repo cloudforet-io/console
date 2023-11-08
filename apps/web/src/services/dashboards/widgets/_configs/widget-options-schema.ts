@@ -19,6 +19,8 @@ export interface WidgetOptionsSchemaProperty {
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
     dependent_properties?: WidgetOptionKey[];
+    // TODO: need discussion about this spec
+    scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
 }
 export type WidgetOptionsSchema = {
     properties: Record<string, WidgetOptionsSchemaProperty>;
@@ -185,6 +187,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         selection_type: 'SINGLE',
         inheritance_mode: 'KEY_MATCHING',
         fixed: true,
+        scope: 'GLOBAL',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key },
         ],
@@ -233,6 +236,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         selection_type: 'SINGLE',
         inheritance_mode: 'KEY_MATCHING',
         fixed: true,
+        scope: 'GLOBAL',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
         ],
