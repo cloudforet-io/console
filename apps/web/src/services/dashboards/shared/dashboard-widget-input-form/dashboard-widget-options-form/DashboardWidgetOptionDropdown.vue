@@ -236,10 +236,12 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     }
 
     // delete case
-    if (propertyName.includes('filters')) {
-        delete widgetOptions.filters?.[dataName];
-    } else {
-        delete widgetOptions[propertyName];
+    if (!selected?.length) {
+        if (propertyName.includes('filters')) {
+            delete widgetOptions.filters?.[dataName];
+        } else {
+            delete widgetOptions[propertyName];
+        }
     }
 
     widgetFormStore.updateOptions(widgetOptions);
