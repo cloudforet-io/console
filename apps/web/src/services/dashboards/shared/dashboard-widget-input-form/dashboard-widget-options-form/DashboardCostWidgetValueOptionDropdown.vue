@@ -38,7 +38,6 @@ const selectDropdownRef = ref<null|HTMLElement>(null);
 
 const state = reactive({
     visibleMenu: false,
-    reloadOnMenuHandlerUpdate: false,
     selectedKey: undefined as SelectDropdownMenuItem|undefined,
     valueTarget: props.optionKey === 'cost_tag_value' ? 'tags' : 'additional_info',
     selectedItems: [] as SelectDropdownMenuItem[],
@@ -119,7 +118,6 @@ const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit 
 const handleUpdateSelected = (selected: SelectDropdownMenuItem) => {
     if (!state.selectedKey) {
         state.selectedKey = selected;
-        state.reloadOnMenuHandlerUpdate = true;
         menuHandler('');
         if (selectDropdownRef.value) {
             selectDropdownRef.value.reloadMenu();
@@ -137,7 +135,6 @@ const handleDeleteButton = () => {
 };
 const initMenu = () => {
     state.visibleMenu = false;
-    state.reloadOnMenuHandlerUpdate = false;
     state.selectedKey = undefined;
 };
 
@@ -173,7 +170,6 @@ watch(() => props.selected, (selected) => {
                            multi-selectable
                            :visible-menu.sync="state.visibleMenu"
                            :handler="menuHandler"
-                           :reload-on-menu-handler-update="state.reloadOnMenuHandlerUpdate"
                            :selected="state.selectedItems"
                            :invalid="props.invalid"
                            @select="handleUpdateSelected"

@@ -59,7 +59,6 @@ interface SelectDropdownProps {
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
     initSelectedWithHandler?: boolean;
-    reloadOnMenuHandlerUpdate?: boolean;
 }
 
 const props = withDefaults(defineProps<SelectDropdownProps>(), {
@@ -83,7 +82,6 @@ const props = withDefaults(defineProps<SelectDropdownProps>(), {
     pageSize: undefined,
     resetSelectedOnUnmounted: false,
     initSelectedWithHandler: false,
-    reloadOnMenuHandlerUpdate: false,
 });
 
 /* event emits */
@@ -273,13 +271,12 @@ watch(() => props.handler, async () => {
                     return item;
                 });
             } else {
-                throw new Error(`Failed to fetch data from handler: ${idx}`);
+                console.error(new Error(`Failed to fetch data from handler: ${idx}`));
             }
         });
     }
 }, { immediate: true });
 
-// HACK: Will be Remove reloadOnMenuHandlerUpdate after Modeling at Console's dashboard cost widget filter options.
 defineExpose({ reloadMenu });
 </script>
 
