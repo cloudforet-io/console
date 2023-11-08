@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import {
@@ -17,20 +16,15 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
@@ -51,25 +45,7 @@ type FullData = CostAnalyzeResponse<Data>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    // TODO: reconsider to remove it
-    widgetLocation: computed<Location|undefined>(() => {
-        if (!widgetState.options.cost_data_source) return undefined;
-        return {
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-            params: {
-                dataSourceId: widgetState.options.cost_data_source,
-                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-            },
-            query: {
-                granularity: primitiveToQueryString(GRANULARITY.DAILY),
-                group_by: arrayToQueryString([widgetState.dataField]),
-                period: objectToQueryString(widgetState.dateRange),
-                filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-            },
-        };
-    }),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const state = reactive({
     loading: true,
