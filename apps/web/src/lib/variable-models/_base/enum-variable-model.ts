@@ -24,14 +24,17 @@ export default class EnumVariableModel implements IEnumVariableModel {
         this.values = config.values;
     }
 
-    async list(options: ListQuery = {}): Promise<ListResponse> {
-        if (!options.search) {
-            this.#response = { results: this.values };
-        } else {
-            const regex = getTextHighlightRegex(options.search);
-            const results = this.values.filter((item) => regex.test(item.name));
-            this.#response = { results };
+    async list(query: ListQuery = {}): Promise<ListResponse> {
+        let results = this.values;
+        const filters = query.filters;
+        if (filters?.length) {
+            results = results.filter((item) => filters.includes(item.key));
         }
+        if (query.search) {
+            const regex = getTextHighlightRegex(query.search);
+            results = results.filter((item) => regex.test(item.name));
+        }
+        this.#response = { results };
         return this.#response;
     }
 }
