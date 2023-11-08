@@ -255,38 +255,32 @@ watch(() => props.disabled, (disabled) => {
     throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
 })();
 watch(() => props.handler, async () => {
-    if (props.handler && !props.disableHandler) {
-        if (props.initSelectedWithHandler) {
-            // this is to refine selected items by handler's results whose label is fully set.
-            const handlers = Array.isArray(props.handler) ? props.handler : [props.handler];
-            const promiseResults = await Promise.allSettled(handlers.map((handler) => handler(
-                '',
-                undefined,
-                undefined,
-                state.proxySelectedItem,
-            )));
-            promiseResults.forEach((result, idx) => {
-                if (result.status === 'fulfilled') {
-                    const results = result.value.results;
-                    state.proxySelectedItem = state.proxySelectedItem.map((item) => {
-                        const found = results.find((d) => d.name === item.name);
-                        if (found) return found;
-                        return item;
-                    });
-                } else {
-                    console.error(`Failed to fetch data from handler: ${idx}`);
-                }
-            });
-        }
+    if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
+        // this is to refine selected items by handler's results whose label is fully set.
+        const handlers = Array.isArray(props.handler) ? props.handler : [props.handler];
+        const promiseResults = await Promise.allSettled(handlers.map((handler) => handler(
+            '',
+            undefined,
+            undefined,
+            state.proxySelectedItem,
+        )));
+        promiseResults.forEach((result, idx) => {
+            if (result.status === 'fulfilled') {
+                const results = result.value.results;
+                state.proxySelectedItem = state.proxySelectedItem.map((item) => {
+                    const found = results.find((d) => d.name === item.name);
+                    if (found) return found;
+                    return item;
+                });
+            } else {
+                throw new Error(`Failed to fetch data from handler: ${idx}`);
+            }
+        });
     }
 }, { immediate: true });
 
 // HACK: Will be Remove reloadOnMenuHandlerUpdate after Modeling at Console's dashboard cost widget filter options.
-watch(() => props.reloadOnMenuHandlerUpdate, async (reloadOnMenuHandlerUpdate) => {
-    if (reloadOnMenuHandlerUpdate) {
-        await reloadMenu();
-    }
-});
+defineExpose({ reloadMenu });
 </script>
 
 <template>

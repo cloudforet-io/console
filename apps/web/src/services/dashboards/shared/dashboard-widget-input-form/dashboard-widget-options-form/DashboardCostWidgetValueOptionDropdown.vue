@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    reactive, watch,
+    reactive, watch, ref,
 } from 'vue';
 
 import { PIconButton, PSelectDropdown, PBadge } from '@spaceone/design-system';
@@ -34,10 +34,12 @@ const emit = defineEmits<{(e: 'update:selected', selected: SelectDropdownMenuIte
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.$state;
 
+const selectDropdownRef = ref<null|HTMLElement>(null);
+
 const state = reactive({
     visibleMenu: false,
     reloadOnMenuHandlerUpdate: false,
-    selectedKey: {} as SelectDropdownMenuItem,
+    selectedKey: undefined as SelectDropdownMenuItem|undefined,
     valueTarget: props.optionKey === 'cost_tag_value' ? 'tags' : 'additional_info',
     selectedItems: [] as SelectDropdownMenuItem[],
 });
@@ -47,20 +49,29 @@ const variableModelKeys = {
     cost_additional_info_value: 'cost_additional_info_keys',
 } as const;
 
-const menuHandler: AutocompleteHandler = async () => {
+const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit = 10) => {
     // key handler
-    if (Object.keys(state.selectedKey).length === 0) {
+    if (!state.selectedKey) {
         const param = {
             data_source_id: widgetFormState.widgetOptions.cost_data_source,
             query: {
                 only: [variableModelKeys[props.optionKey]],
                 filter: [
                     {
-                        key: 'cost_tag_keys',
+                        key: variableModelKeys[props.optionKey],
                         value: null,
                         operator: 'not',
                     },
+                    {
+                        key: variableModelKeys[props.optionKey],
+                        value: inputText,
+                        operator: 'contain',
+                    },
                 ],
+                page: {
+                    start: pageStart,
+                    limit: pageLimit,
+                },
             },
         };
         const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list(param);
@@ -72,17 +83,28 @@ const menuHandler: AutocompleteHandler = async () => {
     }
     // value handler
     const param = {
-        resource_type: 'cost_analysis.Cost',
-        options: { limit: 10, search_type: 'value' },
-        distinct_key: state.selectedKey.name,
+        query: {
+            distinct: state.selectedKey?.name,
+            filter: [
+                {
+                    key: state.selectedKey?.name,
+                    value: null,
+                    operator: 'not',
+                },
+            ],
+            page: {
+                start: pageStart,
+                limit: pageLimit,
+            },
+        },
     };
     try {
-        const res = await SpaceConnector.client.addOns.autocomplete.distinct(param);
+        const res = await SpaceConnector.clientV2.costAnalysis.cost.stat(param);
         return {
             results: res.results.reduce((results, d) => {
-                if (d.name !== '' && d.name !== undefined && d.name !== null) results.push({ label: d.name, name: `${state.selectedKey.name}.${d.key}` });
+                if (d !== '' && d !== undefined && d !== null) results.push({ label: d, name: `${state.selectedKey?.name}.${d}` });
                 return results;
-            }, [{ label: state.selectedKey.label, type: 'header' }]),
+            }, [{ label: state.selectedKey?.label, type: 'header' }]),
             totalCount: res.total_count,
         };
     } catch (e) {
@@ -95,12 +117,15 @@ const menuHandler: AutocompleteHandler = async () => {
 };
 
 const handleUpdateSelected = (selected: SelectDropdownMenuItem) => {
-    if (Object.keys(state.selectedKey).length === 0) {
+    if (!state.selectedKey) {
         state.selectedKey = selected;
         state.reloadOnMenuHandlerUpdate = true;
         menuHandler('');
+        if (selectDropdownRef.value) {
+            selectDropdownRef.value.reloadMenu();
+        }
     } else {
-        const selectedItem = { name: selected.name, label: `${state.selectedKey.label}: ${selected.label}`, target: 'value' };
+        const selectedItem = { name: selected.name, label: `${state.selectedKey?.label}: ${selected.label}`, target: 'value' };
         emit('update:selected', [...state.selectedItems, selectedItem]);
         initMenu();
     }
@@ -113,7 +138,7 @@ const handleDeleteButton = () => {
 const initMenu = () => {
     state.visibleMenu = false;
     state.reloadOnMenuHandlerUpdate = false;
-    state.selectedKey = {};
+    state.selectedKey = undefined;
 };
 
 watch(() => state.visibleMenu, (visibleMenu) => {
@@ -141,7 +166,8 @@ watch(() => props.selected, (selected) => {
 <template>
     <div class="select-form-wrapper">
         <!-- TODO: Applying selection list and 'Show more' button soon -->
-        <p-select-dropdown class="select-dropdown"
+        <p-select-dropdown ref="selectDropdownRef"
+                           class="select-dropdown"
                            use-fixed-menu-style
                            is-fixed-width
                            multi-selectable
