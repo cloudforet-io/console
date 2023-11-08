@@ -17,14 +17,17 @@ import { i18n } from '@/translations';
 
 import type { VariableModelConfig } from '@/lib/variable-models';
 import { VariableModel } from '@/lib/variable-models';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
+import type { WidgetFiltersMap } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    InheritanceMode,
+    InheritanceMode, WidgetFilterKey,
     WidgetOptionsSchemaProperty,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
@@ -100,7 +103,7 @@ const getInheritOptionMenuHandler = (schema?: WidgetOptionsSchemaProperty): Auto
     const selectableVariableMenuItems: {name: string; label: string;}[] = [];
     Object.entries(props.variablesSchema?.properties ?? {}).forEach(([propertyName, property]) => {
         if (property.use && property.selection_type === schema.selection_type) {
-            selectableVariableMenuItems.push({ name: getWidgetOptionKeyByVariableKey(propertyName), label: property.name });
+            selectableVariableMenuItems.push({ name: getWidgetOptionKeyByVariableKey(propertyName) as string, label: property.name });
         }
     });
     return (inputText) => {
@@ -210,6 +213,24 @@ const initSelectedMenuItems = async (inherit: boolean): Promise<SelectDropdownMe
     console.warn(new Error(`Invalid selected value: ${selected}`));
     return [];
 };
+
+const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap: WidgetFiltersMap = {}): WidgetFiltersMap => {
+    const modelConf = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as WidgetFilterKey];
+    if (!modelConf) {
+        console.error(new Error(`Invalid widget options filter key: ${filterKey}`));
+        return filtersMap;
+    }
+    const idKey = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as ManagedVariableModelKey].idKey;
+    if (!idKey) {
+        console.error(new Error(`Invalid referencing idKey of variable model by options filter key: ${filterKey}`));
+        return filtersMap;
+    }
+
+    const _filtersMap = { ...filtersMap };
+    const _value = Array.isArray(value) ? value : [value];
+    _filtersMap[filterKey] = [{ k: idKey, v: _value, o: '=' }];
+    return _filtersMap;
+};
 const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     const propertyName = props.propertyName;
     const widgetOptions = { ...widgetFormState.widgetOptions };
@@ -218,26 +239,22 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     // add case
     if (selected?.length) {
         if (state.schemaProperty?.selection_type === 'SINGLE') {
+            const value = selected[0].name as string;
             if (propertyName.startsWith('filters.')) {
-                widgetOptions.filters = {
-                    ...widgetOptions.filters,
-                    [dataName]: selected[0].name,
-                };
+                widgetOptions.filters = addWidgetFilters(dataName, value, widgetOptions.filters);
             } else {
-                widgetOptions[propertyName] = selected[0].name;
+                widgetOptions[propertyName] = value;
             }
-        } else if (propertyName.startsWith('filters.')) {
-            widgetOptions.filters = {
-                ...widgetOptions.filters,
-                [dataName]: selected.map((item) => item.name),
-            };
         } else {
-            widgetOptions[propertyName] = selected.map((item) => item.name);
+            const values = selected.map((item) => item.name) as string[];
+            if (propertyName.startsWith('filters.')) {
+                widgetOptions.filters = addWidgetFilters(dataName, values, widgetOptions.filters);
+            } else {
+                widgetOptions[propertyName] = values;
+            }
         }
-    }
-
     // delete case
-    if (!selected?.length) {
+    } else if (!selected?.length) {
         if (propertyName.startsWith('filters.')) {
             delete widgetOptions.filters?.[dataName];
         } else {
