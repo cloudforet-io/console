@@ -74,7 +74,6 @@ const state = reactive({
     chartData: computed<ChartData[]>(() => {
         if (!widgetState.dataField || !state.data?.results?.length) return [];
         const chartData = getRefinedPieChartData(state.data.results, widgetState.parsedDataField, props.allReferenceTypeInfo);
-        console.debug('chartData', chartData);
         return chartData;
     }),
     tableFields: computed<Field[]>(() => {

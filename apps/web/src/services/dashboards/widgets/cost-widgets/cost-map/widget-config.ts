@@ -27,6 +27,7 @@ const costMapWidgetConfig: WidgetConfig = {
         'cost_data_source',
         'cost_data_field',
         'cost_data_type',
+        ['granularity', { fixed: true, readonly: true }],
         'filters.provider',
         'filters.project',
         'filters.service_account',
