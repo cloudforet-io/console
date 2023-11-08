@@ -2,10 +2,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { getRefinedDependencyOptions } from '@/lib/helper/variable-models-dependency-helper';
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
+import { getRefinedDependencyOptions } from '@/lib/variable-models/dependency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
