@@ -52,8 +52,8 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
             filter: [
                 {
                     key: this.referenceKey,
-                    value: null,
-                    operator: 'not',
+                    value: [null, ''],
+                    operator: 'not_in',
                 },
             ],
         };
