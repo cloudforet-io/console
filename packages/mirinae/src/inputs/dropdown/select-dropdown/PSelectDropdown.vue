@@ -271,11 +271,13 @@ watch(() => props.handler, async () => {
                     return item;
                 });
             } else {
-                console.error(`Failed to fetch data from handler: ${idx}`);
+                console.error(new Error(`Failed to fetch data from handler: ${idx}`));
             }
         });
     }
 }, { immediate: true });
+
+defineExpose({ reloadMenu });
 </script>
 
 <template>

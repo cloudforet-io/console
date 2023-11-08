@@ -289,7 +289,7 @@ watch(() => state.errorMessage, (errorMessage) => {
             </template>
             <div>
                 <!-- HACK: Modeling it like any other option thereafter -->
-                <div v-if="(state.schemaProperty?.key !== COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.key) ||
+                <div v-if="(state.schemaProperty?.key !== COST_VALUE_WIDGET_OPTION_CONFIGS.cost_tag_value.key) &&
                          (state.schemaProperty?.key !== COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.key)"
                      class="select-form-wrapper"
                 >
@@ -319,11 +319,10 @@ watch(() => state.errorMessage, (errorMessage) => {
                                    @click="handleDeleteProperty"
                     />
                 </div>
-                <!-- TODO: will be updated-->
                 <dashboard-cost-widget-value-option-dropdown
                     v-else
                     :selected="state.selected"
-                    :handler="menuState.menuHandlers"
+                    :option-key="state.schemaProperty?.key"
                     :invalid="!!state.errorMessage"
                     @update:selected="handleUpdateSelected"
                     @delete="handleDeleteProperty"
