@@ -166,7 +166,6 @@ const fetchData = async (): Promise<FullData> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        console.debug('options', widgetState.options, 'state.dataType', state.dataType);
         if (!widgetState.dataField) throw new Error('Data field is required');
         if (!widgetState.secondaryDataField) throw new Error('Secondary data field is required');
 
