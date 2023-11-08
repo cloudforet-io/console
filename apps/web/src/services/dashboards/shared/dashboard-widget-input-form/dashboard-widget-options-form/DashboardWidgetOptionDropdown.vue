@@ -217,7 +217,7 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     // add case
     if (selected?.length) {
         if (state.schemaProperty?.selection_type === 'SINGLE') {
-            if (propertyName.includes('filters')) {
+            if (propertyName.startsWith('filters.')) {
                 widgetOptions.filters = {
                     ...widgetOptions.filters,
                     [dataName]: selected[0].name,
@@ -225,7 +225,7 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
             } else {
                 widgetOptions[propertyName] = selected[0].name;
             }
-        } else if (propertyName.includes('filters')) {
+        } else if (propertyName.startsWith('filters.')) {
             widgetOptions.filters = {
                 ...widgetOptions.filters,
                 [dataName]: selected.map((item) => item.name),
@@ -237,7 +237,7 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
 
     // delete case
     if (!selected?.length) {
-        if (propertyName.includes('filters')) {
+        if (propertyName.startsWith('filters.')) {
             delete widgetOptions.filters?.[dataName];
         } else {
             delete widgetOptions[propertyName];
