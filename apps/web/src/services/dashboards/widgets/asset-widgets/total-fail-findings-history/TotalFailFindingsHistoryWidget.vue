@@ -94,24 +94,24 @@ const state = reactive({
     }),
     timeUnit: computed<TimeUnit>(() => {
         if (widgetState.options.granularity === GRANULARITY.YEARLY) return 'year';
-        if (widgetState.options.granularity === GRANULARITY.MONTHLY) return 'month';
-        return 'day';
+        if (widgetState.options.granularity === GRANULARITY.DAILY) return 'day';
+        return 'month';
     }),
     data: null as Data[]|null,
     chartData: computed<ChartData[]>(() => getRefinedChartData(state.data)),
     currDateText: computed<string>(() => {
         let _dateFormat = 'MMM, YYYY';
         if (widgetState.options.granularity === GRANULARITY.YEARLY) _dateFormat = 'YYYY';
-        if (widgetState.options.granularity === GRANULARITY.DAILY) _dateFormat = 'MMM DD, YYYY';
+        if (widgetState.options.granularity === GRANULARITY.DAILY) _dateFormat = 'MMM D, YYYY';
         return dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(_dateFormat);
     }),
     currData: computed<Data>(() => {
-        const currMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(state.dateFormat);
-        return state.data?.find((d) => d.date === currMonth);
+        const currDate = dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(state.dateFormat);
+        return state.data?.find((d) => d.date === currDate);
     }),
     prevData: computed<Data>(() => {
-        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(2, state.timeUnit).format(state.dateFormat);
-        return state.data?.find((d) => d.date === prevMonth);
+        const prevDate = dayjs.utc(widgetState.dateRange.end).subtract(2, state.timeUnit).format(state.dateFormat);
+        return state.data?.find((d) => d.date === prevDate);
     }),
     currTotalCount: computed<number>(() => (state.currData?._total_pass_finding_count ?? 0) + (state.currData?._total_fail_finding_count ?? 0)),
     currTotalFailureCount: computed<number>(() => state.currData?._total_fail_finding_count ?? 0),
@@ -123,14 +123,7 @@ const state = reactive({
         }
         return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_MONTH') as string;
     }),
-    failureRate: computed<number>(() => {
-        const targetData: Data = state.data?.find((d) => d.date === widgetState.dateRange.end);
-        if (!targetData) return 0;
-        const passCount = targetData._total_pass_finding_count ?? 0;
-        const failCount = targetData._total_fail_finding_count ?? 0;
-        const totalCount = passCount + failCount;
-        return totalCount ? Math.round((failCount / totalCount) * 100) : 0;
-    }),
+    failureRate: computed<number>(() => (state.currTotalCount ? Math.round((state.currTotalFailureCount / state.currTotalCount) * 100) : 0)),
 });
 
 /* API */
@@ -195,8 +188,8 @@ const getRefinedChartData = (data: Data[]): ChartData[] => {
 };
 const drawChart = (chartData: XYChartData[]) => {
     if (!chartData?.length) return;
-    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
-    xAxis.get('baseInterval').timeUnit = 'month';
+    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange, widgetState.options.granularity));
+    xAxis.get('baseInterval').timeUnit = state.timeUnit;
     chartHelper.setChartColors(chart, colorSet.value);
     chart.get('cursor')?.lineX.setAll({
         visible: true,
@@ -224,8 +217,11 @@ const drawChart = (chartData: XYChartData[]) => {
         });
 
         // set data processor to series
+        let dateFormat = 'yyyy-MM';
+        if (widgetState.options.granularity === GRANULARITY.DAILY) dateFormat = 'yyyy-MM-dd';
+        else if (widgetState.options.granularity === GRANULARITY.YEARLY) dateFormat = 'yyyy';
         series.data.processor = chartHelper.createDataProcessor({
-            dateFormat: state.dateFormat,
+            dateFormat,
             dateFields: [DATE_FIELD_NAME],
         });
 
@@ -259,6 +255,7 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     return state.data;
 };
 const refreshWidget = async (): Promise<Data[]> => {
+    await nextTick();
     state.data = await fetchTrendData();
     chartHelper.refreshRoot();
     await nextTick();
