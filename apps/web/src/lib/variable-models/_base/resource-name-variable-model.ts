@@ -59,8 +59,8 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
             filter: [
                 {
                     key: this.idKey,
-                    value: null,
-                    operator: 'not',
+                    value: [null, ''],
+                    operator: 'not_in',
                 },
             ],
             only: this.only,
