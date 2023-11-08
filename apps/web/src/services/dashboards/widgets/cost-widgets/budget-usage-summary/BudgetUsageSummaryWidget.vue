@@ -58,6 +58,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(11, 'month').format('YYYY-MM');
         return { start, end };
     }),
+    widgetLocation: undefined,
 });
 const state = reactive({
     loading: true,
@@ -121,7 +122,7 @@ const fetchData = async (): Promise<Data[]> => {
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
-                granularity: widgetState.options.granularity,
+                granularity: widgetState.granularity,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {

@@ -26,6 +26,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
         'cost_data_field',
+        ['granularity', { fixed: true, readonly: true }],
         'filters.provider',
         'filters.project',
         'filters.service_account',
