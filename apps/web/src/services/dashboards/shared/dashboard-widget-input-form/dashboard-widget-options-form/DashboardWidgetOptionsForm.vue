@@ -22,6 +22,8 @@ const props = defineProps<{
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormGetters.widgetConfig?.options_schema?.properties ?? {}),
@@ -32,20 +34,20 @@ const state = reactive({
 /* event handlers */
 const handleReturnToInitialSettings = () => {
     const mergedWidgetState = mergeBaseWidgetState({
-        inheritOptions: widgetFormStore.originWidgetInfo?.inherit_options,
-        widgetOptions: widgetFormStore.originWidgetInfo?.widget_options,
-        widgetName: widgetFormStore.originWidgetInfo?.widget_name ?? '',
+        inheritOptions: widgetFormGetters.originWidgetInfo?.inherit_options,
+        widgetOptions: widgetFormGetters.originWidgetInfo?.widget_options,
+        widgetName: widgetFormGetters.originWidgetInfo?.widget_name ?? '',
         dashboardSettings: dashboardDetailState.settings,
         dashboardVariablesSchema: dashboardDetailState.variablesSchema,
         dashboardVariables: dashboardDetailState.variables,
-        title: widgetFormStore.originWidgetInfo?.title,
-        schemaProperties: widgetFormStore.originWidgetInfo?.schema_properties,
+        title: widgetFormGetters.originWidgetInfo?.title,
+        schemaProperties: widgetFormGetters.originWidgetInfo?.schema_properties,
     });
-    widgetFormStore.$patch((_state) => {
-        _state.widgetTitle = mergedWidgetState.title ?? '';
-        _state.schemaProperties = mergedWidgetState.schemaProperties ?? [];
-        _state.widgetOptions = mergedWidgetState.options ?? {};
-        _state.inheritOptions = mergedWidgetState.inheritOptions ?? {};
+    widgetFormStore.updateTitle(mergedWidgetState.title ?? '');
+    widgetFormStore.$patch((s) => {
+        s.state.widgetOptions = mergedWidgetState.options ?? {};
+        s.state.schemaProperties = mergedWidgetState.schemaProperties ?? [];
+        s.state.inheritOptions = mergedWidgetState.inheritOptions ?? {};
     });
     state.uuid = uuidv4();
 };
