@@ -261,10 +261,8 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
 
     const isInherit = !!widgetFormState.inheritOptions?.[props.propertyName]?.enabled;
     if (isInherit) {
-        widgetFormStore.updateInheritOption(props.propertyName, true, selected[0]?.name);
         updateWidgetOptionsBySelected();
     } else {
-        widgetFormStore.updateInheritOption(props.propertyName, false);
         updateWidgetOptionsBySelected(selected);
     }
 };
