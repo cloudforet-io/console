@@ -48,6 +48,7 @@ const widgetFormGetters = widgetFormStore.getters;
 const state = reactive({
     // property schema
     schemaProperty: computed<WidgetOptionsSchemaProperty|undefined>(() => widgetFormGetters.widgetConfig?.options_schema?.properties?.[props.propertyName]),
+    readonly: computed<boolean>(() => state.schemaProperty?.readonly),
     label: computed(() => state.schemaProperty?.name ?? props.propertyName),
     selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => state.schemaProperty?.selection_type),
     inherit: computed<boolean>(() => !!widgetFormState.inheritOptions?.[props.propertyName]?.enabled),
@@ -300,7 +301,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                                        :handler="menuState.menuHandlers"
                                        :selected="state.selected"
                                        :invalid="!!state.errorMessage"
-                                       :disabled="state.inheritanceMode === 'KEY_MATCHING' && state.inherit"
+                                       :disabled="(state.inheritanceMode === 'KEY_MATCHING' && state.inherit) || state.readonly"
                                        @update:selected="handleUpdateSelected"
                     >
                         <template #dropdown-button>
