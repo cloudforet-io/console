@@ -22,12 +22,14 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { filterForExcelSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
+import type { CloudServiceDetailSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/type';
+
 
 
 const props = defineProps<{
     visible: boolean;
     cloudServiceId?: string;
-    isServerPage: boolean;
     hiddenFilters: ConsoleFilter[]; // for server tab
     cloudServiceListFields: DynamicField[];
 }>();
@@ -35,18 +37,18 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 
-interface CloudServiceDetailSchema {
-    name: string;
-    type: string;
-    options: any;
-}
+
+const MAIN_TABLE = 'Main Table';
 
 const state = reactive({
-    isValid: true,
+    isValid: computed<boolean>(() => !!state.selectedSubData.length),
     downloadLoading: false,
     isSubDataLoading: false,
-    subDataList: computed(() => state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name)),
-    selectedSubData: [] as string[],
+    subDataList: computed(() => [
+        MAIN_TABLE,
+        ...state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name),
+    ]),
+    selectedSubData: [MAIN_TABLE] as string[],
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     detailSchema: [] as CloudServiceDetailSchema[],
 });
@@ -62,21 +64,21 @@ const getCloudServiceListQuery = () => {
 const handleConfirm = async () => {
     state.downloadLoading = true;
     const excelExportFetcher = () => {
-        const cloudServiceListSheetQuery: ExportOption = {
+        const cloudServiceListSheetQuery: ExportOption|undefined = (state.selectedSubData.includes('Main Table')) ? ({
             name: 'Cloud Service List',
             query_type: QueryType.SEARCH,
             search_query: {
                 ...getCloudServiceListQuery(),
                 fields: dynamicFieldsToExcelDataFields(props.cloudServiceListFields),
             },
-        };
+        }) : undefined;
 
         const cloudServiceExcelExportParams: ExportParameter = {
             options: [
-                cloudServiceListSheetQuery,
                 // will be added more sheet query
             ],
         };
+        if (cloudServiceListSheetQuery) cloudServiceExcelExportParams.options.push(cloudServiceListSheetQuery);
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);
@@ -92,18 +94,13 @@ const getSchema = async () => {
     try {
         const params: Record<string, any> = {
             schema: 'details',
+            resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceId,
             },
         };
-        if (props.isServerPage) {
-            params.resource_type = 'inventory.Server';
-        } else {
-            params.resource_type = 'inventory.CloudService';
-        }
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-
-        state.detailSchema = res.details;
+        state.detailSchema = filterForExcelSchema(res.details);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

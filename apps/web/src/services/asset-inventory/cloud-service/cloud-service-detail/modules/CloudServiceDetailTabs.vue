@@ -117,7 +117,7 @@ const monitoringState: MonitoringProps = reactive({
            :class="multiItemTabState.activeTab"
     >
         <template #data>
-            <p-dynamic-layout v-if="tableState.multiSchema"
+            <p-dynamic-layout v-if="tableState.multiSchema && props.isServerPage"
                               type="simple-table"
                               :options="tableState.multiSchema.options"
                               :type-options="{ colCopy: true, timezone: props.timezone }"

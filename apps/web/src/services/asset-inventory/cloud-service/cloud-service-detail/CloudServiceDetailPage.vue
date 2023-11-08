@@ -23,8 +23,12 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ExportParameter } from '@/models/export';
+import { QueryType } from '@/models/export';
 import { store } from '@/store';
 
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
+import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { objectToQueryString, queryStringToObject, replaceUrlQuery } from '@/lib/router-query-string';
@@ -274,8 +278,30 @@ watch(urlQueryStringFilters, (queryStringFilters) => {
 const excelState = reactive({
     visible: false,
 });
-const exportCloudServiceData = () => {
-    excelState.visible = true;
+const exportCloudServiceData = async () => {
+    if (!props.isServerPage) excelState.visible = true;
+    else {
+        const excelExportFetcher = () => {
+            const excelQuery = new ApiQueryHelper()
+                .setMultiSortV2([{ key: 'created_at', desc: true }])
+                .setFilters(hiddenFilters.value);
+
+            const cloudServiceExcelExportParams: ExportParameter = {
+                options: [
+                    {
+                        name: 'Cloud Service List',
+                        query_type: QueryType.SEARCH,
+                        search_query: {
+                            ...excelQuery.data,
+                            fields: dynamicFieldsToExcelDataFields(tableState.dynamicTableFields),
+                        },
+                    },
+                ],
+            };
+            return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+        };
+        await downloadExcelByExportFetcher(excelExportFetcher);
+    }
 };
 
 const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
@@ -422,7 +448,6 @@ debouncedWatch([() => props.group, () => props.name], async () => {
         />
         <excel-export-option-modal :visible="excelState.visible"
                                    :cloud-service-id="tableState.items[0]?.cloud_service_id"
-                                   :is-server-page="props.isServerPage"
                                    :hidden-filters="hiddenFilters"
                                    :cloud-service-list-fields="tableState.dynamicTableFields"
                                    @update:visible="handleUpdateVisible"
