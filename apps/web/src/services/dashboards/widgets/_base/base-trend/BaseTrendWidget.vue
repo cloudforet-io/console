@@ -32,7 +32,7 @@ import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import {
-    CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY, WIDGET_SIZE,
+    CHART_TYPE, COST_DATA_FIELD_MAP, WIDGET_SIZE,
 } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
@@ -90,13 +90,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
     assetWidgetLocation: undefined,
     costWidgetLocation: computed<Location|undefined>(() => {
         if (!widgetState.options.cost_data_source) return undefined;
-        if (!widgetState.dataField) return undefined;
-
-        const end = dayjs.utc(widgetState.dateRange.end);
-        const _period = {
-            start: end.subtract(5, 'month').format('YYYY-MM'),
-            end: end.format('YYYY-MM'),
-        };
+        if (!widgetState.dataField || !widgetState.options.cost_data_type) return undefined;
 
         return {
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
@@ -105,9 +99,9 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
                 costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
             },
             query: {
-                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                group_by: arrayToQueryString([widgetState.dataField]),
-                period: objectToQueryString(_period),
+                granularity: primitiveToQueryString(widgetState.granularity),
+                group_by: arrayToQueryString([widgetState.dataField, widgetState.options.cost_data_type]),
+                period: objectToQueryString(widgetState.dateRange),
                 filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
         };
