@@ -1,6 +1,6 @@
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const awsCloudFrontCostWidgetConfig: WidgetConfig = {
@@ -23,6 +23,8 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         cost_data_type: 'cost',
         chart_type: CHART_TYPE.STACKED_COLUMN,
         granularity: GRANULARITY.YEARLY,
+        cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
+        cost_secondary_data_field: COST_DATA_FIELD_MAP.PRODUCT.name,
         legend_options: {
             enabled: true,
             show_at: 'chart',
@@ -37,6 +39,7 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
         ['cost_data_field', { name: 'Row Field' }],
         ['cost_secondary_data_field', { name: 'Column Field' }],
         'cost_data_type',
+        ['granularity', { fixed: true, readonly: true }],
         ['filters.cost_product', { fixed: true }],
         'filters.provider',
         'filters.project',
