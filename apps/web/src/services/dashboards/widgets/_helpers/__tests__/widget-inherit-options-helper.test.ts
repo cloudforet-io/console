@@ -15,6 +15,7 @@ const widgetConfigMock: WidgetConfig = {
     widget_config_id: 'test',
     scopes: ['DOMAIN', 'PROJECT', 'WORKSPACE'],
     sizes: ['sm'],
+    options: {},
     options_schema: {
         properties: {
             'filters.region': {
@@ -65,19 +66,33 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
         expect(refined).not.toHaveProperty('filters.region');
     });
     // inheritance_mode is KEY_MATCHING
-    it('should include property if inheritance mode is KEY_MATCHING and variable is available regardless of stored inherit options', () => {
+    it('should include property with enabled true if inheritance mode is KEY_MATCHING and variable is available if it is undefined in stored inherit option', () => {
         const widgetConfig = cloneDeep(widgetConfigMock);
         (widgetConfig.options_schema as WidgetOptionsSchema).properties['filters.region'].inheritance_mode = 'KEY_MATCHING';
         (widgetConfig.options_schema as WidgetOptionsSchema).properties['filters.region'].key = 'region';
         const variablesSchema = cloneDeep(variablesSchemaMock);
         variablesSchema.properties.region.use = true;
         const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-        storedInheritOptions['filters.region'].enabled = false;
+        delete storedInheritOptions['filters.region']; // delete property from inherit options
         const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
         expect(refined).toHaveProperty('filters.region');
         expect(refined['filters.region']).toEqual({
             enabled: true,
             variable_key: 'region',
+        });
+    });
+    it('should include property with enabled false if it is disabled in stored inherit options', () => {
+        const widgetConfig = cloneDeep(widgetConfigMock);
+        (widgetConfig.options_schema as WidgetOptionsSchema).properties['filters.region'].inheritance_mode = 'KEY_MATCHING';
+        (widgetConfig.options_schema as WidgetOptionsSchema).properties['filters.region'].key = 'region';
+        const variablesSchema = cloneDeep(variablesSchemaMock);
+        variablesSchema.properties.region.use = true;
+        const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
+        storedInheritOptions['filters.region'] = { enabled: false }; // set false
+        const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
+        expect(refined).toHaveProperty('filters.region');
+        expect(refined['filters.region']).toEqual({
+            enabled: false,
         });
     });
     it('should NOT include property if inheritance mode is KEY_MATCHING and variable is unavailable regardless of stored inherit options', () => {
@@ -87,19 +102,19 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
         const variablesSchema = cloneDeep(variablesSchemaMock);
         variablesSchema.properties.region.use = false;
         const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-        storedInheritOptions['filters.region'].enabled = true;
+        storedInheritOptions['filters.region'] = { ...storedInheritOptions['filters.region'], enabled: true };
         const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
         expect(refined).not.toHaveProperty('filters.region');
     });
     // inheritance_mode is undefined means KEY_MATCHING
-    it('should include property if inheritance mode is undefined and variable is available regardless of stored inherit options', () => {
+    it('should include property if inheritance mode is undefined and variable is available if it is undefined in stored inherit option', () => {
         const widgetConfig = cloneDeep(widgetConfigMock);
         (widgetConfig.options_schema as WidgetOptionsSchema).properties['filters.region'].inheritance_mode = undefined;
         (widgetConfig.options_schema as WidgetOptionsSchema).properties['filters.region'].key = 'region';
         const variablesSchema = cloneDeep(variablesSchemaMock);
         variablesSchema.properties.region.use = true;
         const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-        storedInheritOptions['filters.region'].enabled = false;
+        delete storedInheritOptions['filters.region']; // delete property from inherit options
         const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
         expect(refined).toHaveProperty('filters.region');
         expect(refined['filters.region']).toEqual({
@@ -114,7 +129,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
         const variablesSchema = cloneDeep(variablesSchemaMock);
         variablesSchema.properties.region.use = false;
         const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-        storedInheritOptions['filters.region'].enabled = true;
+        storedInheritOptions['filters.region'] = { ...storedInheritOptions['filters.region'], enabled: true };
         const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
         expect(refined).not.toHaveProperty('filters.region');
     });
@@ -128,8 +143,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
                 const variablesSchema = cloneDeep(variablesSchemaMock);
                 variablesSchema.properties.region.use = true; // make variable available
                 const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-                storedInheritOptions['filters.region'].enabled = true;
-                storedInheritOptions['filters.region'].variable_key = 'region';
+                storedInheritOptions['filters.region'] = { variable_key: 'region', enabled: true };
                 const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
                 expect(refined).toHaveProperty('filters.region');
                 expect(refined['filters.region']).toEqual({
@@ -147,8 +161,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
                 variablesSchema.properties.provider.use = true; // make other variable available
                 variablesSchema.properties.provider.selection_type = 'MULTI';
                 const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-                storedInheritOptions['filters.region'].enabled = true;
-                storedInheritOptions['filters.region'].variable_key = 'region';
+                storedInheritOptions['filters.region'] = { variable_key: 'region', enabled: true };
                 const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
                 expect(refined).toHaveProperty('filters.region');
                 expect(refined['filters.region']).toEqual({
@@ -165,8 +178,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
                 variablesSchema.properties.region.use = true; // make variable available
                 variablesSchema.properties.region.selection_type = 'MULTI';
                 const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-                storedInheritOptions['filters.region'].enabled = true;
-                storedInheritOptions['filters.region'].variable_key = undefined; // make variable_key undefined
+                storedInheritOptions['filters.region'] = { variable_key: undefined, enabled: true };
                 const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
                 expect(refined).toHaveProperty('filters.region');
                 expect(refined['filters.region']).toEqual({
@@ -184,8 +196,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
                 variablesSchema.properties.provider.use = true; // make variable available
                 variablesSchema.properties.provider.selection_type = 'SINGLE'; // make selection_type different
                 const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-                storedInheritOptions['filters.region'].enabled = true;
-                storedInheritOptions['filters.region'].variable_key = 'region';
+                storedInheritOptions['filters.region'] = { variable_key: 'region', enabled: true };
                 const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
                 expect(refined).not.toHaveProperty('filters.region');
             });
@@ -199,14 +210,14 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
                 variablesSchema.properties.provider.use = true; // make variable available
                 variablesSchema.properties.provider.selection_type = 'SINGLE'; // make selection_type different
                 const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-                storedInheritOptions['filters.region'].enabled = true;
-                storedInheritOptions['filters.region'].variable_key = undefined; // make variable_key undefined
+                storedInheritOptions['filters.region'] = { variable_key: undefined, enabled: true };
                 const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
                 expect(refined).not.toHaveProperty('filters.region');
                 expect(refined).not.toHaveProperty('filters.provider');
             });
         });
         describe('and when the property in stored inherit options is NOT enabled, the property', () => {
+            // should include property with enabled true regardless if it is undefined in stored inherit option
             it('should NOT be defined regardless of variable availability and selection_type matching', () => {
                 const widgetConfig = cloneDeep(widgetConfigMock);
                 (widgetConfig.options_schema as WidgetOptionsSchema).properties['filters.region'].inheritance_mode = 'SELECTION_TYPE_MATCHING';
@@ -215,7 +226,7 @@ describe('[Widget Inherit Options Helper] getInitialWidgetInheritOptions', () =>
                 variablesSchema.properties.region.use = true; // make variable available
                 variablesSchema.properties.region.selection_type = 'MULTI'; // make selection_type the same
                 const storedInheritOptions = cloneDeep(storedInheritOptionsMock);
-                storedInheritOptions['filters.region'].enabled = false; // make enabled false
+                delete storedInheritOptions['filters.region'];
                 const refined = getInitialWidgetInheritOptions(widgetConfig, storedInheritOptions, variablesSchema);
                 expect(refined).not.toHaveProperty('filters.region');
             });

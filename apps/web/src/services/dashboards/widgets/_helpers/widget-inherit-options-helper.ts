@@ -10,8 +10,12 @@ export const getInitialWidgetInheritOptions = (
 
     Object.entries(widgetConfig?.options_schema?.properties ?? {}).forEach(([optionName, property]) => {
         const inheritOption = storedInheritOptions?.[optionName];
-        const inheritanceMode = property.inheritance_mode;
+        if (typeof inheritOption?.enabled === 'boolean' && !inheritOption?.enabled) {
+            refined[optionName] = { ...inheritOption };
+            return;
+        }
 
+        const inheritanceMode = property.inheritance_mode;
         if (inheritanceMode === 'NONE') return;
 
         if (!inheritanceMode || inheritanceMode === 'KEY_MATCHING') { // default inheritance mode is KEY_MATCHING

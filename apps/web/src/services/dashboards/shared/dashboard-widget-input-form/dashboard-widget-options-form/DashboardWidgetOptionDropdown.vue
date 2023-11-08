@@ -139,11 +139,11 @@ const getRefinedSelectedItemByHandlers = async (
     return _selected;
 };
 // init selected menu items on init or inherit changed
-const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
+const initSelectedMenuItems = async (inherit: boolean): Promise<SelectDropdownMenuItem[]> => {
     const inheritOption = widgetFormState.inheritOptions?.[props.propertyName];
 
     // 1) inherit case
-    if (state.inherit) {
+    if (inherit) {
         const variableKey = inheritOption.variable_key;
         const variableProperty = props.variablesSchema?.properties?.[variableKey];
         if (!state.inheritanceMode || state.inheritanceMode === 'KEY_MATCHING') {
@@ -213,15 +213,38 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
 const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     const propertyName = props.propertyName;
     const widgetOptions = { ...widgetFormState.widgetOptions };
+    const dataName = propertyName.replace('filters.', '');
+
+    // add case
     if (selected?.length) {
         if (state.schemaProperty?.selection_type === 'SINGLE') {
-            widgetOptions[propertyName] = selected[0].name;
+            if (propertyName.startsWith('filters.')) {
+                widgetOptions.filters = {
+                    ...widgetOptions.filters,
+                    [dataName]: selected[0].name,
+                };
+            } else {
+                widgetOptions[propertyName] = selected[0].name;
+            }
+        } else if (propertyName.startsWith('filters.')) {
+            widgetOptions.filters = {
+                ...widgetOptions.filters,
+                [dataName]: selected.map((item) => item.name),
+            };
         } else {
             widgetOptions[propertyName] = selected.map((item) => item.name);
         }
-    } else {
-        delete widgetOptions[propertyName];
     }
+
+    // delete case
+    if (!selected?.length) {
+        if (propertyName.startsWith('filters.')) {
+            delete widgetOptions.filters?.[dataName];
+        } else {
+            delete widgetOptions[propertyName];
+        }
+    }
+
     widgetFormStore.updateOptions(widgetOptions);
 };
 const updateWidgetSchemaProperties = () => {
@@ -239,21 +262,20 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
 
     const isInherit = !!widgetFormState.inheritOptions?.[props.propertyName]?.enabled;
     if (isInherit) {
-        widgetFormStore.updateInheritOption(props.propertyName, true, selected[0]?.name);
         updateWidgetOptionsBySelected();
     } else {
-        widgetFormStore.updateInheritOption(props.propertyName, false);
         updateWidgetOptionsBySelected(selected);
     }
 };
 const handleUpdateInherit = async (inherit: boolean) => {
     if (inherit) {
         widgetFormStore.updateInheritOption(props.propertyName, true);
-        updateWidgetOptionsBySelected();
     } else {
         widgetFormStore.updateInheritOption(props.propertyName, false);
     }
-    state.selected = await initSelectedMenuItems();
+    const selected = await initSelectedMenuItems(inherit);
+    state.selected = selected;
+    updateWidgetOptionsBySelected(inherit ? undefined : selected);
 };
 const handleDeleteProperty = () => {
     state.selected = [];
@@ -263,7 +285,7 @@ const handleDeleteProperty = () => {
 };
 
 watch(() => props.propertyName, async (propertyName) => {
-    if (propertyName) state.selected = await initSelectedMenuItems();
+    if (propertyName) state.selected = await initSelectedMenuItems(state.inherit);
 }, { immediate: true });
 watch(() => state.errorMessage, (errorMessage) => {
     emit('update:is-valid', !errorMessage);
