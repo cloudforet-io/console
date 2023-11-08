@@ -44,8 +44,10 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
         budgetWidgetLocation: computed<Location | undefined>(() => {
             if (Object.hasOwn(overrides, 'budgetWidgetLocation')) return isRef(overrides.budgetWidgetLocation) ? overrides.budgetWidgetLocation.value : overrides.budgetWidgetLocation;
 
+            budgetQueryHelper.setFilters([]);
             const dataSourceId = baseState.options.cost_data_source;
-            if (dataSourceId) budgetQueryHelper.setFilters([{ k: 'data_source_id', v: [dataSourceId], o: '=' }]);
+            if (dataSourceId) budgetQueryHelper.addFilter({ k: 'data_source_id', v: [dataSourceId], o: '=' });
+            if (baseState.options.filters?.provider) budgetQueryHelper.addFilter(...baseState.options.filters.provider);
             return {
                 name: COST_EXPLORER_ROUTE.BUDGET._NAME,
                 params: {},

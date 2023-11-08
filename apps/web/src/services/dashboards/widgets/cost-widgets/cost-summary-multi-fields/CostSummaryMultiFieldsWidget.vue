@@ -2,11 +2,9 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import type * as am5xy from '@amcharts/amcharts5/xy';
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { cloneDeep, uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -18,25 +16,21 @@ import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type {
     WidgetEmit, WidgetExpose, WidgetProps,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 // eslint-disable-next-line import/no-cycle
@@ -72,30 +66,7 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    // TODO: reconsider to remove it
-    widgetLocation: computed<Location|undefined>(() => {
-        if (!widgetState.options.cost_data_source) return undefined;
-        const end = dayjs.utc(widgetState.settings?.date_range?.end);
-        const _period = {
-            start: end.subtract(5, 'month').format('YYYY-MM'),
-            end: end.format('YYYY-MM'),
-        };
-        return {
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-            params: {
-                dataSourceId: widgetState.options.cost_data_source,
-                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-            },
-            query: {
-                granularity: primitiveToQueryString(GRANULARITY.MONTHLY),
-                group_by: arrayToQueryString([widgetState.dataField, COST_DATA_FIELD_MAP.USAGE_TYPE.name]),
-                period: objectToQueryString(_period),
-                filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-            },
-        };
-    }),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const { colorSet } = useWidgetColorSet({
     theme: toRef(props, 'theme'),
@@ -193,15 +164,17 @@ const fetchData = async (): Promise<Response> => {
     apiQueryHelper.setFilters(widgetState.consoleFilters);
     if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
     try {
-        const dataField = [widgetState.dataField, widgetState.secondaryDataField];
+        const dataFields = [widgetState.dataField, widgetState.secondaryDataField];
+        const fieldGroups = [widgetState.parsedSecondaryDataField];
         if (state.dataType === 'usage_quantity') {
-            dataField.push('usage_unit');
+            dataFields.push('usage_unit');
+            fieldGroups.push('usage_unit');
         }
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: dataField,
+                group_by: dataFields,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -210,8 +183,8 @@ const fetchData = async (): Promise<Response> => {
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_value_sum', desc: true }, { key: widgetState.secondaryDataField, desc: false }],
-                field_group: ['usage_unit', widgetState.parsedSecondaryDataField],
+                sort: [{ key: '_total_value_sum', desc: true }, { key: widgetState.dataField, desc: false }, { key: widgetState.secondaryDataField, desc: false }],
+                field_group: fieldGroups,
                 ...apiQueryHelper.data,
             },
         });

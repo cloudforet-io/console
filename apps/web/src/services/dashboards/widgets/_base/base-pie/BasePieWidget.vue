@@ -36,15 +36,18 @@ import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-wi
 import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
+interface SubData {
+    [field_group: string]: any;
+    value: number
+}
 interface Data {
-    cost_sum?: Array<{
-        [field_group: string]: any;
-        value: number
-    }>
+    cost_sum?: SubData[];
     _total_cost_sum?: number;
 }
 type FullData = CostAnalyzeResponse<Data>;
-interface ChartData extends Data {
+interface ChartData {
+    cost_sum?: number;
+    date: string;
     [parsedDataField: string]: string | any;
 }
 
@@ -70,7 +73,8 @@ const state = reactive({
     series: null as null|ReturnType<typeof chartHelper.createPieSeries>,
     chartData: computed<ChartData[]>(() => {
         if (!widgetState.dataField || !state.data?.results?.length) return [];
-        return getRefinedPieChartData(state.data.results, widgetState.parsedDataField, props.allReferenceTypeInfo);
+        const chartData = getRefinedPieChartData(state.data.results, widgetState.parsedDataField, props.allReferenceTypeInfo);
+        return chartData;
     }),
     tableFields: computed<Field[]>(() => {
         if (!widgetState.dataField) return [];
@@ -141,7 +145,7 @@ const drawChart = (chartData: ChartData[]) => {
     chart.series.push(series);
     chartHelper.setChartColors(chart, colorSet.value);
 
-    if (chartData.some((d) => d.cost_sum && d.cost_sum > 0)) {
+    if (chartData.some((d) => typeof d.cost_sum === 'number' && d.cost_sum > 0)) {
         const tooltip = chartHelper.createTooltip();
         chartHelper.setPieTooltipText(series, tooltip, widgetState.currency);
         series.slices.template.set('tooltip', tooltip);

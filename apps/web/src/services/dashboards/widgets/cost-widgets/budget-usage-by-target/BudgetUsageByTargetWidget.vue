@@ -84,11 +84,23 @@ const fetchData = async (): Promise<Response> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+
+
+        const groupBy: string[] = ['budget_id', 'name'];
+        if (widgetState.dataField) groupBy.push(widgetState.dataField);
+        if (widgetState.dataField === COST_DATA_FIELD_MAP.PROJECT_GROUP.name) groupBy.push(COST_DATA_FIELD_MAP.PROJECT.name);
+        else if (widgetState.dataField === COST_DATA_FIELD_MAP.PROJECT.name) groupBy.push(COST_DATA_FIELD_MAP.PROJECT_GROUP.name);
+
+        const defaultSelect = {} as Record<string, string>;
+        groupBy.forEach((field) => {
+            defaultSelect[field] = field;
+        });
+
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: ['budget_id', 'name', COST_DATA_FIELD_MAP.PROJECT_GROUP.name, COST_DATA_FIELD_MAP.PROJECT.name],
+                group_by: groupBy,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -102,10 +114,7 @@ const fetchData = async (): Promise<Response> => {
                     },
                 },
                 select: {
-                    budget_id: 'budget_id',
-                    name: 'name',
-                    [COST_DATA_FIELD_MAP.PROJECT_GROUP.name]: COST_DATA_FIELD_MAP.PROJECT_GROUP.name,
-                    [COST_DATA_FIELD_MAP.PROJECT.name]: COST_DATA_FIELD_MAP.PROJECT.name,
+                    ...defaultSelect,
                     total_spent: 'total_spent',
                     total_budget: 'total_budget',
                     budget_usage: {

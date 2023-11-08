@@ -37,6 +37,7 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
         ['cost_data_field', { name: 'Row Field', readonly: true }],
         ['cost_secondary_data_field', { name: 'Column Field' }],
         'cost_data_type',
+        ['granularity', { fixed: true, readonly: true }],
         ['filters.cost_product', { fixed: true }],
         'filters.provider',
         'filters.project',
