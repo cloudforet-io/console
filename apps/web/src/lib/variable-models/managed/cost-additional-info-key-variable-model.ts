@@ -2,6 +2,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { getRefinedDependencyOptions } from '@/lib/helper/variable-models-dependency-helper';
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
@@ -17,6 +18,10 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
 
     labels = ['cost'] as VariableModelLabel[];
 
+    dependencies = {
+        cost_data_source: 'data_source_id',
+    };
+
     #response: ListResponse = { results: [] };
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<{
@@ -25,7 +30,7 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
         try {
-            if (!query.options?.data_source_id) throw new Error('No \'data_source_id\'');
+            const dependencyOptions = getRefinedDependencyOptions(this.dependencies, query.options);
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
@@ -52,7 +57,7 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
                 });
             }
             const { status, response } = await this.#fetcher({
-                data_source_id: query.options.data_source_id,
+                ...dependencyOptions,
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {
