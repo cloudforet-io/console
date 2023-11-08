@@ -8,11 +8,9 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
-import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/merge-base-widget-state';
 
 const props = defineProps<{
     projectId?: string;
@@ -22,8 +20,6 @@ const props = defineProps<{
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormGetters.widgetConfig?.options_schema?.properties ?? {}),
@@ -33,22 +29,7 @@ const state = reactive({
 
 /* event handlers */
 const handleReturnToInitialSettings = () => {
-    const mergedWidgetState = mergeBaseWidgetState({
-        inheritOptions: widgetFormGetters.originWidgetInfo?.inherit_options,
-        widgetOptions: widgetFormGetters.originWidgetInfo?.widget_options,
-        widgetName: widgetFormGetters.originWidgetInfo?.widget_name ?? '',
-        dashboardSettings: dashboardDetailState.settings,
-        dashboardVariablesSchema: dashboardDetailState.variablesSchema,
-        dashboardVariables: dashboardDetailState.variables,
-        title: widgetFormGetters.originWidgetInfo?.title,
-        schemaProperties: widgetFormGetters.originWidgetInfo?.schema_properties,
-    });
-    widgetFormStore.updateTitle(mergedWidgetState.title ?? '');
-    widgetFormStore.$patch((s) => {
-        s.state.widgetOptions = mergedWidgetState.options ?? {};
-        s.state.schemaProperties = mergedWidgetState.schemaProperties ?? [];
-        s.state.inheritOptions = mergedWidgetState.inheritOptions ?? {};
-    });
+    widgetFormStore.returnToInitialSettings();
     state.uuid = uuidv4();
 };
 const handleDeleteProperty = (propertyName: string) => {
