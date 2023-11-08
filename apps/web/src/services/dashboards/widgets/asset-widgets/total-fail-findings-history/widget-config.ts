@@ -24,6 +24,7 @@ const totalFailFindingsHistoryWidgetConfig: WidgetConfig = {
     },
     options_schema: getWidgetOptionsSchema([
         'cloud_service_query_set',
+        ['granularity', { fixed: true }],
         'filters.project',
         // 'filters.service_account', HACK: Re-enable it after backend is ready
         'filters.provider',
