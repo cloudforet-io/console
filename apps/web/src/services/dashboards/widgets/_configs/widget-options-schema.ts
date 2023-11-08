@@ -173,6 +173,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         key: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.name,
         selection_type: 'SINGLE',
+        inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.key },
@@ -182,6 +183,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
         selection_type: 'SINGLE',
+        inheritance_mode: 'KEY_MATCHING',
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key },
@@ -230,6 +232,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
         name: 'Compliance Framework',
         selection_type: 'SINGLE',
+        inheritance_mode: 'KEY_MATCHING',
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
@@ -307,14 +310,7 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
                 ...additionalProperties,
             };
 
-            if (!option[1].readonly) {
-                properties[optionName] = defaultProperties;
-            } else {
-                properties[optionName] = {
-                    ...defaultProperties,
-                    item_options: undefined,
-                };
-            }
+            properties[optionName] = defaultProperties;
         } else if (typeof option !== 'string') console.error(new Error(`Wrong format of argument ${option}`));
 
         order.push(optionName);
