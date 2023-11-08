@@ -295,7 +295,7 @@ const getConvertedWidgetLayouts = (storedWidgetLayouts: DashboardModel['layouts'
 
     return storedWidgetLayouts.map((layout) => layout.map((widgetInfo) => {
         const convertedInheritOptions = getConvertedWidgetInheritOptions(widgetInfo.inherit_options);
-        const convertedWidgetOptions = getConvertedWidgetOptions(widgetInfo.widget_options);
+        const convertedWidgetOptions = getConvertedWidgetOptions(widgetInfo.widget_name, widgetInfo.widget_options);
         const convertedWidgetName = getConvertedWidgetName(widgetInfo.widget_name);
         return {
             ...widgetInfo,
@@ -327,9 +327,26 @@ type DeprecatedInheritOptions = Record<string, {
         key: string;
     },
 }>;
-const getConvertedWidgetOptions = (storedWidgetOptions?: WidgetOptions): WidgetOptions|undefined => {
+const getConvertedWidgetOptions = (storedWidgetName: string, storedWidgetOptions?: WidgetOptions): WidgetOptions|undefined => {
     const widgetOptions = cloneDeep(storedWidgetOptions);
-    if (isEmpty(widgetOptions)) return widgetOptions;
+
+    if (storedWidgetName === 'awsDataTransferByRegion') {
+        let _widgetOptions = widgetOptions;
+        if (!_widgetOptions) _widgetOptions = {};
+        _widgetOptions.cost_secondary_data_field = 'additional_info.Usage Type Details';
+        delete (_widgetOptions as any).cost_group_by;
+        return _widgetOptions;
+    }
+
+    if (['awsDataTransferCostTrend', 'awsCloudFrontCost'].includes(storedWidgetName)) {
+        let _widgetOptions = widgetOptions;
+        if (!_widgetOptions) _widgetOptions = {};
+        _widgetOptions.cost_data_field = 'additional_info.Usage Type Details';
+        delete (_widgetOptions as any).cost_group_by;
+        return _widgetOptions;
+    }
+
+    if (!widgetOptions || isEmpty(widgetOptions)) return widgetOptions;
 
     Object.entries(widgetOptions).forEach(([k, v]) => {
         if (k === 'cost_group_by') {
@@ -340,11 +357,18 @@ const getConvertedWidgetOptions = (storedWidgetOptions?: WidgetOptions): WidgetO
             delete widgetOptions[k];
         }
     });
+
     return widgetOptions;
 };
 const getConvertedWidgetName = (storedWidgetName: string): string => {
     if (storedWidgetName === 'awsDataTransferCostTrend') {
         return 'costTrend';
+    }
+    if (storedWidgetName === 'awsDataTransferByRegion') {
+        return 'costByRegionMultiFields';
+    }
+    if (storedWidgetName === 'awsCloudFrontCost') {
+        return 'costSummaryMultiFields';
     }
     return storedWidgetName;
 };
