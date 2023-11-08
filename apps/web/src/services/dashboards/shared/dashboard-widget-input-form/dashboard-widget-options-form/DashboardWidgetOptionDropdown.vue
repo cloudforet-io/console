@@ -294,6 +294,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                      class="select-form-wrapper"
                 >
                     <p-select-dropdown use-fixed-menu-style
+                                       is-fixed-width
                                        :is-filterable="!state.inherit"
                                        :multi-selectable="state.selectionType === 'MULTI'"
                                        :handler="menuState.menuHandlers"
