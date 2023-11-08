@@ -23,7 +23,6 @@ interface EmitFn {
 const emit = defineEmits<EmitFn>();
 const props = defineProps<Props>();
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;
 
 const handleEditModalCancel = () => {
@@ -38,7 +37,7 @@ const handleEditModalConfirm = () => {
     <p-button-modal class="dashboard-widget-edit-modal"
                     :visible="props.visible"
                     :header-title="$t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
-                    :disabled="!widgetFormState.isValid"
+                    :disabled="!widgetFormGetters.isAllValid"
                     size="sm"
                     @cancel="handleEditModalCancel"
                     @confirm="handleEditModalConfirm"
