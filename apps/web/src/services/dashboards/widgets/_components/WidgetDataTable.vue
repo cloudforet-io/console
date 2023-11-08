@@ -142,9 +142,12 @@ useResizeObserver(tableRef, throttle((entries) => {
     tableWidth.value = width;
 }, 500));
 
-const getTooltipContents = (item, field:Field):string => {
+const getTooltipContents = (item: any, field: Field): string => {
     const value = getValue(item, field);
-    return (typeof value === 'number') ? value.toString() : value;
+    if (typeof value === 'number') return value.toString();
+    if (Array.isArray(value)) return value.join(', ');
+    if (typeof value === 'object') return JSON.stringify(value);
+    return value;
 };
 
 /* event */

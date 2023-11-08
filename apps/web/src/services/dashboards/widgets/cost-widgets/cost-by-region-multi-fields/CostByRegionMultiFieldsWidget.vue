@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import type { Circle } from '@amcharts/amcharts5';
 import { Template } from '@amcharts/amcharts5';
@@ -17,22 +16,17 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type {
     WidgetExpose, WidgetProps, WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -75,25 +69,7 @@ const chartHelper = useAmcharts5(chartContext);
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    // TODO: reconsider to remove it
-    widgetLocation: computed<Location|undefined>(() => {
-        if (!widgetState.options.cost_data_source) return undefined;
-        return {
-            name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-            params: {
-                dataSourceId: widgetState.options.cost_data_source,
-                costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-            },
-            query: {
-                granularity: primitiveToQueryString(GRANULARITY.DAILY),
-                group_by: arrayToQueryString([widgetState.parsedDataField, COST_DATA_FIELD_MAP.USAGE_TYPE.name]),
-                period: objectToQueryString(widgetState.dateRange),
-                filters: objectToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-            },
-        };
-    }),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const state = reactive({
     loading: true,
@@ -190,16 +166,23 @@ const fetchData = async (): Promise<FullData> => {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
 
-        const dataField = [widgetState.dataField, widgetState.secondaryDataField];
+        console.debug('options', widgetState.options, 'state.dataType', state.dataType);
+        if (!widgetState.dataField) throw new Error('Data field is required');
+        if (!widgetState.secondaryDataField) throw new Error('Secondary data field is required');
+
+        const dataFields = [widgetState.dataField, widgetState.secondaryDataField];
+        const fieldGroups = [widgetState.parsedSecondaryDataField];
+
         if (state.dataType === 'usage_quantity') {
-            dataField.push('usage_unit');
+            dataFields.push('usage_unit');
+            fieldGroups.push('usage_unit');
         }
 
         const { status, response } = await fetchCostAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: dataField,
+                group_by: dataFields,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -208,7 +191,7 @@ const fetchData = async (): Promise<FullData> => {
                         operator: 'sum',
                     },
                 },
-                field_group: ['usage_unit', widgetState.parsedSecondaryDataField],
+                field_group: fieldGroups,
                 sort: [{ key: '_total_value_sum', desc: true }, { key: widgetState.secondaryDataField, desc: false }],
                 ...apiQueryHelper.data,
             },

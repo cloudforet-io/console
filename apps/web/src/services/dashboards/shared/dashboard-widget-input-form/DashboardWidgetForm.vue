@@ -58,14 +58,14 @@ watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, wid
 <template>
     <div class="dashboard-widget-input-form">
         <p-field-group :label="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.LABEL_NAME')"
-                       :invalid="widgetFormGetters.isTitleInvalid"
+                       :invalid="!widgetFormGetters.isTitleValid"
                        :invalid-text="widgetFormGetters.titleInvalidText"
                        class="name-field"
                        required
         >
             <p-text-input :value="widgetFormGetters.title"
                           :is-focused.sync="state.isFocused"
-                          :invalid="widgetFormGetters.isTitleInvalid"
+                          :invalid="!widgetFormGetters.isTitleValid"
                           :placeholder="$t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.NAME_PLACEHOLDER')"
                           class="input"
                           @update:value="handleUpdateTitle"

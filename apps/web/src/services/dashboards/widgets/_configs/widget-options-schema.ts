@@ -48,6 +48,8 @@ export type WidgetFilterOptionKey = typeof WIDGET_OPTION_FILTER_KEY_MAP[keyof ty
 const WIDGET_FILTER_OPTION_KEYS = Object.values(WIDGET_OPTION_FILTER_KEY_MAP);
 
 export const WIDGET_OPTION_KEYS = [
+    // common
+    'granularity',
     // cost option keys
     'cost_data_source',
     'cost_data_type',
@@ -167,10 +169,21 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
 };
 
 export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, WidgetOptionsSchemaProperty>, WidgetFilterOptionKey> = {
+    granularity: {
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.key,
+        name: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.name,
+        selection_type: 'SINGLE',
+        inheritance_mode: 'NONE',
+        fixed: true,
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.granularity.key },
+        ],
+    },
     cost_data_source: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.name,
         selection_type: 'SINGLE',
+        inheritance_mode: 'KEY_MATCHING',
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key },
@@ -205,7 +218,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         key: 'cost_secondary_data_field',
         name: 'Data Field (Cost)',
         selection_type: 'SINGLE',
-        readonly: true,
         inheritance_mode: 'NONE',
         fixed: true,
         item_options: [
@@ -219,6 +231,7 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
         name: 'Compliance Framework',
         selection_type: 'SINGLE',
+        inheritance_mode: 'KEY_MATCHING',
         fixed: true,
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key },
@@ -296,14 +309,7 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
                 ...additionalProperties,
             };
 
-            if (!option[1].readonly) {
-                properties[optionName] = defaultProperties;
-            } else {
-                properties[optionName] = {
-                    ...defaultProperties,
-                    item_options: undefined,
-                };
-            }
+            properties[optionName] = defaultProperties;
         } else if (typeof option !== 'string') console.error(new Error(`Wrong format of argument ${option}`));
 
         order.push(optionName);

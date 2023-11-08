@@ -34,13 +34,13 @@ export interface PartialDashboardLayoutWidgetInfo extends DashboardLayoutWidgetI
 }
 
 interface Getters {
-    title: ComputedRef<string>;
-    isTitleInvalid: ComputedRef<boolean|undefined>;
-    titleInvalidText: ComputedRef<string|undefined>;
     widgetConfig: ComputedRef<WidgetConfig|undefined>;
     originWidgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
     mergedWidgetInfo: ComputedRef<PartialDashboardLayoutWidgetInfo|undefined>;
     updatedWidgetInfo: ComputedRef<UpdatableWidgetInfo|undefined>;
+    title: ComputedRef<string>;
+    isTitleValid: ComputedRef<boolean|undefined>;
+    titleInvalidText: ComputedRef<string|undefined>;
     isAllValid: ComputedRef<boolean>;
 }
 
@@ -48,7 +48,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailState = dashboardDetailStore.$state;
     const {
-        title, resetTitle, updateTitle, isTitleInvalid, titleInvalidText,
+        title, resetTitle, updateTitle, isTitleValid, titleInvalidText,
     } = useWidgetTitleInput();
 
     const initialState = {
@@ -116,9 +116,9 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         }),
         //
         title,
-        isTitleInvalid,
+        isTitleValid,
         titleInvalidText: titleInvalidText as ComputedRef<string|undefined>,
-        isAllValid: computed<boolean>(() => state.isOptionsValid && !getters.isTitleInvalid),
+        isAllValid: computed<boolean>(() => !!(state.isOptionsValid && getters.isTitleValid)),
     });
 
     const actions = {

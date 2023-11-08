@@ -14,7 +14,7 @@ const apiQueryHelper = new ApiQueryHelper();
 export default class CostDataKeyVariableModel implements IBaseVariableModel {
     key = 'cost_data_key';
 
-    name = 'Data Type (Cost)';
+    name = 'Data Key (Cost)';
 
     labels: VariableModelLabel[] = ['cost'];
 
