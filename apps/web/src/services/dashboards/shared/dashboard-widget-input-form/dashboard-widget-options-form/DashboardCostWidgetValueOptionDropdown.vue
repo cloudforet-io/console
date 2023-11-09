@@ -55,7 +55,7 @@ const variableModelKeys = {
 } as const;
 
 /* Handler */
-const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit = 10) => {
+const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit = 6) => {
     // key handler
     if (!state.selectedKey) {
         const param = {
@@ -74,17 +74,15 @@ const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit 
                         operator: 'contain',
                     },
                 ],
-                page: {
-                    start: pageStart,
-                    limit: pageLimit,
-                },
             },
         };
         const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list(param);
+        const refinedResultsItems = results[0][variableModelKeys[props.optionKey]].reduce((result, d) => {
+            if (d !== '' && d !== undefined && d !== null) result.push({ label: d, name: `${state.valueTarget}.${d}` });
+            return result;
+        }, []);
         return {
-            results: results[0][variableModelKeys[props.optionKey]].map((result) => (
-                { label: result, name: `${state.valueTarget}.${result}` }
-            )),
+            results: refinedResultsItems,
         };
     }
     // value handler
@@ -105,13 +103,18 @@ const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit 
         },
     };
     try {
-        const res = await SpaceConnector.clientV2.costAnalysis.cost.stat(param);
+        const { results, total_count } = await SpaceConnector.clientV2.costAnalysis.cost.stat(param);
+        const refinedResultsItems = results.reduce((result, d, index) => {
+            if ((!pageStart || pageStart === 1) && index === 0) {
+                result.push({ label: state.selectedKey?.label, type: 'header' });
+            }
+            if (d !== '' && d !== undefined && d !== null) result.push({ label: d, name: `${state.selectedKey?.name}.${d}` });
+            return result;
+        }, []);
         return {
-            results: res.results.reduce((results, d) => {
-                if (d !== '' && d !== undefined && d !== null) results.push({ label: d, name: `${state.selectedKey?.name}.${d}` });
-                return results;
-            }, [{ label: state.selectedKey?.label, type: 'header' }]),
-            totalCount: res.total_count,
+            results: refinedResultsItems,
+            totalCount: total_count,
+            more: pageLimit - 1 < refinedResultsItems.length,
         };
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -186,6 +189,7 @@ watch(() => props.selected, (selected) => {
                            :handler="menuHandler"
                            :selected="state.selectedItems"
                            :invalid="props.invalid"
+                           :page-size="6"
                            @select="handleUpdateSelected"
         >
             <template #menu-header>
