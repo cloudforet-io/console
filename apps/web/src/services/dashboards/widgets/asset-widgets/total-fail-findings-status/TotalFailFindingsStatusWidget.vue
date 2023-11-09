@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive, toRef,
+    computed, defineExpose, defineProps, reactive, toRef,
 } from 'vue';
 
 import {
@@ -130,7 +130,6 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     return state.data;
 };
 const refreshWidget = async (): Promise<Data[]> => {
-    await nextTick();
     state.data = await fetchRealtimeData();
     return state.data;
 };

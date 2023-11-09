@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, defineExpose, defineProps, nextTick, reactive,
+    computed, defineExpose, defineProps, reactive,
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
@@ -140,7 +140,6 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     return state.data;
 };
 const refreshWidget = async (): Promise<Data[]> => {
-    await nextTick();
     state.loading = true;
     state.data = await fetchData();
     state.loading = false;
