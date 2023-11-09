@@ -318,7 +318,9 @@ watch(() => state.errorMessage, (errorMessage) => {
                        required
         >
             <template #label-extra>
-                <div class="inherit-toggle-button-wrapper">
+                <div v-if="state.inheritanceMode !== 'NONE'"
+                     class="inherit-toggle-button-wrapper"
+                >
                     <span class="text"
                           :class="{inherit: state.inheritanceMode !== 'NONE'}"
                     >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
