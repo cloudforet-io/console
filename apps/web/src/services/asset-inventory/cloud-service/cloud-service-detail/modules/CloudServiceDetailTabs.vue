@@ -14,6 +14,8 @@ import type { Reference } from '@/lib/reference/type';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import type { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
+import CloudServiceMultipleSelectedData
+    from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-history-detail/CloudServiceMultipleSelectedData.vue';
 import CloudServiceAdmin
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/CloudServiceAdmin.vue';
 import CloudServiceDetail
@@ -124,6 +126,11 @@ const monitoringState: MonitoringProps = reactive({
                               :data="tableState.selectedItems"
                               :field-handler="fieldHandler"
                               class="selected-data-tab"
+            />
+            <cloud-service-multiple-selected-data v-else
+                                                  :cloud-service-group="props.group"
+                                                  :cloud-service-type="props.name"
+                                                  :cloud-service-id-list="tableState.selectedItems.map((item) => item?.cloud_service_id)"
             />
         </template>
         <template #monitoring>
