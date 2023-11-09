@@ -141,7 +141,7 @@ const getListApiParams = () => {
         params = {
             query: {
                 ...apiQuery.data,
-                unwind: { // api spec changed during development
+                unwind: {
                     path: state.rootPath,
                     // filter will be added for search
                 },
