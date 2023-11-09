@@ -48,7 +48,6 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
     searchText: '',
 };
 
-const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
 
@@ -94,25 +93,19 @@ const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     'inventory.CloudService',
 );
 const getSchema = async () => {
-    let layouts = layoutSchemaCacheMap[props.cloudServiceIdList[0]];
-    if (!layouts) {
-        try {
-            const params: Record<string, any> = {
-                schema: 'details',
-                resource_type: 'inventory.CloudService',
-                options: {
-                    cloud_service_id: props.cloudServiceIdList[0],
-                },
-            };
-            const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-            layouts = filterForExcelSchema(res.details);
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
+    try {
+        const params: Record<string, any> = {
+            schema: 'details',
+            resource_type: 'inventory.CloudService',
+            options: {
+                cloud_service_id: props.cloudServiceIdList[0],
+            },
+        };
+        const res = await SpaceConnector.client.addOns.pageSchema.get(params);
+        state.layouts = filterForExcelSchema(res.details);
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
-
-    layoutSchemaCacheMap[props.cloudServiceIdList[0]] = layouts;
-    state.layouts = layouts || [];
     if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
 };
 
