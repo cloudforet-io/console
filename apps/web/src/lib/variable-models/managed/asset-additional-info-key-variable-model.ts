@@ -62,7 +62,7 @@ export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariabl
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.additional_info_keys ?? [];
                 this.#response = {
-                    results: target.map((d) => ({ key: d, name: d })),
+                    results: target.map((d) => ({ key: `additional_info.${d}`, name: d })),
                 };
             }
             return this.#response;

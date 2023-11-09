@@ -25,7 +25,7 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
     #response: ListResponse = { results: [] };
 
     #fetcher?: ReturnType<typeof getCancellableFetcher<{
-        results: { keys: string[] }[];
+        results: { data_keys: string[] }[];
     }>>;
 
     async list(query: ListQuery = {}): Promise<ListResponse> {
@@ -60,7 +60,7 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
                 query: _query,
             });
             if (status === 'succeed' && response.results?.length) {
-                const target = response.results[0]?.keys ?? [];
+                const target = response.results[0]?.data_keys ?? [];
                 this.#response = {
                     results: target.map((d) => ({ key: d, name: d })),
                 };
