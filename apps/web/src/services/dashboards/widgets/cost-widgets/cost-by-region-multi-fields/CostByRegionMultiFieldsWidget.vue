@@ -84,7 +84,10 @@ const state = reactive({
                 [widgetState.parsedDataField]: d[widgetState.parsedDataField] ?? 'Unknown',
             };
             d.value_sum.forEach((subData: SubData) => {
-                const rowKey = state.dataType === 'usage_quantity' ? `${subData[widgetState.parsedSecondaryDataField]}_${subData.usage_unit}` : subData[widgetState.parsedSecondaryDataField];
+                let rowKey = subData[widgetState.parsedSecondaryDataField] ?? 'Unknown';
+                if (state.dataType === 'usage_quantity') {
+                    rowKey = `${rowKey}_${subData.usage_unit}`;
+                }
                 row[rowKey] = subData.value;
             });
             return row;

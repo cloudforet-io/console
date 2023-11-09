@@ -80,6 +80,7 @@ const handleUpdateIsValid = (propertyName: string, isValid: boolean) => {
                                               :key="`option-dropdown-${propertyName}-${state.uuid}`"
                                               :property-name="propertyName"
                                               :variables-schema="props.variablesSchema"
+                                              :global-option-key="state.globalOptionTuple?.[0]"
                                               :is-valid="state.optionsValidMap[propertyName]"
                                               @update:is-valid="handleUpdateIsValid(propertyName, $event)"
                                               @delete="handleDeleteProperty(propertyName)"
@@ -88,6 +89,7 @@ const handleUpdateIsValid = (propertyName: string, isValid: boolean) => {
         <div v-else
              class="no-global-option-wrapper"
         >
+            <!-- TODO: apply translation -->
             <p class="no-global-option-header">
                 <p-i name="ic_error-filled"
                      height="1.25rem"
