@@ -182,7 +182,6 @@ const baseInformationExcelDownload = async (fields:ConsoleDynamicField[]) => {
 
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
-        console.log('search', options);
         fetchOptionsMap[state.fetchOptionKey] = options;
         getData();
     },
