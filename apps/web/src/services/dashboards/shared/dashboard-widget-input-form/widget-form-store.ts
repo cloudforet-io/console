@@ -238,5 +238,6 @@ const getProjectCaseInheritOptions = (inheritOptions: InheritOptions): InheritOp
     ...inheritOptions,
     'filters.project': {
         enabled: true,
+        variable_key: 'project',
     },
 });
