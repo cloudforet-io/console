@@ -147,7 +147,7 @@ const initSelectedMenuItems = async (inherit: boolean): Promise<SelectDropdownMe
 
     // 1) inherit case
     if (inherit) {
-        const variableKey = inheritOption.variable_key;
+        const variableKey = inheritOption.variable_key ?? state.schemaProperty.key;
         const variableProperty = props.variablesSchema?.properties?.[variableKey];
         if (!state.inheritanceMode || state.inheritanceMode === 'KEY_MATCHING') {
             if (!variableKey || !variableProperty?.use) return [];
