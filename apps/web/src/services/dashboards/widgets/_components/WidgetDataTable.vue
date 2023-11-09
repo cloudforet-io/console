@@ -111,8 +111,12 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions'], c
     return value;
 };
 const getValue = (item:string|number|object, field: Field):string|number => {
+    let valueKey = field.name;
+    if (valueKey === null || valueKey === undefined) {
+        valueKey = 'Unknown';
+    }
     if (typeof item === 'object') {
-        return textFormatter(getValueByPath(item, field.name), field.textOptions, item);
+        return textFormatter(getValueByPath(item, valueKey), field.textOptions, item);
     }
     return textFormatter(item, field.textOptions, item);
 };
