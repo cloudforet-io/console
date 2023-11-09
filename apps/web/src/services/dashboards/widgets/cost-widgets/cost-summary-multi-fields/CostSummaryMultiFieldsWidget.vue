@@ -32,6 +32,7 @@ import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/conf
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { getWidgetValueLabel } from '@/services/dashboards/widgets/_helpers/widget-value-label-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 // eslint-disable-next-line import/no-cycle
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -114,7 +115,10 @@ const state = reactive({
         const dynamicTableFields: Field[] = [];
         state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
             dynamicTableFields.push({
-                label: d[widgetState.parsedSecondaryDataField] ?? 'Unknown',
+                label: getWidgetValueLabel(d[widgetState.parsedSecondaryDataField], {
+                    allReferenceTypeInfo: props.allReferenceTypeInfo,
+                    referenceIdKey: widgetState.parsedSecondaryDataField,
+                }),
                 name: state.dataType === 'usage_quantity' ? `${d[widgetState.parsedSecondaryDataField]}_${d.usage_unit}` : d[widgetState.parsedSecondaryDataField], // HTTP Requests_Bytes
                 textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
                 textAlign: 'right',

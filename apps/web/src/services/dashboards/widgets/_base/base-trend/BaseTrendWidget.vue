@@ -16,8 +16,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ReferenceType } from '@/store/reference/all-reference-store';
-
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
@@ -45,8 +43,9 @@ import {
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import {
-    getReferenceTypeOfDataField, getRefinedDateTableData, getWidgetTableDateFields,
+    getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { getWidgetValueLabel } from '@/services/dashboards/widgets/_helpers/widget-value-label-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
@@ -133,7 +132,6 @@ const state = reactive({
         }
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
         const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
-        const referenceType = getReferenceTypeOfDataField(props.allReferenceTypeInfo, widgetState.dataField) as ReferenceType;
 
         // set width of table fields
         const dataFieldTableFieldWidth = refinedFields.length > 4 ? '28%' : '34%';
@@ -142,7 +140,6 @@ const state = reactive({
         const dataFieldTableField: Field = {
             label: dataFieldLabel,
             name: widgetState.parsedDataField,
-            textOptions: referenceType ? { type: 'reference', referenceType } : undefined,
             width: dataFieldTableFieldWidth,
         };
         return [
@@ -156,8 +153,13 @@ const state = reactive({
             DATE_FIELD_NAME,
             ['value_sum'],
         ).map((data) => {
-            let value = data[widgetState.parsedDataField] ?? 'Unknown';
-            if (state.dataType === 'usage_quantity') value = `${value}${data.usage_unit ? ` (${data.usage_unit})` : ''}`;
+            const value = getWidgetValueLabel(data[widgetState.parsedDataField], {
+                allReferenceTypeInfo: props.allReferenceTypeInfo,
+                referenceIdKey: widgetState.parsedDataField,
+                dataType: state.dataType,
+                usageUnit: data.usage_unit,
+            });
+
             return {
                 ...data,
                 [widgetState.parsedDataField]: value,
