@@ -92,11 +92,8 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // event
-const handleClearSelected = () => {
-    changeVariables([]);
-};
-
 const handleSelectOption = (_selected: MenuItem[]) => {
+    state.selected = _selected;
     changeVariables(_selected);
 };
 
@@ -233,7 +230,7 @@ const {
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
-                        @click.stop="handleClearSelected"
+                        @click.stop="handleSelectOption([])"
                 >
                     <p-i name="ic_close"
                          width="1rem"
