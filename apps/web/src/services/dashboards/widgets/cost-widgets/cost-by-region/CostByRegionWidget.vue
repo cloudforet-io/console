@@ -250,6 +250,7 @@ defineExpose<WidgetExpose<FullData>>({
             @apply col-span-5;
             height: 100%;
             padding-bottom: 1rem;
+            min-height: 22.5rem;
             .chart {
                 @apply border border-gray-200;
                 height: calc(90% - 2px);
