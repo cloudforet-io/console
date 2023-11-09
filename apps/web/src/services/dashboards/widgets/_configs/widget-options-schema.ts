@@ -18,7 +18,6 @@ export interface WidgetOptionsSchemaProperty {
     optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
-    dependent_properties?: WidgetOptionKey[];
     // TODO: need discussion about this spec
     scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
 }
@@ -202,7 +201,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_data_type.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_key.key },
         ],
-        dependent_properties: ['cost_data_source'],
     },
     cost_data_field: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_default_field.key,
@@ -215,7 +213,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
         ],
-        dependent_properties: ['cost_data_source'],
     },
     cost_secondary_data_field: {
         key: 'cost_secondary_data_field',
@@ -228,7 +225,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_additional_info_key.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key },
         ],
-        dependent_properties: ['cost_data_source'],
     },
     cloud_service_query_set: {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
@@ -251,7 +247,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_data_key.key },
         ],
-        dependent_properties: ['cloud_service_query_set'],
     },
     asset_data_field: {
         key: 'asset_data_field',
@@ -263,7 +258,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_default_field.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_additional_info_key.key },
         ],
-        dependent_properties: ['cloud_service_query_set'],
     },
     asset_secondary_data_field: {
         key: 'asset_secondary_data_field',
@@ -276,7 +270,6 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_default_field.key },
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_additional_info_key.key },
         ],
-        dependent_properties: ['cloud_service_query_set'],
     },
 };
 
@@ -292,14 +285,7 @@ export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTup
             properties[optionName] = WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName] as WidgetOptionsSchemaProperty;
         } else if (WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName]) {
             const filterProperty = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName];
-            if (properties.cost_data_source) {
-                properties[optionName] = {
-                    ...filterProperty,
-                    dependent_properties: ['cost_data_source'],
-                } as WidgetOptionsSchemaProperty;
-            } else {
-                properties[optionName] = filterProperty as WidgetOptionsSchemaProperty;
-            }
+            properties[optionName] = filterProperty as WidgetOptionsSchemaProperty;
         } else {
             console.error(new Error(`No matched option schema for ${optionName}`));
         }

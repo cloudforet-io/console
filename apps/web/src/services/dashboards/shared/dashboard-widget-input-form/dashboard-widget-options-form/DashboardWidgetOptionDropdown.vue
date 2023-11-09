@@ -39,6 +39,7 @@ const props = defineProps<{
     propertyName: string;
     variablesSchema?: DashboardVariablesSchema;
     isValid?: boolean;
+    globalOptionKey?: string;
 }>();
 const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
     (e: 'delete'): void;
@@ -78,9 +79,9 @@ const menuState = reactive({
 
         // get options from schema dependencies
         const modelOptions: Record<string, any> = {}; // e.g. { cost_data_source: 'ds-1' }
-        state.schemaProperty.dependent_properties?.forEach((property) => {
-            modelOptions[property] = widgetFormState.widgetOptions[property];
-        });
+        if (props.globalOptionKey) {
+            modelOptions[props.globalOptionKey] = widgetFormState.widgetOptions[props.globalOptionKey];
+        }
 
         return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, modelOptions));
     }),
