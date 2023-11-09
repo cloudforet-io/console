@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AsyncComponent, ComponentPublicInstance } from 'vue';
 import {
-    computed, reactive, toRef, watch,
+    computed, nextTick, reactive, toRef, watch,
 } from 'vue';
 
 import {
@@ -88,15 +88,17 @@ const handleCloseModal = () => {
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
 };
-const handleCloseSidebar = (save: boolean) => {
+const handleCloseSidebar = async (save: boolean) => {
     state.sidebarVisible = false;
     if (!save) state.updatedWidgetInfo = cloneDeep(state.originWidgetInfo);
+    await nextTick();
     state.widgetRef?.refreshWidget();
 };
-const handleUpdateSidebarWidgetInfo = (widgetInfo: UpdatableWidgetInfo) => {
+const handleUpdateSidebarWidgetInfo = async (widgetInfo: UpdatableWidgetInfo) => {
     // NOTE: Do not refresh when the title changes. There are no cases where title and other options change together.
     const refreshWidget = widgetInfo.title === state.updatedWidgetInfo?.title;
     state.updatedWidgetInfo = widgetInfo;
+    await nextTick();
     if (refreshWidget) state.widgetRef?.refreshWidget();
 };
 const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
