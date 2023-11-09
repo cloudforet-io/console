@@ -35,16 +35,19 @@ export const getNonInheritedWidgetOptionsAmongUsedVariables = (
     schemaProperties: string[] = [],
 ): string[] => {
     const nonInheritedOptionKeys: string[] = [];
-    const enabledInheritedOptionKeys = Object.values(widgetInheritOptions)
-        .filter((inheritOption) => inheritOption?.enabled)
-        .map((inheritOption) => inheritOption?.variable_key);
+    const enabledInheritedOptionKeys = Object.entries(widgetInheritOptions)
+        .filter(([, inheritOption]) => inheritOption?.enabled)
+        .map(([propertyName]) => propertyName);
     if (variablesSchema?.properties) {
         Object.entries(variablesSchema.properties).forEach(([key, property]) => {
             const optionKey = getWidgetOptionKeyByVariableKey(key);
             if (optionKey
                 && property.use
                 && schemaProperties.includes(optionKey)
-                && !enabledInheritedOptionKeys.includes(optionKey)) nonInheritedOptionKeys.push(optionKey);
+                && !enabledInheritedOptionKeys.includes(optionKey)) {
+                const refinedName = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionKey]?.name ?? WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionKey]?.name ?? optionKey;
+                nonInheritedOptionKeys.push(refinedName);
+            }
         });
     }
     return nonInheritedOptionKeys;
