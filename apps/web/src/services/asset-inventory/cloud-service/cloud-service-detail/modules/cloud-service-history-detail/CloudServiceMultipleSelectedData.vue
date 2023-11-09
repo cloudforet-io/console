@@ -112,7 +112,7 @@ const getSchema = async () => {
 const apiQuery = new ApiQueryHelper();
 const getQuery = (): any => {
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
-    if (options.sortBy !== undefined) apiQuery.setSort(options.sortBy, options.sortDesc);
+    if (options.sortBy) apiQuery.setMultiSortV2([{ key: options.sortBy, desc: options.sortDesc }]);
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
     if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
@@ -124,10 +124,23 @@ const getQuery = (): any => {
 };
 
 const getParams = () => {
-    const params: any = { query: getQuery().data };
+    const query = getQuery();
+    let params: any;
 
-    const keyPath = state.currentLayout.options?.root_path;
-    if (keyPath) params.key_path = keyPath;
+    const rootPath = state.currentLayout.options?.root_path;
+    const fields = state.currentLayout.options?.fields;
+    if (rootPath && fields) {
+        const only:string[] = [];
+        fields.forEach((d) => { if (d) only.push(`${rootPath}.${d.key}`); });
+        params = {
+            query: {
+                ...query.setOnly(...only).data,
+                unwind: rootPath,
+            },
+        };
+    } else {
+        params = { query: query.data };
+    }
 
     return params;
 };
