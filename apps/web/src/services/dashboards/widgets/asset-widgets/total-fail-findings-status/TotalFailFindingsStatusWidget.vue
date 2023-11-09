@@ -246,7 +246,7 @@ defineExpose<WidgetExpose>({
             padding-top: 0.5rem;
         }
         .severity-wrapper {
-            padding-top: 1rem;
+            padding: 1rem 0;
             .title {
                 @apply text-label-lg;
                 padding-bottom: 0.25rem;
