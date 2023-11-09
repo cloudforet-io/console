@@ -255,7 +255,6 @@ const initWidget = async (data?: Data[]): Promise<Data[]> => {
     return state.data;
 };
 const refreshWidget = async (): Promise<Data[]> => {
-    await nextTick();
     state.data = await fetchTrendData();
     chartHelper.refreshRoot();
     await nextTick();
