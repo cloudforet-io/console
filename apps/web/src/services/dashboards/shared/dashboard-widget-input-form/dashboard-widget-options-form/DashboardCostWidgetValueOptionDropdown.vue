@@ -77,9 +77,10 @@ const menuHandler: AutocompleteHandler = async (inputText, pageStart, pageLimit 
             },
         };
         const { results } = await SpaceConnector.clientV2.costAnalysis.dataSource.list(param);
-        const refinedResultsItems = results[0][variableModelKeys[props.optionKey]].map((result) => (
-            { label: result, name: `${state.valueTarget}.${result}` }
-        ));
+        const refinedResultsItems = results[0][variableModelKeys[props.optionKey]].reduce((result, d) => {
+            if (d !== '' && d !== undefined && d !== null) result.push({ label: d, name: `${state.valueTarget}.${d}` });
+            return result;
+        }, []);
         return {
             results: refinedResultsItems,
         };
