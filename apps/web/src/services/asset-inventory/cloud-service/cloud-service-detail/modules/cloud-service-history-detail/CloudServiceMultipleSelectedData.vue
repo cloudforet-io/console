@@ -12,6 +12,7 @@ import type { DynamicLayout } from '@spaceone/design-system/types/data-display/d
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
+import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -87,6 +88,7 @@ const state = reactive({
         return state.currentLayout.options;
     }),
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
+    rootPath: computed(() => state.currentLayout.options?.root_path),
 });
 const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed(() => state.currentLayout?.options?.search ?? []),
@@ -110,7 +112,15 @@ const getSchema = async () => {
 };
 
 const apiQuery = new ApiQueryHelper();
-const getQuery = (): any => {
+
+const setOnlyQuery = (query:ApiQueryHelper) => {
+    if (!state.rootPath) return;
+    const fields:DynamicField[] = state.currentLayout.options?.fields ?? [];
+    const only:string[] = [];
+    fields.forEach((d) => { if (d) only.push(`${state.rootPath}.${d.key}`); });
+    query.setOnly(...only);
+};
+const setListQuery = () => {
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
     if (options.sortBy) apiQuery.setMultiSortV2([{ key: options.sortBy, desc: options.sortDesc }]);
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
@@ -120,26 +130,25 @@ const getQuery = (): any => {
         apiQuery.setFiltersAsQueryTag(options.queryTags);
     }
     apiQuery.addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' });
-    return apiQuery;
+    setOnlyQuery(apiQuery);
 };
 
-const getParams = () => {
-    const query = getQuery();
+const getListApiParams = () => {
+    setListQuery();
     let params: any;
 
-    const rootPath = state.currentLayout.options?.root_path;
-    const fields = state.currentLayout.options?.fields;
-    if (rootPath && fields) {
-        const only:string[] = [];
-        fields.forEach((d) => { if (d) only.push(`${rootPath}.${d.key}`); });
+    if (state.rootPath) {
         params = {
             query: {
-                ...query.setOnly(...only).data,
-                unwind: rootPath,
+                ...apiQuery.data,
+                unwind: { // api spec changed during development
+                    path: state.rootPath,
+                    // filter will be added for search
+                },
             },
         };
     } else {
-        params = { query: query.data };
+        params = { query: apiQuery.data };
     }
 
     return params;
@@ -150,7 +159,7 @@ const getData = async () => {
     state.loading = true;
     state.data = dataMap[state.fetchOptionKey];
     try {
-        const res = await SpaceConnector.clientV2.inventory.cloudService.list(getParams());
+        const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams());
         state.totalCount = res.total_count;
         state.data = res.results;
     } catch (e) {
@@ -163,12 +172,12 @@ const getData = async () => {
     dataMap[state.fetchOptionKey] = state.data;
 };
 
+const excelQuery = new ApiQueryHelper()
+    .addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' })
+    .setMultiSortV2([{ key: 'created_at', desc: true }]);
+
 const baseInformationExcelDownload = async (fields:ConsoleDynamicField[]) => {
     const excelExportFetcher = () => {
-        const excelQuery = new ApiQueryHelper()
-            .addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' })
-            .setMultiSortV2([{ key: 'created_at', desc: true }]);
-
         const cloudServiceExcelExportParams: ExportParameter = {
             options: [
                 {
@@ -176,6 +185,28 @@ const baseInformationExcelDownload = async (fields:ConsoleDynamicField[]) => {
                     query_type: QueryType.SEARCH,
                     search_query: {
                         ...excelQuery.data,
+                        fields: dynamicFieldsToExcelDataFields(fields),
+                    },
+                },
+            ],
+        };
+        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+    };
+    await downloadExcelByExportFetcher(excelExportFetcher);
+};
+
+const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
+    const excelExportFetcher = () => {
+        const cloudServiceExcelExportParams: ExportParameter = {
+            options: [
+                {
+                    name: 'Cloud Service List',
+                    query_type: QueryType.SEARCH,
+                    search_query: {
+                        ...excelQuery.data,
+                        unwind: {
+                            path: state.rootPath,
+                        },
                         fields: dynamicFieldsToExcelDataFields(fields),
                     },
                 },
@@ -200,8 +231,8 @@ const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
             fields = state.currentLayout.options?.layouts[0].options?.fields;
             baseInformationExcelDownload(fields);
         } else {
-            // TODO: unwind excel api
             fields = state.currentLayout?.options?.fields;
+            unwindTableExcelDownload(fields);
         }
     },
 };

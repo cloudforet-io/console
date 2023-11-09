@@ -23,8 +23,8 @@ export const getApiActionByLayoutType = (type: DynamicLayoutType): 'getData'|'ge
     return 'get';
 };
 
-export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): ExcelDataField[] => fields.map((d) => {
-    const res: ExcelDataField = { key: d.key, name: d.name ?? d.key, options: d.options };
+export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[], rootPathForUnwind?:string): ExcelDataField[] => fields.map((d) => {
+    const res: ExcelDataField = { key: rootPathForUnwind ? `${rootPathForUnwind}.${d.key}` : d.key, name: d.name ?? d.key, options: d.options };
 
     // lis type case will be deprecated
     if (d.type === 'list' && (d.options as ListOptions)?.sub_key) {
