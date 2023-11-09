@@ -1,10 +1,12 @@
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { IDateAxisSettings } from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import type { DateRange } from '@/services/dashboards/config';
-import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
+import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import type {
     Legend,
 } from '@/services/dashboards/widgets/type';
@@ -56,9 +58,12 @@ export const getPieChartLegends = (rawData: RawData[], dataField?: string): Lege
     return rawData.map((d) => ({ name: d[dataField], disabled: false }));
 };
 
-export const getDateAxisSettings = (dateRange: DateRange): Partial<IDateAxisSettings<any>> => {
+export const getDateAxisSettings = (dateRange: DateRange, granularity?: Granularity): Partial<IDateAxisSettings<any>> => {
+    let timeUnit: TimeUnit = 'month';
+    if (granularity === GRANULARITY.YEARLY) timeUnit = 'year';
+    if (granularity === GRANULARITY.DAILY) timeUnit = 'day';
     const start = dayjs.utc(dateRange.start);
-    const end = dayjs.utc(dateRange.end).add(1, 'month'); // 1 month added because of `max` property bug
+    const end = dayjs.utc(dateRange.end).add(1, timeUnit); // 1 month added because of `max` property bug
     return {
         min: start.valueOf(),
         max: end.valueOf(),

@@ -3,6 +3,7 @@ import {
     computed, defineExpose, defineProps, nextTick, reactive, ref, toRef,
 } from 'vue';
 
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import {
     PI, PDataLoader, PProgressBar,
 } from '@spaceone/design-system';
@@ -27,6 +28,7 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -54,7 +56,6 @@ interface ChartData {
 }
 
 const SEVERITY_FAIL_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP).filter((status) => status.name !== 'PASS');
-const DATE_FORMAT = 'YYYY-MM';
 const DATE_FIELD_NAME = 'date';
 
 const props = defineProps<WidgetProps>();
@@ -69,24 +70,48 @@ const { colorSet } = useWidgetColorSet({
 
 const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
     dateRange: computed<DateRange>(() => {
-        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT);
-        const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
+        if (widgetState.options.granularity === GRANULARITY.YEARLY) {
+            const end = dayjs.utc(widgetState.settings?.date_range?.end).format(state.dateFormat);
+            const start = dayjs.utc(end).subtract(2, 'year').format(state.dateFormat);
+            return { start, end };
+        } if (widgetState.options.granularity === GRANULARITY.DAILY) {
+            const end = dayjs.utc(widgetState.settings?.date_range?.end).format(state.dateFormat);
+            const start = dayjs.utc(end).subtract(13, 'day').format(state.dateFormat);
+            return { start, end };
+        }
+        const end = dayjs.utc(widgetState.settings?.date_range?.end).format(state.dateFormat);
+        const start = dayjs.utc(end).subtract(11, 'month').format(state.dateFormat);
         return { start, end };
     }),
     widgetLocation: undefined,
 });
 const state = reactive({
     loading: true,
+    dateFormat: computed<string>(() => {
+        if (widgetState.options.granularity === GRANULARITY.YEARLY) return 'YYYY';
+        if (widgetState.options.granularity === GRANULARITY.DAILY) return 'YYYY-MM-DD';
+        return 'YYYY-MM';
+    }),
+    timeUnit: computed<TimeUnit>(() => {
+        if (widgetState.options.granularity === GRANULARITY.YEARLY) return 'year';
+        if (widgetState.options.granularity === GRANULARITY.DAILY) return 'day';
+        return 'month';
+    }),
     data: null as Data[]|null,
     chartData: computed<ChartData[]>(() => getRefinedChartData(state.data)),
-    currDateText: computed(() => dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format('MMM, YYYY')),
+    currDateText: computed<string>(() => {
+        let _dateFormat = 'MMM, YYYY';
+        if (widgetState.options.granularity === GRANULARITY.YEARLY) _dateFormat = 'YYYY';
+        if (widgetState.options.granularity === GRANULARITY.DAILY) _dateFormat = 'MMM D, YYYY';
+        return dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(_dateFormat);
+    }),
     currData: computed<Data>(() => {
-        const currMonth = dayjs.utc(widgetState.dateRange.end).subtract(1, 'month').format(DATE_FORMAT);
-        return state.data?.find((d) => d.date === currMonth);
+        const currDate = dayjs.utc(widgetState.dateRange.end).subtract(1, state.timeUnit).format(state.dateFormat);
+        return state.data?.find((d) => d.date === currDate);
     }),
     prevData: computed<Data>(() => {
-        const prevMonth = dayjs.utc(widgetState.dateRange.end).subtract(2, 'month').format(DATE_FORMAT);
-        return state.data?.find((d) => d.date === prevMonth);
+        const prevDate = dayjs.utc(widgetState.dateRange.end).subtract(2, state.timeUnit).format(state.dateFormat);
+        return state.data?.find((d) => d.date === prevDate);
     }),
     currTotalCount: computed<number>(() => (state.currData?._total_pass_finding_count ?? 0) + (state.currData?._total_fail_finding_count ?? 0)),
     currTotalFailureCount: computed<number>(() => state.currData?._total_fail_finding_count ?? 0),
@@ -98,14 +123,7 @@ const state = reactive({
         }
         return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_MONTH') as string;
     }),
-    failureRate: computed<number>(() => {
-        const targetData: Data = state.data?.find((d) => d.date === widgetState.dateRange.end);
-        if (!targetData) return 0;
-        const passCount = targetData._total_pass_finding_count ?? 0;
-        const failCount = targetData._total_fail_finding_count ?? 0;
-        const totalCount = passCount + failCount;
-        return totalCount ? Math.round((failCount / totalCount) * 100) : 0;
-    }),
+    failureRate: computed<number>(() => (state.currTotalCount ? Math.round((state.currTotalFailureCount / state.currTotalCount) * 100) : 0)),
 });
 
 /* API */
@@ -118,7 +136,7 @@ const fetchTrendData = async (): Promise<Data[]> => {
         const { status, response } = await fetchTrendDataAnalyze({
             query_set_id: widgetState.options.cloud_service_query_set,
             query: {
-                granularity: 'MONTHLY',
+                granularity: widgetState.options.granularity,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 group_by: ['additional_info.severity'],
@@ -170,8 +188,8 @@ const getRefinedChartData = (data: Data[]): ChartData[] => {
 };
 const drawChart = (chartData: XYChartData[]) => {
     if (!chartData?.length) return;
-    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange));
-    xAxis.get('baseInterval').timeUnit = 'month';
+    const { chart, xAxis } = chartHelper.createXYDateChart({}, getDateAxisSettings(widgetState.dateRange, widgetState.options.granularity));
+    xAxis.get('baseInterval').timeUnit = state.timeUnit;
     chartHelper.setChartColors(chart, colorSet.value);
     chart.get('cursor')?.lineX.setAll({
         visible: true,
@@ -199,8 +217,11 @@ const drawChart = (chartData: XYChartData[]) => {
         });
 
         // set data processor to series
+        let dateFormat = 'yyyy-MM';
+        if (widgetState.options.granularity === GRANULARITY.DAILY) dateFormat = 'yyyy-MM-dd';
+        else if (widgetState.options.granularity === GRANULARITY.YEARLY) dateFormat = 'yyyy';
         series.data.processor = chartHelper.createDataProcessor({
-            dateFormat: DATE_FORMAT,
+            dateFormat,
             dateFields: [DATE_FIELD_NAME],
         });
 

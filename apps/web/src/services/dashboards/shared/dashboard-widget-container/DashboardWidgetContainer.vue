@@ -210,6 +210,8 @@ const handleUpdateViewModalVisible = (visible: boolean) => {
     widgetViewState.visibleModal = visible;
     if (visible) return;
 
+    const widgetKey = widgetEditState.targetWidget?.widget_key;
+    widgetRef.value.find((comp) => comp?.$el.id === widgetKey)?.refreshWidget();
     widgetViewState.targetWidget = null;
 };
 </script>
