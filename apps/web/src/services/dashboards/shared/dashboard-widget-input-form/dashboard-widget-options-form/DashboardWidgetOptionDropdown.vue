@@ -25,9 +25,9 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import type { WidgetFiltersMap } from '@/services/dashboards/widgets/_configs/config';
+import type { InheritOptions, WidgetFiltersMap } from '@/services/dashboards/widgets/_configs/config';
 import type {
-    InheritanceMode, WidgetFilterKey,
+    InheritanceMode, WidgetFilterKey, WidgetOptionKey,
     WidgetOptionsSchemaProperty,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import {
@@ -60,12 +60,14 @@ const state = reactive({
     //
     selected: [] as SelectDropdownMenuItem[],
     errorMessage: computed<string|undefined>(() => {
+        if (!state.isOptionInitiated) return undefined;
         if (state.schemaProperty?.optional) return undefined;
         if (!state.selected?.length) {
             return i18n.t('DASHBOARDS.WIDGET.NO_SELECTED_ITEM') as string;
         }
         return undefined;
     }),
+    isOptionInitiated: false,
 });
 const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
@@ -142,77 +144,99 @@ const getRefinedSelectedItemByHandlers = async (
     });
     return _selected;
 };
+
+const initSelectedInInheritCase = (inheritOption: InheritOptions[WidgetOptionKey]): SelectDropdownMenuItem[] => {
+    if (!inheritOption) return [];
+
+    const variableKey = inheritOption.variable_key ?? state.schemaProperty.key;
+    const variableProperty = props.variablesSchema?.properties?.[variableKey];
+    if (!state.inheritanceMode || state.inheritanceMode === 'KEY_MATCHING') {
+        if (!variableKey || !variableProperty?.use) return [];
+        return [{ name: variableKey, label: variableProperty.name }];
+    }
+    if (state.inheritanceMode === 'SELECTION_TYPE_MATCHING') {
+        // if variable is available, use it
+        if (variableKey && variableProperty?.use) {
+            return [{ name: variableKey, label: variableProperty.name }];
+        }
+
+        // find variable key from variables schema by selection type
+        const matchedPropertyTuples = Object.entries(props.variablesSchema?.properties ?? {})
+            .find(([, d]) => d.use && d.selection_type === state.schemaProperty?.selection_type);
+        if (matchedPropertyTuples) {
+            const matchedVariableKey = matchedPropertyTuples[0];
+            const matchedVariableProperty = props.variablesSchema?.properties?.[matchedVariableKey];
+            return [{ name: matchedVariableKey, label: matchedVariableProperty?.name }];
+        }
+    }
+    return [];
+};
+
+const initSelectedInNoStoredOptionCase = async (): Promise<SelectDropdownMenuItem[]> => {
+    if (state.schemaProperty?.optional) return [];
+    const menuHandler = menuState.menuHandlers?.[0];
+    if (menuHandler) {
+        const results = await menuHandler('');
+        return [results.results[0]];
+    }
+    return [];
+};
+
+const initSelectedInStoredOptionArrayTypeCase = async (selected: Array<ConsoleFilter|string>): Promise<SelectDropdownMenuItem[]> => {
+    let values: SelectDropdownMenuItem[] = selected.map((item) => {
+        // string[] case
+        if (typeof item === 'string') {
+            return [{ name: item }];
+        }
+        // ConsoleFilter[] case
+        return Array.isArray(item.v) ? item.v.map((v) => ({ name: v })) : { name: item.v };
+    }) as SelectDropdownMenuItem[];
+    if (Array.isArray(values[0])) values = values.flat();
+    if (menuState.menuHandlers) {
+        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, values);
+        return refinedSelected;
+    }
+    return values;
+};
+
+const initSelectedInStoredOptionPrimitiveTypeCase = async (selected: string): Promise<SelectDropdownMenuItem[]> => {
+    if (menuState.menuHandlers) {
+        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, [{ name: selected }]);
+        return refinedSelected;
+    }
+    return [{ name: selected }];
+};
+
+
 // init selected menu items on init or inherit changed
 const initSelectedMenuItems = async (inherit: boolean): Promise<SelectDropdownMenuItem[]> => {
     const inheritOption = widgetFormState.inheritOptions?.[props.propertyName];
-
+    let results: SelectDropdownMenuItem[];
     // 1) inherit case
     if (inherit) {
-        const variableKey = inheritOption.variable_key ?? state.schemaProperty.key;
-        const variableProperty = props.variablesSchema?.properties?.[variableKey];
-        if (!state.inheritanceMode || state.inheritanceMode === 'KEY_MATCHING') {
-            if (!variableKey || !variableProperty?.use) return [];
-            return [{ name: variableKey, label: variableProperty.name }];
-        }
-        if (state.inheritanceMode === 'SELECTION_TYPE_MATCHING') {
-            // if variable is available, use it
-            if (variableKey && variableProperty?.use) {
-                return [{ name: variableKey, label: variableProperty.name }];
-            }
-
-            // find variable key from variables schema by selection type
-            const matchedPropertyTuples = Object.entries(props.variablesSchema?.properties ?? {})
-                .find(([, d]) => d.use && d.selection_type === state.schemaProperty?.selection_type);
-            if (matchedPropertyTuples) {
-                const matchedVariableKey = matchedPropertyTuples[0];
-                const matchedVariableProperty = props.variablesSchema?.properties?.[matchedVariableKey];
-                return [{ name: matchedVariableKey, label: matchedVariableProperty?.name }];
-            }
-        }
-        return [];
-    }
-
+        results = initSelectedInInheritCase(inheritOption);
     // 2) non-inherit case
-    const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormState.widgetOptions, props.propertyName);
+    } else {
+        const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormState.widgetOptions, props.propertyName);
 
-    // 2-1) no selected case
-    if (!selected) {
-        const menuHandler = menuState.menuHandlers?.[0];
-        if (menuHandler) {
-            const results = await menuHandler('');
-            return [results.results[0]];
+        // 2-1) no stored option case
+        if (!selected) {
+            results = await initSelectedInNoStoredOptionCase();
+        // 2-2) existing stored option case
+        // 2-2-1) array case (e.g. ['aws', 'gcp'] or [{k: 'product', v: ['AWSDataTransfer'], o: '='}])
+        } else if (Array.isArray(selected)) {
+            results = await initSelectedInStoredOptionArrayTypeCase(selected);
+        // 2-2-2) primitive type case (e.g. 'aws')
+        } else if (typeof selected !== 'object') {
+            results = await initSelectedInStoredOptionPrimitiveTypeCase(selected);
+        } else {
+            console.warn(new Error(`Invalid selected value: ${selected}`));
+            results = [];
         }
-        return [];
     }
 
-    // 2-2) selected case
-    // 2-2-1) array case (e.g. ['aws', 'gcp'] or [{k: 'product', v: ['AWSDataTransfer'], o: '='}])
-    if (Array.isArray(selected)) {
-        let values: SelectDropdownMenuItem[] = selected.map((item) => {
-            // string[] case
-            if (typeof item === 'string') {
-                return [{ name: item }];
-            }
-            // ConsoleFilter[] case
-            return Array.isArray(item.v) ? item.v.map((v) => ({ name: v })) : { name: item.v };
-        }) as SelectDropdownMenuItem[];
-        if (Array.isArray(values[0])) values = values.flat();
-        if (menuState.menuHandlers) {
-            const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, values);
-            return refinedSelected;
-        }
-        return values;
-    }
-    // 2-2-2) string case (e.g. 'aws')
-    if (typeof selected !== 'object') {
-        if (menuState.menuHandlers) {
-            const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, [{ name: selected }]);
-            return refinedSelected;
-        }
-        return [{ name: selected }];
-    }
-    console.warn(new Error(`Invalid selected value: ${selected}`));
-    return [];
+    state.isOptionInitiated = true;
+    return results;
 };
 
 const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap: WidgetFiltersMap = {}): WidgetFiltersMap => {
@@ -286,6 +310,7 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     }
 };
 const handleUpdateInherit = async (inherit: boolean) => {
+    state.isOptionInitiated = false;
     if (inherit) {
         widgetFormStore.updateInheritOption(props.propertyName, true);
     } else {
@@ -303,6 +328,7 @@ const handleDeleteProperty = () => {
 };
 
 watch(() => props.propertyName, async (propertyName) => {
+    state.isOptionInitiated = false;
     if (propertyName) state.selected = await initSelectedMenuItems(state.inherit);
 }, { immediate: true });
 watch(() => state.errorMessage, (errorMessage) => {
