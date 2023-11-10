@@ -30,6 +30,7 @@ import type { Reference } from '@/lib/reference/type';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
 import { filterForExcelSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
 
 interface Props {
@@ -82,7 +83,7 @@ const state = reactive({
     currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
     layoutOptions: computed(() => {
         if (!state.currentLayout.options) return {};
-        if (state.currentLayout.name === 'Base Information') {
+        if (state.currentLayout.name === BASE_INFORMATION) {
             return { ...state.currentLayout.options?.layouts[0].options };
         }
         return state.currentLayout.options;
@@ -234,7 +235,7 @@ const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     },
     export() {
         let fields:ConsoleDynamicField[] = [];
-        if (state.currentLayout.name === 'Base Information') {
+        if (state.currentLayout.name === BASE_INFORMATION) {
             fields = state.currentLayout.options?.layouts[0].options?.fields;
             baseInformationExcelDownload(fields);
         } else {
@@ -288,7 +289,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                       :slot="layout.name"
             >
                 <div :key="`${layout.name}-${i}`">
-                    <p-dynamic-layout :type="layout.name === 'Base Information' ? 'simple-table' : layout.type"
+                    <p-dynamic-layout :type="layout.name === BASE_INFORMATION ? 'simple-table' : layout.type"
                                       :options="state.layoutOptions"
                                       :data="state.data"
                                       :type-options="{
