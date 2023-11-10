@@ -7,6 +7,7 @@ import {
     PButtonModal, PCheckboxGroup, PCheckbox, PDataLoader,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -22,6 +23,7 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
 import { filterForExcelSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
 import type { CloudServiceDetailSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/type';
 
@@ -41,16 +43,17 @@ const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 const MAIN_TABLE = 'Main Table';
 
 const state = reactive({
-    isValid: computed<boolean>(() => !!state.selectedSubData.length),
+    isValid: computed<boolean>(() => !!state.selectedSubDataIds.length),
     downloadLoading: false,
     isSubDataLoading: false,
     subDataList: computed(() => [
         MAIN_TABLE,
-        ...state.detailSchema.map((schema:CloudServiceDetailSchema) => schema.name),
+        ...state.detailSchemaList.map((schema:CloudServiceDetailSchema) => schema.name),
     ]),
-    selectedSubData: [MAIN_TABLE] as string[],
+    selectedSubDataIds: [MAIN_TABLE] as string[],
+    selectedSubDataSchemas: computed<CloudServiceDetailSchema[]>(() => state.detailSchemaList.filter((schema:CloudServiceDetailSchema) => state.selectedSubDataIds.includes(schema.name))),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    detailSchema: [] as CloudServiceDetailSchema[],
+    detailSchemaList: [] as CloudServiceDetailSchema[],
 });
 
 
@@ -61,10 +64,36 @@ const getCloudServiceListQuery = () => {
     return apiQuery.data;
 };
 
+const getSubDataExcelSearchQuery = () => {
+    const sort = [{ key: 'created_at', desc: true }];
+    const options:ExportOption[] = [];
+    state.selectedSubDataSchemas.forEach((schema:DynamicLayout) => {
+        const isBaseInformationSchema = schema.name === BASE_INFORMATION;
+        const fields:DynamicField[] = (isBaseInformationSchema ? schema.options?.layouts[0]?.options?.fields : schema.options?.fields) ?? [];
+        if (!fields.length) return;
+        const rootPath = schema.options?.root_path ?? undefined;
+        const query:ExportOption = {
+            name: schema.name,
+            query_type: QueryType.SEARCH,
+            search_query: {
+                sort,
+                ...(!isBaseInformationSchema && {
+                    unwind: {
+                        path: schema.options?.root_path ?? '',
+                    },
+                }),
+                fields: dynamicFieldsToExcelDataFields(fields, rootPath),
+            },
+        };
+        options.push(query);
+    });
+    return options;
+};
+
 const handleConfirm = async () => {
     state.downloadLoading = true;
     const excelExportFetcher = () => {
-        const cloudServiceListSheetQuery: ExportOption|undefined = (state.selectedSubData.includes('Main Table')) ? ({
+        const cloudServiceListSheetQuery: ExportOption|undefined = (state.selectedSubDataIds.includes('Main Table')) ? ({
             name: 'Cloud Service List',
             query_type: QueryType.SEARCH,
             search_query: {
@@ -74,11 +103,9 @@ const handleConfirm = async () => {
         }) : undefined;
 
         const cloudServiceExcelExportParams: ExportParameter = {
-            options: [
-                // will be added more sheet query
-            ],
+            options: cloudServiceListSheetQuery ? [cloudServiceListSheetQuery].concat(getSubDataExcelSearchQuery()) : getSubDataExcelSearchQuery(),
         };
-        if (cloudServiceListSheetQuery) cloudServiceExcelExportParams.options.push(cloudServiceListSheetQuery);
+        console.log('cloudServiceExcelExportParams', getSubDataExcelSearchQuery());
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);
@@ -100,7 +127,7 @@ const getSchema = async () => {
             },
         };
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-        state.detailSchema = filterForExcelSchema(res.details);
+        state.detailSchemaList = filterForExcelSchema(res.details);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -110,7 +137,8 @@ const getSchema = async () => {
 
 
 watch(() => props.visible, () => {
-    if (props.cloudServiceId && !state.detailSchema.length) getSchema();
+    if (props.cloudServiceId && !state.detailSchemaList.length) getSchema();
+    state.selectedSubDataIds = [MAIN_TABLE];
 });
 
 
@@ -130,12 +158,12 @@ watch(() => props.visible, () => {
             </p>
             <p-data-loader class="sub-data-section"
                            :loading="state.isSubDataLoading"
-                           :data="state.detailSchema"
+                           :data="state.detailSchemaList"
             >
                 <p-checkbox-group direction="vertical">
                     <p-checkbox v-for="value in state.subDataList"
                                 :key="value"
-                                v-model="state.selectedSubData"
+                                v-model="state.selectedSubDataIds"
                                 :value="value"
                     >
                         {{ value }}
