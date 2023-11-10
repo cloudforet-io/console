@@ -5,7 +5,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type {
     ListQuery, ListResponse, VariableModelLabel, IBaseVariableModel,
 } from '@/lib/variable-models/_base/types';
-import { getRefinedDependencyOptions } from '@/lib/variable-models/dependency-helper';
+import { getRefinedDependencyOptions } from '@/lib/variable-models/_helpers/dependency-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
