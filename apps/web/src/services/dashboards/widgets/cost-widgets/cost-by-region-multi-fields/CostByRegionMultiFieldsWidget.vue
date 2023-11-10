@@ -28,6 +28,7 @@ import type {
 import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getPieChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
+import { getWidgetValueLabel } from '@/services/dashboards/widgets/_helpers/widget-value-label-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
@@ -39,7 +40,7 @@ import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/
 
 interface SubData {
     value: number;
-    usage_unit: string | null;
+    usage_unit?: string;
     [parsedSecondaryDataField: string]: any;
 }
 interface Data {
@@ -83,7 +84,7 @@ const state = reactive({
             const row: TableData = {
                 [widgetState.parsedDataField]: d[widgetState.parsedDataField] ?? 'Unknown',
             };
-            d.value_sum.forEach((subData: SubData) => {
+            d?.value_sum?.forEach((subData: SubData) => {
                 let rowKey = subData[widgetState.parsedSecondaryDataField] ?? 'Unknown';
                 if (state.dataType === 'usage_quantity') {
                     rowKey = `${rowKey}_${subData.usage_unit}`;
@@ -105,7 +106,10 @@ const state = reactive({
         const dynamicTableFields: Field[] = [];
         state.data?.results?.[0]?.value_sum?.forEach((d: SubData) => {
             dynamicTableFields.push({
-                label: d[widgetState.parsedSecondaryDataField] ?? 'Unknown',
+                label: getWidgetValueLabel(d[widgetState.parsedSecondaryDataField], {
+                    allReferenceTypeInfo: props.allReferenceTypeInfo,
+                    referenceIdKey: widgetState.parsedSecondaryDataField,
+                }),
                 name: state.dataType === 'usage_quantity' ? `${d[widgetState.parsedSecondaryDataField]}_${d.usage_unit}` : d[widgetState.parsedSecondaryDataField], // HTTP Requests_Bytes
                 textOptions: { ...textOptions, unit: d.usage_unit } as Field['textOptions'],
                 textAlign: 'right',
