@@ -112,6 +112,7 @@ const getSchema = async () => {
 };
 
 const apiQuery = new ApiQueryHelper();
+const baseInformationQuery = new ApiQueryHelper();
 
 const setOnlyQuery = (query:ApiQueryHelper) => {
     if (!state.rootPath) return;
@@ -122,7 +123,11 @@ const setOnlyQuery = (query:ApiQueryHelper) => {
 };
 const setListQuery = () => {
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
-    if (options.sortBy) apiQuery.setMultiSortV2([{ key: options.sortBy, desc: options.sortDesc }]);
+    apiQuery.setFilters([]);
+    if (options.sortBy) {
+        const key = (state.rootPath) ? `${state.rootPath}.${options.sortBy}` : options.sortBy;
+        apiQuery.setSort(key, options.sortDesc);
+    }
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
     if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
@@ -148,7 +153,9 @@ const getListApiParams = () => {
             },
         };
     } else {
-        params = { query: apiQuery.data };
+        baseInformationQuery
+            .setFilters([{ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' }]);
+        params = { query: baseInformationQuery.data };
     }
 
     return params;
@@ -200,14 +207,14 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
         const cloudServiceExcelExportParams: ExportParameter = {
             options: [
                 {
-                    name: 'Cloud Service List',
+                    name: state.currentLayout.name,
                     query_type: QueryType.SEARCH,
                     search_query: {
                         ...excelQuery.data,
                         unwind: {
                             path: state.rootPath,
                         },
-                        fields: dynamicFieldsToExcelDataFields(fields),
+                        fields: dynamicFieldsToExcelDataFields(fields, state.rootPath),
                     },
                 },
             ],
@@ -281,7 +288,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                       :slot="layout.name"
             >
                 <div :key="`${layout.name}-${i}`">
-                    <p-dynamic-layout :type="layout.name === 'Base Information' ? 'table' : layout.type"
+                    <p-dynamic-layout :type="layout.name === 'Base Information' ? 'simple-table' : layout.type"
                                       :options="state.layoutOptions"
                                       :data="state.data"
                                       :type-options="{
