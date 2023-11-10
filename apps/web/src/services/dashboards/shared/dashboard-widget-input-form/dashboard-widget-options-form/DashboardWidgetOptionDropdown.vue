@@ -60,12 +60,14 @@ const state = reactive({
     //
     selected: [] as SelectDropdownMenuItem[],
     errorMessage: computed<string|undefined>(() => {
+        if (!state.isOptionInitiated) return undefined;
         if (state.schemaProperty?.optional) return undefined;
         if (!state.selected?.length) {
             return i18n.t('DASHBOARDS.WIDGET.NO_SELECTED_ITEM') as string;
         }
         return undefined;
     }),
+    isOptionInitiated: false,
 });
 const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
@@ -209,32 +211,32 @@ const initSelectedInStoredOptionPrimitiveTypeCase = async (selected: string): Pr
 // init selected menu items on init or inherit changed
 const initSelectedMenuItems = async (inherit: boolean): Promise<SelectDropdownMenuItem[]> => {
     const inheritOption = widgetFormState.inheritOptions?.[props.propertyName];
-
+    let results: SelectDropdownMenuItem[];
     // 1) inherit case
     if (inherit) {
-        return initSelectedInInheritCase(inheritOption);
-    }
-
+        results = initSelectedInInheritCase(inheritOption);
     // 2) non-inherit case
-    const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormState.widgetOptions, props.propertyName);
+    } else {
+        const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormState.widgetOptions, props.propertyName);
 
-    // 2-1) no stored option case
-    if (!selected) {
-        const items = await initSelectedInNoStoredOptionCase();
-        return items;
+        // 2-1) no stored option case
+        if (!selected) {
+            results = await initSelectedInNoStoredOptionCase();
+        // 2-2) existing stored option case
+        // 2-2-1) array case (e.g. ['aws', 'gcp'] or [{k: 'product', v: ['AWSDataTransfer'], o: '='}])
+        } else if (Array.isArray(selected)) {
+            results = await initSelectedInStoredOptionArrayTypeCase(selected);
+        // 2-2-2) primitive type case (e.g. 'aws')
+        } else if (typeof selected !== 'object') {
+            results = await initSelectedInStoredOptionPrimitiveTypeCase(selected);
+        } else {
+            console.warn(new Error(`Invalid selected value: ${selected}`));
+            results = [];
+        }
     }
 
-    // 2-2) existing stored option case
-    // 2-2-1) array case (e.g. ['aws', 'gcp'] or [{k: 'product', v: ['AWSDataTransfer'], o: '='}])
-    if (Array.isArray(selected)) {
-        return initSelectedInStoredOptionArrayTypeCase(selected);
-    }
-    // 2-2-2) primitive type case (e.g. 'aws')
-    if (typeof selected !== 'object') {
-        return initSelectedInStoredOptionPrimitiveTypeCase(selected);
-    }
-    console.warn(new Error(`Invalid selected value: ${selected}`));
-    return [];
+    state.isOptionInitiated = true;
+    return results;
 };
 
 const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap: WidgetFiltersMap = {}): WidgetFiltersMap => {
@@ -308,6 +310,7 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     }
 };
 const handleUpdateInherit = async (inherit: boolean) => {
+    state.isOptionInitiated = false;
     if (inherit) {
         widgetFormStore.updateInheritOption(props.propertyName, true);
     } else {
@@ -325,6 +328,7 @@ const handleDeleteProperty = () => {
 };
 
 watch(() => props.propertyName, async (propertyName) => {
+    state.isOptionInitiated = false;
     if (propertyName) state.selected = await initSelectedMenuItems(state.inherit);
 }, { immediate: true });
 watch(() => state.errorMessage, (errorMessage) => {
