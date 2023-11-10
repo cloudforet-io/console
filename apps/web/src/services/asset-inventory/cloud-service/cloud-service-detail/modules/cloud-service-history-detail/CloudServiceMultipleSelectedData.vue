@@ -12,6 +12,7 @@ import type { DynamicLayout } from '@spaceone/design-system/types/data-display/d
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
+import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -48,7 +49,6 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
     searchText: '',
 };
 
-const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
 
@@ -88,38 +88,41 @@ const state = reactive({
         return state.currentLayout.options;
     }),
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
+    rootPath: computed(() => state.currentLayout.options?.root_path),
 });
 const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed(() => state.currentLayout?.options?.search ?? []),
     'inventory.CloudService',
 );
 const getSchema = async () => {
-    let layouts = layoutSchemaCacheMap[props.cloudServiceIdList[0]];
-    if (!layouts) {
-        try {
-            const params: Record<string, any> = {
-                schema: 'details',
-                resource_type: 'inventory.CloudService',
-                options: {
-                    cloud_service_id: props.cloudServiceIdList[0],
-                },
-            };
-            const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-            layouts = filterForExcelSchema(res.details);
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
+    try {
+        const params: Record<string, any> = {
+            schema: 'details',
+            resource_type: 'inventory.CloudService',
+            options: {
+                cloud_service_id: props.cloudServiceIdList[0],
+            },
+        };
+        const res = await SpaceConnector.client.addOns.pageSchema.get(params);
+        state.layouts = filterForExcelSchema(res.details);
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
-
-    layoutSchemaCacheMap[props.cloudServiceIdList[0]] = layouts;
-    state.layouts = layouts || [];
     if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
 };
 
 const apiQuery = new ApiQueryHelper();
-const getQuery = (): any => {
+
+const setOnlyQuery = (query:ApiQueryHelper) => {
+    if (!state.rootPath) return;
+    const fields:DynamicField[] = state.currentLayout.options?.fields ?? [];
+    const only:string[] = [];
+    fields.forEach((d) => { if (d) only.push(`${state.rootPath}.${d.key}`); });
+    query.setOnly(...only);
+};
+const setListQuery = () => {
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
-    if (options.sortBy !== undefined) apiQuery.setSort(options.sortBy, options.sortDesc);
+    if (options.sortBy) apiQuery.setMultiSortV2([{ key: options.sortBy, desc: options.sortDesc }]);
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
     if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
@@ -127,14 +130,26 @@ const getQuery = (): any => {
         apiQuery.setFiltersAsQueryTag(options.queryTags);
     }
     apiQuery.addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' });
-    return apiQuery;
+    setOnlyQuery(apiQuery);
 };
 
-const getParams = () => {
-    const params: any = { query: getQuery().data };
+const getListApiParams = () => {
+    setListQuery();
+    let params: any;
 
-    const keyPath = state.currentLayout.options?.root_path;
-    if (keyPath) params.key_path = keyPath;
+    if (state.rootPath) {
+        params = {
+            query: {
+                ...apiQuery.data,
+                unwind: {
+                    path: state.rootPath,
+                    // filter will be added for search
+                },
+            },
+        };
+    } else {
+        params = { query: apiQuery.data };
+    }
 
     return params;
 };
@@ -144,7 +159,7 @@ const getData = async () => {
     state.loading = true;
     state.data = dataMap[state.fetchOptionKey];
     try {
-        const res = await SpaceConnector.clientV2.inventory.cloudService.list(getParams());
+        const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams());
         state.totalCount = res.total_count;
         state.data = res.results;
     } catch (e) {
@@ -157,12 +172,12 @@ const getData = async () => {
     dataMap[state.fetchOptionKey] = state.data;
 };
 
+const excelQuery = new ApiQueryHelper()
+    .addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' })
+    .setMultiSortV2([{ key: 'created_at', desc: true }]);
+
 const baseInformationExcelDownload = async (fields:ConsoleDynamicField[]) => {
     const excelExportFetcher = () => {
-        const excelQuery = new ApiQueryHelper()
-            .addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' })
-            .setMultiSortV2([{ key: 'created_at', desc: true }]);
-
         const cloudServiceExcelExportParams: ExportParameter = {
             options: [
                 {
@@ -170,6 +185,28 @@ const baseInformationExcelDownload = async (fields:ConsoleDynamicField[]) => {
                     query_type: QueryType.SEARCH,
                     search_query: {
                         ...excelQuery.data,
+                        fields: dynamicFieldsToExcelDataFields(fields),
+                    },
+                },
+            ],
+        };
+        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
+    };
+    await downloadExcelByExportFetcher(excelExportFetcher);
+};
+
+const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
+    const excelExportFetcher = () => {
+        const cloudServiceExcelExportParams: ExportParameter = {
+            options: [
+                {
+                    name: 'Cloud Service List',
+                    query_type: QueryType.SEARCH,
+                    search_query: {
+                        ...excelQuery.data,
+                        unwind: {
+                            path: state.rootPath,
+                        },
                         fields: dynamicFieldsToExcelDataFields(fields),
                     },
                 },
@@ -194,8 +231,8 @@ const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
             fields = state.currentLayout.options?.layouts[0].options?.fields;
             baseInformationExcelDownload(fields);
         } else {
-            // TODO: unwind excel api
             fields = state.currentLayout?.options?.fields;
+            unwindTableExcelDownload(fields);
         }
     },
 };

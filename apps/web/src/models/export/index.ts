@@ -23,6 +23,9 @@ interface SearchQuery {
     sort?: Query['sort'];
     fields?: Array<SearchQueryField>;
     keyword?: string;
+    unwind?: {
+        path: string;
+    }
 }
 
 interface AnalyzeQuery {
