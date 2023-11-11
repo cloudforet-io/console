@@ -17,7 +17,7 @@
   "author": "Cloudforet",
   "license": "Apache-2.0",
   "dependencies": {
-    "axios": "^0.25.0",
+    "axios": "^1.6.0",
     "axios-auth-refresh": "^3.2.2",
     "bytes": "^3.1.2",
     "dayjs": "^1.10.7",
