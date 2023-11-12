@@ -3,7 +3,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { getApiActionByLayoutType } from '@/lib/component-util/dynamic-layout';
 
-import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
 import type { CloudServiceDetailSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/type';
 
 export const makeCustomValueHandler = (distinctKey: string, cloudServiceId: string): ValueHandler => async (inputText: string) => {
@@ -33,7 +32,5 @@ export const makeCustomValueHandler = (distinctKey: string, cloudServiceId: stri
 };
 
 // This is a helper function that extracts only the schema required for excel download from the metadata of the cloudService type.
-export const filterForExcelSchema = (schemaList: CloudServiceDetailSchema[]):CloudServiceDetailSchema[] => schemaList.filter((schema: CloudServiceDetailSchema) => {
-    if (schema.name === BASE_INFORMATION) return true;
-    return getApiActionByLayoutType(schema.type) === 'getData';
-});
+export const filterForExcelSchema = (schemaList: CloudServiceDetailSchema[]):CloudServiceDetailSchema[] => schemaList
+    .filter((schema: CloudServiceDetailSchema) => getApiActionByLayoutType(schema.type) === 'getData');

@@ -13,6 +13,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { find } from 'lodash';
 
 import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -27,11 +28,9 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
-import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
-import { filterForExcelSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
 
 interface Props {
     cloudServiceIdList: string[];
@@ -83,18 +82,23 @@ const state = reactive({
     currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
     layoutOptions: computed(() => {
         if (!state.currentLayout.options) return {};
-        if (state.currentLayout.name === BASE_INFORMATION) {
-            return { ...state.currentLayout.options?.layouts[0].options };
-        }
         return state.currentLayout.options;
     }),
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
-    rootPath: computed(() => state.currentLayout.options?.root_path),
+    rootPath: computed(() => state.currentLayout.options?.unwind?.path ?? ''),
+    isBaseInformationSchema: computed(() => (state.currentLayout.name === BASE_INFORMATION)),
+    keyItemSets: computed<KeyItemSet[]>(() => {
+        const keyItemSets: KeyItemSet[] = [{
+            title: 'Properties',
+            items: state.currentLayout.options?.search?.map((d) => ({
+                label: d.name,
+                name: d.key,
+                operators: ['', '!', '=', '!='],
+            })),
+        }];
+        return keyItemSets;
+    }),
 });
-const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
-    computed(() => state.currentLayout?.options?.search ?? []),
-    'inventory.CloudService',
-);
 const getSchema = async () => {
     try {
         const params: Record<string, any> = {
@@ -102,10 +106,11 @@ const getSchema = async () => {
             resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceIdList[0],
+                is_multiple: true,
             },
         };
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-        state.layouts = filterForExcelSchema(res.details);
+        state.layouts = res.details;
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -116,40 +121,39 @@ const apiQuery = new ApiQueryHelper();
 const baseInformationQuery = new ApiQueryHelper();
 
 const setOnlyQuery = (query:ApiQueryHelper) => {
-    if (!state.rootPath) return;
+    if (state.isBaseInformationSchema) return;
     const fields:DynamicField[] = state.currentLayout.options?.fields ?? [];
     const only:string[] = [];
-    fields.forEach((d) => { if (d) only.push(`${state.rootPath}.${d.key}`); });
+    fields.forEach((d) => { if (d) only.push(d.key); });
     query.setOnly(...only);
 };
-const setListQuery = () => {
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+const setListQuery = (options) => {
     apiQuery.setFilters([]);
     if (options.sortBy) {
-        const key = (state.rootPath) ? `${state.rootPath}.${options.sortBy}` : options.sortBy;
-        apiQuery.setSort(key, options.sortDesc);
+        apiQuery.setSort(options.sortBy, options.sortDesc);
     }
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
     if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
-    if (options.queryTags !== undefined) {
-        apiQuery.setFiltersAsQueryTag(options.queryTags);
-    }
     apiQuery.addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' });
     setOnlyQuery(apiQuery);
 };
 
+const unwindTagQuery = new ApiQueryHelper();
 const getListApiParams = () => {
-    setListQuery();
+    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    setListQuery(options);
+    if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
+    const isTagsEmpty = (options.queryTags ?? []).length === 0;
     let params: any;
 
-    if (state.rootPath) {
+    if (!state.isBaseInformationSchema) {
         params = {
             query: {
                 ...apiQuery.data,
                 unwind: {
                     path: state.rootPath,
-                    // filter will be added for search
+                    ...(!isTagsEmpty && { ...unwindTagQuery.data }),
                 },
             },
         };
@@ -181,29 +185,13 @@ const getData = async () => {
 };
 
 const excelQuery = new ApiQueryHelper()
-    .addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' })
     .setMultiSortV2([{ key: 'created_at', desc: true }]);
 
-const baseInformationExcelDownload = async (fields:ConsoleDynamicField[]) => {
-    const excelExportFetcher = () => {
-        const cloudServiceExcelExportParams: ExportParameter = {
-            options: [
-                {
-                    name: 'Cloud Service List',
-                    query_type: QueryType.SEARCH,
-                    search_query: {
-                        ...excelQuery.data,
-                        fields: dynamicFieldsToExcelDataFields(fields),
-                    },
-                },
-            ],
-        };
-        return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
-    };
-    await downloadExcelByExportFetcher(excelExportFetcher);
-};
-
 const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
+    excelQuery.setFilters([{ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' }]);
+    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    const isTagsEmpty = (options.queryTags ?? []).length === 0;
+    if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const excelExportFetcher = () => {
         const cloudServiceExcelExportParams: ExportParameter = {
             options: [
@@ -214,8 +202,9 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
                         ...excelQuery.data,
                         unwind: {
                             path: state.rootPath,
+                            ...(!isTagsEmpty && { ...unwindTagQuery.data }),
                         },
-                        fields: dynamicFieldsToExcelDataFields(fields, state.rootPath),
+                        fields: dynamicFieldsToExcelDataFields(fields),
                     },
                 },
             ],
@@ -227,21 +216,18 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
 
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
-        fetchOptionsMap[state.fetchOptionKey] = options;
+        fetchOptionsMap[state.fetchOptionKey] = {
+            ...fetchOptionsMap[state.fetchOptionKey],
+            ...options,
+        };
         getData();
     },
     select(selectIndex) {
         state.selectIndex = selectIndex;
     },
     export() {
-        let fields:ConsoleDynamicField[] = [];
-        if (state.currentLayout.name === BASE_INFORMATION) {
-            fields = state.currentLayout.options?.layouts[0].options?.fields;
-            baseInformationExcelDownload(fields);
-        } else {
-            fields = state.currentLayout?.options?.fields;
-            unwindTableExcelDownload(fields);
-        }
+        const fields:ConsoleDynamicField[] = state.currentLayout?.options?.fields;
+        unwindTableExcelDownload(fields);
     },
 };
 
@@ -288,8 +274,10 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
             <template v-for="(layout, i) in state.layouts"
                       :slot="layout.name"
             >
-                <div :key="`${layout.name}-${i}`">
-                    <p-dynamic-layout :type="layout.name === BASE_INFORMATION ? 'simple-table' : layout.type"
+                <div :key="`${layout.name}-${i}`"
+                     class="dynamic-layout-wrapper"
+                >
+                    <p-dynamic-layout :type="layout.type"
                                       :options="state.layoutOptions"
                                       :data="state.data"
                                       :type-options="{
@@ -297,8 +285,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                                           totalCount:state.totalCount,
                                           timezone:state.timezone,
                                           selectIndex:state.selectIndex,
-                                          keyItemSets,
-                                          valueHandlerMap,
+                                          keyItemSets: state.keyItemSets,
                                           lanuage:state.language,
                                           excelVisible: true
                                       }"
@@ -310,3 +297,17 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
         </p-button-tab>
     </div>
 </template>
+
+<style scoped lang="postcss">
+/* custom design-system component - p-toolbox-table */
+.dynamic-layout-wrapper {
+    :deep(.p-dynamic-layout-query-search-table) {
+        .p-toolbox-table {
+            border-width: 0;
+            .table-container {
+                min-height: 200px;
+            }
+        }
+    }
+}
+</style>

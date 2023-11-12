@@ -79,7 +79,7 @@ const getSubDataExcelSearchQuery = () => {
                 sort,
                 ...(!isBaseInformationSchema && {
                     unwind: {
-                        path: schema.options?.root_path ?? '',
+                        path: schema.options?.unwind?.path ?? '',
                     },
                 }),
                 fields: dynamicFieldsToExcelDataFields(fields, rootPath),
@@ -105,7 +105,6 @@ const handleConfirm = async () => {
         const cloudServiceExcelExportParams: ExportParameter = {
             options: cloudServiceListSheetQuery ? [cloudServiceListSheetQuery].concat(getSubDataExcelSearchQuery()) : getSubDataExcelSearchQuery(),
         };
-        console.log('cloudServiceExcelExportParams', getSubDataExcelSearchQuery());
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
     await downloadExcelByExportFetcher(excelExportFetcher);

@@ -24,7 +24,7 @@ interface SearchQuery {
     fields?: Array<SearchQueryField>;
     keyword?: string;
     unwind?: {
-        path: string;
+        path?: string;
     }
 }
 
