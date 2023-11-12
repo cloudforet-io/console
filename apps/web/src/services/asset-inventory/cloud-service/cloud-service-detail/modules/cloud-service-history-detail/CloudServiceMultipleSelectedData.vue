@@ -13,6 +13,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { find } from 'lodash';
 
 import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
+import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -27,7 +28,6 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
-import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
@@ -90,11 +90,18 @@ const state = reactive({
     }),
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
     rootPath: computed(() => state.currentLayout.options?.root_path),
+    keyItemSets: computed<KeyItemSet[]>(() => {
+        const keyItemSets: KeyItemSet[] = [{
+            title: 'Properties',
+            items: state.currentLayout.options?.fields?.map((d) => ({
+                label: d.name,
+                name: d.key,
+                operators: ['', '!', '=', '!='],
+            })),
+        }];
+        return keyItemSets;
+    }),
 });
-const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
-    computed(() => state.currentLayout?.options?.search ?? []),
-    'inventory.CloudService',
-);
 const getSchema = async () => {
     try {
         const params: Record<string, any> = {
@@ -122,8 +129,7 @@ const setOnlyQuery = (query:ApiQueryHelper) => {
     fields.forEach((d) => { if (d) only.push(`${state.rootPath}.${d.key}`); });
     query.setOnly(...only);
 };
-const setListQuery = () => {
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+const setListQuery = (options) => {
     apiQuery.setFilters([]);
     if (options.sortBy) {
         const key = (state.rootPath) ? `${state.rootPath}.${options.sortBy}` : options.sortBy;
@@ -132,15 +138,16 @@ const setListQuery = () => {
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
     if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
-    if (options.queryTags !== undefined) {
-        apiQuery.setFiltersAsQueryTag(options.queryTags);
-    }
     apiQuery.addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' });
     setOnlyQuery(apiQuery);
 };
 
+const unwindTagQuery = new ApiQueryHelper();
 const getListApiParams = () => {
-    setListQuery();
+    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    setListQuery(options);
+    unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
+    const isTagsEmpty = (options.queryTags ?? []).length === 0;
     let params: any;
 
     if (state.rootPath) {
@@ -149,7 +156,12 @@ const getListApiParams = () => {
                 ...apiQuery.data,
                 unwind: {
                     path: state.rootPath,
-                    // filter will be added for search
+                    // filter: [{
+                    //     k: `${state.rootPath}.mac_address`,
+                    //     o: 'contain_in',
+                    //     v: ['06:6f:3a:bd:50:46'],
+                    // }],
+                    ...(!isTagsEmpty && { ...unwindTagQuery.data }),
                 },
             },
         };
@@ -288,8 +300,10 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
             <template v-for="(layout, i) in state.layouts"
                       :slot="layout.name"
             >
-                <div :key="`${layout.name}-${i}`">
-                    <p-dynamic-layout :type="layout.name === BASE_INFORMATION ? 'simple-table' : layout.type"
+                <div :key="`${layout.name}-${i}`"
+                     class="dynamic-layout-wrapper"
+                >
+                    <p-dynamic-layout :type="layout.name === BASE_INFORMATION ? 'simple-table' : 'query-search-table'"
                                       :options="state.layoutOptions"
                                       :data="state.data"
                                       :type-options="{
@@ -297,8 +311,7 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                                           totalCount:state.totalCount,
                                           timezone:state.timezone,
                                           selectIndex:state.selectIndex,
-                                          keyItemSets,
-                                          valueHandlerMap,
+                                          keyItemSets:state.keyItemSets,
                                           lanuage:state.language,
                                           excelVisible: true
                                       }"
@@ -310,3 +323,14 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
         </p-button-tab>
     </div>
 </template>
+
+<style scoped lang="postcss">
+/* custom design-system component - p-toolbox-table */
+.dynamic-layout-wrapper {
+    :deep(.p-dynamic-layout-query-search-table) {
+        .p-toolbox-table {
+            border-width: 0;
+        }
+    }
+}
+</style>
