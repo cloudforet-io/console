@@ -129,12 +129,9 @@ const setOnlyQuery = (query:ApiQueryHelper) => {
 };
 const setListQuery = (options) => {
     apiQuery.setFilters([]);
-    if (options.sortBy) {
-        apiQuery.setSort(options.sortBy, options.sortDesc);
-    }
+    if (options.sortBy) apiQuery.setSort(options.sortBy, options.sortDesc);
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
-    if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
     apiQuery.addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' });
     setOnlyQuery(apiQuery);
 };
@@ -287,7 +284,6 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                                           selectIndex:state.selectIndex,
                                           keyItemSets: state.keyItemSets,
                                           lanuage:state.language,
-                                          excelVisible: true
                                       }"
                                       :field-handler="fieldHandler"
                                       v-on="dynamicLayoutListeners"
