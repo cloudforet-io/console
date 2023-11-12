@@ -44,6 +44,9 @@ export type DynamicLayoutType = typeof dynamicLayoutTypes[number];
 export interface CommonOptions {
     root_path?: string;
     translation_id?: string;
+    unwind?: {
+        path?: string;
+    }
 }
 
 export interface ItemOptions extends CommonOptions {
