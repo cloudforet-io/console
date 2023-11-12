@@ -14,14 +14,11 @@ interface ExcelDataField {
 }
 
 /**
- * @name getApiActionByLayoutType
- * @description returns action name that match with dynamic layout type with camelcase.
+ * @name isTableTypeInDynamicLayoutType
+ * @description returns boolean value that match with dynamic layout type with camelcase.
  * @param type
  */
-export const getApiActionByLayoutType = (type: DynamicLayoutType): 'getData'|'get' => {
-    if (['raw-table', 'table', 'query-search-table'].includes(type)) return 'getData';
-    return 'get';
-};
+export const isTableTypeInDynamicLayoutType = (type: DynamicLayoutType): boolean => (['raw-table', 'table', 'query-search-table'].includes(type));
 
 export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[], rootPathForUnwind?:string): ExcelDataField[] => fields.map((d) => {
     const res: ExcelDataField = { key: rootPathForUnwind ? `${rootPathForUnwind}.${d.key}` : d.key, name: d.name ?? d.key, options: d.options };
@@ -55,6 +52,6 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[], ro
 });
 
 export default {
-    getApiActionByLayoutType,
+    getApiActionByLayoutType: isTableTypeInDynamicLayoutType,
     dynamicFieldsToExcelDataFields,
 };

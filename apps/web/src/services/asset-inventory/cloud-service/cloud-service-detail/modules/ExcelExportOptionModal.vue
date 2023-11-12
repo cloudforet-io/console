@@ -18,13 +18,12 @@ import { QueryType } from '@/models/export';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
+import { dynamicFieldsToExcelDataFields, isTableTypeInDynamicLayoutType } from '@/lib/component-util/dynamic-layout';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
-import { filterForExcelSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/helper';
 import type { CloudServiceDetailSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/type';
 
 
@@ -104,6 +103,7 @@ const handleConfirm = async () => {
 
         const cloudServiceExcelExportParams: ExportParameter = {
             options: cloudServiceListSheetQuery ? [cloudServiceListSheetQuery].concat(getSubDataExcelSearchQuery()) : getSubDataExcelSearchQuery(),
+            // timezone: state.timezone,
         };
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
@@ -126,7 +126,7 @@ const getSchema = async () => {
             },
         };
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-        state.detailSchemaList = filterForExcelSchema(res.details);
+        state.detailSchemaList = res.details.filter((schema: CloudServiceDetailSchema) => isTableTypeInDynamicLayoutType(schema.type));
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
