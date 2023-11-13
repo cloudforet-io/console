@@ -72,6 +72,12 @@ const state = reactive({
 const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
+    listQueryOptions: computed<Record<string, any>|undefined>(() => {
+        if (!props.globalOptionKey) return undefined;
+        return {
+            [props.globalOptionKey]: widgetFormState.widgetOptions[props.globalOptionKey],
+        }; // e.g. { cost_data_source: 'ds-1' }
+    }),
     menuHandlers: computed(() => {
         if (!state.schemaProperty) return [];
 
@@ -79,13 +85,7 @@ const menuState = reactive({
             return [menuState.inheritOptionMenuHandler];
         }
 
-        // get options from schema dependencies
-        const modelOptions: Record<string, any> = {}; // e.g. { cost_data_source: 'ds-1' }
-        if (props.globalOptionKey) {
-            modelOptions[props.globalOptionKey] = widgetFormState.widgetOptions[props.globalOptionKey];
-        }
-
-        return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, modelOptions));
+        return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, menuState.listQueryOptions));
     }),
 });
 
