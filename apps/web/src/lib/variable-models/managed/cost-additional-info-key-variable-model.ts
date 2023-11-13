@@ -34,37 +34,23 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
-            const _query: Record<string, any> = {
-                only: ['cost_additional_info_keys'],
-                filter: [
-                    {
-                        key: 'cost_additional_info_keys',
-                        value: null,
-                        operator: 'not',
-                    },
-                ],
-            };
-            if (query.filters?.length) {
-                const filters = query.filters.map((f) => (f.startsWith('additional_info.') ? f.replace('additional_info.', '') : f));
-                apiQueryHelper.setFilters([{ k: 'cost_additional_info_keys', v: filters, o: '=' }]);
-                _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
-            }
-            if (query.search) {
-                _query.filter.push({
-                    key: 'cost_additional_info_keys',
-                    value: query.search,
-                    operator: 'contain',
-                });
-            }
+            apiQueryHelper.setOnly('cost_additional_info_keys')
+                .setFilters([{
+                    k: 'cost_additional_info_keys',
+                    v: null,
+                    o: '!=',
+                }]);
             const { status, response } = await this.#fetcher({
                 ...dependencyOptions,
-                query: _query,
+                query: apiQueryHelper.data,
             });
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_additional_info_keys ?? [];
-                this.#response = {
-                    results: target.map((d) => ({ key: `additional_info.${d}`, name: d })),
-                };
+                let _results = target.map((d) => ({ key: `additional_info.${d}`, name: d }));
+                if (query.search) {
+                    _results = _results.filter((d) => d.name.toLowerCase().includes(query.search?.toLowerCase() as string));
+                }
+                this.#response = { results: _results };
             }
             return this.#response;
         } catch (e) {

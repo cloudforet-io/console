@@ -39,36 +39,23 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
-            const _query: Record<string, any> = {
-                only: ['cost_tag_keys'],
-                filter: [
-                    {
-                        key: 'cost_tag_keys',
-                        value: null,
-                        operator: 'not',
-                    },
-                ],
-            };
-            if (query.filters?.length) {
-                apiQueryHelper.setFilters([{ k: 'cost_tag_keys', v: query.filters, o: '=' }]);
-                _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
-            }
-            if (query.search) {
-                _query.filter.push({
-                    key: 'cost_tag_keys',
-                    value: query.search,
-                    operator: 'contain',
-                });
-            }
+            apiQueryHelper.setOnly('cost_tag_keys')
+                .setFilters([{
+                    k: 'cost_tag_keys',
+                    v: null,
+                    o: '!=',
+                }]);
             const { status, response } = await this.#fetcher({
                 ...dependencyOptions,
-                query: _query,
+                query: apiQueryHelper.data,
             });
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_tag_keys ?? [];
-                this.#response = {
-                    results: target.map((d) => ({ key: `tags.${d}`, name: `[Tag] ${d}` })),
-                };
+                let _results = target.map((d) => ({ key: `tags.${d}`, name: `[Tag] ${d}` }));
+                if (query.search) {
+                    _results = _results.filter((d) => d.name.toLowerCase().includes(query.search as string));
+                }
+                this.#response = { results: _results };
             }
             return this.#response;
         } catch (e) {
