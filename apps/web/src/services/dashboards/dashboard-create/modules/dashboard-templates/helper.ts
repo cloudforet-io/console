@@ -50,6 +50,7 @@ export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVa
         });
     } else if (label === DASHBOARD_LABEL.BLANK) {
         _managedVariablesSchema.properties[COST_VARIABLE_TYPE_INFO.cost_data_source.type].required = false;
+        _managedVariablesSchema.properties[ASSET_VARIABLE_TYPE_INFO.cloud_service_query_set.type].required = false;
     }
     return _managedVariablesSchema;
 };
