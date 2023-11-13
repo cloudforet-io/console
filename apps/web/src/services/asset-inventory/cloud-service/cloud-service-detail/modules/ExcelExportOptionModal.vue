@@ -123,6 +123,7 @@ const getSchema = async () => {
             resource_type: 'inventory.CloudService',
             options: {
                 cloud_service_id: props.cloudServiceId,
+                is_multiple: true,
             },
         };
         const res = await SpaceConnector.client.addOns.pageSchema.get(params);
