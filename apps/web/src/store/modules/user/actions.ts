@@ -23,6 +23,7 @@ const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> 
         timezone: response.timezone,
         // email_verified : There is data only when the value is true.
         emailVerified: !!response.email_verified,
+        mfa: response.mfa,
     };
 };
 
@@ -39,6 +40,7 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         requiredActions: response.required_actions,
         // email_verified : There is data only when the value is true.
         emailVerified: !!response.email_verified,
+        mfa: response.mfa,
     };
 };
 
@@ -145,6 +147,7 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
         language: userRequest.language || state.language,
         timezone: userRequest.timezone || state.timezone,
         emailVerified: userRequest.email_verified !== undefined ? userRequest.email_verified : state.emailVerified,
+        mfa: userRequest.mfa || state.mfa,
     });
 
     commit('setUser', { ...state, ...convertRequestType() });
