@@ -187,7 +187,7 @@ const getData = async () => {
     try {
         const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams(state.currentLayout.type));
         if (res.total_count !== undefined) state.totalCount = res.total_count;
-        state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
+        if (res.results) state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.data = undefined;
