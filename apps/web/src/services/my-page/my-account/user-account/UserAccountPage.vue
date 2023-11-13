@@ -3,6 +3,7 @@
         <p-heading :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <base-information />
         <notification-email v-if="state.smtpEnabled && (state.userType === 'LOCAL' || state.userType === 'EXTERNAL')" />
+        <multi-factor-authentication />
         <change-password v-if="state.userType === 'LOCAL'" />
     </section>
 </template>
@@ -18,6 +19,8 @@ import config from '@/lib/config';
 
 import BaseInformation from '@/services/my-page/my-account/user-account/modules/BaseInformation.vue';
 import ChangePassword from '@/services/my-page/my-account/user-account/modules/ChangePassword.vue';
+import MultiFactorAuthentication
+    from '@/services/my-page/my-account/user-account/modules/MultiFactorAuthentication.vue';
 import NotificationEmail from '@/services/my-page/my-account/user-account/modules/NotificationEmail.vue';
 
 
