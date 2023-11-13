@@ -1913,6 +1913,14 @@
 				"USER_MANAGEMENT": "ユーザー管理",
 				"YESTERDAY": "昨日"
 			},
+			"MFA": {
+				"EMAIL": "メールアドレス",
+				"ENABLE_MFA": "",
+				"NOT_VERIFIED": "認証されていません",
+				"TITLE": "",
+				"TYPE": "",
+				"VERIFIED": "認証済みです"
+			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "プロジェクトチャンネルの削除に失敗",
 				"ALT_E_DELETE_USER_CHANNEL": "ユーザーチャンネルの削除に失敗",

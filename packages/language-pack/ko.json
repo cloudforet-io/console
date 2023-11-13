@@ -1913,6 +1913,14 @@
 				"USER_MANAGEMENT": "사용자 관리 ",
 				"YESTERDAY": "어제 "
 			},
+			"MFA": {
+				"EMAIL": "이메일",
+				"ENABLE_MFA": "",
+				"NOT_VERIFIED": "인증되지 않음",
+				"TITLE": "",
+				"TYPE": "",
+				"VERIFIED": "인증됨"
+			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "프로젝트 채널 삭제 실패",
 				"ALT_E_DELETE_USER_CHANNEL": "사용자 채널 삭제 실패",

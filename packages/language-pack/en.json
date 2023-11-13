@@ -1913,6 +1913,14 @@
 				"USER_MANAGEMENT": "User Management",
 				"YESTERDAY": "Yesterday"
 			},
+			"MFA": {
+				"EMAIL": "Email",
+				"ENABLE_MFA": "Enable MFA",
+				"NOT_VERIFIED": "Not Verified",
+				"TITLE": "Multi-factor Authentication",
+				"TYPE": "MFA Type",
+				"VERIFIED": "Verified"
+			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "Failed to Delete Project Channel",
 				"ALT_E_DELETE_USER_CHANNEL": "Failed to Delete User Channel",
