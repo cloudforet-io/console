@@ -1545,8 +1545,12 @@
 			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "Displays the count, rate, and severity of compliance failures observed during the selected period.",
+				"LESS_THAN_PREV_DAY": "less than previous day",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
-				"MORE_THAN_PREV_MONTH": "more than previous month"
+				"LESS_THAN_PREV_YEAR": "less than previous year",
+				"MORE_THAN_PREV_DAY": "more than previous day",
+				"MORE_THAN_PREV_MONTH": "more than previous month",
+				"MORE_THAN_PREV_YEAR": "more than previous year"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group By' option."

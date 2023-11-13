@@ -119,8 +119,12 @@ const state = reactive({
     totalFailureComparingMessage: computed<string|undefined>(() => {
         if (state.currTotalFailureCount === state.prevTotalFailureCount) return undefined;
         if (state.prevTotalFailureCount < state.currTotalFailureCount) {
+            if (widgetState.options.granularity === GRANULARITY.YEARLY) return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.MORE_THAN_PREV_YEAR') as string;
+            if (widgetState.options.granularity === GRANULARITY.DAILY) return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.MORE_THAN_PREV_DAY') as string;
             return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.MORE_THAN_PREV_MONTH') as string;
         }
+        if (widgetState.options.granularity === GRANULARITY.YEARLY) return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_YEAR') as string;
+        if (widgetState.options.granularity === GRANULARITY.DAILY) return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_DAY') as string;
         return i18n.t('DASHBOARDS.WIDGET.TOTAL_FAIL_FINDINGS_STATUS.LESS_THAN_PREV_MONTH') as string;
     }),
     failureRate: computed<number>(() => (state.currTotalCount ? Math.round((state.currTotalFailureCount / state.currTotalCount) * 100) : 0)),

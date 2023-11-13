@@ -1545,8 +1545,12 @@
 			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "",
+				"LESS_THAN_PREV_DAY": "前日よりも少ない",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
-				"MORE_THAN_PREV_MONTH": "前月よりも多い"
+				"LESS_THAN_PREV_YEAR": "前年よりも少ない",
+				"MORE_THAN_PREV_DAY": "前日よりも多い",
+				"MORE_THAN_PREV_MONTH": "前月よりも多い",
+				"MORE_THAN_PREV_YEAR": "前年よりも多い"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "選択した期間中のコンプライアンスのPass/Fail findingsのトレンドを'Group By'オプションで集計して表示するウィジェット"
