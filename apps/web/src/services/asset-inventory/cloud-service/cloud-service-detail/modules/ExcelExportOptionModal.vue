@@ -157,7 +157,7 @@ watch(() => props.visible, () => {
             </p>
             <p-data-loader class="sub-data-section"
                            :loading="state.isSubDataLoading"
-                           :data="state.detailSchemaList"
+                           :data="state.subDataList"
             >
                 <p-checkbox-group direction="vertical">
                     <p-checkbox v-for="value in state.subDataList"
