@@ -142,6 +142,10 @@ export interface DashboardLayoutWidgetInfo {
 }
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
 
+export interface InheritOption {
+    enabled?: boolean;
+    variable_key?: string;
+}
 export type InheritOptions = Partial<Record<WidgetOptionKey, {
     enabled?: boolean;
     variable_key?: string;
