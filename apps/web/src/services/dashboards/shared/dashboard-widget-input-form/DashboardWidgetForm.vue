@@ -37,9 +37,6 @@ const handleUpdateTitle = (value: string) => {
 };
 
 /* states init */
-const initSchemaAndFormData = (widgetConfigId: string, widgetKey?: string) => {
-    widgetFormStore.initWidgetForm(widgetKey, widgetConfigId);
-};
 watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, widgetKey]) => {
     // do nothing if still loading
     if (!widgetConfigId) return;
@@ -47,7 +44,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, wid
     // reset states
     widgetFormStore.resetAll();
 
-    initSchemaAndFormData(widgetConfigId, widgetKey);
+    widgetFormStore.initWidgetForm(widgetKey, widgetConfigId);
 
     // set focus on text input
     state.isFocused = true;
