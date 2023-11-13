@@ -165,6 +165,8 @@ const handleVisibleCloneModal = () => {
 
 // else
 const handleRefresh = () => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
 const handleUpdateLabels = async (labels: string[]) => {
