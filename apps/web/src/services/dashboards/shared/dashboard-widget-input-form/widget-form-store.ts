@@ -47,7 +47,7 @@ interface Getters {
     globalOptionInfo: ComputedRef<GlobalOptionInfo|undefined>;
 }
 
-interface GlobalOptionInfo {optionKey: string; variableKey: string; name: string; value?: any; initiated: boolean; ready: boolean;}
+interface GlobalOptionInfo {optionKey: string; variableKey: string; name: string; value?: any; initiated: boolean; initiatedAndHasValue: boolean;}
 export const useWidgetFormStore = defineStore('widget-form', () => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailState = dashboardDetailStore.$state;
@@ -149,7 +149,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                     name,
                     value,
                     initiated: state.optionsInitMap[optionKey],
-                    ready: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
+                    initiatedAndHasValue: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
                 };
             }
             // normal case
@@ -160,7 +160,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                 name,
                 value,
                 initiated: state.optionsInitMap[optionKey],
-                ready: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
+                initiatedAndHasValue: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
             };
         }),
     });

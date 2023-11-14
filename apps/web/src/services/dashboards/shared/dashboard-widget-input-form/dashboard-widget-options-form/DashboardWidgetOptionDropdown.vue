@@ -78,8 +78,10 @@ const menuState = reactive({
     menuHandlers: computed(() => {
         if (!state.schemaProperty) return [];
         if (widgetFormGetters.globalOptionInfo) {
-            if (widgetFormGetters.globalOptionInfo.optionKey !== props.propertyName && !widgetFormGetters.globalOptionInfo.ready) {
-                return [];
+            // if it is not global option
+            if (widgetFormGetters.globalOptionInfo.optionKey !== props.propertyName) {
+                // and if global option is not initiated, return empty array
+                if (!widgetFormGetters.globalOptionInfo.initiatedAndHasValue) return [];
             }
         }
 

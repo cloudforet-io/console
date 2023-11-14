@@ -52,7 +52,7 @@ const handleDeleteProperty = (propertyName: string) => {
         </p-text-button>
         <p-data-loader class="widget-options-form-wrapper"
                        :loading="!widgetFormGetters.isAllOptionsInitiated"
-                       :data="widgetFormGetters.globalOptionInfo ? widgetFormGetters.globalOptionInfo.ready : true"
+                       :data="widgetFormGetters.globalOptionInfo ? widgetFormGetters.globalOptionInfo.initiatedAndHasValue : true"
         >
             <dashboard-widget-option-dropdown v-for="propertyName in widgetFormState.schemaProperties"
                                               :key="`option-dropdown-${propertyName}-${state.uuid}`"
