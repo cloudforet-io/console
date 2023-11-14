@@ -11,9 +11,6 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import type {
-    WidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const props = defineProps<{
     projectId?: string;
@@ -25,7 +22,25 @@ const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;
 
 const state = reactive({
-    properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormGetters.widgetConfig?.options_schema?.properties ?? {}),
+    loading: computed(() => {
+        // in global option existing case,
+        if (widgetFormGetters.globalOptionInfo) {
+            // if global option is not initiated, regard it as loading
+            if (!widgetFormGetters.globalOptionInfo.initiated) return true;
+
+            // if global option is initiated and has value,
+            if (widgetFormGetters.globalOptionInfo.initiatedAndHasValue) {
+                // decide loading state by checking if all options are initiated
+                return !widgetFormGetters.isAllOptionsInitiated;
+            }
+
+            // if global option is initiated but has no value, regard it as still loading
+            return false;
+        }
+
+        // in no global option case, decide loading state by checking if all options are initiated
+        return !widgetFormGetters.isAllOptionsInitiated;
+    }),
     uuid: uuidv4(),
 });
 
@@ -52,7 +67,7 @@ const handleDeleteProperty = (propertyName: string) => {
             {{ $t('DASHBOARDS.FORM.RETURN_TO_INITIAL_SETTINGS') }}
         </p-text-button>
         <p-data-loader class="widget-options-form-wrapper"
-                       :loading="!widgetFormGetters.isAllOptionsInitiated"
+                       :loading="state.loading"
                        :data="widgetFormGetters.globalOptionInfo ? widgetFormGetters.globalOptionInfo.initiatedAndHasValue : true"
         >
             <dashboard-widget-option-dropdown v-for="propertyName in widgetFormState.schemaProperties"
