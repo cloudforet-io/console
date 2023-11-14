@@ -10,6 +10,7 @@ import type {
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, get } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
@@ -85,16 +86,8 @@ const menuState = reactive({
             [globalOptionInfo.variableKey]: widgetFormState.widgetOptions[globalOptionInfo.optionKey],
         }; // e.g. { cost_data_source: 'ds-1' }
     }),
-    menuHandlers: computed(() => {
-        if (!state.schemaProperty) return [];
-        if (!state.isReadyToInit) return [];
-
-        if (widgetFormState.inheritOptions?.[props.propertyName]?.enabled) {
-            return [menuState.inheritOptionMenuHandler];
-        }
-
-        return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, menuState.listQueryOptions));
-    }),
+    menuHandlers: [] as AutocompleteHandler[],
+    contextKey: uuidv4(),
 });
 
 /* Util */
@@ -246,6 +239,15 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     return results;
 };
 
+const initMenuHandlers = () => {
+    if (widgetFormState.inheritOptions?.[props.propertyName]?.enabled) {
+        menuState.menuHandlers = [menuState.inheritOptionMenuHandler];
+    } else {
+        menuState.menuHandlers = menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, menuState.listQueryOptions));
+    }
+    menuState.contextKey = uuidv4();
+};
+
 const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap: WidgetFiltersMap = {}): WidgetFiltersMap => {
     const modelConf = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as WidgetFilterKey];
     if (!modelConf) {
@@ -324,6 +326,7 @@ const handleUpdateInherit = async (inherit: boolean) => {
     } else {
         widgetFormStore.updateInheritOption(props.propertyName, false);
     }
+    initMenuHandlers();
     const selected = await initSelectedMenuItems();
     state.selected = selected;
     updateWidgetOptionsBySelected(inherit ? undefined : selected);
@@ -340,6 +343,7 @@ watch([() => props.propertyName, () => state.isReadyToInit], async ([propertyNam
     if (!propertyName) return;
     if (!isReadyToInit) return;
     widgetFormStore.updateOptionInitState(propertyName, false);
+    initMenuHandlers();
     state.selected = await initSelectedMenuItems();
     updateWidgetOptionsBySelected(state.selected);
     widgetFormStore.updateOptionInitState(propertyName, true);
@@ -375,7 +379,8 @@ watch(() => state.errorMessage, (errorMessage) => {
                          (state.schemaProperty?.key !== COST_VALUE_WIDGET_OPTION_CONFIGS.cost_additional_info_value.key)"
                      class="select-form-wrapper"
                 >
-                    <p-select-dropdown use-fixed-menu-style
+                    <p-select-dropdown :key="menuState.contextKey"
+                                       use-fixed-menu-style
                                        appearance-type="badge"
                                        is-fixed-width
                                        :is-filterable="!state.inherit"
