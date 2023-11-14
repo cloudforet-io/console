@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { debouncedWatch } from '@vueuse/core';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -7,7 +6,6 @@ import {
 import {
     PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
-import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -97,11 +95,11 @@ const handleCloseSidebar = () => {
     emit('close', false);
 };
 
-debouncedWatch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllOptionsInitiated], ([widgetInfo, isAllInit], [prevWidgetInfo]) => {
+watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllOptionsInitiated], ([widgetInfo, isAllInit]) => {
     if (!isAllInit) return;
-    if (widgetInfo === undefined || isEqual(widgetInfo, prevWidgetInfo)) return;
+    if (widgetInfo === undefined) return;
     emit('update:widget-info', widgetInfo as UpdatableWidgetInfo);
-}, { debounce: 150 });
+});
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {
     emit('update:has-non-inherited-widget-options', value);

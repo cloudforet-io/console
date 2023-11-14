@@ -7,7 +7,7 @@ import {
 import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -95,12 +95,12 @@ const handleCloseSidebar = async (save: boolean) => {
     await nextTick();
     state.widgetRef?.refreshWidget();
 };
-const handleUpdateSidebarWidgetInfo = async (widgetInfo: UpdatableWidgetInfo) => {
+const handleUpdateSidebarWidgetInfo = debounce(async (widgetInfo: UpdatableWidgetInfo) => {
     // NOTE: Do not refresh when the title changes. There are no cases where title and other options change together.
     const refreshWidget = widgetInfo.title === widgetFormGetters.updatedWidgetInfo?.title;
     await nextTick();
     if (refreshWidget) state.widgetRef?.refreshWidget();
-};
+}, 150);
 const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
     state.hasNonInheritedWidgetOptions = value;
 };
