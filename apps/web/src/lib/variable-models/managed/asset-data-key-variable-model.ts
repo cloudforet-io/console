@@ -1,3 +1,5 @@
+import { getTextHighlightRegex } from '@spaceone/design-system';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -34,36 +36,24 @@ export default class AssetDataKeyVariableModel implements IBaseVariableModel {
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
 
-            const _query: Record<string, any> = {
-                only: ['data_keys'],
-                filter: [
-                    {
-                        key: 'data_keys',
-                        value: null,
-                        operator: 'not',
-                    },
-                ],
-            };
-            if (query.filters?.length) {
-                apiQueryHelper.setFilters([{ k: 'data_keys', v: query.filters, o: '=' }]);
-                _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
-            }
-            if (query.search) {
-                _query.filter.push({
-                    key: 'data_keys',
-                    value: query.search,
-                    operator: 'contain',
-                });
-            }
+            apiQueryHelper.setOnly('data_keys')
+                .setFilters([{
+                    k: 'data_keys',
+                    v: null,
+                    o: '!=',
+                }]);
             const { status, response } = await this.#fetcher({
-                ...dependencyOptions, // TODO: check its working
-                query: _query,
+                ...dependencyOptions,
+                query: apiQueryHelper.data,
             });
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.data_keys ?? [];
-                this.#response = {
-                    results: target.map((d) => ({ key: d, name: d })),
-                };
+                let results = target.map((d) => ({ key: d, name: d }));
+                if (query.search) {
+                    const regex = getTextHighlightRegex(query.search);
+                    results = results.filter((item) => regex.test(item.name));
+                }
+                this.#response = { results };
             }
             return this.#response;
         } catch (e) {

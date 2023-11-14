@@ -1,3 +1,5 @@
+import { getTextHighlightRegex } from '@spaceone/design-system';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -39,36 +41,24 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
 
             if (!this.#fetcher) this.#fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
 
-            const _query: Record<string, any> = {
-                only: ['cost_tag_keys'],
-                filter: [
-                    {
-                        key: 'cost_tag_keys',
-                        value: null,
-                        operator: 'not',
-                    },
-                ],
-            };
-            if (query.filters?.length) {
-                apiQueryHelper.setFilters([{ k: 'cost_tag_keys', v: query.filters, o: '=' }]);
-                _query.filter.push(...(apiQueryHelper.data?.filter ?? []));
-            }
-            if (query.search) {
-                _query.filter.push({
-                    key: 'cost_tag_keys',
-                    value: query.search,
-                    operator: 'contain',
-                });
-            }
+            apiQueryHelper.setOnly('cost_tag_keys')
+                .setFilters([{
+                    k: 'cost_tag_keys',
+                    v: null,
+                    o: '!=',
+                }]);
             const { status, response } = await this.#fetcher({
                 ...dependencyOptions,
-                query: _query,
+                query: apiQueryHelper.data,
             });
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_tag_keys ?? [];
-                this.#response = {
-                    results: target.map((d) => ({ key: `tags.${d}`, name: `[Tag] ${d}` })),
-                };
+                let results = target.map((d) => ({ key: `tags.${d}`, name: `[Tag] ${d}` }));
+                if (query.search) {
+                    const regex = getTextHighlightRegex(query.search);
+                    results = results.filter((item) => regex.test(item.name));
+                }
+                this.#response = { results };
             }
             return this.#response;
         } catch (e) {
