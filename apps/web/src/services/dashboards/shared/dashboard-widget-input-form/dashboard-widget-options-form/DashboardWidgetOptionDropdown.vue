@@ -72,7 +72,7 @@ const menuState = reactive({
     listQueryOptions: computed<Record<string, any>|undefined>(() => {
         if (!widgetFormGetters.globalOptionInfo?.optionKey) return undefined;
         return {
-            [widgetFormGetters.globalOptionInfo.optionKey]: widgetFormState.widgetOptions[widgetFormGetters.globalOptionInfo.optionKey],
+            [widgetFormGetters.globalOptionInfo.variableKey]: widgetFormState.widgetOptions[widgetFormGetters.globalOptionInfo.optionKey],
         }; // e.g. { cost_data_source: 'ds-1' }
     }),
     menuHandlers: computed(() => {
