@@ -68,9 +68,10 @@ const state = reactive({
     isReadyToInit: computed(() => {
         if (!widgetFormGetters.globalOptionInfo) return true;
 
+        // if it is global option, it is ready to init
         if (widgetFormGetters.globalOptionInfo.optionKey === props.propertyName) return true;
 
-        // if global option is not initiated, it is not ready to init
+        // if global option is not initiated with value, it is not ready to init
         return !widgetFormGetters.globalOptionInfo.initiatedAndHasValue;
     }),
 });
