@@ -47,7 +47,14 @@ interface Getters {
     globalOptionInfo: ComputedRef<GlobalOptionInfo|undefined>;
 }
 
-interface GlobalOptionInfo {optionKey: string; variableKey: string; name: string; value?: any; initiated: boolean; initiatedAndHasValue: boolean;}
+interface GlobalOptionInfo {
+    optionKey: string;
+    variableKey: string;
+    name: string;
+    value?: any;
+    initiated?: boolean;
+    initiatedAndHasValue?: boolean;
+}
 export const useWidgetFormStore = defineStore('widget-form', () => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailState = dashboardDetailStore.$state;
@@ -165,26 +172,16 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         }),
     });
 
-    const initOptionsValidMap = (properties?: string[]) => {
-        if (!properties) {
-            state.optionsValidMap = {};
-            return;
-        }
+    const initOptionsValidMap = () => {
         const optionsValidMap = {};
-        Object.keys(properties).forEach((name) => {
-            if (!state.schemaProperties.includes(name)) return;
-            optionsValidMap[name] = true;
+        Object.keys(state.schemaProperties).forEach((name) => {
+            optionsValidMap[name] = false;
         });
         state.optionsValidMap = optionsValidMap;
     };
-    const initOptionsInitMap = (properties?: string[]) => {
-        if (!properties) {
-            state.optionsInitMap = {};
-            return;
-        }
+    const initOptionsInitMap = () => {
         const optionsInitMap = {};
-        Object.keys(properties).forEach((name) => {
-            if (!state.schemaProperties.includes(name)) return;
+        Object.keys(state.schemaProperties).forEach((name) => {
             optionsInitMap[name] = false;
         });
         state.optionsInitMap = optionsInitMap;
@@ -230,8 +227,8 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             state.inheritOptions = widgetInfo?.inherit_options ?? {};
             state.schemaProperties = widgetInfo?.schema_properties ?? [];
 
-            initOptionsValidMap(state.schemaProperties);
-            initOptionsInitMap(state.schemaProperties);
+            initOptionsValidMap();
+            initOptionsInitMap();
         },
         updateInheritOption(propertyName: string, enabled: boolean, variableKey?: string) {
             const inheritOptions = { ...state.inheritOptions };
@@ -264,8 +261,8 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             });
             state.widgetOptions = widgetOptions;
 
-            initOptionsValidMap(properties);
-            initOptionsInitMap(properties);
+            initOptionsValidMap();
+            initOptionsInitMap();
         },
         returnToInitialSettings() {
             const mergedWidgetState = mergeBaseWidgetState({
@@ -283,8 +280,8 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             state.schemaProperties = mergedWidgetState.schemaProperties ?? [];
             state.inheritOptions = mergedWidgetState.inheritOptions ?? {};
 
-            initOptionsValidMap(state.schemaProperties);
-            initOptionsInitMap(state.schemaProperties);
+            initOptionsValidMap();
+            initOptionsInitMap();
         },
     };
 
