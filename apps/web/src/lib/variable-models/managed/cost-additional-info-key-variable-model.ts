@@ -1,3 +1,5 @@
+import { getTextHighlightRegex } from '@spaceone/design-system';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -46,11 +48,12 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
             });
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_additional_info_keys ?? [];
-                let _results = target.map((d) => ({ key: `additional_info.${d}`, name: d }));
+                let results = target.map((d) => ({ key: `additional_info.${d}`, name: d }));
                 if (query.search) {
-                    _results = _results.filter((d) => d.name.toLowerCase().includes(query.search?.toLowerCase() as string));
+                    const regex = getTextHighlightRegex(query.search);
+                    results = results.filter((item) => regex.test(item.name));
                 }
-                this.#response = { results: _results };
+                this.#response = { results };
             }
             return this.#response;
         } catch (e) {
