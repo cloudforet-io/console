@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { red } from '@/styles/colors';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardWidgetOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardWidgetOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
@@ -15,6 +15,7 @@ import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widge
 const props = defineProps<{
     projectId?: string;
     variablesSchema?: DashboardVariablesSchema;
+    variables?: DashboardVariables;
 }>();
 
 const widgetFormStore = useWidgetFormStore();
@@ -74,6 +75,7 @@ const handleDeleteProperty = (propertyName: string) => {
                                               :key="`option-dropdown-${propertyName}-${state.uuid}`"
                                               :property-name="propertyName"
                                               :variables-schema="props.variablesSchema"
+                                              :variables="props.variables"
                                               @delete="handleDeleteProperty(propertyName)"
             />
             <template #no-data>

@@ -22,7 +22,7 @@ import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
@@ -39,6 +39,7 @@ import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_
 const props = defineProps<{
     propertyName: string;
     variablesSchema?: DashboardVariablesSchema;
+    variables?: DashboardVariables;
 }>();
 const emit = defineEmits<{(e: 'delete'): void;
 }>();
@@ -55,6 +56,17 @@ const state = reactive({
     selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => state.schemaProperty?.selection_type),
     inherit: computed<boolean>(() => !!widgetFormState.inheritOptions?.[props.propertyName]?.enabled),
     inheritanceMode: computed<InheritanceMode>(() => state.schemaProperty?.inheritance_mode),
+    inheritToggleDisabled: computed<boolean>(() => {
+        if (state.inheritanceMode === 'NONE') return true;
+        if (state.inherit) return false;
+        if (state.inheritanceMode === 'KEY_MATCHING') {
+            const variableKey = state.schemaProperty?.key;
+            const value = props.variables?.[variableKey];
+            if (Array.isArray(value)) return !value.length;
+            return value === undefined;
+        }
+        return false;
+    }),
     //
     selected: [] as SelectDropdownMenuItem[],
     errorMessage: computed<string|undefined>(() => {
@@ -377,7 +389,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                           :class="{inherit: state.inheritanceMode !== 'NONE'}"
                     >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                     <p-toggle-button :value="state.inherit"
-                                     :disabled="state.inheritanceMode === 'NONE'"
+                                     :disabled="state.inheritToggleDisabled"
                                      @change-toggle="handleUpdateInherit"
                     />
                 </div>
