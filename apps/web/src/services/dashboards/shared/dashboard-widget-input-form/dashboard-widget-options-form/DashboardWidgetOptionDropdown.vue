@@ -320,16 +320,29 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     }
 };
 const handleUpdateInherit = async (inherit: boolean) => {
-    widgetFormStore.updateOptionInitState(props.propertyName, false);
+    // update init state
+    if (widgetFormGetters.globalOptionInfo) {
+        if (widgetFormGetters.globalOptionInfo.optionKey === props.propertyName) {
+            // reset all other options init state to false
+            widgetFormStore.resetOptionsInitMap();
+        } else {
+            widgetFormStore.updateOptionInitState(props.propertyName, false);
+        }
+    }
+
+    // update inherit state
     if (inherit) {
         widgetFormStore.updateInheritOption(props.propertyName, true);
     } else {
         widgetFormStore.updateInheritOption(props.propertyName, false);
     }
+
+    // init values
     initMenuHandlers();
     const selected = await initSelectedMenuItems();
     state.selected = selected;
     updateWidgetOptionsBySelected(inherit ? undefined : selected);
+
     widgetFormStore.updateOptionInitState(props.propertyName, true);
 };
 const handleDeleteProperty = () => {
@@ -345,7 +358,7 @@ watch([() => props.propertyName, () => state.isReadyToInit], async ([propertyNam
     widgetFormStore.updateOptionInitState(propertyName, false);
     initMenuHandlers();
     state.selected = await initSelectedMenuItems();
-    updateWidgetOptionsBySelected(state.selected);
+    updateWidgetOptionsBySelected(widgetFormState.inheritOptions?.[props.propertyName]?.enabled ? undefined : state.selected);
     widgetFormStore.updateOptionInitState(propertyName, true);
 }, { immediate: true });
 watch(() => state.errorMessage, (errorMessage) => {
