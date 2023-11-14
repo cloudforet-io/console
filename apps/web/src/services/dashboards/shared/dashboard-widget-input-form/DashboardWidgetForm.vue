@@ -74,8 +74,8 @@ watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, wid
             {{ $t(widgetFormGetters.widgetConfig.description.translation_id) }}
         </div>
 
-        <!-- TODO: update props binding after updating widget config options_schema -->
-        <dashboard-widget-options-form :project-id="dashboardDetailState.projectId"
+        <dashboard-widget-options-form :key="`${props.widgetConfigId}-${props.widgetKey}`"
+                                       :project-id="dashboardDetailState.projectId"
                                        :variables-schema="dashboardDetailState.variablesSchema"
         />
 
