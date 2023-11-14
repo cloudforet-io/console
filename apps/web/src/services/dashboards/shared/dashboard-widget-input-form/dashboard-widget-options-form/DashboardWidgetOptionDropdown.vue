@@ -66,7 +66,7 @@ const state = reactive({
         return undefined;
     }),
     isOptionInitiated: computed<boolean>(() => widgetFormState.optionsInitMap[props.propertyName]),
-    isReadyToInit: computed(() => {
+    isGlobalOptionReady: computed(() => {
         if (!widgetFormGetters.globalOptionInfo) return true;
 
         // if it is global option, it is always ready to init
@@ -81,9 +81,9 @@ const menuState = reactive({
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
     listQueryOptions: computed<Record<string, any>|undefined>(() => {
         const globalOptionInfo = widgetFormGetters.globalOptionInfo;
-        if (!globalOptionInfo?.optionKey) return undefined;
+        if (!globalOptionInfo?.initiatedAndHasValue) return undefined;
         return {
-            [globalOptionInfo.variableKey]: widgetFormState.widgetOptions[globalOptionInfo.optionKey],
+            [globalOptionInfo.variableKey]: globalOptionInfo.value,
         }; // e.g. { cost_data_source: 'ds-1' }
     }),
     menuHandlers: [] as AutocompleteHandler[],
@@ -239,11 +239,11 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     return results;
 };
 
-const initMenuHandlers = () => {
+const initMenuHandlers = (listQueryOptions?: Record<string, any>) => {
     if (widgetFormState.inheritOptions?.[props.propertyName]?.enabled) {
         menuState.menuHandlers = [menuState.inheritOptionMenuHandler];
     } else {
-        menuState.menuHandlers = menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, menuState.listQueryOptions));
+        menuState.menuHandlers = menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, listQueryOptions));
     }
     menuState.contextKey = uuidv4();
 };
@@ -342,11 +342,17 @@ const handleDeleteProperty = () => {
     emit('delete');
 };
 
-watch([() => props.propertyName, () => state.isReadyToInit, () => state.isOptionInitiated], async ([propertyName, isReadyToInit, isOptionInitiated]) => {
+watch([
+    () => props.propertyName,
+    () => state.isGlobalOptionReady,
+    () => state.isOptionInitiated,
+    () => menuState.listQueryOptions, // watch listQueryOptions to re-init menu handlers
+], async ([propertyName, isGlobalOptionReady, isOptionInitiated, listQueryOptions]) => {
     if (!propertyName) return;
-    if (!isReadyToInit) return;
+    if (!isGlobalOptionReady) return; // init option after global option is ready
     if (isOptionInitiated) return;
-    initMenuHandlers();
+
+    initMenuHandlers(listQueryOptions);
     state.selected = await initSelectedMenuItems();
     updateWidgetOptionsBySelected(widgetFormState.inheritOptions?.[props.propertyName]?.enabled ? undefined : state.selected);
     widgetFormStore.updateOptionInitState(propertyName, true);
