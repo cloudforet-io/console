@@ -78,6 +78,7 @@ const handleDeleteProperty = (propertyName: string) => {
                         {{ $t('DASHBOARDS.FORM.UNABLE_TO_ADD_WIDGET_DESC2') }}
                     </div>
                 </div>
+                <div v-else />
             </template>
         </p-data-loader>
     </div>
@@ -87,16 +88,14 @@ const handleDeleteProperty = (propertyName: string) => {
 .dashboard-widget-options-form {
     display: flex;
     flex-direction: column;
-    height: 100%;
     .return-to-initial-settings-button {
         padding: 1rem 0;
         margin-left: auto;
     }
     .widget-options-form-wrapper {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
         min-height: 15rem;
+        flex-grow: 1;
+        flex-shrink: 0;
         .no-global-option-wrapper {
             @apply bg-red-100 text-gray-900;
             align-self: flex-start;
