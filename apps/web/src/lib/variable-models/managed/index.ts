@@ -3,6 +3,7 @@ import type {
     IResourceNameVariableModel,
     VariableModelLabel,
     Value,
+    IResourceValueVariableModel,
 } from '@/lib/variable-models/_base/types';
 
 import AssetAccountVariableModel from './asset-account-variable-model';
@@ -69,6 +70,7 @@ interface ModelConfig {
     values?: Value[];
     resourceType?: string;
     idKey?: string;
+    referenceKey?: string;
 }
 export const MANAGED_VARIABLE_MODEL_CONFIGS: Record<ManagedVariableModelKey, ModelConfig> = {} as any;
 Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
@@ -83,6 +85,7 @@ Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
             values: (model as IEnumVariableModel).values,
             resourceType: (model as IResourceNameVariableModel).resourceType,
             idKey: (model as IResourceNameVariableModel).idKey,
+            referenceKey: (model as IResourceValueVariableModel).referenceKey,
         },
     });
 });

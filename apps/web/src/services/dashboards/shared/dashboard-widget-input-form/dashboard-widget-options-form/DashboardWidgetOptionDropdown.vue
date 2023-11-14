@@ -248,7 +248,8 @@ const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap:
         console.error(new Error(`Invalid widget options filter key: ${filterKey}`));
         return filtersMap;
     }
-    const idKey = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as ManagedVariableModelKey].idKey;
+    const idKey = MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as ManagedVariableModelKey].idKey
+        ?? MANAGED_VARIABLE_MODEL_CONFIGS[filterKey as ManagedVariableModelKey].referenceKey;
     if (!idKey) {
         console.error(new Error(`Invalid referencing idKey of variable model by options filter key: ${filterKey}`));
         return filtersMap;
