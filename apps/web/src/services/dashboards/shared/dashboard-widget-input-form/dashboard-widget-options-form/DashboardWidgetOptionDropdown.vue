@@ -268,7 +268,6 @@ const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap:
 };
 const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     const propertyName = props.propertyName;
-    console.debug('update options by selected', propertyName, selected);
     const widgetOptions = cloneDeep(widgetFormState.widgetOptions);
     const dataName = propertyName.replace('filters.', '');
 
