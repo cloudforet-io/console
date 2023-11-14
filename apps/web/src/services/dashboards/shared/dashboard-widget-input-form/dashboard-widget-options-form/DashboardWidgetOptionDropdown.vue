@@ -69,11 +69,11 @@ const state = reactive({
     isReadyToInit: computed(() => {
         if (!widgetFormGetters.globalOptionInfo) return true;
 
-        // if it is global option, it is ready to init
+        // if it is global option, it is always ready to init
         if (widgetFormGetters.globalOptionInfo.optionKey === props.propertyName) return true;
 
-        // if global option is not initiated with value, it is not ready to init
-        return !widgetFormGetters.globalOptionInfo.initiatedAndHasValue;
+        // if global option is initiated with value, it is ready to init
+        return widgetFormGetters.globalOptionInfo.initiatedAndHasValue;
     }),
 });
 const menuState = reactive({
