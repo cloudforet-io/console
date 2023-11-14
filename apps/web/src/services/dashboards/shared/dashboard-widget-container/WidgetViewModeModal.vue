@@ -20,6 +20,7 @@ import type { DashboardSettings, DashboardVariables as IDashboardVariables, Dash
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
 import DashboardVariables from '@/services/dashboards/shared/dashboard-variables/DashboardVariables.vue';
 import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
@@ -49,6 +50,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+const widgetFormStore = useWidgetFormStore();
+const widgetFormGetters = widgetFormStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
@@ -65,7 +68,6 @@ const state = reactive({
         if (!props.widgetKey) return undefined;
         return dashboardDetailState.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
     }),
-    updatedWidgetInfo: undefined as Partial<DashboardLayoutWidgetInfo>|undefined,
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -89,14 +91,13 @@ const handleClickEditOption = () => {
 };
 const handleCloseSidebar = async (save: boolean) => {
     state.sidebarVisible = false;
-    if (!save) state.updatedWidgetInfo = cloneDeep(state.originWidgetInfo);
+    if (!save) widgetFormStore.returnToInitialSettings();
     await nextTick();
     state.widgetRef?.refreshWidget();
 };
 const handleUpdateSidebarWidgetInfo = async (widgetInfo: UpdatableWidgetInfo) => {
     // NOTE: Do not refresh when the title changes. There are no cases where title and other options change together.
-    const refreshWidget = widgetInfo.title === state.updatedWidgetInfo?.title;
-    state.updatedWidgetInfo = widgetInfo;
+    const refreshWidget = widgetInfo.title === widgetFormGetters.updatedWidgetInfo?.title;
     await nextTick();
     if (refreshWidget) state.widgetRef?.refreshWidget();
 };
@@ -105,7 +106,6 @@ const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
 };
 
 const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: UpdatableWidgetInfo) => {
-    state.updatedWidgetInfo = widgetInfo;
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
@@ -188,10 +188,10 @@ watch(() => props.visible, async (visible) => {
                                ref="widgetRef"
                                :widget-key="props.widgetKey"
                                :widget-config-id="state.originWidgetInfo.widget_name"
-                               :title="state.updatedWidgetInfo?.title ?? state.originWidgetInfo.title"
-                               :options="state.updatedWidgetInfo?.widget_options ?? state.originWidgetInfo.widget_options"
-                               :inherit-options="state.updatedWidgetInfo?.inherit_options ?? state.originWidgetInfo.inherit_options"
-                               :schema-properties="state.updatedWidgetInfo?.schema_properties ?? state.originWidgetInfo.schema_properties"
+                               :title="widgetFormGetters.updatedWidgetInfo?.title ?? state.originWidgetInfo.title"
+                               :options="widgetFormGetters.updatedWidgetInfo?.widget_options ?? state.originWidgetInfo.widget_options"
+                               :inherit-options="widgetFormGetters.updatedWidgetInfo?.inherit_options ?? state.originWidgetInfo.inherit_options"
+                               :schema-properties="widgetFormGetters.updatedWidgetInfo?.schema_properties ?? state.originWidgetInfo.schema_properties"
                                size="full"
                                :theme="props.theme"
                                :error-mode="dashboardDetailState.widgetValidMap[props.widgetKey] === false"
