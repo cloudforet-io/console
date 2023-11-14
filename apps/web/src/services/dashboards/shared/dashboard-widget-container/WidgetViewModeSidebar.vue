@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { debouncedWatch } from '@vueuse/core';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -97,10 +96,10 @@ const handleCloseSidebar = () => {
     emit('close', false);
 };
 
-debouncedWatch(() => widgetFormGetters.updatedWidgetInfo, (after, before) => {
+watch(() => widgetFormGetters.updatedWidgetInfo, (after, before) => {
     if (before === undefined || isEqual(after, before)) return;
     emit('update:widget-info', after as UpdatableWidgetInfo);
-}, { debounce: 150 });
+});
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {
     emit('update:has-non-inherited-widget-options', value);
