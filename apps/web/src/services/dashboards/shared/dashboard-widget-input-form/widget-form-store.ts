@@ -2,7 +2,7 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 
 import {
-    cloneDeep, flattenDeep,
+    flattenDeep,
 } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -12,11 +12,11 @@ import {
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
-    DashboardLayoutWidgetInfo,
+    DashboardLayoutWidgetInfo, InheritOption,
     InheritOptions, UpdatableWidgetInfo, WidgetConfig,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
+import type { WidgetOptionsSchemaProperty } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/merge-base-widget-state';
 
@@ -43,8 +43,11 @@ interface Getters {
     titleInvalidText: ComputedRef<string|undefined>;
     isOptionsValid: ComputedRef<boolean>;
     isAllValid: ComputedRef<boolean>;
+    isAllOptionsInitiated: ComputedRef<boolean>;
+    globalOptionInfo: ComputedRef<GlobalOptionInfo|undefined>;
 }
 
+interface GlobalOptionInfo {optionKey: string; variableKey: string; name: string; value?: any; initiated: boolean; initiatedAndHasValue: boolean;}
 export const useWidgetFormStore = defineStore('widget-form', () => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailState = dashboardDetailStore.$state;
@@ -61,6 +64,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         schemaProperties: [] as string[],
         //
         optionsValidMap: {} as Record<string, boolean>,
+        optionsInitMap: {} as Record<string, boolean>,
     };
 
     const state = reactive(initialState);
@@ -121,13 +125,88 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         titleInvalidText: titleInvalidText as ComputedRef<string|undefined>,
         isOptionsValid: computed<boolean>(() => Object.values(state.optionsValidMap).every((valid) => valid)),
         isAllValid: computed<boolean>(() => !!(getters.isOptionsValid && getters.isTitleValid)),
+        //
+        isAllOptionsInitiated: computed<boolean>(() => state.schemaProperties.every((name) => state.optionsInitMap[name])),
+        globalOptionInfo: computed<GlobalOptionInfo|undefined>(() => {
+            const properties = getters.widgetConfig?.options_schema?.properties;
+            if (!properties) return undefined;
+
+            const found = Object.entries(properties).find(([, property]) => (property as WidgetOptionsSchemaProperty).scope === 'GLOBAL');
+            if (!found) return undefined;
+
+            const [optionKey, schema] = found;
+            const name = schema.name as string;
+            const variableKey = schema.key as string;
+
+            // inherit case
+            const inheritOption: InheritOption|undefined = state.inheritOptions[optionKey];
+            if (inheritOption?.enabled) {
+                if (!inheritOption.variable_key) return undefined;
+                const value = dashboardDetailState.variables?.[inheritOption.variable_key];
+                return {
+                    optionKey,
+                    variableKey,
+                    name,
+                    value,
+                    initiated: state.optionsInitMap[optionKey],
+                    initiatedAndHasValue: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
+                };
+            }
+            // normal case
+            const value = state.widgetOptions[optionKey];
+            return {
+                optionKey,
+                variableKey,
+                name,
+                value,
+                initiated: state.optionsInitMap[optionKey],
+                initiatedAndHasValue: state.optionsInitMap[optionKey] && (Array.isArray(value) ? value.length > 0 : !!value),
+            };
+        }),
     });
+
+    const initOptionsValidMap = (properties?: string[]) => {
+        if (!properties) {
+            state.optionsValidMap = {};
+            return;
+        }
+        const optionsValidMap = {};
+        Object.keys(properties).forEach((name) => {
+            if (!state.schemaProperties.includes(name)) return;
+            optionsValidMap[name] = true;
+        });
+        state.optionsValidMap = optionsValidMap;
+    };
+    const initOptionsInitMap = (properties?: string[]) => {
+        if (!properties) {
+            state.optionsInitMap = {};
+            return;
+        }
+        const optionsInitMap = {};
+        Object.keys(properties).forEach((name) => {
+            if (!state.schemaProperties.includes(name)) return;
+            optionsInitMap[name] = false;
+        });
+        state.optionsInitMap = optionsInitMap;
+    };
 
     const actions = {
         resetTitle,
         updateTitle,
         updateOptionsValidMap(optionsValidMap: Record<string, boolean>) {
             state.optionsValidMap = optionsValidMap;
+        },
+        updateOptionValidState(optionKey: string, isValid: boolean) {
+            state.optionsValidMap = {
+                ...state.optionsValidMap,
+                [optionKey]: isValid,
+            };
+        },
+        updateOptionInitState(optionKey: string, isInit: boolean) {
+            state.optionsInitMap = {
+                ...state.optionsInitMap,
+                [optionKey]: isInit,
+            };
         },
         updateOptions(options: WidgetOptions) {
             state.widgetOptions = options;
@@ -138,36 +217,6 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             });
             resetTitle();
         },
-        updateInheritOptionsAndWidgetOptionsByFormData(formData: any) {
-            if (!getters.widgetConfig) return;
-            const _widgetOptions: WidgetOptions = cloneDeep(getters.widgetConfig.options ?? {});
-            const _widgetFilters: WidgetOptions['filters'] = {};
-            const _inheritOptions = cloneDeep(state.inheritOptions);
-
-            Object.entries(formData).forEach(([key, val]) => {
-                // inherit widget option case
-                if (_inheritOptions?.[key]?.enabled && val) {
-                    _inheritOptions[key] = {
-                        enabled: true,
-                        variable_key: val as string,
-                    };
-                // widget option filters case
-                } else if (key.startsWith('filters.')) {
-                    if (val) {
-                        const variableKey = getters.widgetConfig?.options_schema?.properties?.[key]?.key ?? '';
-                        const filterDataKey = getWidgetFilterDataKey(variableKey);
-                        _widgetFilters[variableKey] = [{ k: filterDataKey, v: val, o: '=' }];
-                    }
-                // other widget option case
-                } else {
-                    _widgetOptions[key] = val;
-                }
-            });
-
-            _widgetOptions.filters = _widgetFilters;
-            state.widgetOptions = _widgetOptions;
-            state.inheritOptions = _inheritOptions;
-        },
         initWidgetForm(widgetKey: string|undefined, widgetConfigId: string) {
             state.widgetKey = widgetKey;
             state.widgetConfigId = widgetConfigId;
@@ -177,6 +226,9 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             state.widgetOptions = widgetInfo?.widget_options ?? {};
             state.inheritOptions = widgetInfo?.inherit_options ?? {};
             state.schemaProperties = widgetInfo?.schema_properties ?? [];
+
+            initOptionsValidMap(state.schemaProperties);
+            initOptionsInitMap(state.schemaProperties);
         },
         updateInheritOption(propertyName: string, enabled: boolean, variableKey?: string) {
             const inheritOptions = { ...state.inheritOptions };
@@ -208,6 +260,9 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                 if (!properties.includes(name)) delete widgetOptions[name];
             });
             state.widgetOptions = widgetOptions;
+
+            initOptionsValidMap(properties);
+            initOptionsInitMap(properties);
         },
         returnToInitialSettings() {
             const mergedWidgetState = mergeBaseWidgetState({
@@ -224,6 +279,9 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             state.widgetOptions = mergedWidgetState.options ?? {};
             state.schemaProperties = mergedWidgetState.schemaProperties ?? [];
             state.inheritOptions = mergedWidgetState.inheritOptions ?? {};
+
+            initOptionsValidMap(state.schemaProperties);
+            initOptionsInitMap(state.schemaProperties);
         },
     };
 

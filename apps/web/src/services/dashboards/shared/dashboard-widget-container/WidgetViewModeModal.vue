@@ -16,10 +16,9 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import { gray } from '@/styles/colors';
 
-import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardSettings, DashboardVariables as IDashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
-import DashboardVariablesSelectDropdown
-    from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import DashboardVariables from '@/services/dashboards/shared/dashboard-variables/DashboardVariables.vue';
 import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
@@ -57,7 +56,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
     component: null as AsyncComponent|null,
-    variablesSnapshot: {} as DashboardVariables,
+    variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
@@ -171,11 +170,11 @@ watch(() => props.visible, async (visible) => {
                 </div>
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <dashboard-variables-select-dropdown :is-manageable="state.hasManagePermission"
-                                                             disable-more-button
-                                                             disable-save-button
-                                                             :origin-variables="state.variablesSnapshot"
-                                                             :origin-variables-schema="state.variableSchemaSnapshot"
+                        <dashboard-variables :is-manageable="state.hasManagePermission"
+                                             disable-more-button
+                                             disable-save-button
+                                             :origin-variables="state.variablesSnapshot"
+                                             :origin-variables-schema="state.variableSchemaSnapshot"
                         />
                     </div>
                     <div class="right-part">

@@ -25,7 +25,7 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-import type { InheritOptions, WidgetFiltersMap } from '@/services/dashboards/widgets/_configs/config';
+import type { InheritOption, InheritOptions, WidgetFiltersMap } from '@/services/dashboards/widgets/_configs/config';
 import type {
     InheritanceMode, WidgetFilterKey, WidgetOptionKey,
     WidgetOptionsSchemaProperty,
@@ -38,11 +38,8 @@ import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_
 const props = defineProps<{
     propertyName: string;
     variablesSchema?: DashboardVariablesSchema;
-    isValid?: boolean;
-    globalOptionKey?: string;
 }>();
-const emit = defineEmits<{(e: 'update:is-valid', isValid: boolean): void;
-    (e: 'delete'): void;
+const emit = defineEmits<{(e: 'delete'): void;
 }>();
 
 const widgetFormStore = useWidgetFormStore();
@@ -67,25 +64,32 @@ const state = reactive({
         }
         return undefined;
     }),
-    isOptionInitiated: false,
+    isOptionInitiated: computed<boolean>(() => widgetFormState.optionsInitMap[props.propertyName]),
 });
 const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
+    listQueryOptions: computed<Record<string, any>|undefined>(() => {
+        if (!widgetFormGetters.globalOptionInfo?.optionKey) return undefined;
+        return {
+            [widgetFormGetters.globalOptionInfo.optionKey]: widgetFormState.widgetOptions[widgetFormGetters.globalOptionInfo.optionKey],
+        }; // e.g. { cost_data_source: 'ds-1' }
+    }),
     menuHandlers: computed(() => {
         if (!state.schemaProperty) return [];
+        if (widgetFormGetters.globalOptionInfo) {
+            // if it is not global option
+            if (widgetFormGetters.globalOptionInfo.optionKey !== props.propertyName) {
+                // and if global option is not initiated, return empty array
+                if (!widgetFormGetters.globalOptionInfo.initiatedAndHasValue) return [];
+            }
+        }
 
         if (widgetFormState.inheritOptions?.[props.propertyName]?.enabled) {
             return [menuState.inheritOptionMenuHandler];
         }
 
-        // get options from schema dependencies
-        const modelOptions: Record<string, any> = {}; // e.g. { cost_data_source: 'ds-1' }
-        if (props.globalOptionKey) {
-            modelOptions[props.globalOptionKey] = widgetFormState.widgetOptions[props.globalOptionKey];
-        }
-
-        return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, modelOptions));
+        return menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, menuState.listQueryOptions));
     }),
 });
 
@@ -209,11 +213,11 @@ const initSelectedInStoredOptionPrimitiveTypeCase = async (selected: string): Pr
 
 
 // init selected menu items on init or inherit changed
-const initSelectedMenuItems = async (inherit: boolean): Promise<SelectDropdownMenuItem[]> => {
-    const inheritOption = widgetFormState.inheritOptions?.[props.propertyName];
+const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
+    const inheritOption: InheritOption = widgetFormState.inheritOptions?.[props.propertyName];
     let results: SelectDropdownMenuItem[];
     // 1) inherit case
-    if (inherit) {
+    if (inheritOption?.enabled) {
         results = initSelectedInInheritCase(inheritOption);
     // 2) non-inherit case
     } else {
@@ -235,7 +239,6 @@ const initSelectedMenuItems = async (inherit: boolean): Promise<SelectDropdownMe
         }
     }
 
-    state.isOptionInitiated = true;
     return results;
 };
 
@@ -262,7 +265,7 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     const dataName = propertyName.replace('filters.', '');
 
     // add case
-    if (selected?.length) {
+    if (selected?.length && selected[0] !== undefined) {
         if (state.schemaProperty?.selection_type === 'SINGLE') {
             const value = selected[0].name as string;
             if (propertyName.startsWith('filters.')) {
@@ -310,15 +313,16 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     }
 };
 const handleUpdateInherit = async (inherit: boolean) => {
-    state.isOptionInitiated = false;
+    widgetFormStore.updateOptionInitState(props.propertyName, false);
     if (inherit) {
         widgetFormStore.updateInheritOption(props.propertyName, true);
     } else {
         widgetFormStore.updateInheritOption(props.propertyName, false);
     }
-    const selected = await initSelectedMenuItems(inherit);
+    const selected = await initSelectedMenuItems();
     state.selected = selected;
     updateWidgetOptionsBySelected(inherit ? undefined : selected);
+    widgetFormStore.updateOptionInitState(props.propertyName, true);
 };
 const handleDeleteProperty = () => {
     state.selected = [];
@@ -328,11 +332,14 @@ const handleDeleteProperty = () => {
 };
 
 watch(() => props.propertyName, async (propertyName) => {
-    state.isOptionInitiated = false;
-    if (propertyName) state.selected = await initSelectedMenuItems(state.inherit);
+    if (!propertyName) return;
+    widgetFormStore.updateOptionInitState(propertyName, false);
+    state.selected = await initSelectedMenuItems();
+    updateWidgetOptionsBySelected(state.selected);
+    widgetFormStore.updateOptionInitState(propertyName, true);
 }, { immediate: true });
 watch(() => state.errorMessage, (errorMessage) => {
-    emit('update:is-valid', !errorMessage);
+    widgetFormStore.updateOptionValidState(props.propertyName, !errorMessage);
 }, { immediate: true });
 </script>
 

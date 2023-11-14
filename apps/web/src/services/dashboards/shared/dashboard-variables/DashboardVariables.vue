@@ -5,9 +5,9 @@
                  :key="`${propertyName}-${idx}`"
                  class="variable-selector-box"
             >
-                <dashboard-variables-dropdown :property-name="propertyName"
-                                              :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
-                                              :disabled="state.saveLoading"
+                <dashboard-variable-dropdown :property-name="propertyName"
+                                             :reference-map="state.allReferenceTypeInfo[propertyName]?.referenceMap"
+                                             :disabled="state.saveLoading"
                 />
                 <span class="circle-mark"
                       :class="{'changed': state.modifiedVariablesSchemaProperties.includes(propertyName)}"
@@ -63,7 +63,7 @@ import type { DashboardVariables, DashboardVariablesSchema } from '@/services/da
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
 import DashboardManageVariableOverlay
     from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/DashboardManageVariableOverlay.vue';
-import DashboardVariablesDropdown from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesDropdown.vue';
+import DashboardVariableDropdown from '@/services/dashboards/shared/dashboard-variables/DashboardVariableDropdown.vue';
 import DashboardVariablesMoreButton
     from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesMoreButton.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';

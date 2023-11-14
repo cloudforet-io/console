@@ -11,9 +11,9 @@
         </div>
         <p-divider />
         <div class="dashboard-selectors">
-            <dashboard-variables-select-dropdown class="variable-selector-wrapper"
-                                                 disable-save-button
-                                                 is-manageable
+            <dashboard-variables class="variable-selector-wrapper"
+                                 disable-save-button
+                                 is-manageable
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         refresh-disabled
@@ -50,7 +50,7 @@ import DashboardCustomizePageName
 import DashboardCustomizeSidebar from '@/services/dashboards/dashboard-customize/modules/DashboardCustomizeSidebar.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
-import DashboardVariablesSelectDropdown from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import DashboardVariables from '@/services/dashboards/shared/dashboard-variables/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/shared/dashboard-widget-container/DashboardWidgetContainer.vue';
 import DashboardLabels from '@/services/dashboards/shared/DashboardLabels.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/shared/DashboardRefreshDropdown.vue';
