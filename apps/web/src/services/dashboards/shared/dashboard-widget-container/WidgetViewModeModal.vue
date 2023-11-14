@@ -208,17 +208,15 @@ watch(() => props.visible, async (visible) => {
                     />
                 </div>
             </div>
-            <transition name="slide-left">
-                <widget-view-mode-sidebar v-if="state.originWidgetInfo"
-                                          v-show="state.sidebarVisible"
-                                          :widget-config-id="state.originWidgetInfo.widget_name"
-                                          :widget-key="state.originWidgetInfo.widget_key"
-                                          :visible="state.sidebarVisible"
-                                          @close="handleCloseSidebar"
-                                          @update:widget-info="handleUpdateSidebarWidgetInfo"
-                                          @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"
-                />
-            </transition>
+            <widget-view-mode-sidebar v-if="state.originWidgetInfo"
+                                      v-show="state.sidebarVisible"
+                                      :widget-config-id="state.originWidgetInfo.widget_name"
+                                      :widget-key="state.originWidgetInfo.widget_key"
+                                      :visible="state.sidebarVisible"
+                                      @close="handleCloseSidebar"
+                                      @update:widget-info="handleUpdateSidebarWidgetInfo"
+                                      @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"
+            />
         </div>
     </transition>
 </template>
@@ -270,33 +268,5 @@ watch(() => props.visible, async (visible) => {
             z-index: 10;
         }
     }
-}
-
-/* transition */
-.slide-up-enter-active {
-    transition: all 0.3s ease;
-}
-.slide-up-leave-active {
-    transition: all 0.3s ease-out;
-}
-.slide-up-enter, .slide-up-leave-to {
-    transform: translateY(100px);
-    opacity: 0;
-}
-.slide-left-leave-active,
-.slide-left-enter-active {
-    transition: all 0.3s ease;
-}
-.slide-left-enter {
-    transform: translate(100%, 0);
-}
-.slide-left-leave {
-    transform: translate(0, 0);
-}
-.slide-left-leave-to {
-    transform: translate(100%, 0);
-}
-.slide-left-enter-to {
-    transform: translate(0, 0);
 }
 </style>

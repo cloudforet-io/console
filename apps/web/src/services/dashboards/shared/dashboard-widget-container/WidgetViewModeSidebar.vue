@@ -112,64 +112,66 @@ watch(() => props.visible, (value) => {
 </script>
 
 <template>
-    <div class="widget-view-mode-sidebar">
-        <p-sidebar :visible="true"
-                   style-type="primary"
-                   size="md"
-                   is-fixed-size
-                   hide-close-button
-                   @close="handleCloseSidebar"
-        >
-            <main class="main">
-                <slot />
-            </main>
-            <template #title>
-                <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
-            </template>
-            <template #sidebar>
-                <div class="sidebar-contents">
-                    <dashboard-widget-form :key="state.contextKey"
-                                           :widget-config-id="props.widgetConfigId"
-                                           :widget-key="props.widgetKey"
-                    />
-                </div>
-            </template>
-            <template #footer>
-                <div class="footer-wrapper">
-                    <p-button style-type="transparent"
-                              @click="handleCloseSidebar"
-                    >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!widgetFormGetters.isAllValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-sidebar>
-        <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
-                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
-                        size="sm"
-                        @confirm="handleClickSaveButton"
-        >
-            <template #body>
-                <div class="non-inherited-option-modal-body">
-                    <p>
-                        <p-i name="ic_warning-filled"
-                             color="inherit"
-                             width="1rem"
-                             height="1rem"
-                             class="warning-icon"
+    <transition name="slide-left">
+        <div class="widget-view-mode-sidebar">
+            <p-sidebar :visible="true"
+                       style-type="primary"
+                       size="md"
+                       is-fixed-size
+                       hide-close-button
+                       @close="handleCloseSidebar"
+            >
+                <main class="main">
+                    <slot />
+                </main>
+                <template #title>
+                    <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
+                </template>
+                <template #sidebar>
+                    <div class="sidebar-contents">
+                        <dashboard-widget-form :key="state.contextKey"
+                                               :widget-config-id="props.widgetConfigId"
+                                               :widget-key="props.widgetKey"
                         />
-                        <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
-                    </p>
-                </div>
-            </template>
-        </p-button-modal>
-    </div>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="footer-wrapper">
+                        <p-button style-type="transparent"
+                                  @click="handleCloseSidebar"
+                        >
+                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
+                        </p-button>
+                        <p-button style-type="primary"
+                                  :disabled="!widgetFormGetters.isAllValid"
+                                  @click="handleClickSaveButton"
+                        >
+                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
+                        </p-button>
+                    </div>
+                </template>
+            </p-sidebar>
+            <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
+                            :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
+                            size="sm"
+                            @confirm="handleClickSaveButton"
+            >
+                <template #body>
+                    <div class="non-inherited-option-modal-body">
+                        <p>
+                            <p-i name="ic_warning-filled"
+                                 color="inherit"
+                                 width="1rem"
+                                 height="1rem"
+                                 class="warning-icon"
+                            />
+                            <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
+                        </p>
+                    </div>
+                </template>
+            </p-button-modal>
+        </div>
+    </transition>
 </template>
 
 <style lang="postcss" scoped>
@@ -221,5 +223,33 @@ $footer-height: 57px;
             padding-bottom: 1rem;
         }
     }
+}
+
+/* transition */
+.slide-up-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-up-leave-active {
+    transition: all 0.3s ease-out;
+}
+.slide-up-enter, .slide-up-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
+}
+.slide-left-leave-active,
+.slide-left-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-left-enter {
+    transform: translate(100%, 0);
+}
+.slide-left-leave {
+    transform: translate(0, 0);
+}
+.slide-left-leave-to {
+    transform: translate(100%, 0);
+}
+.slide-left-enter-to {
+    transform: translate(0, 0);
 }
 </style>
