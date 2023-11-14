@@ -65,25 +65,28 @@ const state = reactive({
         return undefined;
     }),
     isOptionInitiated: computed<boolean>(() => widgetFormState.optionsInitMap[props.propertyName]),
+    isReadyToInit: computed(() => {
+        if (!widgetFormGetters.globalOptionInfo) return true;
+
+        if (widgetFormGetters.globalOptionInfo.optionKey === props.propertyName) return true;
+
+        // if global option is not initiated, it is not ready to init
+        return !widgetFormGetters.globalOptionInfo.initiatedAndHasValue;
+    }),
 });
 const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
     listQueryOptions: computed<Record<string, any>|undefined>(() => {
-        if (!widgetFormGetters.globalOptionInfo?.optionKey) return undefined;
+        const globalOptionInfo = widgetFormGetters.globalOptionInfo;
+        if (!globalOptionInfo?.optionKey) return undefined;
         return {
-            [widgetFormGetters.globalOptionInfo.variableKey]: widgetFormState.widgetOptions[widgetFormGetters.globalOptionInfo.optionKey],
+            [globalOptionInfo.variableKey]: widgetFormState.widgetOptions[globalOptionInfo.optionKey],
         }; // e.g. { cost_data_source: 'ds-1' }
     }),
     menuHandlers: computed(() => {
         if (!state.schemaProperty) return [];
-        if (widgetFormGetters.globalOptionInfo) {
-            // if it is not global option
-            if (widgetFormGetters.globalOptionInfo.optionKey !== props.propertyName) {
-                // and if global option is not initiated, return empty array
-                if (!widgetFormGetters.globalOptionInfo.initiatedAndHasValue) return [];
-            }
-        }
+        if (!state.isReadyToInit) return [];
 
         if (widgetFormState.inheritOptions?.[props.propertyName]?.enabled) {
             return [menuState.inheritOptionMenuHandler];
@@ -331,8 +334,9 @@ const handleDeleteProperty = () => {
     emit('delete');
 };
 
-watch(() => props.propertyName, async (propertyName) => {
+watch([() => props.propertyName, () => state.isReadyToInit], async ([propertyName, isReadyToInit]) => {
     if (!propertyName) return;
+    if (!isReadyToInit) return;
     widgetFormStore.updateOptionInitState(propertyName, false);
     state.selected = await initSelectedMenuItems();
     updateWidgetOptionsBySelected(state.selected);
