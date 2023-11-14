@@ -25,10 +25,6 @@ const widgetFormGetters = widgetFormStore.getters;
 
 const state = reactive({
     properties: computed<WidgetOptionsSchema['properties']>(() => widgetFormGetters.widgetConfig?.options_schema?.properties ?? {}),
-    globalOptionHasValue: computed<boolean>(() => {
-        if (!widgetFormGetters.globalOptionInfo) return true;
-        return !!widgetFormGetters.globalOptionInfo.value;
-    }),
     uuid: uuidv4(),
 });
 
