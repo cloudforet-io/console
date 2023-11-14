@@ -1545,8 +1545,12 @@
 			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "",
+				"LESS_THAN_PREV_DAY": "전일 대비 하락",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
-				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
+				"LESS_THAN_PREV_YEAR": "전년 대비 하락",
+				"MORE_THAN_PREV_DAY": "전일 대비 상승",
+				"MORE_THAN_PREV_MONTH": "전월 대비 상승",
+				"MORE_THAN_PREV_YEAR": "전년 대비 상승"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "선택한 'Group By' 옵션을 기준으로 조회 기간 동안의 컴플라이언스 Pass/Fail findings 트렌드를 보여주는 위젯. "
