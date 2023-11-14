@@ -331,8 +331,8 @@ const handleClickViewModeButton = () => {
             .footer-left {
                 @apply flex items-center gap-2;
                 .widget-footer-label {
+                    @apply text-gray-500;
                     font-size: 0.875rem;
-                    color: theme('colors.gray.700');
                     line-height: 1.25;
                     margin: 0;
 

@@ -108,9 +108,9 @@ const fetchRealtimeData = async (): Promise<Data> => {
                 ...apiQueryHelper.data,
             },
         });
-        if (status === 'succeed' && response.results.length) {
+        if (status === 'succeed') {
             state.loading = false;
-            return response.results[0];
+            return response.results[0] ?? {};
         }
         return state.data ?? {};
     } catch (e) {
