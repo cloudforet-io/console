@@ -77,6 +77,7 @@ watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, wid
         <dashboard-widget-options-form :key="`${props.widgetConfigId}-${props.widgetKey}`"
                                        :project-id="dashboardDetailState.projectId"
                                        :variables-schema="dashboardDetailState.variablesSchema"
+                                       :variables="dashboardDetailState.variables"
         />
 
         <dashboard-widget-more-options class="more-option-container" />
@@ -113,10 +114,6 @@ watch([() => props.widgetConfigId, () => props.widgetKey], ([widgetConfigId, wid
         font-size: 0.875rem;
         font-weight: 400;
         padding: 0.75rem;
-    }
-
-    .more-option-container {
-        z-index: 2;
     }
 }
 </style>

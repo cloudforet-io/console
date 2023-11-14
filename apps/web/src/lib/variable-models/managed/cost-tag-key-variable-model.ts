@@ -54,6 +54,10 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_tag_keys ?? [];
                 let results = target.map((d) => ({ key: `tags.${d}`, name: `[Tag] ${d}` }));
+                if (query.filters?.length) {
+                    const filters = query.filters.map((f) => (f.startsWith('tags.') ? f.replace('tags.', '') : f));
+                    results = results.filter((item) => filters?.includes(item.key));
+                }
                 if (query.search) {
                     const regex = getTextHighlightRegex(query.search);
                     results = results.filter((item) => regex.test(item.name));

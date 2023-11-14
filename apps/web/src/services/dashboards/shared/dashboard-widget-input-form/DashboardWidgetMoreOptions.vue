@@ -115,9 +115,3 @@ watch(() => widgetFormState.schemaProperties, (selectedProperties) => {
     </div>
 </template>
 
-<style lang="postcss" scoped>
-.dashboard-widget-more-options {
-    position: relative;
-    display: inline-block;
-}
-</style>

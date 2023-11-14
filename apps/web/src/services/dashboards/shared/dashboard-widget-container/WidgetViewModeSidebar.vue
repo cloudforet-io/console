@@ -97,9 +97,10 @@ const handleCloseSidebar = () => {
     emit('close', false);
 };
 
-debouncedWatch(() => widgetFormGetters.updatedWidgetInfo, (after, before) => {
-    if (before === undefined || isEqual(after, before)) return;
-    emit('update:widget-info', after as UpdatableWidgetInfo);
+debouncedWatch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllOptionsInitiated], ([widgetInfo, isAllInit], [prevWidgetInfo]) => {
+    if (!isAllInit) return;
+    if (widgetInfo === undefined || isEqual(widgetInfo, prevWidgetInfo)) return;
+    emit('update:widget-info', widgetInfo as UpdatableWidgetInfo);
 }, { debounce: 150 });
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {

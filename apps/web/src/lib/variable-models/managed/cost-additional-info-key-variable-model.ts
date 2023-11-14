@@ -49,6 +49,10 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_additional_info_keys ?? [];
                 let results = target.map((d) => ({ key: `additional_info.${d}`, name: d }));
+                if (query.filters?.length) {
+                    const filters = query.filters.map((f) => (f.startsWith('additional_info.') ? f.replace('additional_info.', '') : f));
+                    results = results.filter((item) => filters?.includes(item.key));
+                }
                 if (query.search) {
                     const regex = getTextHighlightRegex(query.search);
                     results = results.filter((item) => regex.test(item.name));

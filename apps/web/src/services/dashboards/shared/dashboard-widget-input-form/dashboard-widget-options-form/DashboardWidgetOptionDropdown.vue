@@ -22,7 +22,7 @@ import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/shared/dashboard-widget-input-form/dashboard-widget-options-form/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
@@ -39,6 +39,7 @@ import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_
 const props = defineProps<{
     propertyName: string;
     variablesSchema?: DashboardVariablesSchema;
+    variables?: DashboardVariables;
 }>();
 const emit = defineEmits<{(e: 'delete'): void;
 }>();
@@ -55,6 +56,17 @@ const state = reactive({
     selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => state.schemaProperty?.selection_type),
     inherit: computed<boolean>(() => !!widgetFormState.inheritOptions?.[props.propertyName]?.enabled),
     inheritanceMode: computed<InheritanceMode>(() => state.schemaProperty?.inheritance_mode),
+    inheritToggleDisabled: computed<boolean>(() => {
+        if (state.inheritanceMode === 'NONE') return true;
+        if (state.inherit) return false;
+        if (state.inheritanceMode === 'KEY_MATCHING') {
+            const variableKey = state.schemaProperty?.key;
+            const value = props.variables?.[variableKey];
+            if (Array.isArray(value)) return !value.length;
+            return value === undefined;
+        }
+        return false;
+    }),
     //
     selected: [] as SelectDropdownMenuItem[],
     errorMessage: computed<string|undefined>(() => {
@@ -66,26 +78,20 @@ const state = reactive({
         return undefined;
     }),
     isOptionInitiated: computed<boolean>(() => widgetFormState.optionsInitMap[props.propertyName]),
-    isGlobalOptionReady: computed(() => {
+    isGlobalOptionReady: computed<boolean>(() => {
         if (!widgetFormGetters.globalOptionInfo) return true;
 
         // if it is global option, it is always ready to init
         if (widgetFormGetters.globalOptionInfo.optionKey === props.propertyName) return true;
 
         // if global option is initiated with value, it is ready to init
-        return widgetFormGetters.globalOptionInfo.initiatedAndHasValue;
+        return !!widgetFormGetters.globalOptionInfo.initiatedAndHasValue;
     }),
+    globalOptionValue: computed<any>(() => widgetFormGetters.globalOptionInfo?.value),
 });
 const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
-    listQueryOptions: computed<Record<string, any>|undefined>(() => {
-        const globalOptionInfo = widgetFormGetters.globalOptionInfo;
-        if (!globalOptionInfo?.initiatedAndHasValue) return undefined;
-        return {
-            [globalOptionInfo.variableKey]: globalOptionInfo.value,
-        }; // e.g. { cost_data_source: 'ds-1' }
-    }),
     menuHandlers: [] as AutocompleteHandler[],
     contextKey: uuidv4(),
 });
@@ -239,10 +245,18 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     return results;
 };
 
-const initMenuHandlers = (listQueryOptions?: Record<string, any>) => {
+const getListQueryOptions = () => {
+    const globalOptionInfo = widgetFormGetters.globalOptionInfo;
+    if (!globalOptionInfo?.initiatedAndHasValue) return undefined;
+    return {
+        [globalOptionInfo.variableKey]: globalOptionInfo.value,
+    }; // e.g. { cost_data_source: 'ds-1' }
+};
+const initMenuHandlers = () => {
     if (widgetFormState.inheritOptions?.[props.propertyName]?.enabled) {
         menuState.menuHandlers = [menuState.inheritOptionMenuHandler];
     } else {
+        const listQueryOptions = getListQueryOptions();
         menuState.menuHandlers = menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, listQueryOptions));
     }
     menuState.contextKey = uuidv4();
@@ -346,13 +360,13 @@ watch([
     () => props.propertyName,
     () => state.isGlobalOptionReady,
     () => state.isOptionInitiated,
-    () => menuState.listQueryOptions, // watch listQueryOptions to re-init menu handlers
-], async ([propertyName, isGlobalOptionReady, isOptionInitiated, listQueryOptions]) => {
+    () => state.globalOptionValue, // watch globalOptionValue to re-init menu handlers
+], async ([propertyName, isGlobalOptionReady, isOptionInitiated]) => {
     if (!propertyName) return;
     if (!isGlobalOptionReady) return; // init option after global option is ready
     if (isOptionInitiated) return;
 
-    initMenuHandlers(listQueryOptions);
+    initMenuHandlers();
     state.selected = await initSelectedMenuItems();
     updateWidgetOptionsBySelected(widgetFormState.inheritOptions?.[props.propertyName]?.enabled ? undefined : state.selected);
     widgetFormStore.updateOptionInitState(propertyName, true);
@@ -377,7 +391,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                           :class="{inherit: state.inheritanceMode !== 'NONE'}"
                     >{{ $t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.INHERIT') }}</span>
                     <p-toggle-button :value="state.inherit"
-                                     :disabled="state.inheritanceMode === 'NONE'"
+                                     :disabled="state.inheritToggleDisabled"
                                      @change-toggle="handleUpdateInherit"
                     />
                 </div>
