@@ -114,12 +114,12 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
 
 watch(() => props.visible, async (visible) => {
     if (!state.originWidgetInfo) return;
+    state.sidebarVisible = false;
     if (visible) {
         initSnapshot();
         state.component = getWidgetComponent(state.originWidgetInfo.widget_name);
     } else {
         state.loadingWidget = true;
-        state.sidebarVisible = false;
         state.component = null;
         emit('update:visible', false);
     }
