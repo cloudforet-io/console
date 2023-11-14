@@ -2,6 +2,7 @@
 import { computed, reactive } from 'vue';
 
 import { PDataLoader, PTextButton, PI } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
 import { red } from '@/styles/colors';
@@ -35,9 +36,9 @@ const handleReturnToInitialSettings = () => {
 };
 const handleDeleteProperty = (propertyName: string) => {
     widgetFormStore.updateInheritOption(propertyName, false);
-    const optionsValidMap = widgetFormState.optionsValidMap;
-    delete optionsValidMap[propertyName];
-    widgetFormStore.updateOptionsValidMap(optionsValidMap);
+    const _optionsValidMap = cloneDeep(widgetFormState.optionsValidMap);
+    delete _optionsValidMap[propertyName];
+    widgetFormStore.updateOptionsValidMap(_optionsValidMap);
 };
 </script>
 

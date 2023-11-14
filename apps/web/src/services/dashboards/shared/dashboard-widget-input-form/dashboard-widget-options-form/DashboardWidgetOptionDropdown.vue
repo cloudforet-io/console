@@ -299,8 +299,8 @@ const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
 
     widgetFormStore.updateOptions(widgetOptions);
 };
-const updateWidgetSchemaProperties = () => {
-    const schemaProperties = [...widgetFormState.schemaProperties];
+const deleteWidgetSchemaProperties = () => {
+    const schemaProperties = cloneDeep(widgetFormState.schemaProperties);
     const index = schemaProperties.findIndex((item) => item === props.propertyName);
     if (index >= 0) {
         schemaProperties.splice(index, 1);
@@ -338,7 +338,7 @@ const handleUpdateInherit = async (inherit: boolean) => {
 const handleDeleteProperty = () => {
     state.selected = [];
     updateWidgetOptionsBySelected();
-    updateWidgetSchemaProperties();
+    deleteWidgetSchemaProperties();
     emit('delete');
 };
 

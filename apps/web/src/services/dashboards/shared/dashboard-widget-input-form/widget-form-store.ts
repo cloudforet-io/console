@@ -174,14 +174,14 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
     const initOptionsValidMap = () => {
         const optionsValidMap = {};
-        Object.keys(state.schemaProperties).forEach((name) => {
-            optionsValidMap[name] = false;
+        state.schemaProperties.forEach((name) => {
+            optionsValidMap[name] = true;
         });
         state.optionsValidMap = optionsValidMap;
     };
     const initOptionsInitMap = () => {
         const optionsInitMap = {};
-        Object.keys(state.schemaProperties).forEach((name) => {
+        state.schemaProperties.forEach((name) => {
             optionsInitMap[name] = false;
         });
         state.optionsInitMap = optionsInitMap;
@@ -206,7 +206,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             };
         },
         resetOptionsInitMap() {
-            initOptionsInitMap(state.schemaProperties);
+            initOptionsInitMap();
         },
         updateOptions(options: WidgetOptions) {
             state.widgetOptions = options;
