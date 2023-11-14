@@ -208,6 +208,9 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                 [optionKey]: isInit,
             };
         },
+        resetOptionsInitMap() {
+            initOptionsInitMap(state.schemaProperties);
+        },
         updateOptions(options: WidgetOptions) {
             state.widgetOptions = options;
         },
