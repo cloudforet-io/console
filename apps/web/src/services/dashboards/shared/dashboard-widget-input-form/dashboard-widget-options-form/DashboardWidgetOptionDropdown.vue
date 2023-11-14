@@ -320,16 +320,6 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     }
 };
 const handleUpdateInherit = async (inherit: boolean) => {
-    // update init state
-    if (widgetFormGetters.globalOptionInfo) {
-        if (widgetFormGetters.globalOptionInfo.optionKey === props.propertyName) {
-            // reset all other options init state to false
-            widgetFormStore.resetOptionsInitMap();
-        } else {
-            widgetFormStore.updateOptionInitState(props.propertyName, false);
-        }
-    }
-
     // update inherit state
     if (inherit) {
         widgetFormStore.updateInheritOption(props.propertyName, true);
@@ -337,13 +327,13 @@ const handleUpdateInherit = async (inherit: boolean) => {
         widgetFormStore.updateInheritOption(props.propertyName, false);
     }
 
-    // init values
-    initMenuHandlers();
-    const selected = await initSelectedMenuItems();
-    state.selected = selected;
-    updateWidgetOptionsBySelected(inherit ? undefined : selected);
-
-    widgetFormStore.updateOptionInitState(props.propertyName, true);
+    // update init state
+    if (widgetFormGetters.globalOptionInfo?.optionKey === props.propertyName) {
+        // reset all other options init state to false
+        widgetFormStore.resetOptionsInitMap();
+    } else {
+        widgetFormStore.updateOptionInitState(props.propertyName, false);
+    }
 };
 const handleDeleteProperty = () => {
     state.selected = [];
@@ -352,10 +342,10 @@ const handleDeleteProperty = () => {
     emit('delete');
 };
 
-watch([() => props.propertyName, () => state.isReadyToInit], async ([propertyName, isReadyToInit]) => {
+watch([() => props.propertyName, () => state.isReadyToInit, () => state.isOptionInitiated], async ([propertyName, isReadyToInit, isOptionInitiated]) => {
     if (!propertyName) return;
     if (!isReadyToInit) return;
-    widgetFormStore.updateOptionInitState(propertyName, false);
+    if (isOptionInitiated) return;
     initMenuHandlers();
     state.selected = await initSelectedMenuItems();
     updateWidgetOptionsBySelected(widgetFormState.inheritOptions?.[props.propertyName]?.enabled ? undefined : state.selected);
