@@ -9,7 +9,7 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import { get } from 'lodash';
+import { cloneDeep, get } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
@@ -221,8 +221,8 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
         results = initSelectedInInheritCase(inheritOption);
     // 2) non-inherit case
     } else {
-        const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormState.widgetOptions, props.propertyName);
-
+        const selected: Array<ConsoleFilter|string>|string|undefined = get(widgetFormGetters.updatedWidgetInfo?.widget_options, props.propertyName)
+            ?? get(widgetFormState.widgetOptions, props.propertyName);
         // 2-1) no stored option case
         if (!selected) {
             results = await initSelectedInNoStoredOptionCase();
@@ -261,7 +261,7 @@ const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap:
 };
 const updateWidgetOptionsBySelected = (selected?: SelectDropdownMenuItem[]) => {
     const propertyName = props.propertyName;
-    const widgetOptions = { ...widgetFormState.widgetOptions };
+    const widgetOptions = cloneDeep(widgetFormState.widgetOptions);
     const dataName = propertyName.replace('filters.', '');
 
     // add case
