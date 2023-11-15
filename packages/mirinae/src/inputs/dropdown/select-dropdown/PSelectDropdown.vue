@@ -54,7 +54,7 @@ interface SelectDropdownProps {
     indexMode?: boolean;
 
     /* others */
-    handler?: AutocompleteHandler; // or AutocompleteHandler[]
+    handler?: AutocompleteHandler;
     disableHandler?: boolean;
     pageSize?: number;
     resetSelectedOnUnmounted?: boolean;
@@ -154,7 +154,7 @@ const {
     initiateMenu,
     reloadMenu,
     showMoreMenu,
-} = useContextMenuController({
+} = useContextMenuController<SelectDropdownMenuItem>({
     useFixedStyle: computed(() => props.useFixedMenuStyle),
     targetRef,
     contextMenuRef: menuRef,
@@ -199,7 +199,7 @@ const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boole
 };
 const handleClickShowMore = async (item: SelectDropdownMenuItem) => {
     if (!props.disableHandler) {
-        await showMoreMenu(item.handlerRef);
+        await showMoreMenu(item._resultIndex);
     }
     emit('click-show-more');
 };
@@ -252,29 +252,33 @@ watch(() => props.disabled, (disabled) => {
 
     throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
 })();
-watch(() => props.handler, async () => {
-    if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
-        // this is to refine selected items by handler's results whose label is fully set.
-        const handlers = Array.isArray(props.handler) ? props.handler : [props.handler];
-        const promiseResults = await Promise.allSettled(handlers.map((handler) => handler(
-            '',
-            undefined,
-            undefined,
-            state.proxySelectedItem,
-        )));
-        promiseResults.forEach((result, idx) => {
-            if (result.status === 'fulfilled') {
-                const results = result.value.results;
-                state.proxySelectedItem = state.proxySelectedItem.map((item) => {
-                    const found = results.find((d) => d.name === item.name);
-                    if (found) return found;
-                    return item;
-                });
-            } else {
-                console.error(new Error(`Failed to fetch data from handler: ${idx}`));
-            }
-        });
-    }
+
+const isInitiatingWithHandler = ref(false);
+watch(() => props.handler, async (handler, prevHandler) => {
+    if (props.disableHandler) return;
+    if (!props.initSelectedWithHandler) return;
+    if (!handler || handler === prevHandler) return;
+    if (!state.proxySelectedItem.length) return;
+    if (isInitiatingWithHandler.value) return;
+
+    isInitiatingWithHandler.value = true;
+
+    // this is to refine selected items by handler's results whose label is fully set.
+    let responses = handler(
+        '',
+        undefined,
+        undefined,
+        state.proxySelectedItem,
+    );
+    if (responses instanceof Promise) responses = await responses;
+    const { results } = Array.isArray(responses) ? { results: responses.map((r) => r.results).flat() } : responses;
+    state.proxySelectedItem = state.proxySelectedItem.map((item) => {
+        const found = results.find((d) => d.name === item.name);
+        if (found) return found;
+        return item;
+    });
+
+    isInitiatingWithHandler.value = false;
 }, { immediate: true });
 
 defineExpose({ reloadMenu });

@@ -15,7 +15,7 @@ import {
 } from "@/inputs/dropdown/select-dropdown/type";
 import {
     getSelectDropdownMenu,
-    getSelectDropdownMenuWithMultiTypes
+    getSelectDropdownMenuWithMultiTypes, getHandler,
 } from "@/inputs/dropdown/select-dropdown/mock";
 
 <Meta title='Inputs/Dropdown/Select Dropdown' parameters={{
@@ -603,52 +603,41 @@ interface AutocompleteHandler {
                 <p-select-dropdown :loading="loading" :menu="menu"  />
                 <br/>
                 <p class="text-label-lg font-bold my-3">With custom handler</p>
-                <p-select-dropdown :handler="menuHandlers" />
+                <p-select-dropdown :handler="menuHandler" :page-size="5" />
                 <br/>
                 <p class="text-label-lg font-bold my-3">With custom handler and loading</p>
-                <p-select-dropdown :loading="loading" :handler="menuHandlers" />
+                <p-select-dropdown :loading="loading" :handler="menuHandler" :page-size="5" />
                 <br/>
                 <p class="text-label-lg font-bold my-3">With custom handler & init selected with handler</p>
                 With <span class="text-blue-700">initSelectedWithHandler</span> prop, the selected values' label will be initialized with the handler's result.<br/>
                 So you can see the selected values' label even if there is no label property in the given selected items.<br/>
                 <br/>
-                <p-select-dropdown :loading="loading" :handler="menuHandlers" :selected="selected" initSelectedWithHandler />
+                <p-select-dropdown v-if="isReady" :loading="loading" :handler="menuHandler" :page-size="5" :selected="selected" initSelectedWithHandler />
                 <br/>
             </div>
 `,
             setup() {
-                const menu = getSelectDropdownMenuWithMultiTypes()
                 const state = reactive({
                     loading: false,
-                    selected: [{ name: menu[2].name }]
+                    selected: [],
+                    isReady: false
                 })
-                let allResults = []
-                const simpleHandler = async (inputText) => {
+                const simpleHandler = getHandler()
+                const menuHandler = async (...args) => {
                     state.loading = true;
-                    allResults = await new Promise(resolve => {
-                        setTimeout(() => {
-                            let filtered;
-                            const trimmed = inputText.trim();
-                            if (trimmed) {
-                                filtered = new Fuse(menu, {
-                                    keys: ['label'],
-                                    distance: 100,
-                                    threshold: 0.1,
-                                    ignoreLocation: true,
-                                }).search(trimmed);
-                            } else {
-                                filtered = [...menu]
-                            }
-                            resolve(filtered)
-                        }, 500)
-                    })
+                    const res = await simpleHandler(...args);
                     state.loading = false;
-                    const results = allResults.slice(0, 5)
-                    return { results, more: allResults.length > results.length }
+                    return res;
                 }
+                (async () => {
+                    const res = await simpleHandler('', 0, 2);
+                    state.selected = res[0].results.map(d => ({ name: d.name }));
+                    console.debug('res', res)
+                    state.isReady = true;
+                })();
                 return {
                     ...toRefs(state),
-                    menuHandlers: [simpleHandler, simpleHandler],
+                    menuHandler,
                 }
             }
         }}

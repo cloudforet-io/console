@@ -1,4 +1,4 @@
-import type { ComputedRef, Ref } from 'vue';
+import type { ComputedRef, Ref, UnwrapRef } from 'vue';
 import type Vue from 'vue';
 import {
     computed, isRef, reactive, ref, toRef,
@@ -10,7 +10,7 @@ import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 import type { MenuItem } from '@/inputs/context-menu/type';
 import { getTextHighlightRegex } from '@/utils/helpers';
 
-export interface UseContextMenuControllerOptions {
+export interface UseContextMenuControllerOptions<Item extends MenuItem = MenuItem> {
     targetRef: Ref<HTMLElement|Vue|null>; // required for style
 
     contextMenuRef?: Ref<any|null>; // required when using focusing feature by focusOnContextMenu()
@@ -26,9 +26,9 @@ export interface UseContextMenuControllerOptions {
     /* Whether to automatically reorder on initiateMenu(). */
     useReorderBySelection?: boolean;
     /* Required values when using the reorder by selection feature: menu or handler, selected */
-    menu?: Ref<MenuItem[]>|MenuItem[]; // The original menu that serves as the basis for order when reordering menus
-    handler?: Ref<MenuAttachHandler|MenuAttachHandler[]|undefined>;
-    selected?: Ref<MenuItem[]>|ComputedRef<MenuItem[]>|MenuItem[]; // Items to be displayed at the top of the menu
+    menu?: Ref<Item[]>|Item[]; // The original menu that serves as the basis for order when reordering menus
+    handler?: Ref<MenuAttachHandler<Item>|undefined>;
+    selected?: Ref<Item[]>|ComputedRef<Item[]>|Item[]; // Items to be displayed at the top of the menu
 
     /* Whether to automatically filtering menu by searchText  */
     useMenuFiltering?: boolean;
@@ -45,10 +45,10 @@ export interface UseContextMenuControllerOptions {
 
 interface FocusOnContextMenu { (position?: number): void }
 
-export const useContextMenuController = ({
+export const useContextMenuController = <Item extends MenuItem = MenuItem>({
     useFixedStyle, targetRef, contextMenuRef, visibleMenu, useReorderBySelection, menu, selected,
     useMenuFiltering, searchText, handler, pageSize, position,
-}: UseContextMenuControllerOptions) => {
+}: UseContextMenuControllerOptions<Item>) => {
     if (!targetRef) throw new Error('\'targetRef\' option must be given.');
     if (useReorderBySelection) {
         if (!menu && (!handler || (isRef(handler) && !handler.value))) {
@@ -71,8 +71,8 @@ export const useContextMenuController = ({
         contextMenuRef,
         useFixedStyle: useFixedStyle ?? false,
         visibleMenu: visibleMenu ?? false,
-        menu: menu ?? [] as MenuItem[],
-        selected: selected ?? [] as MenuItem[],
+        menu: menu ?? [] as Item[],
+        selected: selected ?? [] as Item[],
         pageSize,
         searchText: searchText ?? '',
         position: position ?? 'left',
@@ -89,8 +89,8 @@ export const useContextMenuController = ({
     });
 
     // menu filtering
-    const filterItemsBySearchText = (text: string, items: MenuItem[]) => {
-        let results: MenuItem[];
+    const filterItemsBySearchText = (text: string, items: Item[]) => {
+        let results: Item[];
         const trimmed = text.trim();
         if (trimmed) {
             const regex = getTextHighlightRegex(trimmed);
@@ -106,36 +106,36 @@ export const useContextMenuController = ({
     };
 
     /* menu capturing */
-    const selectedSnapshot = ref<MenuItem[]>([]);
+    const selectedSnapshot = ref<Item[]>([]);
     const capture = () => {
-        selectedSnapshot.value = [...state.selected];
+        selectedSnapshot.value = [...state.selected] as UnwrapRef<Item[]>;
     };
 
     /* menu attaching */
-    const defaultMenu = useMenuFiltering ? computed<MenuItem[]>(() => filterItemsBySearchText(state.searchText, state.menu)) : toRef(state, 'menu');
+    const defaultMenu = useMenuFiltering ? computed<Item[]>(() => filterItemsBySearchText(state.searchText, state.menu as Item[])) : toRef(state, 'menu');
     const {
         attachedMenu,
         attachLoading,
         resetMenuAndPagination: resetAttachedMenuAndPagination,
         attachMenuItems,
-    } = useContextMenuAttach({
+    } = useContextMenuAttach<Item>({
         attachHandler: handler,
-        menu: defaultMenu,
+        menu: defaultMenu as Ref<Item[]>,
         searchText,
         pageSize: toRef(state, 'pageSize'),
-        filterItems: useReorderBySelection ? selectedSnapshot : undefined,
+        filterItems: useReorderBySelection ? selectedSnapshot as Ref<Item[]> : undefined,
     });
 
     /* menu refining */
     const SELECTION_DIVIDER_KEY = 'selection-divider';
-    const topItems = computed<MenuItem[]>(() => filterItemsBySearchText(state.searchText, selectedSnapshot.value));
+    const topItems = computed<Item[]>(() => filterItemsBySearchText(state.searchText, selectedSnapshot.value as Item[]));
     const refinedMenu = computed(() => {
         if (!useReorderBySelection) return attachedMenu.value;
 
-        let newItems: MenuItem[] = [];
+        let newItems: Item[] = [];
         if (topItems.value.length) {
             newItems = newItems.concat(topItems.value);
-            newItems.push({ type: 'divider', name: SELECTION_DIVIDER_KEY });
+            newItems.push({ type: 'divider', name: SELECTION_DIVIDER_KEY } as Item);
             newItems = newItems.concat(attachedMenu.value);
         } else {
             newItems = attachedMenu.value;

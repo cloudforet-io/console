@@ -21,5 +21,5 @@ export interface MenuItem {
     iconColor?: string;
     error?: boolean;
     imageUrl?: string;
-    handlerRef?: number; // this is to identify the handler when the menu item is from a handler and handler is an array.
+    _resultIndex?: number; // A value indicating which item corresponds to or belongs to the nth result among the handler outputs. It is used internally.
 }
