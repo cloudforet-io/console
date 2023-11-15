@@ -99,7 +99,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
             },
             query: {
                 granularity: primitiveToQueryString(widgetState.granularity),
-                group_by: arrayToQueryString([widgetState.dataField, widgetState.options.cost_data_type]),
+                group_by: arrayToQueryString([widgetState.dataField]),
                 period: objectToQueryString(widgetState.dateRange),
                 filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
             },
