@@ -330,6 +330,12 @@ const handleUpdateSelected = (selected: SelectDropdownMenuItem[]) => {
     } else {
         updateWidgetOptionsBySelected(selected);
     }
+
+    // update init state in global option case
+    if (widgetFormGetters.globalOptionInfo?.optionKey === props.propertyName) {
+        // reset all other options' init states to false - except for global option
+        widgetFormStore.resetOptionsInitMap(true);
+    }
 };
 const handleUpdateInherit = async (inherit: boolean) => {
     // update inherit state

@@ -179,11 +179,15 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         });
         state.optionsValidMap = optionsValidMap;
     };
-    const initOptionsInitMap = () => {
+    const initOptionsInitMap = (exceptGlobalOption ?: boolean) => {
         const optionsInitMap = {};
         state.schemaProperties.forEach((name) => {
             optionsInitMap[name] = false;
         });
+        const globalOptionKey = getters.globalOptionInfo?.optionKey;
+        if (exceptGlobalOption && globalOptionKey) {
+            optionsInitMap[globalOptionKey] = state.optionsInitMap[globalOptionKey];
+        }
         state.optionsInitMap = optionsInitMap;
     };
 
@@ -205,8 +209,8 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
                 [optionKey]: isInit,
             };
         },
-        resetOptionsInitMap() {
-            initOptionsInitMap();
+        resetOptionsInitMap(exceptGlobalOption = false) {
+            initOptionsInitMap(exceptGlobalOption);
         },
         updateOptions(options: WidgetOptions) {
             state.widgetOptions = options;
