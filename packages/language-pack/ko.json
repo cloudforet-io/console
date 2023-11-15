@@ -1484,7 +1484,7 @@
 				"DESC": "조회 기간동안 발생한 Region별 총 비용 데이터를 보여주는 위젯. "
 			},
 			"COST_BY_REGION_MULTI_FIELDS": {
-				"DESC": "선택한 'Column Field'에 기반하여 조회 기간 동안\u001d의 Region별 비용 또는 사용량을 보여주는 위젯. "
+				"DESC": "선택한 'Column Field'에 기반하여 조회 기간 동안의 Region별 비용 또는 사용량을 보여주는 위젯."
 			},
 			"COST_DONUT": {
 				"DESC": "선택한 'Data Field'를 기준으로 조회 기간동안 발생한 비용 데이터를 한눈에 확인할 수 있는 위젯."
