@@ -62,6 +62,7 @@ const state = reactive({
     inheritToggleDisabled: computed<boolean>(() => {
         if (state.inheritanceMode === 'NONE') return true;
         if (state.inherit) return false;
+        if (widgetFormGetters.globalOptionInfo?.optionKey !== props.propertyName) return false;
         if (state.inheritanceMode === 'KEY_MATCHING') {
             const variableKey = state.schemaProperty?.key;
             const value = props.variables?.[variableKey];
