@@ -93,6 +93,12 @@ const updateDashboardVariables = async () => {
 const handleClickSaveButton = () => {
     updateDashboardVariables();
 };
+const handleResetVariables = () => {
+    dashboardDetailStore.resetVariables(
+        props.originVariables ?? dashboardDetailState.dashboardInfo?.variables,
+        props.originVariablesSchema ?? dashboardDetailState.dashboardInfo?.variables_schema,
+    );
+};
 
 </script>
 
@@ -119,7 +125,7 @@ const handleClickSaveButton = () => {
         <p-text-button style-type="highlight"
                        class="reset-button"
                        :disabled="state.saveLoading"
-                       @click="dashboardDetailStore.resetVariables(props.originVariables, props.originVariablesSchema)"
+                       @click="handleResetVariables"
         >
             <p-i name="ic_refresh"
                  width="1rem"
