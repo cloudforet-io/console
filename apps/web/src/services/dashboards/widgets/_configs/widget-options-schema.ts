@@ -155,6 +155,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
         key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'NONE',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key },
         ],
@@ -163,6 +164,7 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
         key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.name,
         selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key },
         ],
