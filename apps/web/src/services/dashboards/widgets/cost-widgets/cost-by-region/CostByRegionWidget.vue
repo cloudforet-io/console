@@ -159,7 +159,6 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
-    await nextTick();
     state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
@@ -206,7 +205,7 @@ defineExpose<WidgetExpose<FullData>>({
         <div class="content-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="props.loading || state.loading"
-                           :data="state.chartData"
+                           :data="state.data"
                            :loader-backdrop-opacity="1"
                            loader-type="skeleton"
                            show-data-from-scratch
