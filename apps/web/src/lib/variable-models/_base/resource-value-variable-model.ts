@@ -24,7 +24,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: string[] }>>;
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: string[], total_count: number }>>;
 
     constructor(config?: ResourceValueVariableModelConfig) {
         if (!config) return;
@@ -36,7 +36,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
         this.#fetcher = this.#getFetcher();
     }
 
-    #getFetcher(): ReturnType<typeof getCancellableFetcher<{ results: string[] }>>|undefined {
+    #getFetcher(): ReturnType<typeof getCancellableFetcher<{ results: string[], total_count: number }>>|undefined {
         if (!this.resourceType) return undefined;
         const apiPath = this.resourceType.split('.').map((d) => camelCase(d));
 
@@ -78,10 +78,15 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
                 this.#getParams(query),
             );
             if (status === 'succeed') {
+                let more = false;
+                if (query.start && query.limit && response.total_count) {
+                    more = (query.start * query.limit) <= response.total_count;
+                }
                 this.#response = {
                     results: response.results.map((value) => ({
                         key: value, name: value,
                     })),
+                    more,
                 };
             }
             return this.#response;

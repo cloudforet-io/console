@@ -92,11 +92,16 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
                 this.#getParams(query),
             );
             if (status === 'succeed') {
-                response.results = response.results.map((d) => ({
-                    key: d[this.idKey],
-                    name: this.nameFormatter(d),
-                }));
-                this.#response = response;
+                let more = false;
+                if (query.start && query.limit && response.total_count) {
+                    more = (query.start * query.limit) <= response.total_count;
+                }
+                this.#response = {
+                    results: response.results.map((d) => ({
+                        key: d[this.idKey], name: this.nameFormatter(d),
+                    })),
+                    more,
+                };
             }
             return this.#response;
         } catch (e) {
