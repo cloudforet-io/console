@@ -40,12 +40,14 @@ interface AnalyzeQuery {
 
 export interface ExportOption {
     name: string; // name of the sheet
+    title?: string;
     query_type: QueryType;
     search_query?: SearchQuery;
     analyze_query?: AnalyzeQuery;
 }
 
 export interface ExportParameter {
+    file_name?: string;
     options: ExportOption[]
     timezone?: string;
     file_format?: 'Excel' | 'CSV'; // default: Excel

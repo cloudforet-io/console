@@ -25,6 +25,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
 import type { CloudServiceDetailSchema } from '@/services/asset-inventory/cloud-service/cloud-service-detail/lib/type';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
 
 
 
@@ -37,6 +38,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
+const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 
 
 const MAIN_TABLE = 'Main Table';
@@ -93,7 +95,7 @@ const handleConfirm = async () => {
     state.downloadLoading = true;
     const excelExportFetcher = () => {
         const cloudServiceListSheetQuery: ExportOption|undefined = (state.selectedSubDataIds.includes('Main Table')) ? ({
-            name: 'Cloud Service List',
+            name: 'Main_Table',
             query_type: QueryType.SEARCH,
             search_query: {
                 ...getCloudServiceListQuery(),
@@ -102,6 +104,7 @@ const handleConfirm = async () => {
         }) : undefined;
 
         const cloudServiceExcelExportParams: ExportParameter = {
+            file_name: cloudServiceDetailPageStore.sheetNamePrefix,
             options: cloudServiceListSheetQuery ? [cloudServiceListSheetQuery].concat(getSubDataExcelSearchQuery()) : getSubDataExcelSearchQuery(),
             // timezone: state.timezone,
         };

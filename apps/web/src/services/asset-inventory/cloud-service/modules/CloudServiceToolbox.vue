@@ -191,21 +191,16 @@ const getExcelPayloadList = async (): Promise<ExportOption[]> => {
         });
         return result;
     };
-    const checkSameSheetNameExist = (list: ExportOption[], sheetName: string):string => {
-        const index = list.filter((d) => ((typeof d.name === 'string') ? d.name.includes(sheetName) : false)).length;
-        return index ? `${sheetName}${index}` : sheetName;
-    };
     excelFieldList.forEach((excelField, idx) => {
+        let sheetName = `${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
+        sheetName = removeErrorString(sheetName);
+
         const provider = excelItems[idx].provider;
         const providerName = state.providers[provider]?.label || provider;
-        let sheetName = `${providerName}.${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
-        sheetName = removeErrorString(sheetName);
-        if (sheetName.length > 29) sheetName = sheetName.substr(0, 29);
-        const checkedSheetName = checkSameSheetNameExist(excelPayloadList, sheetName);
-        if (checkedSheetName !== sheetName) sheetName = checkedSheetName;
 
         excelPayloadList.push({
             name: sheetName,
+            title: `[${providerName}] ${excelItems[idx].cloud_service_group} ${excelItems[idx].cloud_service_type}`,
             query_type: QueryType.SEARCH,
             search_query: {
                 ...getExcelQuery(excelItems[idx]),
@@ -234,6 +229,7 @@ const handleExport = () => {
     const excelExportFetcher = async () => {
         const excelPayloadList = await getExcelPayloadList();
         const cloudServiceExcelExportParams:ExportParameter = {
+            file_name: 'cloud_service_export',
             options: [
                 getCloudServiceResourcesPayload(),
                 ...excelPayloadList,

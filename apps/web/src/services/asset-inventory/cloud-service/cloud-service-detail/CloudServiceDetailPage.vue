@@ -289,7 +289,7 @@ const exportCloudServiceData = async () => {
             const cloudServiceExcelExportParams: ExportParameter = {
                 options: [
                     {
-                        name: 'Cloud Service List',
+                        name: 'Main_table',
                         query_type: QueryType.SEARCH,
                         search_query: {
                             ...excelQuery.data,
