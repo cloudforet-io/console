@@ -514,7 +514,7 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",
 				"ADDITIONAL_INFO": "Additional Info",
-				"ADD_MORE": "Add More",
+				"ADD_MORE": "More",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "The file will be downloaded as monthly data rather than accumulated data.",
 				"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 				"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
@@ -1366,7 +1366,7 @@
 			}
 		},
 		"DETAIL": {
-			"APPLY": "Apply",
+			"APPLY": "Confirm",
 			"AUTO": "Auto",
 			"CLONE": "Clone",
 			"CURRENT_MONTH": "Current month",
@@ -1411,7 +1411,7 @@
 			"LABEL_VIEWERS": "Viewers",
 			"REQUIRED": "Required Field",
 			"RETURN_TO_INITIAL_SETTINGS": "Return to Initial Settings",
-			"UNABLE_TO_ADD_WIDGET": "Unable to add the widget.",
+			"UNABLE_TO_ADD_WIDGET": "Unable to add the widget",
 			"UNABLE_TO_ADD_WIDGET_DESC": "There's currently no available {field} in this domain. ",
 			"UNABLE_TO_ADD_WIDGET_DESC2": "Please contact the system administrator.",
 			"UPDATE_TITLE": "Edit Dashboard Name",
@@ -1484,25 +1484,25 @@
 				"DESC": "Displays the total costs by Region for the selected period. "
 			},
 			"COST_BY_REGION_MULTI_FIELDS": {
-				"DESC": "Displays cost and usage trends for a specific Product by Region during the selected period."
+				"DESC": "Displays cost or usage data by Region during the selected period based on the chosen 'Column Field'."
 			},
 			"COST_DONUT": {
-				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Data Field'."
 			},
 			"COST_MAP": {
-				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Group by' option."
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by Data Field'."
 			},
 			"COST_PIE": {
-				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Data Field'."
 			},
 			"COST_SUMMARY_MULTI_FIELDS": {
-				"DESC": "Displays cost and usage trends for a specific Product along with 'Group By' option during the selected period."
+				"DESC": "Displays the cost or usage data during the selected period based on the chosen 'Row Field' & 'Column Field'."
 			},
 			"COST_TREND": {
-				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays the cost or usage trends up to the selected period based on the chosen 'Data Field'."
 			},
 			"COST_TREND_STACKED": {
-				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays the cost or usage trends up to the selected period based on the chosen 'Data Field'."
 			},
 			"COUNT_OF_FAIL_FINDINGS": {
 				"DESC": "Displays the count of compliance Fail findings for the selected period, aggregated by 'Group By' option."
