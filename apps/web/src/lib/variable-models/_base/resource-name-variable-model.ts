@@ -28,7 +28,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<ListResponse>>;
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: string[]; total_count: number }>>;
 
     nameFormatter(data: any): string {
         return data[this.nameKey];
@@ -44,7 +44,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
         return [this.idKey, this.nameKey];
     }
 
-    #getFetcher(): ReturnType<typeof getCancellableFetcher<ListResponse>>|undefined {
+    #getFetcher(): ReturnType<typeof getCancellableFetcher<{ results: string[]; total_count: number }>>|undefined {
         if (!this.resourceType) return undefined;
         const apiPath = this.resourceType.split('.').map((d) => camelCase(d));
 
@@ -92,11 +92,16 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
                 this.#getParams(query),
             );
             if (status === 'succeed') {
-                response.results = response.results.map((d) => ({
-                    key: d[this.idKey],
-                    name: this.nameFormatter(d),
-                }));
-                this.#response = response;
+                let more = false;
+                if (query.start && query.limit && response.total_count) {
+                    more = (query.start * query.limit) <= response.total_count;
+                }
+                this.#response = {
+                    results: response.results.map((d) => ({
+                        key: d[this.idKey], name: this.nameFormatter(d),
+                    })),
+                    more,
+                };
             }
             return this.#response;
         } catch (e) {

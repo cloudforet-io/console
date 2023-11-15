@@ -9,7 +9,9 @@ import {
     PBadge, PContextMenu, PI, useContextMenuController,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type {
+    AutocompleteHandler, SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import {
     cloneDeep, debounce, flattenDeep,
 } from 'lodash';
@@ -115,6 +117,9 @@ const handleUpdateSearchText = debounce((text: string) => {
     state.searchText = text;
     reloadMenu();
 }, 200);
+const handleClickShowMore = (item: SelectDropdownMenuItem) => {
+    showMoreMenu(item._resultIndex);
+};
 
 // TODO: apply filters to variable model referencing code below.
 // const filtersHelper = new QueryHelper();
@@ -250,7 +255,7 @@ const {
                         :multi-selectable="variableProperty?.selection_type === 'MULTI'"
                         show-select-marker
                         :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.fixed"
-                        @click-show-more="showMoreMenu"
+                        @click-show-more="handleClickShowMore"
                         @keyup:down:end="focusOnContextMenu()"
                         @update:selected="handleSelectOption"
                         @update:search-text="handleUpdateSearchText"
