@@ -52,13 +52,11 @@ const state = reactive({
             : SpaceConnector.client.addOns.autocomplete.resource;
         return getCancellableFetcher(api);
     }),
-    menuHandlers: computed<AutocompleteHandler[]>(() => {
+    menuHandler: computed<AutocompleteHandler|undefined>(() => {
         const options = state.variableProperty?.options;
-        if (!Array.isArray(options)) return [];
-        return options.map((config) => {
-            const variableModel = new VariableModel(config);
-            return getVariableModelMenuHandler(variableModel);
-        });
+        if (!Array.isArray(options)) return undefined;
+        const variableModels = options.map((config) => new VariableModel(config));
+        return getVariableModelMenuHandler(variableModels);
     }),
 });
 
@@ -79,7 +77,7 @@ const {
     useReorderBySelection: true,
     searchText: toRef(state, 'searchText'),
     selected: toRef(state, 'selected'),
-    handler: toRef(state, 'menuHandlers'),
+    handler: toRef(state, 'menuHandler'),
     pageSize: 10,
 });
 
@@ -137,19 +135,14 @@ const handleUpdateSearchText = debounce((text: string) => {
 
 const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {
     let foundItems: MenuItem[] = [];
-    const handlerPromises = state.menuHandlers.map((handler: AutocompleteHandler) => handler(
+    const responses = await state.menuHandler(
         state.searchText,
         undefined,
         undefined,
         selectedValues?.map((d) => ({ name: d, label: d })),
-    ));
-    const promiseResults = await Promise.allSettled(handlerPromises);
-    promiseResults.forEach((result) => {
-        if (result.status === 'fulfilled') {
-            const { results } = result.value;
-            foundItems = foundItems.concat(results);
-        }
-    });
+    );
+    const results = responses.map((res) => res.results).flat();
+    foundItems = foundItems.concat(results);
     return foundItems;
 };
 const initVariableAndSelected = async () => {

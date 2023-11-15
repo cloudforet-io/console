@@ -95,11 +95,6 @@ const handleCloseSidebar = () => {
     emit('close', false);
 };
 
-watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllOptionsInitiated], ([widgetInfo, isAllInit]) => {
-    if (!isAllInit) return;
-    if (widgetInfo === undefined) return;
-    emit('update:widget-info', widgetInfo as UpdatableWidgetInfo);
-});
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {
     emit('update:has-non-inherited-widget-options', value);
@@ -107,6 +102,14 @@ watch(() => state.hasNonInheritedWidgetOptions, (value) => {
 
 watch(() => props.visible, (value) => {
     if (value) state.contextKey = getUUID();
+});
+
+watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllOptionsInitiated], ([widgetInfo, isAllInit]) => {
+    if (!isAllInit) return;
+    if (widgetInfo === undefined) return;
+    if (!props.visible) return;
+
+    emit('update:widget-info', widgetInfo as UpdatableWidgetInfo);
 });
 </script>
 
