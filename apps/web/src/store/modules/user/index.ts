@@ -30,6 +30,7 @@ const state: UserState = {
     requiredActions: storedUserState.requiredActions,
     emailVerified: storedUserState.emailVerified,
     isSignInLoading: false,
+    mfa: storedUserState.mfa,
 };
 
 export default {
