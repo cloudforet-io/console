@@ -1914,12 +1914,16 @@
 				"YESTERDAY": "어제 "
 			},
 			"MFA": {
-				"EMAIL": "이메일",
+				"BTN_CHANGE": "변경",
+				"BTN_SEND_MAIL": "인증 코드 전송",
 				"ENABLE_MFA": "",
-				"NOT_VERIFIED": "인증되지 않음",
+				"MODAL": {
+					"TITLE": ""
+				},
+				"STATE_NOT_VERIFIED": "인증되지 않음",
+				"STATE_VERIFIED": "인증됨",
 				"TITLE": "",
-				"TYPE": "",
-				"VERIFIED": "인증됨"
+				"TYPE": ""
 			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "프로젝트 채널 삭제 실패",

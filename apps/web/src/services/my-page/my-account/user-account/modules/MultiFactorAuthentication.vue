@@ -20,12 +20,12 @@ import UserAccountModuleContainer
 
 // Currently, only email is supported.
 const contextMenuItems = [
-    { label: i18n.t('IDENTITY.USER.MFA.EMAIL'), name: 'email' },
+    { label: 'Email', name: 'email' },
 ];
 
 const state = reactive({
     disable: false,
-    isVerified: computed(() => store.state.user.mfa !== undefined),
+    isVerified: computed(() => store.state.user.mfa),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
 });
@@ -68,13 +68,13 @@ const {
                              color="#60B731"
                         />
                         <span>
-                            {{ $t('IDENTITY.USER.MFA.VERIFIED') }}
+                            {{ $t('IDENTITY.USER.MFA.STATE_VERIFIED') }}
                         </span>
                     </div>
                     <span v-else
                           class="not-verified"
                     >
-                        {{ $t('IDENTITY.USER.MFA.NOT_VERIFIED') }}
+                        {{ $t('IDENTITY.USER.MFA.STATE_NOT_VERIFIED') }}
                     </span>
                 </div>
             </div>

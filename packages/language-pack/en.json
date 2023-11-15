@@ -1914,12 +1914,16 @@
 				"YESTERDAY": "Yesterday"
 			},
 			"MFA": {
-				"EMAIL": "Email",
+				"BTN_CHANGE": "Change",
+				"BTN_SEND_MAIL": "Send Verification Code",
 				"ENABLE_MFA": "Enable MFA",
-				"NOT_VERIFIED": "Not Verified",
+				"MODAL": {
+					"TITLE": ""
+				},
+				"STATE_NOT_VERIFIED": "Not Verified",
+				"STATE_VERIFIED": "Verified",
 				"TITLE": "Multi-factor Authentication",
-				"TYPE": "MFA Type",
-				"VERIFIED": "Verified"
+				"TYPE": "MFA Type"
 			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "Failed to Delete Project Channel",

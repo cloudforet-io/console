@@ -1914,12 +1914,16 @@
 				"YESTERDAY": "昨日"
 			},
 			"MFA": {
-				"EMAIL": "メールアドレス",
+				"BTN_CHANGE": "変更",
+				"BTN_SEND_MAIL": "認証コード送信",
 				"ENABLE_MFA": "",
-				"NOT_VERIFIED": "認証されていません",
+				"MODAL": {
+					"TITLE": ""
+				},
+				"STATE_NOT_VERIFIED": "認証されていません",
+				"STATE_VERIFIED": "認証済みです",
 				"TITLE": "",
-				"TYPE": "",
-				"VERIFIED": "認証済みです"
+				"TYPE": ""
 			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "プロジェクトチャンネルの削除に失敗",
