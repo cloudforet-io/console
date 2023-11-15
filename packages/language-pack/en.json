@@ -514,7 +514,7 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",
 				"ADDITIONAL_INFO": "Additional Info",
-				"ADD_MORE": "Add More",
+				"ADD_MORE": "More",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "The file will be downloaded as monthly data rather than accumulated data.",
 				"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 				"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
@@ -550,7 +550,7 @@
 					"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
 				},
 				"HIDE_ALL": "Hide all",
-				"INVALID_PERIOD_TEXT": "No data found for previously selected period",
+				"INVALID_PERIOD_TEXT": "No data found for previously selected period.",
 				"KEEP_MY_SETTING": "Keep the settings above as my settings",
 				"LABEL_ADDITIONAL_FIELD": "Additional Field",
 				"LABEL_COST_ANALYSIS_NAME": "Cost Analysis Name",
@@ -1367,7 +1367,7 @@
 			}
 		},
 		"DETAIL": {
-			"APPLY": "Apply",
+			"APPLY": "Confirm",
 			"AUTO": "Auto",
 			"CLONE": "Clone",
 			"CURRENT_MONTH": "Current month",

@@ -492,7 +492,7 @@
 					"CREATE_BUDGET": "예산 생성",
 					"DATA_SOURCE": "데이터 소스",
 					"DESC": "내림차순",
-					"NO_BUDGET": "",
+					"NO_BUDGET": "예산 없음",
 					"OVERSPENT": "예산초과",
 					"PERIOD": "기준 기간",
 					"PROVIDER": "서비스 제공자",
@@ -514,7 +514,7 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "누적 데이터",
 				"ADDITIONAL_INFO": "추가 정보",
-				"ADD_MORE": "",
+				"ADD_MORE": "추가",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "누적 데이터가 아닌 월별 데이터로 파일이 다운로드 됩니다.",
 				"ALT_E_ADD_GROUP_BY": "Group-by는 최대 3개까지만 선택이 가능합니다.",
 				"ALT_E_ADD_GROUP_BY_DESC": "이전 Group-by 선택을 최소 1개 해제한 후에 새로 선택해주세요.",
@@ -533,7 +533,7 @@
 				"DAILY": "일별 데이터 (누적 데이터)",
 				"DEFAULT": "기본",
 				"DETAIL": {
-					"ORIGINAL_CURRENCY": ""
+					"ORIGINAL_CURRENCY": "원본 통화"
 				},
 				"DONUT": "도넛",
 				"DOWNLOAD": "다운로드",
@@ -550,7 +550,7 @@
 					"UP_TO_LAST_12_MONTHS": "최대 12개월 기간내 설정 가능"
 				},
 				"HIDE_ALL": "전체 숨김",
-				"INVALID_PERIOD_TEXT": "",
+				"INVALID_PERIOD_TEXT": "이전에 선택된 기간의 데이터를 더 이상 표시할 수 없습니다. ",
 				"KEEP_MY_SETTING": "위의 설정을 내 설정사항으로 유지",
 				"LABEL_ADDITIONAL_FIELD": "추가 필드",
 				"LABEL_COST_ANALYSIS_NAME": "비용 분석 이름 ",
@@ -1367,14 +1367,14 @@
 			}
 		},
 		"DETAIL": {
-			"APPLY": "",
+			"APPLY": "확인",
 			"AUTO": "자동",
 			"CLONE": "복제",
 			"CURRENT_MONTH": "최근월",
 			"CUSTOM": "커스텀",
 			"CUSTOMIZE": "편집",
-			"CUSTOM_DATE_MODAL_MONTH": "",
-			"CUSTOM_DATE_MODAL_TITLE": "",
+			"CUSTOM_DATE_MODAL_MONTH": "기준월",
+			"CUSTOM_DATE_MODAL_TITLE": "커스텀 기간 선택",
 			"DEFAULT": "기본",
 			"DELETE": "삭제",
 			"EXPORT": "파일 저장",
@@ -2043,8 +2043,8 @@
 				"MEMBER": "연관된 멤버"
 			},
 			"EXCEL_EXPORT_MODAL": {
-				"DESCRIPTION": "",
-				"TITLE": ""
+				"DESCRIPTION": "선택한 데이터 테이블의 세부 정보가 여러 시트로 구성된 단일 파일에 저장됩니다.",
+				"TITLE": "내보내기 옵션 선택"
 			},
 			"HISTORY": {
 				"ALL_MONTH": "전체 월",
