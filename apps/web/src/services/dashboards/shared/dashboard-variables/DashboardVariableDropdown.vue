@@ -178,10 +178,12 @@ watch(() => state.variableProperty, async (property) => {
     });
 
     const value = dashboardDetailState.variables[props.propertyName];
-    if (property.required && value === undefined) {
-        await initVariableAndSelected();
-    } else if (value) {
+    if (value) {
         await initSelected(value);
+    } else if (property?.required) {
+        await initVariableAndSelected();
+    } else {
+        state.selected = [];
     }
 
     dashboardDetailStore.$patch((_state) => {
