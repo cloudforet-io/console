@@ -53,7 +53,10 @@ const state = reactive({
     schemaProperty: computed<WidgetOptionsSchemaProperty|undefined>(() => widgetFormGetters.widgetConfig?.options_schema?.properties?.[props.propertyName]),
     readonly: computed<boolean>(() => state.schemaProperty?.readonly),
     label: computed(() => state.schemaProperty?.name ?? props.propertyName),
-    selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => state.schemaProperty?.selection_type),
+    selectionType: computed<WidgetOptionsSchemaProperty['selection_type']>(() => {
+        if (state.inherit) return 'SINGLE';
+        return state.schemaProperty?.selection_type;
+    }),
     inherit: computed<boolean>(() => !!widgetFormState.inheritOptions?.[props.propertyName]?.enabled),
     inheritanceMode: computed<InheritanceMode>(() => state.schemaProperty?.inheritance_mode),
     inheritToggleDisabled: computed<boolean>(() => {
