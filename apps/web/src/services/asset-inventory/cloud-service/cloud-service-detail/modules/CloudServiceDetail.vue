@@ -297,6 +297,7 @@ watch(() => props.cloudServiceId, async (after, before) => {
                                           selectIndex:state.selectIndex,
                                           keyItemSets:state.keyItemSets,
                                           lanuage:state.language,
+                                          excelVisible: layout.type !== 'raw-table',
                                       }"
                                       :field-handler="fieldHandler"
                                       v-on="dynamicLayoutListeners"
