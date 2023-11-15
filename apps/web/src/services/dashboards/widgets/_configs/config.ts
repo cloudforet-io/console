@@ -38,7 +38,7 @@ export const COST_DATA_FIELD_MAP = {
     REGION: { name: 'region_code', label: 'Region' },
     // cost reference
     USAGE_TYPE: { name: 'cost_usage_type', label: 'Type' },
-    PRODUCT: { name: 'cost_product', label: 'Product' },
+    PRODUCT: { name: 'product', label: 'Product' },
 } as const;
 export const ASSET_DATA_FIELD_MAP = {
     // resource reference type
