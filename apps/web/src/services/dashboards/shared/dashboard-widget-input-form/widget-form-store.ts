@@ -35,7 +35,7 @@ export interface PartialDashboardLayoutWidgetInfo extends DashboardLayoutWidgetI
 
 interface Getters {
     widgetConfig: ComputedRef<WidgetConfig|undefined>;
-    originWidgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
+    _dashboardWidgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
     mergedWidgetInfo: ComputedRef<PartialDashboardLayoutWidgetInfo|undefined>;
     updatedWidgetInfo: ComputedRef<UpdatableWidgetInfo|undefined>;
     title: ComputedRef<string>;
@@ -79,24 +79,23 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     const getters: UnwrapRef<Getters> = reactive({
         widgetConfig: computed<WidgetConfig|undefined>(() => (state.widgetConfigId ? getWidgetConfig(state.widgetConfigId) : undefined)),
         //
-        originWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
+        _dashboardWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
             if (!state.widgetKey) return undefined;
             const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
             return _dashboardWidgetInfoList.find((w) => w.widget_key === state.widgetKey);
         }),
         mergedWidgetInfo: computed<PartialDashboardLayoutWidgetInfo|undefined>(() => {
             if (!state.widgetConfigId) return undefined;
-            const widgetInfo = getters.originWidgetInfo;
 
             const mergedWidgetState = mergeBaseWidgetState({
-                inheritOptions: widgetInfo?.inherit_options,
-                widgetOptions: widgetInfo?.widget_options,
+                inheritOptions: getters._dashboardWidgetInfo?.inherit_options,
+                widgetOptions: getters._dashboardWidgetInfo?.widget_options,
                 widgetName: state.widgetConfigId,
                 dashboardSettings: dashboardDetailState.settings,
                 dashboardVariablesSchema: dashboardDetailState.variablesSchema,
                 dashboardVariables: dashboardDetailState.variables,
-                title: widgetInfo?.title,
-                schemaProperties: widgetInfo?.schema_properties,
+                title: getters._dashboardWidgetInfo?.title,
+                schemaProperties: getters._dashboardWidgetInfo?.schema_properties,
             });
 
             // refine inheritOptions to make inherit project variable from dashboard if it is project dashboard.
@@ -104,10 +103,10 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             const refinedInheritOptions = projectId ? getProjectCaseInheritOptions(mergedWidgetState.inheritOptions) : mergedWidgetState.inheritOptions;
 
             return {
-                ...(widgetInfo ?? {}),
+                ...(getters._dashboardWidgetInfo ?? {}),
                 widget_key: state.widgetKey,
                 widget_name: state.widgetConfigId,
-                version: widgetInfo?.version ?? '1',
+                version: getters._dashboardWidgetInfo?.version ?? '1',
                 title: mergedWidgetState.title,
                 inherit_options: refinedInheritOptions,
                 widget_options: mergedWidgetState.options,
@@ -265,20 +264,10 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             initOptionsInitMap();
         },
         returnToInitialSettings() {
-            const mergedWidgetState = mergeBaseWidgetState({
-                inheritOptions: getters.originWidgetInfo?.inherit_options,
-                widgetOptions: getters.originWidgetInfo?.widget_options,
-                widgetName: getters.originWidgetInfo?.widget_name ?? '',
-                dashboardSettings: dashboardDetailState.settings,
-                dashboardVariablesSchema: dashboardDetailState.variablesSchema,
-                dashboardVariables: dashboardDetailState.variables,
-                title: getters.originWidgetInfo?.title,
-                schemaProperties: getters.originWidgetInfo?.schema_properties,
-            });
-            updateTitle(mergedWidgetState.title ?? '');
-            state.widgetOptions = mergedWidgetState.options ?? {};
-            state.schemaProperties = mergedWidgetState.schemaProperties ?? [];
-            state.inheritOptions = mergedWidgetState.inheritOptions ?? {};
+            updateTitle(getters.mergedWidgetInfo?.title ?? '');
+            state.widgetOptions = getters.mergedWidgetInfo?.widget_options ?? {};
+            state.schemaProperties = getters.mergedWidgetInfo?.schema_properties ?? [];
+            state.inheritOptions = getters.mergedWidgetInfo?.inherit_options ?? {};
 
             initOptionsValidMap();
             initOptionsInitMap();
