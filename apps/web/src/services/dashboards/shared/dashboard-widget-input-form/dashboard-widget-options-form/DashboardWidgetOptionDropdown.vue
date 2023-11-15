@@ -77,6 +77,7 @@ const state = reactive({
         }
         return undefined;
     }),
+    isInitiating: false,
     isOptionInitiated: computed<boolean>(() => widgetFormState.optionsInitMap[props.propertyName]),
     isGlobalOptionReady: computed<boolean>(() => {
         if (!widgetFormGetters.globalOptionInfo) return true;
@@ -92,7 +93,7 @@ const state = reactive({
 const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
-    menuHandlers: [] as AutocompleteHandler[],
+    menuHandler: undefined as AutocompleteHandler|undefined,
     contextKey: uuidv4(),
 });
 
@@ -126,28 +127,23 @@ const getInheritOptionMenuHandler = (schema?: WidgetOptionsSchemaProperty): Auto
 };
 // refine selected item by handlers (e.g. [{ name: 'aws' }] -> [{ name: 'aws', label: 'AWS' }])
 const getRefinedSelectedItemByHandlers = async (
-    handlers: AutocompleteHandler[],
+    handler: AutocompleteHandler,
     selected: SelectDropdownMenuItem|SelectDropdownMenuItem[],
 ): Promise<SelectDropdownMenuItem[]> => {
     if (!selected) return [];
     let _selected = Array.isArray(selected) ? selected : [selected];
-    const promiseResults = await Promise.allSettled(handlers.map((handler) => handler(
+    let handlerResponses = await handler(
         '',
         undefined,
         undefined,
         _selected,
-    )));
-    promiseResults.forEach((result, idx) => {
-        if (result.status === 'fulfilled') {
-            const results = result.value.results;
-            _selected = _selected.map((item) => {
-                const found = results.find((d) => d.name === item.name);
-                if (found) return found;
-                return item;
-            });
-        } else {
-            console.error(new Error(`Failed to fetch data from handler: ${idx}`));
-        }
+    );
+    handlerResponses = Array.isArray(handlerResponses) ? handlerResponses : [handlerResponses];
+    const results = handlerResponses.map((res) => res.results).flat();
+    _selected = _selected.map((item) => {
+        const found = results.find((d) => d.name === item.name);
+        if (found) return found;
+        return item;
     });
     return _selected;
 };
@@ -181,10 +177,11 @@ const initSelectedInInheritCase = (inheritOption: InheritOptions[WidgetOptionKey
 
 const initSelectedInNoStoredOptionCase = async (): Promise<SelectDropdownMenuItem[]> => {
     if (state.schemaProperty?.optional) return [];
-    const menuHandler = menuState.menuHandlers?.[0];
+    const menuHandler = menuState.menuHandler;
     if (menuHandler) {
-        const results = await menuHandler('');
-        return [results.results[0]];
+        const res = await menuHandler('', undefined, undefined, undefined, 0);
+        const item = Array.isArray(res) ? res[0]?.results[0] : res?.results[0];
+        return item ? [item] : [];
     }
     return [];
 };
@@ -199,16 +196,16 @@ const initSelectedInStoredOptionArrayTypeCase = async (selected: Array<ConsoleFi
         return Array.isArray(item.v) ? item.v.map((v) => ({ name: v })) : { name: item.v };
     }) as SelectDropdownMenuItem[];
     if (Array.isArray(values[0])) values = values.flat();
-    if (menuState.menuHandlers) {
-        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, values);
+    if (menuState.menuHandler) {
+        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandler, values);
         return refinedSelected;
     }
     return values;
 };
 
 const initSelectedInStoredOptionPrimitiveTypeCase = async (selected: string): Promise<SelectDropdownMenuItem[]> => {
-    if (menuState.menuHandlers) {
-        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandlers, [{ name: selected }]);
+    if (menuState.menuHandler) {
+        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandler, [{ name: selected }]);
         return refinedSelected;
     }
     return [{ name: selected }];
@@ -245,19 +242,20 @@ const initSelectedMenuItems = async (): Promise<SelectDropdownMenuItem[]> => {
     return results;
 };
 
-const getListQueryOptions = () => {
+const getListQueryOptions = (globalOptionValue?: any) => {
     const globalOptionInfo = widgetFormGetters.globalOptionInfo;
     if (!globalOptionInfo?.initiatedAndHasValue) return undefined;
     return {
-        [globalOptionInfo.variableKey]: globalOptionInfo.value,
+        [globalOptionInfo.variableKey]: globalOptionValue,
     }; // e.g. { cost_data_source: 'ds-1' }
 };
-const initMenuHandlers = () => {
+const initMenuHandlers = (globalOptionValue?: any) => {
     if (widgetFormState.inheritOptions?.[props.propertyName]?.enabled) {
-        menuState.menuHandlers = [menuState.inheritOptionMenuHandler];
+        menuState.menuHandler = menuState.inheritOptionMenuHandler;
     } else {
-        const listQueryOptions = getListQueryOptions();
-        menuState.menuHandlers = menuState.variableModels.map((variableModel) => getVariableModelMenuHandler(variableModel, listQueryOptions));
+        const listQueryOptions = getListQueryOptions(globalOptionValue);
+        const variableModels = menuState.variableModels;
+        menuState.menuHandler = getVariableModelMenuHandler(variableModels, listQueryOptions);
     }
     menuState.contextKey = uuidv4();
 };
@@ -343,7 +341,7 @@ const handleUpdateInherit = async (inherit: boolean) => {
 
     // update init state
     if (widgetFormGetters.globalOptionInfo?.optionKey === props.propertyName) {
-        // reset all other options init state to false
+        // reset all options' init states to false - including global option
         widgetFormStore.resetOptionsInitMap();
     } else {
         widgetFormStore.updateOptionInitState(props.propertyName, false);
@@ -361,15 +359,18 @@ watch([
     () => state.isGlobalOptionReady,
     () => state.isOptionInitiated,
     () => state.globalOptionValue, // watch globalOptionValue to re-init menu handlers
-], async ([propertyName, isGlobalOptionReady, isOptionInitiated]) => {
+], async ([propertyName, isGlobalOptionReady, isOptionInitiated, globalOptionValue]) => {
     if (!propertyName) return;
     if (!isGlobalOptionReady) return; // init option after global option is ready
     if (isOptionInitiated) return;
+    if (state.isInitiating) return;
 
-    initMenuHandlers();
+    state.isInitiating = true;
+    initMenuHandlers(globalOptionValue);
     state.selected = await initSelectedMenuItems();
     updateWidgetOptionsBySelected(widgetFormState.inheritOptions?.[props.propertyName]?.enabled ? undefined : state.selected);
     widgetFormStore.updateOptionInitState(propertyName, true);
+    state.isInitiating = false;
 }, { immediate: true });
 watch(() => state.errorMessage, (errorMessage) => {
     widgetFormStore.updateOptionValidState(props.propertyName, !errorMessage);
@@ -408,7 +409,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                                        is-fixed-width
                                        :is-filterable="!state.inherit"
                                        :multi-selectable="state.selectionType === 'MULTI'"
-                                       :handler="menuState.menuHandlers"
+                                       :handler="menuState.menuHandler"
                                        :selected="state.selected"
                                        :invalid="!!state.errorMessage"
                                        :disabled="(state.inheritanceMode === 'KEY_MATCHING' && state.inherit) || state.readonly"
