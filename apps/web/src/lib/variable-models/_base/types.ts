@@ -49,7 +49,6 @@ export interface ListQuery {
 }
 export interface ListResponse {
     results: Value[];
-    total_count?: number;
     more?: boolean;
 }
 export interface Value {
