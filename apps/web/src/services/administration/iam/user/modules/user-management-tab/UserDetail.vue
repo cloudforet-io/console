@@ -11,12 +11,15 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
+import { postValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 
 import { calculateTime, userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import type { UserDetailData } from '@/services/administration/iam/user/type';
@@ -62,6 +65,9 @@ const state = reactive({
         ];
     }),
     data: {} as UserDetailData,
+    verifyEmailLoading: false,
+    isModalVisible: false,
+    modalType: '',
 });
 
 /* API */
@@ -78,6 +84,24 @@ const getUserDetailData = async (userId) => {
         state.loading = false;
     } catch (e) {
         ErrorHandler.handleError(e);
+    }
+};
+const handleClickVerifyButton = async (type: string) => {
+    state.verifyEmailLoading = true;
+    try {
+        if (state.data.email_verified) return;
+        await postValidationEmail({
+            user_id: state.data.user_id,
+            domain_id: state.data.domain_id,
+            email: state.data.email,
+        });
+        await store.dispatch('user/setUser', { email: state.data.email });
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.isModalVisible = true;
+        state.verifyEmailLoading = false;
+        state.modalType = type;
     }
 };
 
@@ -153,13 +177,21 @@ watch(() => userPageState.visibleUpdateModal, (value) => {
             <template #extra="{label}">
                 <verify-button
                     v-if="label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && state.data.user_type !== 'API_USER'"
+                    :loading="state.verifyEmailLoading"
                     :email="state.data.email"
-                    :user-id="state.data.user_id"
-                    :domain-id="state.data.domain_id"
                     :verified="state.data.email_verified"
                     is-administration
-                    @refresh-user="getUserDetailData"
-                />
+                    @click-button="handleClickVerifyButton"
+                >
+                    <notification-email-modal
+                        :domain-id="state.data.domain_id"
+                        :user-id="state.data.user_id"
+                        :email="state.data.email"
+                        :modal-type="state.modalType"
+                        :visible.sync="state.isModalVisible"
+                        @refresh-user="getUserDetailData"
+                    />
+                </verify-button>
             </template>
         </p-definition-table>
     </div>
