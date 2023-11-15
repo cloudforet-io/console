@@ -1,3 +1,54 @@
+<script setup lang="ts">
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import { PI, PTextInput, PFieldGroup } from '@spaceone/design-system';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { emailValidator } from '@/lib/helper/user-validation-helper';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+
+import UserAccountModuleContainer
+    from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
+
+const state = reactive({
+    userType: computed(() => store.state.user.backend),
+    verified: computed(() => store.state.user.emailVerified),
+    userId: computed(() => store.state.user.userId),
+    domainId: computed(() => store.state.domain.domainId),
+});
+const {
+    forms: {
+        notificationEmail,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    notificationEmail: '',
+}, {
+    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
+});
+
+/* Watcher */
+watch(() => store.state.user.email, (value) => {
+    let result = value;
+    if (value === '') {
+        if (state.userType === 'LOCAL') {
+            result = state.userId;
+        } else {
+            result = '';
+        }
+    }
+    setForm('notificationEmail', result);
+}, { immediate: true });
+</script>
+
 <template>
     <user-account-module-container
         class="notification-email-wrapper"
@@ -58,57 +109,6 @@
         </form>
     </user-account-module-container>
 </template>
-
-<script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
-
-import { PI, PTextInput, PFieldGroup } from '@spaceone/design-system';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { emailValidator } from '@/lib/helper/user-validation-helper';
-
-import { useFormValidator } from '@/common/composables/form-validator';
-import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
-
-import UserAccountModuleContainer
-    from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
-
-const state = reactive({
-    userType: computed(() => store.state.user.backend),
-    verified: computed(() => store.state.user.emailVerified),
-    userId: computed(() => store.state.user.userId),
-    domainId: computed(() => store.state.domain.domainId),
-});
-const {
-    forms: {
-        notificationEmail,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-} = useFormValidator({
-    notificationEmail: '',
-}, {
-    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
-});
-
-/* Watcher */
-watch(() => store.state.user.email, (value) => {
-    let result = value;
-    if (value === '') {
-        if (state.userType === 'LOCAL') {
-            result = state.userId;
-        } else {
-            result = '';
-        }
-    }
-    setForm('notificationEmail', result);
-}, { immediate: true });
-</script>
 
 <style lang="postcss" scoped>
 .notification-email-wrapper {
