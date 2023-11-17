@@ -22,29 +22,29 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
 
     nameKey = 'name';
 
-    #only?: string[];
+    protected _only?: string[];
 
-    #searchTargets?: string[];
+    protected _searchTargets?: string[];
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: string[]; total_count: number }>>;
+    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results?: string[]; total_count?: number }>>;
 
     nameFormatter(data: any): string {
         return data[this.nameKey];
     }
 
     get only(): string[] {
-        if (this.#only) return this.#only;
+        if (this._only) return this._only;
         return [this.idKey, this.nameKey];
     }
 
     get searchTargets(): string[] {
-        if (this.#searchTargets) return this.#searchTargets;
+        if (this._searchTargets) return this._searchTargets;
         return [this.idKey, this.nameKey];
     }
 
-    #getFetcher(): ReturnType<typeof getCancellableFetcher<{ results: string[]; total_count: number }>>|undefined {
+    #getFetcher(): ReturnType<typeof getCancellableFetcher<{ results?: string[]; total_count?: number }>>|undefined {
         if (!this.resourceType) return undefined;
         const apiPath = this.resourceType.split('.').map((d) => camelCase(d));
 
@@ -97,9 +97,9 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
                     more = (query.start * query.limit) <= response.total_count;
                 }
                 this.#response = {
-                    results: response.results.map((d) => ({
+                    results: response.results ? response.results.map((d) => ({
                         key: d[this.idKey], name: this.nameFormatter(d),
-                    })),
+                    })) : [],
                     more,
                 };
             }
