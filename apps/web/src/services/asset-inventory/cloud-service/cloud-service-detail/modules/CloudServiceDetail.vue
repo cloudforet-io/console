@@ -135,6 +135,7 @@ const getSchema = async () => {
 };
 
 const apiQuery = new ApiQueryHelper();
+const apiQueryForGetData = new ApiQueryHelper();
 const listTypeQuery = new ApiQueryHelper();
 const unwindTagQuery = new ApiQueryHelper();
 
@@ -182,9 +183,29 @@ const getListApiParams = (type?: DynamicLayoutType) => {
     return params;
 };
 
+
+
+const getQueryForGetDataAPI = (): any => {
+    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
+    if (options.sortBy !== undefined) apiQueryForGetData.setSort(options.sortBy, options.sortDesc);
+    if (options.pageLimit !== undefined) apiQueryForGetData.setPageLimit(options.pageLimit);
+    if (options.pageStart !== undefined) apiQueryForGetData.setPageStart(options.pageStart);
+    if (options.searchText !== undefined) apiQueryForGetData.setFilters([{ v: options.searchText }]);
+    if (options.queryTags !== undefined) {
+        apiQueryForGetData.setFiltersAsQueryTag(options.queryTags);
+    }
+    return apiQueryForGetData.data;
+};
 const getData = async () => {
     state.data = dataMap[state.fetchOptionKey];
-    if (state.isTableTypeInDynamicLayout) {
+    if (state.currentLayout.type === 'raw-table') {
+        const params: any = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
+        const keyPath = state.currentLayout.options?.root_path;
+        if (keyPath) params.key_path = keyPath;
+        const res = await SpaceConnector.client.inventory.cloudService.getData(params);
+        if (res.total_count !== undefined) state.totalCount = res.total_count;
+        state.data = res.results;
+    } else if (state.isTableTypeInDynamicLayout) {
         try {
             const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams(state.currentLayout.type));
             if (res.total_count !== undefined) state.totalCount = res.total_count;
