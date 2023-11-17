@@ -87,6 +87,7 @@ const handleDeleteProperty = (propertyName: string) => {
                              height="1.25rem"
                              width="1.25rem"
                              :color="red[400]"
+                             class="header-icon"
                         />
                         {{ $t('DASHBOARDS.FORM.UNABLE_TO_ADD_WIDGET') }}
                     </p>
@@ -117,11 +118,19 @@ const handleDeleteProperty = (propertyName: string) => {
             @apply bg-red-100 text-gray-900;
             align-self: flex-start;
             padding: 1rem;
+            width: 100%;
             .no-global-option-header {
                 @apply text-label-lg font-bold;
+                display: flex;
+                align-items: center;
+                margin-bottom: 0.25rem;
+                .header-icon {
+                    margin-right: 0.25rem;
+                }
             }
             .no-global-option-desc {
                 @apply text-paragraph-md;
+                text-align: left;
             }
         }
     }
