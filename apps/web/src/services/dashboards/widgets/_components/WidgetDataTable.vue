@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core';
 import {
+    computed,
     defineProps, reactive, ref, watch,
 } from 'vue';
 
@@ -64,6 +65,14 @@ const emit = defineEmits<{(e: string, value: any): void}>();
 const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
     disabledLegends: {} as Record<number, boolean>,
+    tableOverflowXScroll: computed<boolean>(() => {
+        if (props.fields.length > 13) return true;
+        return false;
+    }),
+    tableOverflowXScrollWidth: computed<string|undefined>(() => {
+        if (!state.tableOverflowXScroll) return undefined;
+        return `${props.fields.length * 7}rem`;
+    }),
 });
 
 const labelRef = ref<HTMLElement[]|null>(null);
@@ -179,7 +188,13 @@ watch(() => props.legends, () => {
         >
             <template #default="{isEmpty}">
                 <table ref="tableRef"
-                       :class="{'ellipsis-table': !props.disableEllipsis }"
+                       :class="{
+                           'ellipsis-table': !props.disableEllipsis,
+                           'table-overflow-x-scroll': state.tableOverflowXScroll
+                       }"
+                       :style="{
+                           width: state.tableOverflowXScrollWidth,
+                       }"
                 >
                     <thead>
                         <tr>
@@ -364,9 +379,12 @@ watch(() => props.legends, () => {
         border-collapse: separate;
         border-spacing: 0;
         table-layout: fixed;
-    }
-    .ellipsis-table {
-        @apply w-full;
+        &.ellipsis-table {
+            @apply w-full;
+        }
+        &.table-overflow-x-scroll {
+            overflow-x: auto;
+        }
     }
     thead {
         tr {
