@@ -184,15 +184,26 @@ const getListApiParams = (type?: DynamicLayoutType) => {
 
 const getData = async () => {
     state.data = dataMap[state.fetchOptionKey];
-    try {
-        const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams(state.currentLayout.type));
-        if (res.total_count !== undefined) state.totalCount = res.total_count;
-        if (res.results) state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.data = undefined;
-        state.totalCount = 0;
+    if (state.isTableTypeInDynamicLayout) {
+        try {
+            const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams(state.currentLayout.type));
+            if (res.total_count !== undefined) state.totalCount = res.total_count;
+            if (res.results) state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            state.data = undefined;
+            state.totalCount = 0;
+        }
+    } else {
+        try {
+            const res = await SpaceConnector.clientV2.inventory.cloudService.get({ cloud_service_id: props.cloudServiceId });
+            if (res) state.data = res;
+        } catch (e) {
+            ErrorHandler.handleError(e);
+            state.data = undefined;
+        }
     }
+
     dataMap[state.fetchOptionKey] = state.data;
 };
 
