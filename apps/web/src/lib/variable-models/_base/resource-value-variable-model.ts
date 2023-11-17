@@ -63,6 +63,13 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
                 limit: query.limit,
             };
         }
+        if (query.search) {
+            _query.filter.push({
+                key: this.referenceKey,
+                value: query.search,
+                operator: 'contain',
+            });
+        }
         return {
             query: _query,
         };

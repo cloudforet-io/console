@@ -207,12 +207,12 @@ const initSelectedInStoredOptionArrayTypeCase = async (selected: Array<ConsoleFi
     return values;
 };
 
-const initSelectedInStoredOptionPrimitiveTypeCase = async (selected: string): Promise<SelectDropdownMenuItem[]> => {
+const initSelectedInStoredOptionPrimitiveTypeCase = async (value: string): Promise<SelectDropdownMenuItem[]> => {
     if (menuState.menuHandler) {
-        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandler, [{ name: selected }]);
+        const refinedSelected = await getRefinedSelectedItemByHandlers(menuState.menuHandler, [{ name: value }]);
         return refinedSelected;
     }
-    return [{ name: selected }];
+    return [{ name: value, label: value }];
 };
 
 

@@ -71,6 +71,7 @@ interface ModelConfig {
     resourceType?: string;
     idKey?: string;
     referenceKey?: string;
+    prefetch?: boolean;
 }
 export const MANAGED_VARIABLE_MODEL_CONFIGS: Record<ManagedVariableModelKey, ModelConfig> = {} as any;
 Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
@@ -86,6 +87,7 @@ Object.keys(MANAGED_VARIABLE_MODELS).forEach((key) => {
             resourceType: (model as IResourceNameVariableModel).resourceType,
             idKey: (model as IResourceNameVariableModel).idKey,
             referenceKey: (model as IResourceValueVariableModel).referenceKey,
+            prefetch: model.prefetch,
         },
     });
 });
