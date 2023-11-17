@@ -12,7 +12,7 @@ import type {
     DashboardSettings, DashboardVariables, DashboardVariablesSchema,
     DashboardVariableSchemaProperty,
 } from '@/services/dashboards/config';
-import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import { DASHBOARD_LABEL, DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type {
@@ -59,9 +59,13 @@ export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>(
 });
 
 const refineProjectDashboardVariablesSchema = (variablesSchemaInfo: DashboardVariablesSchema, labels?: string[]): DashboardVariablesSchema => {
-    let projectPropertySchema = { ...MANAGED_DASH_VAR_SCHEMA.properties.project, disabled: true };
+    let projectPropertySchema = {
+        ...MANAGED_DASH_VAR_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
+    };
     if (labels?.includes('Asset')) {
-        projectPropertySchema = { ...MANAGED_DASH_VAR_SCHEMA.properties.project, disabled: true };
+        projectPropertySchema = {
+            ...MANAGED_DASH_VAR_SCHEMA.properties.project, readonly: true, fixed: true, required: true,
+        };
     }
     const properties = { ...variablesSchemaInfo.properties, project: projectPropertySchema };
 
@@ -277,13 +281,15 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         },
         // This action is for handling dashboard data that does not reflect schema changes.
         convertDashboardInfo(dashboardInfo: DashboardModel): DashboardModel {
-            // NOTE: This is for conversion from old dashboard variable schema to new one which is stored to database before version 2.0(<=1.12).
-            const convertedVariablesSchema = getConvertedVariablesSchema(dashboardInfo.variables_schema);
+            // NOTE: This is for conversion from old dashboard variable schema and variables to new one which is stored to database before version 2.0(<=1.12).
+            const convertedVariablesSchema = getConvertedVariablesSchema(dashboardInfo.variables_schema, dashboardInfo.labels);
+            const convertedVariables = getConvertedVariables(dashboardInfo.variables);
             // NOTE: This is for conversion from old widget info spec to new one which is stored to database before version 2.0(<=1.12).
             const convertedWidgetLayouts = getConvertedWidgetLayouts(dashboardInfo.layouts);
             return {
                 ...dashboardInfo,
                 variables_schema: convertedVariablesSchema,
+                variables: convertedVariables,
                 layouts: convertedWidgetLayouts,
             };
         },
@@ -373,7 +379,7 @@ const getConvertedWidgetName = (storedWidgetName: string): string => {
     return storedWidgetName;
 };
 
-const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSchema): DashboardVariablesSchema => {
+const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSchema, labels: string[]): DashboardVariablesSchema => {
     if (isEmpty(storedVariablesSchema)) return storedVariablesSchema;
 
     const variablesSchema = cloneDeep(storedVariablesSchema);
@@ -385,10 +391,14 @@ const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSc
                     use: property.use,
                 };
             } else if (k === 'asset_query_set' || k === 'asset_compliance_type') { // NOTE: asset_compliance_type was used only in development environment.
-                variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = {
+                const schema = {
                     ...MANAGED_DASH_VAR_SCHEMA.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key],
-                    use: property.use,
                 };
+                schema.use = property.use;
+                if (labels.includes('Asset')) {
+                    schema.required = true;
+                }
+                variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = schema;
                 delete variablesSchema.properties[k];
             } else {
                 console.error(new Error(`conversion failed: ${k}: ${JSON.stringify(property)}`));
@@ -398,6 +408,13 @@ const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSc
             variablesSchema.properties[k] = {
                 ...property, options,
             };
+        }
+
+        if (!labels.includes(DASHBOARD_LABEL.ASSET) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]) {
+            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key].fixed = false;
+        }
+        if (!labels.includes(DASHBOARD_LABEL.COST) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]) {
+            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key].fixed = false;
         }
     });
     return variablesSchema;
@@ -420,6 +437,18 @@ const getConvertedCustomOptions = (storedOptions?: DeprecatedCustomVariableOptio
 
     console.error(new Error(`getConvertedCustomOptions: conversion failed ${JSON.stringify(storedOptions)}`));
     return undefined;
+};
+const getConvertedVariables = (storedVariables: DashboardVariables): DashboardVariables => {
+    if (isEmpty(storedVariables)) return storedVariables;
+
+    const variables = cloneDeep(storedVariables);
+    Object.entries(variables).forEach(([k, v]) => {
+        if (k === 'asset_query_set' || k === 'asset_compliance_type') { // NOTE: asset_compliance_type was used only in development environment.
+            variables[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = v;
+            delete variables[k];
+        }
+    });
+    return variables;
 };
 // only ENUM type was supported for custom options in old dashboard variable schema.
 type DeprecatedCustomVariableOptions = {

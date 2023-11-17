@@ -56,7 +56,7 @@ export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
             use: false,
             selection_type: 'SINGLE',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_DATA_SOURCE',
-            fixed: true,
+            required: true,
             options: [{
                 type: 'MANAGED',
                 key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
@@ -91,7 +91,7 @@ export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
             use: false,
             selection_type: 'SINGLE',
             description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_ASSET_COMPLIANCE_FRAMEWORK',
-            fixed: true,
+            required: true,
             options: [{
                 type: 'MANAGED',
                 key: MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
