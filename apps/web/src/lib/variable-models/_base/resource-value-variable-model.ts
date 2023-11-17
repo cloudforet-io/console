@@ -70,6 +70,13 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
                 operator: 'contain',
             });
         }
+        if (query.filters) {
+            _query.filter.push({
+                key: this.referenceKey,
+                value: query.filters,
+                operator: 'in',
+            });
+        }
         return {
             query: _query,
         };
