@@ -36,6 +36,7 @@ interface AnalyzeQuery {
     labels?: string[];
     group_by?: string[];
     keyword?: string;
+    select?: any;
 }
 
 export interface ExportOption {
