@@ -100,8 +100,10 @@ watch(() => state.hasNonInheritedWidgetOptions, (value) => {
     emit('update:has-non-inherited-widget-options', value);
 }, { immediate: true });
 
-watch(() => props.visible, (value) => {
-    if (value) state.contextKey = getUUID();
+watch([() => props.visible, () => dashboardDetailState.variables], ([visible]) => {
+    if (visible) {
+        state.contextKey = getUUID();
+    }
 });
 
 watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllOptionsInitiated], ([widgetInfo, isAllInit]) => {
