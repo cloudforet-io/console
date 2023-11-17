@@ -57,7 +57,7 @@ const searchQueryHelper = new QueryHelper().setKeyItemSets(props.handlers.keyIte
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     queryTags: computed(() => searchQueryHelper.setFilters(cloudServicePageState.searchFilters).queryTags),
-    cloudServiceFilters: computed(() => cloudServicePageStore.allFilters.filter((f: any) => f.k && ![
+    cloudServiceFilters: computed(() => cloudServicePageStore.allFilters.filter((f: any) => ![
         'labels',
         'service_code',
     ].includes(f.k))),
@@ -165,6 +165,7 @@ const getCloudServiceResourcesPayload = (): ExportOption => {
     ]);
     return ({
         name: 'Summary',
+        title: 'Summary',
         query_type: QueryType.ANALYZE,
         analyze_query: {
             ...excelApiQueryHelper.data,

@@ -78,6 +78,7 @@ const getSubDataExcelSearchQuery = () => {
             query_type: QueryType.SEARCH,
             search_query: {
                 sort,
+                ...getCloudServiceListQuery(),
                 ...(!isBaseInformationSchema && {
                     unwind: {
                         path: schema.options?.unwind?.path ?? '',
@@ -106,7 +107,7 @@ const handleConfirm = async () => {
         const cloudServiceExcelExportParams: ExportParameter = {
             file_name: cloudServiceDetailPageStore.sheetNamePrefix,
             options: cloudServiceListSheetQuery ? [cloudServiceListSheetQuery].concat(getSubDataExcelSearchQuery()) : getSubDataExcelSearchQuery(),
-            // timezone: state.timezone,
+            timezone: state.timezone,
         };
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
@@ -140,7 +141,7 @@ const getSchema = async () => {
 
 
 watch(() => props.visible, () => {
-    if (props.cloudServiceId && !state.detailSchemaList.length) getSchema();
+    if (props.cloudServiceId) getSchema();
     state.selectedSubDataIds = [MAIN_TABLE];
 });
 
