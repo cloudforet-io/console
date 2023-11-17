@@ -57,7 +57,7 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
                 },
             ],
         };
-        if (query.limit) {
+        if (query.start !== undefined && query.limit !== undefined) {
             _query.page = {
                 start: query.start,
                 limit: query.limit,
@@ -93,8 +93,8 @@ export default class ResourceValueVariableModel implements IResourceValueVariabl
             );
             if (status === 'succeed') {
                 let more = false;
-                if (query.start && query.limit && response.total_count) {
-                    more = (query.start * query.limit) <= response.total_count;
+                if (query.start !== undefined && query.limit !== undefined && response.total_count !== undefined) {
+                    more = (query.start * query.limit) < response.total_count;
                 }
                 this.#response = {
                     results: response.results.map((value) => ({
