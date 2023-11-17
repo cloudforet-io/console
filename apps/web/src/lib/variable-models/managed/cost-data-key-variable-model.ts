@@ -49,11 +49,21 @@ export default class CostDataKeyVariableModel implements IBaseVariableModel {
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.keys ?? [];
                 let results = target.map((d) => ({ key: d, name: d }));
+                let more = false;
+                if (query.filters?.length) {
+                    results = results.filter((item) => query.filters?.includes(item.key));
+                }
                 if (query.search) {
                     const regex = getTextHighlightRegex(query.search);
                     results = results.filter((item) => regex.test(item.name));
                 }
-                this.#response = { results };
+                if (query.start !== undefined && query.limit !== undefined) {
+                    const end = query.start + query.limit;
+                    const totalCount = results.length + 1;
+                    results = results.slice(query.start, end);
+                    more = end < totalCount;
+                }
+                this.#response = { results, more };
             }
             return this.#response;
         } catch (e) {

@@ -54,6 +54,7 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
             if (status === 'succeed' && response.results?.length) {
                 const target = response.results[0]?.cost_tag_keys ?? [];
                 let results = target.map((d) => ({ key: `tags.${d}`, name: `[Tag] ${d}` }));
+                let more = false;
                 if (query.filters?.length) {
                     const filters = query.filters.map((f) => (f.startsWith('tags.') ? f.replace('tags.', '') : f));
                     results = results.filter((item) => filters?.includes(item.key));
@@ -62,7 +63,13 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
                     const regex = getTextHighlightRegex(query.search);
                     results = results.filter((item) => regex.test(item.name));
                 }
-                this.#response = { results };
+                if (query.start !== undefined && query.limit !== undefined) {
+                    const end = query.start + query.limit;
+                    const totalCount = results.length + 1;
+                    results = results.slice(query.start, end);
+                    more = end < totalCount;
+                }
+                this.#response = { results, more };
             }
             return this.#response;
         } catch (e) {
