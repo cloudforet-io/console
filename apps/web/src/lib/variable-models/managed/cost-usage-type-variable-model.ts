@@ -11,4 +11,6 @@ export default class CostUsageTypeVariableModel extends ResourceValueVariableMod
     resourceType = 'cost_analysis.Cost';
 
     referenceKey = 'usage_type';
+
+    prefetch = true;
 }
