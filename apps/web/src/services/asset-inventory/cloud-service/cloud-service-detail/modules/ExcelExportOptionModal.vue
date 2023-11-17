@@ -106,7 +106,7 @@ const handleConfirm = async () => {
         const cloudServiceExcelExportParams: ExportParameter = {
             file_name: cloudServiceDetailPageStore.sheetNamePrefix,
             options: cloudServiceListSheetQuery ? [cloudServiceListSheetQuery].concat(getSubDataExcelSearchQuery()) : getSubDataExcelSearchQuery(),
-            // timezone: state.timezone,
+            timezone: state.timezone,
         };
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };

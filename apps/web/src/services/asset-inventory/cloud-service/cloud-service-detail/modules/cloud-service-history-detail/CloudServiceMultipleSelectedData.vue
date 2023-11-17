@@ -205,6 +205,7 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
                     },
                 },
             ],
+            timezone: state.timezone,
         };
         return SpaceConnector.clientV2.inventory.cloudService.export(cloudServiceExcelExportParams);
     };
