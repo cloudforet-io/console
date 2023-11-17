@@ -23,8 +23,8 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import type { Granularity, WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 
@@ -36,6 +36,7 @@ export interface WidgetFrameProps {
     widgetLocation?: Location;
     widgetConfigId?: string;
     dateRange?: DateRange;
+    granularity?: Granularity;
     noData?: boolean;
     printMode?: boolean;
     selectedDates?: string[];
@@ -68,6 +69,7 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     widgetLocation: undefined,
     widgetConfigId: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
+    granularity: undefined,
     selectedDates: () => [],
     currency: undefined,
     overflowY: undefined,
@@ -85,20 +87,36 @@ const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
         if (props.dataCriteria === 'realtime') return i18n.t('DASHBOARDS.WIDGET.REALTIME');
+
         const start = props.dateRange?.start;
-        const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
-        if (endDayjs) {
+        const end = props.dateRange?.end;
+        if (props.granularity === GRANULARITY.YEARLY) {
+            const nowDayjs = dayjs.utc();
+            const endDayjs = end ? dayjs.utc(end) : nowDayjs;
+            const isCurrentYear = endDayjs.isSame(nowDayjs, 'year');
             let endText;
-            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
-            if (isCurrentMonth) endText = dayjs.utc().format('YY-MM-DD');
-            else endText = endDayjs.endOf('month').format('YY-MM-DD');
+            if (isCurrentYear) endText = nowDayjs.format('YYYY/MM/DD');
+            else endText = endDayjs.endOf('year').format('YYYY/MM/DD');
             if (start) {
-                const startText = dayjs.utc(start).format('YY-MM-DD');
+                const startText = endDayjs.startOf('year').format('YYYY/MM/DD');
                 return `${startText} ~ ${endText}`;
             }
             return endText;
         }
-        if (start && !endDayjs) {
+
+        if (end) {
+            let endText;
+            const endDayjs = dayjs.utc(end);
+            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
+            if (isCurrentMonth) endText = dayjs.utc().format('YYYY/MM/DD');
+            else endText = endDayjs.endOf('month').format('YYYY/MM/DD');
+            if (start) {
+                const startText = dayjs.utc(start).format('YYYY/MM/DD');
+                return `${startText} ~ ${endText}`;
+            }
+            return endText;
+        }
+        if (start && !end) {
             const today = dayjs();
             const diff = today.diff(start, 'day', true);
             if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
