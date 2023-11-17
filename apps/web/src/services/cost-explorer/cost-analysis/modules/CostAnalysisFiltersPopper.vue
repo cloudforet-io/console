@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
     PSelectDropdown, PTextButton,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { cloneDeep, isEqual } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { VariableModel } from '@/lib/variable-models';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
+import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -23,20 +23,29 @@ import CostAnalysisFiltersAddMoreButton
 import { GROUP_BY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 
-
-const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageState = costAnalysisPageStore.$state;
 
-const storeState = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
-    projectGroups: computed(() => allReferenceStore.getters.projectGroup),
-    providers: computed(() => allReferenceStore.getters.provider),
-    serviceAccounts: computed(() => allReferenceStore.getters.serviceAccount),
+const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
+    [GROUP_BY.PROJECT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key })],
+    [GROUP_BY.PROJECT_GROUP]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key })],
+    [GROUP_BY.PRODUCT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key })],
+    [GROUP_BY.PROVIDER]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key })],
+    [GROUP_BY.SERVICE_ACCOUNT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key })],
+    [GROUP_BY.REGION]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.region.key })],
+    [GROUP_BY.USAGE_TYPE]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_usage_type.key })],
+};
+
+const getInitialSelectedItemsMap = (): Record<string, SelectDropdownMenuItem[]> => ({
 });
+
+const props = defineProps<{
+    visible: boolean;
+}>();
+
 const state = reactive({
     loading: true,
-    enabledFilters: computed<MenuItem[]>(() => {
+    enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
         return costAnalysisPageState.enabledFiltersProperties.map((d) => {
             const targetItem = costAnalysisPageStore.defaultGroupByItems.find((item) => item.name === d);
@@ -44,70 +53,58 @@ const state = reactive({
             return { name: d, label: d };
         });
     }),
-    selectedFilterableItemsMap: computed<Record<string, SelectDropdownMenuItem[]>>(() => {
-        const _selectedItems = {} as Record<string, SelectDropdownMenuItem[]>;
-        Object.entries(costAnalysisPageState.filters ?? {}).forEach(([groupBy, items]) => {
-            _selectedItems[groupBy] = getRefinedMenuItems(groupBy, items.map((d) => ({ name: d, label: d })));
+    listQueryOptions: computed<Partial<Record<ManagedVariableModelKey, any>>>(() => ({
+        cost_data_source: costAnalysisPageStore.selectedDataSourceId,
+    })),
+    selectedItemsMap: getInitialSelectedItemsMap() as Record<string, SelectDropdownMenuItem[]>,
+    handlerMap: computed(() => {
+        const handlerMaps = {};
+        state.enabledFilters.forEach(({ name }) => {
+            handlerMaps[name] = getMenuHandler(name, state.listQueryOptions);
         });
-        return _selectedItems;
+        return handlerMaps;
     }),
 });
 
-const resourceApiQueryHelper = new ApiQueryHelper();
-const fetchDistinct = getCancellableFetcher(SpaceConnector.client.addOns.autocomplete.distinct);
-const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|undefined> => {
-    resourceApiQueryHelper.setFilters([
-        { k: 'data_source_id', v: costAnalysisPageStore.selectedDataSourceId ?? '', o: '=' },
-    ]);
+const getMenuHandler = (groupBy: string, listQueryOptions: Partial<Record<ManagedVariableModelKey, any>>): AutocompleteHandler => {
     try {
-        let resourceType = 'cost_analysis.Cost';
-        if (distinctKey === GROUP_BY.PROJECT_GROUP) resourceType = 'identity.ProjectGroup';
-        else if (distinctKey === GROUP_BY.PROJECT) resourceType = 'identity.Project';
-        const { status, response } = await fetchDistinct({
-            resource_type: resourceType,
-            distinct_key: distinctKey,
-            search: inputText,
-            ...resourceApiQueryHelper.data,
-        });
-        if (status) return response?.results;
-        return undefined;
-    } catch (e: any) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    }
-};
-const menuHandler = (groupBy: string): AutocompleteHandler => async (inputValue: string, pageStart, pageLimit = 10) => {
-    if (!groupBy) return { results: [] };
-
-    state.loading = true;
-    const results = await getResources('', groupBy);
-    /* Get all resources without inputValue.
-    * Because, results has no label to be filtered by inputValue. */
-    state.loading = false;
-
-    const refinedMenuItems = getRefinedMenuItems(groupBy, results?.map((d) => ({ name: d.key, label: d.name })));
-    // filter by inputValue here.
-    const refinedMenuItemsFilteredByInputValue = refinedMenuItems.filter((d) => (d.label as string).toLowerCase().includes(inputValue.toLowerCase()));
-    const slicedResults = refinedMenuItemsFilteredByInputValue?.slice((pageStart ?? 1) - 1, pageLimit);
-    return { results: slicedResults, more: pageLimit < refinedMenuItemsFilteredByInputValue.length };
-};
-const getRefinedMenuItems = (groupBy: string, results?: Array<{name: string; label: string}>): MenuItem[] => {
-    if (!results) return [];
-    return results.map((d) => {
-        if (groupBy === GROUP_BY.PROJECT) {
-            return { name: d.name, label: storeState.projects[d.name].label };
-        } if (groupBy === GROUP_BY.PROJECT_GROUP) {
-            return { name: d.name, label: storeState.projectGroups[d.name].label };
-        } if (groupBy === GROUP_BY.PROVIDER) {
-            return { name: d.name, label: storeState.providers[d.name].label };
-        } if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
-            return { name: d.name, label: storeState.serviceAccounts[d.name].label };
+        let variableModels: VariableModel|VariableModel[] = GROUP_BY_TO_VAR_MODELS[groupBy];
+        if (!variableModels) {
+            variableModels = new VariableModel(({
+                type: 'RESOURCE_VALUE',
+                resource_type: 'cost_analysis.Cost',
+                reference_key: groupBy,
+                name: groupBy,
+            }));
         }
-        return { name: d.name, label: d.label };
-    });
+        const handler = getVariableModelMenuHandler(variableModels, listQueryOptions);
+
+        return async (...args) => {
+            if (!groupBy) return { results: [] };
+            try {
+                state.loading = true;
+                const results = await handler(...args);
+                return results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return { results: [] };
+            } finally {
+                state.loading = false;
+            }
+        };
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return async () => ({ results: [] });
+    }
 };
 
 const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropdownMenuItem[]) => {
+    if (isEqual(state.selectedItemsMap[groupBy], selectedItems)) return;
+
+    const selectedItemsMap = cloneDeep(state.selectedItemsMap);
+    selectedItemsMap[groupBy] = selectedItems;
+    state.selectedItemsMap = selectedItemsMap;
+
     costAnalysisPageStore.$patch((_state) => {
         _state.filters = {
             ..._state.filters,
@@ -117,6 +114,7 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropd
 };
 const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
     if (all) {
+        state.selectedItemsMap = getInitialSelectedItemsMap();
         costAnalysisPageStore.$patch((_state) => {
             _state.filters = {};
         });
@@ -128,6 +126,8 @@ const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
     }
 };
 const handleClickResetFilters = () => {
+    state.selectedItemsMap = getInitialSelectedItemsMap();
+
     const _originConsoleFilters: ConsoleFilter[]|undefined = costAnalysisPageStore.selectedQuerySet?.options?.filters;
     const _originFilters: Record<string, string[]> = {};
     if (_originConsoleFilters?.length) {
@@ -140,14 +140,16 @@ const handleClickResetFilters = () => {
     });
 };
 
-(async () => {
-    await Promise.allSettled([
-        allReferenceStore.load('project'),
-        allReferenceStore.load('projectGroup'),
-        allReferenceStore.load('provider'),
-        allReferenceStore.load('serviceAccount'),
-    ]);
-})();
+watch(() => props.visible, (visible) => {
+    if (!visible) return;
+    const filters = costAnalysisPageState.filters;
+    const selectedItemsMap = {};
+    Object.keys(filters ?? {}).forEach((groupBy) => {
+        selectedItemsMap[groupBy] = filters?.[groupBy].map((d) => ({ name: d })) ?? [];
+    });
+    state.selectedItemsMap = selectedItemsMap;
+}, { immediate: true });
+
 </script>
 
 <template>
@@ -157,8 +159,8 @@ const handleClickResetFilters = () => {
             :key="`filters-dropdown-${groupBy.name}`"
             class="filters-popper-dropdown"
             is-filterable
-            :handler="menuHandler(groupBy.name)"
-            :selected="state.selectedFilterableItemsMap[groupBy.name] ?? []"
+            :handler="state.handlerMap[groupBy.name]"
+            :selected="state.selectedItemsMap[groupBy.name] ?? []"
             :loading="state.loading"
             multi-selectable
             style-type="rounded"
@@ -166,6 +168,7 @@ const handleClickResetFilters = () => {
             show-select-marker
             use-fixed-menu-style
             selection-highlight
+            :init-selected-with-handler="props.visible && !!GROUP_BY_TO_VAR_MODELS[groupBy.name]"
             :selection-label="groupBy.label"
             :show-delete-all-button="false"
             :page-size="10"

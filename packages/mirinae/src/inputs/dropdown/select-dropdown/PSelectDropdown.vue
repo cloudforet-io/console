@@ -254,10 +254,10 @@ watch(() => props.disabled, (disabled) => {
 })();
 
 const isInitiatingWithHandler = ref(false);
-watch(() => props.handler, async (handler, prevHandler) => {
+watch([() => props.handler, () => props.initSelectedWithHandler], async ([handler, initSelectedWithHandler]) => {
     if (props.disableHandler) return;
-    if (!props.initSelectedWithHandler) return;
-    if (!handler || handler === prevHandler) return;
+    if (!initSelectedWithHandler) return;
+    if (!handler) return;
     if (!state.proxySelectedItem.length) return;
     if (isInitiatingWithHandler.value) return;
 
