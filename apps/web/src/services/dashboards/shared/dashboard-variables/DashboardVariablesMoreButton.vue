@@ -106,7 +106,7 @@ const state = reactive({
         return ({
             name: property,
             label: currentProperty?.name ?? property,
-            disabled: currentProperty?.required,
+            disabled: currentProperty?.fixed,
         });
     })),
     selected: computed<MenuItem[]>(() => {
@@ -114,7 +114,7 @@ const state = reactive({
         state.variableSchema.order.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
-            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled || currentProperty.required });
+            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.fixed });
         });
         return result;
     }),

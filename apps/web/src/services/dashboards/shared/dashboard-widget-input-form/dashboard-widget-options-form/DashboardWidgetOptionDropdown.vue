@@ -424,6 +424,7 @@ watch(() => state.errorMessage, (errorMessage) => {
                                        :invalid="!!state.errorMessage"
                                        :disabled="(state.inheritanceMode === 'KEY_MATCHING' && state.inherit) || state.readonly"
                                        show-select-marker
+                                       :page-size="10"
                                        @update:selected="handleUpdateSelected"
                     >
                         <template #dropdown-button>

@@ -27,6 +27,7 @@ export default class EnumVariableModel implements IEnumVariableModel {
     async list(query: ListQuery = {}): Promise<ListResponse> {
         let results = this.values;
         const filters = query.filters;
+        let more = false;
         if (filters?.length) {
             results = results.filter((item) => filters.includes(item.key));
         }
@@ -34,7 +35,12 @@ export default class EnumVariableModel implements IEnumVariableModel {
             const regex = getTextHighlightRegex(query.search);
             results = results.filter((item) => regex.test(item.name));
         }
-        this.#response = { results };
+        if (query.start !== undefined && query.limit !== undefined) {
+            const end = query.start + query.limit;
+            results = results.slice(query.start, end);
+            more = end < results.length + 1;
+        }
+        this.#response = { results, more };
         return this.#response;
     }
 }

@@ -121,23 +121,6 @@ const handleClickShowMore = (item: SelectDropdownMenuItem) => {
     showMoreMenu(item._resultIndex);
 };
 
-// TODO: apply filters to variable model referencing code below.
-// const filtersHelper = new QueryHelper();
-// const getFilters = (variableProperty?: DashboardVariableSchemaProperty): QueryHelper['apiQuery']['filter']|undefined => {
-//     filtersHelper.setFilters([]);
-//
-//     // NOTE: Some variables(asset) require specific API filters.
-//     if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_query_set.name) {
-//         filtersHelper.setFilters([{ k: 'ref_cloud_service_type.labels', o: '=', v: 'Compliance' }]);
-//     } else if (variableProperty?.name === ASSET_VARIABLE_TYPE_INFO.asset_account.name) {
-//         filtersHelper.setFilters([{ k: 'provider', o: '=', v: 'aws' }]);
-//     }
-//
-//     const filters = filtersHelper.apiQuery.filter;
-//     if (filters.length) return filters;
-//     return undefined;
-// };
-
 const loadOptionItems = async (selectedValues?: string[]): Promise<MenuItem[]> => {
     let foundItems: MenuItem[] = [];
     const responses = await state.menuHandler(
