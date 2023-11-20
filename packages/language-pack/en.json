@@ -970,6 +970,7 @@
 			"SEND_CODE": "Send Code",
 			"SEND_NEW_CODE": "Send new code",
 			"SENT_DESC": "A verification code has been sent to",
+			"SUCCESS": "A verification code has been sent to your notification email.",
 			"TITLE": "Verify your Email Address",
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFY_NOW": "Verify Now"
