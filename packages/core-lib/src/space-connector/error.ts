@@ -11,7 +11,7 @@ export class APIError extends Error {
 
     axiosError?: AxiosError;
 
-    constructor(axiosError: AxiosError) {
+    constructor(axiosError: AxiosError<any>) {
 	    super();
 	    this.name = RESPONSE.API_ERROR;
 	    this.status = 500;
