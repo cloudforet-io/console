@@ -16,9 +16,14 @@ export interface UserRole {
     pagePermissions: RawPagePermission[];
 }
 
+interface UserMfaOptions {
+    email?: string;
+}
+
 interface UserMfa {
     state: MfaState;
     mfaType: MfaType;
+    options?: UserMfaOptions;
 }
 
 export interface UserState {

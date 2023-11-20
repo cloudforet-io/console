@@ -8,7 +8,7 @@ import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/typ
 interface Props {
     loading: boolean
     email: string
-    verified: boolean
+    verified?: boolean
     isAdministration?: boolean
 }
 

@@ -962,6 +962,18 @@
 		"INFO_BUTTON": {
 			"INFO": "Info"
 		},
+		"MFA_MODAL": {
+			"COLLAPSE_DESC": "Check your junk mail folder or wait a few minutes. if you're still having\ntrouble,",
+			"COLLAPSE_TITLE": "Didn't get verification code?",
+			"EMAIL": "Email",
+			"INVALID_CODE": "Invalid code. Please check the email try again.",
+			"SEND_CODE": "Send Code",
+			"SEND_NEW_CODE": "Send new code",
+			"SENT_DESC": "A verification code has been sent to",
+			"TITLE": "Verify your Email Address",
+			"VERIFICATION_CODE": "Verification Code",
+			"VERIFY_NOW": "Verify Now"
+		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "Every metric time displays in  {timezone}.",
 			"LIMIT_OF_RESOURCE": "Resource limit: {limitCount}",
