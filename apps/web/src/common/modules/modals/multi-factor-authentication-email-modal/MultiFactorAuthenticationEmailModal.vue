@@ -252,7 +252,6 @@ watch(() => state.proxyVisible, (value) => {
             }
             .edit-email-wrapper {
                 @apply flex items-end;
-                gap: 1rem;
                 margin-bottom: 0.875rem;
                 .email-input-group {
                     flex: 1;
