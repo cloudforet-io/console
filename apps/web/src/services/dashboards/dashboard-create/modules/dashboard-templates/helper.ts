@@ -43,6 +43,9 @@ export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVa
     if (label === DASHBOARD_LABEL.ASSET) {
         ASSET_VARIABLE_KEYS.forEach((key) => {
             _managedVariablesSchema.properties[key].use = true;
+            if (key === MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key) {
+                _managedVariablesSchema.properties[key].fixed = true;
+            }
         });
         _managedVariablesSchema.order = _managedVariablesSchema.order.sort((a, b) => {
             if (COST_VARIABLE_KEYS.includes(a)) {
@@ -56,6 +59,9 @@ export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVa
     if (label === DASHBOARD_LABEL.COST) {
         COST_VARIABLE_KEYS.forEach((key) => {
             _managedVariablesSchema.properties[key].use = true;
+            if (key === MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key) {
+                _managedVariablesSchema.properties[key].fixed = true;
+            }
         });
         _managedVariablesSchema.order = _managedVariablesSchema.order.sort((a, b) => {
             if (ASSET_VARIABLE_KEYS.includes(a)) {
