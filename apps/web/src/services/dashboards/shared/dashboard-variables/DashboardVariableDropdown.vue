@@ -209,7 +209,7 @@ const {
                 >
                     +{{ state.selected.length - 1 }}
                 </p-badge>
-                <button v-if="!state.variableProperty?.readonly && !state.variableProperty?.fixed"
+                <button v-if="!state.variableProperty?.readonly && !state.variableProperty?.required"
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"

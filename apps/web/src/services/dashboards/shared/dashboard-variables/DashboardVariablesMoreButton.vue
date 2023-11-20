@@ -209,7 +209,7 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 
     // Normal case
     beforePropertiesEntries.forEach(([k, v]) => {
-        if (v.required) return; /* required variable case */
+        if (v.fixed) return; /* required variable case */
         if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
             if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
                 state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(k);
