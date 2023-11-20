@@ -51,8 +51,7 @@ export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariabl
                 let results = target.map((d) => ({ key: `additional_info.${d}`, name: d }));
                 let more = false;
                 if (query.filters?.length) {
-                    const filters = query.filters.map((f) => (f.startsWith('additional_info.') ? f.replace('additional_info.', '') : f));
-                    results = results.filter((item) => filters?.includes(item.key));
+                    results = results.filter((item) => query.filters?.includes(item.key));
                 }
                 if (query.search) {
                     const regex = getTextHighlightRegex(query.search);
