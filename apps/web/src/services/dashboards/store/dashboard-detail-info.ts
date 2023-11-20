@@ -390,13 +390,13 @@ const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSc
                     ...MANAGED_DASH_VAR_SCHEMA.properties[k],
                     use: property.use,
                 };
-            } else if (k === 'asset_query_set' || k === 'asset_compliance_type') { // NOTE: asset_compliance_type was used only in development environment.
+            } else if (k === 'asset_query_set') {
                 const schema = {
                     ...MANAGED_DASH_VAR_SCHEMA.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key],
                 };
                 schema.use = property.use;
                 if (labels.includes('Asset')) {
-                    schema.required = true;
+                    schema.fixed = true;
                 }
                 variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = schema;
                 delete variablesSchema.properties[k];
@@ -410,11 +410,26 @@ const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSc
             };
         }
 
+        // Remove `fixed` property that is not appropriate for the dashboard label
         if (!labels.includes(DASHBOARD_LABEL.ASSET) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]) {
             variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key].fixed = false;
         }
         if (!labels.includes(DASHBOARD_LABEL.COST) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]) {
             variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key].fixed = false;
+        }
+
+        // Add fixed property for the dashboard label
+        if (labels.includes(DASHBOARD_LABEL.ASSET) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]) {
+            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key].fixed = true;
+        }
+        if (labels.includes(DASHBOARD_LABEL.COST) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]) {
+            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key].fixed = true;
+        }
+
+        // Change deprecated name from order
+        const index = variablesSchema.order.indexOf('asset_query_set');
+        if (index > -1) {
+            variablesSchema.order.splice(index, 1, MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key);
         }
     });
     return variablesSchema;
@@ -443,7 +458,7 @@ const getConvertedVariables = (storedVariables: DashboardVariables): DashboardVa
 
     const variables = cloneDeep(storedVariables);
     Object.entries(variables).forEach(([k, v]) => {
-        if (k === 'asset_query_set' || k === 'asset_compliance_type') { // NOTE: asset_compliance_type was used only in development environment.
+        if (k === 'asset_query_set') {
             variables[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = v;
             delete variables[k];
         }
