@@ -2,10 +2,10 @@ import {
     cloneDeep, isEmpty, isEqual,
 } from 'lodash';
 import { defineStore } from 'pinia';
-import { v4 as uuidv4 } from 'uuid';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import type {
@@ -188,7 +188,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             this.labels = _dashboardInfo.labels;
             this.dashboardWidgetInfoList = _dashboardInfo?.layouts?.flat()?.map((info) => ({
                 ...info,
-                widget_key: info.widget_key ?? uuidv4(),
+                widget_key: info.widget_key ?? getRandomId(),
             })) ?? [];
         },
         async getDashboardInfo(dashboardId: undefined|string, force = false) {

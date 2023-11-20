@@ -3,7 +3,8 @@ import { computed, reactive } from 'vue';
 
 import { PDataLoader, PTextButton, PI } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
+
+import getRandomId from '@/lib/random-id-generator';
 
 import { red } from '@/styles/colors';
 
@@ -42,13 +43,13 @@ const state = reactive({
         // in no global option case, decide loading state by checking if all options are initiated
         return !widgetFormGetters.isAllOptionsInitiated;
     }),
-    uuid: uuidv4(),
+    uuid: getRandomId(),
 });
 
 /* event handlers */
 const handleReturnToInitialSettings = () => {
     widgetFormStore.returnToInitialSettings();
-    state.uuid = uuidv4();
+    state.uuid = getRandomId();
 };
 const handleDeleteProperty = (propertyName: string) => {
     widgetFormStore.updateInheritOption(propertyName, false);
