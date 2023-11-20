@@ -344,14 +344,29 @@ const getConvertedWidgetOptions = (storedWidgetName: string, storedWidgetOptions
         if (!_widgetOptions) _widgetOptions = {};
         _widgetOptions.cost_secondary_data_field = 'additional_info.Usage Type Details';
         delete (_widgetOptions as any).cost_group_by;
+        _widgetOptions.filters = {
+            cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
+        };
         return _widgetOptions;
     }
-
-    if (['awsDataTransferCostTrend', 'awsCloudFrontCost'].includes(storedWidgetName)) {
+    if (storedWidgetName === 'awsDataTransferCostTrend') {
         let _widgetOptions = widgetOptions;
         if (!_widgetOptions) _widgetOptions = {};
         _widgetOptions.cost_data_field = 'additional_info.Usage Type Details';
         delete (_widgetOptions as any).cost_group_by;
+        _widgetOptions.filters = {
+            cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
+        };
+        return _widgetOptions;
+    }
+    if (storedWidgetName === 'awsCloudFrontCost') {
+        let _widgetOptions = widgetOptions;
+        if (!_widgetOptions) _widgetOptions = {};
+        _widgetOptions.cost_secondary_data_field = 'additional_info.Usage Type Details';
+        delete (_widgetOptions as any).cost_group_by;
+        _widgetOptions.filters = {
+            cost_product: [{ k: 'product', v: ['AmazonCloudFront'], o: '=' }],
+        };
         return _widgetOptions;
     }
 
