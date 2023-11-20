@@ -30,7 +30,7 @@ export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-
         selectedCloudServiceType: undefined as undefined | CloudServiceTypeInfo,
     }),
     getters: {
-        sheetNamePrefix: (state) => (`${state.provider}_${state.group}_${state.name}`.replace(/\//g, '')),
+        sheetNamePrefix: (state) => (`${state.provider}_${state.group}_${state.name}`.replace(/\//g, '')).toLowerCase(),
     },
     actions: {
         async listCloudServiceTypeData() {

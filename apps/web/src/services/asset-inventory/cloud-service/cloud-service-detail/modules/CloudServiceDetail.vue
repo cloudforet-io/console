@@ -34,6 +34,8 @@ import type { Reference } from '@/lib/reference/type';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
+
 interface Props {
     cloudServiceId: string;
     cloudServiceGroup: string;
@@ -57,7 +59,7 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
 const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
-
+const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
 const state = reactive({
     data: undefined as any,
     loading: true,
@@ -239,10 +241,10 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const excelExportFetcher = () => {
         const cloudServiceExcelExportParams: ExportParameter = {
+            file_name: cloudServiceDetailPageStore.sheetNamePrefix,
             options: [
                 {
                     name: state.currentLayout.name,
-                    title: `[${props.cloudServiceGroup}] ${props.cloudServiceType} ${state.activeTab}`,
                     query_type: QueryType.SEARCH,
                     search_query: {
                         ...excelQuery.data,
