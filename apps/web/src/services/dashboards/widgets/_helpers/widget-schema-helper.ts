@@ -90,12 +90,5 @@ export const getRefinedSchemaProperties = (
     widgetOptions?: WidgetOptions,
 ): string[] => {
     const optionExistProperties = storedProperties.filter((property) => !!get(widgetOptions, property));
-
-    // Change deprecated name from order
-    const index = optionExistProperties.indexOf('asset_query_set');
-    if (index > -1) {
-        optionExistProperties.splice(index, 1, WIDGET_OPTIONS_SCHEMA_PROPERTIES.cloud_service_query_set.key);
-    }
-
     return union(initialProperties, optionExistProperties);
 };

@@ -21,6 +21,7 @@ import type {
     UpdatableWidgetInfo, WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { WIDGET_OPTIONS_SCHEMA_PROPERTIES } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface WidgetValidMap {
@@ -302,12 +303,14 @@ const getConvertedWidgetLayouts = (storedWidgetLayouts: DashboardModel['layouts'
     return storedWidgetLayouts.map((layout) => layout.map((widgetInfo) => {
         const convertedInheritOptions = getConvertedWidgetInheritOptions(widgetInfo.inherit_options);
         const convertedWidgetOptions = getConvertedWidgetOptions(widgetInfo.widget_name, widgetInfo.widget_options);
+        const convertedSchemaProperties = getConvertedSchemaProperties(widgetInfo.schema_properties);
         const convertedWidgetName = getConvertedWidgetName(widgetInfo.widget_name);
         return {
             ...widgetInfo,
             widget_name: convertedWidgetName,
             inherit_options: convertedInheritOptions,
             widget_options: convertedWidgetOptions,
+            schema_properties: convertedSchemaProperties,
         };
     }));
 };
@@ -365,6 +368,17 @@ const getConvertedWidgetOptions = (storedWidgetName: string, storedWidgetOptions
     });
 
     return widgetOptions;
+};
+const getConvertedSchemaProperties = (storedSchemaProperties?: string[]): string[]|undefined => {
+    if (!storedSchemaProperties?.length) return undefined;
+
+    // Change deprecated name from order
+    const _storedSchemaProperties = cloneDeep(storedSchemaProperties);
+    const index = _storedSchemaProperties.indexOf('asset_query_set');
+    if (index > -1) {
+        _storedSchemaProperties.splice(index, 1, WIDGET_OPTIONS_SCHEMA_PROPERTIES.cloud_service_query_set.key);
+    }
+    return _storedSchemaProperties;
 };
 const getConvertedWidgetName = (storedWidgetName: string): string => {
     if (storedWidgetName === 'awsDataTransferCostTrend') {
