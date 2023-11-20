@@ -2,7 +2,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
-const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
+const costByRegionMultiFieldsWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegionMultiFields',
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-widgets/cost-by-region-multi-fields/CostByRegionMultiFieldsWidget.vue'),
@@ -50,4 +50,4 @@ const awsDataTransferByRegionWidgetConfig: WidgetConfig = {
     ]),
 };
 
-export default awsDataTransferByRegionWidgetConfig;
+export default costByRegionMultiFieldsWidgetConfig;

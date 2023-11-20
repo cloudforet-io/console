@@ -3,7 +3,7 @@ import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config
 import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
-const awsCloudFrontCostWidgetConfig: WidgetConfig = {
+const costSummaryMultiFieldsWidgetConfig: WidgetConfig = {
     widget_config_id: 'costSummaryMultiFields',
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-widgets/cost-summary-multi-fields/CostSummaryMultiFieldsWidget.vue'),
@@ -52,4 +52,4 @@ const awsCloudFrontCostWidgetConfig: WidgetConfig = {
     ]),
 };
 
-export default awsCloudFrontCostWidgetConfig;
+export default costSummaryMultiFieldsWidgetConfig;
