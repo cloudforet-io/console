@@ -39,7 +39,6 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
-const cloudServiceDetailPageStoreState = cloudServiceDetailPageStore.$state;
 
 
 const MAIN_TABLE = 'Main Table';
@@ -76,7 +75,6 @@ const getSubDataExcelSearchQuery = () => {
         const rootPath = schema.options?.root_path ?? undefined;
         const query:ExportOption = {
             name: schema.name,
-            title: `[${cloudServiceDetailPageStoreState.group}] ${cloudServiceDetailPageStoreState.name} ${schema.name}`,
             query_type: QueryType.SEARCH,
             search_query: {
                 sort,
@@ -98,8 +96,7 @@ const handleConfirm = async () => {
     state.downloadLoading = true;
     const excelExportFetcher = () => {
         const cloudServiceListSheetQuery: ExportOption|undefined = (state.selectedSubDataIds.includes('Main Table')) ? ({
-            name: 'Main_Table',
-            title: 'Main Table',
+            name: 'Main Table',
             query_type: QueryType.SEARCH,
             search_query: {
                 ...getCloudServiceListQuery(),
