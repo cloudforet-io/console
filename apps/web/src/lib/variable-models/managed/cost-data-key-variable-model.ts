@@ -58,10 +58,9 @@ export default class CostDataKeyVariableModel implements IBaseVariableModel {
                     results = results.filter((item) => regex.test(item.name));
                 }
                 if (query.start !== undefined && query.limit !== undefined) {
-                    const end = query.start + query.limit;
-                    const totalCount = results.length + 1;
-                    results = results.slice(query.start, end);
-                    more = end < totalCount;
+                    const end = query.start + query.limit - 1;
+                    more = end < results.length;
+                    results = results.slice(query.start - 1, end);
                 }
                 this.#response = { results, more };
             }
