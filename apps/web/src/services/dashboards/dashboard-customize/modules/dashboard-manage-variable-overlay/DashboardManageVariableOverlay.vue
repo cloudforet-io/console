@@ -67,7 +67,8 @@ import { cloneDeep } from 'lodash';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+
+import getRandomId from '@/lib/random-id-generator';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
@@ -168,7 +169,7 @@ const handleChangeCloneContent = (propertyName: string) => {
 const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
     if (state.contentType === 'ADD' || state.contentType === 'CLONE') {
-        const variableKey = getUUID();
+        const variableKey = getRandomId();
         properties[variableKey] = variable;
         dashboardDetailStore.$patch((_state) => {
             _state.variablesSchema = { properties, order: [...state.variableSchema.order, variableKey] };

@@ -12,8 +12,8 @@ import { i18n } from '@/translations';
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
-import { getUUID } from '@/lib/component-util/getUUID';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import getRandomId from '@/lib/random-id-generator';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -47,7 +47,7 @@ const state = reactive({
     }),
     notifications: computed(() => {
         const notifications = budgetPageState.budgetData?.notifications;
-        return notifications ? notifications.map((d) => ({ ...d, id: getUUID() })) : [];
+        return notifications ? notifications.map((d) => ({ ...d, id: getRandomId() })) : [];
     }),
     budgetNotificationsModalVisible: false,
     budgetId: computed(() => budgetPageState.budgetData?.budget_id ?? ''),

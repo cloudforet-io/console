@@ -8,8 +8,8 @@ import {
     PDivider, PI, PLazyImg, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 
-import { getUUID } from '@/lib/component-util/getUUID';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import getRandomId from '@/lib/random-id-generator';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 import LNBMenuItem from '@/common/modules/navigations/lnb/modules/LNBMenuItem.vue';
@@ -99,7 +99,7 @@ const handleSelect = (id: string, selected: string) => {
             </div>
             <template v-for="(menuData, idx) in menuSet">
                 <div v-if="menuData.type === MENU_ITEM_TYPE.FAVORITE_ONLY"
-                     :key="`${idx}-${getUUID()}`"
+                     :key="`${idx}-${getRandomId()}`"
                      class="favorite-only-wrapper"
                 >
                     <p-field-title :label="$t('DASHBOARDS.LNB.ONLY_FAVORITE')"
@@ -112,7 +112,7 @@ const handleSelect = (id: string, selected: string) => {
                     />
                 </div>
                 <div v-else-if="menuData.type === MENU_ITEM_TYPE.SLOT"
-                     :key="`${idx}-${getUUID()}`"
+                     :key="`${idx}-${getRandomId()}`"
                      class="slot-menu-wrapper"
                 >
                     <slot :name="`slot-${menuData.id}`"
@@ -120,7 +120,7 @@ const handleSelect = (id: string, selected: string) => {
                     />
                 </div>
                 <l-n-b-menu-item v-else
-                                 :key="`${idx}-${getUUID()}`"
+                                 :key="`${idx}-${getRandomId()}`"
                                  :menu-data="menuData"
                                  :current-path="state.currentPath"
                                  :depth="Array.isArray(menuData) ? 2 : 1"
