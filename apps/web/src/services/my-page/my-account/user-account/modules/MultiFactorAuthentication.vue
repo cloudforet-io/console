@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -10,28 +10,73 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { postDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+import MultiFactorAuthenticationEmailModal
+    from '@/common/modules/modals/multi-factor-authentication-email-modal/MultiFactorAuthenticationEmailModal.vue';
 
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
 
 // Currently, only email is supported.
 const contextMenuItems = [
-    { label: 'Email', name: 'email' },
+    { label: 'Email', name: 'EMAIL' },
 ];
 
 const state = reactive({
-    disable: false,
-    isVerified: computed(() => store.state.user.mfa),
+    loading: false,
+    mfa: computed(() => store.state.user.mfa || undefined),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
+    isVerified: false,
+    enableMfa: false,
+    isModalVisible: false,
+
+    // Currently, only email is supported.
+    selectedItem: contextMenuItems[0].name,
 });
 
-const handleChangeEnableToggle = () => {
-    state.disable = !state.disable;
+/* Components */
+const handleSelectDropdownItem = (selected: string) => {
+    state.selectedItem = selected;
+};
+const initState = () => {
+    state.enableMfa = state.mfa?.state === 'ENABLED';
+    state.isVerified = state.enableMfa && (state.mfa?.mfa_type !== undefined && state.mfa?.mfa_type !== '');
+};
+
+/* API */
+const handleChangeToggle = async () => {
+    if (!state.enableMfa) {
+        await postDisableMfa({
+            user_id: state.userId,
+            domain_id: state.domainId,
+        });
+        state.isModalVisible = true;
+    }
+};
+const handleClickVerifyButton = async () => {
+    if (state.isVerified) {
+        state.isModalVisible = true;
+        return;
+    }
+
+    state.loading = true;
+
+    await postEnableMfa({
+        user_id: state.userId,
+        mfa_type: state.selectedItem,
+        options: {
+            email: email.value,
+        },
+        domain_id: state.domainId,
+    });
+    state.isModalVisible = true;
+
+    state.loading = false;
 };
 
 const {
@@ -42,89 +87,106 @@ const {
     invalidState,
     invalidTexts,
 } = useFormValidator({
-    email: store.state.user.email,
+    email: '',
 }, {
     email(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
 });
+
+/* Watcher */
+watch(() => state.mfa, (mfa) => {
+    setForm('email', mfa?.options?.email || '');
+}, { immediate: true });
+
+(() => {
+    initState();
+})();
 </script>
 
 <template>
-    <user-account-module-container
-        class="multi-factor-authentication-wrapper"
-    >
-        <template #headline>
-            <div class="headline-wrapper">
-                <p class="form-title">
-                    {{ $t('IDENTITY.USER.MFA.TITLE') }}
-                </p>
-                <div class="verify-status-wrapper">
-                    <div v-if="state.isVerified"
-                         class="verified"
-                    >
-                        <p-i name="ic_verified"
-                             height="1rem"
-                             width="1rem"
-                             class="verified-icon"
-                             color="#60B731"
-                        />
-                        <span>
-                            {{ $t('IDENTITY.USER.MFA.STATE_VERIFIED') }}
+    <div>
+        <user-account-module-container
+            class="multi-factor-authentication-wrapper"
+        >
+            <template #headline>
+                <div class="headline-wrapper">
+                    <p class="form-title">
+                        {{ $t('IDENTITY.USER.MFA.TITLE') }}
+                    </p>
+                    <div class="verify-status-wrapper">
+                        <div v-if="state.isVerified"
+                             class="verified"
+                        >
+                            <p-i name="ic_verified"
+                                 height="1rem"
+                                 width="1rem"
+                                 class="verified-icon"
+                                 color="#60B731"
+                            />
+                            <span>
+                                {{ $t('IDENTITY.USER.MFA.STATE_VERIFIED') }}
+                            </span>
+                        </div>
+                        <span v-else
+                              class="not-verified"
+                        >
+                            {{ $t('IDENTITY.USER.MFA.STATE_NOT_VERIFIED') }}
                         </span>
                     </div>
-                    <span v-else
-                          class="not-verified"
-                    >
-                        {{ $t('IDENTITY.USER.MFA.STATE_NOT_VERIFIED') }}
-                    </span>
                 </div>
+            </template>
+            <div class="enable-toggle">
+                <p-field-title class="toggle-title">
+                    {{ $t('IDENTITY.USER.MFA.ENABLE_MFA') }}
+                </p-field-title>
+                <p-toggle-button :value.sync="state.enableMfa"
+                                 show-state-text
+                                 position="left"
+                                 @change-toggle="handleChangeToggle"
+                />
             </div>
-        </template>
-        <div class="enable-toggle">
-            <p-field-title class="toggle-title">
-                {{ $t('IDENTITY.USER.MFA.ENABLE_MFA') }}
-            </p-field-title>
-            <p-toggle-button :value="!state.disable"
-                             show-state-text
-                             position="left"
-                             @change-toggle="handleChangeEnableToggle"
-            />
-        </div>
-        <form v-if="!state.disable"
-              class="form"
-              onsubmit="return false"
-        >
-            <p-field-group
-                :label="$t('IDENTITY.USER.MFA.TYPE')"
-                required
-                class="field-group"
+            <div v-if="state.enableMfa"
+                 class="enable-mfa-wrapper"
             >
-                <p-select-dropdown :menu="contextMenuItems"
-                                   :selected="contextMenuItems[0].name"
-                                   class="type-dropdown"
+                <p-field-group
+                    :label="$t('IDENTITY.USER.MFA.TYPE')"
+                    required
+                >
+                    <p-select-dropdown :menu="contextMenuItems"
+                                       :selected="state.selectedItem"
+                                       class="type-dropdown"
+                                       @update:selected="handleSelectDropdownItem"
+                    />
+                </p-field-group>
+                <p-field-group
+                    :invalid="invalidState.email"
+                    :invalid-text="invalidTexts.email"
+                    required
+                    class="email-input"
+                >
+                    <p-text-input :value="email"
+                                  :disabled="state.isVerified"
+                                  :invalid="invalidState.email"
+                                  block
+                                  @update:value="setForm('email', $event)"
+                    />
+                </p-field-group>
+                <verify-button
+                    :loading="state.loading"
+                    :email="email"
+                    :verified="state.isVerified"
+                    class="verify-button"
+                    @click-button="handleClickVerifyButton"
                 />
-            </p-field-group>
-            <p-field-group
-                :invalid="invalidState.email"
-                :invalid-text="invalidTexts.email"
-                required
-                class="field-group input-form"
-            >
-                <p-text-input v-model="email"
-                              :placeholder="state.userId"
-                              :disabled="state.isVerified"
-                              :invalid="invalidState.email"
-                              block
-                              @update:value="setForm('email', $event)"
-                />
-            </p-field-group>
-            <verify-button
-                :email="email"
-                :user-id="state.userId"
-                :domain-id="state.domainId"
-                :verified="state.isVerified"
-            />
-        </form>
-    </user-account-module-container>
+            </div>
+        </user-account-module-container>
+        <multi-factor-authentication-email-modal v-if="state.isModalVisible"
+                                                 :email="email"
+                                                 :verified="state.isVerified"
+                                                 :mfa-type="state.selectedItem"
+                                                 :visible="state.isModalVisible"
+                                                 @refresh="initState"
+        />
+    </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -155,17 +217,32 @@ const {
         @apply flex items-center;
         gap: 1rem;
     }
-    .form {
+    .enable-mfa-wrapper {
         @apply flex items-end;
         max-width: 47.5rem;
+        margin-bottom: 1rem;
         .type-dropdown {
             min-width: 13rem;
         }
-        .input-form {
+        .email-input {
             flex: 1;
-            max-width: 21.125rem;
             margin-left: 1rem;
         }
+    }
+
+    .verify-button {
+        @apply flex items-end;
+    }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    @apply relative;
+    margin-bottom: 0;
+    .invalid-feedback {
+        @apply absolute;
+        bottom: -1.125rem;
+        left: 0;
     }
 }
 </style>

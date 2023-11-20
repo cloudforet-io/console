@@ -970,6 +970,7 @@
 			"SEND_CODE": "인증 코드 전송",
 			"SEND_NEW_CODE": "인증 코드 재전송",
 			"SENT_DESC": "인증코드가 입력한 이메일로 발송 되었습니다: ",
+			"SUCCESS": "인증 코드가 알림 이메일로 전송되었습니다.",
 			"TITLE": "",
 			"VERIFICATION_CODE": "인증 코드",
 			"VERIFY_NOW": "인증"
