@@ -171,6 +171,7 @@ watch(() => state.mfa?.options?.email, (value) => {
                 :loading="state.loading"
                 :email="email"
                 :verified="state.isVerified"
+                class="verify-button"
                 @click-button="handleClickVerifyButton"
             >
                 <multi-factor-authentication-email-modal :email="email"
@@ -233,6 +234,10 @@ watch(() => state.mfa?.options?.email, (value) => {
                 left: 0;
             }
         }
+    }
+
+    .verify-button {
+        @apply flex items-end;
     }
 }
 </style>
