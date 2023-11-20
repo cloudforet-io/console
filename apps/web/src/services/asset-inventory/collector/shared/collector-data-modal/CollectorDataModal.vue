@@ -12,12 +12,12 @@
             <template #body>
                 <div v-if="state.isDuplicateJobs">
                     <collector-data-duplication-inner :name="state.accountName"
-                                                      :icon="state.provider.icon"
+                                                      :icon="state.provider?.icon"
                     />
                 </div>
                 <collector-data-default-inner v-else
                                               :name="state.accountName"
-                                              :icon="state.provider.icon"
+                                              :icon="state.provider?.icon"
                                               :secrets-count="state.secretsCount"
                 />
             </template>
@@ -89,7 +89,7 @@ const state = reactive({
     accountName: computed(() => {
         const collectDataType = collectorDataModalState.collectDataType;
         if (collectDataType === COLLECT_DATA_TYPE.ENTIRE) {
-            return state.provider.label;
+            return state.provider?.label;
         }
 
         const selectedSecret = collectorDataModalState.selectedSecret;
