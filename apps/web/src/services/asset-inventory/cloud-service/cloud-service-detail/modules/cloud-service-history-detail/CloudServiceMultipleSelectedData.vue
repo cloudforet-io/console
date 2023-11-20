@@ -194,6 +194,7 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
             options: [
                 {
                     name: state.currentLayout.name,
+                    title: `[${props.cloudServiceGroup}] ${props.cloudServiceType} ${state.activeTab}`,
                     query_type: QueryType.SEARCH,
                     search_query: {
                         ...excelQuery.data,
