@@ -74,7 +74,7 @@ export default {
                 if (typeof props.data !== 'string') return '';
                 return props.data;
             }),
-            iframeData: computed(() => DOMPurify.sanitize(state.rootData, { ALLOWED_TAGS: ['a'], ALLOWED_ATTR: ['target'] })),
+            iframeData: computed(() => DOMPurify.sanitize(state.rootData, { ALLOWED_TAGS: ['a'], ALLOWED_ATTR: ['target', 'href'] })),
         });
 
 
