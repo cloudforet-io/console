@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 
 const baseTrendWidgetConfig: WidgetConfig = {
     widget_config_id: 'baseTrend',
@@ -12,8 +12,7 @@ const baseTrendWidgetConfig: WidgetConfig = {
     },
     sizes: ['lg', 'full'],
     options: {
-        granularity: 'MONTHLY',
-        cost_group_by: COST_GROUP_BY.PROVIDER,
+        granularity: GRANULARITY.MONTHLY,
         pagination_options: {
             enabled: true,
             page_size: 5,

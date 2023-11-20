@@ -252,10 +252,10 @@ const isIncreasedByHalfOrMore = (item: CostAnalyzeRawData, fieldName: string): b
     return false;
 };
 const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
-    if (field.name.startsWith(`${ADDITIONAL_GROUP_BY.TAGS}_`)) {
+    if (field.name?.startsWith(`${ADDITIONAL_GROUP_BY.TAGS}_`)) {
         return ` (${ADDITIONAL_GROUP_BY_ITEM_MAP[ADDITIONAL_GROUP_BY.TAGS].label})`;
     }
-    if (field.name.startsWith(`${ADDITIONAL_GROUP_BY.ADDITIONAL_INFO}_`)) {
+    if (field.name?.startsWith(`${ADDITIONAL_GROUP_BY.ADDITIONAL_INFO}_`)) {
         return ` (${ADDITIONAL_GROUP_BY_ITEM_MAP[ADDITIONAL_GROUP_BY.ADDITIONAL_INFO].label})`;
     }
     return '';

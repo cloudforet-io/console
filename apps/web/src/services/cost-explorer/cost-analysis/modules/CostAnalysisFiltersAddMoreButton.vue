@@ -10,9 +10,8 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+import { VariableModel } from '@/lib/variable-models';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,6 +35,7 @@ const state = reactive({
             ...tagsMenuItems,
         ];
     }),
+    initiated: false,
     tagsMenuItems: [] as MenuItem[],
     selectedItems: [] as MenuItem[],
     searchText: '',
@@ -67,24 +67,18 @@ const {
 });
 onClickOutside(containerRef, hideContextMenu);
 
+const costTagKeysVariableModel = new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_tag_key.key });
 /* Api */
-const resourceQueryHelper = new QueryHelper();
-const fetchSearchResources = getCancellableFetcher<{results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
-const getTagsResources = async (): Promise<{name: string; key: string}[]|undefined> => {
+const getTagsResources = async (): Promise<{name: string; key: string}[]> => {
     try {
-        resourceQueryHelper.setFilters([{ k: 'data_source_id', v: [state.dataSourceId], o: '=' }]);
-        const { status, response } = await fetchSearchResources({
-            resource_type: 'cost_analysis.Cost',
-            distinct_key: 'tags',
-            options: {
-                filter: resourceQueryHelper.apiQuery.filter,
-            },
-        });
-        if (status === 'succeed') return response.results;
-        return undefined;
+        const options = {
+            cost_data_source: state.dataSourceId,
+        };
+        const response = await costTagKeysVariableModel.list({ options });
+        return response.results;
     } catch (e: any) {
         ErrorHandler.handleError(e);
-        return undefined;
+        return [];
     }
 };
 
@@ -129,8 +123,10 @@ watch(() => costAnalysisPageState.enabledFiltersProperties, (_enabledFiltersProp
 
 watch(() => state.dataSourceId, async (dataSourceId) => {
     if (!dataSourceId) return;
+    state.initiated = false;
     const tagsResources = await getTagsResources();
-    state.tagsMenuItems = tagsResources ? tagsResources.map((d) => ({ name: `tags.${d.key}`, label: d.name })) : [];
+    state.tagsMenuItems = tagsResources ? tagsResources.map((d) => ({ name: d.key, label: d.name })) : [];
+    state.initiated = true;
 }, { immediate: true });
 </script>
 
@@ -149,6 +145,7 @@ watch(() => state.dataSourceId, async (dataSourceId) => {
                         ref="contextMenuRef"
                         class="add-more-context-menu"
                         searchable
+                        :loading="!state.initiated"
                         :search-text="state.searchText"
                         :style="contextMenuStyle"
                         :menu="refinedMenu"

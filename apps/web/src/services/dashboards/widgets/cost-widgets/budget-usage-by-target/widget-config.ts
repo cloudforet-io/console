@@ -1,12 +1,7 @@
 import { GRANULARITY } from '@/services/dashboards/config';
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames,
-    getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageByTarget',
@@ -14,7 +9,7 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     widget_component: () => ({
         component: import('@/services/dashboards/widgets/cost-widgets/budget-usage-by-target/BudgetUsageByTargetWidget.vue'),
     }),
-    labels: ['Cost'],
+    labels: ['Cost', 'Budget'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BUDGET_USAGE_WITH_FORECAST.DESC',
         preview_image: 'widget-img_budgetUsageWithForecast--thumbnail.png',
@@ -26,42 +21,15 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     sizes: ['lg', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: 'budget_id',
+        cost_data_field: COST_DATA_FIELD_MAP.PROJECT.name,
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'cost_product',
-        ),
-    },
-    options_schema: {
-        default_properties: [
-            'cost_data_source',
-            ...getWidgetFilterSchemaPropertyNames(
-                'project',
-                'service_account',
-            ),
-        ],
-        fixed_properties: ['cost_data_source'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source'),
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    'service_account',
-                ),
-            },
-            order: [
-                'cost_data_source',
-                ...getWidgetFilterSchemaPropertyNames(
-                    'project',
-                    'service_account',
-                ),
-            ],
-        },
-    },
-} as WidgetConfig;
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'cost_data_field',
+        ['granularity', { fixed: true, readonly: true }],
+        'filters.project',
+        'filters.project_group',
+    ]),
+};
 
 export default budgetUsageByTargetWidgetConfig;

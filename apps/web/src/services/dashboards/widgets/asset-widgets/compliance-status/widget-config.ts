@@ -1,10 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions,
-    getWidgetInheritOptionsForFilter, getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const complianceStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'complianceStatus',
@@ -23,46 +18,16 @@ const complianceStatusWidgetConfig: WidgetConfig = {
     },
     sizes: ['md'],
     options: {
-        granularity: GRANULARITY.YEARLY,
+        data_criteria: 'realtime',
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('asset_query_set'),
-        ...getWidgetInheritOptionsForFilter(
-            'project',
-            'provider',
-            'region',
-            'asset_account',
-        ),
-    },
-    options_schema: {
-        default_properties: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames(
-            'provider',
-            'project',
-            'region',
-            'asset_account',
-        )],
-        fixed_properties: ['asset_query_set'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('asset_query_set'),
-                ...getWidgetFilterOptionsSchema(
-                    'project',
-                    // 'service_account', HACK: Re-enable it after backend is ready
-                    'provider',
-                    'region',
-                    'asset_account',
-                ),
-            },
-            order: ['asset_query_set', ...getWidgetFilterSchemaPropertyNames(
-                'project',
-                // 'service_account',
-                'provider',
-                'region',
-                'asset_account',
-            )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cloud_service_query_set',
+        'filters.project',
+        // 'filters.service_account', HACK: Re-enable it after backend is ready
+        'filters.provider',
+        'filters.region',
+        'filters.asset_account',
+    ]),
 };
 
 export default complianceStatusWidgetConfig;

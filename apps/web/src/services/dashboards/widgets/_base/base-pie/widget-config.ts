@@ -1,5 +1,5 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, GRANULARITY, COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 
 const basePieWidgetConfig: WidgetConfig = {
     widget_config_id: 'basePie',
@@ -13,7 +13,7 @@ const basePieWidgetConfig: WidgetConfig = {
     sizes: ['sm', 'full'],
     options: {
         granularity: GRANULARITY.MONTHLY,
-        cost_group_by: COST_GROUP_BY.PROVIDER,
+        cost_data_field: COST_DATA_FIELD_MAP.PROVIDER.name,
         chart_type: CHART_TYPE.PIE,
         legend_options: {
             enabled: true,

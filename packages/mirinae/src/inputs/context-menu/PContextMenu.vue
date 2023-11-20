@@ -404,6 +404,7 @@ defineExpose({
         }
         > .context-show-more {
             padding: 0.5rem;
+            min-width: 7rem;
         }
         > .bottom-slot-area {
             padding: 0.5rem;

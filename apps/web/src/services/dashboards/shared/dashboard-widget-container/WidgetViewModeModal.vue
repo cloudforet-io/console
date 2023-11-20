@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { AsyncComponent, ComponentPublicInstance } from 'vue';
 import {
-    computed, reactive, toRef, watch,
+    computed, nextTick, reactive, toRef, watch,
 } from 'vue';
 
 import {
     PButton, PBadge, PI,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, debounce } from 'lodash';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -16,11 +16,11 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import { gray } from '@/styles/colors';
 
-import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardSettings, DashboardVariables as IDashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
-import DashboardVariablesSelectDropdown
-    from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import DashboardVariables from '@/services/dashboards/shared/dashboard-variables/DashboardVariables.vue';
 import WidgetViewModeSidebar from '@/services/dashboards/shared/dashboard-widget-container/WidgetViewModeSidebar.vue';
+import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type {
     DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
@@ -50,6 +50,8 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
+const widgetFormStore = useWidgetFormStore();
+const widgetFormGetters = widgetFormStore.getters;
 const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     widgetRef: null as WidgetComponent|null,
@@ -57,7 +59,7 @@ const state = reactive({
     hasManagePermission: useManagePermissionState(),
     allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => allReferenceStore.getters.allReferenceTypeInfo),
     component: null as AsyncComponent|null,
-    variablesSnapshot: {} as DashboardVariables,
+    variablesSnapshot: {} as IDashboardVariables,
     variableSchemaSnapshot: {} as DashboardVariablesSchema,
     settingsSnapshot: {} as DashboardSettings,
     sidebarVisible: false,
@@ -66,7 +68,6 @@ const state = reactive({
         if (!props.widgetKey) return undefined;
         return dashboardDetailState.dashboardWidgetInfoList.find((widgetInfo) => widgetInfo.widget_key === props.widgetKey);
     }),
-    updatedWidgetInfo: undefined as Partial<DashboardLayoutWidgetInfo>|undefined,
 });
 const widgetRef = toRef(state, 'widgetRef');
 
@@ -88,23 +89,23 @@ const handleCloseModal = () => {
 const handleClickEditOption = () => {
     state.sidebarVisible = true;
 };
-const handleCloseSidebar = (save: boolean) => {
+const handleCloseSidebar = async (save: boolean) => {
     state.sidebarVisible = false;
-    if (!save) state.updatedWidgetInfo = cloneDeep(state.originWidgetInfo);
+    if (!save) widgetFormStore.returnToInitialSettings();
+    await nextTick();
     state.widgetRef?.refreshWidget();
 };
-const handleUpdateSidebarWidgetInfo = (widgetInfo: UpdatableWidgetInfo) => {
+const handleUpdateSidebarWidgetInfo = debounce(async (widgetInfo: UpdatableWidgetInfo) => {
     // NOTE: Do not refresh when the title changes. There are no cases where title and other options change together.
-    const refreshWidget = widgetInfo.title === state.updatedWidgetInfo?.title;
-    state.updatedWidgetInfo = widgetInfo;
+    const refreshWidget = widgetInfo.title === widgetFormGetters.updatedWidgetInfo?.title;
+    await nextTick();
     if (refreshWidget) state.widgetRef?.refreshWidget();
-};
+}, 150);
 const handleUpdateHasNonInheritedWidgetOptions = (value: boolean) => {
     state.hasNonInheritedWidgetOptions = value;
 };
 
 const handleUpdateWidgetInfo = (widgetKey: string, widgetInfo: UpdatableWidgetInfo) => {
-    state.updatedWidgetInfo = widgetInfo;
     dashboardDetailStore.updateWidgetInfo(widgetKey, widgetInfo);
 };
 const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
@@ -113,12 +114,12 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
 
 watch(() => props.visible, async (visible) => {
     if (!state.originWidgetInfo) return;
+    state.sidebarVisible = false;
     if (visible) {
         initSnapshot();
         state.component = getWidgetComponent(state.originWidgetInfo.widget_name);
     } else {
         state.loadingWidget = true;
-        state.sidebarVisible = false;
         state.component = null;
         emit('update:visible', false);
     }
@@ -169,11 +170,11 @@ watch(() => props.visible, async (visible) => {
                 </div>
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <dashboard-variables-select-dropdown :is-manageable="state.hasManagePermission"
-                                                             disable-more-button
-                                                             disable-save-button
-                                                             :origin-variables="state.variablesSnapshot"
-                                                             :origin-variables-schema="state.variableSchemaSnapshot"
+                        <dashboard-variables :is-manageable="state.hasManagePermission"
+                                             disable-more-button
+                                             disable-save-button
+                                             :origin-variables="state.variablesSnapshot"
+                                             :origin-variables-schema="state.variableSchemaSnapshot"
                         />
                     </div>
                     <div class="right-part">
@@ -187,10 +188,10 @@ watch(() => props.visible, async (visible) => {
                                ref="widgetRef"
                                :widget-key="props.widgetKey"
                                :widget-config-id="state.originWidgetInfo.widget_name"
-                               :title="state.updatedWidgetInfo?.title ?? state.originWidgetInfo.title"
-                               :options="state.updatedWidgetInfo?.widget_options ?? state.originWidgetInfo.widget_options"
-                               :inherit-options="state.updatedWidgetInfo?.inherit_options ?? state.originWidgetInfo.inherit_options"
-                               :schema-properties="state.updatedWidgetInfo?.schema_properties ?? state.originWidgetInfo.schema_properties"
+                               :title="widgetFormGetters.updatedWidgetInfo?.title ?? state.originWidgetInfo.title"
+                               :options="widgetFormGetters.updatedWidgetInfo?.widget_options ?? state.originWidgetInfo.widget_options"
+                               :inherit-options="widgetFormGetters.updatedWidgetInfo?.inherit_options ?? state.originWidgetInfo.inherit_options"
+                               :schema-properties="widgetFormGetters.updatedWidgetInfo?.schema_properties ?? state.originWidgetInfo.schema_properties"
                                size="full"
                                :theme="props.theme"
                                :error-mode="dashboardDetailState.widgetValidMap[props.widgetKey] === false"
@@ -206,17 +207,15 @@ watch(() => props.visible, async (visible) => {
                     />
                 </div>
             </div>
-            <transition name="slide-left">
-                <widget-view-mode-sidebar v-if="state.originWidgetInfo"
-                                          v-show="state.sidebarVisible"
-                                          :widget-config-id="state.originWidgetInfo.widget_name"
-                                          :widget-key="state.originWidgetInfo.widget_key"
-                                          :visible="state.sidebarVisible"
-                                          @close="handleCloseSidebar"
-                                          @update:widget-info="handleUpdateSidebarWidgetInfo"
-                                          @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"
-                />
-            </transition>
+            <widget-view-mode-sidebar v-if="state.originWidgetInfo"
+                                      v-show="state.sidebarVisible"
+                                      :widget-config-id="state.originWidgetInfo.widget_name"
+                                      :widget-key="state.originWidgetInfo.widget_key"
+                                      :visible="state.sidebarVisible"
+                                      @close="handleCloseSidebar"
+                                      @update:widget-info="handleUpdateSidebarWidgetInfo"
+                                      @update:has-non-inherited-widget-options="handleUpdateHasNonInheritedWidgetOptions"
+            />
         </div>
     </transition>
 </template>
@@ -268,33 +267,5 @@ watch(() => props.visible, async (visible) => {
             z-index: 10;
         }
     }
-}
-
-/* transition */
-.slide-up-enter-active {
-    transition: all 0.3s ease;
-}
-.slide-up-leave-active {
-    transition: all 0.3s ease-out;
-}
-.slide-up-enter, .slide-up-leave-to {
-    transform: translateY(100px);
-    opacity: 0;
-}
-.slide-left-leave-active,
-.slide-left-enter-active {
-    transition: all 0.3s ease;
-}
-.slide-left-enter {
-    transform: translate(100%, 0);
-}
-.slide-left-leave {
-    transform: translate(0, 0);
-}
-.slide-left-leave-to {
-    transform: translate(100%, 0);
-}
-.slide-left-enter-to {
-    transform: translate(0, 0);
 }
 </style>

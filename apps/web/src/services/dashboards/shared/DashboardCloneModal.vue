@@ -71,7 +71,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { gray } from '@/styles/colors';
 
-import type { DashboardViewer, DashboardConfig, DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardViewer, DashboardTemplate, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
@@ -180,7 +180,7 @@ export default defineComponent<Props>({
                 }
                 return { properties: {}, order: [] };
             }),
-            apiParam: computed<Partial<DashboardConfig>>(() => ({
+            apiParam: computed<Partial<DashboardTemplate>>(() => ({
                 name: name.value,
                 viewers: viewers.value,
                 layouts: state.layouts,

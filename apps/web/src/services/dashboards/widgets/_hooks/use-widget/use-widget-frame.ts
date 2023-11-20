@@ -13,17 +13,17 @@ import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components
 import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
-import type { MergedWidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-merged-widget-state';
+import type { WidgetState } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 export interface WidgetFrameOptions {
     dateRange?: DateRange|ComputedRef<DateRange>;
     currency?: Currency|ComputedRef<Currency>;
-    widgetLocation?: Location|ComputedRef<Location>;
+    widgetLocation?: Location|ComputedRef<Location|undefined>;
 }
 export const useWidgetFrame = (
     props: UnwrapRef<WidgetProps>,
     emit: WidgetEmit,
-    widgetState: UnwrapRef<MergedWidgetState & WidgetFrameOptions>,
+    widgetState: UnwrapRef<WidgetState>,
 ) => {
     const title = computed(() => props.title ?? widgetState.widgetConfig.title);
     const size = computed(() => {
@@ -49,6 +49,7 @@ export const useWidgetFrame = (
         title: title.value,
         size: size.value,
         dateRange: widgetState.dateRange ?? widgetState.settings?.date_range,
+        granularity: widgetState.granularity,
         currency: widgetState.currency,
         disableFullSize: !widgetState.widgetConfig?.sizes.includes(WIDGET_SIZE.full),
         isOnlyFullSize: widgetState.widgetConfig?.sizes.length === 1 && widgetState.widgetConfig?.sizes[0] === WIDGET_SIZE.full,
@@ -57,6 +58,7 @@ export const useWidgetFrame = (
         errorMode: props.errorMode,
         theme: props.theme,
         nonInheritOptionsTooltipText: nonInheritOptionsTooltipText.value,
+        dataCriteria: widgetState.widgetConfig.options?.data_criteria,
     }));
 
     const widgetFrameEventHandlers = {

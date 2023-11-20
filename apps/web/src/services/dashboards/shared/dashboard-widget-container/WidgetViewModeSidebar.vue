@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { debouncedWatch } from '@vueuse/core';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -7,7 +6,6 @@ import {
 import {
     PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
-import { isEqual } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -15,8 +13,8 @@ import { getUUID } from '@/lib/component-util/getUUID';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import DashboardWidgetInputForm
-    from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import DashboardWidgetForm
+    from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetForm.vue';
 import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/store/dashboard-detail-info';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
@@ -41,7 +39,9 @@ const emit = defineEmits<{(e: 'close', save: boolean): void;
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormState = widgetFormStore.state;
+const widgetFormGetters = widgetFormStore.getters;
+
 const state = reactive({
     nonInheritedOptionModalVisible: false,
     hasNonInheritedWidgetOptions: computed<boolean>(() => {
@@ -58,7 +58,7 @@ const state = reactive({
 /* Util */
 const updateDashboardWidgetStore = () => {
     // update widget info in dashboard detail store
-    if (widgetFormStore.updatedWidgetInfo) dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormStore.updatedWidgetInfo);
+    if (widgetFormGetters.updatedWidgetInfo) dashboardDetailStore.updateWidgetInfo(props.widgetKey, widgetFormGetters.updatedWidgetInfo);
 };
 
 /* Api */
@@ -95,79 +95,87 @@ const handleCloseSidebar = () => {
     emit('close', false);
 };
 
-debouncedWatch(() => widgetFormStore.updatedWidgetInfo, (after, before) => {
-    if (before === undefined || isEqual(after, before)) return;
-    emit('update:widget-info', after as UpdatableWidgetInfo);
-}, { debounce: 150 });
 
 watch(() => state.hasNonInheritedWidgetOptions, (value) => {
     emit('update:has-non-inherited-widget-options', value);
 }, { immediate: true });
 
-watch(() => props.visible, (value) => {
-    if (value) state.contextKey = getUUID();
+watch([() => props.visible, () => dashboardDetailState.variables], ([visible]) => {
+    if (visible) {
+        state.contextKey = getUUID();
+    }
+});
+
+watch([() => widgetFormGetters.updatedWidgetInfo, () => widgetFormGetters.isAllOptionsInitiated], ([widgetInfo, isAllInit]) => {
+    if (!isAllInit) return;
+    if (widgetInfo === undefined) return;
+    if (!props.visible) return;
+
+    emit('update:widget-info', widgetInfo as UpdatableWidgetInfo);
 });
 </script>
 
 <template>
-    <div class="widget-view-mode-sidebar">
-        <p-sidebar :visible="true"
-                   style-type="primary"
-                   size="md"
-                   is-fixed-size
-                   hide-close-button
-                   @close="handleCloseSidebar"
-        >
-            <main class="main">
-                <slot />
-            </main>
-            <template #title>
-                <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
-            </template>
-            <template #sidebar>
-                <div class="sidebar-contents">
-                    <dashboard-widget-input-form :key="state.contextKey"
-                                                 :widget-config-id="props.widgetConfigId"
-                                                 :widget-key="props.widgetKey"
-                    />
-                </div>
-            </template>
-            <template #footer>
-                <div class="footer-wrapper">
-                    <p-button style-type="transparent"
-                              @click="handleCloseSidebar"
-                    >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
-                    </p-button>
-                    <p-button style-type="primary"
-                              :disabled="!widgetFormState.isValid"
-                              @click="handleClickSaveButton"
-                    >
-                        {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
-                    </p-button>
-                </div>
-            </template>
-        </p-sidebar>
-        <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
-                        :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
-                        size="sm"
-                        @confirm="handleClickSaveButton"
-        >
-            <template #body>
-                <div class="non-inherited-option-modal-body">
-                    <p>
-                        <p-i name="ic_warning-filled"
-                             color="inherit"
-                             width="1rem"
-                             height="1rem"
-                             class="warning-icon"
+    <transition name="slide-left">
+        <div class="widget-view-mode-sidebar">
+            <p-sidebar :visible="true"
+                       style-type="primary"
+                       size="md"
+                       is-fixed-size
+                       hide-close-button
+                       @close="handleCloseSidebar"
+            >
+                <main class="main">
+                    <slot />
+                </main>
+                <template #title>
+                    <span class="sidebar-title">{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.EDIT_WIDGET_OPTION') }}</span> <br>
+                </template>
+                <template #sidebar>
+                    <div class="sidebar-contents">
+                        <dashboard-widget-form :key="state.contextKey"
+                                               :widget-config-id="props.widgetConfigId"
+                                               :widget-key="props.widgetKey"
                         />
-                        <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
-                    </p>
-                </div>
-            </template>
-        </p-button-modal>
-    </div>
+                    </div>
+                </template>
+                <template #footer>
+                    <div class="footer-wrapper">
+                        <p-button style-type="transparent"
+                                  @click="handleCloseSidebar"
+                        >
+                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.CANCEL') }}
+                        </p-button>
+                        <p-button style-type="primary"
+                                  :disabled="!widgetFormGetters.isAllValid"
+                                  @click="handleClickSaveButton"
+                        >
+                            {{ $t('DASHBOARDS.FULL_SCREEN_VIEW.SAVE') }}
+                        </p-button>
+                    </div>
+                </template>
+            </p-sidebar>
+            <p-button-modal :visible.sync="state.nonInheritedOptionModalVisible"
+                            :header-title="$t('DASHBOARDS.FULL_SCREEN_VIEW.NON_INHERITED_OPTIONS_INCLUDED')"
+                            size="sm"
+                            @confirm="handleClickSaveButton"
+            >
+                <template #body>
+                    <div class="non-inherited-option-modal-body">
+                        <p>
+                            <p-i name="ic_warning-filled"
+                                 color="inherit"
+                                 width="1rem"
+                                 height="1rem"
+                                 class="warning-icon"
+                            />
+                            <span>{{ $t('DASHBOARDS.FULL_SCREEN_VIEW.APPLY_NON_INHERITED_OPTION_HELP_TEXT') }}</span>
+                        </p>
+                    </div>
+                </template>
+            </p-button-modal>
+        </div>
+    </transition>
 </template>
 
 <style lang="postcss" scoped>
@@ -219,5 +227,33 @@ $footer-height: 57px;
             padding-bottom: 1rem;
         }
     }
+}
+
+/* transition */
+.slide-up-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-up-leave-active {
+    transition: all 0.3s ease-out;
+}
+.slide-up-enter, .slide-up-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
+}
+.slide-left-leave-active,
+.slide-left-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-left-enter {
+    transform: translate(100%, 0);
+}
+.slide-left-leave {
+    transform: translate(0, 0);
+}
+.slide-left-leave-to {
+    transform: translate(100%, 0);
+}
+.slide-left-enter-to {
+    transform: translate(0, 0);
 }
 </style>

@@ -1,22 +1,22 @@
 import type { ReferenceMap } from '@/store/modules/reference/type';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import type { CostGroupBy } from '@/services/dashboards/widgets/_configs/config';
+import type { CostDataField } from '@/services/dashboards/widgets/_configs/config';
 
 /**
  * @name getRefinedTreemapChartData
  * @description Convert raw data to TreemapChart data.
  */
-export const getRefinedTreemapChartData = (rawDataList: AnalyzeRawData[], groupBy: CostGroupBy|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
+export const getRefinedTreemapChartData = (rawDataList: AnalyzeRawData[], dataField: CostDataField|undefined, allReferenceTypeInfo: AllReferenceTypeInfo) => {
     const chartData: TreemapChartData[] = [{
         children: [],
     }];
-    if (!rawDataList || !groupBy) return [];
+    if (!rawDataList || !dataField) return [];
 
-    const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy)?.referenceMap;
+    const referenceMap = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField)?.referenceMap;
     rawDataList.forEach((rawData) => {
-        const groupByValue = rawData[groupBy];
-        const label = convertValueToLabel(groupByValue, referenceMap);
+        const dataFieldValue = rawData[dataField];
+        const label = convertValueToLabel(dataFieldValue, referenceMap);
 
         chartData[0].children.push({
             ...rawData,
@@ -34,7 +34,7 @@ const convertValueToLabel = (value?: string, referenceMap?: ReferenceMap) => {
 export type AnalyzeRawData = {
     cost_sum: number; // valueField
     _total_cost_sum: number;
-} & Partial<Record<CostGroupBy, string>>;
+} & Partial<Record<CostDataField, string>>;
 
 interface TreemapChartChild extends AnalyzeRawData {
     value: string; // categoryField

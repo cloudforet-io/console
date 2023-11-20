@@ -1,10 +1,6 @@
 import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE } from '@/services/dashboards/widgets/_configs/config';
-import {
-    getWidgetFilterOptionsSchema,
-    getWidgetFilterSchemaPropertyNames, getWidgetInheritOptions, getWidgetInheritOptionsForFilter,
-    getWidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { CHART_TYPE, COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const costPieWidgetConfig: Partial<WidgetConfig> = {
     widget_config_id: 'costPie',
@@ -16,53 +12,24 @@ const costPieWidgetConfig: Partial<WidgetConfig> = {
         preview_image: 'widget-img_costPie--thumbnail.png',
     },
     options: {
+        cost_data_field: COST_DATA_FIELD_MAP.PROVIDER.name,
+        granularity: GRANULARITY.MONTHLY,
         chart_type: CHART_TYPE.PIE,
     },
-    inherit_options: {
-        ...getWidgetInheritOptions('cost_data_source'),
-        ...getWidgetInheritOptionsForFilter(
-            'provider',
-            'project',
-            'service_account',
-            'region',
-            'cost_product',
-        ),
-    },
-    options_schema: {
-        default_properties: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
-            'provider',
-            'project',
-            'service_account',
-            'region',
-            'cost_product',
-        )],
-        fixed_properties: ['cost_data_source', 'cost_group_by'],
-        non_inheritable_properties: ['cost_group_by'],
-        schema: {
-            type: 'object',
-            properties: {
-                ...getWidgetOptionsSchema('cost_data_source', 'cost_group_by'),
-                ...getWidgetFilterOptionsSchema(
-                    'provider',
-                    'project',
-                    'service_account',
-                    'project_group',
-                    'cost_product',
-                    'region',
-                    'cost_usage_type',
-                ),
-            },
-            order: ['cost_data_source', 'cost_group_by', ...getWidgetFilterSchemaPropertyNames(
-                'provider',
-                'project',
-                'service_account',
-                'project_group',
-                'cost_product',
-                'region',
-                'cost_usage_type',
-            )],
-        },
-    },
+    options_schema: getWidgetOptionsSchema([
+        'cost_data_source',
+        'cost_data_field',
+        ['granularity', { fixed: true, readonly: true }],
+        'filters.provider',
+        'filters.project',
+        'filters.service_account',
+        'filters.region',
+        'filters.project_group',
+        'filters.cost_product',
+        'filters.cost_usage_type',
+        'filters.cost_additional_info_value',
+        'filters.cost_tag_value',
+    ]),
 };
 
 export default costPieWidgetConfig;

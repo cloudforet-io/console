@@ -21,4 +21,5 @@ export interface MenuItem {
     iconColor?: string;
     error?: boolean;
     imageUrl?: string;
+    _resultIndex?: number; // A value indicating which item corresponds to or belongs to the nth result among the handler outputs. It is used internally.
 }

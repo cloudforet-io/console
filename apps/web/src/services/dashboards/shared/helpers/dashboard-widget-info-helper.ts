@@ -7,8 +7,8 @@ import type {
     WidgetConfig, WidgetFiltersMap,
     WidgetOptions,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getInheritingProperties } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
-import { getWidgetOptionName } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
+import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 /**
  * @description get updated widget info. if the property is not changed, it will be declared as undefined.
@@ -16,15 +16,14 @@ import { getWidgetOptionName } from '@/services/dashboards/widgets/_helpers/widg
  * @param mergedWidgetInfo
  */
 export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInfo: UpdatableWidgetInfo): UpdatableWidgetInfo => {
-    const configInheritOptions = widgetConfig.inherit_options ?? {};
     const configWidgetOptions = widgetConfig.options ?? {};
-    const mergedInheritOptions = mergedWidgetInfo.inherit_options ?? {};
-    const updatedInheritOptions: InheritOptions = cloneDeep(mergedInheritOptions);
+    const inheritOptions = mergedWidgetInfo.inherit_options ?? {};
+    const updatedInheritOptions: InheritOptions = cloneDeep(inheritOptions) ?? {};
     const updatedWidgetOptions: WidgetOptions = cloneDeep(mergedWidgetInfo.widget_options) ?? {};
     const schemaProperties = mergedWidgetInfo.schema_properties ?? [];
 
-    Object.entries(updatedInheritOptions).forEach(([key, inheritOption]) => {
-        if (!schemaProperties.includes(key) || isObjectEqual(inheritOption, configInheritOptions[key])) {
+    Object.entries(updatedInheritOptions).forEach(([key]) => {
+        if (!schemaProperties.includes(key)) {
             delete updatedInheritOptions[key];
         }
     });
@@ -34,8 +33,8 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
         if (key === 'filters') {
             if (!val) return;
             Object.entries(val).forEach(([filterKey, filterVal]) => {
-                const optionKey = getWidgetOptionName(filterKey);
-                const isInherited = getInheritingProperties(filterKey, updatedInheritOptions).length > 0;
+                const optionKey = getWidgetOptionKeyByVariableKey(filterKey);
+                const isInherited = getInheritingOptionKeys(filterKey, updatedInheritOptions).length > 0;
                 // if the filter is not in the schemaProperties or inherited, it will be deleted.
                 if (!schemaProperties.includes(optionKey)) {
                     delete (updatedWidgetOptions.filters as WidgetFiltersMap)[filterKey];
@@ -48,7 +47,7 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
             });
         // other widget option case
         } else {
-            const isInherited = getInheritingProperties(key, updatedInheritOptions).length > 0;
+            const isInherited = getInheritingOptionKeys(key, updatedInheritOptions).length > 0;
             // if the widget option is not in the schemaProperties or inherited, it will be deleted.
             if (!schemaProperties.includes(key)) {
                 delete updatedWidgetOptions[key];
@@ -66,6 +65,5 @@ export const getUpdatedWidgetInfo = (widgetConfig: WidgetConfig, mergedWidgetInf
         inherit_options: isEmpty(updatedInheritOptions) ? undefined : updatedInheritOptions,
         widget_options: isEmpty(updatedWidgetOptions) ? undefined : updatedWidgetOptions,
         schema_properties: schemaProperties.length ? schemaProperties : undefined,
-        size: mergedWidgetInfo.size === widgetConfig.sizes?.[0] ? undefined : mergedWidgetInfo.size,
     };
 };
