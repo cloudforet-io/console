@@ -13,7 +13,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { find } from 'lodash';
 
 import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -28,6 +28,7 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
+import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
@@ -87,18 +88,16 @@ const state = reactive({
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
     rootPath: computed(() => state.currentLayout.options?.unwind?.path ?? ''),
     isBaseInformationSchema: computed(() => (state.currentLayout.name === BASE_INFORMATION)),
-    keyItemSets: computed<KeyItemSet[]>(() => {
-        const keyItemSets: KeyItemSet[] = [{
-            title: 'Properties',
-            items: state.currentLayout.options?.search?.map((d) => ({
-                label: d.name,
-                name: d.key,
-                operators: ['', '!', '=', '!='],
-            })),
-        }];
-        return keyItemSets;
-    }),
 });
+const schemaQueryHelper = new QueryHelper();
+const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
+    computed(() => (state.currentLayout?.options?.search ?? [])),
+    'inventory.CloudService',
+    computed(() => schemaQueryHelper.setFilters([
+        { k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' },
+    ]).apiQuery.filter),
+);
+
 const getSchema = async () => {
     try {
         const params: Record<string, any> = {
@@ -284,7 +283,8 @@ watch(() => props.cloudServiceIdList, async (after, before) => {
                                           totalCount:state.totalCount,
                                           timezone:state.timezone,
                                           selectIndex:state.selectIndex,
-                                          keyItemSets: state.keyItemSets,
+                                          keyItemSets,
+                                          valueHandlerMap,
                                           lanuage:state.language,
                                       }"
                                       :field-handler="fieldHandler"

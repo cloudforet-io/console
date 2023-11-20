@@ -13,7 +13,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { find } from 'lodash';
 
 import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
+import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -31,6 +31,7 @@ import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper'
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
+import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface Props {
@@ -94,18 +95,17 @@ const state = reactive({
         return state.currentLayout.options;
     }),
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
-    keyItemSets: computed<KeyItemSet[]>(() => {
-        const keyItemSets: KeyItemSet[] = [{
-            title: 'Properties',
-            items: state.currentLayout.options?.search?.map((d) => ({
-                label: d.name,
-                name: d.key,
-                operators: ['', '!', '=', '!='],
-            })),
-        }];
-        return keyItemSets;
-    }),
 });
+
+const schemaQueryHelper = new QueryHelper();
+const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
+    computed(() => (state.currentLayout?.options?.search ?? [])),
+    'inventory.CloudService',
+    computed(() => schemaQueryHelper.setFilters([
+        { k: 'cloud_service_id', v: props.cloudServiceId, o: '=' },
+    ]).apiQuery.filter),
+);
+
 const getSchema = async () => {
     let layouts = layoutSchemaCacheMap[props.cloudServiceId];
     if (!layouts) {
@@ -329,7 +329,8 @@ watch(() => props.cloudServiceId, async (after, before) => {
                                           totalCount:state.totalCount,
                                           timezone:state.timezone,
                                           selectIndex:state.selectIndex,
-                                          keyItemSets:state.keyItemSets,
+                                          keyItemSets,
+                                          valueHandlerMap,
                                           lanuage:state.language,
                                           excelVisible: layout.type !== 'raw-table',
                                       }"
