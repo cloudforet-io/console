@@ -16,6 +16,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { store } from '@/store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -65,6 +66,7 @@ const state = reactive({
             },
         };
     }),
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 
 const fetchBudgetUsages = async (): Promise<{more: boolean; results: BudgetUsageAnalyzeResult[]}> => {
@@ -123,7 +125,7 @@ const handleExport = async () => {
     ];
     budgetUsageExportQueryHelper.setFilters(state.queryStoreFilters);
     const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
-    await store.dispatch('file/downloadExcel', {
+    await downloadExcel({
         url: '/cost-analysis/budget-usage/analyze',
         param: {
             query: {
@@ -134,6 +136,7 @@ const handleExport = async () => {
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.budget,
         version: 'v2',
+        timezone: state.timezone,
     });
 };
 

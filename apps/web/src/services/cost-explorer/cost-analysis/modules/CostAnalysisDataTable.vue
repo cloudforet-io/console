@@ -19,7 +19,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
-import type { ExcelDataField } from '@/store/modules/file/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -27,6 +26,8 @@ import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
+import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -343,7 +344,7 @@ const handleExcelDownload = async () => {
     try {
         const results = await listCostAnalysisExcelData();
         const refinedData = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
-        await store.dispatch('file/downloadExcel', {
+        await downloadExcel({
             data: refinedData,
             fields: tableState.excelFields,
             file_name_prefix: FILE_NAME_PREFIX.costAnalysis,

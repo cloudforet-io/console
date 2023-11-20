@@ -9,14 +9,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import {
-    SIDEBAR_TYPE,
-} from '@/store/modules/display/config';
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type { DisplayState } from '@/store/modules/display/type';
-
-import {
-    hideLoadingMessage, showLoadingMessage, showSuccessMessage,
-} from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -45,25 +39,6 @@ export const startInitializing = ({ commit }): void => {
 
 export const finishInitializing = ({ commit }): void => {
     commit('setIsInitialized', true);
-};
-
-interface StartLoadingPayload {loadingMessage?: string}
-export const startLoading = ({ state, commit }, { loadingMessage }: StartLoadingPayload = {}): void => {
-    if (!state.isLoading) {
-        commit('setIsLoading', true);
-        showLoadingMessage(loadingMessage, '');
-    }
-};
-
-interface FinishLoadingPayload { successMessage?: string}
-export const finishLoading = ({ commit }, { successMessage }: FinishLoadingPayload = {}): void => {
-    commit('setIsLoading', false);
-    hideLoadingMessage();
-    if (successMessage) {
-        setTimeout(() => {
-            showSuccessMessage(successMessage, '');
-        }, 500);
-    }
 };
 
 export const showSignInErrorMessage = ({ commit }): void => {

@@ -7,7 +7,6 @@ import display from './modules/display';
 import domain from './modules/domain';
 import error from './modules/error';
 import favorite from './modules/favorite';
-import file from './modules/file';
 import recent from './modules/recent';
 import reference from './modules/reference';
 import service from './modules/service';
@@ -27,7 +26,6 @@ const store = new Vuex.Store<any>({
         recent,
         reference,
         display,
-        file,
         service,
         error,
     },

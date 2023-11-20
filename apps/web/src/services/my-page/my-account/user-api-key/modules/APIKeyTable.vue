@@ -228,9 +228,10 @@ export default {
         };
 
         const openAPIKeyConfirmModal = async () => {
+            let loadingMessageId:string|undefined;
             try {
                 modalState.loading = true;
-                showLoadingMessage('Create API Key', '');
+                loadingMessageId = showLoadingMessage('Create API Key', '');
                 const resp = await SpaceConnector.client.identity.apiKey.create({
                     user_id: state.user,
                 });
@@ -240,7 +241,7 @@ export default {
                 ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'));
             } finally {
                 modalState.loading = false;
-                hideLoadingMessage(vm.$root);
+                if (loadingMessageId) hideLoadingMessage(loadingMessageId);
                 await listAPIKey(state.user);
             }
         };

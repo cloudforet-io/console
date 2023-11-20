@@ -8,7 +8,7 @@ import { PDynamicLayout, PButtonTab } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
@@ -22,10 +22,7 @@ import { QueryType } from '@/models/export';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import {
-    dynamicFieldsToExcelDataFields,
-    isTableTypeInDynamicLayoutType,
-} from '@/lib/component-util/dynamic-layout';
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import type { ConsoleDynamicField } from '@/lib/component-util/dynamic-layout/type';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -34,16 +31,15 @@ import type { Reference } from '@/lib/reference/type';
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { BASE_INFORMATION } from '@/services/asset-inventory/cloud-service/cloud-service-detail/config';
+
 interface Props {
-    cloudServiceId: string;
+    cloudServiceIdList: string[];
     cloudServiceGroup: string;
     cloudServiceType: string;
-    isServerPage: boolean;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    isServerPage: false,
-});
+const props = defineProps<Props>();
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -54,7 +50,6 @@ const defaultFetchOptions: DynamicLayoutFetchOptions = {
     searchText: '',
 };
 
-const layoutSchemaCacheMap = {};
 const fetchOptionsMap = {};
 const dataMap = {};
 
@@ -86,154 +81,110 @@ const state = reactive({
         return res;
     }),
     currentLayout: computed<DynamicLayout>(() => state.layoutMap[state.activeTab] || {}),
-    isTableTypeInDynamicLayout: computed(() => isTableTypeInDynamicLayoutType(state.currentLayout.type)),
     layoutOptions: computed(() => {
         if (!state.currentLayout.options) return {};
-        if (state.isTableTypeInDynamicLayout) {
-            return { ...state.currentLayout.options, root_path: undefined };
-        }
         return state.currentLayout.options;
     }),
     fetchOptionKey: computed(() => `${state.currentLayout.name}/${state.currentLayout.type}`),
+    rootPath: computed(() => state.currentLayout.options?.unwind?.path ?? ''),
+    isBaseInformationSchema: computed(() => (state.currentLayout.name === BASE_INFORMATION)),
 });
-
 const schemaQueryHelper = new QueryHelper();
 const { keyItemSets, valueHandlerMap } = useQuerySearchPropsWithSearchSchema(
     computed(() => (state.currentLayout?.options?.search ?? [])),
     'inventory.CloudService',
     computed(() => schemaQueryHelper.setFilters([
-        { k: 'cloud_service_id', v: props.cloudServiceId, o: '=' },
+        { k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' },
     ]).apiQuery.filter),
 );
 
 const getSchema = async () => {
-    let layouts = layoutSchemaCacheMap[props.cloudServiceId];
-    if (!layouts) {
-        try {
-            const params: Record<string, any> = {
-                schema: 'details',
-                options: {
-                    cloud_service_id: props.cloudServiceId,
-                },
-            };
-            if (props.isServerPage) {
-                params.resource_type = 'inventory.Server';
-            } else {
-                params.resource_type = 'inventory.CloudService';
-            }
-            const res = await SpaceConnector.client.addOns.pageSchema.get(params);
-
-            layouts = res.details;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
+    try {
+        const params: Record<string, any> = {
+            schema: 'details',
+            resource_type: 'inventory.CloudService',
+            options: {
+                cloud_service_id: props.cloudServiceIdList[0],
+                is_multiple: true,
+            },
+        };
+        const res = await SpaceConnector.client.addOns.pageSchema.get(params);
+        state.layouts = res.details;
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
-
-    layoutSchemaCacheMap[props.cloudServiceId] = layouts;
-    state.layouts = layouts || [];
     if (!find(state.tabs, { name: state.activeTab })) state.activeTab = state.tabs[0].name;
 };
 
 const apiQuery = new ApiQueryHelper();
-const apiQueryForGetData = new ApiQueryHelper();
-const listTypeQuery = new ApiQueryHelper();
-const unwindTagQuery = new ApiQueryHelper();
+const baseInformationQuery = new ApiQueryHelper();
 
-const setOnlyQuery = (query:ApiQueryHelper, type?: DynamicLayoutType) => {
-    if (type === 'list') return;
+const setOnlyQuery = (query:ApiQueryHelper) => {
+    if (state.isBaseInformationSchema) return;
     const fields:DynamicField[] = state.currentLayout.options?.fields ?? [];
     const only:string[] = [];
     fields.forEach((d) => { if (d) only.push(d.key); });
     query.setOnly(...only);
 };
-const setListQuery = (options, type?:DynamicLayoutType): any => {
+const setListQuery = (options) => {
     apiQuery.setFilters([]);
     if (options.sortBy) apiQuery.setSort(options.sortBy, options.sortDesc);
     if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
     if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
-    apiQuery.addFilter({ k: 'cloud_service_id', v: props.cloudServiceId, o: '=' });
-    setOnlyQuery(apiQuery, type);
+    apiQuery.addFilter({ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' });
+    setOnlyQuery(apiQuery);
 };
 
-
-
-const getListApiParams = (type?: DynamicLayoutType) => {
+const unwindTagQuery = new ApiQueryHelper();
+const getListApiParams = () => {
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
-    setListQuery(options, type);
+    setListQuery(options);
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const isTagsEmpty = (options.queryTags ?? []).length === 0;
     let params: any;
 
-    if (type !== 'list') {
+    if (!state.isBaseInformationSchema) {
         params = {
             query: {
                 ...apiQuery.data,
                 unwind: {
-                    path: state.currentLayout.options?.unwind?.path ?? '',
+                    path: state.rootPath,
                     ...(!isTagsEmpty && { ...unwindTagQuery.data }),
                 },
             },
         };
     } else {
-        listTypeQuery
-            .setFilters([{ k: 'cloud_service_id', v: props.cloudServiceId, o: '=' }]);
-        params = { query: listTypeQuery.data };
+        baseInformationQuery
+            .setFilters([{ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' }]);
+        params = { query: baseInformationQuery.data };
     }
 
     return params;
 };
 
 
-
-const getQueryForGetDataAPI = (): any => {
-    const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
-    if (options.sortBy !== undefined) apiQueryForGetData.setSort(options.sortBy, options.sortDesc);
-    if (options.pageLimit !== undefined) apiQueryForGetData.setPageLimit(options.pageLimit);
-    if (options.pageStart !== undefined) apiQueryForGetData.setPageStart(options.pageStart);
-    if (options.searchText !== undefined) apiQueryForGetData.setFilters([{ v: options.searchText }]);
-    if (options.queryTags !== undefined) {
-        apiQueryForGetData.setFiltersAsQueryTag(options.queryTags);
-    }
-    return apiQueryForGetData.data;
-};
 const getData = async () => {
+    state.loading = true;
     state.data = dataMap[state.fetchOptionKey];
-    if (state.currentLayout.type === 'raw-table') {
-        const params: any = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
-        const keyPath = state.currentLayout.options?.root_path;
-        if (keyPath) params.key_path = keyPath;
-        const res = await SpaceConnector.client.inventory.cloudService.getData(params);
-        if (res.total_count !== undefined) state.totalCount = res.total_count;
+    try {
+        const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams());
+        state.totalCount = res.total_count;
         state.data = res.results;
-    } else if (state.isTableTypeInDynamicLayout) {
-        try {
-            const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams(state.currentLayout.type));
-            if (res.total_count !== undefined) state.totalCount = res.total_count;
-            if (res.results) state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            state.data = undefined;
-            state.totalCount = 0;
-        }
-    } else {
-        try {
-            const res = await SpaceConnector.clientV2.inventory.cloudService.get({ cloud_service_id: props.cloudServiceId });
-            if (res) state.data = res;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            state.data = undefined;
-        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.data = undefined;
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
     }
-
     dataMap[state.fetchOptionKey] = state.data;
 };
 
-// excel
 const excelQuery = new ApiQueryHelper()
     .setMultiSortV2([{ key: 'created_at', desc: true }]);
 
 const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
-    excelQuery.setFilters([{ k: 'cloud_service_id', v: props.cloudServiceId, o: '=' }]);
+    excelQuery.setFilters([{ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' }]);
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
     const isTagsEmpty = (options.queryTags ?? []).length === 0;
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
@@ -247,7 +198,7 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
                     search_query: {
                         ...excelQuery.data,
                         unwind: {
-                            path: state.currentLayout.options?.unwind?.path ?? '',
+                            path: state.rootPath,
                             ...(!isTagsEmpty && { ...unwindTagQuery.data }),
                         },
                         fields: dynamicFieldsToExcelDataFields(fields),
@@ -263,7 +214,10 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
 
 const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
     fetch(options) {
-        fetchOptionsMap[state.fetchOptionKey] = options;
+        fetchOptionsMap[state.fetchOptionKey] = {
+            ...fetchOptionsMap[state.fetchOptionKey],
+            ...options,
+        };
         getData();
     },
     select(selectIndex) {
@@ -294,7 +248,7 @@ const onChangeTab = async (tab) => {
     await loadSchemaAndData();
 };
 
-watch(() => props.cloudServiceId, async (after, before) => {
+watch(() => props.cloudServiceIdList, async (after, before) => {
     if (after && after !== before) {
         await loadSchemaAndData();
     }
@@ -332,7 +286,6 @@ watch(() => props.cloudServiceId, async (after, before) => {
                                           keyItemSets,
                                           valueHandlerMap,
                                           lanuage:state.language,
-                                          excelVisible: layout.type !== 'raw-table',
                                       }"
                                       :field-handler="fieldHandler"
                                       v-on="dynamicLayoutListeners"

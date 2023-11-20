@@ -7,31 +7,28 @@ import type { ConsoleDynamicField, Reference } from '@/lib/component-util/dynami
 interface ExcelDataField {
     key: string;
     name: string;
-    type?: 'datetime'|'enum';
+    type?: 'datetime'|'enum'|'size';
     enum_items?: any;
     reference?: Reference;
     options?: DynamicFieldOptions;
 }
 
 /**
- * @name getApiActionByLayoutType
- * @description returns action name that match with dynamic layout type with camelcase.
+ * @name isTableTypeInDynamicLayoutType
+ * @description returns boolean value that match with dynamic layout type with camelcase.
  * @param type
  */
-export const getApiActionByLayoutType = (type: DynamicLayoutType): 'getData'|'get' => {
-    if (['raw-table', 'table', 'query-search-table'].includes(type)) return 'getData';
-    return 'get';
-};
+export const isTableTypeInDynamicLayoutType = (type: DynamicLayoutType): boolean => (['raw-table', 'table', 'query-search-table'].includes(type));
 
-export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): ExcelDataField[] => fields.map((d) => {
-    const res: ExcelDataField = { key: d.key, name: d.name ?? d.key, options: d.options };
+export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[], rootPathForUnwind?:string): ExcelDataField[] => fields.map((d) => {
+    const res: ExcelDataField = { key: rootPathForUnwind ? `${rootPathForUnwind}.${d.key}` : d.key, name: d.name ?? d.key, options: d.options };
 
     // lis type case will be deprecated
     if (d.type === 'list' && (d.options as ListOptions)?.sub_key) {
         res.key = `${d.key}.${(d.options as ListOptions).sub_key}`;
     }
 
-    if (d.type === 'datetime') {
+    if (d.type === 'datetime' || d.type === 'size') {
         res.type = d.type;
     } else if (d.type === 'enum') {
         res.type = d.type;
@@ -55,6 +52,6 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
 });
 
 export default {
-    getApiActionByLayoutType,
+    getApiActionByLayoutType: isTableTypeInDynamicLayoutType,
     dynamicFieldsToExcelDataFields,
 };

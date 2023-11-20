@@ -83,6 +83,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -117,6 +118,7 @@ export default {
             providerList: computed(() => Object.values(state.providers)),
             selectedProvider: undefined,
             selectedProviderName: computed(() => state.providers[state.selectedProvider]?.label),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
         });
 
         /** States for Dynamic Layout(search table type) * */
@@ -226,11 +228,12 @@ export default {
 
         /** API for Excel export * */
         const exportServiceAccountData = async () => {
-            await store.dispatch('file/downloadExcel', {
+            await downloadExcel({
                 url: '/identity/service-account/list',
                 param: { query: getQuery() },
                 fields: dynamicFieldsToExcelDataFields(tableState.schema?.options?.fields ?? []),
                 file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
+                timezone: state.timezone,
             });
         };
 

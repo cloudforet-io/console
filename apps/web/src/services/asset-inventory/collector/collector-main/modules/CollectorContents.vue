@@ -15,12 +15,12 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import type { ExcelDataField } from '@/store/modules/file/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-
+import { downloadExcel } from '@/lib/helper/file-download-helper';
+import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -42,6 +42,7 @@ const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 
 const keyItemSets: KeyItemSet[] = [{
@@ -174,11 +175,12 @@ const handleClickCollectDataConfirm = () => {
 
 /* API */
 const handleExportExcel = async () => {
-    await store.dispatch('file/downloadExcel', {
+    await downloadExcel({
         url: '/inventory/collector/list',
         param: { query: collectorApiQueryHelper.data },
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.collector,
+        timezone: storeState.timezone,
     });
 };
 const fetchCollectorList = async () => {
