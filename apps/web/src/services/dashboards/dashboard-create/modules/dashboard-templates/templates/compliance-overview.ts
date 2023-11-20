@@ -1,34 +1,35 @@
-import type { DashboardConfig } from '@/services/dashboards/config';
+import type { DashboardTemplate } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
-import type { DefaultDashboardPreviewConfig } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
+import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
 import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/helper';
-import { ASSET_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['complianceStatus'],
     ['totalFailFindingsStatus'],
+    ['totalFailFindingsHistory'],
     ['countOfPassAndFailFindings', {
         title: 'Count of Pass and Fail Findings by Region',
         widget_options: {
-            asset_group_by: ASSET_GROUP_BY.REGION,
+            asset_data_field: ASSET_DATA_FIELD_MAP.REGION.name,
         },
     }],
     ['countOfFailFindings', {
         title: 'Count of Fail Findings by Service',
         widget_options: {
-            asset_group_by: ASSET_GROUP_BY.SERVICE,
+            asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
         },
     }],
     ['trendOfPassAndFailFindings', {
         title: 'Trend of Pass and Fail Findings by Service',
         widget_options: {
-            asset_group_by: ASSET_GROUP_BY.SERVICE,
+            asset_data_field: ASSET_DATA_FIELD_MAP.SERVICE.name,
         },
     }],
     ['severityStatusByService'],
 ];
 
-export const complianceOverviewDashboardPreview: DefaultDashboardPreviewConfig = {
+export const complianceOverviewDashboardPreview: DefaultDashboardPreviewTemplate = {
     name: 'Compliance Overview',
     labels: [DASHBOARD_LABEL.ASSET, DASHBOARD_LABEL.COMPLIANCE, DASHBOARD_LABEL.SECURITY],
     version: '1',
@@ -38,7 +39,7 @@ export const complianceOverviewDashboardPreview: DefaultDashboardPreviewConfig =
     },
 };
 
-export const complianceOverviewDashboard: DashboardConfig = {
+export const complianceOverviewDashboard: DashboardTemplate = {
     ...complianceOverviewDashboardPreview,
     settings: {
         date_range: {

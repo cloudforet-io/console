@@ -3,24 +3,22 @@ import {
 } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import {
-    getVariableKeyFromWidgetSchemaProperty,
-} from '@/services/dashboards/shared/helpers/dashboard-variable-schema-helper';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
 import type {
-    InheritOptions, WidgetOptionsSchema, DashboardLayoutWidgetInfo, WidgetConfig, WidgetFilterKey,
+    InheritOptions, DashboardLayoutWidgetInfo, WidgetConfig,
     UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
-import { getInheritingProperties } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
+import type { WidgetFilterOptionKey, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {
-    getWidgetOptionName,
+    getWidgetOptionKeyByVariableKey,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 
 export const getWidgetInheritOptionsErrorMap = (
     schemaProperties: string[],
     inheritOptions?: InheritOptions,
-    widgetOptionsSchema?: WidgetOptionsSchema['schema'],
+    widgetOptionsSchema?: WidgetOptionsSchema,
     dashboardVariablesSchema?: DashboardVariablesSchema,
 ): Record<string, boolean> => {
     if (!inheritOptions || isEmpty(inheritOptions)) {
@@ -30,15 +28,15 @@ export const getWidgetInheritOptionsErrorMap = (
     schemaProperties.forEach((propertyName) => {
         if (!inheritOptions[propertyName]?.enabled) return;
 
-        const variableKey = inheritOptions[propertyName]?.variable_info?.key ?? getVariableKeyFromWidgetSchemaProperty(propertyName);
+        const variableKey = inheritOptions[propertyName]?.variable_key;
         if (!variableKey) return;
         if (!dashboardVariablesSchema?.properties?.[variableKey]?.use) {
             errorMap[propertyName] = true;
             return;
         }
 
-        const variableType = dashboardVariablesSchema.properties[variableKey].selection_type === 'MULTI' ? 'array' : 'string';
-        const widgetPropertyType = widgetOptionsSchema?.properties?.[propertyName]?.type;
+        const variableType = dashboardVariablesSchema.properties[variableKey].selection_type;
+        const widgetPropertyType = widgetOptionsSchema?.properties?.[propertyName]?.selection_type;
         if (variableType !== widgetPropertyType) {
             errorMap[propertyName] = true;
         }
@@ -120,37 +118,38 @@ export const validateWidgetByVariablesSchemaUpdate = ({
 const getUpdatedDashboardVariableSchemaProperties = (
     after?: DashboardVariablesSchema,
     before?: DashboardVariablesSchema,
-): [WidgetFilterKey[], WidgetFilterKey[], WidgetFilterKey[]] => {
-    const added: WidgetFilterKey[] = [];
-    const deleted: WidgetFilterKey[] = [];
-    const changed: WidgetFilterKey[] = [];
+): [WidgetFilterOptionKey[], WidgetFilterOptionKey[], WidgetFilterOptionKey[]] => {
+    const added: WidgetFilterOptionKey[] = [];
+    const deleted: WidgetFilterOptionKey[] = [];
+    const changed: WidgetFilterOptionKey[] = [];
     const afterVariables = Object.keys(after?.properties ?? {});
     const beforeVariables = Object.keys(before?.properties ?? {});
     union(afterVariables, beforeVariables).forEach((variable) => {
         if (!after?.properties[variable].use && !before?.properties[variable].use) return;
         if (after?.properties[variable].use && before?.properties[variable].use) {
             if (isEqual(after?.properties[variable], before?.properties[variable])) return; /* Not changed variable */
-            changed.push(variable as WidgetFilterKey);
+            changed.push(variable as WidgetFilterOptionKey);
         } else if (after?.properties[variable].use && !before?.properties[variable].use) {
-            added.push(variable as WidgetFilterKey);
+            added.push(variable as WidgetFilterOptionKey);
         } else {
-            deleted.push(variable as WidgetFilterKey);
+            deleted.push(variable as WidgetFilterOptionKey);
         }
     });
     return [added, deleted, changed];
 };
 const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
-    addedVariables: WidgetFilterKey[],
+    addedVariables: WidgetFilterOptionKey[],
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
     const _inheritOptions = cloneDeep(widgetInfo.inherit_options) ?? {};
     const _schemaProperties = widgetInfo.schema_properties ? [...widgetInfo.schema_properties] : [];
     const _widgetOptions = cloneDeep(widgetInfo.widget_options) ?? {};
-    const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.schema.properties ?? {});
+    const optionsSchemaProperties: string[] = Object.keys(widgetConfig.options_schema?.properties ?? {});
     let isAffected = false;
     addedVariables.forEach((variableKey) => {
-        const property = getWidgetOptionName(variableKey);
+        const property = getWidgetOptionKeyByVariableKey(variableKey);
+        if (!property) return; // no widget option matched by variable key
 
         const isInWidgetOptionsSchema = optionsSchemaProperties.some((d) => d.includes(property));
         if (!isInWidgetOptionsSchema) return; // not exist in widget options schema
@@ -163,7 +162,7 @@ const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
         }
 
         // enable inheritOption that match added variable
-        _inheritOptions[property] = { enabled: true, variable_info: { key: variableKey } };
+        _inheritOptions[property] = { enabled: true, variable_key: variableKey };
 
         // remove property from widget options
         delete _widgetOptions[property];
@@ -175,7 +174,7 @@ const getAffectedWidgetInfoByAddingVariableSchemaProperty = (
     } : undefined;
 };
 const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
-    dashboardVariables: WidgetFilterKey[],
+    dashboardVariables: WidgetFilterOptionKey[],
     widgetConfig: WidgetConfig,
     widgetInfo: Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>,
 ): Pick<DashboardLayoutWidgetInfo, 'inherit_options'|'schema_properties'|'widget_options'>|undefined => {
@@ -186,23 +185,23 @@ const getAffectedWidgetInfoByDeletingVariableSchemaProperty = (
 
     // delete or update options using deleted variables
     dashboardVariables.forEach((variableKey) => {
-        const inheritingProperties = getInheritingProperties(variableKey, _inheritOptions);
+        const inheritingOptionKeys = getInheritingOptionKeys(variableKey, _inheritOptions);
 
         // do nothing if inheriting properties are not exist
-        if (!inheritingProperties.length) return;
-
-        // revert to default inheritOption for each inheriting properties
-        inheritingProperties.forEach((inheritingProperty) => {
-            _inheritOptions[inheritingProperty] = widgetConfig.inherit_options?.[inheritingProperty] as InheritOptions['string'];
+        if (!inheritingOptionKeys.length) return;
+        inheritingOptionKeys.forEach((property) => {
+            delete _inheritOptions[property];
         });
 
-        const targetProperty = getWidgetOptionName(variableKey);
-        const isFixedProperty: boolean = widgetConfig.options_schema?.fixed_properties?.includes(targetProperty) ?? false;
+        const targetOptionKey = getWidgetOptionKeyByVariableKey(variableKey);
+        if (!targetOptionKey) return; // no widget option matched by variable key
+
+        const isFixedProperty: boolean = widgetConfig.options_schema?.properties?.[targetOptionKey]?.fixed ?? false;
         if (!isFixedProperty) {
             // remove from schemaProperties if it is not fixed property
-            const propertyIdx = _schemaProperties.indexOf(targetProperty);
+            const propertyIdx = _schemaProperties.indexOf(targetOptionKey);
             if (propertyIdx > -1) {
-                _schemaProperties.splice(_schemaProperties.indexOf(targetProperty), 1);
+                _schemaProperties.splice(_schemaProperties.indexOf(targetOptionKey), 1);
             }
         }
 
@@ -222,7 +221,7 @@ const isAffectedByChangedVariableSchemaProperties = (
 ): boolean => {
     const enabledInheritOptions = Object.entries(widgetInfo.inherit_options ?? {})
         .filter(([, v]) => v.enabled)
-        .map(([, v]) => v.variable_info?.key as WidgetFilterKey);
+        .map(([, v]) => v.variable_key as WidgetFilterOptionKey);
     if (!enabledInheritOptions.length || !enabledInheritOptions.some((d) => dashboardVariables.includes(d))) return false;
     return true;
 };
@@ -232,6 +231,6 @@ const validateWidget = (
     widgetConfig: WidgetConfig,
     dashboardVariableSchema?: DashboardVariablesSchema,
 ): boolean => {
-    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(schemaProperties, inheritOptions, widgetConfig.options_schema?.schema, dashboardVariableSchema);
+    const _widgetSchemaErrorMap = getWidgetInheritOptionsErrorMap(schemaProperties, inheritOptions, widgetConfig.options_schema, dashboardVariableSchema);
     return isEmpty(_widgetSchemaErrorMap);
 };

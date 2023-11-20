@@ -4,7 +4,6 @@ import {
 } from 'vue';
 
 import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { min } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -13,7 +12,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type {
     CloudServiceStatsModel, ComplianceStatus, Severity,
@@ -42,16 +40,11 @@ const BOX_MIN_WIDTH = 112;
 const SEVERITY_PRIORITY_MAP: Record<number, Severity> = {};
 Object.values(SEVERITY_STATUS_MAP).forEach((s) => { SEVERITY_PRIORITY_MAP[s.priority] = s.name; });
 
-const DATE_FORMAT = 'YYYY-MM';
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(widgetState.settings?.date_range?.end).format(DATE_FORMAT),
-    })),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const state = reactive({
     loading: true,
@@ -68,35 +61,30 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'additional_info.status', v: ['PASS', 'FAIL'], o: '=' });
-        const { status, response } = await fetchCloudServiceStatsAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+            .setFilters(widgetState.consoleFilters)
+            .addFilter({ k: 'data.status', v: ['PASS', 'FAIL'], o: '=' });
+        const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                group_by: ['additional_info.service'],
-                granularity: 'MONTHLY',
-                start: widgetState.dateRange.end,
-                end: widgetState.dateRange.end,
+                group_by: ['data.service'],
                 fields: {
                     pass_finding_count: {
-                        key: 'values.pass_finding_count',
+                        key: 'data.stats.findings.pass',
                         operator: 'sum',
                     },
                     fail_finding_count: {
-                        key: 'values.fail_finding_count',
+                        key: 'data.stats.findings.fail',
                         operator: 'sum',
                     },
                     status: {
-                        key: 'additional_info.status',
+                        key: 'data.status',
                         operator: 'add_to_set',
                     },
                     severity: {
-                        key: 'additional_info.severity',
+                        key: 'data.severity',
                         operator: 'add_to_set',
                     },
                 },

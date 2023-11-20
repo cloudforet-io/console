@@ -2,14 +2,12 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import {
     PProgressBar,
 } from '@spaceone/design-system';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -18,12 +16,11 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field, WidgetTableData } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
@@ -42,22 +39,11 @@ interface Data {
 }
 type Response = BudgetUsageAnalyzeResponse<Data>;
 
-const budgetQueryHelper = new QueryHelper();
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => {
-        const dataSourceId = widgetState.options.cost_data_source;
-        return {
-            name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-            params: {},
-            query: {
-                filters: budgetQueryHelper.setFilters([{ k: 'data_source_id', v: [dataSourceId], o: '=' }]).rawQueryStrings,
-            },
-        };
-    }),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
+
 const state = reactive({
     loading: true,
     data: undefined as Response | undefined,
@@ -96,13 +82,25 @@ const apiQueryHelper = new ApiQueryHelper();
 const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Response> => {
     try {
-        apiQueryHelper.setFilters(widgetState.budgetConsoleFilters);
+        apiQueryHelper.setFilters(widgetState.consoleFilters);
         if (pageSize.value) apiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
+
+
+        const groupBy: string[] = ['budget_id', 'name'];
+        if (widgetState.dataField) groupBy.push(widgetState.dataField);
+        if (widgetState.dataField === COST_DATA_FIELD_MAP.PROJECT_GROUP.name) groupBy.push(COST_DATA_FIELD_MAP.PROJECT.name);
+        else if (widgetState.dataField === COST_DATA_FIELD_MAP.PROJECT.name) groupBy.push(COST_DATA_FIELD_MAP.PROJECT_GROUP.name);
+
+        const defaultSelect = {} as Record<string, string>;
+        groupBy.forEach((field) => {
+            defaultSelect[field] = field;
+        });
+
         const { status, response } = await fetchBudgetUsageAnalyze({
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: ['budget_id', 'name', COST_GROUP_BY.PROJECT_GROUP, COST_GROUP_BY.PROJECT],
+                group_by: groupBy,
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -116,10 +114,7 @@ const fetchData = async (): Promise<Response> => {
                     },
                 },
                 select: {
-                    budget_id: 'budget_id',
-                    name: 'name',
-                    [COST_GROUP_BY.PROJECT_GROUP]: COST_GROUP_BY.PROJECT_GROUP,
-                    [COST_GROUP_BY.PROJECT]: COST_GROUP_BY.PROJECT,
+                    ...defaultSelect,
                     total_spent: 'total_spent',
                     total_budget: 'total_budget',
                     budget_usage: {

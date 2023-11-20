@@ -1,19 +1,18 @@
 import type { AsyncComponent } from 'vue';
 
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
 import type { Tags } from '@/models';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
-
 import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import type {
+    WidgetFilterKey,
+    WidgetOptionKey,
+    WidgetOptionsSchema,
+} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 
 export const WIDGET_SIZE = {
@@ -30,28 +29,26 @@ export const GRANULARITY = {
     YEARLY: 'YEARLY',
 } as const;
 
-export const COST_GROUP_BY = {
+export const COST_DATA_FIELD_MAP = {
     // resource reference type
-    PROVIDER: REFERENCE_TYPE_INFO.provider.key,
-    PROJECT: REFERENCE_TYPE_INFO.project.key,
-    SERVICE_ACCOUNT: REFERENCE_TYPE_INFO.service_account.key,
-    PROJECT_GROUP: REFERENCE_TYPE_INFO.project_group.key,
-    REGION: REFERENCE_TYPE_INFO.region.key,
+    PROJECT_GROUP: { name: 'project_group_id', label: 'Project Group' },
+    PROJECT: { name: 'project_id', label: 'Project' },
+    PROVIDER: { name: 'provider', label: 'Provider' },
+    SERVICE_ACCOUNT: { name: 'service_account_id', label: 'Service Account' },
+    REGION: { name: 'region_code', label: 'Region' },
     // cost reference
-    USAGE_TYPE: COST_VARIABLE_TYPE_INFO.cost_usage_type.key,
-    PRODUCT: COST_VARIABLE_TYPE_INFO.cost_product.key,
+    USAGE_TYPE: { name: 'cost_usage_type', label: 'Type' },
+    PRODUCT: { name: 'product', label: 'Product' },
 } as const;
-
-export const ASSET_GROUP_BY = {
+export const ASSET_DATA_FIELD_MAP = {
     // resource reference type
-    PROJECT: REFERENCE_TYPE_INFO.project.key,
-    PROVIDER: REFERENCE_TYPE_INFO.provider.key,
-    REGION: REFERENCE_TYPE_INFO.region.key,
+    PROJECT: { name: 'project_id', label: 'Project' },
+    PROVIDER: { name: 'provider', label: 'Provider' },
+    REGION: { name: 'region_code', label: 'Region' },
     // asset reference
-    // REQUIREMENT_ID: ASSET_REFERENCE_TYPE_INFO.asset_requirement_id.key,
-    SERVICE: ASSET_VARIABLE_TYPE_INFO.asset_service.key,
-    COMPLIANCE_FRAMEWORK: 'cloud_service_type',
-    ACCOUNT: ASSET_VARIABLE_TYPE_INFO.asset_account.key,
+    SERVICE: { name: 'additional_info.service', label: 'Service' },
+    COMPLIANCE_FRAMEWORK: { name: 'cloud_service_type', label: 'Compliance Framework' },
+    ACCOUNT: { name: 'account', label: 'Account' },
 };
 
 export const CHART_TYPE = {
@@ -66,45 +63,34 @@ export const CHART_TYPE = {
 
 export type WidgetSize = typeof WIDGET_SIZE[keyof typeof WIDGET_SIZE];
 export type Granularity = typeof GRANULARITY[keyof typeof GRANULARITY];
-export type CostGroupBy = typeof COST_GROUP_BY[keyof typeof COST_GROUP_BY];
-export type AssetGroupBy = typeof ASSET_GROUP_BY[keyof typeof ASSET_GROUP_BY];
-export type GroupBy = CostGroupBy|AssetGroupBy;
+export type CostDataField = typeof COST_DATA_FIELD_MAP[keyof typeof COST_DATA_FIELD_MAP]['name'];
+export type AssetDataField = typeof ASSET_DATA_FIELD_MAP[keyof typeof ASSET_DATA_FIELD_MAP]['name'];
+export type DataField = CostDataField|AssetDataField|string;
 type WidgetScope = 'DOMAIN'|'WORKSPACE'|'PROJECT';
 
 export interface BaseConfigInfo {
     config_id: string;
     version?: string;
 }
-export interface BaseWidgetConfig {
+export interface WidgetConfig {
     widget_config_id: string;
     widget_component?: AsyncComponent;
     base_configs?: BaseConfigInfo[];
     title?: string;
-
+    labels?: Array<'Cost'|'Asset'|'Budget'|string>;
     description?: {
         translation_id?: string;
         preview_image?: string;
     };
     scopes: WidgetScope[];
-
     theme?: {
         inherit?: boolean;
         inherit_count?: number;
     };
     sizes: WidgetSize[];
-    inherit_options?: InheritOptions;
+    options: WidgetOptions;
     options_schema?: WidgetOptionsSchema;
 }
-
-export interface CostWidgetConfig extends BaseWidgetConfig {
-    labels?: Array<'Cost'|string>;
-    options?: CostWidgetOptions;
-}
-export interface AssetWidgetConfig extends BaseWidgetConfig {
-    labels?: Array<'Asset'|string>;
-    options?: AssetWidgetOptions;
-}
-export type WidgetConfig = CostWidgetConfig|AssetWidgetConfig;
 
 type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 interface LegendOptions {
@@ -118,74 +104,31 @@ export interface WidgetFilter {
     v: null|string|boolean|number|Array<null|string|boolean|number>;
     o?: ConsoleFilterOperator;
 }
-export const WIDGET_FILTER_KEYS = [
-    // resource reference type
-    REFERENCE_TYPE_INFO.provider.type,
-    REFERENCE_TYPE_INFO.project.type,
-    REFERENCE_TYPE_INFO.service_account.type,
-    REFERENCE_TYPE_INFO.project_group.type,
-    REFERENCE_TYPE_INFO.user.type,
-    REFERENCE_TYPE_INFO.cloud_service_type.type,
-    REFERENCE_TYPE_INFO.region.type,
-    // cost reference
-    COST_VARIABLE_TYPE_INFO.cost_product.type,
-    COST_VARIABLE_TYPE_INFO.cost_usage_type.type,
-    // asset reference
-    ASSET_VARIABLE_TYPE_INFO.asset_account.type,
-] as const;
-export type WidgetFilterKey = typeof WIDGET_FILTER_KEYS[number];
+
 export type WidgetFiltersMap = Partial<Record<WidgetFilterKey, WidgetFilter[]>>;
 
-
-/* widget schema */
-export type WidgetFiltersSchema = {
-    [K in WidgetFilterKey as `filters.${K}`]: JsonSchema['properties']
-};
-export type WidgetFiltersSchemaProperty = keyof WidgetFiltersSchema;
-export type WidgetOptionsSchemaProperty = 'cost_group_by'|'asset_group_by'|WidgetFiltersSchemaProperty|string;
-export type CostWidgetOptionsSchemaProperty = 'cost_group_by'|WidgetFiltersSchemaProperty|string;
-export type AssetWidgetOptionsSchemaProperty = 'asset_group_by'|WidgetFiltersSchemaProperty|string;
-export interface BaseWidgetOptionsSchema<T extends string> {
-    default_properties?: T[];
-    fixed_properties?: T[];
-    non_inheritable_properties?: T[];
-    schema: JsonSchema;
-}
-export type WidgetOptionsSchema =
-     | BaseWidgetOptionsSchema<CostWidgetOptionsSchemaProperty>
-     | BaseWidgetOptionsSchema<AssetWidgetOptionsSchemaProperty>;
-
 /* widget options */
-export interface BaseWidgetOptions {
-    // group_by?: GroupBy | string;
+export interface WidgetOptions {
+    // cost
+    cost_data_source?: string;
+    cost_data_type?: string;
+    cost_data_field?: string;
+    cost_secondary_data_field?: string;
+    // asset
+    cloud_service_query_set?: string;
+    asset_data_field?: string;
+    asset_secondary_data_field?: string;
+    // common
     granularity?: Granularity;
-    stacked?: boolean;
-    legend_options?: LegendOptions;
     chart_type?: ChartType;
-    // selector_options?: {
-    //     enabled?: boolean;
-    //     type: 'cost-usage'|'days';
-    // };
+    legend_options?: LegendOptions;
     pagination_options?: {
         enabled?: boolean;
         page_size?: number;
     };
+    data_criteria?: 'history'|'realtime';
     filters?: WidgetFiltersMap;
 }
-export interface SelectorOptions {
-    enabled?: boolean;
-    type: 'cost-usage'|'days';
-}
-export interface CostWidgetOptions extends BaseWidgetOptions {
-    cost_data_source?: string;
-    cost_group_by?: CostGroupBy | string;
-    selector_options?: SelectorOptions;
-}
-export interface AssetWidgetOptions extends BaseWidgetOptions {
-    asset_query_set?: string;
-    asset_group_by?: AssetGroupBy | string;
-}
-export type WidgetOptions = CostWidgetOptions&AssetWidgetOptions;
 
 export interface DashboardLayoutWidgetInfo {
     widget_name: string; // widget config name
@@ -199,12 +142,14 @@ export interface DashboardLayoutWidgetInfo {
 }
 export type UpdatableWidgetInfo = Pick<DashboardLayoutWidgetInfo, 'title'|'inherit_options'|'widget_options'|'schema_properties'>;
 
-export type InheritOptions = Record<string, {
+export interface InheritOption {
     enabled?: boolean;
-    variable_info?: {
-        key: string;
-    },
-}>;
+    variable_key?: string;
+}
+export type InheritOptions = Partial<Record<WidgetOptionKey, {
+    enabled?: boolean;
+    variable_key?: string;
+}>>;
 
 export interface CustomWidgetInfo extends DashboardLayoutWidgetInfo {
     custom_widget_id: string;
@@ -268,5 +213,3 @@ export interface WidgetExpose<Data = any> {
     refreshWidget: () => Promise<Data>;
 }
 
-export type SelectorType = 'cost' | 'usage' | 'day' | 'month';
-export type UsageType = 'data-transfer.out' | 'data-transfer.in' | 'data-transfer.etc' | 'requests.http' | 'requests.https';

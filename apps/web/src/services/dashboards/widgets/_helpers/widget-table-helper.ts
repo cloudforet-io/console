@@ -1,14 +1,12 @@
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy } from 'lodash';
 
-import { sortArrayInObjectArray } from '@cloudforet/core-lib';
-
 import type { AllReferenceTypeInfo, ReferenceType } from '@/store/reference/all-reference-store';
 
 import { getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
-import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_configs/config';
+import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
 
 /**
  * @name getWidgetTableDateFields
@@ -16,7 +14,7 @@ import type { Granularity, GroupBy } from '@/services/dashboards/widgets/_config
  * @example [{ name: 'cost_sum.0.value', label: '2022-09' }, ...]
  */
 export const getWidgetTableDateFields = (
-    granularity: Granularity,
+    granularity: Granularity|undefined,
     dateRange: DateRange,
     textOptions: Field['textOptions'],
     fieldsKey = 'cost_sum',
@@ -92,15 +90,8 @@ export const fillEmptyDateToObjectArray = <Data extends RawData = RawData>(field
 };
 
 
-// TODO: remove this after refactoring
-export const sortTableData = <Data extends RawData = RawData>(
-    rawData: Data[],
-    sortKey = 'date',
-    targetFieldKeys: string[] = ['cost_sum', 'usage_quantity_sum'],
-): Data[] => sortArrayInObjectArray<Data>(rawData, sortKey, targetFieldKeys);
-
-export const getReferenceTypeOfGroupBy = (allReferenceTypeInfo: AllReferenceTypeInfo, groupBy: GroupBy): ReferenceType | undefined => {
-    const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === groupBy);
+export const getReferenceTypeOfDataField = (allReferenceTypeInfo: AllReferenceTypeInfo, dataField?: string): ReferenceType | undefined => {
+    const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField);
     if (referenceTypeInfo) return referenceTypeInfo.type;
     return undefined;
 };

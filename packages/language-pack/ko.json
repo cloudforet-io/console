@@ -550,7 +550,7 @@
 					"UP_TO_LAST_12_MONTHS": "최대 12개월 기간내 설정 가능"
 				},
 				"HIDE_ALL": "전체 숨김",
-				"INVALID_PERIOD_TEXT": "이전에 선택된 기간의 데이터를 더 이상 표시할 수 없습니다. ",
+				"INVALID_PERIOD_TEXT": "이전에 선택된 기간의 데이터를 더 이상 표시할 수 없습니다.",
 				"KEEP_MY_SETTING": "위의 설정을 내 설정사항으로 유지",
 				"LABEL_ADDITIONAL_FIELD": "추가 필드",
 				"LABEL_COST_ANALYSIS_NAME": "비용 분석 이름 ",
@@ -1412,6 +1412,9 @@
 			"LABEL_VIEWERS": "공개 여부",
 			"REQUIRED": "필수 입력 항목입니다.",
 			"RETURN_TO_INITIAL_SETTINGS": "초기 설정으로 돌아가기",
+			"UNABLE_TO_ADD_WIDGET": "위젯 추가 불가",
+			"UNABLE_TO_ADD_WIDGET_DESC": "{field} 등록이 필요합니다. ",
+			"UNABLE_TO_ADD_WIDGET_DESC2": "시스템 관리자에게 문의해주세요.",
 			"UPDATE_TITLE": "대시보드 이름 수정",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "대시보드 이름을 입력해주세요.",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "대시보드 이름은 100글자를 넘을 수 없습니다.",
@@ -1440,12 +1443,6 @@
 			},
 			"ASSET_SUMMARY_BY_REGIONS": {
 				"DESC": "클라우드 프로바이더의 Region별 클라우드 서비스 사용 현황을 요약해서 보여주는 위젯. "
-			},
-			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안의 AWS CloudFront 사용량과 비용을 보여주는 위젯. "
-			},
-			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": "조회 기간동안 발생한 Region별 AWS Data-Transfer 사용량과 비용을 보여주는 위젯. "
 			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "조회 기간 동안 발생한 AWS Data-Transfer 비용 추이를 보여주는 위젯. "
@@ -1478,6 +1475,8 @@
 				"DESC": "클라우드 자원의 비용 추이 또는 서버, 데이터베이스, 스토리지 사용 추이를 빠르게 파악할 수 있는 위젯. "
 			},
 			"COMPLIANCE_STATUS": {
+				"COMPLIANCE_SCORE": "Compliance score",
+				"COMPLIANCE_SCORE_TOOLTIP": "이 점수는 Fail 항목들의 심각도(severity) 레벨을 아래의 기준에 따라 가중치를 부여하여 계산한 결과입니다.",
 				"DESC": "조회 기간동안 확인된 컴플라이언스 Pass/Fail 관련 전반적인 상태를 보여주는 위젯. ",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
 				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
@@ -1485,20 +1484,26 @@
 			"COST_BY_REGION": {
 				"DESC": "조회 기간동안 발생한 Region별 총 비용 데이터를 보여주는 위젯. "
 			},
+			"COST_BY_REGION_MULTI_FIELDS": {
+				"DESC": "선택한 'Column Field'에 기반하여 조회 기간 동안의 Region별 비용 또는 사용량을 보여주는 위젯."
+			},
 			"COST_DONUT": {
-				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안 각각의 총 비용 데이터를 보여주는 위젯."
+				"DESC": "선택한 'Data Field'를 기준으로 조회 기간동안 발생한 비용 데이터를 한눈에 확인할 수 있는 위젯."
 			},
 			"COST_MAP": {
-				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간동안 발생한 상위 비용 데이터를 한눈에 확인할 수 있는 위젯."
+				"DESC": "선택한 'Data Field'를 기준으로 조회 기간동안 발생한 상위 비용 데이터를 한눈에 확인할 수 있는 위젯."
 			},
 			"COST_PIE": {
-				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안 각각의 총 비용 데이터를 보여주는 위젯. "
+				"DESC": "선택한 'Data Field'를 기준으로 조회 기간동안 발생한 비용 데이터를 한눈에 확인할 수 있는 위젯."
+			},
+			"COST_SUMMARY_MULTI_FIELDS": {
+				"DESC": "선택한 'Row Field', 'Column Field' 에 기반하여 조회 기간 동안\u001d의 비용 또는 사용량을 보여주는 위젯. "
 			},
 			"COST_TREND": {
-				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안의 월별 비용 데이터를 보여주는 위젯. "
+				"DESC": "선택한 'Data Field'에 기반하여 조회 기간까지의 비용 또는 사용량 트렌드를 보여주는 위젯. "
 			},
 			"COST_TREND_STACKED": {
-				"DESC": "선택한 'Group by' 옵션을 기준으로 조회 기간 동안의 월별 비용 데이터를 보여주는 위젯. "
+				"DESC": "선택한 'Data Field'에 기반하여 조회 기간까지의 비용 또는 사용량 트렌드를 보여주는 위젯. "
 			},
 			"COUNT_OF_FAIL_FINDINGS": {
 				"DESC": "선택한 'Group By' 옵션을 기준으로 조회 기간 동안의 컴플라이언스 Fail findings 수치를 보여주는 위젯. "
@@ -1525,22 +1530,31 @@
 				"SELECTED_MONTH": "지정 월"
 			},
 			"NO_DATA": "데이터가 없습니다.",
+			"NO_SELECTED_ITEM": "1개 이상의 옵션을 선택해 주세요.",
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "프로젝트별 이슈 발생, 인지 또는 안전과 같은 활동 현황을 빠르게 확인할 수 있는 위젯. "
 			},
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "최근 발생한 얼럿들에 의한 프로젝트별 긴급도를 빠르게 확인할 수 있는 위젯. "
 			},
+			"REALTIME": "실시간 데이터",
 			"SEVERITY_STATUS_BY_SERVICE": {
 				"DESC": "조회 기간동안 확인된 서비스별 컴플라이언스 Failure 심각도를 히트맵을 통해 확인할 수 있는 위젯."
 			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "컴퓨트, 데이터베이스, 스토리지 리소스 사용량이 많은 상위 프로젝트들을 빠르게 파악할 수 있는 위젯."
 			},
+			"TOTAL_FAIL_FINDINGS_HISTORY": {
+				"DESC": "조회 기간동안 확인된 컴플라이언스 Failure 개수, 비율과 심각도를 보여주는 위젯. "
+			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
-				"DESC": "조회 기간동안 확인된 컴플라이언스 Failure 개수, 비율과 심각도를 보여주는 위젯. ",
+				"DESC": "조회 기간동안 확인된 컴플라이언스 Failure 개수, 비율과 심각도를 보여주는 위젯.",
+				"LESS_THAN_PREV_DAY": "전일 대비 하락",
 				"LESS_THAN_PREV_MONTH": "전월 대비 하락",
-				"MORE_THAN_PREV_MONTH": "전월 대비 상승"
+				"LESS_THAN_PREV_YEAR": "전년 대비 하락",
+				"MORE_THAN_PREV_DAY": "전일 대비 상승",
+				"MORE_THAN_PREV_MONTH": "전월 대비 상승",
+				"MORE_THAN_PREV_YEAR": "전년 대비 상승"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "선택한 'Group By' 옵션을 기준으로 조회 기간 동안의 컴플라이언스 Pass/Fail findings 트렌드를 보여주는 위젯. "

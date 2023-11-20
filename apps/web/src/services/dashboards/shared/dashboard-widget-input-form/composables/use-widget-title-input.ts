@@ -4,22 +4,23 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { useWidgetFormStore } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
-
 export const useWidgetTitleInput = () => {
-    const widgetFormStore = useWidgetFormStore();
     const {
-        forms: { title }, setForm, invalidState, invalidTexts, isAllValid: isTitleValid, resetAll: resetTitle,
+        forms: { title }, setForm,
+        invalidTexts,
+        resetAll: resetTitle,
+        isAllValid: isTitleValid,
     } = useFormValidator({
         title: '',
     }, {
-        title(value: string) { return value.trim().length ? '' : i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.VALIDATION_NAME'); },
+        title(value: string|undefined) {
+            if (value === undefined || !value.trim()) return i18n.t('DASHBOARDS.CUSTOMIZE.ADD_WIDGET.VALIDATION_NAME');
+            return '';
+        },
     });
     const updateTitle = (val) => {
         setForm('title', val);
-        widgetFormStore.$patch({ widgetTitle: val });
     };
-    const isTitleInvalid = toRef(invalidState, 'title');
     const titleInvalidText = toRef(invalidTexts, 'title');
 
     return {
@@ -27,7 +28,6 @@ export const useWidgetTitleInput = () => {
         resetTitle,
         updateTitle,
         isTitleValid,
-        isTitleInvalid,
         titleInvalidText,
     };
 };

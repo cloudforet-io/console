@@ -5,8 +5,7 @@ import {
 
 import { color, percent } from '@amcharts/amcharts5';
 import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
-import { PDataLoader } from '@spaceone/design-system';
-import dayjs from 'dayjs';
+import { PDataLoader, PTooltip, PI } from '@spaceone/design-system';
 import { isEmpty, sum } from 'lodash';
 
 import { numberFormatter } from '@cloudforet/core-lib';
@@ -14,10 +13,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { i18n } from '@/translations';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import {
@@ -61,7 +61,6 @@ interface InnerChartData {
 
 const COMPLIANCE_STATUS_MAP_VALUES = Object.values(COMPLIANCE_STATUS_MAP);
 const SEVERITY_STATUS_MAP_VALUES = Object.values(SEVERITY_STATUS_MAP);
-const DATE_FORMAT = 'YYYY-MM';
 
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
@@ -69,11 +68,7 @@ const emit = defineEmits<WidgetEmit>();
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    dateRange: computed<DateRange>(() => ({
-        end: dayjs.utc(widgetState.settings?.date_range?.start).format(DATE_FORMAT),
-    })),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 const state = reactive({
     loading: true,
     data: null as Data[]|null,
@@ -133,35 +128,36 @@ const state = reactive({
         if (totalScore === 0) return 0;
         return Math.round((passScore / totalScore) * 100);
     }),
+    tooltipText: computed<string>(() => {
+        let text: string = i18n.t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.COMPLIANCE_SCORE_TOOLTIP') as string;
+        Object.values(SEVERITY_STATUS_MAP).forEach((severity) => {
+            if (severity.level) text += `<br>· ${severity.label}: ${severity.level}`;
+        });
+        return text;
+    }),
 });
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceStatsAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' })
-            .addFilter({ k: 'additional_info.status', v: ['PASS', 'FAIL'], o: '=' });
-        const { status, response } = await fetchCloudServiceStatsAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+            .setFilters(widgetState.consoleFilters)
+            .addFilter({ k: 'data.status', v: ['PASS', 'FAIL'], o: '=' });
+        const { status, response } = await fetchCloudServiceAnalyze({
             query: {
-                granularity: 'MONTHLY',
-                start: widgetState.dateRange.end,
-                end: widgetState.dateRange.end,
-                group_by: ['unit', 'additional_info.status', 'additional_info.severity'],
+                group_by: ['data.status', 'data.severity'],
                 fields: {
                     compliance_count: {
-                        key: 'values.compliance_count',
-                        operator: 'sum',
+                        operator: 'count',
                     },
                     pass_score: {
-                        key: 'values.pass_score',
+                        key: 'data.stats.score.pass',
                         operator: 'sum',
                     },
                     fail_score: {
-                        key: 'values.fail_score',
+                        key: 'data.stats.score.fail',
                         operator: 'sum',
                     },
                 },
@@ -331,6 +327,19 @@ defineExpose<WidgetExpose<Data[]>>({
                                 {{ numberFormatter(state.complianceCountMap[status.name] ?? 0) }}
                             </p>
                         </div>
+                        <div class="tooltip-wrapper">
+                            <p-tooltip :contents="state.tooltipText"
+                                       position="bottom"
+                            >
+                                <span>{{ $t('DASHBOARDS.WIDGET.COMPLIANCE_STATUS.COMPLIANCE_SCORE') }}</span>
+                                <p-i name="ic_info-circle"
+                                     width="1rem"
+                                     height="1rem"
+                                     color="inherit"
+                                     class="tooltip-icon"
+                                />
+                            </p-tooltip>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -393,6 +402,12 @@ defineExpose<WidgetExpose<Data[]>>({
                     }
                     .value {
                         @apply text-display-md;
+                    }
+                }
+                .tooltip-wrapper {
+                    padding-top: 1.5rem;
+                    .tooltip-icon {
+                        margin-left: 0.25rem;
                     }
                 }
             }

@@ -1,34 +1,14 @@
 import { cloneDeep } from 'lodash';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ASSET_VARIABLE_TYPE_INFO } from '@/lib/reference/asset-reference-config';
-import { COST_VARIABLE_TYPE_INFO } from '@/lib/reference/cost-reference-config';
-import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import type { DashboardLabel, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { DASHBOARD_LABEL } from '@/services/dashboards/config';
 import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/dashboard-create/modules/dashboard-templates/config';
-import { managedDashboardVariablesSchema, managedVariablesPropertiesMap } from '@/services/dashboards/managed-variables-schema';
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
-
-export const getDefaultWidgetFormData = (widgetId: string): Record<string, string> => {
-    const widgetConfig = getWidgetConfig(widgetId);
-    const fixedProperties: string[] = widgetConfig.options_schema?.fixed_properties ?? [];
-    const defaultProperties: string[] = widgetConfig.options_schema?.default_properties?.filter((d) => !fixedProperties.includes(d)) ?? [];
-    const schemaFormData = {};
-
-    // set default value to fixed properties
-    fixedProperties.forEach((propertyName) => {
-        schemaFormData[propertyName] = widgetConfig?.options?.[propertyName];
-    });
-    // set default value to default properties
-    defaultProperties.forEach((propertyName) => {
-        schemaFormData[propertyName] = propertyName.replace('filters.', '');
-    });
-
-    return schemaFormData;
-};
 
 type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<Pick<DashboardLayoutWidgetInfo, 'title'|'widget_options'|'size'|'inherit_options'|'schema_properties'>>];
 export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): DashboardLayoutWidgetInfo[] => widgetList.map(
@@ -49,24 +29,54 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
     },
 );
 
+const ASSET_VARIABLE_KEYS: string[] = [
+    MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+    MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
+];
+const COST_VARIABLE_KEYS: string[] = [
+    MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
+    MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
+];
 export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVariablesSchema => {
-    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(managedDashboardVariablesSchema);
+    const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASH_VAR_SCHEMA);
+
     if (label === DASHBOARD_LABEL.ASSET) {
-        managedVariablesPropertiesMap.forEach((value, key) => {
-            if (Object.keys(ASSET_VARIABLE_TYPE_INFO).includes(key)) {
-                _managedVariablesSchema.properties[key] = { ...value, use: true }; // set Asset variables to use
+        ASSET_VARIABLE_KEYS.forEach((key) => {
+            _managedVariablesSchema.properties[key].use = true;
+            if (key === MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key) {
+                _managedVariablesSchema.properties[key].fixed = true;
             }
         });
-        // HACK: remove below code after backend is ready
-        _managedVariablesSchema.properties[REFERENCE_TYPE_INFO.service_account.type].use = false;
-    } else if (label === DASHBOARD_LABEL.COST) {
-        managedVariablesPropertiesMap.forEach((value, key) => {
-            if (Object.keys(COST_VARIABLE_TYPE_INFO).includes(key)) {
-                _managedVariablesSchema.properties[key] = { ...value, use: true }; // set Cost variables to use
+        _managedVariablesSchema.order = _managedVariablesSchema.order.sort((a, b) => {
+            if (COST_VARIABLE_KEYS.includes(a)) {
+                return COST_VARIABLE_KEYS.includes(b) ? 0 : 1;
             }
+            return COST_VARIABLE_KEYS.includes(b) ? -1 : 0;
         });
-    } else if (label === DASHBOARD_LABEL.BLANK) {
-        _managedVariablesSchema.properties[COST_VARIABLE_TYPE_INFO.cost_data_source.type].required = false;
+        return _managedVariablesSchema;
     }
+
+    if (label === DASHBOARD_LABEL.COST) {
+        COST_VARIABLE_KEYS.forEach((key) => {
+            _managedVariablesSchema.properties[key].use = true;
+            if (key === MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key) {
+                _managedVariablesSchema.properties[key].fixed = true;
+            }
+        });
+        _managedVariablesSchema.order = _managedVariablesSchema.order.sort((a, b) => {
+            if (ASSET_VARIABLE_KEYS.includes(a)) {
+                return ASSET_VARIABLE_KEYS.includes(b) ? 0 : 1;
+            }
+            return ASSET_VARIABLE_KEYS.includes(b) ? -1 : 0;
+        });
+        return _managedVariablesSchema;
+    }
+
+    if (label === DASHBOARD_LABEL.BLANK) {
+        _managedVariablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key].fixed = false;
+        _managedVariablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key].fixed = false;
+        return _managedVariablesSchema;
+    }
+
     return _managedVariablesSchema;
 };

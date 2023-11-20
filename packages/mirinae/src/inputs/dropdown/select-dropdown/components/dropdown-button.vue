@@ -191,7 +191,6 @@ const handleTagDelete = (item: SelectDropdownMenuItem, idx: number) => {
         .selection-display-wrapper {
             @apply flex flex-grow flex-shrink items-center text-label-md;
             width: 100%;
-            min-height: 2rem;
             padding-top: 0.375rem;
             padding-bottom: 0.375rem;
             .placeholder {

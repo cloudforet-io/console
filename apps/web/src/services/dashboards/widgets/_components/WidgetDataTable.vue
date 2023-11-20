@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core';
 import {
+    computed,
     defineProps, reactive, ref, watch,
 } from 'vue';
 
@@ -64,6 +65,14 @@ const emit = defineEmits<{(e: string, value: any): void}>();
 const state = reactive({
     proxyThisPage: useProxyValue('thisPage', props, emit),
     disabledLegends: {} as Record<number, boolean>,
+    tableOverflowXScroll: computed<boolean>(() => {
+        if (props.fields.length > 13) return true;
+        return false;
+    }),
+    tableOverflowXScrollWidth: computed<string|undefined>(() => {
+        if (!state.tableOverflowXScroll) return undefined;
+        return `${props.fields.length * 7}rem`;
+    }),
 });
 
 const labelRef = ref<HTMLElement[]|null>(null);
@@ -111,8 +120,12 @@ const textFormatter = (value:string|number, textOptions: Field['textOptions'], c
     return value;
 };
 const getValue = (item:string|number|object, field: Field):string|number => {
+    let valueKey = field.name;
+    if (valueKey === null || valueKey === undefined) {
+        valueKey = 'Unknown';
+    }
     if (typeof item === 'object') {
-        return textFormatter(getValueByPath(item, field.name), field.textOptions, item);
+        return textFormatter(getValueByPath(item, valueKey), field.textOptions, item);
     }
     return textFormatter(item, field.textOptions, item);
 };
@@ -142,9 +155,12 @@ useResizeObserver(tableRef, throttle((entries) => {
     tableWidth.value = width;
 }, 500));
 
-const getTooltipContents = (item, field:Field):string => {
+const getTooltipContents = (item: any, field: Field): string => {
     const value = getValue(item, field);
-    return (typeof value === 'number') ? value.toString() : value;
+    if (typeof value === 'number') return value.toString();
+    if (Array.isArray(value)) return value.join(', ');
+    if (typeof value === 'object') return JSON.stringify(value);
+    return value;
 };
 
 /* event */
@@ -172,7 +188,13 @@ watch(() => props.legends, () => {
         >
             <template #default="{isEmpty}">
                 <table ref="tableRef"
-                       :class="{'ellipsis-table': !props.disableEllipsis }"
+                       :class="{
+                           'ellipsis-table': !props.disableEllipsis,
+                           'table-overflow-x-scroll': state.tableOverflowXScroll
+                       }"
+                       :style="{
+                           width: state.tableOverflowXScrollWidth,
+                       }"
                 >
                     <thead>
                         <tr>
@@ -357,9 +379,12 @@ watch(() => props.legends, () => {
         border-collapse: separate;
         border-spacing: 0;
         table-layout: fixed;
-    }
-    .ellipsis-table {
-        @apply w-full;
+        &.ellipsis-table {
+            @apply w-full;
+        }
+        &.table-overflow-x-scroll {
+            overflow-x: auto;
+        }
     }
     thead {
         tr {
