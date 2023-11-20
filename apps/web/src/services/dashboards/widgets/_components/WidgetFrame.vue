@@ -95,10 +95,10 @@ const state = reactive({
             const endDayjs = end ? dayjs.utc(end) : nowDayjs;
             const isCurrentYear = endDayjs.isSame(nowDayjs, 'year');
             let endText;
-            if (isCurrentYear) endText = nowDayjs.format('YYYY/MM/DD');
-            else endText = endDayjs.endOf('year').format('YYYY/MM/DD');
+            if (isCurrentYear) endText = nowDayjs.format('YY/MM/DD');
+            else endText = endDayjs.endOf('year').format('YY/MM/DD');
             if (start) {
-                const startText = endDayjs.startOf('year').format('YYYY/MM/DD');
+                const startText = endDayjs.startOf('year').format('YY/MM/DD');
                 return `${startText} ~ ${endText}`;
             }
             return endText;
@@ -108,10 +108,10 @@ const state = reactive({
             let endText;
             const endDayjs = dayjs.utc(end);
             const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
-            if (isCurrentMonth) endText = dayjs.utc().format('YYYY/MM/DD');
-            else endText = endDayjs.endOf('month').format('YYYY/MM/DD');
+            if (isCurrentMonth) endText = dayjs.utc().format('YY/MM/DD');
+            else endText = endDayjs.endOf('month').format('YY/MM/DD');
             if (start) {
-                const startText = dayjs.utc(start).format('YYYY/MM/DD');
+                const startText = dayjs.utc(start).format('YY/MM/DD');
                 return `${startText} ~ ${endText}`;
             }
             return endText;
@@ -209,11 +209,21 @@ const handleClickViewModeButton = () => {
             <div class="widget-footer-wrapper">
                 <div class="footer-left">
                     <template v-if="state.dateLabel">
-                        <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
-                             width="1rem"
-                             height="1rem"
-                        />
-                        <label class="widget-footer-label">{{ state.dateLabel }}</label>
+                        <p-tooltip v-if="props.size === WIDGET_SIZE.sm"
+                                   :contents="state.dateLabel"
+                        >
+                            <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                        </p-tooltip>
+                        <template v-else>
+                            <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <label class="widget-footer-label">{{ state.dateLabel }}</label>
+                        </template>
                     </template>
                     <p-divider v-if="state.isDivided"
                                :vertical="true"
