@@ -45,17 +45,32 @@ const state = reactive({
 const handleSelectDropdownItem = (selected: string) => {
     state.selectedItem = selected;
 };
+const initState = () => {
+    state.enableMfa = state.mfa?.state === 'ENABLED';
+    state.isVerified = state.enableMfa && (state.mfa?.mfa_type !== undefined && state.mfa?.mfa_type !== '');
+};
 
 /* API */
 const handleChangeToggle = async () => {
     if (!state.enableMfa) {
-        await postDisableMfa({
-            user_id: state.userId,
-            domain_id: state.domainId,
-        });
+        try {
+            await postDisableMfa({
+                user_id: state.userId,
+                domain_id: state.domainId,
+            });
+            state.isModalVisible = true;
+        } catch (e: any) {
+            showErrorMessage(e.message, e);
+            ErrorHandler.handleError(e);
+        }
     }
 };
 const handleClickVerifyButton = async () => {
+    if (state.isVerified) {
+        state.isModalVisible = true;
+        return;
+    }
+
     state.loading = true;
     try {
         await postEnableMfa({
@@ -89,99 +104,100 @@ const {
 });
 
 /* Watcher */
-watch(() => state.mfa?.options?.email, (value) => {
-    setForm('email', value || '');
+watch(() => state.mfa, (mfa) => {
+    setForm('email', mfa?.options?.email || '');
 }, { immediate: true });
 
-/* Init */
-(async () => {
-    state.enableMfa = state.mfa?.state === 'ENABLED';
-    state.isVerified = state.mfa?.options && state.mfa?.mfaType;
+(() => {
+    initState();
 })();
 </script>
 
 <template>
-    <user-account-module-container
-        class="multi-factor-authentication-wrapper"
-    >
-        <template #headline>
-            <div class="headline-wrapper">
-                <p class="form-title">
-                    {{ $t('IDENTITY.USER.MFA.TITLE') }}
-                </p>
-                <div class="verify-status-wrapper">
-                    <div v-if="state.isVerified"
-                         class="verified"
-                    >
-                        <p-i name="ic_verified"
-                             height="1rem"
-                             width="1rem"
-                             class="verified-icon"
-                             color="#60B731"
-                        />
-                        <span>
-                            {{ $t('IDENTITY.USER.MFA.STATE_VERIFIED') }}
+    <div>
+        <user-account-module-container
+            class="multi-factor-authentication-wrapper"
+        >
+            <template #headline>
+                <div class="headline-wrapper">
+                    <p class="form-title">
+                        {{ $t('IDENTITY.USER.MFA.TITLE') }}
+                    </p>
+                    <div class="verify-status-wrapper">
+                        <div v-if="state.isVerified"
+                             class="verified"
+                        >
+                            <p-i name="ic_verified"
+                                 height="1rem"
+                                 width="1rem"
+                                 class="verified-icon"
+                                 color="#60B731"
+                            />
+                            <span>
+                                {{ $t('IDENTITY.USER.MFA.STATE_VERIFIED') }}
+                            </span>
+                        </div>
+                        <span v-else
+                              class="not-verified"
+                        >
+                            {{ $t('IDENTITY.USER.MFA.STATE_NOT_VERIFIED') }}
                         </span>
                     </div>
-                    <span v-else
-                          class="not-verified"
-                    >
-                        {{ $t('IDENTITY.USER.MFA.STATE_NOT_VERIFIED') }}
-                    </span>
                 </div>
+            </template>
+            <div class="enable-toggle">
+                <p-field-title class="toggle-title">
+                    {{ $t('IDENTITY.USER.MFA.ENABLE_MFA') }}
+                </p-field-title>
+                <p-toggle-button :value.sync="state.enableMfa"
+                                 show-state-text
+                                 position="left"
+                                 @change-toggle="handleChangeToggle"
+                />
             </div>
-        </template>
-        <div class="enable-toggle">
-            <p-field-title class="toggle-title">
-                {{ $t('IDENTITY.USER.MFA.ENABLE_MFA') }}
-            </p-field-title>
-            <p-toggle-button :value.sync="state.enableMfa"
-                             show-state-text
-                             position="left"
-                             @change-toggle="handleChangeToggle"
-            />
-        </div>
-        <div v-if="state.enableMfa"
-             class="enable-mfa-wrapper"
-        >
-            <p-field-group
-                :label="$t('IDENTITY.USER.MFA.TYPE')"
-                required
+            <div v-if="state.enableMfa"
+                 class="enable-mfa-wrapper"
             >
-                <p-select-dropdown :menu="contextMenuItems"
-                                   :selected="state.selectedItem"
-                                   class="type-dropdown"
-                                   @update:selected="handleSelectDropdownItem"
+                <p-field-group
+                    :label="$t('IDENTITY.USER.MFA.TYPE')"
+                    required
+                >
+                    <p-select-dropdown :menu="contextMenuItems"
+                                       :selected="state.selectedItem"
+                                       class="type-dropdown"
+                                       @update:selected="handleSelectDropdownItem"
+                    />
+                </p-field-group>
+                <p-field-group
+                    :invalid="invalidState.email"
+                    :invalid-text="invalidTexts.email"
+                    required
+                    class="email-input"
+                >
+                    <p-text-input :value="email"
+                                  :disabled="state.isVerified"
+                                  :invalid="invalidState.email"
+                                  block
+                                  @update:value="setForm('email', $event)"
+                    />
+                </p-field-group>
+                <verify-button
+                    :loading="state.loading"
+                    :email="email"
+                    :verified="state.isVerified"
+                    class="verify-button"
+                    @click-button="handleClickVerifyButton"
                 />
-            </p-field-group>
-            <p-field-group
-                :invalid="invalidState.email"
-                :invalid-text="invalidTexts.email"
-                required
-                class="email-input"
-            >
-                <p-text-input :value="email"
-                              :disabled="state.isVerified"
-                              :invalid="invalidState.email"
-                              block
-                              @update:value="setForm('email', $event)"
-                />
-            </p-field-group>
-            <verify-button
-                :loading="state.loading"
-                :email="email"
-                :verified="state.isVerified"
-                class="verify-button"
-                @click-button="handleClickVerifyButton"
-            >
-                <multi-factor-authentication-email-modal :email="email"
-                                                         :verified="state.isVerified"
-                                                         :mfa-type="state.selectedItem"
-                                                         :visible="state.isModalVisible"
-                />
-            </verify-button>
-        </div>
-    </user-account-module-container>
+            </div>
+        </user-account-module-container>
+        <multi-factor-authentication-email-modal v-if="state.isModalVisible"
+                                                 :email="email"
+                                                 :verified="state.isVerified"
+                                                 :mfa-type="state.selectedItem"
+                                                 :visible="state.isModalVisible"
+                                                 @refresh="initState"
+        />
+    </div>
 </template>
 
 <style lang="postcss" scoped>
@@ -223,21 +239,21 @@ watch(() => state.mfa?.options?.email, (value) => {
             flex: 1;
             margin-left: 1rem;
         }
-
-        /* custom design-system component - p-field-group */
-        :deep(.p-field-group) {
-            @apply relative;
-            margin-bottom: 0;
-            .invalid-feedback {
-                @apply absolute;
-                bottom: -1.125rem;
-                left: 0;
-            }
-        }
     }
 
     .verify-button {
         @apply flex items-end;
+    }
+}
+
+/* custom design-system component - p-field-group */
+:deep(.p-field-group) {
+    @apply relative;
+    margin-bottom: 0;
+    .invalid-feedback {
+        @apply absolute;
+        bottom: -1.125rem;
+        left: 0;
     }
 }
 </style>

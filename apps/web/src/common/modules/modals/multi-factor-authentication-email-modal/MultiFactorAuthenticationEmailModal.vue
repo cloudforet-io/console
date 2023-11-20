@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
 
-const emit = defineEmits<{(e: 'update:visible'): void}>();
+const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const state = reactive({
     loading: false,
@@ -119,17 +119,19 @@ const handleClickConfirmButton = async () => {
         validationState.validationCodeInvalidText = i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
     } finally {
         state.confirmLoading = false;
+        emit('refresh');
     }
 };
 
 /* Watcher */
-watch(() => state.proxyVisible, (value) => {
+watch(() => props.visible, (value) => {
+    state.proxyVisible = value;
     if (value) {
         if (props.verified) {
             state.isEditMode = true;
         }
     }
-});
+}, { immediate: true });
 </script>
 
 <template>
@@ -253,6 +255,7 @@ watch(() => state.proxyVisible, (value) => {
             .edit-email-wrapper {
                 @apply flex items-end;
                 margin-bottom: 0.875rem;
+                gap: 1rem;
                 .email-input-group {
                     flex: 1;
                 }
