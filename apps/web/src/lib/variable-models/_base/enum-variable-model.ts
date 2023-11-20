@@ -36,9 +36,9 @@ export default class EnumVariableModel implements IEnumVariableModel {
             results = results.filter((item) => regex.test(item.name));
         }
         if (query.start !== undefined && query.limit !== undefined) {
-            const end = query.start + query.limit;
-            results = results.slice(query.start, end);
-            more = end < results.length + 1;
+            const end = query.start + query.limit - 1;
+            more = end < results.length;
+            results = results.slice(query.start - 1, end);
         }
         this.#response = { results, more };
         return this.#response;
