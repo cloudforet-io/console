@@ -124,8 +124,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 
 interface Props {
-    domainId: string
-    userId: string
+    domainId?: string
+    userId?: string
     visible: boolean
     email?: string
     modalType?: string
