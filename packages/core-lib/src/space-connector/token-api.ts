@@ -1,5 +1,5 @@
 import type {
-    AxiosInstance, AxiosResponse,
+    AxiosInstance, AxiosResponse, InternalAxiosRequestConfig, AxiosRequestHeaders,
 } from 'axios';
 import axios from 'axios';
 import type { JwtPayload } from 'jwt-decode';
@@ -161,12 +161,12 @@ export default class TokenAPI {
 
     private setAxiosInterceptors(): void {
         // Axios request interceptor to set the refresh token
-        this.refreshInstance.interceptors.request.use((request) => {
+        this.refreshInstance.interceptors.request.use((request: InternalAxiosRequestConfig) => {
             const storedRefreshToken = LocalStorageAccessor.getItem(REFRESH_TOKEN_KEY);
             if (!storedRefreshToken) {
                 throw new Error('Session has expired. No stored refresh token.');
             }
-            if (!request.headers) request.headers = {};
+            if (!request.headers) request.headers = {} as AxiosRequestHeaders;
 
             request.headers.Authorization = `Bearer ${storedRefreshToken}`;
             return request;
