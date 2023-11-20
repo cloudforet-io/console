@@ -7,7 +7,7 @@ import type { ConsoleDynamicField, Reference } from '@/lib/component-util/dynami
 interface ExcelDataField {
     key: string;
     name: string;
-    type?: 'datetime'|'enum';
+    type?: 'datetime'|'enum'|'size';
     enum_items?: any;
     reference?: Reference;
     options?: DynamicFieldOptions;
@@ -28,7 +28,7 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[], ro
         res.key = `${d.key}.${(d.options as ListOptions).sub_key}`;
     }
 
-    if (d.type === 'datetime') {
+    if (d.type === 'datetime' || d.type === 'size') {
         res.type = d.type;
     } else if (d.type === 'enum') {
         res.type = d.type;
