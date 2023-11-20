@@ -11,10 +11,8 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { postDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 import MultiFactorAuthenticationEmailModal
@@ -53,16 +51,11 @@ const initState = () => {
 /* API */
 const handleChangeToggle = async () => {
     if (!state.enableMfa) {
-        try {
-            await postDisableMfa({
-                user_id: state.userId,
-                domain_id: state.domainId,
-            });
-            state.isModalVisible = true;
-        } catch (e: any) {
-            showErrorMessage(e.message, e);
-            ErrorHandler.handleError(e);
-        }
+        await postDisableMfa({
+            user_id: state.userId,
+            domain_id: state.domainId,
+        });
+        state.isModalVisible = true;
     }
 };
 const handleClickVerifyButton = async () => {
@@ -72,22 +65,18 @@ const handleClickVerifyButton = async () => {
     }
 
     state.loading = true;
-    try {
-        await postEnableMfa({
-            user_id: state.userId,
-            mfa_type: state.selectedItem,
-            options: {
-                email: email.value,
-            },
-            domain_id: state.domainId,
-        });
-        state.isModalVisible = true;
-    } catch (e: any) {
-        showErrorMessage(e.message, e);
-        ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
-    }
+
+    await postEnableMfa({
+        user_id: state.userId,
+        mfa_type: state.selectedItem,
+        options: {
+            email: email.value,
+        },
+        domain_id: state.domainId,
+    });
+    state.isModalVisible = true;
+
+    state.loading = false;
 };
 
 const {

@@ -19,7 +19,6 @@ import { i18n } from '@/translations';
 import { postEnableMfa, postValidationMfaCode } from '@/lib/helper/multi-factor-authentication-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -88,21 +87,18 @@ const resetFormData = () => {
 /* API */
 const handleClickSendEmailButton = async () => {
     state.loading = true;
-    try {
-        await postEnableMfa({
-            user_id: state.userId,
-            mfa_type: props.mfaType,
-            options: {
-                email: state.isEditMode ? newEmail.value : props.email,
-            },
-            domain_id: state.domainId,
-        });
-        state.isEditMode = false;
-    } catch (error: any) {
-        ErrorHandler.handleError(error);
-    } finally {
-        state.loading = false;
-    }
+
+    await postEnableMfa({
+        user_id: state.userId,
+        mfa_type: props.mfaType,
+        options: {
+            email: state.isEditMode ? newEmail.value : props.email,
+        },
+        domain_id: state.domainId,
+    });
+    state.isEditMode = false;
+
+    state.loading = false;
 };
 const handleClickConfirmButton = async () => {
     state.confirmLoading = true;
