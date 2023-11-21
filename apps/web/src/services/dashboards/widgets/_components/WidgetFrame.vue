@@ -16,7 +16,7 @@ import { i18n } from '@/translations';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+import getRandomId from '@/lib/random-id-generator';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
@@ -264,7 +264,7 @@ const handleClickViewModeButton = () => {
             <div class="button-group">
                 <template v-for="icon in state.editModeIconButtonList">
                     <p-icon-button v-if="icon.isAvailable"
-                                   :key="`${icon.name}-${getUUID()}`"
+                                   :key="`${icon.name}-${getRandomId()}`"
                                    :name="icon.name"
                                    shape="square"
                                    style-type="tertiary"

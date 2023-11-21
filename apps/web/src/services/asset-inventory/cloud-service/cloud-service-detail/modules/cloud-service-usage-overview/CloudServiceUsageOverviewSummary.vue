@@ -46,7 +46,7 @@ import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/types/da
 
 import { store } from '@/store';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+import getRandomId from '@/lib/random-id-generator';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
@@ -83,7 +83,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            contextId: getUUID(),
+            contextId: getRandomId(),
         });
 
         const fieldHandler: DynamicWidgetFieldHandler<Record<'reference', Reference>> = (field) => {

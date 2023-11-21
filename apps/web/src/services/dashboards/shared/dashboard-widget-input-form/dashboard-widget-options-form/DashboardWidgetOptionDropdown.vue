@@ -10,12 +10,12 @@ import type {
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep, get } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { i18n } from '@/translations';
 
+import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfig } from '@/lib/variable-models';
 import { VariableModel } from '@/lib/variable-models';
 import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
@@ -98,7 +98,7 @@ const menuState = reactive({
     variableModels: computed<VariableModel[]>(() => getVariableModels(state.schemaProperty)),
     inheritOptionMenuHandler: computed(() => getInheritOptionMenuHandler(state.schemaProperty)),
     menuHandler: undefined as AutocompleteHandler|undefined,
-    contextKey: uuidv4(),
+    contextKey: getRandomId(),
 });
 
 /* Util */
@@ -261,7 +261,7 @@ const initMenuHandlers = (globalOptionValue?: any) => {
         const variableModels = menuState.variableModels;
         menuState.menuHandler = getVariableModelMenuHandler(variableModels, listQueryOptions);
     }
-    menuState.contextKey = uuidv4();
+    menuState.contextKey = getRandomId();
 };
 
 const addWidgetFilters = (filterKey: string, value: string|string[], filtersMap: WidgetFiltersMap = {}): WidgetFiltersMap => {

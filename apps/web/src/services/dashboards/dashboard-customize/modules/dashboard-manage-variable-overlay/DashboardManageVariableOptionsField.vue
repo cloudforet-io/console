@@ -74,7 +74,7 @@ import {
     PButton, PFieldGroup, PIconButton, PTextInput, PI, useProxyValue,
 } from '@spaceone/design-system';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfigType } from '@/lib/variable-models';
 
 import type { OptionItem } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
@@ -122,7 +122,7 @@ const handleChangeOptionLabel = (index: number, value: string) => {
 // };
 const handleAddOption = () => {
     state.proxyOptions = [...state.proxyOptions, {
-        draggableItemId: getUUID(), key: '', label: '', error: true,
+        draggableItemId: getRandomId(), key: '', label: '', error: true,
     }];
 };
 const handleDeleteOption = (draggableItemId: string) => {

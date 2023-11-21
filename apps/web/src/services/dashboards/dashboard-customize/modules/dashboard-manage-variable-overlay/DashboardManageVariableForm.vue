@@ -63,7 +63,7 @@ import {
 
 import { i18n } from '@/translations';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfigType } from '@/lib/variable-models';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -136,7 +136,7 @@ const state = reactive({
     selectionType: 'MULTI',
     optionsType: 'ENUM' as VariableModelConfigType,
     options: [
-        { draggableItemId: getUUID(), key: '', label: '' },
+        { draggableItemId: getRandomId(), key: '', label: '' },
     ] as OptionItem[],
     resourceKey: '', // TODO: setting resource key in 'SEARCH_RESOURCE' option type
     selectionMenu: computed(() => [
@@ -211,9 +211,10 @@ onMounted(() => {
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
         // TODO: update
         // if (Array.isArray(props.selectedVariable?.options)) {
-        //     state.options = (props.selectedVariable?.options ?? []).map((d) => ({ draggableItemId: getUUID(), key: d, label: d })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
+        //     state.options = (props.selectedVariable?.options ?? []).map((d) => ({ draggableItemId: getRandomId();, key: d, label: d })) ?? [{ draggableItemId: getRandomId();, key: '', label: '' }];
         // } else if (props.selectedVariable?.options?.type === 'ENUM') {
-        //     state.options = props.selectedVariable?.options.values.map((d) => ({ draggableItemId: getUUID(), key: d.key, label: d.label })) ?? [{ draggableItemId: getUUID(), key: '', label: '' }];
+        // eslint-disable-next-line max-len
+        //     state.options = props.selectedVariable?.options.values.map((d) => ({ draggableItemId: getRandomId();, key: d.key, label: d.label })) ?? [{ draggableItemId: getRandomId();, key: '', label: '' }];
         // }
     }
 });

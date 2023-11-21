@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 
+import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import type { DashboardLabel, DashboardVariablesSchema } from '@/services/dashboards/config';
@@ -16,7 +16,7 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
         try {
             const widgetConfig = getWidgetConfig(widgetId);
             const widgetInfo: DashboardLayoutWidgetInfo = {
-                widget_key: uuidv4(),
+                widget_key: getRandomId(),
                 widget_name: widgetConfig.widget_config_id,
                 version: '1',
                 ...customInfo,

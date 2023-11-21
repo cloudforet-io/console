@@ -9,7 +9,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -52,7 +52,7 @@ const state = reactive({
         );
         return nonInheritedWidgetOptions.length > 0;
     }),
-    contextKey: getUUID(),
+    contextKey: getRandomId(),
 });
 
 /* Util */
@@ -102,7 +102,7 @@ watch(() => state.hasNonInheritedWidgetOptions, (value) => {
 
 watch([() => props.visible, () => dashboardDetailState.variables], ([visible]) => {
     if (visible) {
-        state.contextKey = getUUID();
+        state.contextKey = getRandomId();
     }
 });
 

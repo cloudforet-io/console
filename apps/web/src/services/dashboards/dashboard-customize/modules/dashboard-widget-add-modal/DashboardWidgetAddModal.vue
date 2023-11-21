@@ -5,9 +5,10 @@ import {
 
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { v4 as uuidv4 } from 'uuid';
 
 import { i18n } from '@/translations';
+
+import getRandomId from '@/lib/random-id-generator';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -43,7 +44,7 @@ const handleConfirm = () => {
     if (!widgetFormState.widgetConfigId || !widgetFormGetters.title) return;
     const widgetConfig = getWidgetConfig(widgetFormState.widgetConfigId);
     const dashboardLayoutWidgetInfo: DashboardLayoutWidgetInfo = {
-        widget_key: uuidv4(),
+        widget_key: getRandomId(),
         widget_name: widgetFormState.widgetConfigId,
         size: widgetConfig.sizes[0],
         version: '1', // TODO: auto?
