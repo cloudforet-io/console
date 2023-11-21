@@ -3,13 +3,14 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { UserType } from '@/api-schema/identity/user/model';
+import { USER_TYPE } from '@/api-schema/identity/user/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { calculateTime } from '@/services/administration/iam/user/lib/helper';
-import type { User, UserType } from '@/services/administration/iam/user/type';
-import { USER_TYPE } from '@/services/administration/iam/user/type';
+import { calculateTime } from '@/services/administration/helpers/user-management-tab-helpers';
+import type { User } from '@/services/administration/types/user-type';
 
 const _getArrayWithNotDuplicatedItem = (array) => [...new Set(array)];
 const _getUserType = (userType: UserType) => {

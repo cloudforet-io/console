@@ -70,7 +70,10 @@ import { i18n } from '@/translations';
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { timezoneToUtcFormatter, utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
+import {
+    timezoneToUtcFormatter,
+    utcToTimezoneFormatter,
+} from '@/services/administration/helpers/user-notification-timezone-helpers';
 
 const START_TIME_LIST = range(0, 24);
 const END_TIME_LIST = range(1, 25);
