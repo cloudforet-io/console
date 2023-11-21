@@ -3,7 +3,7 @@ import axios from 'axios';
 import { downloadByFileUrl } from '@cloudforet/core-lib/file-download';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ExportResponse } from '@/models/export';
+import type { ExportResponse } from '@/api-schema/common/api-verbs/export';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';

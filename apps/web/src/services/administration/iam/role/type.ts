@@ -2,7 +2,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
-import type { Tags, TimeStamp } from '@/models';
+import type { Tags, TimeStamp } from '@/api-schema/common/model';
 
 import type { PagePermissionType, RawPagePermission } from '@/lib/access-control/config';
 

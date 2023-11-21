@@ -2,7 +2,7 @@ import type { AsyncComponent } from 'vue';
 
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
-import type { Tags } from '@/models';
+import type { Tags } from '@/api-schema/common/model';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 

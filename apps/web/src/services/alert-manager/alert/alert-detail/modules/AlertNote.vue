@@ -61,7 +61,7 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/api-schema/common/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
