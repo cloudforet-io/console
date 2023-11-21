@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ComponentPublicInstance } from 'vue';
+import type { ComponentPublicInstance, ComputedRef } from 'vue';
 import {
     computed,
     getCurrentInstance, reactive, ref,
@@ -112,13 +112,18 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 
-import PasswordForm from '@/services/auth/password/modules/PasswordForm.vue';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { PASSWORD_STATUS } from '@/services/auth/type';
-import type { PasswordFormExpose, PasswordFormState } from '@/services/auth/type';
+import PasswordForm from '@/services/auth/components/PasswordForm.vue';
+import { PASSWORD_STATUS } from '@/services/auth/constants/password-constants';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
+import type { PasswordFormExpose } from '@/services/auth/types/password-type';
 
 interface Props {
     status: string;
+}
+interface PasswordFormState {
+    userIdInput: ComputedRef<string>,
+    passwordInput: ComputedRef<string>,
+    confirmPasswordInput: ComputedRef<string>,
 }
 
 const props = withDefaults(defineProps<Props>(), {

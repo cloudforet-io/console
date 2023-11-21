@@ -77,8 +77,8 @@ import {
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { PASSWORD_STATUS } from '@/services/auth/type';
-import type { PasswordFormExpose } from '@/services/auth/type';
+import { PASSWORD_STATUS } from '@/services/auth/constants/password-constants';
+import type { PasswordFormExpose } from '@/services/auth/types/password-type';
 
 interface Props {
     status: string

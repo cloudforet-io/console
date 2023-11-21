@@ -74,7 +74,7 @@
                     >
                         {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.COLLAPSED') }}
                     </p-collapsible-toggle>
-                    <collapsible-contents v-else />
+                    <validation-email-collapsible-contents v-else />
                 </div>
             </div>
             <div v-else
@@ -102,8 +102,8 @@ import {
     PButton, PCollapsibleToggle, PI, PIconButton,
 } from '@spaceone/design-system';
 
-import CollapsibleContents from '@/services/auth/password/validation-email/modules/CollapsibleContents.vue';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+import ValidationEmailCollapsibleContents from '@/services/auth/components/ValidationEmailCollapsibleContents.vue';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
 
 const vm = getCurrentInstance()?.proxy as Vue;
 const { status, userId } = vm.$route.query;

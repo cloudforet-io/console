@@ -18,7 +18,7 @@ import type { Vue } from 'vue/types/vue';
 
 import { PButton } from '@spaceone/design-system';
 
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
 
 export default defineComponent({
     name: 'KEYCLOAK',

@@ -8,7 +8,7 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
 
 export default {
     name: 'SignOutPage',

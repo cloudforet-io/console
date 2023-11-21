@@ -47,7 +47,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
 
 
 const { query } = SpaceRouter.router.currentRoute;

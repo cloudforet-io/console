@@ -83,7 +83,7 @@ import { store } from '@/store';
 
 import config from '@/lib/config';
 
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
 
 export default {
     name: 'SignInRightContainer',

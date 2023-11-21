@@ -9,7 +9,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import administrationRoute from '@/services/administration/routes';
 import alertManagerRoute from '@/services/alert-manager/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';
-import authRoutes from '@/services/auth/routes';
+import authRoutes from '@/services/auth/routes/routes';
 import costExplorerRoute from '@/services/cost-explorer/routes/routes';
 import dashboardsRoute from '@/services/dashboards/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';

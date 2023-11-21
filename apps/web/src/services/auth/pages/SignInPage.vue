@@ -61,10 +61,10 @@ import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
-import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
-import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
-import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
+import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
+import SignInLeftContainer from '@/services/auth/components/SignInLeftContainer.vue';
+import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
+import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 
 export default {
     name: 'SignInPage',

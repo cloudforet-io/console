@@ -13,7 +13,7 @@ import { store } from '@/store';
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import {getDefaultRouteAfterSignIn} from "@/services/auth/lib/helper";
+import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
 
 
 export default defineComponent({
