@@ -3,7 +3,7 @@ import {
 } from 'lodash';
 
 import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import { getUpdatedWidgetInfo } from '@/services/dashboards/shared/helpers/dashboard-widget-info-helper';
+import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import type {
     InheritOptions, DashboardLayoutWidgetInfo, WidgetConfig,
     UpdatableWidgetInfo,

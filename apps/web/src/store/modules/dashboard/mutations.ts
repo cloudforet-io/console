@@ -2,7 +2,7 @@ import type { Mutation } from 'vuex';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { DashboardState } from './type';
+import type { DashboardState, DashboardScopeType } from './type';
 
 // TODO: implementation
 export const setDomainItems: Mutation<DashboardState> = (state, dashboard): void => {
@@ -26,7 +26,7 @@ export const setSelectedViewers: Mutation<DashboardState> = (state, viewers: str
     state.viewers = viewers;
 };
 
-export const setSelectedScope: Mutation<DashboardState> = (state, scope: string): void => {
+export const setSelectedScope: Mutation<DashboardState> = (state, scope: DashboardScopeType): void => {
     state.scope = scope;
 };
 

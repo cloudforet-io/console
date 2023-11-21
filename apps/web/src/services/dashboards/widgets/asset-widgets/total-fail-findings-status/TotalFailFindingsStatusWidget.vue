@@ -16,13 +16,13 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type { Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
 import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 
 
 interface SubData {

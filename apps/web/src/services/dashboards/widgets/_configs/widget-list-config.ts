@@ -1,8 +1,4 @@
 // base widgets
-import baseCountOfFindings from '@/services/dashboards/widgets/_base/base-count-of-findings/widget-config';
-import basePie from '@/services/dashboards/widgets/_base/base-pie/widget-config';
-import baseTrend from '@/services/dashboards/widgets/_base/base-trend/widget-config';
-// console widgets
 import complianceStatus from '@/services/dashboards/widgets/asset-widgets/compliance-status/widget-config';
 import countOfFailFindings from '@/services/dashboards/widgets/asset-widgets/count-of-fail-findings/widget-config';
 import countOfPassAndFailFindings from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
@@ -10,6 +6,10 @@ import severityStatusByService from '@/services/dashboards/widgets/asset-widgets
 import totalFailFindingsHistory from '@/services/dashboards/widgets/asset-widgets/total-fail-findings-history/widget-config';
 import totalFailFindingsStatus from '@/services/dashboards/widgets/asset-widgets/total-fail-findings-status/widget-config';
 import trendOfPassAndFailFindings from '@/services/dashboards/widgets/asset-widgets/trend-of-pass-and-fail-findings/widget-config';
+import baseCountOfFindings from '@/services/dashboards/widgets/base-widgets/base-count-of-findings/widget-config';
+import basePie from '@/services/dashboards/widgets/base-widgets/base-pie/widget-config';
+import baseTrend from '@/services/dashboards/widgets/base-widgets/base-trend/widget-config';
+// console widgets
 import budgetStatus from '@/services/dashboards/widgets/cost-widgets/budget-status/widget-config';
 import budgetUsageByTarget from '@/services/dashboards/widgets/cost-widgets/budget-usage-by-target/widget-config';
 import budgetUsageSummary from '@/services/dashboards/widgets/cost-widgets/budget-usage-summary/widget-config';
