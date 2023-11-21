@@ -23,8 +23,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ExportParameter } from '@/models/export';
-import { QueryType } from '@/models/export';
+import type { ExportParameter } from '@/api-schema/common/api-verbs/export';
+import { QueryType } from '@/api-schema/common/api-verbs/export';
 import { store } from '@/store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';

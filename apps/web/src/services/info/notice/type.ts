@@ -1,6 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/api-schema/common/model';
 
 import type { FileInfo } from '@/lib/file-manager/type';
 

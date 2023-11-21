@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
-import type { Tags, TimeStamp } from '@/models';
+import type { Tags, TimeStamp } from '@/api-schema/common/model';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 

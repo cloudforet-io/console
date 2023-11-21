@@ -1,6 +1,6 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
-import type { Tags } from '@/models';
+import type { Tags } from '@/api-schema/common/model';
 
 import type { MonitoringType } from '@/common/modules/monitoring/config';
 

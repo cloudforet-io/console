@@ -73,7 +73,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { TimeStamp } from '@/models';
+import type { TimeStamp } from '@/api-schema/common/model';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
