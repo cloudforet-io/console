@@ -87,10 +87,14 @@ const signIn = async () => {
         } else {
             emit('sign-in', state.userId);
         }
-    } catch (e) {
-        ErrorHandler.handleError(e);
+    } catch (e:any) {
+        if (e.message.includes('MFA')) {
+            await router.push({ name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTHENTICATION._NAME, query: { userId: state.userId } });
+        } else {
+            ErrorHandler.handleError(e);
+            await store.dispatch('display/showSignInErrorMessage');
+        }
         state.password = '';
-        await store.dispatch('display/showSignInErrorMessage');
     }
 };
 
