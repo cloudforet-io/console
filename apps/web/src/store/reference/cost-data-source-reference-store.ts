@@ -27,7 +27,7 @@ export type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>
 export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
-const lastLoadedTime = 0;
+let lastLoadedTime = 0;
 
 export const useCostDataSourceReferenceStore = defineStore('cost-data-source-reference-store', () => {
     const state = reactive({
@@ -54,7 +54,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
                     || (options?.lazyLoad && state.items)
                 ) && !options?.force
             ) return;
-
+            lastLoadedTime = currentTime;
 
             const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
             try {

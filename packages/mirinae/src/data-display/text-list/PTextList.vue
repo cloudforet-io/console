@@ -9,13 +9,13 @@
                    :target="linkTarget || undefined"
         >
             <slot name="default"
-                  v-bind="{...$props, index: i, item, value: item || ''}"
+                  v-bind="{...$props, index: i, item, value: item ?? ''}"
             >
-                {{ item || '' }}
+                {{ item ?? '' }}
             </slot>
             <slot v-if="i < displayItems.length - 1"
                   name="delimiter"
-                  v-bind="{...$props, index: i, item, value: item || ''}"
+                  v-bind="{...$props, index: i, item, value: item ?? ''}"
             >
                 <span v-if="!isLineBreak"
                       class="delimiter"

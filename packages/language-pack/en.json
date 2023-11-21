@@ -514,7 +514,7 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",
 				"ADDITIONAL_INFO": "Additional Info",
-				"ADD_MORE": "Add More",
+				"ADD_MORE": "More",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "The file will be downloaded as monthly data rather than accumulated data.",
 				"ALT_E_ADD_GROUP_BY": "There can be a maximum of three group-by options.",
 				"ALT_E_ADD_GROUP_BY_DESC": "Please unselect at least 1 of your previous Group-by choices\nbefore making a new selection.",
@@ -550,7 +550,7 @@
 					"UP_TO_LAST_12_MONTHS": "Up to last 12 months"
 				},
 				"HIDE_ALL": "Hide all",
-				"INVALID_PERIOD_TEXT": "No data found for previously selected period",
+				"INVALID_PERIOD_TEXT": "No data found for previously selected period.",
 				"KEEP_MY_SETTING": "Keep the settings above as my settings",
 				"LABEL_ADDITIONAL_FIELD": "Additional Field",
 				"LABEL_COST_ANALYSIS_NAME": "Cost Analysis Name",
@@ -794,6 +794,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"DOWNLOAD": "Download",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "desktop",
 				"SUPPORT_PDF_HELP_TEXT": "This feature is not supported on your browser or device. Try again with {chrome} or {edge} browser on {desktop}."
@@ -1379,7 +1380,7 @@
 			}
 		},
 		"DETAIL": {
-			"APPLY": "Apply",
+			"APPLY": "Confirm",
 			"AUTO": "Auto",
 			"CLONE": "Clone",
 			"CURRENT_MONTH": "Current month",
@@ -1424,6 +1425,9 @@
 			"LABEL_VIEWERS": "Viewers",
 			"REQUIRED": "Required Field",
 			"RETURN_TO_INITIAL_SETTINGS": "Return to Initial Settings",
+			"UNABLE_TO_ADD_WIDGET": "Unable to add the widget",
+			"UNABLE_TO_ADD_WIDGET_DESC": "There's currently no available {field} in this domain. ",
+			"UNABLE_TO_ADD_WIDGET_DESC2": "Please contact the system administrator.",
 			"UPDATE_TITLE": "Edit Dashboard Name",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "Please enter dashboard name.",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "The dashboard name cannot be longer than 100 characters.",
@@ -1452,12 +1456,6 @@
 			},
 			"ASSET_SUMMARY_BY_REGIONS": {
 				"DESC": "Summarizes cloud service usage by region from cloud providers."
-			},
-			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "Displays the data usage and costs from AWS CloudFront for the selected period, aggregated by 'Group by' option. "
-			},
-			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": "Displays the data usage and costs by Region from AWS Data-Transfer for the selected period."
 			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "Displays AWS Data-Transfer cost trend during the selected period. "
@@ -1490,6 +1488,8 @@
 				"DESC": "Displays the cost trend of cloud resources or the status of server, database, storage usage."
 			},
 			"COMPLIANCE_STATUS": {
+				"COMPLIANCE_SCORE": "Compliance score",
+				"COMPLIANCE_SCORE_TOOLTIP": "The score calculated based on each 'severity' level and corresponding weight.",
 				"DESC": "Displays an overall status of compliance Pass/Fail during the selected period.",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
 				"MORE_THAN_PREV_MONTH": "more than previous month"
@@ -1497,20 +1497,26 @@
 			"COST_BY_REGION": {
 				"DESC": "Displays the total costs by Region for the selected period. "
 			},
+			"COST_BY_REGION_MULTI_FIELDS": {
+				"DESC": "Displays cost or usage data by Region during the selected period based on the chosen 'Column Field'."
+			},
 			"COST_DONUT": {
-				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Data Field'."
 			},
 			"COST_MAP": {
-				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Group by' option."
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by Data Field'."
 			},
 			"COST_PIE": {
-				"DESC": "Displays total costs of each item for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays proportions of total costs that allow you to compare 10-15 top highest spending for the selected period, aggregated by 'Data Field'."
+			},
+			"COST_SUMMARY_MULTI_FIELDS": {
+				"DESC": "Displays the cost or usage data during the selected period based on the chosen 'Row Field' & 'Column Field'."
 			},
 			"COST_TREND": {
-				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays the cost or usage trends up to the selected period based on the chosen 'Data Field'."
 			},
 			"COST_TREND_STACKED": {
-				"DESC": "Displays monthly costs for the selected period, aggregated by 'Group by' option. "
+				"DESC": "Displays the cost or usage trends up to the selected period based on the chosen 'Data Field'."
 			},
 			"COUNT_OF_FAIL_FINDINGS": {
 				"DESC": "Displays the count of compliance Fail findings for the selected period, aggregated by 'Group By' option."
@@ -1537,22 +1543,31 @@
 				"SELECTED_MONTH": "Selected month "
 			},
 			"NO_DATA": "No Data",
+			"NO_SELECTED_ITEM": "One of the options must be selected.",
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "Displays the status of each project's activities such as triggered, acknowledged, or healthy."
 			},
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "Displays the urgency of each project by recently occured alerts."
 			},
+			"REALTIME": "Real-time",
 			"SEVERITY_STATUS_BY_SERVICE": {
 				"DESC": "Displays the compliance failures for each service observed during the selected period using heatmap."
 			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "Displays the top project list that used resources of compute, database, storage the most.   "
 			},
+			"TOTAL_FAIL_FINDINGS_HISTORY": {
+				"DESC": "Displays the count, rate, and severity of compliance failures observed during the selected period."
+			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
 				"DESC": "Displays the count, rate, and severity of compliance failures observed during the selected period.",
+				"LESS_THAN_PREV_DAY": "less than previous day",
 				"LESS_THAN_PREV_MONTH": "less than previous month",
-				"MORE_THAN_PREV_MONTH": "more than previous month"
+				"LESS_THAN_PREV_YEAR": "less than previous year",
+				"MORE_THAN_PREV_DAY": "more than previous day",
+				"MORE_THAN_PREV_MONTH": "more than previous month",
+				"MORE_THAN_PREV_YEAR": "more than previous year"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "Displays the trend of compliance Pass/Fail findings for the selected period, aggregated by 'Group By' option."
@@ -2065,6 +2080,10 @@
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "Related Member"
+			},
+			"EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "Selected data table(s) will be included as multiple sheets.",
+				"TITLE": "Select Export Options"
 			},
 			"HISTORY": {
 				"ALL_MONTH": "All Month",

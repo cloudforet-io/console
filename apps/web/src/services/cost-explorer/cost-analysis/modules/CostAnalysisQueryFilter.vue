@@ -163,7 +163,9 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
                         </p-badge>
                     </p-button>
                     <template #content>
-                        <cost-analysis-filters-popper ref="filtersPopperRef" />
+                        <cost-analysis-filters-popper ref="filtersPopperRef"
+                                                      :visible="state.filtersPopoverVisible"
+                        />
                     </template>
                 </p-popover>
             </div>

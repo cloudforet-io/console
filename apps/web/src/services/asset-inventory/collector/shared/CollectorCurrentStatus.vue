@@ -15,7 +15,7 @@
                         animation="spin"
                     />
                     <span>
-                        {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.remainedTasksPercentage }}%</span>
+                        {{ $t('INVENTORY.COLLECTOR.MAIN.IN_PROGRESS') }} <span class="remained-task">{{ state.formattedRemainedTasks }}%</span>
                     </span>
                 </div>
                 <div v-else>
@@ -98,9 +98,13 @@ const state = reactive({
         if (state.status === JOB_STATE.IN_PROGRESS) {
             const remainedTasks = props.recentJob?.remained_tasks ?? 0;
             const totalTasks = props.recentJob?.total_tasks ?? 0;
-            return totalTasks > 0 ? numberFormatter(((totalTasks - remainedTasks) / totalTasks) * 100) : 100;
+            return totalTasks > 0 ? ((totalTasks - remainedTasks) / totalTasks) * 100 : 100;
         }
         return 0;
+    }),
+    formattedRemainedTasks: computed<string>(() => {
+        const remainedTasks = state.remainedTasksPercentage;
+        return numberFormatter(remainedTasks);
     }),
 });
 </script>

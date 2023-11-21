@@ -106,7 +106,7 @@ const state = reactive({
         return ({
             name: property,
             label: currentProperty?.name ?? property,
-            disabled: currentProperty?.required,
+            disabled: currentProperty?.fixed,
         });
     })),
     selected: computed<MenuItem[]>(() => {
@@ -114,7 +114,7 @@ const state = reactive({
         state.variableSchema.order.forEach((property) => {
             const currentProperty = state.variableSchema.properties[property];
             if (!currentProperty?.use) return;
-            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.disabled || currentProperty.required });
+            result.push({ name: property, label: currentProperty.name, disabled: currentProperty.fixed });
         });
         return result;
     }),
@@ -154,9 +154,9 @@ const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string
 
     dashboardDetailState.dashboardWidgetInfoList.forEach((widgetInfo) => {
         const widgetConfig = getWidgetConfig(widgetInfo.widget_name);
-        const mergedInheritOptions = merge({}, widgetConfig?.inherit_options ?? {}, widgetInfo.inherit_options);
+        const inheritOptions = merge({}, widgetInfo.inherit_options);
 
-        const widgetInheritVariableKeys = Object.values(mergedInheritOptions).filter((d) => d.enabled).map((d) => d.variable_info?.key);
+        const widgetInheritVariableKeys = Object.values(inheritOptions).filter((d) => d.enabled).map((d) => d.variable_key);
         if (widgetInheritVariableKeys.includes(targetProperty)) {
             widgetTitles.push(widgetInfo.title ?? widgetConfig.title as string);
         }
@@ -209,7 +209,7 @@ const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
 
     // Normal case
     beforePropertiesEntries.forEach(([k, v]) => {
-        if (v.required) return; /* required variable case */
+        if (v.fixed) return; /* required variable case */
         if (v?.use && !_afterPropertyNames.includes(k)) { /* uncheck case */
             if (dashboardDetailState.variablesSchema.properties[k]?.variable_type === 'CUSTOM') { /* custom variable case */
                 state.affectedWidgetTitlesByCustomVariable = getAffectedWidgetTitlesByCustomVariable(k);

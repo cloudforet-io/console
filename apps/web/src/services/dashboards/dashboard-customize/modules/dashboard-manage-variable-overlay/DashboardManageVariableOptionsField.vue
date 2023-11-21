@@ -75,13 +75,14 @@ import {
 } from '@spaceone/design-system';
 
 import { getUUID } from '@/lib/component-util/getUUID';
+import type { VariableModelConfigType } from '@/lib/variable-models';
 
 import type { OptionItem } from '@/services/dashboards/dashboard-customize/modules/dashboard-manage-variable-overlay/type';
 
 
 interface Props {
     options: OptionItem[];
-    optionsType: 'ENUM' | 'SEARCH_RESOURCE';
+    optionsType: VariableModelConfigType;
 }
 interface EmitFn {
     (e: string, value: string): void;

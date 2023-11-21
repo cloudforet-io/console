@@ -1,5 +1,8 @@
 import type { TranslateResult } from 'vue-i18n';
 
+import type { ManagedVariableModelConfig } from '@/lib/variable-models';
+import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
+
 import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 
 
@@ -52,7 +55,7 @@ export interface DashboardSettings {
     refresh_interval_option: RefreshIntervalOption;
 }
 
-export interface DashboardConfig {
+export interface DashboardTemplate {
     name: string;
     layouts: DashboardLayoutWidgetInfo[][];
     settings: DashboardSettings;
@@ -72,7 +75,7 @@ export const DASHBOARD_LABEL = {
     ASSET: 'Asset',
     COMPLIANCE: 'Compliance',
     SECURITY: 'Security',
-    BLANK: 'blank',
+    BLANK: 'Blank',
 } as const;
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 
@@ -91,24 +94,7 @@ export type VariableSelectionType = typeof VARIABLE_SELECTION_TYPES[number];
 export const VARIABLE_TYPES = ['MANAGED', 'CUSTOM'] as const;
 export type VariableType = typeof VARIABLE_TYPES[number];
 
-
-export interface EnumOptions {
-    type: 'ENUM';
-    values: { key: string; label: string; }[];
-}
-export interface SearchResourceOptions {
-    type: 'SEARCH_RESOURCE';
-    resource_type: string;
-    resource_key?: string;
-    default_path?: string|number;
-}
-export interface ReferenceResourceOptions {
-    type: 'REFERENCE_RESOURCE',
-    reference_key: string;
-}
-
-type LegacyOptions = string[];
-type VariableOptions = EnumOptions|SearchResourceOptions|ReferenceResourceOptions|LegacyOptions;
+export type DashboardVariableOptions = ManagedVariableModelConfig|EnumVariableModelConfig|ResourceValueVariableModelConfig;
 
 // variables schema
 export interface DashboardVariableSchemaProperty {
@@ -117,13 +103,15 @@ export interface DashboardVariableSchemaProperty {
     use: boolean;
     selection_type: VariableSelectionType;
     description?: string;
-    disabled?: boolean;
-    options?: VariableOptions;
-    required?: boolean;
+    readonly?: boolean; // can not edit value
+    options?: DashboardVariableOptions[];
+    fixed?: boolean; // can not delete this variable from dashboard
+    required?: boolean; // value is required
 }
-export interface DashboardVariablesSchema<T = Record<string, DashboardVariableSchemaProperty>> {
-    properties: T;
-    order: Array<keyof T>;
+export type DashboardVariableSchemaProperties = Record<string, DashboardVariableSchemaProperty>;
+export interface DashboardVariablesSchema {
+    properties: DashboardVariableSchemaProperties;
+    order: string[];
 }
 
 export const MANAGE_VARIABLES_HASH_NAME = 'manage-variables';

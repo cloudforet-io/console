@@ -148,6 +148,7 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -395,13 +396,14 @@ export default {
         };
 
         const onExportToExcel = async () => {
-            await store.dispatch('file/downloadExcel', {
+            await downloadExcel({
                 url: '/monitoring/alert/list',
                 param: {
                     query: alertApiQuery,
                 },
                 fields: state.excelFields,
                 file_name_prefix: FILE_NAME_PREFIX.alert,
+                timezone: storeState.timezone,
             });
         };
 

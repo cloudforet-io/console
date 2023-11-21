@@ -713,13 +713,13 @@ export default {
         <br>\\n
         <b>권장 조치</b>
         <br>\\n서비스 한도가 초과할 것으로 예상될 때는 지원 센터에서 케이스를 생성하여 
-        <a href=\\"https://aws.amazon.com/support/createCase?type=service_limit_increase\\" target=\\"_blank\\">
+        <a href="https://aws.amazon.com/support/createCase?type=service_limit_increase" target=\\"_blank\\">
         한도 상향 조정을 요청</a>합니다.
         <br>\\n
         <br>\\n
         <b>추가 리소스</b>
         <br>\\n
-        <a href=\\"https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html#limits_elastic_load_balancer\\" target=\\"_blank\\">
+        <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html#limits_elastic_load_balancer" target=\\"_blank\\">
         AWS 서비스 한도 - Elastic Load Balancing 기본 서비스 한도
         </a>
         `,

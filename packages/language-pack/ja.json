@@ -492,7 +492,7 @@
 					"CREATE_BUDGET": "予算作成",
 					"DATA_SOURCE": "データソース",
 					"DESC": "降順",
-					"NO_BUDGET": "",
+					"NO_BUDGET": "予算なし",
 					"OVERSPENT": "予算超過",
 					"PERIOD": "期間",
 					"PROVIDER": "プロバイダー",
@@ -514,7 +514,7 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "累積データ",
 				"ADDITIONAL_INFO": "追加情報",
-				"ADD_MORE": "",
+				"ADD_MORE": "もっと見る",
 				"ALT_EXCEL_DOWNLOAD_STACKED": "累積データではなく、月別データでファイルがダウンロードされます。",
 				"ALT_E_ADD_GROUP_BY": "最大で3つのグループ化オプションを選択できます。",
 				"ALT_E_ADD_GROUP_BY_DESC": "新しい選択を行う前に、以前のグループ化オプションを少なくとも1つ選択解除してください。",
@@ -533,7 +533,7 @@
 				"DAILY": "日別データ (累積データ)",
 				"DEFAULT": "デフォルト",
 				"DETAIL": {
-					"ORIGINAL_CURRENCY": ""
+					"ORIGINAL_CURRENCY": "元の通貨"
 				},
 				"DONUT": "ドーナツ",
 				"DOWNLOAD": "ダウンロード",
@@ -550,7 +550,7 @@
 					"UP_TO_LAST_12_MONTHS": "最長12ヶ月(期間内)設定可能"
 				},
 				"HIDE_ALL": "すべて隠す",
-				"INVALID_PERIOD_TEXT": "",
+				"INVALID_PERIOD_TEXT": "以前に選択された期間のデータは見つかりませんでした。",
 				"KEEP_MY_SETTING": "上記の設定をマイ設定として保持",
 				"LABEL_ADDITIONAL_FIELD": "追加フィールド",
 				"LABEL_COST_ANALYSIS_NAME": "コスト分析の名前",
@@ -577,7 +577,7 @@
 					"LAST_12_MONTHS": "過去12ヶ月間",
 					"LAST_14_DAYS": "過去14日間",
 					"LAST_3_MONTHS": "過去3ヶ月間",
-					"LAST_3_YEARS": "",
+					"LAST_3_YEARS": "過去3年",
 					"LAST_6_MONTHS": "過去6ヶ月間",
 					"LAST_7_DAYS": "直近7日間",
 					"LAST_MONTH": "直近の月",
@@ -794,6 +794,7 @@
 	},
 	"COMMON": {
 		"BUTTONS": {
+			"DOWNLOAD": "ダウンロード",
 			"PDF_DOWNLOAD_BUTTON": {
 				"DESKTOP": "デスクトップ",
 				"SUPPORT_PDF_HELP_TEXT": "この機能は、ご使用のブラウザまたはデバイスではサポートされていません。 {desktop}で{chrome}または{edge}ブラウザを使用して再試行してください。"
@@ -1379,14 +1380,14 @@
 			}
 		},
 		"DETAIL": {
-			"APPLY": "",
+			"APPLY": "確認",
 			"AUTO": "自動",
 			"CLONE": "複製",
 			"CURRENT_MONTH": "当月分",
 			"CUSTOM": "カスタム",
 			"CUSTOMIZE": "カスタマイズ",
-			"CUSTOM_DATE_MODAL_MONTH": "",
-			"CUSTOM_DATE_MODAL_TITLE": "",
+			"CUSTOM_DATE_MODAL_MONTH": "月",
+			"CUSTOM_DATE_MODAL_TITLE": "適用するカスタム範囲",
 			"DEFAULT": "既定値",
 			"DELETE": "削除",
 			"EXPORT": "エクスポート",
@@ -1424,6 +1425,9 @@
 			"LABEL_VIEWERS": "公開可否",
 			"REQUIRED": "必須入力項目です",
 			"RETURN_TO_INITIAL_SETTINGS": "初期設定に戻る",
+			"UNABLE_TO_ADD_WIDGET": "ウィジェット追加不可",
+			"UNABLE_TO_ADD_WIDGET_DESC": "現在、このドメインには利用可能な{field}がありません。",
+			"UNABLE_TO_ADD_WIDGET_DESC2": "システム管理者にお問い合わせください。",
 			"UPDATE_TITLE": "ダッシュボード名の編集",
 			"VALIDATION_DASHBOARD_NAME_INPUT": "ダッシュボードの名を入力してください。",
 			"VALIDATION_DASHBOARD_NAME_LENGTH": "ダッシュボード名は 100 文字を超えることはできません。",
@@ -1452,12 +1456,6 @@
 			},
 			"ASSET_SUMMARY_BY_REGIONS": {
 				"DESC": "クラウドプロバイダのRegion別クラウドサービスの使用状況を要約して表示します。"
-			},
-			"AWS_CLOUD_FRONT_COST": {
-				"DESC": "選択した期間のAWS CloudFrontのデータ使用量とコストを、'Group by'オプションで集計して表示します。"
-			},
-			"AWS_DATA_TRANSFER_BY_REGION": {
-				"DESC": "選択した期間の AWS Data-TransferのRegion別のデータ使用量とコストを表示します。"
 			},
 			"AWS_DATA_TRANSFER_COST_TREND": {
 				"DESC": "選択した期間のAWS Data-Transferのコスト推移を表示します。"
@@ -1490,6 +1488,8 @@
 				"DESC": "クラウドリソースのコスト推移や、サーバー、データベース、ストレージの使用状況を表示します。"
 			},
 			"COMPLIANCE_STATUS": {
+				"COMPLIANCE_SCORE": "Compliance score",
+				"COMPLIANCE_SCORE_TOOLTIP": "各 'severity' レベルと対応する重みを基に計算されたスコアです。",
 				"DESC": "選択した期間中のコンプライアンスのPass/Failの全体的な状態を表示するウィジェット",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
 				"MORE_THAN_PREV_MONTH": "前月よりも多い"
@@ -1497,20 +1497,26 @@
 			"COST_BY_REGION": {
 				"DESC": "選択された期間のRegion別コスト合計を表示します。"
 			},
+			"COST_BY_REGION_MULTI_FIELDS": {
+				"DESC": "選択した 'Column Field' に基づき、選択された期間中の地域ごとの費用または使用データを表示します。"
+			},
 			"COST_DONUT": {
-				"DESC": "選択された期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した 'Data Field' を基に、選択された期間中に発生したトータルコストを一目で表示するウィジェット。"
 			},
 			"COST_MAP": {
-				"DESC": "選択した期間の総費用の比率を「Group by」オプションで集計し、上位10-15位を比較できるように表示します。"
+				"DESC": "選択した期間の総費用の比率を「Data Field」オプションで集計し、上位10-15位を比較できるように表示します。"
 			},
 			"COST_PIE": {
-				"DESC": "選択した期間の各項目の合計コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した 'Data Field' を基に、選択された期間中に発生したトータルコストを一目で表示するウィジェット。"
+			},
+			"COST_SUMMARY_MULTI_FIELDS": {
+				"DESC": "選択した「Row Field」と「Column Field」に基づき、選択された期間中の費用または使用データを表示します。"
 			},
 			"COST_TREND": {
-				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した[Data Field]に基づいて、選択された期間までの費用または使用量のトレンドを表示します。"
 			},
 			"COST_TREND_STACKED": {
-				"DESC": "選択した期間の月別コストを「Group by」オプションで集計して表示します。"
+				"DESC": "選択した[Data Field]に基づいて、選択された期間までの費用または使用量のトレンドを表示します。"
 			},
 			"COUNT_OF_FAIL_FINDINGS": {
 				"DESC": "選択した期間中のコンプライアンスのFail findingsの数を'Group By'オプションで集計して表示するウィジェット"
@@ -1537,22 +1543,31 @@
 				"SELECTED_MONTH": "選択した月"
 			},
 			"NO_DATA": "データがありません",
+			"NO_SELECTED_ITEM": "オプションのうちの一つを選択する必要があります。",
 			"PROJECT_ACTIVITY_SUMMARY": {
 				"DESC": "各プロジェクト別のトリガー、認知、安全などを素早く確認できます。"
 			},
 			"PROJECT_HEALTH_BOARD": {
 				"DESC": "最近発生したアラートによって、各プロジェクトの緊急度を表示します。"
 			},
+			"REALTIME": "リアルタイム",
 			"SEVERITY_STATUS_BY_SERVICE": {
 				"DESC": "選択した期間中に確認された各サービスのコンプライアンスFailureをヒートマップを使用して表示するウィジェット"
 			},
 			"TOP_RESOURCE_MANAGING_PROJECTS": {
 				"DESC": "コンピュート、データベース、ストレージのリソースを最も多く使用した上位のプロジェクトリストを表示します。"
 			},
+			"TOTAL_FAIL_FINDINGS_HISTORY": {
+				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット"
+			},
 			"TOTAL_FAIL_FINDINGS_STATUS": {
-				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット",
+				"DESC": "選択した期間中に確認されたコンプライアンスFailureの数、比率、深刻度を表示するウィジェット。",
+				"LESS_THAN_PREV_DAY": "前日よりも少ない",
 				"LESS_THAN_PREV_MONTH": "前月よりも少ない",
-				"MORE_THAN_PREV_MONTH": "前月よりも多い"
+				"LESS_THAN_PREV_YEAR": "前年よりも少ない",
+				"MORE_THAN_PREV_DAY": "前日よりも多い",
+				"MORE_THAN_PREV_MONTH": "前月よりも多い",
+				"MORE_THAN_PREV_YEAR": "前年よりも多い"
 			},
 			"TREND_OF_PASS_AND_FAIL_FINDINGS": {
 				"DESC": "選択した期間中のコンプライアンスのPass/Fail findingsのトレンドを'Group By'オプションで集計して表示するウィジェット"
@@ -2065,6 +2080,10 @@
 		"CLOUD_SERVICE": {
 			"ADMIN": {
 				"MEMBER": "関連するメンバー"
+			},
+			"EXCEL_EXPORT_MODAL": {
+				"DESCRIPTION": "選択されたデータテーブルは複数のシートとして含まれ、一つのファイルに保存されます。",
+				"TITLE": "エクスポート選択"
 			},
 			"HISTORY": {
 				"ALL_MONTH": "全体月",

@@ -6,7 +6,7 @@ on:
       version:
         description: 'enter version(x.y.z)'
         required: true
-        default: '1.0.0'
+        default: '2.0.0'
       container_arch:
         type: choice
         description: 'choose container architecture'
@@ -179,6 +179,7 @@ jobs:
             ${{ vars.DOCKER_REPO_OWNER }}/${{ github.event.repository.name }}:${{ env.VERSION }}
             ${{ secrets.ECR_REPO }}/${{ github.event.repository.name }}:latest
             ${{ secrets.ECR_REPO }}/${{ github.event.repository.name }}:${{ env.VERSION }}
+          provenance: false
 
       - name: Notice when job fails
         if: failure()

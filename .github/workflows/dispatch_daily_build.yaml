@@ -74,6 +74,7 @@ jobs:
             cloudforetdev/${{ github.event.repository.name }}:${{ env.TIME }}
           cache-from: cloudforetdev/${{ env.SERVICE }}:latest
           cache-to: type=inline
+          provenance: false
 
       - name: Notice when job fails
         if: failure()

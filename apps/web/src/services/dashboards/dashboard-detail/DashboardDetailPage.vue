@@ -56,9 +56,9 @@
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
-            <dashboard-variables-select-dropdown class="variable-selector-wrapper"
-                                                 :is-manageable="state.hasManagePermission"
-                                                 :dashboard-id="props.dashboardId"
+            <dashboard-variables class="variable-selector-wrapper"
+                                 :is-manageable="state.hasManagePermission"
+                                 :dashboard-id="props.dashboardId"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"
@@ -108,7 +108,7 @@ import DashboardDeleteModal from '@/services/dashboards/dashboard-detail/modules
 import DashboardNameEditModal from '@/services/dashboards/dashboard-detail/modules/DashboardNameEditModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import DashboardToolset from '@/services/dashboards/shared/dashboard-toolset/DashboardToolset.vue';
-import DashboardVariablesSelectDropdown from '@/services/dashboards/shared/dashboard-variables/DashboardVariablesSelectDropdown.vue';
+import DashboardVariables from '@/services/dashboards/shared/dashboard-variables/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/shared/dashboard-widget-container/DashboardWidgetContainer.vue';
 import DashboardCloneModal from '@/services/dashboards/shared/DashboardCloneModal.vue';
 import DashboardLabels from '@/services/dashboards/shared/DashboardLabels.vue';
@@ -165,6 +165,8 @@ const handleVisibleCloneModal = () => {
 
 // else
 const handleRefresh = () => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     if (widgetContainerRef.value) widgetContainerRef.value.refreshAllWidget();
 };
 const handleUpdateLabels = async (labels: string[]) => {

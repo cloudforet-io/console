@@ -23,8 +23,8 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { red } from '@/styles/colors';
 
 import type { DateRange } from '@/services/dashboards/config';
-import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import type { Granularity, WidgetSize } from '@/services/dashboards/widgets/_configs/config';
+import { GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 
 
@@ -36,6 +36,7 @@ export interface WidgetFrameProps {
     widgetLocation?: Location;
     widgetConfigId?: string;
     dateRange?: DateRange;
+    granularity?: Granularity;
     noData?: boolean;
     printMode?: boolean;
     selectedDates?: string[];
@@ -52,6 +53,7 @@ export interface WidgetFrameProps {
     overflowY?: string;
     theme?: WidgetTheme;
     nonInheritOptionsTooltipText?: string;
+    dataCriteria?: 'history'|'realtime';
 }
 
 interface IconConfig {
@@ -67,11 +69,13 @@ const props = withDefaults(defineProps<WidgetFrameProps>(), {
     widgetLocation: undefined,
     widgetConfigId: undefined,
     dateRange: () => ({ start: undefined, end: undefined }),
+    granularity: undefined,
     selectedDates: () => [],
     currency: undefined,
     overflowY: undefined,
     theme: undefined,
     nonInheritOptionsTooltipText: undefined,
+    dataCriteria: 'history',
 });
 
 const emit = defineEmits<{(event: 'click-delete'): void;
@@ -82,20 +86,37 @@ const emit = defineEmits<{(event: 'click-delete'): void;
 const state = reactive({
     isFull: computed<boolean>(() => props.size === WIDGET_SIZE.full),
     dateLabel: computed<TranslateResult|undefined>(() => {
+        if (props.dataCriteria === 'realtime') return i18n.t('DASHBOARDS.WIDGET.REALTIME');
+
         const start = props.dateRange?.start;
-        const endDayjs = props.dateRange?.end ? dayjs.utc(props.dateRange.end) : undefined;
-        if (endDayjs) {
+        const end = props.dateRange?.end;
+        if (props.granularity === GRANULARITY.YEARLY) {
+            const nowDayjs = dayjs.utc();
+            const endDayjs = end ? dayjs.utc(end) : nowDayjs;
+            const isCurrentYear = endDayjs.isSame(nowDayjs, 'year');
             let endText;
-            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
-            if (isCurrentMonth) endText = dayjs.utc().format('YY-MM-DD');
-            else endText = endDayjs.endOf('month').format('YY-MM-DD');
+            if (isCurrentYear) endText = nowDayjs.format('YY/MM/DD');
+            else endText = endDayjs.endOf('year').format('YY/MM/DD');
             if (start) {
-                const startText = dayjs.utc(start).format('YY-MM-DD');
+                const startText = endDayjs.startOf('year').format('YY/MM/DD');
                 return `${startText} ~ ${endText}`;
             }
             return endText;
         }
-        if (start && !endDayjs) {
+
+        if (end) {
+            let endText;
+            const endDayjs = dayjs.utc(end);
+            const isCurrentMonth = endDayjs.isSame(dayjs.utc(), 'month');
+            if (isCurrentMonth) endText = dayjs.utc().format('YY/MM/DD');
+            else endText = endDayjs.endOf('month').format('YY/MM/DD');
+            if (start) {
+                const startText = dayjs.utc(start).format('YY/MM/DD');
+                return `${startText} ~ ${endText}`;
+            }
+            return endText;
+        }
+        if (start && !end) {
             const today = dayjs();
             const diff = today.diff(start, 'day', true);
             if (diff < 1) return i18n.t('DASHBOARDS.WIDGET.DATE_TODAY');
@@ -187,9 +208,23 @@ const handleClickViewModeButton = () => {
         <div class="widget-footer">
             <div class="widget-footer-wrapper">
                 <div class="footer-left">
-                    <label v-if="state.dateLabel"
-                           class="widget-footer-label"
-                    >{{ state.dateLabel }}</label>
+                    <template v-if="state.dateLabel">
+                        <p-tooltip v-if="props.size === WIDGET_SIZE.sm"
+                                   :contents="state.dateLabel"
+                        >
+                            <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                        </p-tooltip>
+                        <template v-else>
+                            <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
+                                 width="1rem"
+                                 height="1rem"
+                            />
+                            <label class="widget-footer-label">{{ state.dateLabel }}</label>
+                        </template>
+                    </template>
                     <p-divider v-if="state.isDivided"
                                :vertical="true"
                     />
@@ -324,8 +359,8 @@ const handleClickViewModeButton = () => {
             .footer-left {
                 @apply flex items-center gap-2;
                 .widget-footer-label {
+                    @apply text-gray-500;
                     font-size: 0.875rem;
-                    color: theme('colors.gray.700');
                     line-height: 1.25;
                     margin: 0;
 

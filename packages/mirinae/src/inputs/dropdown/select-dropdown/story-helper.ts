@@ -303,12 +303,12 @@ const extraArgTypes: ArgTypes = {
     },
     handler: {
         name: 'handler',
-        type: { name: 'function' },
+        type: { name: 'function, array of function' },
         description: 'Handler that returns auto-completion menu according to input value. If no value is given, the default handler is executed.',
         defaultValue: undefined,
         table: {
             type: {
-                summary: 'function',
+                summary: 'function, array of function',
             },
             category: 'props',
             defaultValue: {

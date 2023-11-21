@@ -1,8 +1,8 @@
 import type { Tags } from '@/models';
 
-import type { DashboardConfig, DashboardViewer } from '@/services/dashboards/config';
+import type { DashboardTemplate, DashboardViewer } from '@/services/dashboards/config';
 
-export interface DomainDashboardModel extends DashboardConfig {
+export interface DomainDashboardModel extends DashboardTemplate {
     domain_dashboard_id: string;
     viewers: DashboardViewer;
     tags: Tags;
@@ -12,7 +12,7 @@ export interface DomainDashboardModel extends DashboardConfig {
     updated_at: string;
 }
 
-export interface ProjectDashboardModel extends DashboardConfig {
+export interface ProjectDashboardModel extends DashboardTemplate {
     project_dashboard_id: string;
     project_id: string;
     viewers: DashboardViewer;

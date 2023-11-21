@@ -25,17 +25,16 @@ import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDat
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
 import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+import { ASSET_DATA_FIELD_MAP, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import type {
     WidgetExpose, WidgetProps,
     WidgetEmit,
 } from '@/services/dashboards/widgets/_configs/config';
-import { ASSET_GROUP_BY_ITEM_MAP } from '@/services/dashboards/widgets/_configs/view-config';
 import {
     getDateAxisSettings,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
-    getReferenceTypeOfGroupBy, getRefinedDateTableData, getWidgetTableDateFields,
+    getReferenceTypeOfDataField, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
@@ -83,35 +82,29 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(range, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
+    widgetLocation: undefined,
 });
 
 const state = reactive({
     loading: true,
     data: null as FullData | null,
-    groupByKey: computed<string|undefined>(() => {
-        // ex. additional_info.service -> service
-        if (!widgetState.groupBy) return undefined;
-        const dotIndex = widgetState.groupBy.indexOf('.');
-        if (dotIndex !== -1) return widgetState.groupBy.slice(dotIndex + 1);
-        return widgetState.groupBy;
-    }),
     chartData: computed<ChartData[]>(() => refineChartData(state.data?.chartData?.results ?? [])),
     noChartData: computed<boolean>(() => !state.data?.chartData),
     tableLoading: false,
     tableFields: computed<Field[]>(() => {
-        if (!widgetState.groupBy) return [];
+        if (!widgetState.dataField) return [];
         const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, { type: 'number' }, 'value');
         const refinedFieldsWithLabel = refinedFields.map((field) => ({
             ...field,
             label: `${field.label}\nFailure count`,
             width: props.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
         }));
-        const groupByLabel = ASSET_GROUP_BY_ITEM_MAP[widgetState.groupBy]?.label ?? widgetState.groupBy;
-        const referenceType = getReferenceTypeOfGroupBy(props.allReferenceTypeInfo, widgetState.groupBy) as ReferenceType;
+        const dataFieldLabel = Object.values(ASSET_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
+        const referenceType = getReferenceTypeOfDataField(props.allReferenceTypeInfo, widgetState.dataField) as ReferenceType;
         return [
             {
-                label: groupByLabel,
-                name: state.groupByKey,
+                label: dataFieldLabel,
+                name: widgetState.parsedDataField,
                 textOptions: { type: 'reference', referenceType },
                 width: props.size === 'full' ? TABLE_COL_MIN_WIDTH : undefined,
             },
@@ -137,11 +130,9 @@ const fetchTableDataAnalyze = getCancellableFetcher<FullData['tableData']>(Space
 const fetchChartData = async (): Promise<FullData['chartData']> => {
     state.loading = true;
     try {
-        chartDataApiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
-            .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
+        chartDataApiQueryHelper.setFilters(widgetState.consoleFilters);
         const { status, response } = await fetchChartDataAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+            query_set_id: widgetState.options.cloud_service_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
@@ -176,16 +167,16 @@ const fetchTableData = async (): Promise<FullData['tableData']> => {
         state.tableLoading = true;
 
         tableDataApiQueryHelper
-            .setFilters(widgetState.cloudServiceStatsConsoleFilters)
+            .setFilters(widgetState.consoleFilters)
             .addFilter({ k: 'ref_cloud_service_type.labels', v: 'Compliance', o: '=' });
         if (pageSize.value) tableDataApiQueryHelper.setPage(getPageStart(thisPage.value, pageSize.value), pageSize.value);
         const { status, response } = await fetchTableDataAnalyze({
-            query_set_id: widgetState.options.asset_query_set,
+            query_set_id: widgetState.options.cloud_service_query_set,
             query: {
                 granularity: 'MONTHLY',
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
-                group_by: [widgetState.groupBy],
+                group_by: [widgetState.dataField],
                 fields: {
                     value: {
                         key: 'values.fail_finding_count',

@@ -99,6 +99,13 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
         fill: am5.color(gray[600]),
         paddingRight: 8,
     });
+    yRenderer.labels.template.adapters.add('text', (text) => {
+        if (text) {
+            const convertedText = text.replace(/,/g, '');
+            return numberFormatter(Number(convertedText), { notation: 'compact' });
+        }
+        return text;
+    });
     const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
         min: 0,

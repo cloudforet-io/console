@@ -16,10 +16,6 @@ export const setIsInitialized: Mutation<DisplayState> = (state, isInitialized: b
     state.isInitialized = isInitialized;
 };
 
-export const setIsLoading: Mutation<DisplayState> = (state, isLoading: boolean): void => {
-    state.isLoading = isLoading;
-};
-
 export const setUncheckedNotificationCount: Mutation<DisplayState> = (state, count: number): void => {
     state.uncheckedNotificationCount = count;
 };

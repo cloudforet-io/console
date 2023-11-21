@@ -5,7 +5,7 @@ import {
     PButtonModal,
 } from '@spaceone/design-system';
 
-import DashboardWidgetInputForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetInputForm.vue';
+import DashboardWidgetForm from '@/services/dashboards/shared/dashboard-widget-input-form/DashboardWidgetForm.vue';
 import {
     useWidgetFormStore,
 } from '@/services/dashboards/shared/dashboard-widget-input-form/widget-form-store';
@@ -23,13 +23,13 @@ interface EmitFn {
 const emit = defineEmits<EmitFn>();
 const props = defineProps<Props>();
 const widgetFormStore = useWidgetFormStore();
-const widgetFormState = widgetFormStore.$state;
+const widgetFormGetters = widgetFormStore.getters;
 
 const handleEditModalCancel = () => {
     emit('cancel');
 };
 const handleEditModalConfirm = () => {
-    emit('confirm', widgetFormStore.updatedWidgetInfo);
+    emit('confirm', widgetFormGetters.updatedWidgetInfo);
 };
 </script>
 
@@ -37,15 +37,15 @@ const handleEditModalConfirm = () => {
     <p-button-modal class="dashboard-widget-edit-modal"
                     :visible="props.visible"
                     :header-title="$t('DASHBOARDS.WIDGET.UPDATE_TITLE')"
-                    :disabled="!widgetFormState.isValid"
+                    :disabled="!widgetFormGetters.isAllValid"
                     size="sm"
                     @cancel="handleEditModalCancel"
                     @confirm="handleEditModalConfirm"
                     @close="handleEditModalCancel"
     >
         <template #body>
-            <dashboard-widget-input-form :widget-config-id="props.widgetConfigId"
-                                         :widget-key="props.widgetKey"
+            <dashboard-widget-form :widget-config-id="props.widgetConfigId"
+                                   :widget-key="props.widgetKey"
             />
         </template>
     </p-button-modal>

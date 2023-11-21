@@ -68,6 +68,7 @@ const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(pr
         const start = dayjs.utc(end).subtract(11, 'month').format(DATE_FORMAT);
         return { start, end };
     }),
+    widgetLocation: undefined,
 });
 const state = reactive({
     loading: true,
@@ -183,18 +184,17 @@ const drawChart = (chartData: ChartData[]) => {
 
     // set x-axis
     xAxis.get('baseInterval').timeUnit = 'month';
-    const xRendered = xAxis.get('renderer');
-    xRendered.grid.template.setAll({ strokeOpacity: 0.8, location: 0.5 });
-    xRendered.labels.template.setAll({
+    const xRenderer = xAxis.get('renderer');
+    xRenderer.grid.template.setAll({ strokeOpacity: 0.8, location: 0.5 });
+    xRenderer.labels.template.setAll({
         visible: true,
-        oversizedBehavior: 'hide',
         maxWidth: 25,
     });
 
     // set y-axis
-    const yRendered = yAxis.get('renderer');
-    yRendered.grid.template.setAll({ strokeOpacity: 0.8 });
-    yRendered.labels.template.setAll({ visible: true });
+    const yRenderer = yAxis.get('renderer');
+    yRenderer.grid.template.setAll({ strokeOpacity: 0.8 });
+    yRenderer.labels.template.setAll({ visible: true });
 
     // create line series
     const series = chartHelper.createXYLineSeries(chart, {

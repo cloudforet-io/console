@@ -190,15 +190,20 @@ export default {
 
                 .service-type-name {
                     @apply text-sm text-gray-600;
-                    max-width: 80%;
+                    max-width: 90%;
                     font-weight: 400;
                     line-height: 1.25;
-                    display: inline-block;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: normal;
                     height: calc(100% + 0.5rem);
                 }
                 .service-type-count {
                     @apply text-gray-800;
-                    margin-left: 0.5rem;
+                    margin: 0 0.5rem;
                     font-weight: 400;
                     font-size: 0.875rem;
                     line-height: 1.25;

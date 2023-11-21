@@ -79,7 +79,7 @@ export interface Query {
         keys?: Sort[];
         name?: string;
         desc?: boolean;
-    };
+    } | Sort[];
     only?: Array<string>;
     keyword?: string;
     minimal?: boolean;

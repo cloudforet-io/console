@@ -154,7 +154,7 @@ const {
     initiateMenu,
     reloadMenu,
     showMoreMenu,
-} = useContextMenuController({
+} = useContextMenuController<SelectDropdownMenuItem>({
     useFixedStyle: computed(() => props.useFixedMenuStyle),
     targetRef,
     contextMenuRef: menuRef,
@@ -197,9 +197,9 @@ const handleSelectMenuItem = (item: SelectDropdownMenuItem, _, isSelected: boole
         emit('select', item, isSelected);
     }
 };
-const handleClickShowMore = async () => {
+const handleClickShowMore = async (item: SelectDropdownMenuItem) => {
     if (!props.disableHandler) {
-        await showMoreMenu();
+        await showMoreMenu(item._resultIndex);
     }
     emit('click-show-more');
 };
@@ -252,17 +252,36 @@ watch(() => props.disabled, (disabled) => {
 
     throw new Error('If \'multiSelectable\' is \'true\', \'selected\' option must be an array.');
 })();
-(async () => {
-    if (props.initSelectedWithHandler && props.handler && !props.disableHandler) {
-        // this is to refine selected items by handler's results whose label is fully set.
-        const { results } = await props.handler('', undefined, undefined, state.proxySelectedItem);
-        state.proxySelectedItem = state.proxySelectedItem.map((item) => {
-            const found = results.find((d) => d.name === item.name);
-            if (found) return found;
-            return item;
-        });
-    }
-})();
+
+const isInitiatingWithHandler = ref(false);
+watch([() => props.handler, () => props.initSelectedWithHandler], async ([handler, initSelectedWithHandler]) => {
+    if (props.disableHandler) return;
+    if (!initSelectedWithHandler) return;
+    if (!handler) return;
+    if (!state.proxySelectedItem.length) return;
+    if (isInitiatingWithHandler.value) return;
+
+    isInitiatingWithHandler.value = true;
+
+    // this is to refine selected items by handler's results whose label is fully set.
+    let responses = handler(
+        '',
+        undefined,
+        undefined,
+        state.proxySelectedItem,
+    );
+    if (responses instanceof Promise) responses = await responses;
+    const { results } = Array.isArray(responses) ? { results: responses.map((r) => r.results).flat() } : responses;
+    state.proxySelectedItem = state.proxySelectedItem.map((item) => {
+        const found = results.find((d) => d.name === item.name);
+        if (found) return found;
+        return item;
+    });
+
+    isInitiatingWithHandler.value = false;
+}, { immediate: true });
+
+defineExpose({ reloadMenu });
 </script>
 
 <template>

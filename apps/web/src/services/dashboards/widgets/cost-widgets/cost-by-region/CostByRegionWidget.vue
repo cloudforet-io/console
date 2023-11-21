@@ -2,7 +2,6 @@
 import {
     computed, defineExpose, defineProps, nextTick, reactive, ref,
 } from 'vue';
-import type { Location } from 'vue-router/types/router';
 
 import { PDataLoader } from '@spaceone/design-system';
 import {
@@ -17,20 +16,15 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
-import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
-
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_GROUP_BY, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { getWidgetLocationFilters } from '@/services/dashboards/widgets/_helpers/widget-location-helper';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
@@ -51,37 +45,23 @@ type FullData = CostAnalyzeResponse<Data>;
 const props = defineProps<WidgetProps>();
 const emit = defineEmits<WidgetEmit>();
 
-const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit, {
-    widgetLocation: computed<Location>(() => ({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
-        params: {
-            dataSourceId: widgetState.options.cost_data_source,
-            costQuerySetId: DYNAMIC_COST_QUERY_SET_PARAMS,
-        },
-        query: {
-            granularity: primitiveToQueryString(GRANULARITY.DAILY),
-            group_by: arrayToQueryString([widgetState.groupBy]),
-            period: objectToQueryString(widgetState.dateRange),
-            filters: arrayToQueryString(getWidgetLocationFilters(widgetState.options.filters)),
-        },
-    })),
-});
+const { widgetState, widgetFrameProps, widgetFrameEventHandlers } = useWidget(props, emit);
 
 const state = reactive({
     loading: true,
     data: null as FullData | null,
     tableFields: computed<Field[]>(() => [
         {
-            label: 'Provider', name: COST_GROUP_BY.PROVIDER, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
+            label: 'Provider', name: COST_DATA_FIELD_MAP.PROVIDER.name, textOptions: { type: 'reference', referenceType: 'provider' }, width: '20%',
         },
         {
-            label: 'Region', name: COST_GROUP_BY.REGION, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
+            label: 'Region', name: COST_DATA_FIELD_MAP.REGION.name, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
             label: 'Cost', name: 'cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
-    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_GROUP_BY.PROVIDER, props.allReferenceTypeInfo)),
+    legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_DATA_FIELD_MAP.PROVIDER.name, props.allReferenceTypeInfo)),
     chartLegends: computed(() => uniqWith(state.legends, isEqual)),
     chartData: computed<MapChartData[]>(() => getRefinedMapChartData(state.data?.results, storeState.regions, storeState.providers)),
 });
@@ -108,7 +88,7 @@ const fetchData = async (): Promise<FullData> => {
             data_source_id: widgetState.options.cost_data_source,
             query: {
                 granularity: widgetState.granularity,
-                group_by: [widgetState.groupBy, COST_GROUP_BY.PROVIDER],
+                group_by: [widgetState.dataField, COST_DATA_FIELD_MAP.PROVIDER.name],
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
@@ -179,7 +159,6 @@ const initWidget = async (data?: FullData): Promise<FullData> => {
     return state.data;
 };
 const refreshWidget = async (_thisPage = 1): Promise<FullData> => {
-    await nextTick();
     state.loading = true;
     thisPage.value = _thisPage;
     state.data = await fetchData();
@@ -226,7 +205,7 @@ defineExpose<WidgetExpose<FullData>>({
         <div class="content-wrapper">
             <p-data-loader class="chart-loader"
                            :loading="props.loading || state.loading"
-                           :data="state.chartData"
+                           :data="state.data"
                            :loader-backdrop-opacity="1"
                            loader-type="skeleton"
                            show-data-from-scratch
@@ -270,6 +249,7 @@ defineExpose<WidgetExpose<FullData>>({
             @apply col-span-5;
             height: 100%;
             padding-bottom: 1rem;
+            min-height: 22.5rem;
             .chart {
                 @apply border border-gray-200;
                 height: calc(90% - 2px);

@@ -10,7 +10,7 @@ export interface Data {
     cost_sum: { date: string; value: number }[];
     _total_cost_sum: number;
     provider: string;
-    [groupBy: string]: any;
+    [dataField: string]: any;
 }
 
 export const getRefinedMapChartData = (results: Data[]|null, regions: RegionReferenceMap, providers: ProviderReferenceMap): MapChartData[] => {

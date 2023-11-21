@@ -206,10 +206,16 @@ const widgetViewState = reactive({
     visibleModal: false,
     targetWidget: null as ReformedWidgetInfo|null,
 });
-const handleUpdateViewModalVisible = (visible: boolean) => {
+const handleUpdateViewModalVisible = async (visible: boolean) => {
     widgetViewState.visibleModal = visible;
     if (visible) return;
 
+    const widgetKey = widgetViewState.targetWidget?.widget_key;
+    const foundWidgetRef = widgetRef.value.find((comp) => comp?.$el.id === widgetKey);
+    if (foundWidgetRef) {
+        await nextTick();
+        foundWidgetRef.refreshWidget();
+    }
     widgetViewState.targetWidget = null;
 };
 </script>

@@ -141,12 +141,6 @@ watch(() => state.userId, (userId) => {
             <notice-popup v-if="!store.getters['user/hasSystemRole']" />
             <!--            <survey-modal />-->
         </template>
-        <!-- Iframe for file download -->
-        <iframe class="hidden"
-                :src="store.state.file.downloadSource"
-                width="1"
-                height="1"
-        />
         <!-- Modal for Cross Browsing -->
         <recommended-browser-modal v-if="showsBrowserRecommendation()" />
         <mobile-guide-modal v-if="store.state.display.visibleMobileGuideModal" />
