@@ -28,6 +28,24 @@
 		}
 	},
 	"AUTH": {
+		"COLLAPSED": {
+			"CLICK_HERE": "こちら",
+			"EXTENSION_CONTACT": "ドメイン管理者にお問い合わせください。",
+			"EXTENSION_DESC_1": "それでもメールが届かない場合は通知メールアドレスとユーザーIDが異なる場合があります。もし、通知メールアドレスがわからない場合は、",
+			"EXTENSION_REASON_1": "もうしばらくお待ちください。受信トレイに反映されるまで、10分以上かかる場合があります。",
+			"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
+			"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
+			"EXTENSION_TITLE_1": "メールが届かない場合は、",
+			"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？"
+		},
+		"MFA": {
+			"AUTHENTICATION_CODE": "",
+			"CONFIRM": "確認",
+			"EMAIL_INFO": "",
+			"GO_BACK": "",
+			"SUB_TITLE": "",
+			"TITLE": ""
+		},
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "ログインする",
@@ -56,17 +74,9 @@
 				"DONE": "パスワードのリセットが完了しました!",
 				"EMAIL": {
 					"DONE": {
-						"CLICK_HERE": "こちら",
 						"COLLAPSED": "メールが届かない場合は、",
 						"DESC_1": "メール送信完了",
 						"DESC_2": "送信されたガイドに従ってパスワードを変更してください。",
-						"EXTENSION_CONTACT": "ドメイン管理者にお問い合わせください。",
-						"EXTENSION_DESC_1": "それでもメールが届かない場合は通知メールアドレスとユーザーIDが異なる場合があります。もし、通知メールアドレスがわからない場合は、",
-						"EXTENSION_REASON_1": "もうしばらくお待ちください。受信トレイに反映されるまで、10分以上かかる場合があります。",
-						"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
-						"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
-						"EXTENSION_TITLE_1": "メールが届かない場合は、",
-						"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？",
 						"GO_BACK_TO_CONSOLE": "コンソールログイン",
 						"TITLE": "パスワードリセットメールを送信する"
 					},
