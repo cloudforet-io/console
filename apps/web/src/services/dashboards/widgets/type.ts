@@ -1,11 +1,5 @@
 import type { TranslateResult } from 'vue-i18n';
 
-
-export interface XYChartData {
-    date?: string;
-    [resourceName: string]: number | any; // AmazonCloudFront: 12333
-}
-
 export interface Legend {
     name: string;
     label?: TranslateResult;

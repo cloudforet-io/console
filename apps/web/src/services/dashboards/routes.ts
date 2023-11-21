@@ -12,10 +12,10 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
-const DashboardsMainPage = () => import('@/services/dashboards/dashboard-main/DashboardsMainPage.vue');
-const DashboardCreatePage = () => import('@/services/dashboards/dashboard-create/DashboardCreatePage.vue');
-const DashboardCustomizePage = () => import('@/services/dashboards/dashboard-customize/DashboardCustomizePage.vue');
-const DashboardDetailPage = () => import('@/services/dashboards/dashboard-detail/DashboardDetailPage.vue');
+const DashboardsMainPage = () => import('@/services/dashboards/pages/DashboardsMainPage.vue');
+const DashboardCreatePage = () => import('@/services/dashboards/pages/DashboardCreatePage.vue');
+const DashboardCustomizePage = () => import('@/services/dashboards/pages/DashboardCustomizePage.vue');
+const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardDetailPage.vue');
 
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',

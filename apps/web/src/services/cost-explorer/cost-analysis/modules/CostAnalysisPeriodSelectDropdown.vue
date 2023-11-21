@@ -13,6 +13,7 @@ import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
+import CustomDateRangeModal from '@/services/cost-explorer/cost-analysis/components/CustomDateRangeModal.vue';
 import {
     convertRelativePeriodToPeriod,
     initiatePeriodByGranularity,
@@ -21,7 +22,6 @@ import type { RelativePeriod } from '@/services/cost-explorer/cost-analysis/type
 import { GRANULARITY } from '@/services/cost-explorer/lib/config';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/store/cost-analysis-page-store';
 import type { Granularity, Period, CostQuerySetOption } from '@/services/cost-explorer/type';
-import CustomDateRangeModal from '@/services/dashboards/shared/CustomDateRangeModal.vue';
 
 
 const today = dayjs.utc();

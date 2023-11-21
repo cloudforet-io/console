@@ -22,13 +22,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
 import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
 import type {
     Data,
     MapChartData,
