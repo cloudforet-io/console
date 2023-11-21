@@ -1,16 +1,31 @@
-<script lang="ts" setup>
-import {
-    reactive, computed, watch,
-} from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+<script lang="ts">
+// eslint-disable-next-line import/order,import/no-duplicates
+import { defineComponent } from 'vue';
 
-import { isEmpty } from 'lodash';
+export default defineComponent({
+    beforeRouteEnter(to, from, next) {
+        if (from?.meta?.isSignInPage) {
+            console.log(from);
+            next((vm) => {
+                vm.$router.replace({
+                    query: { ...to.query, nextPath: from.query.nextPath },
+                }).catch(() => {});
+            });
+        } else next();
+    },
+});
+</script>
+
+<script lang="ts" setup>
+/* eslint-disable import/first */
+// eslint-disable-next-line import/no-duplicates
+import { reactive, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
-import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -44,17 +59,6 @@ const state = reactive({
             }
         }
         return component;
-    }),
-    images: computed(() => {
-        const domainImage = config.get('DOMAIN_IMAGE');
-        if (!isEmpty(domainImage)) {
-            return {
-                ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                ciTextWithType: config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE'),
-                signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
-            };
-        }
-        return undefined;
     }),
     showErrorMessage: route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
 });
@@ -91,32 +95,10 @@ watch(() => route.name, () => {
 </script>
 
 <template>
-    <div class="wrapper">
-        <div class="ci-wrapper">
-            <template v-if="state.images">
-                <img class="logo-character"
-                     :src="state.images.ciLogo"
-                >
-                <img class="logo-text"
-                     :src="state.images.ciTextWithType"
-                >
-            </template>
-            <template v-else>
-                <img class="logo-character"
-                     src="@/assets/images/brand/brand_logo.png"
-                >
-                <img class="logo-text"
-                     src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
-                >
-            </template>
-        </div>
-        <sign-in-left-container
-            :is-admin="false"
-            :images="state.images"
-        />
+    <div class="sign-in-page">
+        <sign-in-left-container />
         <sign-in-right-container
-            :is-admin="false"
-            :images="state.images"
+            class="sign-in-page-right-container"
             :show-error-message="state.showErrorMessage"
         >
             <template #input>
@@ -138,80 +120,53 @@ watch(() => route.name, () => {
 </template>
 
 <style lang="postcss" scoped>
-.wrapper {
-    display: flex;
-    position: absolute;
+.sign-in-page {
+    @apply flex absolute;
     width: 100%;
     height: 100%;
     top: 0;
     bottom: 0;
-}
-
-.ci-wrapper {
-    @apply flex;
-    position: fixed;
-    flex-flow: row;
-    .logo-character {
-        width: 56px;
-        height: 56px;
-        margin-top: 2rem;
-        margin-left: 2rem;
-    }
-    .logo-text {
-        width: auto;
-        height: 40px;
-        margin-top: 2.5rem;
+    .id-pw-wrapper {
+        margin-bottom: 1.5rem;
     }
 
-    @screen tablet {
-        @apply hidden;
+    .btn-divider {
+        @apply flex items-center text-gray-200;
+        flex-basis: 100%;
+        font-size: 0.75rem;
+        line-height: 120%;
+        margin-bottom: 1.5rem;
+        & span {
+            @apply text-gray-900;
+            margin: 0.5rem;
+        }
+        &::before, &::after {
+            @apply bg-gray-200;
+            content: "";
+            flex-grow: 1;
+            height: 1px;
+        }
     }
-}
-
-.right-container {
-    @media screen and (width < 478px) {
-        .template-wrapper {
-            width: 15rem;
-            margin: auto 2.5rem;
-            align-self: center;
-            .right-logo-character {
-                @apply mx-auto;
-                display: block;
-                width: 33%;
-                margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
-            }
-            .sign-in-title {
-                display: none;
-            }
-            .sign-in-subtitle {
-                display: none;
+    .sign-in-page-right-container {
+        @media screen and (width < 478px) {
+            .template-wrapper {
+                width: 15rem;
+                margin: auto 2.5rem;
+                align-self: center;
+                .right-logo-character {
+                    @apply mx-auto;
+                    display: block;
+                    width: 33%;
+                    margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
+                }
+                .sign-in-title {
+                    display: none;
+                }
+                .sign-in-subtitle {
+                    display: none;
+                }
             }
         }
     }
-}
-
-.id-pw-wrapper {
-    margin-bottom: 1.5rem;
-}
-
-.btn-divider {
-    @apply text-gray-200;
-    display: flex;
-    flex-basis: 100%;
-    align-items: center;
-    font-size: 0.75rem;
-    line-height: 120%;
-    margin-bottom: 1.5rem;
-}
-.btn-divider > span {
-    @apply text-gray-900;
-    margin: 0.5rem;
-}
-.btn-divider::before,
-.btn-divider::after {
-    @apply bg-gray-200;
-    content: "";
-    flex-grow: 1;
-    height: 1px;
 }
 </style>

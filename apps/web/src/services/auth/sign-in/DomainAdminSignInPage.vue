@@ -1,14 +1,30 @@
+<script lang="ts">
+// eslint-disable-next-line import/order,import/no-duplicates
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+    beforeRouteEnter(to, from, next) {
+        if (from?.meta?.isSignInPage) {
+            next((vm) => {
+                vm.$router.replace({
+                    query: { ...to.query, nextPath: from.query.nextPath },
+                }).catch(() => {});
+            });
+        } else next();
+    },
+});
+</script>
+
 <script lang="ts" setup>
-import {
-    reactive, computed,
-} from 'vue';
+/* eslint-disable import/first */
+// eslint-disable-next-line import/no-duplicates
+import { reactive, computed } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
-import config from '@/lib/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -30,13 +46,7 @@ const props = withDefaults(defineProps<Props>(), {
 const router = useRouter();
 
 const state = reactive({
-    userType: computed(() => (props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER')),
-    authType: computed(() => store.state.domain.extendedAuthType),
-    ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
-    ciTextWithTypeImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE')),
     showErrorMessage: computed(() => store.state.display.isSignInFailed),
-    userId: '' as string | undefined,
-    password: '',
 });
 
 const onSignIn = async () => {
@@ -63,26 +73,7 @@ const onSignIn = async () => {
 </script>
 
 <template>
-    <div class="wrapper">
-        <div class="ci-wrapper">
-            <img v-if="state.ciLogoImage"
-                 class="logo-character"
-                 :src="state.ciLogoImage"
-            >
-            <img v-else
-                 class="logo-character"
-                 src="@/assets/images/brand/brand_logo.png"
-            >
-
-            <img v-if="state.ciTextWithTypeImage"
-                 class="logo-text"
-                 :src="state.ciTextWithTypeImage"
-            >
-            <img v-else
-                 class="logo-text"
-                 src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
-            >
-        </div>
+    <div class="domain-admin-sign-in-page">
         <sign-in-left-container
             is-domain-owner
         />
@@ -101,34 +92,11 @@ const onSignIn = async () => {
 </template>
 
 <style lang="postcss" scoped>
-.wrapper {
-    display: flex;
-    position: absolute;
+.domain-admin-sign-in-page {
+    @apply flex absolute;
     width: 100%;
     height: 100%;
     top: 0;
     bottom: 0;
-}
-
-.ci-wrapper {
-    position: fixed;
-    display: flex;
-    flex-flow: row;
-
-    @screen mobile {
-        @apply hidden;
-    }
-
-    .logo-character {
-        width: 56px;
-        height: 56px;
-        margin-top: 2rem;
-        margin-left: 2rem;
-    }
-    .logo-text {
-        width: auto;
-        height: 40px;
-        margin-top: 2.5rem;
-    }
 }
 </style>
