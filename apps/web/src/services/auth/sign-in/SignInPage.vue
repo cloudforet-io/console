@@ -5,7 +5,6 @@ import { defineComponent } from 'vue';
 export default defineComponent({
     beforeRouteEnter(to, from, next) {
         if (from?.meta?.isSignInPage) {
-            console.log(from);
             next((vm) => {
                 vm.$router.replace({
                     query: { ...to.query, nextPath: from.query.nextPath },
