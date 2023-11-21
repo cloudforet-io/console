@@ -9,11 +9,10 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -91,34 +90,26 @@ const state = reactive({
     }),
 });
 
-let resourceToken: CancelTokenSource | undefined;
+const fetcher = getCancellableFetcher(SpaceConnector.client.addOns.autocomplete.distinct);
 const getResources = async (inputText: string, distinctKey): Promise<DistinctResult> => {
-    if (resourceToken) {
-        resourceToken.cancel('Next request has been called.');
-        resourceToken = undefined;
-    }
-
-    resourceToken = axios.CancelToken.source();
-
     try {
-        const res = await SpaceConnector.client.addOns.autocomplete.distinct({
+        state.resourceMenuLoading = true;
+        const { status, response } = await fetcher({
             resource_type: 'cost_analysis.Cost',
             distinct_key: distinctKey,
             search: inputText,
             options: {
                 limit: 10,
             },
-        }, {
-            cancelToken: resourceToken.token,
         });
-        resourceToken = undefined;
-
-        return res;
-    } catch (e: any) {
-        if (!axios.isCancel(e.axiosError)) {
-            ErrorHandler.handleError(e);
+        if (status === 'succeed') {
+            state.resourceMenuLoading = false;
+            return response;
         }
-
+        return {};
+    } catch (e: any) {
+        state.resourceMenuLoading = false;
+        ErrorHandler.handleError(e);
         return {};
     }
 };
@@ -126,9 +117,7 @@ const getResources = async (inputText: string, distinctKey): Promise<DistinctRes
 const resourceMenuHandler: AutocompleteHandler = async (inputText: string) => {
     if (state.resourceMenuItems) return { results: [] };
 
-    state.resourceMenuLoading = true;
     const { results, total_count } = await getResources(inputText, selectedCostType.value);
-    state.resourceMenuLoading = false;
 
     return {
         results: results ? results.map((d) => ({ name: d.key, label: d.name })) : [],
