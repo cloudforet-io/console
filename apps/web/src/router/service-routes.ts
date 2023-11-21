@@ -15,8 +15,8 @@ import dashboardsRoute from '@/services/dashboards/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import homeDashboardRoute from '@/services/home-dashboard/routes/routes';
 import infoRoute from '@/services/info/routes/routes';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
-import myPageRoute from '@/services/my-page/routes';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-config';
+import myPageRoute from '@/services/my-page/routes/routes';
 import projectRoute from '@/services/project/routes/routes';
 
 export const ROOT_ROUTE = Object.freeze({

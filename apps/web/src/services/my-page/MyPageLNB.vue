@@ -37,7 +37,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-config';
 
 export default defineComponent({
     name: 'MyPageLNB',

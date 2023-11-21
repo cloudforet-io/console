@@ -6,13 +6,13 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-config';
 
 const MyPageContainer = () => import('@/services/my-page/MyPageContainer.vue');
 
-const UserAccountPage = () => import('@/services/my-page/my-account/user-account/UserAccountPage.vue');
-const UserAPIKeyPage = () => import('@/services/my-page/my-account/user-api-key/UserAPIKeyPage.vue');
-const UserNotificationPage = () => import('@/services/my-page/my-account/user-notification/UserNotificationPage.vue');
+const UserAccountPage = () => import('@/services/my-page/pages/UserAccountPage.vue');
+const UserAPIKeyPage = () => import('@/services/my-page/pages/UserAPIKeyPage.vue');
+const UserNotificationPage = () => import('@/services/my-page/pages/UserNotificationPage.vue');
 const NotificationAddPage = () => import('@/services/notification/notification-add/NotificationAddPage.vue');
 
 // eslint-disable-next-line max-len

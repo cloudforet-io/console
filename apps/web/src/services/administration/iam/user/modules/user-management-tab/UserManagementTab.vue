@@ -98,7 +98,7 @@ import { userStateFormatter } from '@/services/administration/iam/user/lib/helpe
 import UserAssignedRole from '@/services/administration/iam/user/modules/user-management-tab/UserAssignedRole.vue';
 import UserDetail from '@/services/administration/iam/user/modules/user-management-tab/UserDetail.vue';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
+import UserAPIKeyTable from '@/services/my-page/components/APIKeyTable.vue';
 
 export default {
     name: 'UserManagementTab',

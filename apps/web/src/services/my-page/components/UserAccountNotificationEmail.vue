@@ -75,7 +75,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 
 import UserAccountModuleContainer
-    from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
+    from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
 const state = reactive({
     userType: computed(() => store.state.user.backend),

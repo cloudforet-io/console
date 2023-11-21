@@ -19,7 +19,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserAccountModuleContainer
-    from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
+    from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
 
 const state = reactive({

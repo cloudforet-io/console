@@ -6,9 +6,9 @@ import { PHeading, PTab } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
-import GRPCEndpointsTab from '@/services/my-page/my-account/user-api-key/modules/GRPCEndpointsTab.vue';
-import RestEndpointsTab from '@/services/my-page/my-account/user-api-key/modules/RestEndpointsTab.vue';
+import UserAPIKeyTable from '@/services/my-page/components/APIKeyTable.vue';
+import UserAPIKeyGRPCEndpointsTab from '@/services/my-page/components/UserAPIKeyGRPCEndpointsTab.vue';
+import UserAPIKeyRestEndpointsTab from '@/services/my-page/components/UserAPIKeyRestEndpointsTab.vue';
 
 
 const state = reactive({
@@ -36,10 +36,10 @@ const state = reactive({
                :tabs="state.tabs"
         >
             <template #rest>
-                <rest-endpoints-tab />
+                <user-a-p-i-key-rest-endpoints-tab />
             </template>
             <template #gRPC>
-                <g-r-p-c-endpoints-tab />
+                <user-a-p-i-key-g-r-p-c-endpoints-tab />
             </template>
         </p-tab>
     </section>

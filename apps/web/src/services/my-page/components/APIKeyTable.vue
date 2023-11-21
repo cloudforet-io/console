@@ -99,7 +99,7 @@ import {
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import UserAPIKeyModal from '@/services/my-page/my-account/user-api-key/modules/APIKeyModal.vue';
+import UserAPIKeyModal from '@/services/my-page/components/APIKeyModal.vue';
 
 
 export interface APIKeyItem {

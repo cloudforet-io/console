@@ -24,7 +24,7 @@ import {
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import UserAccountModuleContainer
-    from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
+    from '@/services/my-page/components/UserAccountModuleContainer.vue';
 
 const state = reactive({
     userId: computed(() => store.state.user.userId),

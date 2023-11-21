@@ -31,7 +31,7 @@ import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNB
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
 
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-config';
 
 export default defineComponent({
     name: 'GNBToolset',
