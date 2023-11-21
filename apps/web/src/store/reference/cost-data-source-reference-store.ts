@@ -8,6 +8,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
+import type { DataSourceModel } from '@/api-schema/cost-analysis/data-source/model';
+
 import type {
     ReferenceItem,
     ReferenceMap,
@@ -19,7 +21,6 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DataSourceModel } from '@/services/cost-explorer/model';
 
 
 type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'>;

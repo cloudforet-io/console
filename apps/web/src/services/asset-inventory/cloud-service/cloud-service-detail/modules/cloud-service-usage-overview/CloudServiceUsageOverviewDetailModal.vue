@@ -86,7 +86,7 @@ import CloudServiceUsageOverviewSummary
     from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/cloud-service-usage-overview/CloudServiceUsageOverviewSummary.vue';
 import type { CloudServiceTypeInfo } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
 import CloudServicePeriodFilter from '@/services/asset-inventory/cloud-service/modules/CloudServicePeriodFilter.vue';
-import type { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 interface Data {
     name?: string;

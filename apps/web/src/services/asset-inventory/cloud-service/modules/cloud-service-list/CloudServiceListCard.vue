@@ -62,7 +62,7 @@ import { objectToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
-import type { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 interface Props {
     item: any;

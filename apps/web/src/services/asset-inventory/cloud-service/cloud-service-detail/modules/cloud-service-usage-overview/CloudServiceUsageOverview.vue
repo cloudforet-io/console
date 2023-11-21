@@ -63,7 +63,7 @@ import CloudServiceUsageOverviewSummary
 import type {
     CloudServiceTypeInfo,
 } from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-import type { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 interface Props {
     cloudServiceTypeInfo: CloudServiceTypeInfo;

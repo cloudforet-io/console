@@ -10,8 +10,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';

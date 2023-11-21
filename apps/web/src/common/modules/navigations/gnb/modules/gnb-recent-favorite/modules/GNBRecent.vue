@@ -71,7 +71,7 @@ import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-se
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';
 

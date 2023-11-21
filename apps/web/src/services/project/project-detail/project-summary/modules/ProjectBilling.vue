@@ -35,7 +35,7 @@ import {
     gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';
 
-import { GROUP_BY } from '@/services/cost-explorer/lib/config';
+import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constants';
 
 
 interface ChartData {

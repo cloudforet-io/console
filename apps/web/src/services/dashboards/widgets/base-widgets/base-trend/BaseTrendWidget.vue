@@ -23,8 +23,8 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
+import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
 import type { DateRange } from '@/services/dashboards/config';
 import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';

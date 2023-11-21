@@ -36,15 +36,15 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 import { gray } from '@/styles/colors';
 
-import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/cost-analysis/config';
-import RelocateDashboardModal from '@/services/cost-explorer/modules/RelocateDashboardModal.vue';
-import RelocateDashboardNotification from '@/services/cost-explorer/modules/RelocateDashboardNotification.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
-import type { RelocateDashboardStatus } from '@/services/cost-explorer/store/cost-explorer-settings-store';
+import CostExplorerLNBRelocateDashboardModal from '@/services/cost-explorer/components/CostExplorerLNBRelocateDashboardModal.vue';
+import CostExplorerLNBRelocateDashboardNotification from '@/services/cost-explorer/components/CostExplorerLNBRelocateDashboardNotification.vue';
+import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import type { RelocateDashboardStatus } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import {
     useCostExplorerSettingsStore,
-} from '@/services/cost-explorer/store/cost-explorer-settings-store';
-import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
+} from '@/services/cost-explorer/stores/cost-explorer-settings-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 
@@ -271,9 +271,10 @@ onMounted(() => {
                         />
                     </template>
                 </l-n-b-router-menu-item>
-                <relocate-dashboard-notification v-if="relocateNotificationState.isBannerVisible"
-                                                 @click-dismiss="handleDismissRelocateNotification"
-                                                 @click-learn-more="handleLearnMoreRelocateNotification"
+                <cost-explorer-l-n-b-relocate-dashboard-notification
+                    v-if="relocateNotificationState.isBannerVisible"
+                    @click-dismiss="handleDismissRelocateNotification"
+                    @click-learn-more="handleLearnMoreRelocateNotification"
                 />
                 <l-n-b-divider-menu-item />
             </template>
@@ -312,7 +313,7 @@ onMounted(() => {
                 </p-select-dropdown>
             </template>
         </l-n-b>
-        <relocate-dashboard-modal :visible.sync="relocateNotificationState.isModalVisible" />
+        <cost-explorer-l-n-b-relocate-dashboard-modal :visible.sync="relocateNotificationState.isModalVisible" />
     </aside>
 </template>
 
