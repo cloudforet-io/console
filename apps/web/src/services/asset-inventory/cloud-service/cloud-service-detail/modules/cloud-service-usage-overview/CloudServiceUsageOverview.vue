@@ -45,14 +45,13 @@ import type {
     DynamicWidgetSchema,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -162,23 +161,27 @@ export default defineComponent<Props>({
             }
         };
 
-        let fetchDataTokenList: Array<CancelTokenSource|undefined> = [];
-
+        const fetcherList: any[] = [];
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema, idx: number): Promise<Data> => {
-            fetchDataTokenList[idx] = axios.CancelToken.source();
+            let _fetcher = fetcherList[idx];
+            if (!_fetcher) {
+                const cancellableFetcher = getCancellableFetcher(SpaceConnector.client.inventory.cloudService.analyze);
+                fetcherList[idx] = cancellableFetcher;
+                _fetcher = cancellableFetcher;
+            }
 
             try {
-                const { results } = await SpaceConnector.client.inventory.cloudService.analyze({
+                const { status, response } = await _fetcher({
                     ...state.apiQuery,
                     default_query: schema.query,
                     date_range: state.dateRange,
-                }, { cancelToken: fetchDataTokenList[idx]?.token });
-                fetchDataTokenList[idx] = undefined;
-                return results[0] ?? {};
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    ErrorHandler.handleError(e);
+                });
+                if (status === 'succeed') {
+                    return response.results[0] ?? {};
                 }
+                return {};
+            } catch (e: any) {
+                ErrorHandler.handleError(e);
                 return {};
             }
         };
@@ -190,18 +193,8 @@ export default defineComponent<Props>({
             else state.widgetSchemaList = await fetchSchemaList();
         };
 
-        const cancelPreviousDataFetchRequests = () => {
-            fetchDataTokenList.forEach((fetchDataToken) => {
-                if (fetchDataToken) {
-                    fetchDataToken.cancel('Next request will called.');
-                }
-            });
-            fetchDataTokenList = [];
-        };
-
         const getDataListWithSchema = debounce(async () => {
             if (!state.dataLoading) state.dataLoading = true;
-            cancelPreviousDataFetchRequests();
             const results: any = await Promise.allSettled(state.summaryWidgetSchemaList.map((schema, i) => fetchDataWithSchema(schema, i)));
             state.summaryDataList = results.map((d) => {
                 if (d.status === 'fulfilled') return d.value;

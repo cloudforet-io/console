@@ -79,13 +79,12 @@ import {
 import type { DynamicLayoutEventListener } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
 import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { debounce, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
@@ -242,34 +241,25 @@ export default defineComponent<Props>({
         const handleChangeTab = (tab: string) => {
             state.activeTab = tab;
         };
-        let getLogDataToken: CancelTokenSource | undefined;
+        const fetcher = getCancellableFetcher(SpaceConnector.client.monitoring.log.list);
         const getLogData = debounce(async (dataSourceId: string, resourceId: string) => {
             try {
-                if (getLogDataToken) {
-                    getLogDataToken.cancel('Next request has been called.');
-                    getLogDataToken = undefined;
-                }
-                getLogDataToken = axios.CancelToken.source();
-
                 state.loading = true;
-                const { results } = await SpaceConnector.client.monitoring.log.list({
+                const { status, response } = await fetcher({
                     data_source_id: dataSourceId,
                     resource_id: resourceId,
                     keyword: state.searchText,
                     start: state.selectedPeriod?.start.toISOString(),
                     end: state.selectedPeriod?.end.toISOString(),
-                }, {
-                    cancelToken: getLogDataToken.token,
                 });
-                getLogDataToken = undefined;
-                state.data = results;
-                state.loading = false;
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    ErrorHandler.handleError(e);
-                    state.data = [];
+                if (status === 'succeed') {
+                    state.data = response.results;
                     state.loading = false;
                 }
+            } catch (e: any) {
+                ErrorHandler.handleError(e);
+                state.data = [];
+                state.loading = false;
             }
         }, 300);
         const schemaApiQueryHelper = new ApiQueryHelper();

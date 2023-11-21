@@ -72,8 +72,6 @@ import {
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
@@ -87,6 +85,7 @@ import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
@@ -197,18 +196,13 @@ export default {
         const cloudServiceApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(24)
             .setSort('count', true);
-        let listCloudServiceRequest: CancelTokenSource | undefined;
+        const fetcher = getCancellableFetcher(SpaceConnector.client.inventory.cloudServiceType.analyze);
         const listCloudServiceType = async () => {
-            if (listCloudServiceRequest) {
-                listCloudServiceRequest.cancel('Next request has been called.');
-                listCloudServiceRequest = undefined;
-            }
-            listCloudServiceRequest = axios.CancelToken.source();
             try {
                 state.loading = true;
                 cloudServiceApiQueryHelper.setFilters(cloudServicePageStore.allFilters)
                     .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
-                const res = await SpaceConnector.client.inventory.cloudServiceType.analyze({
+                const { status, response } = await fetcher({
                     labels: cloudServicePageStore.selectedCategories,
                     ...cloudServiceApiQueryHelper.data,
                     ...(cloudServicePageState.period && {
@@ -217,19 +211,17 @@ export default {
                             end: dayjs.utc(cloudServicePageState.period.end).add(1, 'day').format('YYYY-MM-DD'),
                         },
                     }),
-                }, { cancelToken: listCloudServiceRequest.token });
-                state.items = res.results;
-                state.totalCount = res.total_count || 0;
-                state.loading = false;
-                listCloudServiceRequest = undefined;
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    state.items = [];
-                    state.totalCount = 0;
+                });
+                if (status === 'succeed') {
+                    state.items = response.results;
+                    state.totalCount = response.total_count || 0;
                     state.loading = false;
-                } else {
-                    ErrorHandler.handleError(e);
                 }
+            } catch (e) {
+                state.items = [];
+                state.totalCount = 0;
+                state.loading = false;
+                ErrorHandler.handleError(e);
             }
         };
 

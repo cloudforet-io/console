@@ -112,14 +112,13 @@ import {
     PSelectButtonGroup, PSelectDropdown, PIconButton, PButton, PLink, PSpinner,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import dayjs from 'dayjs';
 import {
     debounce, find, capitalize, chain, range, sortBy, get,
 } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
@@ -255,30 +254,22 @@ export default {
                 state.dataTools = [];
             }
         };
-        let resourceToken: CancelTokenSource | undefined;
+        const fetcher = getCancellableFetcher(SpaceConnector.client.monitoring.metric.list);
         const listMetrics = async () => {
             if (!state.selectedToolId) return;
-            if (resourceToken) {
-                resourceToken.cancel('Next request has been called.');
-                resourceToken = undefined;
-            }
-            resourceToken = axios.CancelToken.source();
             try {
                 state.metrics = [];
 
-                const res = await SpaceConnector.client.monitoring.metric.list({
+                const { status, response } = await fetcher({
                     data_source_id: state.selectedToolId,
                     resources: props.resources.map((d) => d.id),
-                }, {
-                    cancelToken: resourceToken.token,
                 });
-                resourceToken = undefined;
-                state.metrics = sortBy(res.metrics, (m) => m.name);
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    ErrorHandler.handleError(e);
-                    state.metrics = [];
+                if (status === 'succeed') {
+                    state.metrics = sortBy(response.metrics, (m) => m.name);
                 }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.metrics = [];
             }
         };
 

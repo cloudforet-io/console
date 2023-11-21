@@ -64,11 +64,10 @@ import {
 import type { DirectiveFunction, SetupContext } from 'vue';
 
 import { getTextHighlightRegex, PI, screens } from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import { debounce, throttle } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -104,6 +103,11 @@ interface CloudServiceData {
     group: string;
     name: string;
     icon: string;
+}
+interface AutocompleteResourceResult {
+    key: string;
+    name?: string;
+    data?: CloudServiceData;
 }
 
 const LAPTOP_WINDOW_SIZE = screens.laptop.max;
@@ -226,33 +230,25 @@ export default defineComponent<Props>({
         };
 
         /* API */
-        let resourceToken: CancelTokenSource | undefined;
-        const getCloudServiceResources = async (inputText) => {
-            if (resourceToken) {
-                resourceToken.cancel('Next request has been called.');
-                resourceToken = undefined;
-            }
-            resourceToken = axios.CancelToken.source();
-
+        const fetcher = getCancellableFetcher(SpaceConnector.client.addOns.autocomplete.resource);
+        const getCloudServiceResources = async (inputText): Promise<AutocompleteResourceResult[]|undefined> => {
             try {
                 state.loading = true;
-                const { results, total_count } = await SpaceConnector.client.addOns.autocomplete.resource({
+                const { status, response } = await fetcher({
                     resource_type: 'inventory.CloudServiceType',
                     search: inputText,
                     options: {
                         limit: 15,
                         targets: ['name', 'group'],
                     },
-                }, {
-                    cancelToken: resourceToken.token,
                 });
-                resourceToken = undefined;
-                dataState._cloudServiceTotalCount = total_count;
-                return results;
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    ErrorHandler.handleError(e);
+                if (status === 'succeed') {
+                    dataState._cloudServiceTotalCount = response.total_count;
+                    return response.results;
                 }
+                return undefined;
+            } catch (e) {
+                ErrorHandler.handleError(e);
                 dataState._cloudServiceTotalCount = 0;
                 return [];
             } finally {
@@ -337,8 +333,10 @@ export default defineComponent<Props>({
             state.loading = true;
             if (state.trimmedInputText) {
                 const results = await getCloudServiceResources(state.trimmedInputText);
-                dataState.filteredCloudServices = results.map((d) => d.data);
-                dataState.filteredMenuList = filterMenuItemsBySearchTerm(dataState.allMenuList, state.trimmedInputText);
+                if (results) {
+                    dataState.filteredCloudServices = results.map((d) => d.data);
+                    dataState.filteredMenuList = filterMenuItemsBySearchTerm(dataState.allMenuList, state.trimmedInputText);
+                }
             }
         }, 300, {
             leading: true,
