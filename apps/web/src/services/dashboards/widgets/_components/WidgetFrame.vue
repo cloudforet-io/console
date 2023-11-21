@@ -209,10 +209,10 @@ const handleClickViewModeButton = () => {
             <div class="widget-footer-wrapper">
                 <div class="footer-left">
                     <template v-if="state.dateLabel">
-                        <p-tooltip v-if="props.size === WIDGET_SIZE.sm"
+                        <p-tooltip v-if="props.size === WIDGET_SIZE.sm && props.dataCriteria !== 'realtime'"
                                    :contents="state.dateLabel"
                         >
-                            <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
+                            <p-i :name="'ic_time'"
                                  width="1rem"
                                  height="1rem"
                             />
