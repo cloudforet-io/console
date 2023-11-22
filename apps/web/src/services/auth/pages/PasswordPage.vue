@@ -113,7 +113,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 
 import PasswordForm from '@/services/auth/components/PasswordForm.vue';
-import { PASSWORD_STATUS } from '@/services/auth/constants/password-constants';
+import { PASSWORD_STATUS } from '@/services/auth/constants/password-constant';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
 import type { PasswordFormExpose } from '@/services/auth/types/password-type';
 
