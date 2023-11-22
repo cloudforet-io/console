@@ -30,7 +30,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
 import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
-import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
 
 interface Props {
@@ -73,30 +72,15 @@ const onSignIn = async () => {
 </script>
 
 <template>
-    <div class="domain-admin-sign-in-page">
-        <sign-in-left-container
-            is-domain-owner
-        />
-        <sign-in-right-container
-            is-domain-owner
-            :show-error-message="state.showErrorMessage"
-        >
-            <template #input>
-                <i-d-p-w-sign-in class="local-sign-in-wrapper"
-                                 is-domain-owner
-                                 @sign-in="onSignIn"
-                />
-            </template>
-        </sign-in-right-container>
-    </div>
+    <sign-in-right-container
+        is-domain-owner
+        :show-error-message="state.showErrorMessage"
+    >
+        <template #input>
+            <i-d-p-w-sign-in class="local-sign-in-wrapper"
+                             is-domain-owner
+                             @sign-in="onSignIn"
+            />
+        </template>
+    </sign-in-right-container>
 </template>
-
-<style lang="postcss" scoped>
-.domain-admin-sign-in-page {
-    @apply flex absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    bottom: 0;
-}
-</style>
