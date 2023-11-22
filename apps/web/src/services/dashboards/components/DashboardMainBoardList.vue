@@ -102,7 +102,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 
 const PAGE_SIZE = 10;

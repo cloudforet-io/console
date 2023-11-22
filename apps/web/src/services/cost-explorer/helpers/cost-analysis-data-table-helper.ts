@@ -2,7 +2,7 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { DataTableFieldType } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import dayjs from 'dayjs';
 
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getPeriodByGranularity } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import type {
     Period, Granularity,

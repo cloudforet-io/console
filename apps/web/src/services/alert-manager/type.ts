@@ -1,7 +1,7 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
-import type { Tags, TimeStamp } from '@/schema/common/model';
+import type { Tags, TimeStamp } from '@/schema/_common/model';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 

@@ -7,7 +7,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 
 import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 interface Props {
     visible: boolean;

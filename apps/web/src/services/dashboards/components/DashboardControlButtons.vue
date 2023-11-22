@@ -21,7 +21,7 @@ import { PButton } from '@spaceone/design-system';
 import { SpaceRouter } from '@/router';
 
 
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const emit = defineEmits(['update:visible-clone-modal']);
 

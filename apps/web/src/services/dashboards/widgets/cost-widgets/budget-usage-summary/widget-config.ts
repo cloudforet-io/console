@@ -1,7 +1,7 @@
 import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
 import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 
-import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const budgetUsageSummaryConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageSummary',

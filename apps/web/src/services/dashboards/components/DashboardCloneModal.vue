@@ -78,7 +78,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { gray } from '@/styles/colors';
 
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardDetailInfoStoreState } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';

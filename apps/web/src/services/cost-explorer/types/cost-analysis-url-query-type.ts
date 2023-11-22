@@ -1,7 +1,6 @@
 import type { RouteQueryString } from '@/lib/router-query-string';
 
-
-const COST_ANALYSIS_PAGE_URL_QUERY_KEY = ['period', 'group_by', 'filters', 'granularity'] as const;
+import type { COST_ANALYSIS_PAGE_URL_QUERY_KEY } from '@/services/cost-explorer/constants/cost-analysis-url-query-constant';
 
 type CostAnalysisPageUrlQueryKey = typeof COST_ANALYSIS_PAGE_URL_QUERY_KEY[number];
 

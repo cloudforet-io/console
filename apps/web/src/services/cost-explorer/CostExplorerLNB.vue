@@ -39,13 +39,13 @@ import { gray } from '@/styles/colors';
 import CostExplorerLNBRelocateDashboardModal from '@/services/cost-explorer/components/CostExplorerLNBRelocateDashboardModal.vue';
 import CostExplorerLNBRelocateDashboardNotification from '@/services/cost-explorer/components/CostExplorerLNBRelocateDashboardNotification.vue';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { RelocateDashboardStatus } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import {
     useCostExplorerSettingsStore,
 } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
 const FOLDING_COUNT_BY_SHOW_MORE = 7;

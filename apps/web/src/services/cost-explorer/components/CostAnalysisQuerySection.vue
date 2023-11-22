@@ -28,7 +28,7 @@ import CostAnalysisGranularityPeriodDropdown
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 

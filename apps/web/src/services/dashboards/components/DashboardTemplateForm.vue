@@ -135,7 +135,7 @@ import { store } from '@/store';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type {
     DashboardModel,
 } from '@/services/dashboards/types/dashboard-model-type';

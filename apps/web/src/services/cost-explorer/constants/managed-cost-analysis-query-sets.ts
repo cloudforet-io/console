@@ -1,4 +1,4 @@
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 export const DYNAMIC_COST_QUERY_SET_PARAMS = 'dynamic';

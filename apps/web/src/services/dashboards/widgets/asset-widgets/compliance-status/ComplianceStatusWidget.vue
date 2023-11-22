@@ -24,7 +24,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/u
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import {
     COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP,
-} from '@/services/dashboards/widgets/_constants/compliance-constants';
+} from '@/services/dashboards/widgets/_constants/compliance-constant';
 import type { Severity } from '@/services/dashboards/widgets/_types/compliance-type';
 import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_types/widget-type';
 

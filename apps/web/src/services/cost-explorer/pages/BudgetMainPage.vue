@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const currentRoute = SpaceRouter.router.currentRoute;
 

@@ -112,7 +112,7 @@ import DashboardRefreshDropdown from '@/services/dashboards/components/Dashboard
 import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 

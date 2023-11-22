@@ -27,7 +27,7 @@ import { gray } from '@/styles/colors';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');

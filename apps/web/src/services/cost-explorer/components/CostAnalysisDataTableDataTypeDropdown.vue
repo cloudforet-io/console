@@ -3,8 +3,8 @@ import { reactive } from 'vue';
 
 import { PSelectDropdown } from '@spaceone/design-system';
 
-import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/constants/cost-explorer-constants';
-import { USAGE_TYPE_ADDITIONAL_FILTER_MAP } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { USAGE_TYPE_ADDITIONAL_FILTER_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 const emit = defineEmits<{(e: 'update-filter', selected: UsageTypeAdditionalFilter): void; }>();
 

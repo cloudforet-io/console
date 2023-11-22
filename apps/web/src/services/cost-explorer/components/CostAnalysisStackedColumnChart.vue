@@ -20,7 +20,7 @@ import { useAmcharts5 } from '@/common/composables/amcharts5';
 
 import { gray } from '@/styles/colors';
 
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getStackedChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
 import { getPeriodByGranularity } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';

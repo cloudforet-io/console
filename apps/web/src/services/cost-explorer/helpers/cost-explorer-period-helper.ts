@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type {
     RelativePeriod, Granularity, Period, CostQuerySetOptionForPeriod,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';

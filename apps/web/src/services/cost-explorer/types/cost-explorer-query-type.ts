@@ -2,7 +2,7 @@ import type { ManipulateType } from 'dayjs';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import type { FILTER, GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 
 
 export interface Period {

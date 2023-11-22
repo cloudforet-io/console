@@ -35,7 +35,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import CostAnalysisDataTableDataTypeDropdown from '@/services/cost-explorer/components/CostAnalysisDataTableDataTypeDropdown.vue';
-import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     GRANULARITY,
     GROUP_BY,
@@ -43,7 +43,7 @@ import {
     ADDITIONAL_GROUP_BY,
     ADDITIONAL_GROUP_BY_ITEM_MAP,
     USAGE_TYPE_ADDITIONAL_FILTER_MAP,
-} from '@/services/cost-explorer/constants/cost-explorer-constants';
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     getDataTableCostFields, getTimeUnitByGranularity,
 } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';

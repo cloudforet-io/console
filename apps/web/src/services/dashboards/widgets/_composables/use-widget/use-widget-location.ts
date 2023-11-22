@@ -14,7 +14,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';

@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/common/model';
+import type { Tags } from '@/schema/_common/model';
 import type { DashboardTemplate, DashboardViewer } from '@/schema/dashboard/_types/dashboard-type';
 
 export interface DomainDashboardModel extends DashboardTemplate {

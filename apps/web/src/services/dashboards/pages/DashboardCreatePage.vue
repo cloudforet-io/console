@@ -42,7 +42,7 @@ import DashboardCustomize from '@/services/dashboards/components/DashboardCustom
 import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/components/DashboardViewerForm.vue';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 import type { ProjectItemResp } from '@/services/project/types/type';

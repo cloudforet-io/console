@@ -100,7 +100,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
 import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 export default {
     name: 'DashboardMainPage',

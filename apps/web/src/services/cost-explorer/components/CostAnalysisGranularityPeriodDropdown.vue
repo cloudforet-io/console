@@ -14,7 +14,7 @@ import { i18n } from '@/translations';
 
 import CostAnalysisPeriodSelectDropdown
     from '@/services/cost-explorer/components/CostAnalysisPeriodSelectDropdown.vue';
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';

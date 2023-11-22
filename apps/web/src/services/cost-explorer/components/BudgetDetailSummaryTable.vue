@@ -16,10 +16,10 @@ import { i18n } from '@/translations';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { getStackedChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
