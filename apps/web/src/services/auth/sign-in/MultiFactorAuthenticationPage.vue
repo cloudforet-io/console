@@ -39,6 +39,7 @@
                               :invalid="validationState.isVerificationCodeValid"
                               class="text-input"
                               @update:value="handleChangeInput"
+                              @keyup.enter="handleClickConfirmButton"
                 />
             </p-field-group>
             <div>
@@ -52,22 +53,21 @@
                 />
             </div>
             <p-button size="lg"
+                      :loading="state.confirmLoading"
                       class="confirm-button"
+                      :disabled="validationState.verificationCode === ''"
                       @click="handleClickConfirmButton"
             >
                 {{ $t('AUTH.MFA.CONFIRM') }}
             </p-button>
-            <div class="go-back-wrapper">
-                <p-icon-button name="ic_arrow-left"
-                               size="sm"
-                               class="go-back-button mr-2"
-                />
-                <p class="go-back-button">
-                    <router-link :to="{ name: AUTH_ROUTE.SIGN_IN._NAME}">
-                        {{ $t('AUTH.MFA.GO_BACK') }}
-                    </router-link>
-                </p>
-            </div>
+            <p-text-button class="go-back-button mr-2"
+                           icon-left="ic_arrow-left"
+                           style-type="highlight"
+                           size="md"
+                           @click="handleClickGoBackButton"
+            >
+                {{ $t('AUTH.MFA.GO_BACK') }}
+            </p-text-button>
         </div>
     </div>
 </template>
@@ -75,24 +75,27 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PButton,
-    PCollapsibleToggle, PFieldGroup, PI, PIconButton, PTextInput,
+    PButton, PCollapsibleToggle, PFieldGroup, PI, PTextInput, PTextButton,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
-import { postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
+import { postEnableMfa, postValidationMfaCode } from '@/lib/helper/multi-factor-authentication-helper';
 
 import CollapsibleContents from '@/services/auth/components/CollapsibleContents.vue';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 const route = useRoute();
+const router = useRouter();
 
 const state = reactive({
     loading: false,
+    confirmLoading: false,
+    userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
 });
@@ -103,9 +106,20 @@ const validationState = reactive({
     verificationCodeInvalidText: '' as TranslateResult | string,
 });
 
+/* Components */
 const handleChangeInput = (value: string) => {
+    if (validationState.isVerificationCodeValid) {
+        validationState.isVerificationCodeValid = false;
+        validationState.verificationCodeInvalidText = '';
+    }
     validationState.verificationCode = value;
 };
+const handleClickGoBackButton = () => {
+    router.replace({ name: AUTH_ROUTE.SIGN_IN._NAME });
+};
+
+/* API */
+// TODO: need check after API update
 const handleClickResend = async () => {
     state.loading = true;
 
@@ -120,8 +134,22 @@ const handleClickResend = async () => {
 
     state.loading = false;
 };
-// TODO: will be updated
-const handleClickConfirmButton = () => {};
+const handleClickConfirmButton = async () => {
+    state.confirmLoading = true;
+    try {
+        await postValidationMfaCode({
+            user_id: state.userId,
+            domain_id: state.domainId,
+            verify_code: validationState.verificationCode,
+        });
+        validationState.verificationCode = '';
+    } catch (e: any) {
+        validationState.isVerificationCodeValid = true;
+        validationState.verificationCodeInvalidText = i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
+    } finally {
+        state.confirmLoading = false;
+    }
+};
 </script>
 
 <style lang="postcss" scoped>
@@ -177,13 +205,10 @@ const handleClickConfirmButton = () => {};
         .confirm-button {
             margin-top: 1.5rem;
         }
-        .go-back-wrapper {
+        .go-back-button {
             @apply flex items-center justify-center;
             margin-top: 1.5rem;
-            .go-back-button {
-                @apply text-blue-700 text-paragraph-md;
-                margin-right: 0.25rem;
-            }
+            gap: 0.25rem;
         }
     }
 }
