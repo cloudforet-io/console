@@ -118,7 +118,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 
 const FAVORITE_LIMIT = 5;

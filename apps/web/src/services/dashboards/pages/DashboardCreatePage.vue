@@ -45,7 +45,7 @@ import DashboardViewerForm from '@/services/dashboards/components/DashboardViewe
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
-import type { ProjectItemResp } from '@/services/project/type';
+import type { ProjectItemResp } from '@/services/project/types/type';
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();

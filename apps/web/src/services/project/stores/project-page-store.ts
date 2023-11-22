@@ -12,10 +12,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { ProjectPageState } from '@/services/project/store/type';
+import type { ProjectPageState } from '@/services/project/stores/type';
 import type {
     ProjectGroup, ProjectItemResp, ProjectGroupTreeItem, ProjectTreeRoot, ProjectModel,
-} from '@/services/project/type';
+} from '@/services/project/types/type';
 
 interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
 interface ProjectInfo {

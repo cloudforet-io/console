@@ -46,7 +46,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import type { ProjectItemResp } from '@/services/project/type';
+import type { ProjectItemResp } from '@/services/project/types/type';
 
 export default defineComponent({
     name: 'DashboardScopeForm',

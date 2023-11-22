@@ -3,25 +3,25 @@ import type { RouteConfig } from 'vue-router';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
-const ProjectPage = () => import('@/services/project/ProjectPage.vue');
-const ProjectDetailPage = () => import('@/services/project/project-detail/ProjectDetailPage.vue');
+const ProjectPage = () => import('@/services/project/pages/ProjectPage.vue');
+const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 
-const ProjectDashboardPage = () => import('@/services/project/project-detail/project-summary/ProjectSummaryPage.vue');
-const ProjectMemberPage = () => import('@/services/project/project-detail/project-member/ProjectMemberPage.vue');
-const ProjectAlertPage = () => import('@/services/project/project-detail/project-alert/ProjectAlertPage.vue');
-const ProjectNotificationsPage = () => import('@/services/project/project-detail/project-notification/ProjectNotificationPage.vue');
-const ProjectTagPage = () => import('@/services/project/project-detail/project-tag/ProjectTagPage.vue');
+const ProjectDashboardPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
+const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
+const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
+const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
+const ProjectTagPage = () => import('@/services/project/pages/ProjectTagPage.vue');
 // eslint-disable-next-line max-len
-const ProjectAlertEventRulePage = () => import('@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue');
-const ProjectNotificationAddPage = () => import('@/services/project/project-detail/project-notification/ProjectNotificationAddPage.vue');
+const ProjectAlertEventRulePage = () => import('@/services/project/pages/ProjectAlertEventRulePage.vue');
+const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
 
-const ProjectAlertListPage = () => import('@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue');
+const ProjectAlertListPage = () => import('@/services/project/pages/ProjectAlertListPage.vue');
 // eslint-disable-next-line max-len
-const ProjectMaintenanceWindowPage = () => import('@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
-const ProjectWebhookPage = () => import('@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
-const ProjectAlertSettingsPage = () => import('@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
+const ProjectMaintenanceWindowPage = () => import('@/services/project/pages/ProjectMaintenanceWindowPage.vue');
+const ProjectWebhookPage = () => import('@/services/project/pages/ProjectWebhookPage.vue');
+const ProjectAlertSettingsPage = () => import('@/services/project/pages/ProjectAlertSettingsPage.vue');
 
 export default {
     path: 'project',

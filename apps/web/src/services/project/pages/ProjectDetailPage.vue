@@ -147,9 +147,9 @@ import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import MaintenanceHappeningList from '@/services/project/project-detail/modules/MaintenanceHappeningList.vue';
 import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { useProjectDetailPageStore } from '@/services/project/store/project-detail-page-store';
-import type { ProjectModel } from '@/services/project/type';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+import type { ProjectModel } from '@/services/project/types/type';
 
 export default {
     name: 'ProjectDetailPage',
