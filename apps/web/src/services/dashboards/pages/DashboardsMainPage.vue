@@ -88,6 +88,7 @@ import type {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
+import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import { store } from '@/store';
 
 import { DASHBOARD_SCOPE_TYPE } from '@/store/modules/dashboard/type';
@@ -99,7 +100,6 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
 import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 
 export default {

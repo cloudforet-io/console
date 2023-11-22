@@ -6,11 +6,13 @@ import { flattenDeep, isEmpty } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
+
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { WidgetFiltersMap, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
 export const useWidgetConsoleFilters = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: OverridableWidgetState = {}): ComputedRef<ConsoleFilter[]> => {
     const queryHelper = new QueryHelper();

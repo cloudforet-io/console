@@ -20,9 +20,9 @@ import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/us
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { Severity } from '@/services/dashboards/widgets/_configs/asset-config';
-import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constants';
+import type { Severity } from '@/services/dashboards/widgets/_types/compliance-type';
+import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface SubData {

@@ -1,6 +1,7 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { WidgetFiltersMap } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
+
 
 
 /**

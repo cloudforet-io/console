@@ -22,8 +22,9 @@ import costSummaryMultiFields from '@/services/dashboards/widgets/cost-widgets/c
 import costTrendStacked from '@/services/dashboards/widgets/cost-widgets/cost-trend-stacked/widget-config';
 import costTrend from '@/services/dashboards/widgets/cost-widgets/cost-trend/widget-config';
 import monthlyCost from '@/services/dashboards/widgets/cost-widgets/monthly-cost/widget-config';
+
 // eslint-disable-next-line import/order
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 
 export const CONSOLE_WIDGET_LIST = [
     'monthlyCost',

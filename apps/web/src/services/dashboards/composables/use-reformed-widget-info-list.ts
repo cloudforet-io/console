@@ -3,15 +3,17 @@ import { computed, reactive, toRef } from 'vue';
 
 import { flattenDeep } from 'lodash';
 
+import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
+import type { WidgetConfig, WidgetSize } from '@/schema/dashboard/_types/widget-type';
+
 import {
     widgetThemeAssigner,
 } from '@/services/dashboards/helpers/widget-theme-helper';
 import {
     widgetWidthAssigner,
 } from '@/services/dashboards/helpers/widget-width-helper';
-import type { DashboardLayoutWidgetInfo, WidgetConfig, WidgetSize } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 
 interface UseWidgetReformerOptions {
     dashboardWidgetInfoList: Ref<DashboardLayoutWidgetInfo[]>;

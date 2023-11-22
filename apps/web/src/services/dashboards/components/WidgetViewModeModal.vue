@@ -9,6 +9,14 @@ import {
 } from '@spaceone/design-system';
 import { cloneDeep, debounce } from 'lodash';
 
+import type {
+    DashboardSettings,
+    DashboardVariablesSchema,
+    DashboardVariables as IDashboardVariables,
+    DashboardLayoutWidgetInfo,
+} from '@/schema/dashboard/_types/dashboard-type';
+import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -19,16 +27,12 @@ import { gray } from '@/styles/colors';
 import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import WidgetViewModeModalSidebar from '@/services/dashboards/components/WidgetViewModeModalSidebar.vue';
-import type { DashboardSettings, DashboardVariables as IDashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import type {
-    DashboardLayoutWidgetInfo, WidgetExpose, WidgetProps,
-    WidgetSize,
-    UpdatableWidgetInfo,
-} from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
 import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import type {
+    UpdatableWidgetInfo, WidgetExpose, WidgetProps, WidgetTheme,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface WidgetViewModeModalProps {

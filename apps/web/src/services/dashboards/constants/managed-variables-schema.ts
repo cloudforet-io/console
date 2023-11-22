@@ -1,7 +1,6 @@
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-
+import type { DashboardVariablesSchema } from '@/services/dashboards/types/dashboard-model-type';
 
 export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
     properties: {

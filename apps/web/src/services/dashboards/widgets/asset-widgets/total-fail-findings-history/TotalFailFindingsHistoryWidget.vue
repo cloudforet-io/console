@@ -15,6 +15,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -23,17 +25,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { red, green } from '@/styles/colors';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
-import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
+import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constants';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import type { Severity } from '@/services/dashboards/widgets/_types/compliance-type';
+import type { WidgetProps, WidgetExpose, WidgetEmit } from '@/services/dashboards/widgets/_types/widget-type';
 
 interface XYChartData {
     date?: string;
@@ -44,11 +44,12 @@ interface SubData {
     severity: Severity;
     value: number;
 }
-interface Data extends CloudServiceStatsModel {
+interface Data {
     pass_finding_count?: SubData[];
     fail_finding_count?: SubData[];
     _total_fail_finding_count?: number;
     _total_pass_finding_count?: number;
+    date: string;
 }
 interface ChartData {
     date: string;

@@ -92,6 +92,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
 import { store } from '@/store';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -111,7 +112,6 @@ import DashboardRefreshDropdown from '@/services/dashboards/components/Dashboard
 import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
-import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 

@@ -39,6 +39,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
+import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
+import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
 import { store } from '@/store';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
@@ -72,8 +75,6 @@ import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSugge
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
-import type { DashboardModel } from '@/services/dashboards/model';
 
 const RECENT_LIMIT = 30;
 
@@ -98,11 +99,11 @@ export default defineComponent({
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            domainDashboardItems: computed<DashboardModel[]>(() => {
+            domainDashboardItems: computed<DomainDashboardModel[]>(() => {
                 const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_WORKSPACE, store.getters['user/pagePermissionList']);
                 return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
             }),
-            projectDashboardItems: computed<DashboardModel[]>(() => {
+            projectDashboardItems: computed<ProjectDashboardModel[]>(() => {
                 const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_PROJECT, store.getters['user/pagePermissionList']);
                 return isUserAccessibleToProjectDashboards ? store.getters['dashboard/getProjectItems'] : [];
             }),

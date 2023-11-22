@@ -9,8 +9,9 @@
 
 <script setup lang="ts">
 
+import type { DashboardSettings } from '@/schema/dashboard/_types/dashboard-type';
+
 import DashboardToolsetDateDropdown from '@/services/dashboards/components/DashboardToolsetDateDropdown.vue';
-import type { DashboardSettings } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
 const dashboardDetailStore = useDashboardDetailInfoStore();

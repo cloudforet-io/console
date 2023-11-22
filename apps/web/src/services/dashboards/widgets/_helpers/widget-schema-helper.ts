@@ -2,16 +2,14 @@ import {
     chain, get, union,
 } from 'lodash';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
+import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 import type {
     InheritOptions,
     WidgetConfig,
-    WidgetOptions,
-} from '@/services/dashboards/widgets/_configs/config';
-import type {
-    WidgetFilterOptionKey,
+    WidgetFilterOptionKey, WidgetOptions,
     WidgetOptionsSchema,
-} from '@/services/dashboards/widgets/_configs/widget-options-schema';
+} from '@/schema/dashboard/_types/widget-type';
+
 import {
     WIDGET_FILTERS_SCHEMA_PROPERTIES,
     WIDGET_OPTIONS_SCHEMA_PROPERTIES,

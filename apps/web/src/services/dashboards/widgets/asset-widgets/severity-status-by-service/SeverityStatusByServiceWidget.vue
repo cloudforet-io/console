@@ -16,19 +16,18 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type {
-    CloudServiceStatsModel, ComplianceStatus, Severity,
-} from '@/services/dashboards/widgets/_configs/asset-config';
-import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import { SEVERITY_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constants';
+import type { ComplianceStatus, Severity } from '@/services/dashboards/widgets/_types/compliance-type';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_types/widget-type';
 
 
-interface Data extends CloudServiceStatsModel {
+interface Data {
     service: string;
     pass_finding_count: number;
     fail_finding_count: number;
     severity: Severity[];
     status: ComplianceStatus[];
+    date: string;
 }
 interface RefinedData {
     service: string;

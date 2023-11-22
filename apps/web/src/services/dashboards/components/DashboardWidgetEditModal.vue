@@ -9,7 +9,7 @@ import DashboardWidgetForm from '@/services/dashboards/components/DashboardWidge
 import {
     useWidgetFormStore,
 } from '@/services/dashboards/stores/widget-form-store';
-import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 interface Props {
     visible: boolean;

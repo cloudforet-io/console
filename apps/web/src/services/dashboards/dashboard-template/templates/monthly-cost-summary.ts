@@ -1,8 +1,9 @@
-import type { DashboardTemplate } from '@/services/dashboards/config';
-import { DASHBOARD_LABEL } from '@/services/dashboards/constants/dashboard-constants';
-import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-templates/config';
-import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-templates/helper';
-import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
+import { DASHBOARD_LABEL } from '@/schema/dashboard/_constants/dashboard-constant';
+import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
+
+import { getDashboardLayoutWidgetInfoList, getDashboardVariablesSchema } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
+import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-template/types/dashboard-template-type';
 
 const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
     ['monthlyCost', { title: 'Monthly Cost Overview' }],

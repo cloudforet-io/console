@@ -25,7 +25,7 @@ import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashbo
 import type {
     UpdatableWidgetInfo,
     WidgetExpose, WidgetProps,
-} from '@/services/dashboards/widgets/_configs/config';
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 type WidgetComponent = ComponentPublicInstance<WidgetProps, WidgetExpose>;
 

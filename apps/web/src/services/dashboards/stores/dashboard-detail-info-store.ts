@@ -5,20 +5,22 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import getRandomId from '@/lib/random-id-generator';
-
-import type {
-    DashboardSettings, DashboardVariables, DashboardVariablesSchema,
-} from '@/services/dashboards/config';
-import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
-import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import { DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
+import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type {
     DashboardLayoutWidgetInfo,
-    UpdatableWidgetInfo,
-} from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+    DashboardSettings,
+    DashboardVariables, DashboardVariableSchemaProperty,
+    DashboardVariablesSchema,
+} from '@/schema/dashboard/_types/dashboard-type';
+import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
+
+import getRandomId from '@/lib/random-id-generator';
+
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 interface WidgetValidMap {
     [widgetKey: string]: boolean;
@@ -169,7 +171,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 _variables = refineProjectDashboardVariables(_variables, this.projectId);
             }
             const _variablesInitMap = {};
-            Object.entries(_variablesSchema.properties).forEach(([propertyName, property]) => {
+            Object.entries<DashboardVariableSchemaProperty>(_variablesSchema.properties).forEach(([propertyName, property]) => {
                 if (property.use) _variablesInitMap[propertyName] = false;
             });
             this.variablesSchema = _variablesSchema;

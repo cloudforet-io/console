@@ -1,4 +1,5 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const totalFailFindingsStatusWidgetConfig: WidgetConfig = {

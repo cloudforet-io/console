@@ -1,12 +1,13 @@
 import { sum, max } from 'lodash';
 
+import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+
 import {
     WIDGET_WIDTH_RANGE_LIST,
     WIDGET_GAP,
     WIDGET_WIDTH_CRITERIA,
 } from '@/services/dashboards/shared/dashboard-widget-container/widget-container-config';
-import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 
 
 const isEveryWidthMax = (sizeRow: string[], widthRow: number[]): boolean => sizeRow.every((size, idx) => {

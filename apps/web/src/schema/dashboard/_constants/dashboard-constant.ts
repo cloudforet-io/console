@@ -13,3 +13,16 @@ export const REFRESH_INTERVAL_OPTIONS_MAP = {
     '30m': 1800000,
     '1h': 3600000,
 } as const;
+
+export const DASHBOARD_SCOPE = {
+    DOMAIN: 'domain',
+    PROJECT: 'project',
+} as const;
+
+export const DASHBOARD_LABEL = {
+    COST: 'Cost',
+    ASSET: 'Asset',
+    COMPLIANCE: 'Compliance',
+    SECURITY: 'Security',
+    BLANK: 'Blank',
+} as const;

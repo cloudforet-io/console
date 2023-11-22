@@ -39,8 +39,8 @@ import {
     PFieldTitle, PRadioGroup, PRadio, PI,
 } from '@spaceone/design-system';
 
-import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardViewer } from '@/services/dashboards/config';
+import { DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardViewer } from '@/schema/dashboard/_types/dashboard-type';
 
 export default {
     name: 'DashboardViewerForm',

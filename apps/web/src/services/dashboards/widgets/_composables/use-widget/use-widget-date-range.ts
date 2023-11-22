@@ -4,11 +4,12 @@ import { computed, isRef } from 'vue';
 
 import dayjs from 'dayjs';
 
-import type { DateRange } from '@/services/dashboards/config';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
 export const useWidgetDateRange = (props: WidgetProps, widgetState: UnwrapRef<BaseWidgetState>, overrides: OverridableWidgetState = {}): ComputedRef<DateRange> => {
     if (isRef(overrides.dateRange)) return overrides.dateRange;

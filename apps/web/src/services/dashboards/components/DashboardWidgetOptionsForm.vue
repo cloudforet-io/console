@@ -4,13 +4,14 @@ import { computed, reactive } from 'vue';
 import { PDataLoader, PTextButton, PI } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
+import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+
 import getRandomId from '@/lib/random-id-generator';
 
 import { red } from '@/styles/colors';
 
 import DashboardWidgetOptionDropdown
     from '@/services/dashboards/components/DashboardWidgetOptionDropdown.vue';
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
 
 const props = defineProps<{

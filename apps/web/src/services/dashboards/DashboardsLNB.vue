@@ -5,6 +5,8 @@ import {
 
 import { PIconButton } from '@spaceone/design-system';
 
+import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -19,10 +21,8 @@ import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
-import type { DashboardScope } from '@/services/dashboards/config';
-import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import type { ProjectDashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 
 
 const PRIVATE_ICON = 'ic_lock-filled';

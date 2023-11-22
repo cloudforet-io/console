@@ -13,6 +13,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { CurrencySymbol } from '@/store/modules/settings/type';
 
@@ -24,17 +26,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, red, gray } from '@/styles/colors';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getRefinedDateTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import type { CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
+import type {
+    WidgetExpose, WidgetProps, WidgetEmit, CostAnalyzeResponse,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 const chartContext = ref<HTMLElement | null>(null);

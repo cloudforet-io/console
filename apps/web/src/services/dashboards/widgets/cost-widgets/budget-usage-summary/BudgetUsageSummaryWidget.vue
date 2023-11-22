@@ -12,6 +12,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { CurrencySymbol } from '@/store/modules/settings/type';
 
@@ -23,13 +25,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { indigo, red, gray } from '@/styles/colors';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface Data {

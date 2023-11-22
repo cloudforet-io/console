@@ -16,9 +16,9 @@ import DashboardManageVariableOverlay
 import DashboardVariableDropdown from '@/services/dashboards/components/DashboardVariableDropdown.vue';
 import DashboardVariablesMoreButton
     from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
-import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
+import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/types/dashboard-model-type';
 
 interface Props {
     isManageable: boolean;

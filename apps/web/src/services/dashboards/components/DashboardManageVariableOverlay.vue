@@ -76,10 +76,13 @@ import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.v
 import DashboardManageVariableForm from '@/services/dashboards/components/DashboardManageVariableForm.vue';
 import DashboardManageVariableTable
     from '@/services/dashboards/components/DashboardManageVariableTable.vue';
-import type { DashboardVariablesSchema, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { ManageVariableOverlayStatus } from '@/services/dashboards/types/dashboard-manage-variable-type';
+import type {
+    DashboardVariableSchemaProperty,
+    DashboardVariablesSchema,
+} from '@/services/dashboards/types/dashboard-model-type';
+import type { ManageVariableOverlayStatus } from '@/services/dashboards/types/manage-variable-type';
 
 interface Props {
     visible: boolean;

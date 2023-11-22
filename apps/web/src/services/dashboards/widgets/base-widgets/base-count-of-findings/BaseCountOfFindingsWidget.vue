@@ -13,6 +13,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ASSET_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -25,19 +27,19 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/u
 import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
-import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { ASSET_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
+import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constants';
+import type {
+    WidgetEmit, WidgetExpose, WidgetProps, Legend,
+} from '@/services/dashboards/widgets/_types/widget-type';
 import countOfPassAndFailFindingsWidgetConfig
     from '@/services/dashboards/widgets/asset-widgets/count-of-pass-and-fail-findings/widget-config';
-import type { Legend } from '@/services/dashboards/widgets/type';
 
 
-interface Data extends CloudServiceStatsModel {
+interface Data {
     [parsedDataField: string]: string | null | any;
     pass_finding_count: number;
     fail_finding_count: number;
+    date: string;
 }
 interface ChartData {
     [key: string]: string | number;
