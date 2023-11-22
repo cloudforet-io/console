@@ -92,7 +92,7 @@ import {
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import { PASSWORD_TYPE } from '@/services/administration/constants/user-constants';
+import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 

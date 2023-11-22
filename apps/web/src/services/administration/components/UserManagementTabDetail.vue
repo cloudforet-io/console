@@ -92,7 +92,7 @@ import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 
-import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helpers';
+import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {

@@ -121,8 +121,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
 import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
-import { userSearchHandlers } from '@/services/administration/constants/user-table-constants';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helpers';
+import { userSearchHandlers } from '@/services/administration/constants/user-table-constant';
+import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 

@@ -86,21 +86,22 @@ import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { PolicyModel, PolicyType } from '@/api-schema/identity/policy/model';
-import { POLICY_TYPE } from '@/api-schema/identity/policy/model';
+import type { PolicyModel } from '@/api-schema/identity/policy/model';
 import type { Policy } from '@/api-schema/identity/role/model';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
 import {
     makeCustomValueHandler,
     policyCreatedAtFormatter,
     policyTypeBadgeColorFormatter,
-} from '@/services/administration/helpers/policy-helpers';
+} from '@/services/administration/helpers/policy-helper';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
+import type { PolicyType } from '@/services/administration/types/policy-type';
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyModel[], selectedType: PolicyType): PolicyModel[] => {
     // 1. filter by type

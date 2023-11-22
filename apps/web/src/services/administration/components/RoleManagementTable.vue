@@ -94,7 +94,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import RoleDeleteModal
     from '@/services/administration/components/RoleDeleteModal.vue';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constants';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 

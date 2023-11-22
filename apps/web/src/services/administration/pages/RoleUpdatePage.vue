@@ -43,7 +43,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import RoleUpdateForm from '@/services/administration/components/RoleUpdateForm.vue';
-import { FORM_TYPE } from '@/services/administration/constants/role-constants';
+import { FORM_TYPE } from '@/services/administration/constants/role-constant';
 
 
 

@@ -72,7 +72,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helpers';
+import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 
 interface UserRoleItem {
     labels?: string[]|string;

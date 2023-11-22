@@ -92,8 +92,7 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { PolicyModel, PolicyType } from '@/api-schema/identity/policy/model';
-import { POLICY_TYPE } from '@/api-schema/identity/policy/model';
+import type { PolicyModel } from '@/api-schema/identity/policy/model';
 import type { RoleModel } from '@/api-schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -105,9 +104,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     usePageAccessDefinitionTableData,
 } from '@/services/administration/composables/page-access-definition-table-data';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constants';
-import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helpers';
+import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helper';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import type { PolicyType } from '@/services/administration/types/policy-type';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;

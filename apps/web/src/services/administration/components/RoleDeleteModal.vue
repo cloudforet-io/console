@@ -94,7 +94,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constants';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
 

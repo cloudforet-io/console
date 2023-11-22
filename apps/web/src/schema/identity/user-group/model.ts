@@ -21,18 +21,4 @@ interface RepositoryInfoDataModel {
     repository_type: string;
     endpoint: string;
 }
-
-export const POLICY_STATE = {
-    ENABLED: 'ENABLED',
-    DISABLED: 'DISABLED',
-} as const;
-export type PolicyState = typeof POLICY_STATE[keyof typeof POLICY_STATE];
-
-
-// TODO: where
-export const POLICY_TYPE = Object.freeze({
-    MANAGED: 'MANAGED',
-    CUSTOM: 'CUSTOM',
-    ALL: 'ALL',
-} as const);
-export type PolicyType = typeof POLICY_TYPE[keyof typeof POLICY_TYPE];
+type PolicyState = 'ENABLED' | 'DISABLED';

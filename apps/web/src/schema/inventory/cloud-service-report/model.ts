@@ -1,12 +1,8 @@
 import type { Tags, TimeStamp } from '@/api-schema/common/model';
+import type { ROLE_TYPE } from '@/api-schema/identity/role/constant';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 
-export const ROLE_TYPE = Object.freeze({
-    SYSTEM: 'SYSTEM',
-    PROJECT: 'PROJECT',
-    DOMAIN: 'DOMAIN',
-} as const);
 export type RoleType = typeof ROLE_TYPE[keyof typeof ROLE_TYPE];
 
 export interface RoleModel {

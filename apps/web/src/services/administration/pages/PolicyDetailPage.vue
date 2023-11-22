@@ -122,8 +122,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { PolicyType } from '@/api-schema/identity/policy/model';
-import { POLICY_TYPE } from '@/api-schema/identity/policy/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -134,13 +132,14 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import PolicyDeleteModal from '@/services/administration/components/PolicyDeleteModal.vue';
 import PolicyNameEditModal from '@/services/administration/components/PolicyNameEditModal.vue';
+import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
+import type { PolicyType } from '@/services/administration/types/policy-type';
 
 interface PolicyDetailPageProps {
     id: string;
     type: PolicyType;
 }
-
 const policyStore = usePolicyStore();
 const policyState = policyStore.$state;
 

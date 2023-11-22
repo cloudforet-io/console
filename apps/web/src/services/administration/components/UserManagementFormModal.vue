@@ -6,7 +6,7 @@ import { PButtonModal, PBoxTab } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { Tags } from '@/api-schema/common/model';
-import { USER_TYPE } from '@/api-schema/identity/user/model';
+import { USER_TYPE } from '@/api-schema/identity/user/constant';
 import { store } from '@/store';
 
 import config from '@/lib/config';
@@ -19,7 +19,7 @@ import UserManagementFormNotificationEmailForm
     from '@/services/administration/components/UserManagementFormNotificationEmailForm.vue';
 import UserManagementFormPasswordForm from '@/services/administration/components/UserManagementFormPasswordForm.vue';
 import UserManagementFormTags from '@/services/administration/components/UserManagementFormTags.vue';
-import { PASSWORD_TYPE } from '@/services/administration/constants/user-constants';
+import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 

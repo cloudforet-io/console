@@ -73,7 +73,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import {
     timezoneToUtcFormatter,
     utcToTimezoneFormatter,
-} from '@/services/administration/helpers/user-notification-timezone-helpers';
+} from '@/services/administration/helpers/user-notification-timezone-helper';
 
 const START_TIME_LIST = range(0, 24);
 const END_TIME_LIST = range(1, 25);

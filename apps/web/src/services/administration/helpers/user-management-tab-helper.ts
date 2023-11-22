@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 
-import { pluginStateColor, userStateColor } from '@/services/administration/constants/user-table-constants';
+import { pluginStateColor, userStateColor } from '@/services/administration/constants/user-table-constant';
 
 const colorBindFactory = (colorMapping, textFnc) => (value) => ({
     text: textFnc(value),

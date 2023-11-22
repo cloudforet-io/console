@@ -45,7 +45,7 @@ import {
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
 
-import { ROLE_TYPE } from '@/api-schema/identity/role/model';
+import { ROLE_TYPE } from '@/api-schema/identity/role/constant';
 import type { RoleType } from '@/api-schema/identity/role/model';
 
 import type { RawPagePermission } from '@/lib/access-control/config';

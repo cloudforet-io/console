@@ -1,18 +1,18 @@
-import { ROLE_TYPE } from '@/api-schema/identity/role/model';
+import { ROLE_TYPE } from '@/api-schema/identity/role/constant';
 
 import { MENU_ID } from '@/lib/menu/config';
 
 
-export const ROLE_TYPE_BADGE_OPTION = Object.freeze({
+export const ROLE_TYPE_BADGE_OPTION = {
     [ROLE_TYPE.SYSTEM]: { label: 'System', styleType: 'secondary1' },
     [ROLE_TYPE.DOMAIN]: { label: 'Admin', styleType: 'primary1' },
     [ROLE_TYPE.PROJECT]: { label: 'Project', styleType: 'gray500' },
-});
+} as const;
 
-export const FORM_TYPE = Object.freeze({
+export const FORM_TYPE = {
     UPDATE: 'UPDATE',
     CREATE: 'CREATE',
-} as const);
+} as const;
 
 export const MANAGE_FEATURE_MAP = {
     [MENU_ID.DASHBOARDS_WORKSPACE]: {

@@ -3,13 +3,13 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import { USER_TYPE } from '@/api-schema/identity/user/constant';
 import type { UserType } from '@/api-schema/identity/user/model';
-import { USER_TYPE } from '@/api-schema/identity/user/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { calculateTime } from '@/services/administration/helpers/user-management-tab-helpers';
+import { calculateTime } from '@/services/administration/helpers/user-management-tab-helper';
 import type { User } from '@/services/administration/types/user-type';
 
 const _getArrayWithNotDuplicatedItem = (array) => [...new Set(array)];

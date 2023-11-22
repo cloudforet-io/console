@@ -3,10 +3,13 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListModel } from '@/api-schema/common/model';
-import type { PolicyModel, PolicyType } from '@/api-schema/identity/policy/model';
-import { POLICY_TYPE } from '@/api-schema/identity/policy/model';
+import type { PolicyModel } from '@/api-schema/identity/policy/model';
+
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
+import type { PolicyType } from '@/services/administration/types/policy-type';
 
 
 

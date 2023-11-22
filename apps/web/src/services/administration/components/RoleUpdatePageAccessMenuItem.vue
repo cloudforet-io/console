@@ -61,7 +61,7 @@ import {
 
 import { i18n } from '@/translations';
 
-import { MANAGE_FEATURE_MAP } from '@/services/administration/constants/role-constants';
+import { MANAGE_FEATURE_MAP } from '@/services/administration/constants/role-constant';
 import type { PageAccessMenuItem } from '@/services/administration/types/page-access-menu-type';
 
 export default {

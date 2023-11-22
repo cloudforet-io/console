@@ -66,14 +66,14 @@ import {
     PPaneLayout, PHeading, PFieldGroup, PFieldTitle, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 
-import { ROLE_TYPE } from '@/api-schema/identity/role/model';
+import { ROLE_TYPE } from '@/api-schema/identity/role/constant';
 import type { RoleType } from '@/api-schema/identity/role/model';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { BaseInfoFormData } from '@/services/administration/components/RoleUpdateForm.vue';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constants';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 
 interface RoleTypeForm {label: string; key: string; description: TranslateResult}
 

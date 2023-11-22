@@ -69,7 +69,7 @@ import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import RoleManagementTabDetail from '@/services/administration/components/RoleManagementTabDetail.vue';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constants';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 

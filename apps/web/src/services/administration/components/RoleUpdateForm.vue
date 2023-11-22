@@ -54,7 +54,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import PolicyListDataTable from '@/services/administration/components/PolicyListDataTable.vue';
 import RoleUpdatePageAccessForm from '@/services/administration/components/RoleUpdatePageAccessForm.vue';
 import RoleUpdatePageBaseInformation from '@/services/administration/components/RoleUpdatePageBaseInformation.vue';
-import { FORM_TYPE } from '@/services/administration/constants/role-constants';
+import { FORM_TYPE } from '@/services/administration/constants/role-constant';
 
 export interface BaseInfoFormData {
     roleName: string;

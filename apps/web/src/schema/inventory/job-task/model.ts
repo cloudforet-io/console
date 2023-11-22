@@ -1,5 +1,6 @@
 import type { Tags, TimeStamp } from '@/api-schema/common/model';
 import type { RoleBindingModel } from '@/api-schema/identity/role-binding/model';
+import type { USER_TYPE } from '@/api-schema/identity/user/constant';
 
 export interface UserModel {
     created_at: TimeStamp;
@@ -18,9 +19,4 @@ export interface UserModel {
     role_bindings?: RoleBindingModel[];
 }
 
-
-export const USER_TYPE = Object.freeze({
-    API_USER: 'API_USER',
-    USER: 'USER',
-} as const);
 export type UserType = typeof USER_TYPE[keyof typeof USER_TYPE];

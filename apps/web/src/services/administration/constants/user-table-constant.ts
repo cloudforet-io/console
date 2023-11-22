@@ -7,19 +7,19 @@ import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/t
 import * as styles from '@/styles/colors';
 
 
-const USER_TYPE_LABEL = Object.freeze({
+const USER_TYPE_LABEL = {
     API_USER: {
         label: 'API Only',
     },
     USER: {
         label: 'Console, API',
     },
-} as const);
+} as const;
 
-const USER_STATE = Object.freeze({
+const USER_STATE = {
     ENABLE: 'ENABLED',
     DISABLE: 'DISABLED',
-} as const);
+} as const;
 
 export const userSearchHandlers = {
     keyItemSets: [{
@@ -81,7 +81,7 @@ export const userSearchHandlers = {
     },
 };
 
-export const userStateColor = Object.freeze({
+export const userStateColor = {
     ENABLED: {
         iconColor: styles.safe,
         textColor: styles.gray[900],
@@ -94,9 +94,9 @@ export const userStateColor = Object.freeze({
         iconColor: styles.gray[400],
         textColor: styles.gray[400],
     },
-});
+} as const;
 
-export const pluginStateColor = Object.freeze({
+export const pluginStateColor = {
     ACTIVE: {
         iconColor: styles.safe,
         textColor: styles.gray[900],
@@ -105,4 +105,4 @@ export const pluginStateColor = Object.freeze({
         iconColor: styles.gray[400],
         textColor: styles.gray[400],
     },
-});
+} as const;

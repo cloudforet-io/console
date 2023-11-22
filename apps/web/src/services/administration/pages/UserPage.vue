@@ -30,7 +30,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import UserManagementTab from '@/services/administration/components/UserManagementTab.vue';
 import UserManagementTable from '@/services/administration/components/UserManagementTable.vue';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helpers';
+import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 export default {
