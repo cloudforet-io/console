@@ -33,7 +33,7 @@ import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from 
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import CostAnalysisDataTableDataTypeDropdown from '@/services/cost-explorer/components/CostAnalysisDataTableDataTypeDropdown.vue';
 import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {

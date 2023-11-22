@@ -185,7 +185,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';

@@ -45,7 +45,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
+import type { ProjectGroup } from '@/services/asset-inventory/types/service-account-page-type';
 import type { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/types/type';
 
 export default {

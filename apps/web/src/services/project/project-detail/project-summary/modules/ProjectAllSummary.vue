@@ -33,7 +33,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray, primary1, primary2 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import type { DateType, ServiceCategory } from '@/services/project/project-detail/project-summary/modules/config';
 import { DATE_TYPE, SERVICE_CATEGORY } from '@/services/project/project-detail/project-summary/modules/config';
 import ProjectRegionService from '@/services/project/project-detail/project-summary/modules/ProjectRegionService.vue';

@@ -39,9 +39,9 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import AssetInventoryLNB from '@/services/asset-inventory/AssetInventoryLNB.vue';
-import { useAssetInventorySettingsStore } from '@/services/asset-inventory/store/asset-inventory-settings-store';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
-import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+import { useAssetInventorySettingsStore } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 
 
 export default defineComponent({

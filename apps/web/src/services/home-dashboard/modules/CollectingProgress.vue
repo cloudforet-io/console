@@ -93,8 +93,9 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CollectorModel, JobModel, JobStatus } from '@/services/asset-inventory/collector/model';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+
+import type { CollectorModel, JobModel, JobStatus } from '@/api-schema/inventory/collector/model';
 
 const STATUS_FILTER: JobStatus[] = ['IN_PROGRESS'];
 interface JobItem extends JobModel {
