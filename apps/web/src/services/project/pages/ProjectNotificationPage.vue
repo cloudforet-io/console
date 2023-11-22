@@ -3,7 +3,7 @@ import { reactive } from 'vue';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
+import NotificationChannelList from '@/services/my-page/components/NotificationChannelList.vue';
 
 
 interface Props {
