@@ -20,7 +20,6 @@ import { PButtonModal } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorUpdateParameter } from '@/api-schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -29,6 +28,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorNameForm from '@/services/asset-inventory/components/CollectorFormName.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
+
+import type { CollectorModel, CollectorUpdateParameter } from '@/api-schema/inventory/collector/model';
 
 
 

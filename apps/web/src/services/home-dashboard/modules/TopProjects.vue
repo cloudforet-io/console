@@ -29,7 +29,7 @@ import {
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 
 interface Data {

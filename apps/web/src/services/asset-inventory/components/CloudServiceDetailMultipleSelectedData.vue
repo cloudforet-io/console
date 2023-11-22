@@ -17,8 +17,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ExportParameter } from '@/api-schema/common/api-verbs/export';
-import { QueryType } from '@/api-schema/common/api-verbs/export';
+import { QueryType } from '@/schema/_common/api-verbs/export';
+import type { ExportParameter } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -33,6 +33,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BASE_INFORMATION } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
+
 
 
 interface Props {

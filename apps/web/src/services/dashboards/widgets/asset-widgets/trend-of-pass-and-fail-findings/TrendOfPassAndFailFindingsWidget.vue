@@ -12,44 +12,46 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ASSET_DATA_FIELD_MAP, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import { setXYSharedTooltipTextWithRate } from '@/common/composables/amcharts5/xy-chart-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DateRange } from '@/services/dashboards/config';
-import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetChartNoDataOverlay from '@/services/dashboards/widgets/_components/WidgetChartNoDataOverlay.vue';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { CloudServiceStatsModel } from '@/services/dashboards/widgets/_configs/asset-config';
-import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_configs/asset-config';
-import { ASSET_DATA_FIELD_MAP, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import type {
-    WidgetExpose, WidgetProps,
-    WidgetEmit,
-} from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
+import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constant';
 import {
     getDateAxisSettings,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import {
     getReferenceTypeOfDataField, getRefinedDateTableData, getWidgetTableDateFields,
 } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { Legend } from '@/services/dashboards/widgets/type';
+import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type {
+    WidgetExpose, WidgetProps,
+    WidgetEmit,
+    Legend,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
-interface ChartDataResult extends CloudServiceStatsModel {
+interface ChartDataResult {
     pass_finding_count: number;
     fail_finding_count: number;
+    date: string;
 }
-interface TableDataModel extends CloudServiceStatsModel {
+interface TableDataModel {
     value: Array<{ date: string; value: number }>;
+    date: string;
 }
 interface FullData {
     chartData: { results: ChartDataResult[] }|null;

@@ -1,7 +1,9 @@
-import type { TimeStamp } from '@/api-schema/common/model';
+
+import type { TimeStamp } from '@/schema/_common/model';
 
 import type { RoleData } from '@/services/administration/iam/role/type';
-import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+import type { ProjectGroupInfo, ProjectModel } from '@/services/project/types/type';
+
 
 export interface RoleBindingType {
     created_at: TimeStamp;

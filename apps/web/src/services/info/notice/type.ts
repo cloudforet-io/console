@@ -1,10 +1,12 @@
 import type { TranslateResult } from 'vue-i18n';
 
-import type { TimeStamp } from '@/api-schema/common/model';
+
+import type { TimeStamp } from '@/schema/_common/model';
 
 import type { FileInfo } from '@/lib/file-manager/type';
 
 import type { NoticePostType } from '@/services/info/notice/config';
+
 
 export interface NoticePostModel {
     board_id: string;

@@ -5,7 +5,6 @@ import {
     PButton, PCard, PLazyImg,
 } from '@spaceone/design-system';
 
-import type { CollectorUpdateParameter } from '@/api-schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
@@ -22,6 +21,8 @@ import {
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo, JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
+
+import type { CollectorUpdateParameter } from '@/api-schema/inventory/collector/model';
 
 interface Props {
     item: CollectorItemInfo;

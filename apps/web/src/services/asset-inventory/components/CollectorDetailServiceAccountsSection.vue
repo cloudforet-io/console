@@ -52,10 +52,6 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type {
-    CollectorModel,
-    CollectorUpdateParameter,
-} from '@/api-schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -67,6 +63,11 @@ import AttachedServiceAccounts
 import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import AttachedServiceAccountForm from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
+
+import type {
+    CollectorModel,
+    CollectorUpdateParameter,
+} from '@/api-schema/inventory/collector/model';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;

@@ -1,12 +1,14 @@
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import dayjs from 'dayjs';
 import { cloneDeep, sortBy } from 'lodash';
 
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+
 import type { AllReferenceTypeInfo, ReferenceType } from '@/store/reference/all-reference-store';
 
-import { getTimeUnitByGranularity } from '@/services/cost-explorer/lib/helper';
-import type { DateRange } from '@/services/dashboards/config';
-import type { Field } from '@/services/dashboards/widgets/_components/type';
-import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
+import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
 
 /**
  * @name getWidgetTableDateFields
@@ -24,13 +26,13 @@ export const getWidgetTableDateFields = (
     const start = dayjs.utc(dateRange.start);
     const end = dayjs.utc(dateRange.end);
 
-    const timeUnit = getTimeUnitByGranularity(granularity);
+    let timeUnit: TimeUnit = 'day';
+    if (granularity === GRANULARITY.MONTHLY) timeUnit = 'month';
+    else if (granularity === GRANULARITY.YEARLY) timeUnit = 'year';
+
     let labelDateFormat = 'M/D';
-    if (timeUnit === 'month') {
-        labelDateFormat = 'MMM';
-    } else if (timeUnit === 'year') {
-        labelDateFormat = 'YYYY';
-    }
+    if (timeUnit === 'month') labelDateFormat = 'MMM';
+    else if (timeUnit === 'year') labelDateFormat = 'YYYY';
 
     let now = start;
     let count = 0;

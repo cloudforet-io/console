@@ -8,7 +8,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { Reference, ResourceType } from '@/lib/reference/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;

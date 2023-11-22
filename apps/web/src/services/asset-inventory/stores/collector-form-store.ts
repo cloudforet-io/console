@@ -3,15 +3,16 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type {
-    CollectorModel, CollectorOptions,
-    RepositoryPluginModel,
-} from '@/api-schema/inventory/collector/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type {
+    CollectorModel, CollectorOptions,
+    RepositoryPluginModel,
+} from '@/api-schema/inventory/collector/model';
 
 
 /**

@@ -49,7 +49,6 @@ import { range, size } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorUpdateParameter } from '@/api-schema/inventory/collector/model';
 import { store } from '@/store';
 import { i18n as i18nTranslator } from '@/translations';
 
@@ -58,6 +57,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
+
+import type { CollectorModel, CollectorUpdateParameter } from '@/api-schema/inventory/collector/model';
 
 const props = defineProps<{
     hoursReadonly?: boolean;

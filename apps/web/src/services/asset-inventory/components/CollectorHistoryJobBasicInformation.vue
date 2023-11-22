@@ -53,13 +53,14 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib/index';
 
-import type { JobModel } from '@/api-schema/inventory/collector/model';
 import { store } from '@/store';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+
+import type { JobModel } from '@/api-schema/inventory/collector/model';
 
 interface Props {
     job: JobModel;

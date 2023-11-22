@@ -13,8 +13,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ExportOption, ExportParameter } from '@/api-schema/common/api-verbs/export';
-import { QueryType } from '@/api-schema/common/api-verbs/export';
+import { QueryType } from '@/schema/_common/api-verbs/export';
+import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -31,6 +31,7 @@ interface CloudServiceDetailSchema {
     type: string;
     options: any;
 }
+
 
 const props = defineProps<{
     visible: boolean;

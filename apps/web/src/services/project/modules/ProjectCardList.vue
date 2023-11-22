@@ -187,10 +187,10 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import { useProjectPageStore } from '@/services/project/store/project-page-store';
-import type { SummaryType } from '@/services/project/type';
-import { SUMMARY_TYPE } from '@/services/project/type';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type { SummaryType } from '@/services/project/types/type';
+import { SUMMARY_TYPE } from '@/services/project/types/type';
 
 interface CardSummary {
     [projectId: string]: {

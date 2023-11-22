@@ -70,13 +70,14 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import type {
-    RepositoryPluginModel,
-} from '@/api-schema/inventory/collector/model';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { repositoryColorMap, repositoryIconMap, repositoryBackgroundColorMap } from '@/services/asset-inventory/constants/collector-constant';
+
+import type {
+    RepositoryPluginModel,
+} from '@/api-schema/inventory/collector/model';
 
 interface Props {
     plugin?: RepositoryPluginModel|null;

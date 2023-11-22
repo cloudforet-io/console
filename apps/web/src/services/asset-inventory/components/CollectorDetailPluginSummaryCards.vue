@@ -6,10 +6,11 @@ import { PCopyButton, PFieldTitle } from '@spaceone/design-system';
 
 import { iso8601Formatter } from '@cloudforet/core-lib/index';
 
-import type { CollectorModel, JobModel } from '@/api-schema/inventory/collector/model';
 import { store } from '@/store';
 
 import RecentCollectorJobList from '@/services/asset-inventory/components/RecentCollectorJobList.vue';
+
+import type { CollectorModel, JobModel } from '@/api-schema/inventory/collector/model';
 
 const props = defineProps<{
     collector?: CollectorModel|null;

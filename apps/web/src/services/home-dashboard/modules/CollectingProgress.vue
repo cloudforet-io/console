@@ -85,7 +85,6 @@ import { range } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { CollectorModel, JobModel, JobStatus } from '@/api-schema/inventory/collector/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -95,6 +94,8 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+
+import type { CollectorModel, JobModel, JobStatus } from '@/api-schema/inventory/collector/model';
 
 const STATUS_FILTER: JobStatus[] = ['IN_PROGRESS'];
 interface JobItem extends JobModel {

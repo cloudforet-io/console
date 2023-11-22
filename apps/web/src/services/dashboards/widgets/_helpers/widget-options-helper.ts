@@ -1,7 +1,8 @@
 import { isEqual, merge } from 'lodash';
 
-import type { DashboardVariables } from '@/services/dashboards/config';
-import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
+import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
+
 import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
 
 export const getRefinedWidgetOptions = (

@@ -2,14 +2,15 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { IDateAxisSettings } from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import type { DateRange } from '@/services/dashboards/config';
-import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
-import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import type {
     Legend,
-} from '@/services/dashboards/widgets/type';
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface RawData {

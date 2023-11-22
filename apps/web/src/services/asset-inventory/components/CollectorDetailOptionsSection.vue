@@ -68,7 +68,6 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/api-schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -78,6 +77,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
+
+import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/api-schema/inventory/collector/model';
 
 
 

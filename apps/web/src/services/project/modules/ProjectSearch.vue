@@ -72,8 +72,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { useProjectPageStore } from '@/services/project/store/project-page-store';
-import type { ItemType } from '@/services/project/type';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type { ItemType } from '@/services/project/types/type';
 
 const LIMIT = 5;
 

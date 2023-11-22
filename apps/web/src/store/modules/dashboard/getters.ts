@@ -5,9 +5,11 @@ import { getTextHighlightRegex } from '@spaceone/design-system';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
+import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
+
 import type { DashboardState } from '@/store/modules/dashboard/type';
 
-import type { DashboardModel } from '@/services/dashboards/model';
 
 export const getDomainDashboardCount: Getter<DashboardState, any> = (state): any => state.domainItemCount;
 export const getProjectDashboardCount: Getter<DashboardState, any> = (state): any => state.projectItemCount;
@@ -15,7 +17,7 @@ export const getProjectDashboardCount: Getter<DashboardState, any> = (state): an
 export const getDomainItems: Getter<DashboardState, any> = (state): any => getItems(state.domainItems ?? [], state.searchFilters, state.viewers);
 export const getProjectItems: Getter<DashboardState, any> = (state): any => getItems(state.projectItems ?? [], state.searchFilters, state.viewers);
 
-const getItems = (items: DashboardModel[], filters: ConsoleFilter[], viewers: string): DashboardModel[] => {
+const getItems = (items: (DomainDashboardModel|ProjectDashboardModel)[], filters: ConsoleFilter[], viewers: string): (DomainDashboardModel|ProjectDashboardModel)[] => {
     let result = items;
     if (viewers && viewers !== 'ALL') {
         result = result.filter((d) => d.viewers === viewers);

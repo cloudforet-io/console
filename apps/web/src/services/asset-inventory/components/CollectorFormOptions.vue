@@ -69,7 +69,6 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorPluginModel } from '@/api-schema/inventory/collector/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -78,6 +77,8 @@ import { red } from '@/styles/colors';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
+
+import type { CollectorPluginModel } from '@/api-schema/inventory/collector/model';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;

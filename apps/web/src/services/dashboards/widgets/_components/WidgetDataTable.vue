@@ -25,10 +25,11 @@ import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type {
-    Field, TableSize, WidgetTableData,
-} from '@/services/dashboards/widgets/_components/type';
-import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
-import type { Legend } from '@/services/dashboards/widgets/type';
+    Field, WidgetTableData,
+} from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type { Legend } from '@/services/dashboards/widgets/_types/widget-type';
+
+type TableSize = 'sm' | 'md';
 
 interface Props {
     loading: boolean;
@@ -56,7 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
     legends: () => [],
     currency: CURRENCY.USD,
     widgetKey: '',
-    size: TABLE_SIZE.sm,
+    size: 'sm',
     allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
     colorSet: () => [],
     disableEllipsis: false,

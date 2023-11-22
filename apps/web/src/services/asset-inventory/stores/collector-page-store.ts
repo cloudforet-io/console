@@ -4,7 +4,6 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CollectorModel, Schedule, JobModel } from '@/api-schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -12,6 +11,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { JobAnalyzeInfo } from '@/services/asset-inventory/types/collector-main-page-type';
+
+import type { CollectorModel, Schedule, JobModel } from '@/api-schema/inventory/collector/model';
 
 export const useCollectorPageStore = defineStore('collector-page', {
     state: () => ({

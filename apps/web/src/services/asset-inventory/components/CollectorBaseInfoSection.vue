@@ -63,6 +63,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { UPGRADE_MODE } from '@/schema/inventory/collector/model';
 import type {
     CollectorModel,
     CollectorPluginModel,
@@ -70,8 +71,7 @@ import type {
     CollectorUpdateParameter,
     CollectorUpdatePluginParameter,
     RepositoryPluginModel,
-} from '@/api-schema/inventory/collector/model';
-import { UPGRADE_MODE } from '@/api-schema/inventory/collector/model';
+} from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -86,6 +86,7 @@ import CollectorTagForm from '@/services/asset-inventory/components/CollectorFor
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
+
 
 const props = defineProps<{
     historyLink: Location

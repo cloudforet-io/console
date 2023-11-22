@@ -105,7 +105,6 @@ import {
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel } from '@/api-schema/inventory/collector/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -134,6 +133,8 @@ import {
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/types/collector-data-modal-type';
+
+import type { CollectorModel } from '@/api-schema/inventory/collector/model';
 
 const props = defineProps<{
     collectorId: string;

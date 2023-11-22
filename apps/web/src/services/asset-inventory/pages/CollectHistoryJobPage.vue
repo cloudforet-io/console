@@ -10,7 +10,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { JobModel } from '@/api-schema/inventory/collector/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -20,6 +19,8 @@ import JobStatusChart from '@/services/asset-inventory/components/CollectorHisto
 import JobTaskDetails from '@/services/asset-inventory/components/CollectorHistoryJobTaskDetails.vue';
 import JobTable from '@/services/asset-inventory/components/CollectorHistoryJobTaskTable.vue';
 import type { JobTaskData } from '@/services/asset-inventory/types/collector-history-job-type';
+
+import type { JobModel } from '@/api-schema/inventory/collector/model';
 
 interface Props {
     jobId: string;
