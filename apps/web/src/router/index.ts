@@ -12,7 +12,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { GTag } from '@/lib/gtag';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 
-import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';

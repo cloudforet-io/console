@@ -55,7 +55,7 @@ import IDPWSignIn from '@/services/auth/authenticator/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/services/auth/components/SignInLeftContainer.vue';
 import SignInRightContainer from '@/services/auth/components/SignInRightContainer.vue';
 import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-route-helper';
-import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 export default {
     name: 'DomainAdminSignInPage',

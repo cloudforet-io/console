@@ -28,7 +28,7 @@ import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
-import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const vm = getCurrentInstance()?.proxy as Vue;
 

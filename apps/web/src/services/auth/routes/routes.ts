@@ -2,7 +2,7 @@ import type { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
-import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const SignOutPage = () => import('@/services/auth/pages/SignOutPage.vue');
 const SignInPage = () => import('@/services/auth/pages/SignInPage.vue');

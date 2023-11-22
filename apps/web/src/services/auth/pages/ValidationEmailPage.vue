@@ -103,7 +103,7 @@ import {
 } from '@spaceone/design-system';
 
 import ValidationEmailCollapsibleContents from '@/services/auth/components/ValidationEmailCollapsibleContents.vue';
-import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const vm = getCurrentInstance()?.proxy as Vue;
 const { status, userId } = vm.$route.query;

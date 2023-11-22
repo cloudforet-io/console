@@ -79,7 +79,7 @@ import { isMobile } from '@/lib/helper/cross-browsing-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { AUTH_ROUTE } from '@/services/auth/routes/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 export default defineComponent({
     name: 'IDPWSignIn',
