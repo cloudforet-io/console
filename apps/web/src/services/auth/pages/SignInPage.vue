@@ -107,7 +107,7 @@ export default {
                 const auth = state.authType;
                 if (auth) {
                     try {
-                        component = () => import(`./external/${auth}/template/${auth}.vue`);
+                        component = () => import(`../authenticator/external/${auth}/template/${auth}.vue`);
                     } catch (e) {
                         ErrorHandler.handleError(e);
                     }

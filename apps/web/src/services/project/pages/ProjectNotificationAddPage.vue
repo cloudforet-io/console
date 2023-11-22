@@ -13,7 +13,7 @@ import { i18n } from '@/translations';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
-import NotificationAddForm from '@/services/notification/notification-add/modules/NotificationAddForm.vue';
+import NotificationAddForm from '@/services/my-page/components/NotificationAddForm.vue';
 
 
 const route = useRoute();
