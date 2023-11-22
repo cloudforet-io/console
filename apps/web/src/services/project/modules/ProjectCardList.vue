@@ -33,8 +33,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-import type { SummaryType, ProjectGroup } from '@/services/project/types/type';
-import { SUMMARY_TYPE } from '@/services/project/types/type';
+import type { ProjectGroup } from '@/services/project/types/type';
 
 
 interface CardSummary {
@@ -44,6 +43,12 @@ interface CardSummary {
         Storage: number;
     };
 }
+const SUMMARY_TYPE = {
+    SERVER: 'Server',
+    DATABASE: 'Database',
+    STORAGE: 'Storage',
+} as const;
+type SummaryType = typeof SUMMARY_TYPE[keyof typeof SUMMARY_TYPE];
 
 interface Props {
     parentGroups: ProjectGroup[];

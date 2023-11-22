@@ -45,11 +45,3 @@ export type ProjectTreeItem = TreeItem<ProjectItemResp>;
 export type ProjectTreeRoot = Tree<ProjectItemResp>;
 
 export type ProjectGroupTreeItem = Partial<ProjectTreeItem>;
-
-export const SUMMARY_TYPE = {
-    SERVER: 'Server',
-    DATABASE: 'Database',
-    STORAGE: 'Storage',
-} as const;
-
-export type SummaryType = typeof SUMMARY_TYPE[keyof typeof SUMMARY_TYPE];
