@@ -82,7 +82,7 @@ import { alert, secondary } from '@/styles/colors';
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
 import type { AlertListPageUrlQuery } from '@/services/alert-manager/type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',

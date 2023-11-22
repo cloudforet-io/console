@@ -44,7 +44,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
 import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 export default {
     name: 'ProjectAlertListItem',

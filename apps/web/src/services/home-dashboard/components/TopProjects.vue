@@ -29,7 +29,7 @@ import {
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import { HOME_DASHBOARD_DATA_TYPE } from '@/services/home-dashboard/constants/home-dashboard-constant';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
 interface Data {

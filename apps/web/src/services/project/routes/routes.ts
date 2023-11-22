@@ -3,7 +3,7 @@ import type { RouteConfig } from 'vue-router';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 const ProjectPage = () => import('@/services/project/pages/ProjectPage.vue');
 const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
