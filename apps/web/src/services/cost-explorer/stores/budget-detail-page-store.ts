@@ -2,10 +2,12 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { BudgetUsageModel } from '@/api-schema/cost-analysis/budget-usage/model';
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+
+import type { BudgetUsageModel } from '@/schema/cost-analysis/budget-usage/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 
 export const useBudgetDetailPageStore = defineStore('budget-detail-page', {

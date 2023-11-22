@@ -73,8 +73,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { TimeStamp } from '@/api-schema/common/model';
 import { SpaceRouter } from '@/router';
+import type { TimeStamp } from '@/schema/common/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -89,6 +89,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
 import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
 import type { NoticePostModel } from '@/services/info/notice/type';
 import { INFO_ROUTE } from '@/services/info/route-config';
+
 
 interface NoticeItem {
     postId: string;

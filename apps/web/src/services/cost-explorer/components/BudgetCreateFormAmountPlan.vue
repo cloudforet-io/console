@@ -5,7 +5,8 @@ import {
 
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 import BudgetCreateFormAmountPlanLastMonthsCost
     from '@/services/cost-explorer/components/BudgetCreateFormAmountPlanLastMonthsCost.vue';
@@ -19,6 +20,7 @@ import BudgetCreatePeriodSelect
     from '@/services/cost-explorer/components/BudgetCreatePeriodSelect.vue';
 import type { BudgetAmountPlanInfo, MonthAmountInputMap } from '@/services/cost-explorer/types/budget-form-type';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
+
 
 
 type BudgetTimeUnit = BudgetModel['time_unit'];

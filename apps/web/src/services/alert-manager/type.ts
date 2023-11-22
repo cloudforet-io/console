@@ -1,6 +1,7 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { Tags, TimeStamp } from '@/api-schema/common/model';
+
+import type { Tags, TimeStamp } from '@/schema/common/model';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
@@ -8,6 +9,7 @@ import type {
     ScopeType,
     FINISH_CONDITION, AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
 } from '@/services/alert-manager/lib/config';
+
 
 export interface Rule {
     notification_level: string;

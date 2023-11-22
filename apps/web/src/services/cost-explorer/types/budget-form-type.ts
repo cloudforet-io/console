@@ -1,4 +1,4 @@
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 
 export interface MonthAmountInput {

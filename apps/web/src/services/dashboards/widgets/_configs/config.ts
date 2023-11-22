@@ -2,7 +2,8 @@ import type { AsyncComponent } from 'vue';
 
 import type { ConsoleFilterOperator } from '@cloudforet/core-lib/query/type';
 
-import type { Tags } from '@/api-schema/common/model';
+
+import type { Tags } from '@/schema/common/model';
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
@@ -13,6 +14,7 @@ import type {
     WidgetOptionKey,
     WidgetOptionsSchema,
 } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+
 
 
 export const WIDGET_SIZE = {

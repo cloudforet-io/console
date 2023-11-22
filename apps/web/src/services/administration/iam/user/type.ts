@@ -1,7 +1,7 @@
 import VueI18n from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import type { Tags, TimeStamp } from '@/api-schema/common/model';
+import type { Tags, TimeStamp } from '@/schema/common/model';
 
 import type { RoleBindingType } from '@/services/administration/type';
 

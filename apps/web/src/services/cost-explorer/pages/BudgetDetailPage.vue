@@ -4,7 +4,8 @@ import { useRouter } from 'vue-router/composables';
 
 import { PHeading, PIconButton, PDivider } from '@spaceone/design-system';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useCostDataSourceReferenceStore } from '@/store/reference/cost-data-source-reference-store';
@@ -20,6 +21,7 @@ import BudgetDetailSummary
     from '@/services/cost-explorer/components/BudgetDetailSummary.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
+
 
 
 interface Props {

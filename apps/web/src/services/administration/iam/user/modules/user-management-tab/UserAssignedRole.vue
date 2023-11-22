@@ -61,7 +61,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { Tags } from '@/api-schema/common/model';
+import type { Tags } from '@/schema/common/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -73,6 +73,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
+
 
 interface UserRoleItem {
     labels?: string[]|string;

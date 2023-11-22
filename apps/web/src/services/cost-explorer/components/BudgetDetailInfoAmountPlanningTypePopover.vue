@@ -2,9 +2,11 @@
 import { PPopover } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+
+
 
 
 interface Props {
