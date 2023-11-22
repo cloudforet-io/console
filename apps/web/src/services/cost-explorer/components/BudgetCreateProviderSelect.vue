@@ -13,7 +13,7 @@ import { debounce } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -24,6 +24,7 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
+
 
 
 type ProviderFilter = BudgetModel['provider_filter'];

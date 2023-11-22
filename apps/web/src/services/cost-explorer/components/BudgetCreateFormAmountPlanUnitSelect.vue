@@ -4,8 +4,9 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { PFieldTitle, PSelectCard } from '@spaceone/design-system';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
+
 
 
 type BudgetTimeUnit = BudgetModel['time_unit'];

@@ -1,6 +1,8 @@
-import type { Tags, TimeStamp } from '@/api-schema/common/model';
+import type { Tags, TimeStamp } from '@/schema/common/model';
 
 import type { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
+
+
 
 interface RepositoryInfoDataModel {
     repository_id: string;

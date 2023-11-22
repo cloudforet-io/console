@@ -8,8 +8,8 @@ import { PButton } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
 import { SpaceRouter } from '@/router';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
@@ -25,6 +25,7 @@ import BudgetCreateFormAmountPlan
 import BudgetCreateFormBaseInfo from '@/services/cost-explorer/components/BudgetCreateFormBaseInfo.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
 import type { BudgetAmountPlanInfo } from '@/services/cost-explorer/types/budget-form-type';
+
 
 
 type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_group_id'|'project_id'|'data_source_id'>;

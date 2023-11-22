@@ -88,7 +88,7 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { TimeStamp } from '@/api-schema/common/model';
+import type { TimeStamp } from '@/schema/common/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -100,6 +100,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import UserAPIKeyModal from '@/services/my-page/my-account/user-api-key/modules/APIKeyModal.vue';
+
 
 export interface APIKeyItem {
     api_key: string;

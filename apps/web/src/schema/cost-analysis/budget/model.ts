@@ -1,6 +1,7 @@
+import type { Tags } from '@/schema/common/model';
+
 import type { Currency } from '@/store/modules/settings/type';
 
-import type { Tags } from '@/api-schema/common/model';
 
 
 

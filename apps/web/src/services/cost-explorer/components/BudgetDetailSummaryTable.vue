@@ -8,8 +8,8 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { BudgetUsageModel } from '@/api-schema/cost-analysis/budget-usage/model';
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+import type { BudgetUsageModel } from '@/schema/cost-analysis/budget-usage/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 
@@ -22,6 +22,7 @@ import { getStackedChartData } from '@/services/cost-explorer/helpers/cost-explo
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
+
 
 
 const defaultTableKey = [{ name: 'Actual Cost', path: 'cost' }, { name: 'Current vs Budget.', path: 'ratio' }];

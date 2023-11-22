@@ -7,7 +7,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -18,6 +19,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
+
 
 
 type ProviderFilter = BudgetModel['provider_filter'];

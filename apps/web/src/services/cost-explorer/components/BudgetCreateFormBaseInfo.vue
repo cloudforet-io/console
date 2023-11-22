@@ -7,7 +7,7 @@ import {
     PFieldGroup, PPaneLayout, PHeading, PTextInput,
 } from '@spaceone/design-system';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -15,6 +15,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import BudgetCreateDataSourceSelect from '@/services/cost-explorer/components/BudgetCreateDataSourceSelect.vue';
 import BudgetCreateProviderSelect from '@/services/cost-explorer/components/BudgetCreateProviderSelect.vue';
 import BudgetCreateTargetSelect from '@/services/cost-explorer/components/BudgetCreateTargetSelect.vue';
+
 
 
 type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_group_id'|'project_id'|'data_source_id'>;

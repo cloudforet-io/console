@@ -8,7 +8,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import type { DataSourceModel } from '@/api-schema/cost-analysis/data-source/model';
+
+import type { DataSourceModel } from '@/schema/cost-analysis/data-source/model';
 
 import type {
     ReferenceItem,
@@ -20,6 +21,7 @@ import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 
 

@@ -5,7 +5,7 @@ import { PTag, PFieldTitle, PEmpty } from '@spaceone/design-system';
 
 import { isNotEmpty } from '@cloudforet/core-lib';
 
-import type { Tags } from '@/api-schema/common/model';
+import type { Tags } from '@/schema/common/model';
 
 const props = withDefaults(defineProps<{
     tags: Tags;

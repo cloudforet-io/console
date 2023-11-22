@@ -8,7 +8,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import { cloneDeep } from 'lodash';
 
-import type { BudgetModel } from '@/api-schema/cost-analysis/budget/model';
+import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -16,6 +16,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
+
 
 
 type BudgetNotification = BudgetModel['notifications'][number];
