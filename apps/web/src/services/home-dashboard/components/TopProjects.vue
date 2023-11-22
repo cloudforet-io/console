@@ -28,7 +28,7 @@ import {
 } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
-import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
+import { HOME_DASHBOARD_DATA_TYPE } from '@/services/home-dashboard/constants/home-dashboard-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 
@@ -186,15 +186,15 @@ const getRefinedTableData = (rawData: Data[]): TableData[] => rawData.map((d) =>
     },
     server: {
         count: d.server_count,
-        to: getLocation(DATA_TYPE.SERVER, d.project_id),
+        to: getLocation(HOME_DASHBOARD_DATA_TYPE.SERVER, d.project_id),
     },
     database: {
         count: d.database_count,
-        to: getLocation(DATA_TYPE.DATABASE, d.project_id),
+        to: getLocation(HOME_DASHBOARD_DATA_TYPE.DATABASE, d.project_id),
     },
     storage: {
         label: bytes(d.storage_size, { unitSeparator: ' ' }),
-        to: getLocation(DATA_TYPE.STORAGE, d.project_id),
+        to: getLocation(HOME_DASHBOARD_DATA_TYPE.STORAGE, d.project_id),
     },
 }));
 const getRefinedChartData = (tableData: TableData[]): ChartData[] => {

@@ -19,7 +19,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 interface Props {
     statusCode: string;

@@ -74,7 +74,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
-import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
+import { HOME_DASHBOARD_DATA_TYPE } from '@/services/home-dashboard/constants/home-dashboard-constant';
 
 interface SummaryData {
     type: string;
@@ -97,7 +97,7 @@ export default {
         },
         activeTab: {
             type: String,
-            default: DATA_TYPE.SERVER,
+            default: HOME_DASHBOARD_DATA_TYPE.SERVER,
         },
         label: {
             type: String,
@@ -138,7 +138,7 @@ export default {
                 query: apiQueryHelper.data,
             };
 
-            if (type !== DATA_TYPE.STORAGE) {
+            if (type !== HOME_DASHBOARD_DATA_TYPE.STORAGE) {
                 return {
                     ...defaultParam,
                     is_primary: true,
@@ -177,7 +177,7 @@ export default {
                     summaryData.push({
                         provider: d.provider,
                         type: d.display_name || d.cloud_service_group,
-                        count: type === DATA_TYPE.STORAGE ? byteFormatter(d.size) : numberFormatter(d.count),
+                        count: type === HOME_DASHBOARD_DATA_TYPE.STORAGE ? byteFormatter(d.size) : numberFormatter(d.count) ?? '',
                         to: detailLocation,
                     });
                 });
@@ -205,7 +205,7 @@ export default {
         return {
             ...toRefs(state),
             ASSET_INVENTORY_ROUTE,
-            DATA_TYPE,
+            DATA_TYPE: HOME_DASHBOARD_DATA_TYPE,
         };
     },
 };

@@ -85,7 +85,7 @@
                 >
                     <template #image>
                         <img alt="illust_astronaut_radio"
-                             src="@/assets/images/illust_astronaut_radio.svg"
+                             src="../../../assets/images/illust_astronaut_radio.svg"
                         >
                     </template>
                     {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}

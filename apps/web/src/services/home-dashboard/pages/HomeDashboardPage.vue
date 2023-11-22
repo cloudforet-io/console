@@ -45,14 +45,14 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
-import AllSummary from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
-import CollectorProgress from '@/services/home-dashboard/modules/CollectingProgress.vue';
+import AllSummary from '@/services/home-dashboard/components/AllSummary.vue';
+import CollectorProgress from '@/services/home-dashboard/components/CollectingProgress.vue';
 import PersonalHealthDashboard
-    from '@/services/home-dashboard/modules/PersonalHealthDashboard.vue';
-import ResourceMap from '@/services/home-dashboard/modules/ResourceMap.vue';
-import ServiceAccounts from '@/services/home-dashboard/modules/ServiceAccounts.vue';
-import TopProjects from '@/services/home-dashboard/modules/TopProjects.vue';
-import TrustedAdvisor from '@/services/home-dashboard/modules/trusted-advisor/TrustedAdvisor.vue';
+    from '@/services/home-dashboard/components/PersonalHealthDashboard.vue';
+import ResourceMap from '@/services/home-dashboard/components/ResourceMap.vue';
+import ServiceAccounts from '@/services/home-dashboard/components/ServiceAccounts.vue';
+import TopProjects from '@/services/home-dashboard/components/TopProjects.vue';
+import TrustedAdvisor from '@/services/home-dashboard/components/TrustedAdvisor.vue';
 
 export default {
     name: 'HomeDashboard',

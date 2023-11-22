@@ -55,7 +55,7 @@ import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 

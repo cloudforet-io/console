@@ -12,7 +12,7 @@ import { store } from '@/store';
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 export default defineComponent({
     name: 'KeycloakPage',
