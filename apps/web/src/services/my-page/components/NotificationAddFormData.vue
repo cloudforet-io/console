@@ -16,7 +16,7 @@
                 />
             </template>
         </p-field-group>
-        <add-notification-level v-if="projectId"
+        <notification-add-level v-if="projectId"
                                 @change="onChangeLevel"
         />
         <p-json-schema-form v-if="isJsonSchema"
@@ -32,7 +32,7 @@
                            required
             >
                 <template #default>
-                    <add-notification-member-group :project-id="projectId"
+                    <notification-add-member-group :project-id="projectId"
                                                    @change="onChangeMember"
                     />
                 </template>
@@ -58,8 +58,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';
-import AddNotificationMemberGroup from '@/services/notification/modules/AddNotificationMemberGroup.vue';
+import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
+import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
 
 const CHANNEL_TYPE = {
     AWS_SNS: 'AWSSNS',
@@ -77,8 +77,8 @@ const PROTOCOL_TYPE = {
 export default {
     name: 'AddNotificationData',
     components: {
-        AddNotificationLevel,
-        AddNotificationMemberGroup,
+        NotificationAddLevel,
+        NotificationAddMemberGroup,
         PFieldGroup,
         PTextInput,
         PJsonSchemaForm,

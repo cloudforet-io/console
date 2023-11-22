@@ -30,7 +30,7 @@
         >
             <div class="left-section">
                 <p v-if="isSpaceOneUserProtocol">
-                    <add-notification-member-group :users="channelData.data.users"
+                    <notification-add-member-group :users="channelData.data.users"
                                                    :project-id="projectId"
                                                    @change="onChangeUser"
                     />
@@ -128,13 +128,13 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 
-import AddNotificationMemberGroup from '@/services/notification/modules/AddNotificationMemberGroup.vue';
-import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
+import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
+import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import {
     EDIT_TYPE,
     PARAM_KEY_TYPE,
     PROTOCOL_TYPE,
-} from '@/services/notification/modules/notification-channel-item/type';
+} from '@/services/my-page/types/notification-item-type';
 
 export default {
     name: 'NotificationChannelItemData',
@@ -143,7 +143,7 @@ export default {
         PI,
         PBadge,
         PJsonSchemaForm,
-        AddNotificationMemberGroup,
+        NotificationAddMemberGroup,
         InfoMessage,
     },
     props: {
@@ -251,7 +251,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@import '../styles/channelItem.pcss';
+@import '../styles/NotificationChannelItem.pcss';
 .content-wrapper .edit-button {
     display: flex;
     align-items: center;

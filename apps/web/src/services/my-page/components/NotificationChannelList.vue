@@ -108,10 +108,10 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
+import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-config';
-import NotificationChannelItem from '@/services/notification/modules/notification-channel-item/NotificationChannelItem.vue';
-import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { PROTOCOL_TYPE } from '@/services/my-page/types/notification-item-type';
+import { PROJECT_ROUTE } from '@/services/project/route-config';
 
 export default {
     name: 'NotificationChannelList',

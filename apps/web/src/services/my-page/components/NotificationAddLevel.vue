@@ -29,7 +29,7 @@ const LEVEL_LIST = Object.freeze([
 ]);
 
 export default {
-    name: 'AddNotificationLevel',
+    name: 'NotificationAddLevel',
     components: {
         PFieldGroup,
         PSelectDropdown,

@@ -16,7 +16,7 @@ import {
     PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 
-import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
+import NotificationChannelList from '@/services/my-page/components/NotificationChannelList.vue';
 
 export default {
     name: 'UserNotificationPage',

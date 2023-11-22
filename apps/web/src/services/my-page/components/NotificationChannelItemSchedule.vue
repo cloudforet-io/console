@@ -8,7 +8,7 @@
         <div v-if="isEditMode"
              class="content"
         >
-            <add-notification-schedule :schedule="channelData.schedule"
+            <notification-add-schedule :schedule="channelData.schedule"
                                        :is-scheduled="channelData.is_scheduled"
                                        @change="onChangeSchedule"
             />
@@ -76,19 +76,19 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
-import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
-import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
+import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
+import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import {
     EDIT_TYPE,
     PROTOCOL_TYPE,
-} from '@/services/notification/modules/notification-channel-item/type';
+} from '@/services/my-page/types/notification-item-type';
 
 export default {
     name: 'NotificationChannelItemSchedule',
     components: {
         PButton,
         PI,
-        AddNotificationSchedule,
+        NotificationAddSchedule,
     },
     props: {
         channelData: {
@@ -188,7 +188,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@import '../styles/channelItem.pcss';
+@import '../styles/NotificationChannelItem.pcss';
 .content-wrapper .edit-button {
     display: flex;
     align-items: center;

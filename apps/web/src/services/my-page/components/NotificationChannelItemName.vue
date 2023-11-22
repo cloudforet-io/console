@@ -63,8 +63,8 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
-import { EDIT_TYPE, PARAM_KEY_TYPE } from '@/services/notification/modules/notification-channel-item/type';
+import { useNotificationItem } from '@/services/my-page/composables/notification-item';
+import { EDIT_TYPE, PARAM_KEY_TYPE } from '@/services/my-page/types/notification-item-type';
 
 export default {
     name: 'NotificationChannelItemName',
@@ -139,7 +139,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@import '../styles/channelItem.pcss';
+@import '../styles/NotificationChannelItem.pcss';
 .content-wrapper .edit-button {
     display: flex;
     align-items: center;

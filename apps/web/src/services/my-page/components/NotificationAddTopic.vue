@@ -53,7 +53,7 @@ const TOPIC_LIST = [
 ];
 
 export default {
-    name: 'AddNotificationTopic',
+    name: 'NotificationAddTopic',
     components: {
         PRadio,
         PCheckbox,

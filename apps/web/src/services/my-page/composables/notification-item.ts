@@ -11,10 +11,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { ParamType } from '@/services/notification/modules/notification-channel-item/type';
+import type { ParamType } from '@/services/my-page/types/notification-item-type';
 import {
     PARAM_KEY_TYPE,
-} from '@/services/notification/modules/notification-channel-item/type';
+} from '@/services/my-page/types/notification-item-type';
 
 interface NotificationItemState {
 	isEditMode: boolean;

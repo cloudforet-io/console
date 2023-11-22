@@ -83,16 +83,16 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationChannelItemData
-    from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemData.vue';
+    from '@/services/my-page/components/NotificationChannelItemData.vue';
 import NotificationChannelItemLevel
-    from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemLevel.vue';
+    from '@/services/my-page/components/NotificationChannelItemLevel.vue';
 import NotificationChannelItemName
-    from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemName.vue';
+    from '@/services/my-page/components/NotificationChannelItemName.vue';
 import NotificationChannelItemSchedule
-    from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemSchedule.vue';
+    from '@/services/my-page/components/NotificationChannelItemSchedule.vue';
 import NotificationChannelItemTopic
-    from '@/services/notification/modules/notification-channel-item/modules/NotificationChannelItemTopic.vue';
-import { EDIT_TYPE, PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
+    from '@/services/my-page/components/NotificationChannelItemTopic.vue';
+import { EDIT_TYPE, PROTOCOL_TYPE } from '@/services/my-page/types/notification-item-type';
 
 // interface ParamType {
 //     user_channel_id?: string;

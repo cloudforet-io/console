@@ -8,7 +8,7 @@
         <div v-if="isEditMode"
              class="content"
         >
-            <add-notification-topic :topic="channelData.subscriptions"
+            <notification-add-topic :topic="channelData.subscriptions"
                                     :topic-mode="channelData.is_subscribe"
                                     @change="onChangeTopic"
             />
@@ -80,12 +80,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
-import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
+import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
+import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import {
     EDIT_TYPE,
     PROTOCOL_TYPE,
-} from '@/services/notification/modules/notification-channel-item/type';
+} from '@/services/my-page/types/notification-item-type';
 
 export default {
     name: 'NotificationChannelItemTopic',
@@ -93,7 +93,7 @@ export default {
         PButton,
         PI,
         PBadge,
-        AddNotificationTopic,
+        NotificationAddTopic,
     },
     props: {
         channelData: {
@@ -188,7 +188,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@import '../styles/channelItem.pcss';
+@import '../styles/NotificationChannelItem.pcss';
 .content-wrapper .edit-button {
     display: flex;
     align-items: center;

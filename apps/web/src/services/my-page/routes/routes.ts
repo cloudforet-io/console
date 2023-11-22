@@ -13,7 +13,7 @@ const MyPageContainer = () => import('@/services/my-page/MyPageContainer.vue');
 const UserAccountPage = () => import('@/services/my-page/pages/UserAccountPage.vue');
 const UserAPIKeyPage = () => import('@/services/my-page/pages/UserAPIKeyPage.vue');
 const UserNotificationPage = () => import('@/services/my-page/pages/UserNotificationPage.vue');
-const NotificationAddPage = () => import('@/services/notification/notification-add/NotificationAddPage.vue');
+const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotificationAddPage.vue');
 
 // eslint-disable-next-line max-len
 // const UserManageNotificationPage = () => import('@/services/administration/iam/user/user-manage-notification/UserManageNotificationPage.vue');
@@ -67,7 +67,7 @@ const myPageRoutes: RouteConfig = {
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
                             meta: { translationId: 'MY_PAGE.NOTIFICATION.ADD_CHANNEL' },
                             props: true,
-                            component: NotificationAddPage as any,
+                            component: UserNotificationAddPage as any,
                         },
                     ],
                 },

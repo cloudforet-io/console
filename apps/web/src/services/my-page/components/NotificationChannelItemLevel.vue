@@ -9,7 +9,7 @@
         <div v-if="isEditMode"
              class="content"
         >
-            <add-notification-level :notification-level="channelData.notification_level"
+            <notification-add-level :notification-level="channelData.notification_level"
                                     @change="onChangeLevel"
             />
             <div class="button-group">
@@ -89,13 +89,13 @@ import {
     PBadge, PButton, PI,
 } from '@spaceone/design-system';
 
-import AddNotificationLevel from '@/services/notification/modules/AddNotificationLevel.vue';
-import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
+import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
+import { useNotificationItem } from '@/services/my-page/composables/notification-item';
 import {
     EDIT_TYPE,
     PARAM_KEY_TYPE,
     PROTOCOL_TYPE,
-} from '@/services/notification/modules/notification-channel-item/type';
+} from '@/services/my-page/types/notification-item-type';
 
 export default {
     name: 'NotificationChannelItemLevel',
@@ -103,7 +103,7 @@ export default {
         PButton,
         PI,
         PBadge,
-        AddNotificationLevel,
+        NotificationAddLevel,
     },
     props: {
         channelData: {
@@ -162,7 +162,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@import '../styles/channelItem.pcss';
+@import '../styles/NotificationChannelItem.pcss';
 .level-badge {
     @apply rounded;
 }

@@ -24,7 +24,7 @@ import { PHeading } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 
-import NotificationAddForm from '@/services/notification/notification-add/modules/NotificationAddForm.vue';
+import NotificationAddForm from '@/services/my-page/components/NotificationAddForm.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 

@@ -5,11 +5,11 @@
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.BASE_INFO') }}
                 </h3>
-                <add-notification-data :project-id="projectId"
-                                       :supported-schema="supportedSchema"
-                                       :protocol-type="protocolType"
-                                       :protocol-id="protocolId"
-                                       @change="onChangeData"
+                <notification-add-form-data :project-id="projectId"
+                                            :supported-schema="supportedSchema"
+                                            :protocol-type="protocolType"
+                                            :protocol-id="protocolId"
+                                            @change="onChangeData"
                 />
             </p-pane-layout>
             <p-pane-layout class="content-wrapper">
@@ -19,7 +19,7 @@
                 <h4 class="sub-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
                 </h4>
-                <add-notification-schedule @change="onChangeSchedule" />
+                <notification-add-schedule @change="onChangeSchedule" />
             </p-pane-layout>
             <p-pane-layout class="content-wrapper">
                 <h3 class="content-title">
@@ -28,7 +28,7 @@
                 <h4 class="sub-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
                 </h4>
-                <add-notification-topic @change="onChangeTopic" />
+                <notification-add-topic @change="onChangeTopic" />
             </p-pane-layout>
         </section>
         <div class="button-group">
@@ -67,9 +67,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
-import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
-import AddNotificationData from '@/services/notification/notification-add/modules/AddNotificationData.vue';
+import NotificationAddFormData from '@/services/my-page/components/NotificationAddFormData.vue';
+import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
+import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
 
 interface NotificationSchedule {
     day_of_week: [],
@@ -80,9 +80,9 @@ interface NotificationSchedule {
 export default {
     name: 'NotificationAddForm',
     components: {
-        AddNotificationData,
-        AddNotificationSchedule,
-        AddNotificationTopic,
+        NotificationAddFormData,
+        NotificationAddSchedule,
+        NotificationAddTopic,
         PPaneLayout,
         PButton,
     },
