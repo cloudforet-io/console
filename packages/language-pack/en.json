@@ -984,7 +984,7 @@
 			"SUCCESS": "A verification code has been sent to your notification email.",
 			"TITLE": "Verify your Email Address",
 			"VERIFICATION_CODE": "Verification Code",
-			"VERIFY_NOW": "Verify Now"
+			"VERIFY": "Verify"
 		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "Every metric time displays in  {timezone}.",
@@ -1951,18 +1951,6 @@
 				"USER_MANAGEMENT": "User Management",
 				"YESTERDAY": "Yesterday"
 			},
-			"MFA": {
-				"BTN_CHANGE": "Change",
-				"BTN_SEND_MAIL": "Send Verification Code",
-				"ENABLE_MFA": "Enable MFA",
-				"MODAL": {
-					"TITLE": ""
-				},
-				"STATE_NOT_VERIFIED": "Not Verified",
-				"STATE_VERIFIED": "Verified",
-				"TITLE": "Multi-factor Authentication",
-				"TYPE": "MFA Type"
-			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "Failed to Delete Project Channel",
 				"ALT_E_DELETE_USER_CHANNEL": "Failed to Delete User Channel",
@@ -2767,6 +2755,15 @@
 		}
 	},
 	"MY_PAGE": {
+		"MFA": {
+			"BTN_CHANGE": "Change",
+			"BTN_SEND_MAIL": "Send Verification Code",
+			"ENABLE_MFA": "Enable MFA",
+			"STATE_NOT_VERIFIED": "Not Verified",
+			"STATE_VERIFIED": "Verified",
+			"TITLE": "Multi-factor Authentication",
+			"TYPE": "MFA Type"
+		},
 		"NOTIFICATION": {
 			"ADD_CHANNEL": "Add Notifications Channel"
 		}

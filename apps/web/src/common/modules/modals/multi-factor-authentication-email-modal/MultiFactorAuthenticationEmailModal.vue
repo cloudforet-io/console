@@ -224,7 +224,7 @@ watch(() => props.visible, (value) => {
             </div>
         </template>
         <template #confirm-button>
-            {{ $t('COMMON.MFA_MODAL.VERIFY_NOW') }}
+            {{ $t('COMMON.MFA_MODAL.VERIFY') }}
         </template>
     </p-button-modal>
 </template>

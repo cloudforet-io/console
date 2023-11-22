@@ -50,11 +50,12 @@ const initState = () => {
 
 /* API */
 const handleChangeToggle = async () => {
-    if (!state.enableMfa) {
+    if (state.isVerified && !state.enableMfa) {
         await postDisableMfa({
             user_id: state.userId,
             domain_id: state.domainId,
         });
+
         state.isModalVisible = true;
     }
 };
@@ -110,7 +111,7 @@ watch(() => state.mfa, (mfa) => {
             <template #headline>
                 <div class="headline-wrapper">
                     <p class="form-title">
-                        {{ $t('IDENTITY.USER.MFA.TITLE') }}
+                        {{ $t('MY_PAGE.MFA.TITLE') }}
                     </p>
                     <div class="verify-status-wrapper">
                         <div v-if="state.isVerified"
@@ -123,20 +124,20 @@ watch(() => state.mfa, (mfa) => {
                                  color="#60B731"
                             />
                             <span>
-                                {{ $t('IDENTITY.USER.MFA.STATE_VERIFIED') }}
+                                {{ $t('MY_PAGE.MFA.STATE_VERIFIED') }}
                             </span>
                         </div>
                         <span v-else
                               class="not-verified"
                         >
-                            {{ $t('IDENTITY.USER.MFA.STATE_NOT_VERIFIED') }}
+                            {{ $t('MY_PAGE.MFA.STATE_NOT_VERIFIED') }}
                         </span>
                     </div>
                 </div>
             </template>
             <div class="enable-toggle">
                 <p-field-title class="toggle-title">
-                    {{ $t('IDENTITY.USER.MFA.ENABLE_MFA') }}
+                    {{ $t('MY_PAGE.MFA.ENABLE_MFA') }}
                 </p-field-title>
                 <p-toggle-button :value.sync="state.enableMfa"
                                  show-state-text
@@ -148,7 +149,7 @@ watch(() => state.mfa, (mfa) => {
                  class="enable-mfa-wrapper"
             >
                 <p-field-group
-                    :label="$t('IDENTITY.USER.MFA.TYPE')"
+                    :label="$t('MY_PAGE.MFA.TYPE')"
                     required
                 >
                     <p-select-dropdown :menu="contextMenuItems"
