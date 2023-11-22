@@ -84,7 +84,6 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { UserModel } from '@/api-schema/identity/user/model';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -94,6 +93,8 @@ import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue
 
 import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
+import type { UserModel } from '@/api-schema/identity/user/model';
 
 interface Props {
     userId: string

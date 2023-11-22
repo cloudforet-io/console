@@ -44,7 +44,6 @@ import {
 
 import { PHeading } from '@spaceone/design-system';
 
-import type { RoleType, RoleModel, Policy } from '@/api-schema/identity/role/model';
 import { i18n } from '@/translations';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
@@ -55,6 +54,8 @@ import PolicyListDataTable from '@/services/administration/components/PolicyList
 import RoleUpdatePageAccessForm from '@/services/administration/components/RoleUpdatePageAccessForm.vue';
 import RoleUpdatePageBaseInformation from '@/services/administration/components/RoleUpdatePageBaseInformation.vue';
 import { FORM_TYPE } from '@/services/administration/constants/role-constant';
+
+import type { RoleType, RoleModel, Policy } from '@/api-schema/identity/role/model';
 
 export interface BaseInfoFormData {
     roleName: string;

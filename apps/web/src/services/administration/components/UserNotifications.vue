@@ -86,7 +86,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
 import type { ChannelItem, ProtocolItem } from '@/services/administration/types/user-notification-type';
-import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 export default {
     name: 'UserNotifications',

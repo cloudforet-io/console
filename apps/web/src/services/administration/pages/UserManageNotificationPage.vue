@@ -23,7 +23,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
+import NotificationChannelList from '@/services/my-page/components/NotificationChannelList.vue';
 
 export default {
     name: 'ManageNotificationPage',

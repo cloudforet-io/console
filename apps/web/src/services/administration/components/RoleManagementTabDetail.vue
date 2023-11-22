@@ -92,8 +92,6 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { PolicyModel } from '@/api-schema/identity/policy/model';
-import type { RoleModel } from '@/api-schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -109,6 +107,9 @@ import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role
 import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helper';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import type { PolicyType } from '@/services/administration/types/policy-type';
+
+import type { PolicyModel } from '@/api-schema/identity/policy/model';
+import type { RoleModel } from '@/api-schema/identity/role/model';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;

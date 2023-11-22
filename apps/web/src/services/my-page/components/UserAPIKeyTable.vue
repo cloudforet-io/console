@@ -98,8 +98,8 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
-import UserAPIKeyModal from '@/services/my-page/components/APIKeyModal.vue';
+import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import UserAPIKeyModal from '@/services/my-page/components/UserAPIKeyModal.vue';
 
 
 export interface APIKeyItem {
@@ -127,7 +127,7 @@ interface EndpointItem {
 }
 
 export default {
-    name: 'UserAPIKey',
+    name: 'UserAPIKeyTable',
     components: {
         UserAPIKeyModal,
         PStatus,

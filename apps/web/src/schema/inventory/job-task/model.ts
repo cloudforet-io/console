@@ -1,6 +1,7 @@
+import type { USER_TYPE } from '@/api-schema/identity/user/constant';
+
 import type { Tags, TimeStamp } from '@/api-schema/common/model';
 import type { RoleBindingModel } from '@/api-schema/identity/role-binding/model';
-import type { USER_TYPE } from '@/api-schema/identity/user/constant';
 
 export interface UserModel {
     created_at: TimeStamp;

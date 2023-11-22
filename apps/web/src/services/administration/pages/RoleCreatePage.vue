@@ -33,7 +33,6 @@ import { PHeading, PButton } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { RoleModel } from '@/api-schema/identity/role/model';
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
@@ -42,6 +41,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import RoleUpdateForm from '@/services/administration/components/RoleUpdateForm.vue';
+
+import type { RoleModel } from '@/api-schema/identity/role/model';
 
 
 

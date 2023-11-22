@@ -46,7 +46,7 @@ import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
 
 import { ROLE_TYPE } from '@/api-schema/identity/role/constant';
-import type { RoleType } from '@/api-schema/identity/role/model';
+
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
@@ -57,6 +57,8 @@ import {
 import RoleUpdatePageAccessMenuItem from '@/services/administration/components/RoleUpdatePageAccessMenuItem.vue';
 import { getPageAccessMenuList } from '@/services/administration/helpers/page-access-menu-list';
 import type { PageAccessMenuItem } from '@/services/administration/types/page-access-menu-type';
+
+import type { RoleType } from '@/api-schema/identity/role/model';
 
 
 const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePermission[] => {

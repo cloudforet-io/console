@@ -1,7 +1,8 @@
-import type { Tags, TimeStamp } from '@/api-schema/common/model';
 import type { ROLE_TYPE } from '@/api-schema/identity/role/constant';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
+
+import type { Tags, TimeStamp } from '@/api-schema/common/model';
 
 export type RoleType = typeof ROLE_TYPE[keyof typeof ROLE_TYPE];
 

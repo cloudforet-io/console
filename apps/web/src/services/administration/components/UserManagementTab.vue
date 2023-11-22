@@ -98,7 +98,7 @@ import UserManagementTabAssignedRole from '@/services/administration/components/
 import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
 import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import UserAPIKeyTable from '@/services/my-page/my-account/user-api-key/modules/APIKeyTable.vue';
+import UserAPIKeyTable from '@/services/my-page/components/UserAPIKeyTable.vue';
 
 export default {
     name: 'UserManagementTab',
