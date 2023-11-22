@@ -28,7 +28,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';
 
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 export default {
     name: 'AlertTriggeredBy',

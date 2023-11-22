@@ -72,7 +72,7 @@ import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-se
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 interface Props {
     dashboardList: GNBDashboardMenuItem[];

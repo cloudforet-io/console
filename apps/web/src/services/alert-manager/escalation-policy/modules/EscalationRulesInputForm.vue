@@ -183,7 +183,7 @@ import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modu
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
 import { SCOPE } from '@/services/alert-manager/lib/config';
 import type { Rule } from '@/services/alert-manager/type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
 const NOTIFICATION_LEVELS = Object.freeze([

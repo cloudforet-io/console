@@ -20,7 +20,7 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProjectGroup } from '@/services/asset-inventory/types/service-account-page-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/types/type';
 
 interface Props {

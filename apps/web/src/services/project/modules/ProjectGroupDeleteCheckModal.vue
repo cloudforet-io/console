@@ -1,6 +1,43 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+
+
+const projectPageStore = useProjectPageStore();
+const state = reactive({
+    proxyVisible: computed({
+        get() { return projectPageStore.projectGroupDeleteCheckModalVisible; },
+        set(val) { projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: val }); },
+    }),
+    groupId: computed((() => projectPageStore.actionTargetNodeData?.id)),
+});
+
+const deleteProjectGroup = async () => {
+    try {
+        await projectPageStore.deleteProjectGroup();
+        // await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
+    } finally {
+        projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: false });
+    }
+};
+</script>
+
 <template>
     <delete-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
-                  :visible.sync="proxyVisible"
+                  :visible.sync="state.proxyVisible"
                   @confirm="deleteProjectGroup"
     >
         <p>
@@ -16,54 +53,6 @@
         </i18n>
     </delete-modal>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-
-export default {
-    name: 'ProjectGroupDeleteCheckModal',
-    components: {
-        DeleteModal,
-    },
-    setup() {
-        const projectPageStore = useProjectPageStore();
-        const state = reactive({
-            proxyVisible: computed({
-                get() { return projectPageStore.projectGroupDeleteCheckModalVisible; },
-                set(val) { projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: val }); },
-            }),
-            groupId: computed((() => projectPageStore.actionTargetNodeData?.id)),
-        });
-
-        const deleteProjectGroup = async () => {
-            try {
-                await projectPageStore.deleteProjectGroup();
-                // await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
-                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
-            } finally {
-                projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: false });
-            }
-        };
-        return {
-            ...toRefs(state),
-            deleteProjectGroup,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .delete-modal-contents {

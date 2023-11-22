@@ -1,3 +1,216 @@
+<script setup lang="ts">
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
+import { useRoute, useRouter } from 'vue-router/composables';
+
+import {
+    PI, PHeading, PBreadcrumbs, PButton, PSelectDropdown,
+} from '@spaceone/design-system';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import {
+    isInstanceOfAuthorizationError,
+} from '@cloudforet/core-lib/space-connector/error';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import type { FavoriteItem } from '@/store/modules/favorite/type';
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+
+import {
+    convertProjectConfigToReferenceData,
+    convertProjectGroupConfigToReferenceData,
+} from '@/lib/helper/config-data-helper';
+
+import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
+import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
+
+import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
+import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
+import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
+import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
+import ProjectTree from '@/services/project/modules/ProjectTree.vue';
+import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type {
+    ProjectGroup, ProjectGroupTreeItem,
+} from '@/services/project/types/type';
+
+
+const route = useRoute();
+const router = useRouter();
+const projectPageStore = useProjectPageStore();
+
+/* Query String */
+watch(() => projectPageStore.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
+    router.replace({
+        query: {
+            // eslint-disable-next-line camelcase
+            select_pg: selectedItem.node?.data.id || null,
+        },
+    }).catch(() => {});
+});
+
+const storeState = reactive({
+    groupId: computed(() => projectPageStore.groupId),
+    groupName: computed(() => projectPageStore.groupName),
+    searchText: computed(() => projectPageStore.searchText),
+    selectedItem: computed(() => projectPageStore.selectedItem),
+    selectedNodeData: computed(() => projectPageStore.selectedNodeData),
+    parentGroups: computed(() => projectPageStore.parentGroups),
+    hasProjectGroup: computed(() => projectPageStore.hasProjectGroup),
+    projectCount: computed(() => projectPageStore.projectCount),
+    projects: computed(() => store.getters['reference/projectItems']),
+    favoriteProjects: computed(() => store.state.favorite.projectItems),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projectGroupFormVisible: computed(() => projectPageStore.projectGroupFormVisible),
+    projectGroupDeleteCheckModalVisible: computed(() => projectPageStore.projectGroupDeleteCheckModalVisible),
+    favoriteProjectGroups: computed(() => store.state.favorite.projectGroupItems),
+});
+
+const state = reactive({
+    hasRootProjectGroupManagePermission: computed(() => state.hasManagePermission && store.getters['user/hasDomainRole']),
+    hasManagePermission: useManagePermissionState(),
+    initGroupId: route.query.select_pg as string,
+    favoriteItems: computed<FavoriteItem[]>(() => [
+        ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),
+        ...convertProjectConfigToReferenceData(storeState.favoriteProjects, storeState.projects),
+    ]),
+    settingMenu: computed(() => [
+        { name: 'edit', label: i18n.t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
+        { name: 'delete', label: i18n.t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
+    ] as MenuItem[]),
+    projectGroupNavigation: computed(() => {
+        const result = storeState.parentGroups.map((d) => ({ name: d.name, data: d }));
+        if (storeState.selectedNodeData && storeState.groupName) {
+            result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
+        }
+        return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
+    }),
+    groupMemberCount: undefined as number|undefined,
+    groupMemberPageVisible: false,
+    isPermissionDenied: computed(() => state.groupMemberCount === undefined),
+});
+
+/* Favorite */
+const onFavoriteDelete = (item: FavoriteItem) => {
+    store.dispatch('favorite/removeItem', item);
+};
+
+const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
+    if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
+        e.preventDefault();
+        if (storeState.groupId !== item.itemId) {
+            await projectPageStore.selectNode(item.itemId);
+        }
+    }
+};
+
+/* Navigation */
+const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
+    if (item.data) await projectPageStore.selectNode(item.data.id);
+};
+
+/* Handling Forms */
+const openProjectGroupDeleteCheckModal = () => {
+    projectPageStore.openProjectGroupDeleteCheckModal(storeState.selectedItem);
+};
+
+const openProjectGroupUpdateForm = () => {
+    projectPageStore.openProjectGroupUpdateForm(storeState.selectedItem);
+};
+
+const onSelectSettingDropdown = (name) => {
+    switch (name) {
+    case 'edit': openProjectGroupUpdateForm(); break;
+    case 'delete': openProjectGroupDeleteCheckModal(); break;
+    default: break;
+    }
+};
+
+const openProjectGroupCreateForm = () => {
+    projectPageStore.openProjectGroupCreateForm();
+};
+
+const openProjectGroupMemberPage = () => {
+    state.groupMemberPageVisible = true;
+};
+
+const openProjectForm = () => {
+    projectPageStore.openProjectCreateForm(storeState.selectedItem);
+};
+
+/* Member Count */
+const getMemberCount = async (groupId: string) => {
+    if (groupId) {
+        try {
+            const res = await SpaceConnector.client.identity.projectGroup.member.list({
+                project_group_id: groupId,
+            });
+            state.groupMemberCount = res.total_count;
+        } catch (e: any) {
+            if (!isInstanceOfAuthorizationError(e)) {
+                ErrorHandler.handleError(e);
+            }
+            state.groupMemberCount = undefined;
+        }
+    } else {
+        state.groupMemberCount = undefined;
+    }
+};
+
+watch(() => storeState.groupId, async (groupId) => {
+    if (groupId) await getMemberCount(groupId);
+});
+
+// refresh permission info when get back from project group member page
+watch(() => state.groupMemberPageVisible, async (visible) => {
+    if (storeState.groupId && !visible) {
+        await getMemberCount(storeState.groupId);
+        if (state.isPermissionDenied) {
+            projectPageStore.addPermissionInfo({
+                [storeState.groupId]: false,
+            });
+        }
+    }
+});
+
+watch(() => state.isPermissionDenied, (isPermissionDenied) => {
+    if (!isPermissionDenied) {
+        store.commit('error/setVisibleAuthorizationError', false);
+    }
+});
+
+watch(() => route.query, async (after, before) => {
+    if (after?.select_pg !== before?.select_pg && !Array.isArray(after.select_pg)) {
+        await projectPageStore.selectNode(after.select_pg);
+    }
+});
+
+onUnmounted(() => {
+    projectPageStore.$reset();
+    projectPageStore.$dispose();
+});
+
+/* Init */
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
+        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/projectGroup/load'),
+    ]);
+})();
+</script>
+
 <template>
     <fragment>
         <p-vertical-page-layout>
@@ -121,217 +334,6 @@
         </p-vertical-page-layout>
     </fragment>
 </template>
-
-<script setup lang="ts">
-import {
-    computed, getCurrentInstance, onUnmounted, reactive, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PI, PHeading, PBreadcrumbs, PButton, PSelectDropdown,
-} from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import {
-    isInstanceOfAuthorizationError,
-} from '@cloudforet/core-lib/space-connector/error';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { FavoriteItem } from '@/store/modules/favorite/type';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-
-import {
-    convertProjectConfigToReferenceData,
-    convertProjectGroupConfigToReferenceData,
-} from '@/lib/helper/config-data-helper';
-
-import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
-import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
-
-import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
-import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
-import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
-import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
-import ProjectTree from '@/services/project/modules/ProjectTree.vue';
-import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-import type {
-    ProjectGroup, ProjectGroupTreeItem,
-} from '@/services/project/types/type';
-
-
-const vm = getCurrentInstance()?.proxy as Vue;
-const projectPageStore = useProjectPageStore();
-/* Query String */
-watch(() => projectPageStore.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
-    vm.$router.replace({
-        query: {
-            // eslint-disable-next-line camelcase
-            select_pg: selectedItem.node?.data.id || null,
-        },
-    }).catch(() => {});
-});
-
-const storeState = reactive({
-    groupId: computed(() => projectPageStore.groupId),
-    groupName: computed(() => projectPageStore.groupName),
-    searchText: computed(() => projectPageStore.searchText),
-    selectedItem: computed(() => projectPageStore.selectedItem),
-    selectedNodeData: computed(() => projectPageStore.selectedNodeData),
-    parentGroups: computed(() => projectPageStore.parentGroups),
-    hasProjectGroup: computed(() => projectPageStore.hasProjectGroup),
-    projectCount: computed(() => projectPageStore.projectCount),
-    projects: computed(() => store.getters['reference/projectItems']),
-    favoriteProjects: computed(() => store.state.favorite.projectItems),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-    projectGroupFormVisible: computed(() => projectPageStore.projectGroupFormVisible),
-    projectGroupDeleteCheckModalVisible: computed(() => projectPageStore.projectGroupDeleteCheckModalVisible),
-    favoriteProjectGroups: computed(() => store.state.favorite.projectGroupItems),
-});
-
-const state = reactive({
-    hasRootProjectGroupManagePermission: computed(() => state.hasManagePermission && store.getters['user/hasDomainRole']),
-    hasManagePermission: useManagePermissionState(),
-    initGroupId: vm.$route.query.select_pg as string,
-    favoriteItems: computed<FavoriteItem[]>(() => [
-        ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),
-        ...convertProjectConfigToReferenceData(storeState.favoriteProjects, storeState.projects),
-    ]),
-    settingMenu: computed(() => [
-        { name: 'edit', label: i18n.t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
-        { name: 'delete', label: i18n.t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
-    ] as MenuItem[]),
-    projectGroupNavigation: computed(() => {
-        const result = storeState.parentGroups.map((d) => ({ name: d.name, data: d }));
-        if (storeState.selectedNodeData && storeState.groupName) {
-            result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
-        }
-        return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
-    }),
-    groupMemberCount: undefined as number|undefined,
-    groupMemberPageVisible: false,
-    isPermissionDenied: computed(() => state.groupMemberCount === undefined),
-});
-
-/* Favorite */
-const onFavoriteDelete = (item: FavoriteItem) => {
-    store.dispatch('favorite/removeItem', item);
-};
-
-const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
-    if (item.itemType === FAVORITE_TYPE.PROJECT_GROUP) {
-        e.preventDefault();
-        if (storeState.groupId !== item.itemId) {
-            await projectPageStore.selectNode(item.itemId);
-        }
-    }
-};
-
-/* Navigation */
-const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
-    if (item.data) await projectPageStore.selectNode(item.data.id);
-};
-
-/* Handling Forms */
-const openProjectGroupDeleteCheckModal = () => {
-    projectPageStore.openProjectGroupDeleteCheckModal(storeState.selectedItem);
-};
-
-const openProjectGroupUpdateForm = () => {
-    projectPageStore.openProjectGroupUpdateForm(storeState.selectedItem);
-};
-
-const onSelectSettingDropdown = (name) => {
-    switch (name) {
-    case 'edit': openProjectGroupUpdateForm(); break;
-    case 'delete': openProjectGroupDeleteCheckModal(); break;
-    default: break;
-    }
-};
-
-const openProjectGroupCreateForm = () => {
-    projectPageStore.openProjectGroupCreateForm();
-};
-
-const openProjectGroupMemberPage = () => {
-    state.groupMemberPageVisible = true;
-};
-
-const openProjectForm = () => {
-    projectPageStore.openProjectCreateForm(storeState.selectedItem);
-};
-
-/* Member Count */
-const getMemberCount = async (groupId: string) => {
-    if (groupId) {
-        try {
-            const res = await SpaceConnector.client.identity.projectGroup.member.list({
-                project_group_id: groupId,
-            });
-            state.groupMemberCount = res.total_count;
-        } catch (e: any) {
-            if (!isInstanceOfAuthorizationError(e)) {
-                ErrorHandler.handleError(e);
-            }
-            state.groupMemberCount = undefined;
-        }
-    } else {
-        state.groupMemberCount = undefined;
-    }
-};
-
-watch(() => storeState.groupId, async (groupId) => {
-    if (groupId) await getMemberCount(groupId);
-});
-
-// refresh permission info when get back from project group member page
-watch(() => state.groupMemberPageVisible, async (visible) => {
-    if (storeState.groupId && !visible) {
-        await getMemberCount(storeState.groupId);
-        if (state.isPermissionDenied) {
-            projectPageStore.addPermissionInfo({
-                [storeState.groupId]: false,
-            });
-        }
-    }
-});
-
-watch(() => state.isPermissionDenied, (isPermissionDenied) => {
-    if (!isPermissionDenied) {
-        store.commit('error/setVisibleAuthorizationError', false);
-    }
-});
-
-watch(() => vm.$route.query, async (after, before) => {
-    if (after?.select_pg !== before?.select_pg && !Array.isArray(after.select_pg)) {
-        await projectPageStore.selectNode(after.select_pg);
-    }
-});
-
-onUnmounted(() => {
-    projectPageStore.$reset();
-    projectPageStore.$dispose();
-});
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
-        store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
-    ]);
-})();
-</script>
 
 <style lang="postcss" scoped>
 .sidebar-container {
