@@ -7,7 +7,7 @@ import {
 import { DATA_TYPE } from '@spaceone/design-system/src/inputs/datetime-picker/type';
 import dayjs from 'dayjs';
 
-import type { Period } from '@/services/cost-explorer/type';
+import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 interface DateOption {
     minDate?: string;

@@ -10,7 +10,7 @@ import administrationRoute from '@/services/administration/routes';
 import alertManagerRoute from '@/services/alert-manager/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes';
 import authRoutes from '@/services/auth/routes';
-import costExplorerRoute from '@/services/cost-explorer/routes';
+import costExplorerRoute from '@/services/cost-explorer/routes/routes';
 import dashboardsRoute from '@/services/dashboards/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
 import homeDashboardRoute from '@/services/home-dashboard/routes';

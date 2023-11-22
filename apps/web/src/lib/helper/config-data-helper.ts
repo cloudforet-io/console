@@ -11,7 +11,7 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
-import type { CostQuerySetModel } from '@/services/cost-explorer/type';
+import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import type { DashboardScope } from '@/services/dashboards/config';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';

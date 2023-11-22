@@ -41,8 +41,8 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import CostExplorerLNB from '@/services/cost-explorer/CostExplorerLNB.vue';
-import { useCostExplorerSettingsStore } from '@/services/cost-explorer/store/cost-explorer-settings-store';
-import { useCostQuerySetStore } from '@/services/cost-explorer/store/cost-query-set-store';
+import { useCostExplorerSettingsStore } from '@/services/cost-explorer/stores/cost-explorer-settings-store';
+import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 
 
 
