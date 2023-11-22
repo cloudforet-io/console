@@ -241,7 +241,7 @@ const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
     if (options.queryTags !== undefined) unwindTagQuery.setFiltersAsQueryTag(options.queryTags);
     const excelExportFetcher = () => {
         const cloudServiceExcelExportParams: ExportParameter = {
-            file_name: cloudServiceDetailPageStore.sheetNamePrefix,
+            file_name: props.isServerPage ? 'cloud_service_export' : cloudServiceDetailPageStore.sheetNamePrefix,
             options: [
                 {
                     name: state.currentLayout.name,

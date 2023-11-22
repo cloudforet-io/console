@@ -15,6 +15,9 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
                 cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
             },
         },
+        inherit_options: {
+            'filters.cost_product': { enabled: false },
+        },
         schema_properties: [
             'cost_data_source',
             'cost_data_field',
@@ -35,6 +38,9 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
                 cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
             },
         },
+        inherit_options: {
+            'filters.cost_product': { enabled: false },
+        },
     }],
     ['costSummaryMultiFields', {
         title: 'AWS CloudFront Cost',
@@ -45,6 +51,9 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
                 // TODO: must be updated to string[] type
                 cost_product: [{ k: 'product', v: ['AmazonCloudFront'], o: '=' }],
             },
+        },
+        inherit_options: {
+            'filters.cost_product': { enabled: false },
         },
     }],
 ];
