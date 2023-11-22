@@ -1,4 +1,4 @@
-import type { Tags, TimeStamp } from '@/schema/common/model';
+import type { Tags, TimeStamp } from '@/schema/_common/model';
 
 import type { PolicyTypes, PolicyState } from '@/services/administration/iam/policy/lib/config';
 

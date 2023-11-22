@@ -1,4 +1,4 @@
-import type { Tags, TimeStamp } from '@/schema/common/model';
+import type { Tags, TimeStamp } from '@/schema/_common/model';
 
 export interface CloudServiceTypeInfo {
     cloud_service_type_id: string;

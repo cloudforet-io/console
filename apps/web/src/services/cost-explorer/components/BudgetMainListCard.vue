@@ -6,6 +6,7 @@ import {
     PDivider, PI,
 } from '@spaceone/design-system';
 
+import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
 
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
@@ -22,7 +23,6 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 
 
 interface Props {

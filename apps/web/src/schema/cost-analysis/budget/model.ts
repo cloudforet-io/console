@@ -1,4 +1,4 @@
-import type { Tags } from '@/schema/common/model';
+import type { Tags } from '@/schema/_common/model';
 
 import type { Currency } from '@/store/modules/settings/type';
 

@@ -13,8 +13,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { QueryType } from '@/schema/common/api-verbs/export';
-import type { ExportParameter, ExportOption } from '@/schema/common/api-verbs/export';
+import { QueryType } from '@/schema/_common/api-verbs/export';
+import type { ExportParameter, ExportOption } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';

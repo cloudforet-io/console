@@ -61,7 +61,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { Tags } from '@/schema/common/model';
+import type { Tags } from '@/schema/_common/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
