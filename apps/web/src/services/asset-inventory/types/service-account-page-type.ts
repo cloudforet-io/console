@@ -1,12 +1,11 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
+import type { Tags, TimeStamp } from '@/schema/_common/model';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 import type { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
-import type { ProjectItemResp } from '@/services/project/type';
 
-import type { Tags, TimeStamp } from '@/api-schema/common/model';
 
 const idField = 'provider';
 
@@ -26,8 +25,6 @@ export interface ProviderModel extends Tags, IdParameter {
     };
     created_at: TimeStamp;
 }
-
-export type ProjectGroup = ProjectItemResp;
 
 // Service Account Forms
 export type PageMode = 'CREATE' | 'UPDATE' | 'READ';

@@ -19,7 +19,6 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { ProjectGroup } from '@/services/asset-inventory/types/service-account-page-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { ProjectTreeNodeData, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/types/project-tree-type';
 
@@ -122,7 +121,7 @@ const dataSetter = (text, node) => {
     node.data.name = text;
 };
 const dataGetter = (node) => node.data.name;
-const dataFetcher = async (node): Promise<ProjectGroup[]> => {
+const dataFetcher = async (node): Promise<ProjectTreeNodeData[]> => {
     try {
         const params: any = {
             sort: { key: 'name', desc: false },
