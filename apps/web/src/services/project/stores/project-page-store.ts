@@ -6,16 +6,16 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { ProjectPageState } from '@/services/project/stores/type';
 import type {
-    ProjectGroup, ProjectItemResp, ProjectGroupTreeItem, ProjectTreeRoot, ProjectModel,
-} from '@/services/project/types/type';
+    ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectGroupTreeItem, ProjectTreeRoot,
+} from '@/services/project/types/project-tree-type';
 
 interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
 interface ProjectInfo {
@@ -23,19 +23,40 @@ interface ProjectInfo {
     name: string;
 }
 
+export interface ProjectPageState {
+    isInitiated: boolean;
+
+    searchText?: string;
+
+    rootNode?: ProjectTreeRoot|null;
+    selectedItem: ProjectGroupTreeItem;
+    treeEditMode: boolean;
+    permissionInfo: Record<string, boolean>;
+
+    hasProjectGroup?: boolean;
+    projectCount?: number;
+
+    actionTargetItem: ProjectGroupTreeItem;
+    projectGroupFormVisible: boolean;
+    projectGroupFormUpdateMode: boolean;
+    projectGroupDeleteCheckModalVisible: boolean;
+    projectFormVisible: boolean;
+
+    shouldUpdateProjectList: boolean;
+}
 type ProjectStoreGetters = _GettersTree<{
-    selectedNodeData: ProjectItemResp|undefined;
+    selectedNodeData: ProjectTreeNodeData|undefined;
     selectedNodePath: number[]|undefined;
     groupId: string|undefined;
     groupName: string|undefined;
-    actionTargetNodeData: ProjectItemResp|undefined;
+    actionTargetNodeData: ProjectTreeNodeData|undefined;
     actionTargetNodePath: number[]|undefined;
-    parentGroups: ProjectGroup[];
+    parentGroups: ProjectGroupTreeNodeData[];
 }> & _GettersTree<ProjectPageState>;
 
 interface ProjectPageAction {
     initRoot: (root: ProjectTreeRoot) => void;
-    selectNode: (groupId?: string) => Promise<TreeNode<ProjectItemResp>|null>;
+    selectNode: (groupId?: string) => Promise<TreeNode<ProjectTreeNodeData>|null>;
     openProjectGroupCreateForm: (target?: ProjectGroupTreeItem) => void;
     openProjectGroupUpdateForm: (target?: ProjectGroupTreeItem) => void;
     openProjectGroupDeleteCheckModal: (target?: ProjectGroupTreeItem) => void;
@@ -151,7 +172,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 }
                 const res = await SpaceConnector.client.identity.projectGroup.create(params);
 
-                const newData: ProjectItemResp = {
+                const newData: ProjectTreeNodeData = {
                     ...projectGroupInfo,
                     id: res.project_group_id,
                     item_type: 'PROJECT_GROUP',
@@ -255,7 +276,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 this.shouldUpdateProjectList = true;
 
                 if (this.treeEditMode) {
-                    const newData: ProjectItemResp = {
+                    const newData: ProjectTreeNodeData = {
                         name: projectInfo.name,
                         id: res.project_id,
                         item_type: 'PROJECT',

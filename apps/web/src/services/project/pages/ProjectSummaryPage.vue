@@ -11,12 +11,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
 import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
-import ProjectAlertWidget from '@/services/project/project-detail/project-summary/modules/ProjectAlertWidget.vue';
-import ProjectAllSummary from '@/services/project/project-detail/project-summary/modules/ProjectAllSummary.vue';
-import ProjectBilling from '@/services/project/project-detail/project-summary/modules/ProjectBilling.vue';
-import ProjectPersonalHealthDashboard from '@/services/project/project-detail/project-summary/modules/ProjectPersonalHealthDashboard.vue';
-import ProjectServiceAccounts from '@/services/project/project-detail/project-summary/modules/ProjectServiceAccounts.vue';
-import ProjectTrustedAdvisor from '@/services/project/project-detail/project-summary/modules/ProjectTrustedAdvisor.vue';
+import ProjectSummaryAlertWidget from '@/services/project/components/ProjectSummaryAlertWidget.vue';
+import ProjectSummaryAllSummaryWidget from '@/services/project/components/ProjectSummaryAllSummaryWidget.vue';
+import ProjectSummaryBillingWidget from '@/services/project/components/ProjectSummaryBillingWidget.vue';
+import ProjectSummaryPersonalHealthDashboardWidget from '@/services/project/components/ProjectSummaryPersonalHealthDashboardWidget.vue';
+import ProjectSummaryServiceAccountsWidget from '@/services/project/components/ProjectSummaryServiceAccountsWidget.vue';
+import ProjectSummaryTrustedAdvisorWidget from '@/services/project/components/ProjectSummaryTrustedAdvisorWidget.vue';
 
 
 interface Props {
@@ -50,22 +50,27 @@ const getProjectAlertConfig = async () => {
 
 <template>
     <div class="grid grid-cols-12 project-dashboard-page">
-        <project-all-summary class="col-span-12"
-                             :project-id="props.id"
+        <project-summary-all-summary-widget
+            class="col-span-12"
+            :project-id="props.id"
         />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-alert-widget v-if="state.hasAlertConfig"
-                                  class="col-span-12"
-                                  :project-id="props.id"
+            <project-summary-alert-widget
+                v-if="state.hasAlertConfig"
+                class="col-span-12"
+                :project-id="props.id"
             />
-            <project-billing class="col-span-12"
-                             :project-id="props.id"
+            <project-summary-billing-widget
+                class="col-span-12"
+                :project-id="props.id"
             />
-            <project-personal-health-dashboard class="col-span-12"
-                                               :project-id="props.id"
+            <project-summary-personal-health-dashboard-widget
+                class="col-span-12"
+                :project-id="props.id"
             />
-            <project-service-accounts class="col-span-12 service-accounts-table"
-                                      :project-id="props.id"
+            <project-summary-service-accounts-widget
+                class="col-span-12 service-accounts-table"
+                :project-id="props.id"
             />
         </div>
         <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
@@ -76,8 +81,9 @@ const getProjectAlertConfig = async () => {
                             :more-info="true"
                             :project-id="props.id"
             />
-            <project-trusted-advisor class="col-span-12 trusted-advisor"
-                                     :project-id="props.id"
+            <project-summary-trusted-advisor-widget
+                class="col-span-12 trusted-advisor"
+                :project-id="props.id"
             />
         </div>
     </div>

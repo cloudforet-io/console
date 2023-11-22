@@ -46,7 +46,7 @@ import { MENU_ID } from '@/lib/menu/config';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import type { ProjectItemResp } from '@/services/project/types/type';
+import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 export default defineComponent({
     name: 'DashboardScopeForm',
@@ -73,7 +73,7 @@ export default defineComponent({
             updateScope(scopeType);
         };
 
-        const handleSelectProjects = (projects: Array<ProjectItemResp>) => {
+        const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
             // Emit projects as project.
             emit('set-project', projects[0]);
         };

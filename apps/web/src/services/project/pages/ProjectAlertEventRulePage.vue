@@ -18,8 +18,8 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
-import EventRuleContent from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleContent.vue';
-import EventRuleForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleForm.vue';
+import EventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
+import EventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
 
 const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',
