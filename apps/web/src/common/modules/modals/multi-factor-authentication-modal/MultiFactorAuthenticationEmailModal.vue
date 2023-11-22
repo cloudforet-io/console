@@ -88,17 +88,19 @@ const resetFormData = () => {
 const handleClickSendEmailButton = async () => {
     state.loading = true;
 
-    await postEnableMfa({
-        user_id: state.userId,
-        mfa_type: props.mfaType,
-        options: {
-            email: state.isEditMode ? newEmail.value : props.email,
-        },
-        domain_id: state.domainId,
-    });
-    state.isEditMode = false;
-
-    state.loading = false;
+    try {
+        await postEnableMfa({
+            user_id: state.userId,
+            mfa_type: props.mfaType,
+            options: {
+                email: state.isEditMode ? newEmail.value : props.email,
+            },
+            domain_id: state.domainId,
+        });
+        state.isEditMode = false;
+    } finally {
+        state.loading = false;
+    }
 };
 const handleClickConfirmButton = async () => {
     state.confirmLoading = true;

@@ -16,7 +16,7 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 import MultiFactorAuthenticationEmailModal
-    from '@/common/modules/modals/multi-factor-authentication-email-modal/MultiFactorAuthenticationEmailModal.vue';
+    from '@/common/modules/modals/multi-factor-authentication-modal/MultiFactorAuthenticationEmailModal.vue';
 
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
@@ -67,17 +67,19 @@ const handleClickVerifyButton = async () => {
 
     state.loading = true;
 
-    await postEnableMfa({
-        user_id: state.userId,
-        mfa_type: state.selectedItem,
-        options: {
-            email: email.value,
-        },
-        domain_id: state.domainId,
-    });
-    state.isModalVisible = true;
-
-    state.loading = false;
+    try {
+        await postEnableMfa({
+            user_id: state.userId,
+            mfa_type: state.selectedItem,
+            options: {
+                email: email.value,
+            },
+            domain_id: state.domainId,
+        });
+        state.isModalVisible = true;
+    } finally {
+        state.loading = false;
+    }
 };
 
 const {
@@ -167,6 +169,7 @@ watch(() => state.mfa, (mfa) => {
                     <p-text-input :value="email"
                                   :disabled="state.isVerified"
                                   :invalid="invalidState.email"
+                                  is-focused
                                   block
                                   @update:value="setForm('email', $event)"
                     />

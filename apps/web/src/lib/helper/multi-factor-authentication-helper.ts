@@ -15,6 +15,7 @@ export const postEnableMfa = async (body): Promise<void|Error> => {
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
+        throw e;
     }
 };
 
