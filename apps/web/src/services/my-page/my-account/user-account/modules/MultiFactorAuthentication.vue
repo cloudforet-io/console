@@ -50,11 +50,12 @@ const initState = () => {
 
 /* API */
 const handleChangeToggle = async () => {
-    if (!state.enableMfa) {
+    if (state.isVerified && !state.enableMfa) {
         await postDisableMfa({
             user_id: state.userId,
             domain_id: state.domainId,
         });
+
         state.isModalVisible = true;
     }
 };

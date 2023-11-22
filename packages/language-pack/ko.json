@@ -984,7 +984,7 @@
 			"SUCCESS": "인증 코드가 알림 이메일로 전송되었습니다.",
 			"TITLE": "",
 			"VERIFICATION_CODE": "인증 코드",
-			"VERIFY_NOW": "인증"
+			"VERIFY": "인증"
 		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}으로 보여줍니다.",
