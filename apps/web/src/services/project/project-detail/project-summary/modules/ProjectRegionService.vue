@@ -31,7 +31,7 @@ import {
     gray, white, coral, yellow, secondary1,
 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 
 
 interface Data {

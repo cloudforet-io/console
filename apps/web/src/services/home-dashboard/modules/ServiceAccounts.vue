@@ -24,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { white } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 
 
 interface Data {

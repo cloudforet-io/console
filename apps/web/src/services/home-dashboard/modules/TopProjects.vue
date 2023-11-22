@@ -27,7 +27,7 @@ import {
     gray, peacock, secondary, white,
 } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
 import { PROJECT_ROUTE } from '@/services/project/route-config';
 
