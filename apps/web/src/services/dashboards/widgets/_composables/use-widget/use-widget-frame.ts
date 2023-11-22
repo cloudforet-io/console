@@ -2,18 +2,18 @@ import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
+import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/settings/type';
 
-import type { DateRange } from '@/services/dashboards/config';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import type { WidgetFrameProps } from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import type { WidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
 export interface WidgetFrameOptions {
     dateRange?: DateRange|ComputedRef<DateRange>;

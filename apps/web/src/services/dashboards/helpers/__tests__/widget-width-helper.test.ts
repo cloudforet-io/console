@@ -1,11 +1,12 @@
 import { describe, expect } from 'vitest';
 
+import type { WidgetSize } from '@/schema/dashboard/_types/widget-type';
+
 import { widgetWidthAssigner } from '@/services/dashboards/helpers/widget-width-helper';
 import {
     WIDGET_CONTAINER_MAX_WIDTH,
     WIDGET_CONTAINER_MIN_WIDTH, WIDGET_WIDTH_CRITERIA,
 } from '@/services/dashboards/shared/dashboard-widget-container/widget-container-config';
-import type { WidgetSize } from '@/services/dashboards/widgets/_configs/config';
 
 
 /**

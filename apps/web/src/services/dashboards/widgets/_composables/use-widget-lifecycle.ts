@@ -9,20 +9,21 @@ import {
     isEqual,
 } from 'lodash';
 
+import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
+import type { InheritOptions } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import type { Currency } from '@/store/modules/settings/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { DashboardVariables } from '@/services/dashboards/config';
 import type { WidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type {
-    InheritOptions, WidgetProps, WidgetEmit,
-} from '@/services/dashboards/widgets/_configs/config';
 import {
     validateWidgetByVariablesSchemaUpdate,
 } from '@/services/dashboards/widgets/_helpers/widget-validation-helper';
+import type {
+    WidgetProps, WidgetEmit,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface UseWidgetLifecycleOptions<Data> {

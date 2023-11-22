@@ -63,6 +63,13 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
+import type {
+    DashboardLayoutWidgetInfo, DashboardTemplate,
+    DashboardVariablesSchema,
+    DashboardViewer,
+} from '@/schema/dashboard/_types/dashboard-type';
+import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -71,13 +78,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { gray } from '@/styles/colors';
 
-import type { DashboardViewer, DashboardTemplate, DashboardVariablesSchema } from '@/services/dashboards/config';
-import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import type { DashboardDetailInfoStoreState } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 
 interface Props {
     visible: boolean;

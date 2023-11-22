@@ -22,18 +22,18 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { CloudServiceStatsModel, Severity } from '@/services/dashboards/widgets/_configs/asset-config';
 import {
     COMPLIANCE_STATUS_MAP, SEVERITY_STATUS_MAP,
-} from '@/services/dashboards/widgets/_configs/asset-config';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+} from '@/services/dashboards/widgets/_constants/compliance-constants';
+import type { Severity } from '@/services/dashboards/widgets/_types/compliance-type';
+import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface SubData {
     severity: Severity;
     value: number;
 }
-interface Data extends CloudServiceStatsModel {
+interface Data {
     status: 'PASS'|'FAIL';
     compliance_count: SubData[];
     pass_score: SubData[];
@@ -41,6 +41,7 @@ interface Data extends CloudServiceStatsModel {
     _total_compliance_count: number;
     _total_pass_score: number;
     _total_fail_score: number;
+    date: string;
 }
 interface OuterChartData {
     status: string;

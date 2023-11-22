@@ -2,17 +2,20 @@ import {
     cloneDeep, isEmpty, isEqual, union,
 } from 'lodash';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
+import type { DashboardLayoutWidgetInfo, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
 import type {
-    InheritOptions, DashboardLayoutWidgetInfo, WidgetConfig,
-    UpdatableWidgetInfo,
-} from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetFilterOptionKey, WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+    InheritOptions,
+    WidgetConfig,
+    WidgetFilterOptionKey,
+    WidgetOptionsSchema,
+} from '@/schema/dashboard/_types/widget-type';
+
+import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { getInheritingOptionKeys } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {
     getWidgetOptionKeyByVariableKey,
 } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 export const getWidgetInheritOptionsErrorMap = (

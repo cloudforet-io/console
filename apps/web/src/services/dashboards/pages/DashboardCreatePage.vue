@@ -28,6 +28,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardScope, DashboardViewer } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -40,14 +42,9 @@ import DashboardCustomize from '@/services/dashboards/components/DashboardCustom
 import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
 import DashboardViewerForm from '@/services/dashboards/components/DashboardViewerForm.vue';
-import {
-    DASHBOARD_SCOPE,
-    DASHBOARD_VIEWER,
-} from '@/services/dashboards/config';
-import type { DashboardScope, DashboardViewer } from '@/services/dashboards/config';
-import type { DashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 import type { ProjectItemResp } from '@/services/project/type';
 
 

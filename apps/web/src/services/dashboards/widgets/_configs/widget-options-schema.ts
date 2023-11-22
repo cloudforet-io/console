@@ -18,7 +18,6 @@ export interface WidgetOptionsSchemaProperty {
     optional?: boolean;
     inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
     item_options?: Array<VariableModelConfig>;
-    // TODO: need discussion about this spec
     scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
 }
 export type WidgetOptionsSchema = {

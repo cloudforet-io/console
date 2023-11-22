@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
-import type { WidgetConfig, WidgetOptions } from '@/services/dashboards/widgets/_configs/config';
+import type { DashboardVariableSchemaProperty } from '@/schema/dashboard/_types/dashboard-type';
+import type { WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
+
 import {
     getInitialSchemaProperties,
     getRefinedSchemaProperties,

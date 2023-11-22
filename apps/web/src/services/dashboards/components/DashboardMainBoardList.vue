@@ -86,6 +86,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -100,10 +102,8 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
-import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/services/dashboards/config';
-import type { DashboardScope } from '@/services/dashboards/config';
-import type { DashboardModel } from '@/services/dashboards/model';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 
 const PAGE_SIZE = 10;
 const DOMAIN_SCOPE_KEY = 'domain_dashboard_id';

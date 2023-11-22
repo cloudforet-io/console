@@ -7,15 +7,17 @@ import { flattenDeep } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { WidgetFiltersMap } from '@/schema/dashboard/_types/widget-type';
+
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
-import type { DateRange } from '@/services/dashboards/config';
 import type { BaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
 import type { OverridableWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { WidgetFiltersMap, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
 export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseWidgetState>, dateRange: ComputedRef<DateRange>, overrides: OverridableWidgetState = {}) => {
     const assetQueryHelper = new QueryHelper();

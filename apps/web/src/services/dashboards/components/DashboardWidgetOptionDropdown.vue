@@ -13,6 +13,13 @@ import { cloneDeep, get } from 'lodash';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import type { DashboardVariables, DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type {
+    InheritanceMode, InheritOption,
+    InheritOptions, WidgetFilterKey, WidgetFiltersMap,
+    WidgetOptionKey,
+    WidgetOptionsSchemaProperty,
+} from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -24,16 +31,7 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/components/DashboardCostWidgetValueOptionDropdown.vue';
-import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import type { InheritOption, InheritOptions, WidgetFiltersMap } from '@/services/dashboards/widgets/_configs/config';
-import type {
-    InheritanceMode, WidgetFilterKey, WidgetOptionKey,
-    WidgetOptionsSchemaProperty,
-} from '@/services/dashboards/widgets/_configs/widget-options-schema';
-import {
-    COST_VALUE_WIDGET_OPTION_CONFIGS,
-} from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const props = defineProps<{

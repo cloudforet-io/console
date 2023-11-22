@@ -1,5 +1,6 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
+import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
 import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 const costTrendStackedWidgetConfig: Partial<WidgetConfig> = {

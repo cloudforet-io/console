@@ -31,12 +31,12 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import dayjs from 'dayjs';
 import { range } from 'lodash';
 
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import DashboardToolsetDateCustomModal from '@/services/dashboards/components/DashboardToolsetDateCustomModal.vue';
-import type { DateRange } from '@/services/dashboards/config';
 
 export default defineComponent({
     name: 'DashboardDateDropdown',

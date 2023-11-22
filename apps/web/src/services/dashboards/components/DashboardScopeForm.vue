@@ -37,6 +37,8 @@ import {
     PRadio, PRadioGroup, PFieldTitle,
 } from '@spaceone/design-system';
 
+import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 
 import { MENU_ID } from '@/lib/menu/config';
@@ -44,8 +46,6 @@ import { MENU_ID } from '@/lib/menu/config';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
-import type { DashboardScope } from '@/services/dashboards/config';
 import type { ProjectItemResp } from '@/services/project/type';
 
 export default defineComponent({

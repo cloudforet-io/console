@@ -10,7 +10,8 @@ import type { Location } from 'vue-router/types/router';
 
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { DateRange } from '@/services/dashboards/config';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+
 import type {
     BaseWidgetState,
 } from '@/services/dashboards/widgets/_composables/use-widget/use-base-widget-state';
@@ -19,7 +20,7 @@ import { useWidgetConsoleFilters } from '@/services/dashboards/widgets/_composab
 import { useWidgetDateRange } from '@/services/dashboards/widgets/_composables/use-widget/use-widget-date-range';
 import { useWidgetFrame } from '@/services/dashboards/widgets/_composables/use-widget/use-widget-frame';
 import { useWidgetLocation } from '@/services/dashboards/widgets/_composables/use-widget/use-widget-location';
-import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
+import type { WidgetEmit, WidgetProps } from '@/services/dashboards/widgets/_types/widget-type';
 
 export interface OverridableWidgetState {
     dateRange?: DateRange|ComputedRef<DateRange>; // overrides dateRange

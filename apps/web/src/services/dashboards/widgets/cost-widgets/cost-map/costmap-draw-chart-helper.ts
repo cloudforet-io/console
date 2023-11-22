@@ -2,7 +2,7 @@ import {
     gray, palette, transparent, white,
 } from '@/styles/colors';
 
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 import type { TreemapChartData } from '@/services/dashboards/widgets/cost-widgets/cost-map/costmap-chart-data-helper';
 
 export const setThemeColorsToTreemapData = (treemapData: TreemapChartData['children'], theme?: WidgetTheme): TreemapChartData['children'] => {

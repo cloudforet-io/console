@@ -4,10 +4,10 @@ import { computed, reactive } from 'vue';
 import { PButtonTab, PLazyImg } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import DashboardWidgetForm from '@/services/dashboards/components/DashboardWidgetForm.vue';
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
 
 const state = reactive({

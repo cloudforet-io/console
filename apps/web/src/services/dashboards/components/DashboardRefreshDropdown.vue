@@ -30,11 +30,13 @@ import type { TranslateResult } from 'vue-i18n';
 import { PIconButton, PSelectDropdown } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import { REFRESH_INTERVAL_OPTIONS_MAP } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { RefreshIntervalOption } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import type { RefreshIntervalOption } from '@/services/dashboards/config';
-import { refreshIntervalOptionList, REFRESH_INTERVAL_OPTIONS_MAP } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+const REFRESH_INTERVAL_OPTIONS = Object.keys(REFRESH_INTERVAL_OPTIONS_MAP);
 
 interface Props {
     dashboardId: string;
@@ -88,7 +90,7 @@ export default defineComponent<Props>({
                 label: interval.label,
             }))),
             intervalDuration: computed<number|undefined>(() => {
-                if (!refreshIntervalOptionList.includes(dashboardDetailState.settings.refresh_interval_option)) return undefined;
+                if (!REFRESH_INTERVAL_OPTIONS.includes(dashboardDetailState.settings.refresh_interval_option)) return undefined;
                 return REFRESH_INTERVAL_OPTIONS_MAP[dashboardDetailState.settings.refresh_interval_option];
             }),
         });

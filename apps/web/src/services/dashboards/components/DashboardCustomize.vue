@@ -38,6 +38,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { PDivider } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -50,9 +51,6 @@ import DashboardRefreshDropdown from '@/services/dashboards/components/Dashboard
 import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
 import DashboardWidgetContainer from '@/services/dashboards/components/DashboardWidgetContainer.vue';
-import type {
-    DashboardTemplate,
-} from '@/services/dashboards/config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 

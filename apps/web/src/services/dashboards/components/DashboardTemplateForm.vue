@@ -126,15 +126,19 @@ import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
 } from '@spaceone/design-system';
 
+import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardScope, DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
+import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
+import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
 import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
-import type { DashboardTemplate, DashboardScope } from '@/services/dashboards/config';
-import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-templates/template-list';
-import type { DashboardModel, DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import type {
+    DashboardModel,
+} from '@/services/dashboards/types/dashboard-model-type';
 
 const DOMAIN_SCOPE_NAME = 'Workspace';
 const emit = defineEmits(['set-template']);

@@ -3,8 +3,8 @@ import { computed, reactive } from 'vue';
 
 import { palette } from '@/styles/colors';
 
-import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
-import { WIDGET_THEMES } from '@/services/dashboards/widgets/_configs/view-config';
+import type { WidgetColorSetType, WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
+import { WIDGET_THEMES } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 const getColorSet = (theme: WidgetTheme, colorSetType: WidgetColorSetType = 'basic'): string[] => {

@@ -73,9 +73,12 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import type { VariableType, DashboardVariableSchemaProperty } from '@/services/dashboards/config';
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type {
+    DashboardVariableSchemaProperty,
+    VariableType,
+} from '@/services/dashboards/types/dashboard-model-type';
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
     propertyName: string;

@@ -1,15 +1,27 @@
 import { cloneDeep } from 'lodash';
 
+import { DASHBOARD_LABEL } from '@/schema/dashboard/_constants/dashboard-constant';
+import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type {
+    DashboardLabel,
+    DashboardLayoutWidgetInfo,
+    DashboardVariablesSchema,
+} from '@/schema/dashboard/_types/dashboard-type';
+
 import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import type { DashboardLabel } from '@/services/dashboards/constants/dashboard-constants';
-import { DASHBOARD_LABEL } from '@/services/dashboards/constants/dashboard-constants';
-import { ERROR_CASE_WIDGET_INFO } from '@/services/dashboards/dashboard-templates/config';
-import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
+import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+
+
+const ERROR_CASE_WIDGET_INFO: Omit<DashboardLayoutWidgetInfo, 'version'|'widget_key'> = {
+    title: 'Error',
+    widget_name: 'widgetError',
+    widget_options: {},
+    size: WIDGET_SIZE.md,
+    inherit_options: {},
+};
 
 type WidgetTuple = [widgetId: string]|[widgetId: string, customInfo: Partial<Pick<DashboardLayoutWidgetInfo, 'title'|'widget_options'|'size'|'inherit_options'|'schema_properties'>>];
 export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): DashboardLayoutWidgetInfo[] => widgetList.map(
@@ -25,7 +37,11 @@ export const getDashboardLayoutWidgetInfoList = (widgetList: WidgetTuple[]): Das
             return widgetInfo;
         } catch (e) {
             console.error(e);
-            return ERROR_CASE_WIDGET_INFO;
+            return {
+                ...ERROR_CASE_WIDGET_INFO,
+                widget_key: getRandomId(),
+                version: '1',
+            };
         }
     },
 );

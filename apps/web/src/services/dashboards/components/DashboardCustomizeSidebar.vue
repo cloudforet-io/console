@@ -11,13 +11,14 @@ import {
     PButton, PDivider, PI, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
 
+import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import { store } from '@/store';
 
 import { red } from '@/styles/colors';
 
 import DashboardWidgetAddModal from '@/services/dashboards/components/DashboardWidgetAddModal.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardLayoutWidgetInfo, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface Props {

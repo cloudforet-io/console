@@ -13,6 +13,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+
 import type { ReferenceType } from '@/store/reference/all-reference-store';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
@@ -20,7 +22,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { gray } from '@/styles/colors';
 
-import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
@@ -28,13 +29,14 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/u
 import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import { CHART_TYPE, COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
 import {
     getPieChartLegends, getRefinedPieChartData,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
+import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type {
+    WidgetExpose, WidgetProps, WidgetEmit, Legend, CostAnalyzeResponse,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 interface SubData {
     [field_group: string]: any;

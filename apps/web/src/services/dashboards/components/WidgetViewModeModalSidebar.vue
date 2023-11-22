@@ -17,8 +17,8 @@ import DashboardWidgetForm
     from '@/services/dashboards/components/DashboardWidgetForm.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getNonInheritedWidgetOptionsAmongUsedVariables } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
+import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface Props {

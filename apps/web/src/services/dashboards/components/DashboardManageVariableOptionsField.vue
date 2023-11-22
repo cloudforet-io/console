@@ -77,7 +77,7 @@ import {
 import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfigType } from '@/lib/variable-models';
 
-import type { ManageVariableFormOption } from '@/services/dashboards/types/dashboard-manage-variable-type';
+import type { ManageVariableFormOption } from '@/services/dashboards/types/manage-variable-type';
 
 
 interface Props {

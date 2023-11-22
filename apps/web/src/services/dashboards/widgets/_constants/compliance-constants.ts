@@ -17,14 +17,8 @@ export const SEVERITY_STATUS_MAP = {
         name: 'PASS', label: 'Pass', color: green[500], priority: 5,
     },
 } as const;
-export type Severity = keyof typeof SEVERITY_STATUS_MAP;
 
 export const COMPLIANCE_STATUS_MAP = {
     PASS: { name: 'PASS', label: 'Pass', color: green[500] },
     FAIL: { name: 'FAIL', label: 'Fail', color: red[400] },
 } as const;
-export type ComplianceStatus = keyof typeof COMPLIANCE_STATUS_MAP;
-
-export interface CloudServiceStatsModel {
-    date: string;
-}

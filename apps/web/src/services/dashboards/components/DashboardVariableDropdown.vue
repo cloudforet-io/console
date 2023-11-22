@@ -24,8 +24,8 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 import { VariableModel } from '@/lib/variable-models';
 import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-model-menu-handler';
 
-import type { DashboardVariableSchemaProperty } from '@/services/dashboards/config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardVariableSchemaProperty } from '@/services/dashboards/types/dashboard-model-type';
 
 
 interface Props {

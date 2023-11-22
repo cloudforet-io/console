@@ -75,10 +75,11 @@ import {
     cloneDeep, debounce, merge, union,
 } from 'lodash';
 
+import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/config';
+import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';

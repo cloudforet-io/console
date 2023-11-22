@@ -6,19 +6,24 @@ import {
 } from 'lodash';
 import { defineStore } from 'pinia';
 
+import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
+import type {
+    InheritOption,
+    InheritOptions,
+    WidgetConfig,
+    WidgetOptions,
+    WidgetOptionsSchemaProperty,
+} from '@/schema/dashboard/_types/widget-type';
+
 import {
     useWidgetTitleInput,
 } from '@/services/dashboards/composables/use-widget-title-input';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
-import type {
-    DashboardLayoutWidgetInfo, InheritOption,
-    InheritOptions, UpdatableWidgetInfo, WidgetConfig,
-    WidgetOptions,
-} from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetOptionsSchemaProperty } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
+
 
 /* Description
     * This store is used to get/manage 'a' widget data.

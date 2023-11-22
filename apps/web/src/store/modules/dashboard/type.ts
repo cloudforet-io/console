@@ -1,6 +1,7 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
-import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
+import type { DomainDashboardModel, ProjectDashboardModel } from '@/services/dashboards/types/dashboard-model-type';
+
 
 export interface DashboardState {
     domainItems: DomainDashboardModel[];

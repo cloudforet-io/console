@@ -71,7 +71,7 @@ export interface WidgetConfig {
     options_schema?: WidgetOptionsSchema;
 }
 
-type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
+export type ChartType = typeof CHART_TYPE[keyof typeof CHART_TYPE];
 interface LegendOptions {
     enabled?: boolean;
     show_at?: 'table'|'chart';

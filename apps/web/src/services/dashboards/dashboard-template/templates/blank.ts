@@ -1,11 +1,11 @@
 import { computed, reactive } from 'vue';
 
+import { DASHBOARD_LABEL } from '@/schema/dashboard/_constants/dashboard-constant';
+import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
-import type { DashboardTemplate } from '@/services/dashboards/config';
-import { DASHBOARD_LABEL } from '@/services/dashboards/constants/dashboard-constants';
-import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-templates/config';
-import { getDashboardVariablesSchema } from '@/services/dashboards/dashboard-templates/helper';
+import { getDashboardVariablesSchema } from '@/services/dashboards/dashboard-template/helpers/dashboard-template-generator';
+import type { DefaultDashboardPreviewTemplate } from '@/services/dashboards/dashboard-template/types/dashboard-template-type';
 
 export const blankPreview: DefaultDashboardPreviewTemplate = reactive({
     name: 'Blank',

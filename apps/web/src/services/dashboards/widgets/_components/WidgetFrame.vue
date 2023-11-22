@@ -11,6 +11,9 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
+import { GRANULARITY, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { Granularity, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
@@ -22,10 +25,7 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { red } from '@/styles/colors';
 
-import type { DateRange } from '@/services/dashboards/config';
-import type { Granularity, WidgetSize } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 export interface WidgetFrameProps {

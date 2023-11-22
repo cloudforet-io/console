@@ -20,8 +20,9 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import type { WidgetEmit, WidgetExpose, WidgetProps } from '@/services/dashboards/widgets/_configs/config';
-import type { Legend, BudgetUsageAnalyzeResponse } from '@/services/dashboards/widgets/type';
+import type {
+    WidgetEmit, WidgetExpose, WidgetProps, Legend, BudgetUsageAnalyzeResponse,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface Data {

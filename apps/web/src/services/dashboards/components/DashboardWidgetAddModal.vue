@@ -6,6 +6,7 @@ import {
 import { PButtonModal, PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
+import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
 import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
@@ -14,7 +15,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetAddModalDefaultTab from '@/services/dashboards/components/DashboardWidgetAddModalDefaultTab.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import type { DashboardLayoutWidgetInfo } from '@/services/dashboards/widgets/_configs/config';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 

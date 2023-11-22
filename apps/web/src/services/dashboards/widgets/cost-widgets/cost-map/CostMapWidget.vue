@@ -11,6 +11,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { CostDataField } from '@/schema/dashboard/_types/widget-type';
+
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -19,9 +22,8 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/u
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type {
-    WidgetExpose, WidgetProps, WidgetEmit, CostDataField,
-} from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
+    WidgetExpose, WidgetProps, WidgetEmit,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 import type {

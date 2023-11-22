@@ -3,11 +3,13 @@ import {
     computed, reactive,
 } from 'vue';
 
-import type { DashboardSettings, DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/config';
 import type {
-    WidgetConfig, WidgetOptions,
-    InheritOptions,
-} from '@/services/dashboards/widgets/_configs/config';
+    DashboardSettings,
+    DashboardVariables,
+    DashboardVariablesSchema,
+} from '@/schema/dashboard/_types/dashboard-type';
+import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
+
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import { getInitialWidgetInheritOptions } from '@/services/dashboards/widgets/_helpers/widget-inherit-options-helper';
 import {

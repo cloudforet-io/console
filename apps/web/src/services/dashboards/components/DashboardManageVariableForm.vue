@@ -70,13 +70,11 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import DashboardManageVariableOptionsField
     from '@/services/dashboards/components/DashboardManageVariableOptionsField.vue';
-import type {
-    DashboardVariableSchemaProperty,
-} from '@/services/dashboards/config';
+import type { DashboardVariableSchemaProperty } from '@/services/dashboards/types/dashboard-model-type';
 import type {
     ManageVariableFormOption,
     ManageVariableOverlayStatus,
-} from '@/services/dashboards/types/dashboard-manage-variable-type';
+} from '@/services/dashboards/types/manage-variable-type';
 
 const CLONE_PREFIX = 'Copy - ';
 

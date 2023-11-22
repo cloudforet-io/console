@@ -2,9 +2,8 @@ import type { AsyncComponent } from 'vue';
 
 import { mergeWith } from 'lodash';
 
-import type {
-    BaseConfigInfo, WidgetConfig,
-} from '@/services/dashboards/widgets/_configs/config';
+import type { BaseConfigInfo, WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
 import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
 
 const mergeCustomizer = (val1, val2) => {
