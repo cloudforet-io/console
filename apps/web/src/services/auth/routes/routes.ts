@@ -2,15 +2,15 @@ import type { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
-import { AUTH_ROUTE } from '@/services/auth/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
-const SignOutPage = () => import('@/services/auth/sign-out/SignOutPage.vue');
-const SignInPage = () => import('@/services/auth/sign-in/SignInPage.vue');
-const DomainAdminSignInPage = () => import('@/services/auth/sign-in/DomainAdminSignInPage.vue');
-const KeycloakPage = () => import('@/services/auth/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
-const KB_SSO = () => import('@/services/auth/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
-const PasswordPage = () => import('@/services/auth/password/PasswordPage.vue');
-const ValidationEmailPage = () => import('@/services/auth/password/validation-email/ValidationEmailPage.vue');
+const SignOutPage = () => import('@/services/auth/pages/SignOutPage.vue');
+const SignInPage = () => import('@/services/auth/pages/SignInPage.vue');
+const DomainAdminSignInPage = () => import('@/services/auth/pages/DomainAdminSignInPage.vue');
+const KeycloakPage = () => import('@/services/auth/pages/KeycloakPage.vue');
+const KB_SSO = () => import('@/services/auth/pages/KB_SSOPage.vue');
+const PasswordPage = () => import('@/services/auth/pages/PasswordPage.vue');
+const ValidationEmailPage = () => import('@/services/auth/pages/ValidationEmailPage.vue');
 
 export default [
     {

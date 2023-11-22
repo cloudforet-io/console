@@ -1,9 +1,6 @@
 import type { TranslateResult } from 'vue-i18n';
-import type { Location } from 'vue-router/types/router';
 
 import { i18n } from '@/translations';
-
-import { MENU_ID } from '@/lib/menu/config';
 
 interface ValidationInfo {
     isValid: boolean;
@@ -32,20 +29,3 @@ export const getPasswordValidationInfo = (password): ValidationInfo => {
     return result;
 };
 
-export const GENERAL_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MENU_ID.HOME_DASHBOARD,
-});
-
-export const NO_ROLE_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MENU_ID.MY_PAGE_ACCOUNT,
-});
-
-export const DOMAIN_OWNER_DEFAULT_ROUTE = Object.freeze({
-    name: MENU_ID.ADMINISTRATION_USER,
-});
-
-export const getDefaultRouteAfterSignIn = (isDomainOwner: boolean, hasSystemRole: boolean, hasAnyPermissions: boolean): Location => {
-    if (isDomainOwner || hasSystemRole) return DOMAIN_OWNER_DEFAULT_ROUTE;
-    if (hasAnyPermissions) return GENERAL_USER_DEFAULT_ROUTE;
-    return NO_ROLE_USER_DEFAULT_ROUTE;
-};
