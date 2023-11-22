@@ -109,9 +109,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import { PROTOCOL_TYPE } from '@/services/my-page/types/notification-item-type';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 export default {
     name: 'NotificationChannelList',

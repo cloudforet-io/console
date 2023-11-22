@@ -6,7 +6,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-config';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 const MyPageContainer = () => import('@/services/my-page/MyPageContainer.vue');
 
