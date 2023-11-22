@@ -125,7 +125,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import TrustedAdvisorOverall from '@/services/home-dashboard/modules/trusted-advisor/TrustedAdvisorOverall.vue';
 
 enum STATUS {

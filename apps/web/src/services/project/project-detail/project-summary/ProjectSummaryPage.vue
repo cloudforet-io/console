@@ -45,7 +45,7 @@ import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
+import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
 import ProjectAlertWidget from '@/services/project/project-detail/project-summary/modules/ProjectAlertWidget.vue';
 import ProjectAllSummary from '@/services/project/project-detail/project-summary/modules/ProjectAllSummary.vue';
 import ProjectBilling from '@/services/project/project-detail/project-summary/modules/ProjectBilling.vue';

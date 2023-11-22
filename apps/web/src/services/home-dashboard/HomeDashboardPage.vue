@@ -44,7 +44,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
 
-import CloudServices from '@/services/asset-inventory/cloud-service/modules/CloudServices.vue';
+import CloudServices from '@/services/asset-inventory/components/CloudServices.vue';
 import AllSummary from '@/services/home-dashboard/modules/all-summary/AllSummary.vue';
 import CollectorProgress from '@/services/home-dashboard/modules/CollectingProgress.vue';
 import PersonalHealthDashboard

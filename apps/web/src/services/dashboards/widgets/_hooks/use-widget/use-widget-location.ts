@@ -9,7 +9,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { arrayToQueryString, objectToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import { DYNAMIC_COST_QUERY_SET_PARAMS } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import type { DateRange } from '@/services/dashboards/config';

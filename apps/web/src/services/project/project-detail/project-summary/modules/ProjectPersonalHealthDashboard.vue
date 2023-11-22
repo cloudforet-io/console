@@ -114,7 +114,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 
 enum EVENT_CATEGORY {
     accountNotification = 'accountNotification',

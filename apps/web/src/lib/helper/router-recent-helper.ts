@@ -7,7 +7,7 @@ import { getCompoundKeyWithManagedCostQuerySetFavoriteKey } from '@/lib/helper/c
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/cost-analysis/config';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/route-config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';

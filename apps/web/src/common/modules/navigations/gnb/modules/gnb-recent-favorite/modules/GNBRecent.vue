@@ -70,7 +70,7 @@ import type { SuggestionItem } from '@/common/modules/navigations/gnb/modules/gn
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import type { CostQuerySetModel } from '@/services/cost-explorer/type';
 import { DASHBOARD_SCOPE } from '@/services/dashboards/config';
 import type { DashboardModel } from '@/services/dashboards/model';

@@ -71,7 +71,7 @@ import TagsOverlay from '@/common/modules/tags/tags-panel/modules/TagsOverlay.vu
 
 import type {
     CloudServiceTagTableItem,
-} from '@/services/asset-inventory/cloud-service/cloud-service-detail/modules/type';
+} from '@/services/asset-inventory/types/cloud-service-detail-tag-type';
 
 export default {
     name: 'TagsPanel',
