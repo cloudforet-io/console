@@ -24,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { primary } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import AllSummaryDataSummary from '@/services/home-dashboard/components/AllSummaryDataSummary.vue';
 import { HOME_DASHBOARD_DATA_TYPE } from '@/services/home-dashboard/constants/home-dashboard-constant';

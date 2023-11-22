@@ -24,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CollectorContents from '@/services/asset-inventory/components/CollectorMainContents.vue';
 import CollectorNoData from '@/services/asset-inventory/components/CollectorMainNoData.vue';
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type {
     CollectorMainPageQuery,

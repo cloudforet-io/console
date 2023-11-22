@@ -6,14 +6,14 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { INFO_ROUTE } from '@/services/info/route-config';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 const InfoContainer = () => import('@/services/info/InfoContainer.vue');
 
-const NoticePage = () => import('@/services/info/notice/NoticePage.vue');
-const NoticeDetailPage = () => import('@/services/info/notice/notice-detail/NoticeDetailPage.vue');
-const NoticeCreatePage = () => import('@/services/info/notice/notice-create/NoticeCreatePage.vue');
-const NoticeUpdatePage = () => import('@/services/info/notice/notice-update/NoticeUpdatePage.vue');
+const NoticePage = () => import('@/services/info/pages/NoticePage.vue');
+const NoticeDetailPage = () => import('@/services/info/pages/NoticeDetailPage.vue');
+const NoticeCreatePage = () => import('@/services/info/pages/NoticeCreatePage.vue');
+const NoticeUpdatePage = () => import('@/services/info/pages/NoticeUpdatePage.vue');
 
 const infoRoute: RouteConfig = {
     path: 'info',

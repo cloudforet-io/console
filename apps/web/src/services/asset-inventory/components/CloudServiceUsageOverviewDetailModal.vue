@@ -85,8 +85,8 @@ import { useQueryTags } from '@/common/composables/query-tags';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
 import CloudServiceUsageOverviewSummary
     from '@/services/asset-inventory/components/CloudServiceUsageOverviewSummary.vue';
-import type { Period } from '@/services/asset-inventory/type';
 import type { CloudServiceTypeInfo } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Data {
     name?: string;

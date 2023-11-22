@@ -47,7 +47,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { ServiceAccountModel } from '@/services/asset-inventory/types/service-account-page-type';
 
 export default defineComponent({

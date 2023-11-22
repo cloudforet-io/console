@@ -8,8 +8,8 @@ import { store } from '@/store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { CLOUD_SERVICE_FILTER_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
-import type { Period } from '@/services/asset-inventory/type';
 import type { CloudServiceCategory, CloudServiceFilterMap } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 
 export const useCloudServicePageStore = defineStore('cloud-service-page', {

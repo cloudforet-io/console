@@ -122,7 +122,7 @@ import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
 import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type {
     AccountType,
     BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,

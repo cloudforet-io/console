@@ -50,7 +50,7 @@ import {
     TABLE_MIN_HEIGHT, useAssetInventorySettingsStore,
 } from '@/services/asset-inventory/stores/asset-inventory-settings-store';
 import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
-import type { Period } from '@/services/asset-inventory/type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 
 interface Props {

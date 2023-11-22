@@ -75,6 +75,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import type { TimeStamp } from '@/schema/_common/model';
+import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
+import type { NoticePostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -86,9 +88,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
-import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
-import type { NoticePostModel } from '@/services/info/notice/type';
-import { INFO_ROUTE } from '@/services/info/route-config';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+
+
 
 
 interface NoticeItem {

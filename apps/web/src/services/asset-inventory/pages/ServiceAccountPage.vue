@@ -95,7 +95,7 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { ServiceAccountModelForBinding } from '@/services/asset-inventory/types/service-account-page-type';
 
 export default {

@@ -67,6 +67,7 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { NoticePostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -74,8 +75,8 @@ import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getPostBadgeInfo } from '@/services/info/notice/helper';
-import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
+import { getPostBadgeInfo } from '@/services/info/helpers/notice-helper';
+import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
 
 interface Props {
     inputText: string;

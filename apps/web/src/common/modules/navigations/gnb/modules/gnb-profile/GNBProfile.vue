@@ -23,7 +23,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
-import { INFO_ROUTE } from '@/services/info/route-config';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 interface Props {

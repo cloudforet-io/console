@@ -19,7 +19,7 @@ import { PTag } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { Period } from '@/services/asset-inventory/type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 
 interface Props {

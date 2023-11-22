@@ -101,7 +101,7 @@ export default {
             }
 
             /*
-            * Both parameters are set in the route. (beforeEnter navigation guard in route.ts)
+            * Both parameters are set in the route. (beforeEnter navigation guard in routes.ts)
             * */
             if (params.dataSourceId && params.costQuerySetId) {
                 costQuerySetStore.$patch({

@@ -67,7 +67,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorScheduleForm from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';

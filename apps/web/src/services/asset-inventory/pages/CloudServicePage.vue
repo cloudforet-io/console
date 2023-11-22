@@ -114,13 +114,13 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import CloudServiceListCard
     from '@/services/asset-inventory/components/CloudServiceListCard.vue';
 import CloudServiceToolbox from '@/services/asset-inventory/components/CloudServiceToolbox.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { Period } from '@/services/asset-inventory/type';
 import type {
     CloudServiceCategory, CloudServicePageUrlQuery,
     CloudServicePageUrlQueryValue,
 } from '@/services/asset-inventory/types/cloud-service-page-type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 
 export default {

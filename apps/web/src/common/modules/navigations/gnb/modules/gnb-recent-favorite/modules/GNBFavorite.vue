@@ -114,7 +114,7 @@ import type { SuggestionItem, SuggestionType } from '@/common/modules/navigation
 import { SUGGESTION_TYPE } from '@/common/modules/navigations/gnb/modules/gnb-search/config';
 import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSuggestionList.vue';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';

@@ -28,7 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { coral, gray } from '@/styles/colors';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 interface CloudService {
     cloud_service_group: string;

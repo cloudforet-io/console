@@ -3,7 +3,7 @@ import { PEmpty, PButton } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const handleCreate = () => {
     SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME });
