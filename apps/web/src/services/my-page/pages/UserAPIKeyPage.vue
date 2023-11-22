@@ -6,9 +6,9 @@ import { PHeading, PTab } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import UserAPIKeyTable from '@/services/my-page/components/APIKeyTable.vue';
 import UserAPIKeyGRPCEndpointsTab from '@/services/my-page/components/UserAPIKeyGRPCEndpointsTab.vue';
 import UserAPIKeyRestEndpointsTab from '@/services/my-page/components/UserAPIKeyRestEndpointsTab.vue';
+import UserAPIKeyTable from '@/services/my-page/components/UserAPIKeyTable.vue';
 
 
 const state = reactive({

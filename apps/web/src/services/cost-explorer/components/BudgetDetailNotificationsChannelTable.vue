@@ -13,8 +13,8 @@ import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/ty
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { utcToTimezoneFormatter } from '@/services/administration/iam/user/lib/helper';
-import type { ChannelItem } from '@/services/administration/iam/user/type';
+import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
+import type { ChannelItem } from '@/services/administration/types/user-notification-type';
 
 
 const getBadgeColor = (level: string) => {

@@ -87,7 +87,7 @@ import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 

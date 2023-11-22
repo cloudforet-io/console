@@ -22,7 +22,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 export default defineComponent({
     name: 'AdministrationLNB',

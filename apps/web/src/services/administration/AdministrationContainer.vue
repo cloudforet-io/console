@@ -41,8 +41,8 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
 import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
-import RoleCreateEditHandbook from '@/services/administration/modules/RoleCreateEditHandbook.vue';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import RoleCreateEditHandbook from '@/services/administration/components/RoleCreateEditHandbook.vue';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 
 export default defineComponent({

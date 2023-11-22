@@ -1,3 +1,4 @@
+
 import type {
     PagePermissionMap,
     PagePermissionTuple, PagePermissionType, RawPagePermission,
@@ -15,7 +16,8 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
-import type { RoleType } from '@/services/administration/iam/role/config';
+import type { RoleType } from '@/api-schema/identity/role/model';
+
 
 export const getDefaultPagePermissionList = (isDomainOwner: boolean, roleType?: RoleType): PagePermissionTuple[] => {
     if (isDomainOwner) return DOMAIN_OWNER_DEFAULT_PERMISSIONS;

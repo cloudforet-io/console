@@ -25,7 +25,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { checkEmailFormat } from '@/services/administration/iam/user/lib/user-form-validations';
+import { checkEmailFormat } from '@/services/administration/helpers/user-management-form-validations';
 import type { ProjectMemberItem, ProjectMemberRoleMenuItem } from '@/services/project/types/project-member-type';
 
 
