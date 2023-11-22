@@ -5,7 +5,7 @@ import { store } from '@/store';
 
 import { errorRoutes } from '@/router/error-routes';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import administrationRoute from '@/services/administration/routes/routes';
 import alertManagerRoute from '@/services/alert-manager/routes';
 import assetInventoryRoute from '@/services/asset-inventory/routes/routes';

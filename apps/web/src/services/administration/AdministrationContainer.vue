@@ -42,7 +42,7 @@ import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
 import AdministrationLNB from '@/services/administration/AdministrationLNB.vue';
 import RoleCreateEditHandbook from '@/services/administration/components/RoleCreateEditHandbook.vue';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 
 export default defineComponent({

@@ -45,7 +45,7 @@ import deleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 export default {
     name: 'PolicyDeleteModal',

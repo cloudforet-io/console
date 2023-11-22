@@ -2,7 +2,7 @@ import type { RouteConfig } from 'vue-router';
 
 import { errorRoutes } from '@/router/error-routes';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import administrationRoute from '@/services/administration/routes/routes';
 import authRoutes from '@/services/auth/routes/routes';
 

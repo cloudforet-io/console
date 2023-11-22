@@ -6,7 +6,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 

@@ -128,7 +128,7 @@ import { NOTIFICATION_TYPE_ICONS } from '@/common/modules/navigations/gnb/module
 
 import { safe } from '@/styles/colors';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 interface NotificationItem {
     notificationId: string;

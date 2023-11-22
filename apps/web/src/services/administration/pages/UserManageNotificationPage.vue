@@ -22,7 +22,7 @@ import { PBreadcrumbs, PHeading } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
 
 export default {

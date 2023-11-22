@@ -99,7 +99,7 @@ import {
     policyCreatedAtFormatter,
     policyTypeBadgeColorFormatter,
 } from '@/services/administration/helpers/policy-helper';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
 import type { PolicyType } from '@/services/administration/types/policy-type';
 

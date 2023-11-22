@@ -29,7 +29,7 @@ import { PHeading, PButton } from '@spaceone/design-system';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import PolicyListDataTable from '@/services/administration/components/PolicyListDataTable.vue';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
 
 const policyStore = usePolicyStore();

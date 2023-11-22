@@ -107,7 +107,7 @@ import {
 import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helper';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import type { PolicyType } from '@/services/administration/types/policy-type';
 
 type DataTableTranslationField = DataTableField | {
