@@ -1,4 +1,4 @@
-import type { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/type';
+import type { ProjectGroupTreeItem, ProjectTreeRoot } from '@/services/project/types/type';
 
 export interface ProjectPageState {
     isInitiated: boolean;

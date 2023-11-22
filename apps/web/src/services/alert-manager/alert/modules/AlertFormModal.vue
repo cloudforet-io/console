@@ -94,8 +94,8 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { ALERT_URGENCY } from '@/services/alert-manager/lib/config';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import type { ProjectItemResp } from '@/services/project/type';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import type { ProjectItemResp } from '@/services/project/types/type';
 
 export default {
     name: 'AlertFormModal',

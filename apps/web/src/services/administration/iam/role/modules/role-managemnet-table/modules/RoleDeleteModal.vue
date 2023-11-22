@@ -95,7 +95,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/iam/role/config';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 import type { RoleBindingType } from '@/services/administration/type';
-import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
+import type { ProjectGroupInfo, ProjectModel } from '@/services/project/types/type';
 
 
 interface UnDeletableRole {

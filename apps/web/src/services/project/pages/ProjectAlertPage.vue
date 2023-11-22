@@ -25,7 +25,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from 'vue';
@@ -43,7 +42,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 export default {
     name: 'ProjectAlertPage',

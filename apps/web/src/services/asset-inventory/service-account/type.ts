@@ -6,7 +6,7 @@ import type { Tags, TimeStamp } from '@/schema/common/model';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 import type { ACCOUNT_TYPE } from '@/services/asset-inventory/service-account/config';
-import type { ProjectItemResp } from '@/services/project/type';
+import type { ProjectItemResp } from '@/services/project/types/type';
 
 
 const idField = 'provider';

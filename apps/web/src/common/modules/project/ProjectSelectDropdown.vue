@@ -20,8 +20,8 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProjectGroup } from '@/services/asset-inventory/service-account/type';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
-import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
+import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/types/type';
 
 interface Props {
     multiSelectable?: boolean;

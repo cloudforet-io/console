@@ -11,7 +11,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
 import { MANAGED_COST_QUERY_SET_ID_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     /* DASHBOARD */

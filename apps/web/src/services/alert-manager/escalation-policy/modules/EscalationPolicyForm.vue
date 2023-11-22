@@ -120,7 +120,7 @@ import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
 import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 
 export default {

@@ -80,7 +80,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import ProjectAlertListItem from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectAlertListItem.vue';
 import ProjectMaintenanceWindowListItem from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectMaintenanceWindowListItem.vue';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 export default {
     name: 'ProjectSearchWidget',

@@ -135,7 +135,7 @@ import ProjectEscalationPolicyChangeModal
     from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicyChangeModal.vue';
 import ProjectNotificationPolicyUpdateModal
     from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectNotificationPolicyUpdateModal.vue';
-import { PROJECT_ROUTE } from '@/services/project/route-config';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
 
 const NOTIFICATION_URGENCY = Object.freeze({
     ALL: 'ALL',

@@ -17,7 +17,7 @@ import homeDashboardRoute from '@/services/home-dashboard/routes';
 import infoRoute from '@/services/info/routes';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 import myPageRoute from '@/services/my-page/routes';
-import projectRoute from '@/services/project/routes';
+import projectRoute from '@/services/project/routes/routes';
 
 export const ROOT_ROUTE = Object.freeze({
     _NAME: 'root',

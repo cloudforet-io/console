@@ -48,8 +48,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useProjectPageStore } from '@/services/project/store/project-page-store';
-import type { ProjectModel } from '@/services/project/type';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type { ProjectModel } from '@/services/project/types/type';
 
 import TranslateResult = VueI18n.TranslateResult;
 
