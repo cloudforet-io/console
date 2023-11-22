@@ -23,7 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import BudgetCreateFormAmountPlan
     from '@/services/cost-explorer/components/BudgetCreateFormAmountPlan.vue';
 import BudgetCreateFormBaseInfo from '@/services/cost-explorer/components/BudgetCreateFormBaseInfo.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import type { BudgetAmountPlanInfo } from '@/services/cost-explorer/types/budget-form-type';
 
 

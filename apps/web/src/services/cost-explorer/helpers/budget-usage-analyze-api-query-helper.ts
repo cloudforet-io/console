@@ -3,7 +3,7 @@ import { isEmpty } from 'lodash';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';

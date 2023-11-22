@@ -9,7 +9,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
 const DashboardsMainPage = () => import('@/services/dashboards/pages/DashboardsMainPage.vue');

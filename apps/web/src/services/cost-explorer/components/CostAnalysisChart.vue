@@ -20,7 +20,7 @@ import CostAnalysisStackedColumnChart
     from '@/services/cost-explorer/components/CostAnalysisStackedColumnChart.vue';
 import {
     GRANULARITY,
-} from '@/services/cost-explorer/constants/cost-explorer-constants';
+} from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     getLegends, getXYChartData,
 } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';

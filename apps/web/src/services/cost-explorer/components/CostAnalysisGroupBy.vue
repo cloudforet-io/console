@@ -20,7 +20,7 @@ import { showInfoMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
 

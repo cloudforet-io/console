@@ -15,7 +15,7 @@ import {
     gray, indigo, red,
 } from '@/styles/colors';
 
-import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getStackedChartData } from '@/services/cost-explorer/helpers/cost-explorer-chart-data-helper';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 import type { XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';

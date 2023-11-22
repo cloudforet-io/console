@@ -1,6 +1,6 @@
 import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 
-import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const complianceStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'complianceStatus',

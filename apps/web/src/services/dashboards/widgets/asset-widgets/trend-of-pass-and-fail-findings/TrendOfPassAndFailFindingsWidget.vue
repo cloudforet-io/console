@@ -29,7 +29,7 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/u
 import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
-import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constants';
+import { COMPLIANCE_STATUS_MAP } from '@/services/dashboards/widgets/_constants/compliance-constant';
 import {
     getDateAxisSettings,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';

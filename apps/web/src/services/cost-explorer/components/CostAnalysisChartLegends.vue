@@ -13,7 +13,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 import type { Legend } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 

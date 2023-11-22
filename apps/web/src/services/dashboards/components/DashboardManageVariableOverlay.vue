@@ -76,7 +76,7 @@ import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.v
 import DashboardManageVariableForm from '@/services/dashboards/components/DashboardManageVariableForm.vue';
 import DashboardManageVariableTable
     from '@/services/dashboards/components/DashboardManageVariableTable.vue';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type {
     DashboardVariableSchemaProperty,

@@ -19,7 +19,7 @@ import BudgetDetailNotifications
     from '@/services/cost-explorer/components/BudgetDetailNotifications.vue';
 import BudgetDetailSummary
     from '@/services/cost-explorer/components/BudgetDetailSummary.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 

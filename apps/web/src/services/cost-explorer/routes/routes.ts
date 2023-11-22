@@ -12,7 +12,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { DYNAMIC_COST_QUERY_SET_PARAMS, MANAGED_COST_QUERY_SET_IDS } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import CostExplorerHome from '@/services/cost-explorer/pages/CostExplorerHome.vue';
-import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-config';
+import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplorerContainer.vue');
 

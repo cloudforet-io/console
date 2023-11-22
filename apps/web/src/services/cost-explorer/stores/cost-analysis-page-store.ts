@@ -10,7 +10,7 @@ import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type {

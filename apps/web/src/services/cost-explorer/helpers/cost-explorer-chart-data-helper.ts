@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
-import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getPeriodByGranularity } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import type { ChartData, Legend, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
 import type {

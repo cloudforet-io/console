@@ -20,7 +20,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CostAnalysisFiltersAddMoreButton
     from '@/services/cost-explorer/components/CostAnalysisFiltersAddMoreButton.vue';
-import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constants';
+import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
 const costAnalysisPageStore = useCostAnalysisPageStore();

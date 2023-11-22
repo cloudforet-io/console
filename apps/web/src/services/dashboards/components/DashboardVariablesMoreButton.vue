@@ -80,7 +80,7 @@ import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboa
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 

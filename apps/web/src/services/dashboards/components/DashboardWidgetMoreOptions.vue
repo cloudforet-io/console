@@ -9,8 +9,9 @@ import {
 } from '@spaceone/design-system';
 import { chain, isEqual } from 'lodash';
 
+import type { WidgetOptionsSchemaProperty } from '@/schema/dashboard/_types/widget-type';
+
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import type { WidgetOptionsSchemaProperty } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 
 interface MenuItem {
     name: string;

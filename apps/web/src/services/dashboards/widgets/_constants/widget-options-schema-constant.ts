@@ -1,69 +1,10 @@
-import type { VariableModelConfig } from '@/lib/variable-models';
+import type {
+    WidgetFilterOptionKey, WidgetOptionKey,
+    WidgetOptionsSchemaProperty,
+} from '@/schema/dashboard/_types/widget-type';
+
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
-/*
- * inheritance_mode: how to inherit widget options from dashboard variables.
- *      NONE: no inheritance
- *      KEY_MATCHING: inherit by key matching
- *      SELECTION_TYPE_MATCHING: inherit by selection type matching
- */
-export type InheritanceMode = 'NONE'|'KEY_MATCHING'|'SELECTION_TYPE_MATCHING';
-
-export interface WidgetOptionsSchemaProperty {
-    key: string; // e.g. cost_data_source
-    name?: string; // e.g. Data Source
-    selection_type?: 'SINGLE'|'MULTI';
-    readonly?: boolean;
-    fixed?: boolean;
-    optional?: boolean;
-    inheritance_mode?: InheritanceMode; // default: 'KEY_MATCHING'
-    item_options?: Array<VariableModelConfig>;
-    scope?: 'GLOBAL'|'LOCAL'; // default: 'LOCAL'
-}
-export type WidgetOptionsSchema = {
-    properties: Record<string, WidgetOptionsSchemaProperty>;
-    order: string[];
-};
-
-export const WIDGET_OPTION_FILTER_KEY_MAP = {
-    // common
-    provider: 'filters.provider',
-    project: 'filters.project',
-    service_account: 'filters.service_account',
-    project_group: 'filters.project_group',
-    region: 'filters.region',
-    // 'filters.cloud_service_type': 'filters.cloud_service_type',
-    // 'filters.user': 'filters.user',
-    // cost
-    cost_product: 'filters.cost_product',
-    cost_usage_type: 'filters.cost_usage_type',
-    cost_tag_value: 'filters.cost_tag_value',
-    cost_additional_info_value: 'filters.cost_additional_info_value',
-    // asset
-    asset_account: 'filters.asset_account',
-} as const;
-export type WidgetFilterKey = keyof typeof WIDGET_OPTION_FILTER_KEY_MAP;
-export type WidgetFilterOptionKey = typeof WIDGET_OPTION_FILTER_KEY_MAP[keyof typeof WIDGET_OPTION_FILTER_KEY_MAP];
-
-const WIDGET_FILTER_OPTION_KEYS = Object.values(WIDGET_OPTION_FILTER_KEY_MAP);
-
-export const WIDGET_OPTION_KEYS = [
-    // common
-    'granularity',
-    // cost option keys
-    'cost_data_source',
-    'cost_data_type',
-    'cost_data_field',
-    'cost_secondary_data_field',
-    // asset option keys
-    'cloud_service_query_set',
-    'asset_data_field',
-    'asset_data_type',
-    'asset_secondary_data_field',
-    // option filters
-    ...WIDGET_FILTER_OPTION_KEYS,
-] as const;
-export type WidgetOptionKey = typeof WIDGET_OPTION_KEYS[number];
 
 // HACK: Modeling it like any other option thereafter
 export const COST_VALUE_WIDGET_OPTION_CONFIGS = {
@@ -273,40 +214,4 @@ export const WIDGET_OPTIONS_SCHEMA_PROPERTIES: Omit<Record<WidgetOptionKey, Widg
         ],
     },
 };
-
-type CustomOptionTuple = [WidgetOptionKey, Partial<WidgetOptionsSchemaProperty>];
-export const getWidgetOptionsSchema = (options: (WidgetOptionKey|CustomOptionTuple)[]): WidgetOptionsSchema => {
-    const properties = {} as Record<WidgetOptionKey, WidgetOptionsSchemaProperty>;
-    const order: string[] = [];
-
-    options.forEach((option) => {
-        const optionName = typeof option === 'string' ? option : option[0];
-
-        if (WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName]) {
-            properties[optionName] = WIDGET_OPTIONS_SCHEMA_PROPERTIES[optionName] as WidgetOptionsSchemaProperty;
-        } else if (WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName]) {
-            const filterProperty = WIDGET_FILTERS_SCHEMA_PROPERTIES[optionName];
-            properties[optionName] = filterProperty as WidgetOptionsSchemaProperty;
-        } else {
-            console.error(new Error(`No matched option schema for ${optionName}`));
-        }
-
-        if (Array.isArray(option) && option[1]) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { key: _, ...additionalProperties } = option[1];
-
-            const defaultProperties = {
-                ...properties[optionName],
-                ...additionalProperties,
-            };
-
-            properties[optionName] = defaultProperties;
-        } else if (typeof option !== 'string') console.error(new Error(`Wrong format of argument ${option}`));
-
-        order.push(optionName);
-    });
-
-    return { properties, order };
-};
-
 
