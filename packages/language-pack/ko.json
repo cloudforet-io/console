@@ -1951,18 +1951,6 @@
 				"USER_MANAGEMENT": "사용자 관리 ",
 				"YESTERDAY": "어제 "
 			},
-			"MFA": {
-				"BTN_CHANGE": "변경",
-				"BTN_SEND_MAIL": "인증 코드 전송",
-				"ENABLE_MFA": "",
-				"MODAL": {
-					"TITLE": ""
-				},
-				"STATE_NOT_VERIFIED": "인증되지 않음",
-				"STATE_VERIFIED": "인증됨",
-				"TITLE": "",
-				"TYPE": ""
-			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "프로젝트 채널 삭제 실패",
 				"ALT_E_DELETE_USER_CHANNEL": "사용자 채널 삭제 실패",
@@ -2767,6 +2755,15 @@
 		}
 	},
 	"MY_PAGE": {
+		"MFA": {
+			"BTN_CHANGE": "변경",
+			"BTN_SEND_MAIL": "인증 코드 전송",
+			"ENABLE_MFA": "",
+			"STATE_NOT_VERIFIED": "인증되지 않음",
+			"STATE_VERIFIED": "인증됨",
+			"TITLE": "",
+			"TYPE": ""
+		},
 		"NOTIFICATION": {
 			"ADD_CHANNEL": "알림 채널 추가"
 		}

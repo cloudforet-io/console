@@ -1951,18 +1951,6 @@
 				"USER_MANAGEMENT": "ユーザー管理",
 				"YESTERDAY": "昨日"
 			},
-			"MFA": {
-				"BTN_CHANGE": "変更",
-				"BTN_SEND_MAIL": "認証コード送信",
-				"ENABLE_MFA": "",
-				"MODAL": {
-					"TITLE": ""
-				},
-				"STATE_NOT_VERIFIED": "認証されていません",
-				"STATE_VERIFIED": "認証済みです",
-				"TITLE": "",
-				"TYPE": ""
-			},
 			"NOTIFICATION": {
 				"ALT_E_DELETE_PROJECT_CHANNEL": "プロジェクトチャンネルの削除に失敗",
 				"ALT_E_DELETE_USER_CHANNEL": "ユーザーチャンネルの削除に失敗",
@@ -2767,6 +2755,15 @@
 		}
 	},
 	"MY_PAGE": {
+		"MFA": {
+			"BTN_CHANGE": "変更",
+			"BTN_SEND_MAIL": "認証コード送信",
+			"ENABLE_MFA": "",
+			"STATE_NOT_VERIFIED": "認証されていません",
+			"STATE_VERIFIED": "認証済みです",
+			"TITLE": "",
+			"TYPE": ""
+		},
 		"NOTIFICATION": {
 			"ADD_CHANNEL": "通知チャンネル追加"
 		}
