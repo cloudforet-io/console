@@ -11,6 +11,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { NoticePostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -23,8 +24,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { NoticePostModel } from '@/services/info/notice/type';
-import { INFO_ROUTE } from '@/services/info/route-config';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+
 
 interface Props {
     boardId?: string;

@@ -60,9 +60,9 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-import type { Period } from '@/services/asset-inventory/type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Props {
     item: any;

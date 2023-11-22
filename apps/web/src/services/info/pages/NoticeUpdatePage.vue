@@ -19,12 +19,13 @@ import { PHeading } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { NoticePostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import NoticeForm from '@/services/info/notice/modules/NoticeForm.vue';
-import type { NoticePostModel } from '@/services/info/notice/type';
+import NoticeForm from '@/services/info/components/NoticeForm.vue';
+
 
 export default {
     name: 'NoticeUpdatePage',

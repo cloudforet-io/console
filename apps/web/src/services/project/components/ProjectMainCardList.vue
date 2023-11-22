@@ -29,7 +29,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config.js';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant.js';
 import ProjectDetailProjectFormModal from '@/services/project/components/ProjectDetailProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';

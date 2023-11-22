@@ -1,8 +1,9 @@
+import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
+import type { NoticePostType } from '@/schema/board/post/type';
 import { i18n } from '@/translations';
 
-import type { NoticePostType } from '@/services/info/notice/config';
-import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
-import type { NoticePostBadgeInfo } from '@/services/info/notice/type';
+import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
+
 
 export const getPostBadgeInfo = (noticePostType: NoticePostType): NoticePostBadgeInfo => {
     switch (noticePostType) {

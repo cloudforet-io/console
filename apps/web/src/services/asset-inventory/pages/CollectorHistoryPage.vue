@@ -41,7 +41,7 @@ import {
     statusTextColorFormatter,
     statusTextFormatter,
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-history-page-type';
 import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
 

@@ -31,7 +31,7 @@ import CollectorContentItem from '@/services/asset-inventory/components/Collecto
 import CollectorListNoData from '@/services/asset-inventory/components/CollectorMainListNoData.vue';
 import CollectorScheduleModal
     from '@/services/asset-inventory/components/CollectorMainScheduleModal.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
 import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/types/collector-main-page-type';

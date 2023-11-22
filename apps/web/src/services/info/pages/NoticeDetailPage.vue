@@ -119,11 +119,13 @@ import {
     PBadge, PButton, PDataLoader, PDivider, PI, PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
+import type { NoticePostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -136,11 +138,11 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
-import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
-import { getPostBadgeInfo } from '@/services/info/notice/helper';
-import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
-import type { NoticePostModel, NoticePostBadgeInfo } from '@/services/info/notice/type';
-import { INFO_ROUTE } from '@/services/info/route-config';
+import ListItem from '@/services/info/components/NoticeListItem.vue';
+import { getPostBadgeInfo } from '@/services/info/helpers/notice-helper';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
+
 
 export default {
     name: 'NoticeDetailPage',

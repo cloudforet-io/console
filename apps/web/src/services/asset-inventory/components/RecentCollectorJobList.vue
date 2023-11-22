@@ -12,7 +12,7 @@ import { i18n } from '@/translations';
 
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/components/CollectorJobStatusIcon.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CollectorLink } from '@/services/asset-inventory/types/collector-main-page-type';
 import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
 

@@ -83,6 +83,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
+import type { NoticePostModel } from '@/schema/board/post/model';
+import type { NoticePostType } from '@/schema/board/post/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -92,11 +95,9 @@ import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { NoticePostType } from '@/services/info/notice/config';
-import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
-import ListItem from '@/services/info/notice/modules/list-item/ListItem.vue';
-import type { NoticePostModel } from '@/services/info/notice/type';
-import { INFO_ROUTE } from '@/services/info/route-config';
+import ListItem from '@/services/info/components/NoticeListItem.vue';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+
 
 interface Props {
     noticeItems: any[];

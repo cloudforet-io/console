@@ -3,7 +3,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type { CLOUD_SERVICE_CATEGORY, CLOUD_SERVICE_FILTER_KEY, CLOUD_SERVICE_PAGE_URL_QUERY_KEY } from '@/services/asset-inventory/constants/cloud-service-constant';
-import type { Period } from '@/services/asset-inventory/type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 type CloudServicePageUrlQueryKey = typeof CLOUD_SERVICE_PAGE_URL_QUERY_KEY[number];
 

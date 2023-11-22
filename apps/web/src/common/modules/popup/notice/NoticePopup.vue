@@ -19,12 +19,13 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { NoticePostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupItem.vue';
 
-import type { NoticePostModel } from '@/services/info/notice/type';
+
 
 export default {
     name: 'NoticePopup',

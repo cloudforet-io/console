@@ -25,8 +25,8 @@ import {
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import NoticeList from '@/services/info/notice/modules/NoticeList.vue';
-import { INFO_ROUTE } from '@/services/info/route-config';
+import NoticeList from '@/services/info/components/NoticeList.vue';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/route-config';
 
 export default {

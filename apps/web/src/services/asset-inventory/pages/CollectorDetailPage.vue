@@ -126,7 +126,7 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/components/CollectorDetailScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/components/CollectorDetailServiceAccountsSection.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';

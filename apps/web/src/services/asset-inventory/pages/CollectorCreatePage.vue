@@ -72,7 +72,7 @@ import CreateCollectorStep3
     from '@/services/asset-inventory/components/CollectorCreateStep3.vue';
 import CreateCollectorStep4
     from '@/services/asset-inventory/components/CollectorCreateStep4.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const state = reactive({
     step: 1,
