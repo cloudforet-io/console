@@ -63,7 +63,7 @@
                 :title="$t('COMMON.WIDGETS.COLLECTING_JOBS_NO_RUNNING')"
             >
                 <template #image>
-                    <img src="@/assets/images/illust_star.svg"
+                    <img src="../../../assets/images/illust_star.svg"
                          alt="empty-image"
                     >
                 </template>

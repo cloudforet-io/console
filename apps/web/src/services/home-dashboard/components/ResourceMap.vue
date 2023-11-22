@@ -364,7 +364,7 @@ onUnmounted(() => {
                         :title="$t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION')"
                     >
                         <template #image>
-                            <img src="@/assets/images/illust_microscope.svg"
+                            <img src="../../../assets/images/illust_microscope.svg"
                                  alt="illust_microscope"
                             >
                         </template>

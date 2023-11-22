@@ -2,9 +2,9 @@ import type { RouteConfig } from 'vue-router';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
-const HomeDashboard = () => import('@/services/home-dashboard/HomeDashboardPage.vue');
+const HomeDashboard = () => import('@/services/home-dashboard/pages/HomeDashboardPage.vue');
 
 export default {
     path: 'home-dashboard',

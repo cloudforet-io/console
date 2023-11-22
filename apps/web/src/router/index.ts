@@ -13,7 +13,7 @@ import { GTag } from '@/lib/gtag';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 
 import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 

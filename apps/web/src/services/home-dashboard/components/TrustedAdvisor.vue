@@ -87,7 +87,7 @@
                 >
                     <template #image>
                         <img alt="illust_planet"
-                             src="@/assets/images/illust_planet.svg"
+                             src="../../../assets/images/illust_planet.svg"
                         >
                     </template>
                     {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA_DESC') }}
@@ -126,7 +126,7 @@ import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
-import TrustedAdvisorOverall from '@/services/home-dashboard/modules/trusted-advisor/TrustedAdvisorOverall.vue';
+import TrustedAdvisorOverall from '@/services/home-dashboard/components/TrustedAdvisorOverall.vue';
 
 enum STATUS {
     error = 'error',

@@ -2,6 +2,7 @@
 import {
     computed, reactive, ref, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import {
@@ -25,12 +26,17 @@ import { primary } from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
 import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import AllSummaryDataSummary from '@/services/home-dashboard/modules/all-summary/AllSummaryDataSummary.vue';
-import type { DateItem, DateType, DataType } from '@/services/home-dashboard/modules/type';
-import { DATA_TYPE } from '@/services/home-dashboard/modules/type';
+import AllSummaryDataSummary from '@/services/home-dashboard/components/AllSummaryDataSummary.vue';
+import { HOME_DASHBOARD_DATA_TYPE } from '@/services/home-dashboard/constants/home-dashboard-constant';
+import type { HomeDashboardDataType } from '@/services/home-dashboard/types/home-dashboard-type';
 
 
 /* type */
+type DateType = 'DAILY' | 'MONTHLY';
+interface DateItem {
+    name: DateType;
+    label: TranslateResult;
+}
 type Unit = 'b' | 'gb' | 'kb' | 'mb' | 'pb' | 'tb' | 'B' | 'GB' | 'KB' | 'MB' | 'PB' | 'TB';
 interface ChartData {
     date: string;
@@ -79,24 +85,24 @@ const state = reactive({
     //
     loading: true,
     count: {
-        [DATA_TYPE.SERVER]: 0,
-        [DATA_TYPE.DATABASE]: 0,
-        [DATA_TYPE.STORAGE]: 0,
+        [HOME_DASHBOARD_DATA_TYPE.SERVER]: 0,
+        [HOME_DASHBOARD_DATA_TYPE.DATABASE]: 0,
+        [HOME_DASHBOARD_DATA_TYPE.STORAGE]: 0,
     } as CountMap,
     storageBoxSuffix: 'TB' as Unit,
     storageTrendSuffix: 'TB' as Unit,
-    activeTab: DATA_TYPE.SERVER as DataType,
+    activeTab: HOME_DASHBOARD_DATA_TYPE.SERVER as HomeDashboardDataType,
     tabs: computed<TabItem[]>(() => [
         {
-            name: DATA_TYPE.SERVER,
+            name: HOME_DASHBOARD_DATA_TYPE.SERVER,
             label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.SERVER'),
         },
         {
-            name: DATA_TYPE.DATABASE,
+            name: HOME_DASHBOARD_DATA_TYPE.DATABASE,
             label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE'),
         },
         {
-            name: DATA_TYPE.STORAGE,
+            name: HOME_DASHBOARD_DATA_TYPE.STORAGE,
             label: i18n.t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
         },
     ]),
@@ -191,14 +197,14 @@ const getChartData = (data): ChartData[] => {
     const dateUnit = dateType === 'MONTHLY' ? 'month' : 'day';
     const dateFormat = dateType === 'MONTHLY' ? 'YYYY-MM' : 'YYYY-MM-DD';
 
-    if (state.activeTab === DATA_TYPE.STORAGE) {
+    if (state.activeTab === HOME_DASHBOARD_DATA_TYPE.STORAGE) {
         const smallestCount = Math.min(...data.map((d) => d.total));
         const formattedSize = byteFormatter(smallestCount);
         if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
     }
     const formattedData = data.map((d) => {
         let count = d.total;
-        if (state.activeTab === DATA_TYPE.STORAGE) {
+        if (state.activeTab === HOME_DASHBOARD_DATA_TYPE.STORAGE) {
             const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
             if (formattedSize) count = Number(formattedSize.split(' ')[0]);
         }
@@ -242,13 +248,13 @@ const getCount = async () => {
     try {
         const { results } = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
             ...props.extraParams,
-            labels: Object.values(DATA_TYPE),
+            labels: Object.values(HOME_DASHBOARD_DATA_TYPE),
         });
 
         results.forEach((result) => {
             let count;
-            const label: DataType = result.label;
-            if (label === DATA_TYPE.STORAGE) {
+            const label: HomeDashboardDataType = result.label;
+            if (label === HOME_DASHBOARD_DATA_TYPE.STORAGE) {
                 state.storageBoxSuffix = byteFormatter(result.total).split(' ')[1] as Unit;
                 count = parseFloat(byteFormatter(result.total).split(' ')[0]);
                 count = numberFormatter(count);
@@ -292,7 +298,7 @@ const init = async () => {
     state.loading = true;
     await Promise.all([
         getCount(),
-        getTrend(DATA_TYPE.SERVER),
+        getTrend(HOME_DASHBOARD_DATA_TYPE.SERVER),
     ]);
     state.loading = false;
 };
@@ -342,7 +348,7 @@ watch(() => state.selectedDateType, async () => {
                                     <span class="value">{{ state.count[name] }}</span>
                                 </span>
                             </router-link>
-                            <span v-if="name === DATA_TYPE.STORAGE"
+                            <span v-if="name === HOME_DASHBOARD_DATA_TYPE.STORAGE"
                                   class="suffix"
                             >{{ state.storageBoxSuffix }}</span>
                         </template>
