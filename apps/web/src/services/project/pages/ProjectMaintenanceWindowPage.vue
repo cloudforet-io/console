@@ -27,7 +27,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
-import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert/project-maintenance-window/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
@@ -54,6 +53,11 @@ const fields = [
     { name: 'created_by', label: 'Created By' },
     { name: 'created_at', label: 'Created' },
 ];
+const MAINTENANCE_WINDOW_STATE = {
+    NONE: 'None',
+    OPEN: 'Open',
+    CLOSED: 'Closed',
+} as const;
 
 interface Props {
     id?: string;
