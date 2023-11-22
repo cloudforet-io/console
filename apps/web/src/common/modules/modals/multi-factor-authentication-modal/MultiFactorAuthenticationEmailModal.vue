@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -92,11 +92,6 @@ const handleClickConfirmButton = async () => {
         emit('refresh');
     }
 };
-
-/* Watcher */
-watch(() => props.visible, (value) => {
-    state.proxyVisible = value;
-}, { immediate: true });
 </script>
 
 <template>
@@ -138,7 +133,7 @@ watch(() => props.visible, (value) => {
                     <p-text-input :value="validationState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
                                   class="text-input"
-                                  @change="handleChangeInput"
+                                  @update:value="handleChangeInput"
                     />
                 </p-field-group>
                 <div class="collapsible-wrapper">
