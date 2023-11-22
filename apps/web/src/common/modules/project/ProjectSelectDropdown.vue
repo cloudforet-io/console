@@ -21,7 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { ProjectGroup } from '@/services/asset-inventory/types/service-account-page-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import type { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/types/type';
+import type { ProjectTreeNodeData, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/types/project-tree-type';
 
 interface Props {
     multiSelectable?: boolean;
@@ -45,7 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
     useFixedMenuStyle: true,
 });
 
-const emit = defineEmits<{(e: 'select', value: ProjectItemResp[]): void;
+const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
     (e: 'close'): void;
     (e: 'update:selected-project-ids', value: string[]): void;
 }>();
@@ -60,7 +60,7 @@ const state = reactive({
     root: null as ProjectTreeRoot|null,
     // selected states
     selectedProjectItems: [] as ProjectTreeItem[],
-    selectedProjects: computed<ProjectItemResp[]>(() => state.selectedProjectItems.map((d) => d.node.data)),
+    selectedProjects: computed<ProjectTreeNodeData[]>(() => state.selectedProjectItems.map((d) => d.node.data)),
     _selectedProjectIds: [...props.selectedProjectIds] as string[],
     selectedItems: computed<SelectDropdownMenuItem[]>({
         get() {

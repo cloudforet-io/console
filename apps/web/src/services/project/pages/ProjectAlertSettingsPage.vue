@@ -20,13 +20,14 @@ import { red } from '@/styles/colors';
 
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
-import ProjectAutoRecoveryUpdateModal
-    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectAutoRecoveryUpdateModal.vue';
-import ProjectEscalationPolicy from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicy.vue';
-import ProjectEscalationPolicyChangeModal
-    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicyChangeModal.vue';
-import ProjectNotificationPolicyUpdateModal
-    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectNotificationPolicyUpdateModal.vue';
+import ProjectAlertSettingsAutoRecoveryUpdateModal
+    from '@/services/project/components/ProjectAlertSettingsAutoRecoveryUpdateModal.vue';
+import ProjectAlertSettingsEscalationPolicy
+    from '@/services/project/components/ProjectAlertSettingsEscalationPolicy.vue';
+import ProjectAlertSettingsEscalationPolicyChangeModal
+    from '@/services/project/components/ProjectAlertSettingsEscalationPolicyChangeModal.vue';
+import ProjectAlertSettingsNotificationPolicyUpdateModal
+    from '@/services/project/components/ProjectAlertSettingsNotificationPolicyUpdateModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
@@ -213,27 +214,27 @@ onActivated(() => {
                 </div>
             </div>
             <div class="content-wrapper">
-                <project-escalation-policy
+                <project-alert-settings-escalation-policy
                     :project-id="props.id"
                     :escalation-policy="state.escalationPolicy"
                 />
             </div>
         </section>
         <!--modals-->
-        <project-notification-policy-update-modal
+        <project-alert-settings-notification-policy-update-modal
             :project-id="props.id"
             :visible.sync="state.updateNotificationPolicyModalVisible"
             :select-options="state.notificationUrgencyList"
             :selected-option="state.notificationUrgency"
             @confirm="getProjectAlertConfig"
         />
-        <project-auto-recovery-update-modal
+        <project-alert-settings-auto-recovery-update-modal
             :project-id="props.id"
             :visible.sync="state.updateAutoRecoveryModalVisible"
             :selected-option="state.recoveryMode"
             @confirm="getProjectAlertConfig"
         />
-        <project-escalation-policy-change-modal
+        <project-alert-settings-escalation-policy-change-modal
             :project-id="props.id"
             :visible.sync="state.changeEscalationPolicyModalVisible"
             :escalation-policy-id="state.escalationPolicyId"

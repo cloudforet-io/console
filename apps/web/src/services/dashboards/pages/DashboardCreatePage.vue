@@ -45,7 +45,7 @@ import DashboardViewerForm from '@/services/dashboards/components/DashboardViewe
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
-import type { ProjectItemResp } from '@/services/project/types/type';
+import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -56,12 +56,12 @@ const {
     isAllValid,
 } = useFormValidator({
     dashboardTemplate: {} as DashboardModel,
-    dashboardProject: undefined as undefined|ProjectItemResp,
+    dashboardProject: undefined as undefined|ProjectTreeNodeData,
 }, {
     dashboardTemplate(value: DashboardModel) {
         return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
     },
-    dashboardProject(value: ProjectItemResp|undefined) {
+    dashboardProject(value: ProjectTreeNodeData|undefined) {
         return !value && state.dashboardScope === DASHBOARD_SCOPE.PROJECT
             ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
     },

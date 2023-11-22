@@ -10,7 +10,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import ProjectMemberTab from '@/services/project/project-detail/project-member/modules/ProjectMemberTab.vue';
+import ProjectMemberTab from '@/services/project/components/ProjectMemberTab.vue';
 
 
 interface Props {

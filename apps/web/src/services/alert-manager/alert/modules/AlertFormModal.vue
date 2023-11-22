@@ -71,7 +71,6 @@
 </template>
 
 <script lang="ts">
-
 import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs, watch,
@@ -95,7 +94,8 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { ALERT_URGENCY } from '@/services/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import type { ProjectItemResp } from '@/services/project/types/type';
+import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+
 
 export default {
     name: 'AlertFormModal',
@@ -199,7 +199,7 @@ export default {
             }
         };
 
-        const onSelectProject = async (projects: ProjectItemResp[]) => {
+        const onSelectProject = async (projects: ProjectTreeNodeData[]) => {
             state.selectedProjectId = projects[0]?.id ?? null;
             if (state.selectedProjectId) await checkProject();
         };

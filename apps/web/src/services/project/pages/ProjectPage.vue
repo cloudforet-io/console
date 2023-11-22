@@ -33,16 +33,16 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
-import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
-import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
-import ProjectGroupFormModal from '@/services/project/modules/ProjectGroupFormModal.vue';
-import ProjectSearch from '@/services/project/modules/ProjectSearch.vue';
-import ProjectTree from '@/services/project/modules/ProjectTree.vue';
-import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
+import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
+import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
+import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
+import ProjectMainProjectSearch from '@/services/project/components/ProjectMainProjectSearch.vue';
+import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
+import ProjectMemberOverlay from '@/services/project/components/ProjectMemberOverlay.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type {
-    ProjectGroup, ProjectGroupTreeItem,
-} from '@/services/project/types/type';
+    ProjectGroupTreeNodeData, ProjectGroupTreeItem,
+} from '@/services/project/types/project-tree-type';
 
 
 const route = useRoute();
@@ -115,7 +115,7 @@ const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
 };
 
 /* Navigation */
-const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
+const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroupTreeNodeData}) => {
     if (item.data) await projectPageStore.selectNode(item.data.id);
 };
 
@@ -238,12 +238,13 @@ onUnmounted(() => {
 
                     <div class="sidebar-item-wrapper">
                         <sidebar-title :title="$t('PROJECT.LANDING.SEARCH')" />
-                        <project-search />
+                        <project-main-project-search />
                     </div>
 
                     <div class="sidebar-item-wrapper">
-                        <project-tree :init-group-id="state.initGroupId"
-                                      :manage-disabled="!state.hasManagePermission"
+                        <project-main-project-tree
+                            :init-group-id="state.initGroupId"
+                            :manage-disabled="!state.hasManagePermission"
                         />
                     </div>
                 </div>
@@ -314,20 +315,22 @@ onUnmounted(() => {
                             </div>
                         </template>
                     </p-heading>
-                    <project-card-list class="card-container"
-                                       :parent-groups="storeState.parentGroups"
-                                       :manage-disabled="!state.hasRootProjectGroupManagePermission"
-                                       @create-project-group="openProjectGroupCreateForm"
+                    <project-main-card-list
+                        class="card-container"
+                        :parent-groups="storeState.parentGroups"
+                        :manage-disabled="!state.hasRootProjectGroupManagePermission"
+                        @create-project-group="openProjectGroupCreateForm"
                     />
 
-                    <project-group-form-modal v-if="storeState.projectGroupFormVisible" />
+                    <project-main-project-group-form-modal v-if="storeState.projectGroupFormVisible" />
 
-                    <project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
+                    <project-main-project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
 
-                    <project-group-member :visible="!!(state.groupMemberPageVisible && storeState.groupId)"
-                                          :group-id="storeState.groupId"
-                                          :manage-disabled="!state.hasManagePermission"
-                                          @close="state.groupMemberPageVisible = false"
+                    <project-member-overlay
+                        :visible="!!(state.groupMemberPageVisible && storeState.groupId)"
+                        :group-id="storeState.groupId"
+                        :manage-disabled="!state.hasManagePermission"
+                        @close="state.groupMemberPageVisible = false"
                     />
                 </div>
             </template>

@@ -43,8 +43,8 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import type { WebhookState } from '@/services/alert-manager/lib/config';
 import { WEBHOOK_STATE } from '@/services/alert-manager/lib/config';
-import WebhookAddFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookAddFormModal.vue';
-import WebhookUpdateFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookUpdateFormModal.vue';
+import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
+import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
 
 
 interface Props {
@@ -346,7 +346,7 @@ onActivated(() => {
             </template>
         </p-toolbox-table>
 
-        <webhook-add-form-modal
+        <project-alert-webhook-add-modal
             :visible.sync="formState.addModalVisible"
             :project-id="props.id"
             @confirm="listWebhooks()"
@@ -379,7 +379,7 @@ onActivated(() => {
                 <p-copy-button>{{ value }}</p-copy-button>
             </template>
         </p-table-check-modal>
-        <webhook-update-form-modal
+        <project-alert-webhook-update-modal
             v-if="formState.updateModalVisible"
             :visible.sync="formState.updateModalVisible"
             :selected-item="state.selectedItem"

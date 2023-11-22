@@ -16,6 +16,7 @@ import { numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -36,12 +37,11 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ALERT_STATE } from '@/services/alert-manager/lib/config';
-import MaintenanceHappeningList from '@/services/project/project-detail/modules/MaintenanceHappeningList.vue';
-import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
-import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
+import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
+import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
+import ProjectDetailProjectFormModal from '@/services/project/components/ProjectDetailProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
-import type { ProjectModel } from '@/services/project/types/type';
 
 
 interface Props {
@@ -302,11 +302,12 @@ onUnmounted(() => {
             </template>
         </p-button-modal>
 
-        <project-form-modal v-if="formState.projectEditFormVisible"
-                            :visible.sync="formState.projectEditFormVisible"
-                            :project-group-id="state.projectGroupId"
-                            :project="state.item"
-                            @complete="onProjectFormComplete"
+        <project-detail-project-form-modal
+            v-if="formState.projectEditFormVisible"
+            :visible.sync="formState.projectEditFormVisible"
+            :project-group-id="state.projectGroupId"
+            :project="state.item"
+            @complete="onProjectFormComplete"
         />
         <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
                                        :project-id="state.projectId"
