@@ -1,62 +1,3 @@
-<template>
-    <section class="event-rule-condition-form">
-        <div class="title-wrapper">
-            <p class="title">
-                <strong>{{ $t('PROJECT.EVENT_RULE.CONDITION') }}</strong>
-            </p>
-            <p-button style-type="tertiary"
-                      icon-left="ic_plus_bold"
-                      class="add-button"
-                      @click="onClickAdd"
-            >
-                {{ $t('PROJECT.EVENT_RULE.ADD') }}
-            </p-button>
-        </div>
-        <div class="content-wrapper">
-            <div class="radio-wrapper">
-                <p-radio v-for="policy in state.conditionsPolicies"
-                         :key="policy.name"
-                         v-model="state.proxyConditionsPolicy"
-                         :value="policy.name"
-                         class="mr-4"
-                >
-                    {{ policy.label }}
-                </p-radio>
-                <span>{{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
-            </div>
-            <template v-for="(condition, idx) of state.proxyConditions">
-                <p-divider v-if="idx > 0"
-                           :key="`divider-${idx}`"
-                />
-                <div :key="`condition-${idx}`"
-                     class="input-wrapper"
-                >
-                    <div class="left-part">
-                        <p-select-dropdown :selected.sync="condition.key"
-                                           class="input"
-                                           :menu="state.keys"
-                                           use-fixed-menu-style
-                        />
-                        <p-select-dropdown :selected.sync="condition.operator"
-                                           class="input"
-                                           :menu="state.operators"
-                                           use-fixed-menu-style
-                        />
-                        <p-text-input v-model="condition.value"
-                                      class="input"
-                        />
-                    </div>
-                    <p-icon-button name="ic_delete"
-                                   class="delete-button"
-                                   :class="{ opacity: state.proxyConditions.length < 2}"
-                                   @click="onClickDelete(idx)"
-                    />
-                </div>
-            </template>
-        </div>
-    </section>
-</template>
-
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
@@ -165,6 +106,65 @@ const onClickDelete = (idx) => {
     state.proxyConditions = conditions;
 };
 </script>
+
+<template>
+    <section class="event-rule-condition-form">
+        <div class="title-wrapper">
+            <p class="title">
+                <strong>{{ $t('PROJECT.EVENT_RULE.CONDITION') }}</strong>
+            </p>
+            <p-button style-type="tertiary"
+                      icon-left="ic_plus_bold"
+                      class="add-button"
+                      @click="onClickAdd"
+            >
+                {{ $t('PROJECT.EVENT_RULE.ADD') }}
+            </p-button>
+        </div>
+        <div class="content-wrapper">
+            <div class="radio-wrapper">
+                <p-radio v-for="policy in state.conditionsPolicies"
+                         :key="policy.name"
+                         v-model="state.proxyConditionsPolicy"
+                         :value="policy.name"
+                         class="mr-4"
+                >
+                    {{ policy.label }}
+                </p-radio>
+                <span>{{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
+            </div>
+            <template v-for="(condition, idx) of state.proxyConditions">
+                <p-divider v-if="idx > 0"
+                           :key="`divider-${idx}`"
+                />
+                <div :key="`condition-${idx}`"
+                     class="input-wrapper"
+                >
+                    <div class="left-part">
+                        <p-select-dropdown :selected.sync="condition.key"
+                                           class="input"
+                                           :menu="state.keys"
+                                           use-fixed-menu-style
+                        />
+                        <p-select-dropdown :selected.sync="condition.operator"
+                                           class="input"
+                                           :menu="state.operators"
+                                           use-fixed-menu-style
+                        />
+                        <p-text-input v-model="condition.value"
+                                      class="input"
+                        />
+                    </div>
+                    <p-icon-button name="ic_delete"
+                                   class="delete-button"
+                                   :class="{ opacity: state.proxyConditions.length < 2}"
+                                   @click="onClickDelete(idx)"
+                    />
+                </div>
+            </template>
+        </div>
+    </section>
+</template>
 
 <style lang="postcss" scoped>
 .title-wrapper {

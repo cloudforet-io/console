@@ -1,34 +1,6 @@
-<template>
-    <p-button-modal
-        :header-title="$t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_TITLE')"
-        size="sm"
-        fade
-        :visible.sync="proxyVisible"
-        @confirm="onClickConfirm"
-    >
-        <template #body>
-            <div class="content-wrapper">
-                <p>{{ $t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_HELP_TEXT') }}</p>
-                <div class="select-card-wrapper">
-                    <p-select-card v-for="(option, index) in selectOptions"
-                                   :key="option.name"
-                                   v-model="recoveryMode"
-                                   :tab-index="index"
-                                   :value="option.name"
-                                   :label="option.label"
-                                   block
-                    />
-                </div>
-            </div>
-        </template>
-    </p-button-modal>
-</template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
+<script lang="ts" setup>
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -44,76 +16,89 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+
 const RECOVERY_MODE = Object.freeze({
     MANUAL: 'MANUAL',
     AUTO: 'AUTO',
 });
 type RecoveryMode = typeof RECOVERY_MODE[keyof typeof RECOVERY_MODE];
 
-export default {
-    name: 'ProjectAutoRecoveryUpdateModal',
-    components: {
-        PButtonModal,
-        PSelectCard,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: undefined,
+interface Props {
+    projectId?: string;
+    visible?: boolean;
+    selectedOption?: RecoveryMode;
+}
+const props = withDefaults(defineProps<Props>(), {
+    projectId: undefined,
+    visible: false,
+    selectedOption: undefined,
+});
+const emit = defineEmits<{(e: 'confirm'): void;
+    (e: 'update:visible'): void;
+}>();
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    selectOptions: computed(() => ([
+        {
+            name: RECOVERY_MODE.AUTO,
+            label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_YES'),
         },
-        visible: {
-            type: Boolean,
-            required: true,
+        {
+            name: RECOVERY_MODE.MANUAL,
+            label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_NO'),
         },
-        selectedOption: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            selectOptions: computed(() => ([
-                {
-                    name: RECOVERY_MODE.AUTO,
-                    label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_YES'),
-                },
-                {
-                    name: RECOVERY_MODE.MANUAL,
-                    label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_NO'),
-                },
-            ])),
-            recoveryMode: undefined as RecoveryMode | undefined,
+    ])),
+    recoveryMode: undefined as RecoveryMode | undefined,
+});
+
+const onClickConfirm = async () => {
+    try {
+        await SpaceConnector.client.monitoring.projectAlertConfig.update({
+            project_id: props.projectId,
+            options: {
+                recovery_mode: state.recoveryMode,
+            },
         });
-
-        const onClickConfirm = async () => {
-            try {
-                await SpaceConnector.client.monitoring.projectAlertConfig.update({
-                    project_id: props.projectId,
-                    options: {
-                        recovery_mode: state.recoveryMode,
-                    },
-                });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '');
-                emit('confirm');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_AUTO_RECOVERY'));
-            } finally {
-                state.proxyVisible = false;
-            }
-        };
-
-        watch([() => props.selectedOption, () => props.visible], ([selectedOption]) => {
-            state.recoveryMode = selectedOption;
-        });
-
-        return {
-            ...toRefs(state),
-            onClickConfirm,
-        };
-    },
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '');
+        emit('confirm');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_AUTO_RECOVERY'));
+    } finally {
+        state.proxyVisible = false;
+    }
 };
+
+watch([() => props.selectedOption, () => props.visible], ([selectedOption]) => {
+    state.recoveryMode = selectedOption;
+});
 </script>
+
+<template>
+    <p-button-modal
+        :header-title="$t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_TITLE')"
+        size="sm"
+        fade
+        :visible.sync="state.proxyVisible"
+        @confirm="onClickConfirm"
+    >
+        <template #body>
+            <div class="content-wrapper">
+                <p>{{ $t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_HELP_TEXT') }}</p>
+                <div class="select-card-wrapper">
+                    <p-select-card v-for="(option, index) in state.selectOptions"
+                                   :key="option.name"
+                                   v-model="recoveryMode"
+                                   :tab-index="index"
+                                   :value="option.name"
+                                   :label="option.label"
+                                   block
+                    />
+                </div>
+            </div>
+        </template>
+    </p-button-modal>
+</template>
 
 <style lang="postcss" scoped>
 .content-wrapper {

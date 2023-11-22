@@ -1,111 +1,3 @@
-<template>
-    <general-page-layout overflow="scroll">
-        <p-data-loader class="page-inner"
-                       :loading="state.loading"
-                       :loader-backdrop-color="BACKGROUND_COLOR"
-        >
-            <p-breadcrumbs :routes="state.pageNavigation" />
-            <div v-if="state.item"
-                 class="top-wrapper"
-            >
-                <p-heading :title="state.item.name"
-                           show-back-button
-                           @click-back-button="$router.go(-1)"
-                >
-                    <template #title-right-extra>
-                        <div class="button-wrapper">
-                            <span class="favorite-button-wrapper">
-                                <favorite-button :item-id="state.projectId"
-                                                 :favorite-type="FAVORITE_TYPE.PROJECT"
-                                />
-                            </span>
-                            <p-icon-button name="ic_delete"
-                                           class="delete-btn"
-                                           :disabled="!state.hasManagePermission"
-                                           @click="openProjectDeleteForm"
-                            />
-                            <p-icon-button name="ic_edit-text"
-                                           class="edit-btn"
-                                           :disabled="!state.hasManagePermission"
-                                           @click="openProjectEditForm"
-                            />
-                        </div>
-                        <div class="top-right-group">
-                            <p class="copy-project-id">
-                                <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                                {{ state.projectId }}
-                                <p-copy-button class="icon"
-                                               :value="state.projectId"
-                                />
-                            </p>
-                            <p-button v-if="state.hasAlertPermission"
-                                      style-type="tertiary"
-                                      icon-left="ic_spanner-filled"
-                                      class="ml-3"
-                                      :disabled="!state.hasManagePermission"
-                                      @click="state.maintenanceWindowFormVisible = true"
-                            >
-                                {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
-                            </p-button>
-                        </div>
-                    </template>
-                </p-heading>
-            </div>
-
-            <maintenance-happening-list class="maintenance-happening-list"
-                                        :project-id="state.projectId"
-            />
-
-            <p-tab v-if="state.item"
-                   :tabs="singleItemTabState.tabs"
-                   :active-tab.sync="singleItemTabState.activeTab"
-                   @change="onChangeTab"
-            >
-                <keep-alive>
-                    <router-view />
-                </keep-alive>
-                <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && state.counts[ALERT_STATE.TRIGGERED] !== 0"
-                             style-type="primary3"
-                             badge-type="subtle"
-                    >
-                        {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
-                    </p-badge>
-                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
-                </template>
-            </p-tab>
-        </p-data-loader>
-
-        <p-button-modal :header-title="formState.headerTitle"
-                        :centered="true"
-                        size="sm"
-                        :fade="true"
-                        :backdrop="true"
-                        :visible.sync="formState.projectDeleteFormVisible"
-                        :theme-color="formState.themeColor"
-                        :loading="formState.modalLoading"
-                        @confirm="projectDeleteFormConfirm"
-        >
-            <template #body>
-                <p class="delete-modal-content">
-                    {{ formState.modalContent }}
-                </p>
-            </template>
-        </p-button-modal>
-
-        <project-form-modal v-if="formState.projectEditFormVisible"
-                            :visible.sync="formState.projectEditFormVisible"
-                            :project-group-id="state.projectGroupId"
-                            :project="state.item"
-                            @complete="onProjectFormComplete"
-        />
-        <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
-                                       :project-id="state.projectId"
-                                       @confirm="onCreateMaintenanceWindow"
-        />
-    </general-page-layout>
-</template>
-
 <script lang="ts" setup>
 import {
     computed, onUnmounted, reactive, watch,
@@ -314,6 +206,114 @@ onUnmounted(() => {
     projectDetailPageStore.$dispose();
 });
 </script>
+
+<template>
+    <general-page-layout overflow="scroll">
+        <p-data-loader class="page-inner"
+                       :loading="state.loading"
+                       :loader-backdrop-color="BACKGROUND_COLOR"
+        >
+            <p-breadcrumbs :routes="state.pageNavigation" />
+            <div v-if="state.item"
+                 class="top-wrapper"
+            >
+                <p-heading :title="state.item.name"
+                           show-back-button
+                           @click-back-button="$router.go(-1)"
+                >
+                    <template #title-right-extra>
+                        <div class="button-wrapper">
+                            <span class="favorite-button-wrapper">
+                                <favorite-button :item-id="state.projectId"
+                                                 :favorite-type="FAVORITE_TYPE.PROJECT"
+                                />
+                            </span>
+                            <p-icon-button name="ic_delete"
+                                           class="delete-btn"
+                                           :disabled="!state.hasManagePermission"
+                                           @click="openProjectDeleteForm"
+                            />
+                            <p-icon-button name="ic_edit-text"
+                                           class="edit-btn"
+                                           :disabled="!state.hasManagePermission"
+                                           @click="openProjectEditForm"
+                            />
+                        </div>
+                        <div class="top-right-group">
+                            <p class="copy-project-id">
+                                <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
+                                {{ state.projectId }}
+                                <p-copy-button class="icon"
+                                               :value="state.projectId"
+                                />
+                            </p>
+                            <p-button v-if="state.hasAlertPermission"
+                                      style-type="tertiary"
+                                      icon-left="ic_spanner-filled"
+                                      class="ml-3"
+                                      :disabled="!state.hasManagePermission"
+                                      @click="state.maintenanceWindowFormVisible = true"
+                            >
+                                {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
+                            </p-button>
+                        </div>
+                    </template>
+                </p-heading>
+            </div>
+
+            <maintenance-happening-list class="maintenance-happening-list"
+                                        :project-id="state.projectId"
+            />
+
+            <p-tab v-if="state.item"
+                   :tabs="singleItemTabState.tabs"
+                   :active-tab.sync="singleItemTabState.activeTab"
+                   @change="onChangeTab"
+            >
+                <keep-alive>
+                    <router-view />
+                </keep-alive>
+                <template #extra="tab">
+                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && state.counts[ALERT_STATE.TRIGGERED] !== 0"
+                             style-type="primary3"
+                             badge-type="subtle"
+                    >
+                        {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
+                    </p-badge>
+                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
+                </template>
+            </p-tab>
+        </p-data-loader>
+
+        <p-button-modal :header-title="formState.headerTitle"
+                        :centered="true"
+                        size="sm"
+                        :fade="true"
+                        :backdrop="true"
+                        :visible.sync="formState.projectDeleteFormVisible"
+                        :theme-color="formState.themeColor"
+                        :loading="formState.modalLoading"
+                        @confirm="projectDeleteFormConfirm"
+        >
+            <template #body>
+                <p class="delete-modal-content">
+                    {{ formState.modalContent }}
+                </p>
+            </template>
+        </p-button-modal>
+
+        <project-form-modal v-if="formState.projectEditFormVisible"
+                            :visible.sync="formState.projectEditFormVisible"
+                            :project-group-id="state.projectGroupId"
+                            :project="state.item"
+                            @complete="onProjectFormComplete"
+        />
+        <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
+                                       :project-id="state.projectId"
+                                       @confirm="onCreateMaintenanceWindow"
+        />
+    </general-page-layout>
+</template>
 
 <style lang="postcss" scoped>
 .page-inner {
