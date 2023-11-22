@@ -28,6 +28,24 @@
 		}
 	},
 	"AUTH": {
+		"COLLAPSED": {
+			"CLICK_HERE": "이 곳",
+			"EXTENSION_CONTACT": "도메인 관리자에게 문의해주세요. ",
+			"EXTENSION_DESC_1": "알림 전용 이메일은 사용자 아이디와 다를 수 있습니다. 만약, 알림 전용 이메일을 잊으셨다면, ",
+			"EXTENSION_REASON_1": "조금만 더 기다려 주세요. 수신함에 확인될 때까지 10분 이상 소요될 수 있습니다. ",
+			"EXTENSION_REASON_2": "스팸 메일을 확인해주세요. ",
+			"EXTENSION_REASON_3": "을 클릭하여, 이메일을 재전송을 시도하세요. ",
+			"EXTENSION_TITLE_1": "이메일을 받지 못하셨나요?",
+			"EXTENSION_TITLE_2": "아직도 이메일을 받지 못하셨나요? "
+		},
+		"MFA": {
+			"AUTHENTICATION_CODE": "",
+			"CONFIRM": "확인",
+			"EMAIL_INFO": "",
+			"GO_BACK": "",
+			"SUB_TITLE": "",
+			"TITLE": ""
+		},
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "로그인 하러 가기",
@@ -56,17 +74,9 @@
 				"DONE": "비밀번호 재설정 완료!",
 				"EMAIL": {
 					"DONE": {
-						"CLICK_HERE": "이 곳",
 						"COLLAPSED": "이메일을 받지 못하셨나요?",
 						"DESC_1": "이메일 발송 완료",
 						"DESC_2": "전달드린 가이드에 따라 비밀번호를 변경해주세요.",
-						"EXTENSION_CONTACT": "도메인 관리자에게 문의해주세요. ",
-						"EXTENSION_DESC_1": "알림 전용 이메일은 사용자 아이디와 다를 수 있습니다. 만약, 알림 전용 이메일을 잊으셨다면, ",
-						"EXTENSION_REASON_1": "조금만 더 기다려 주세요. 수신함에 확인될 때까지 10분 이상 소요될 수 있습니다. ",
-						"EXTENSION_REASON_2": "스팸 메일을 확인해주세요. ",
-						"EXTENSION_REASON_3": "을 클릭하여, 이메일을 재전송을 시도하세요. ",
-						"EXTENSION_TITLE_1": "이메일을 받지 못하셨나요?",
-						"EXTENSION_TITLE_2": "아직도 이메일을 받지 못하셨나요? ",
 						"GO_BACK_TO_CONSOLE": "콘솔 로그인 하러 가기",
 						"TITLE": "비밀번호 재설정 이메일 발송 완료"
 					},

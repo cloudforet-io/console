@@ -28,6 +28,24 @@
 		}
 	},
 	"AUTH": {
+		"COLLAPSED": {
+			"CLICK_HERE": "Click here",
+			"EXTENSION_CONTACT": "please contact your domain administrators.",
+			"EXTENSION_DESC_1": "Your notification email may not be the same as your user ID. if you've forgotten the exact email address, ",
+			"EXTENSION_REASON_1": "Please wait a bit longer... It could take couple of minutes to show up in your inbox.",
+			"EXTENSION_REASON_2": "Check your spam.",
+			"EXTENSION_REASON_3": "to re-send the email.",
+			"EXTENSION_TITLE_1": "Didn't receive an email?",
+			"EXTENSION_TITLE_2": "Still having trouble?"
+		},
+		"MFA": {
+			"AUTHENTICATION_CODE": "Authentication code",
+			"CONFIRM": "Confirm",
+			"EMAIL_INFO": "An {code} has been sent to an email at:",
+			"GO_BACK": "Back to Sign in",
+			"SUB_TITLE": "Your account required to verify with email MFA.",
+			"TITLE": "Multi-factor\nauthentication"
+		},
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "Back to Sign-in",
@@ -56,17 +74,9 @@
 				"DONE": "Your password has been reset successfully!",
 				"EMAIL": {
 					"DONE": {
-						"CLICK_HERE": "Click here",
 						"COLLAPSED": "Didn't receive an email?",
 						"DESC_1": "An email has been sent",
 						"DESC_2": "Follow the directions in the email to reset your password.",
-						"EXTENSION_CONTACT": "please contact your domain administrators.",
-						"EXTENSION_DESC_1": "Your notification email may not be the same as your user ID. if you've forgotten the exact email address, ",
-						"EXTENSION_REASON_1": "Please wait a bit longer... It could take couple of minutes to show up in your inbox.",
-						"EXTENSION_REASON_2": "Check your spam.",
-						"EXTENSION_REASON_3": "to re-send the email.",
-						"EXTENSION_TITLE_1": "Didn't receive an email?",
-						"EXTENSION_TITLE_2": "Still having trouble?",
 						"GO_BACK_TO_CONSOLE": "Go back to Console",
 						"TITLE": "Password reset email sent"
 					},
