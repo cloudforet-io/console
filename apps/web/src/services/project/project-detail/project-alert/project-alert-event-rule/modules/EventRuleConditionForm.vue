@@ -14,9 +14,9 @@
         </div>
         <div class="content-wrapper">
             <div class="radio-wrapper">
-                <p-radio v-for="policy in conditionsPolicies"
+                <p-radio v-for="policy in state.conditionsPolicies"
                          :key="policy.name"
-                         v-model="proxyConditionsPolicy"
+                         v-model="state.proxyConditionsPolicy"
                          :value="policy.name"
                          class="mr-4"
                 >
@@ -24,7 +24,7 @@
                 </p-radio>
                 <span>{{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
             </div>
-            <template v-for="(condition, idx) of proxyConditions">
+            <template v-for="(condition, idx) of state.proxyConditions">
                 <p-divider v-if="idx > 0"
                            :key="`divider-${idx}`"
                 />
@@ -34,12 +34,12 @@
                     <div class="left-part">
                         <p-select-dropdown :selected.sync="condition.key"
                                            class="input"
-                                           :menu="keys"
+                                           :menu="state.keys"
                                            use-fixed-menu-style
                         />
                         <p-select-dropdown :selected.sync="condition.operator"
                                            class="input"
-                                           :menu="operators"
+                                           :menu="state.operators"
                                            use-fixed-menu-style
                         />
                         <p-text-input v-model="condition.value"
@@ -48,7 +48,7 @@
                     </div>
                     <p-icon-button name="ic_delete"
                                    class="delete-button"
-                                   :class="{ opacity: proxyConditions.length < 2}"
+                                   :class="{ opacity: state.proxyConditions.length < 2}"
                                    @click="onClickDelete(idx)"
                     />
                 </div>
@@ -57,9 +57,8 @@
     </section>
 </template>
 
-<script lang="ts">
-
-import { computed, reactive, toRefs } from 'vue';
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
@@ -68,6 +67,7 @@ import {
 import { i18n } from '@/translations';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+
 
 const CONDITIONS_POLICY = Object.freeze({
     ALL: 'ALL',
@@ -80,106 +80,89 @@ const OPERATOR = Object.freeze({
     not_contain: 'not_contain',
 });
 
-export default {
-    name: 'EventRuleConditionForm',
-    components: {
-        PButton,
-        PRadio,
-        PSelectDropdown,
-        PTextInput,
-        PIconButton,
-        PDivider,
-    },
-    props: {
-        conditionsPolicy: {
-            type: String,
-            default: CONDITIONS_POLICY.ALL,
-        },
-        conditions: {
-            type: Array,
-            default: () => ([]),
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            conditionsPolicies: computed(() => ([
-                {
-                    name: CONDITIONS_POLICY.ALL,
-                    label: i18n.t('PROJECT.EVENT_RULE.ALL'),
-                },
-                {
-                    name: CONDITIONS_POLICY.ANY,
-                    label: i18n.t('PROJECT.EVENT_RULE.ANY'),
-                },
-            ])),
-            operators: computed(() => ([
-                {
-                    name: OPERATOR.contain,
-                    label: i18n.t('PROJECT.EVENT_RULE.CONTAINS'),
-                },
-                {
-                    name: OPERATOR.not_contain,
-                    label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_CONTAIN'),
-                },
-                {
-                    name: OPERATOR.eq,
-                    label: i18n.t('PROJECT.EVENT_RULE.EQUALS'),
-                },
-                {
-                    name: OPERATOR.not,
-                    label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_EQUAL'),
-                },
-            ])),
-            proxyConditionsPolicy: useProxyValue('conditionsPolicy', props, emit),
-            proxyConditions: useProxyValue('conditions', props, emit),
-            keys: [
-                {
-                    name: 'title',
-                    label: 'Title',
-                },
-                {
-                    name: 'description',
-                    label: 'Description',
-                },
-                {
-                    name: 'rule',
-                    label: 'Rule',
-                },
-                {
-                    name: 'resource_id',
-                    label: 'Resource ID',
-                },
-                {
-                    name: 'resource_name',
-                    label: 'Resource Name',
-                },
-                {
-                    name: 'resource_type',
-                    label: 'Resource Type',
-                },
-            ],
-        });
+interface Props {
+    conditionsPolicy?: string;
+    conditions?: any[]; // TODO: set type
+}
+const props = withDefaults(defineProps<Props>(), {
+    conditionsPolicy: 'ALL',
+    conditions: () => ([]),
+});
+const emit = defineEmits<{(e: 'update:conditions-policy'): void;
+    (e: 'update:conditions'): void;
+}>();
 
-        /* event */
-        const onClickAdd = () => {
-            state.proxyConditions.push({
-                key: '',
-                value: '',
-                operator: OPERATOR.contain,
-            });
-        };
-        const onClickDelete = (idx) => {
-            const conditions = [...state.proxyConditions];
-            conditions.splice(idx, 1);
-            state.proxyConditions = conditions;
-        };
+const state = reactive({
+    conditionsPolicies: computed(() => ([
+        {
+            name: CONDITIONS_POLICY.ALL,
+            label: i18n.t('PROJECT.EVENT_RULE.ALL'),
+        },
+        {
+            name: CONDITIONS_POLICY.ANY,
+            label: i18n.t('PROJECT.EVENT_RULE.ANY'),
+        },
+    ])),
+    operators: computed(() => ([
+        {
+            name: OPERATOR.contain,
+            label: i18n.t('PROJECT.EVENT_RULE.CONTAINS'),
+        },
+        {
+            name: OPERATOR.not_contain,
+            label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_CONTAIN'),
+        },
+        {
+            name: OPERATOR.eq,
+            label: i18n.t('PROJECT.EVENT_RULE.EQUALS'),
+        },
+        {
+            name: OPERATOR.not,
+            label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_EQUAL'),
+        },
+    ])),
+    proxyConditionsPolicy: useProxyValue('conditionsPolicy', props, emit),
+    proxyConditions: useProxyValue('conditions', props, emit),
+    keys: [
+        {
+            name: 'title',
+            label: 'Title',
+        },
+        {
+            name: 'description',
+            label: 'Description',
+        },
+        {
+            name: 'rule',
+            label: 'Rule',
+        },
+        {
+            name: 'resource_id',
+            label: 'Resource ID',
+        },
+        {
+            name: 'resource_name',
+            label: 'Resource Name',
+        },
+        {
+            name: 'resource_type',
+            label: 'Resource Type',
+        },
+    ],
+});
 
-        return {
-            ...toRefs(state),
-            onClickAdd,
-            onClickDelete,
-        };
-    },
+/* event */
+const onClickAdd = () => {
+    state.proxyConditions.push({
+        key: '',
+        value: '',
+        operator: OPERATOR.contain,
+    });
+};
+const onClickDelete = (idx) => {
+    const conditions = [...state.proxyConditions];
+    conditions.splice(idx, 1);
+    state.proxyConditions = conditions;
 };
 </script>
 

@@ -1,41 +1,6 @@
-<template>
-    <div class="grid grid-cols-12 project-dashboard-page">
-        <project-all-summary class="col-span-12"
-                             :project-id="id"
-        />
-        <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-alert-widget v-if="hasAlertConfig"
-                                  class="col-span-12"
-                                  :project-id="id"
-            />
-            <project-billing class="col-span-12"
-                             :project-id="id"
-            />
-            <project-personal-health-dashboard class="col-span-12"
-                                               :project-id="id"
-            />
-            <project-service-accounts class="col-span-12 service-accounts-table"
-                                      :project-id="id"
-            />
-        </div>
-        <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
-            <daily-updates class="col-span-12 daily-updates"
-                           :project-id="id"
-            />
-            <cloud-services class="col-span-12 cloud-services"
-                            :more-info="true"
-                            :project-id="id"
-            />
-            <project-trusted-advisor class="col-span-12 trusted-advisor"
-                                     :project-id="id"
-            />
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    reactive, toRefs,
+    reactive,
 } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -53,55 +18,70 @@ import ProjectPersonalHealthDashboard from '@/services/project/project-detail/pr
 import ProjectServiceAccounts from '@/services/project/project-detail/project-summary/modules/ProjectServiceAccounts.vue';
 import ProjectTrustedAdvisor from '@/services/project/project-detail/project-summary/modules/ProjectTrustedAdvisor.vue';
 
-export default {
-    name: 'ProjectDashboardPage',
-    components: {
-        ProjectAlertWidget,
-        ProjectBilling,
-        ProjectPersonalHealthDashboard,
-        ProjectTrustedAdvisor,
-        ProjectAllSummary,
-        CloudServices,
-        DailyUpdates,
-        ProjectServiceAccounts,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            hasAlertConfig: false,
+
+interface Props {
+    id?: string;
+}
+const props = defineProps<Props>();
+const state = reactive({
+    hasAlertConfig: false,
+});
+
+/* api */
+const getProjectAlertConfig = async () => {
+    try {
+        const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
+            project_id: props.id,
         });
-
-        /* api */
-        const getProjectAlertConfig = async () => {
-            try {
-                const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
-                    project_id: props.id,
-                });
-                state.hasAlertConfig = !!results.length;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        (async () => {
-            await Promise.allSettled([
-                getProjectAlertConfig(),
-                // LOAD REFERENCE STORE
-                store.dispatch('reference/cloudServiceType/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-        };
-    },
+        state.hasAlertConfig = !!results.length;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
+
+(async () => {
+    await Promise.allSettled([
+        getProjectAlertConfig(),
+        // LOAD REFERENCE STORE
+        store.dispatch('reference/cloudServiceType/load'),
+    ]);
+})();
 </script>
+
+<template>
+    <div class="grid grid-cols-12 project-dashboard-page">
+        <project-all-summary class="col-span-12"
+                             :project-id="props.id"
+        />
+        <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
+            <project-alert-widget v-if="state.hasAlertConfig"
+                                  class="col-span-12"
+                                  :project-id="props.id"
+            />
+            <project-billing class="col-span-12"
+                             :project-id="props.id"
+            />
+            <project-personal-health-dashboard class="col-span-12"
+                                               :project-id="props.id"
+            />
+            <project-service-accounts class="col-span-12 service-accounts-table"
+                                      :project-id="props.id"
+            />
+        </div>
+        <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
+            <daily-updates class="col-span-12 daily-updates"
+                           :project-id="props.id"
+            />
+            <cloud-services class="col-span-12 cloud-services"
+                            :more-info="true"
+                            :project-id="props.id"
+            />
+            <project-trusted-advisor class="col-span-12 trusted-advisor"
+                                     :project-id="props.id"
+            />
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 /* custom widget-layout */

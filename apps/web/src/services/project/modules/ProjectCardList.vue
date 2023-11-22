@@ -1,18 +1,268 @@
+<script lang="ts" setup>
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import {
+    PSkeleton, PI, PButton, PToolbox, PDataLoader, PEmpty,
+} from '@spaceone/design-system';
+import type { CancelTokenSource } from 'axios';
+import axios from 'axios';
+import bytes from 'bytes';
+import { uniq } from 'lodash';
+
+import { getAllPage } from '@cloudforet/core-lib/component-util/pagination';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import { arrayToQueryString } from '@/lib/router-query-string';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
+import { BACKGROUND_COLOR } from '@/styles/colorsets';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config.js';
+import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type { SummaryType, ProjectGroup } from '@/services/project/types/type';
+import { SUMMARY_TYPE } from '@/services/project/types/type';
+
+
+interface CardSummary {
+    [projectId: string]: {
+        Server: number;
+        Database: number;
+        Storage: number;
+    };
+}
+
+interface Props {
+    parentGroups: ProjectGroup[];
+    manageDisabled: boolean;
+}
+const props = withDefaults(defineProps<Props>(), {
+    parentGroups: () => [],
+    manageDisabled: false,
+});
+
+const projectPageStore = useProjectPageStore();
+const state = reactive({
+    items: undefined,
+    totalCount: 0,
+    loading: true,
+    cardSummaryLoading: true,
+    pageStart: 1,
+    pageSize: 24,
+    allPage: computed(() => getAllPage(state.totalCount, (state.pageSize))),
+    cardSummary: {} as CardSummary,
+    // showAllProjects: false,
+    noProject: computed(() => state.totalCount === 0),
+    hoveredProjectId: '',
+    hoveredGroupId: '',
+    isAll: computed(() => !state.groupId),
+    groupId: computed(() => projectPageStore.groupId),
+    searchText: computed(() => projectPageStore.searchText),
+    noProjectGroup: computed(() => !projectPageStore.hasProjectGroup),
+    projectFormVisible: computed({
+        get() { return projectPageStore.projectFormVisible; },
+        set(val) { projectPageStore.$patch({ projectFormVisible: val }); },
+    }),
+    projectSummaryList: computed(() => [
+        { title: i18n.t('PROJECT.LANDING.SERVER'), summaryType: SUMMARY_TYPE.SERVER },
+        { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
+        { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
+    ]),
+    shouldUpdateProjectList: computed<boolean>(() => projectPageStore.shouldUpdateProjectList),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+});
+
+const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
+const getItemSummaryCount = (summaryType, projectId) => {
+    if (state.cardSummary) {
+        let summaryCount = state.cardSummary[projectId][summaryType];
+        if (summaryType === SUMMARY_TYPE.STORAGE) summaryCount = summaryCount ? byteFormatter(summaryCount) : 0;
+        return summaryCount;
+    }
+    return {};
+};
+const getProvider = (name) => state.providers[name] || {};
+const getDistinctProviders = (items: string[]) => uniq(items);
+const getProjectGroupName = (parentGroups, projectItem) => {
+    let result = '';
+    if (parentGroups.length > 0) {
+        result = `${parentGroups[parentGroups.length - 1].name} > `;
+    }
+    result += projectItem.project_group_info.name;
+    return result;
+};
+
+const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
+const listAllProjectApi = SpaceConnector.client.identity.project.list;
+const listQuery = new ApiQueryHelper();
+
+const getParams = (id?, text?) => {
+    listQuery.setPageStart(state.pageStart)
+        .setPageLimit(state.pageSize);
+
+    if (text) {
+        listQuery.setFilters([{ k: 'name', v: text, o: '' }]);
+    } else {
+        listQuery.setFilters([]);
+    }
+
+    const params: any = { include_provider: true, query: listQuery.data };
+    if (id) params.project_group_id = id;
+    // if (state.showAllProjects) params.recursive = true;
+
+    return params;
+};
+
+let getCardToken: CancelTokenSource | undefined;
+const getCardSummary = async (items) => {
+    if (items.length === 0) return;
+
+    if (getCardToken) {
+        getCardToken.cancel('Next request has been called.');
+        getCardToken = undefined;
+    }
+
+    getCardToken = axios.CancelToken.source();
+    const cardSummary: CardSummary = {};
+    state.cardSummaryLoading = true;
+    try {
+        const ids = items?.map((item) => item.project_id);
+        const res = await SpaceConnector.client.statistics.topic.projectPage({
+            projects: ids,
+        }, { cancelToken: getCardToken.token });
+        res.results.forEach((d) => {
+            cardSummary[d.project_id] = {
+                Server: d.server_count || 0,
+                Database: d.database_count || 0,
+                Storage: d.storage_size || 0,
+            };
+        });
+        getCardToken = undefined;
+        state.cardSummary = cardSummary;
+        state.cardSummaryLoading = false;
+    } catch (e: any) {
+        if (!axios.isCancel(e.axiosError)) {
+            state.cardSummary = cardSummary;
+            state.cardSummaryLoading = false;
+            ErrorHandler.handleError(e);
+        }
+    }
+};
+
+let listProjectToken: CancelTokenSource | undefined;
+const getData = async (_id?, _text?) => {
+    const id = _id || state.groupId;
+    const text = _text || state.searchText;
+
+    // if request is already exist, cancel the request
+    if (listProjectToken) {
+        listProjectToken.cancel('Next request has been called.');
+        listProjectToken = undefined;
+    }
+    // create a new token for upcoming request (overwrite the previous one)
+    listProjectToken = axios.CancelToken.source();
+    state.loading = true;
+    try {
+        let res;
+        if (state.isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
+        else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
+        state.items = res.results;
+        state.totalCount = res.total_count;
+        projectPageStore.$patch({ projectCount: state.totalCount });
+        state.loading = false;
+        listProjectToken = undefined;
+        await getCardSummary(res.results);
+    } catch (e: any) {
+        if (!axios.isCancel(e.axiosError)) {
+            state.items = [];
+            state.totalCount = 0;
+            state.loading = false;
+            projectPageStore.$patch({ projectCount: 0 });
+            ErrorHandler.handleError(e);
+        }
+    }
+};
+
+const onChange = async (options: any) => {
+    if (options.pageLimit !== undefined) {
+        state.pageSize = options.pageLimit;
+    }
+    if (options.pageStart !== undefined) {
+        state.pageStart = options.pageStart;
+    }
+    await getData();
+};
+
+const resetAll = () => {
+    state.totalCount = 0;
+    state.pageStart = 1;
+    state.pageSize = 24;
+};
+
+const listProjects = async (groupId?, searchText?, reset = true) => {
+    if (reset) resetAll();
+    await getData(groupId, searchText);
+};
+
+const queryHelper = new QueryHelper();
+const getLocation = (serviceType: SummaryType, name, projectId) => ({
+    name,
+    query: {
+        provider: 'all',
+        service: arrayToQueryString([serviceType]),
+        filters: queryHelper.setFilters([{ k: 'project_id', v: [projectId], o: '=' }]).rawQueryStrings[0],
+    },
+});
+
+// When ProjectGroup has been updated | project has been created
+watch(() => state.shouldUpdateProjectList, async () => {
+    if (state.shouldUpdateProjectList) {
+        await getData();
+        projectPageStore.$patch({ shouldUpdateProjectList: false });
+    }
+});
+
+/* Init */
+watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
+    if (isInitiated) await listProjects(groupId, searchText);
+}, { immediate: true });
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/provider/load'),
+    ]);
+})();
+</script>
+
 <template>
     <div class="project-card-list">
         <p-toolbox :searchable="false"
-                   :page-size="pageSize"
-                   :total-count="totalCount"
+                   :page-size="state.pageSize"
+                   :total-count="state.totalCount"
                    @change="onChange"
                    @refresh="getData()"
         />
         <p-data-loader class="flex-grow"
-                       :data="items"
-                       :loading="loading"
+                       :data="state.items"
+                       :loading="state.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
             <div class="project-cards">
-                <div v-for="(item, i) in items"
+                <div v-for="(item, i) in state.items"
                      :key="i"
                      class="project-card-container"
                 >
@@ -22,7 +272,7 @@
                         <div class="card-top-wrapper">
                             <div class="group-name-wrapper">
                                 <div class="group-name">
-                                    {{ getProjectGroupName(parentGroups, item) }}
+                                    {{ getProjectGroupName(props.parentGroups, item) }}
                                 </div>
                                 <div class="favorite-wrapper">
                                     <favorite-button :item-id="item.project_id"
@@ -77,15 +327,15 @@
                         </div>
                         <div class="card-bottom-wrapper">
                             <div class="project-summary">
-                                <div v-for="{ title, summaryType } in projectSummaryList"
+                                <div v-for="{ title, summaryType } in state.projectSummaryList"
                                      :key="`summary-${title}-${item.project_id}`"
                                      class="project-summary-item"
                                 >
                                     <div class="summary-item-text">
                                         {{ title }}
                                     </div>
-                                    <p-skeleton v-if="cardSummaryLoading" />
-                                    <router-link v-else-if="cardSummary[item.project_id]"
+                                    <p-skeleton v-if="state.cardSummaryLoading" />
+                                    <router-link v-else-if="state.cardSummary[item.project_id]"
                                                  class="summary-item-num"
                                                  :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
                                     >
@@ -102,7 +352,7 @@
             </div>
             <template #no-data>
                 <p-empty
-                    v-if="noProjectGroup"
+                    v-if="state.noProjectGroup"
                     show-button
                 >
                     <div class="description-content">
@@ -123,7 +373,7 @@
                         <p-button style-type="primary"
                                   class="mt-6"
                                   icon-left="ic_plus_bold"
-                                  :disabled="manageDisabled"
+                                  :disabled="props.manageDisabled"
                                   @click="$emit('create-project-group')"
                         >
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
@@ -131,7 +381,7 @@
                     </template>
                 </p-empty>
                 <p-empty
-                    v-if="noProject"
+                    v-if="state.noProject"
                     show-image
                 >
                     <template #image>
@@ -144,307 +394,13 @@
             </template>
         </p-data-loader>
 
-        <project-form-modal v-if="groupId && projectFormVisible"
-                            :visible.sync="projectFormVisible"
-                            :project-group-id="groupId"
-                            @complete="listProjects(groupId, searchText)"
+        <project-form-modal v-if="state.groupId && state.projectFormVisible"
+                            :visible.sync="state.projectFormVisible"
+                            :project-group-id="state.groupId"
+                            @complete="listProjects(state.groupId, state.searchText)"
         />
     </div>
 </template>
-
-<script lang="ts">
-
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PSkeleton, PI, PButton, PToolbox, PDataLoader, PEmpty,
-} from '@spaceone/design-system';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
-import bytes from 'bytes';
-import { range, uniq } from 'lodash';
-
-import { getAllPage } from '@cloudforet/core-lib/component-util/pagination';
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import { arrayToQueryString } from '@/lib/router-query-string';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-
-import { BACKGROUND_COLOR } from '@/styles/colorsets';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-config';
-import ProjectFormModal from '@/services/project/project-detail/modules/ProjectFormModal.vue';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-config';
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-import type { SummaryType } from '@/services/project/types/type';
-import { SUMMARY_TYPE } from '@/services/project/types/type';
-
-interface CardSummary {
-    [projectId: string]: {
-        Server: number;
-        Database: number;
-        Storage: number;
-    };
-}
-
-export default {
-    name: 'ProjectCardList',
-    components: {
-        ProjectFormModal,
-        PButton,
-        FavoriteButton,
-        PI,
-        PSkeleton,
-        PToolbox,
-        PDataLoader,
-        PEmpty,
-    },
-    props: {
-        parentGroups: {
-            type: Array,
-            default: () => [],
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const projectPageStore = useProjectPageStore();
-        const state = reactive({
-            items: undefined,
-            totalCount: 0,
-            loading: true,
-            cardSummaryLoading: true,
-            pageStart: 1,
-            pageSize: 24,
-            allPage: computed(() => getAllPage(state.totalCount, (state.pageSize))),
-            cardSummary: {} as CardSummary,
-            // showAllProjects: false,
-            noProject: computed(() => state.totalCount === 0),
-            hoveredProjectId: '',
-            hoveredGroupId: '',
-            isAll: computed(() => !state.groupId),
-            groupId: computed(() => projectPageStore.groupId),
-            searchText: computed(() => projectPageStore.searchText),
-            noProjectGroup: computed(() => !projectPageStore.hasProjectGroup),
-            projectFormVisible: computed({
-                get() { return projectPageStore.projectFormVisible; },
-                set(val) { projectPageStore.$patch({ projectFormVisible: val }); },
-            }),
-            projectSummaryList: computed(() => [
-                { title: i18n.t('PROJECT.LANDING.SERVER'), summaryType: SUMMARY_TYPE.SERVER },
-                { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
-                { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
-            ]),
-            shouldUpdateProjectList: computed<boolean>(() => projectPageStore.shouldUpdateProjectList),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-        });
-
-        const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
-        const getItemSummaryCount = (summaryType, projectId) => {
-            if (state.cardSummary) {
-                let summaryCount = state.cardSummary[projectId][summaryType];
-                if (summaryType === SUMMARY_TYPE.STORAGE) summaryCount = summaryCount ? byteFormatter(summaryCount) : 0;
-                return summaryCount;
-            }
-            return {};
-        };
-        const getProvider = (name) => state.providers[name] || {};
-        const goToServiceAccount = (provider) => {
-            vm.$router.push({
-                name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                query: { provider: getProvider(provider) ? provider : null },
-            });
-        };
-        const getDistinctProviders = (items: string[]) => uniq(items);
-        const getProjectGroupName = (parentGroups, projectItem) => {
-            let result = '';
-            if (parentGroups.length > 0) {
-                result = `${parentGroups[parentGroups.length - 1].name} > `;
-            }
-            result += projectItem.project_group_info.name;
-            return result;
-        };
-
-        const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
-        const listAllProjectApi = SpaceConnector.client.identity.project.list;
-        const listQuery = new ApiQueryHelper();
-
-        const getParams = (id?, text?) => {
-            listQuery.setPageStart(state.pageStart)
-                .setPageLimit(state.pageSize);
-
-            if (text) {
-                listQuery.setFilters([{ k: 'name', v: text, o: '' }]);
-            } else {
-                listQuery.setFilters([]);
-            }
-
-            const params: any = { include_provider: true, query: listQuery.data };
-            if (id) params.project_group_id = id;
-            // if (state.showAllProjects) params.recursive = true;
-
-            return params;
-        };
-
-        let getCardToken: CancelTokenSource | undefined;
-        const getCardSummary = async (items) => {
-            if (items.length === 0) return;
-
-            if (getCardToken) {
-                getCardToken.cancel('Next request has been called.');
-                getCardToken = undefined;
-            }
-
-            getCardToken = axios.CancelToken.source();
-            const cardSummary: CardSummary = {};
-            state.cardSummaryLoading = true;
-            try {
-                const ids = items?.map((item) => item.project_id);
-                const res = await SpaceConnector.client.statistics.topic.projectPage({
-                    projects: ids,
-                }, { cancelToken: getCardToken.token });
-                res.results.forEach((d) => {
-                    cardSummary[d.project_id] = {
-                        Server: d.server_count || 0,
-                        Database: d.database_count || 0,
-                        Storage: d.storage_size || 0,
-                    };
-                });
-                getCardToken = undefined;
-                state.cardSummary = cardSummary;
-                state.cardSummaryLoading = false;
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    state.cardSummary = cardSummary;
-                    state.cardSummaryLoading = false;
-                    ErrorHandler.handleError(e);
-                }
-            }
-        };
-
-        let listProjectToken: CancelTokenSource | undefined;
-        const getData = async (_id?, _text?) => {
-            const id = _id || state.groupId;
-            const text = _text || state.searchText;
-
-            // if request is already exist, cancel the request
-            if (listProjectToken) {
-                listProjectToken.cancel('Next request has been called.');
-                listProjectToken = undefined;
-            }
-            // create a new token for upcoming request (overwrite the previous one)
-            listProjectToken = axios.CancelToken.source();
-            state.loading = true;
-            try {
-                let res;
-                if (state.isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
-                else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
-                state.items = res.results;
-                state.totalCount = res.total_count;
-                projectPageStore.$patch({ projectCount: state.totalCount });
-                state.loading = false;
-                listProjectToken = undefined;
-                await getCardSummary(res.results);
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    state.items = [];
-                    state.totalCount = 0;
-                    state.loading = false;
-                    projectPageStore.$patch({ projectCount: 0 });
-                    ErrorHandler.handleError(e);
-                }
-            }
-        };
-
-        const onChange = async (options: any) => {
-            if (options.pageLimit !== undefined) {
-                state.pageSize = options.pageLimit;
-            }
-            if (options.pageStart !== undefined) {
-                state.pageStart = options.pageStart;
-            }
-            await getData();
-        };
-
-        const resetAll = () => {
-            state.totalCount = 0;
-            state.pageStart = 1;
-            state.pageSize = 24;
-        };
-
-        const listProjects = async (groupId?, searchText?, reset = true) => {
-            if (reset) resetAll();
-            await getData(groupId, searchText);
-        };
-
-        const queryHelper = new QueryHelper();
-        const getLocation = (serviceType: SummaryType, name, projectId) => ({
-            name,
-            query: {
-                provider: 'all',
-                service: arrayToQueryString([serviceType]),
-                filters: queryHelper.setFilters([{ k: 'project_id', v: [projectId], o: '=' }]).rawQueryStrings[0],
-            },
-        });
-
-        // When ProjectGroup has been updated | project has been created
-        watch(() => state.shouldUpdateProjectList, async () => {
-            if (state.shouldUpdateProjectList) {
-                await getData();
-                projectPageStore.$patch({ shouldUpdateProjectList: false });
-            }
-        });
-
-        /* Init */
-        watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
-            if (isInitiated) await listProjects(groupId, searchText);
-        }, { immediate: true });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            ASSET_INVENTORY_ROUTE,
-            PROJECT_ROUTE,
-            getProvider,
-            goToServiceAccount,
-            getDistinctProviders,
-            getData,
-            onChange,
-            skeletons: range(1),
-            listProjects,
-            getLocation,
-            byteFormatter,
-            getItemSummaryCount,
-            getProjectGroupName,
-            SUMMARY_TYPE,
-            FAVORITE_TYPE,
-            BACKGROUND_COLOR,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .project-card-list {
