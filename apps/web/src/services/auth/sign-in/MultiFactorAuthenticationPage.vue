@@ -1,77 +1,3 @@
-<template>
-    <div class="multi-factor-authentication-page">
-        <div class="form-wrapper">
-            <div class="headline-wrapper">
-                <p class="title">
-                    {{ $t('AUTH.MFA.TITLE') }}
-                </p>
-                <p class="subtitle">
-                    {{ $t('AUTH.MFA.SUB_TITLE') }}
-                </p>
-            </div>
-            <div class="email-info-wrapper">
-                <span class="email-info-desc">
-                    <i18n path="AUTH.MFA.EMAIL_INFO">
-                        <template #code>
-                            <strong>{{ $t('AUTH.MFA.AUTHENTICATION_CODE') }}</strong>
-                        </template>
-                    </i18n>
-                </span>
-                <div class="email-wrapper">
-                    <p-i name="ic_envelope-filled"
-                         height="1.125rem"
-                         width="1.125rem"
-                         color="inherit"
-                         class="icon-envelope"
-                    />
-                    <strong class="email-text">
-                        {{ route.query.userId }}
-                    </strong>
-                </div>
-            </div>
-            <p-field-group :label="$t('AUTH.MFA.AUTHENTICATION_CODE')"
-                           :invalid="validationState.isVerificationCodeValid"
-                           :invalid-text="validationState.verificationCodeInvalidText"
-                           required
-                           class="input-form"
-            >
-                <p-text-input :value="validationState.verificationCode"
-                              :invalid="validationState.isVerificationCodeValid"
-                              class="text-input"
-                              @update:value="handleChangeInput"
-                              @keyup.enter="handleClickConfirmButton"
-                />
-            </p-field-group>
-            <div>
-                <p-collapsible-toggle v-if="state.isCollapsed"
-                                      v-model="state.isCollapsed"
-                >
-                    {{ $t('AUTH.COLLAPSED.EXTENSION_TITLE_1') }}
-                </p-collapsible-toggle>
-                <collapsible-contents v-else
-                                      @click-resend="handleClickResend"
-                />
-            </div>
-            <p-button size="lg"
-                      :loading="state.confirmLoading"
-                      class="confirm-button"
-                      :disabled="validationState.verificationCode === ''"
-                      @click="handleClickConfirmButton"
-            >
-                {{ $t('AUTH.MFA.CONFIRM') }}
-            </p-button>
-            <p-text-button class="go-back-button mr-2"
-                           icon-left="ic_arrow-left"
-                           style-type="highlight"
-                           size="md"
-                           @click="handleClickGoBackButton"
-            >
-                {{ $t('AUTH.MFA.GO_BACK') }}
-            </p-text-button>
-        </div>
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
@@ -151,6 +77,80 @@ const handleClickConfirmButton = async () => {
     }
 };
 </script>
+
+<template>
+    <div class="multi-factor-authentication-page">
+        <div class="form-wrapper">
+            <div class="headline-wrapper">
+                <p class="title">
+                    {{ $t('AUTH.MFA.TITLE') }}
+                </p>
+                <p class="subtitle">
+                    {{ $t('AUTH.MFA.SUB_TITLE') }}
+                </p>
+            </div>
+            <div class="email-info-wrapper">
+                <span class="email-info-desc">
+                    <i18n path="AUTH.MFA.EMAIL_INFO">
+                        <template #code>
+                            <strong>{{ $t('AUTH.MFA.AUTHENTICATION_CODE') }}</strong>
+                        </template>
+                    </i18n>
+                </span>
+                <div class="email-wrapper">
+                    <p-i name="ic_envelope-filled"
+                         height="1.125rem"
+                         width="1.125rem"
+                         color="inherit"
+                         class="icon-envelope"
+                    />
+                    <strong class="email-text">
+                        {{ route.query.userId }}
+                    </strong>
+                </div>
+            </div>
+            <p-field-group :label="$t('AUTH.MFA.AUTHENTICATION_CODE')"
+                           :invalid="validationState.isVerificationCodeValid"
+                           :invalid-text="validationState.verificationCodeInvalidText"
+                           required
+                           class="input-form"
+            >
+                <p-text-input :value="validationState.verificationCode"
+                              :invalid="validationState.isVerificationCodeValid"
+                              class="text-input"
+                              @update:value="handleChangeInput"
+                              @keyup.enter="handleClickConfirmButton"
+                />
+            </p-field-group>
+            <div>
+                <p-collapsible-toggle v-if="state.isCollapsed"
+                                      v-model="state.isCollapsed"
+                >
+                    {{ $t('AUTH.COLLAPSED.EXTENSION_TITLE_1') }}
+                </p-collapsible-toggle>
+                <collapsible-contents v-else
+                                      @click-resend="handleClickResend"
+                />
+            </div>
+            <p-button size="lg"
+                      :loading="state.confirmLoading"
+                      class="confirm-button"
+                      :disabled="validationState.verificationCode === ''"
+                      @click="handleClickConfirmButton"
+            >
+                {{ $t('AUTH.MFA.CONFIRM') }}
+            </p-button>
+            <p-text-button class="go-back-button mr-2"
+                           icon-left="ic_arrow-left"
+                           style-type="highlight"
+                           size="md"
+                           @click="handleClickGoBackButton"
+            >
+                {{ $t('AUTH.MFA.GO_BACK') }}
+            </p-text-button>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .multi-factor-authentication-page {
