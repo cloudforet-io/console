@@ -6,22 +6,18 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import getRandomId from '@/lib/random-id-generator';
-import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import type {
     DashboardSettings, DashboardVariables, DashboardVariablesSchema,
-    DashboardVariableSchemaProperty,
 } from '@/services/dashboards/config';
-import { DASHBOARD_LABEL, DASHBOARD_VIEWER } from '@/services/dashboards/config';
+import { DASHBOARD_VIEWER } from '@/services/dashboards/config';
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/managed-variables-schema';
 import type { DashboardModel, ProjectDashboardModel } from '@/services/dashboards/model';
 import type {
     DashboardLayoutWidgetInfo,
-    InheritOptions,
-    UpdatableWidgetInfo, WidgetOptions,
+    UpdatableWidgetInfo,
 } from '@/services/dashboards/widgets/_configs/config';
 import { WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import { WIDGET_OPTIONS_SCHEMA_PROPERTIES } from '@/services/dashboards/widgets/_configs/widget-options-schema';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 
 interface WidgetValidMap {
@@ -163,14 +159,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
             };
 
-            // NOTE: This is for conversion from old dashboard variable schema to new one which is stored to database before version 2.0(<=1.12).
-            const _convertedOrder = _dashboardInfo.variables_schema?.order?.map((d) => {
-                if (d === 'asset_query_set') return MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key;
-                return d;
-            }) ?? [];
             let _variablesSchema = {
                 properties: _dashboardInfo.variables_schema?.properties ?? {},
-                order: _convertedOrder,
+                order: _dashboardInfo.variables_schema?.order,
             };
             let _variables = _dashboardInfo.variables ?? {};
             if (this.projectId) {
@@ -204,8 +195,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 } else {
                     result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: this.dashboardId });
                 }
-                const resultWithConvertedVariableSchema = this.convertDashboardInfo(result);
-                this.setDashboardInfo(resultWithConvertedVariableSchema);
+                this.setDashboardInfo(result);
             } catch (e) {
                 this.resetDashboardData();
                 throw e;
@@ -280,222 +270,5 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         updateWidgetValidation(isValid: boolean, widgetKey: string) {
             this.widgetValidMap[widgetKey] = isValid;
         },
-        // This action is for handling dashboard data that does not reflect schema changes.
-        convertDashboardInfo(dashboardInfo: DashboardModel): DashboardModel {
-            // NOTE: This is for conversion from old dashboard variable schema and variables to new one which is stored to database before version 2.0(<=1.12).
-            const convertedVariablesSchema = getConvertedVariablesSchema(dashboardInfo.variables_schema, dashboardInfo.labels);
-            const convertedVariables = getConvertedVariables(dashboardInfo.variables);
-            // NOTE: This is for conversion from old widget info spec to new one which is stored to database before version 2.0(<=1.12).
-            const convertedWidgetLayouts = getConvertedWidgetLayouts(dashboardInfo.layouts);
-            return {
-                ...dashboardInfo,
-                variables_schema: convertedVariablesSchema,
-                variables: convertedVariables,
-                layouts: convertedWidgetLayouts,
-            };
-        },
     },
 });
-
-const getConvertedWidgetLayouts = (storedWidgetLayouts: DashboardModel['layouts']): DashboardModel['layouts'] => {
-    if (!storedWidgetLayouts?.length) return storedWidgetLayouts;
-
-    return storedWidgetLayouts.map((layout) => layout.map((widgetInfo) => {
-        const convertedInheritOptions = getConvertedWidgetInheritOptions(widgetInfo.inherit_options);
-        const convertedWidgetOptions = getConvertedWidgetOptions(widgetInfo.widget_name, widgetInfo.widget_options);
-        const convertedSchemaProperties = getConvertedSchemaProperties(widgetInfo.schema_properties);
-        const convertedWidgetName = getConvertedWidgetName(widgetInfo.widget_name);
-        return {
-            ...widgetInfo,
-            widget_name: convertedWidgetName,
-            inherit_options: convertedInheritOptions,
-            widget_options: convertedWidgetOptions,
-            schema_properties: convertedSchemaProperties,
-        };
-    }));
-};
-const getConvertedWidgetInheritOptions = (storedInheritOptions?: InheritOptions|DeprecatedInheritOptions): InheritOptions|undefined => {
-    if (isEmpty(storedInheritOptions)) return storedInheritOptions;
-
-    const inheritOptions = cloneDeep(storedInheritOptions);
-    Object.entries(inheritOptions).forEach(([k, inheritOption]) => {
-        const variableKey = inheritOption.variable_info?.key;
-        if (variableKey) {
-            inheritOptions[k] = {
-                enabled: inheritOptions[k].enabled,
-                variable_key: variableKey,
-            };
-            delete (inheritOptions[k] as DeprecatedInheritOptions).variable_info;
-        }
-    });
-    return inheritOptions;
-};
-type DeprecatedInheritOptions = Record<string, {
-    enabled?: boolean;
-    variable_info?: {
-        key: string;
-    },
-}>;
-const getConvertedWidgetOptions = (storedWidgetName: string, storedWidgetOptions?: WidgetOptions): WidgetOptions|undefined => {
-    const widgetOptions = cloneDeep(storedWidgetOptions);
-
-    if (storedWidgetName === 'awsDataTransferByRegion') {
-        let _widgetOptions = widgetOptions;
-        if (!_widgetOptions) _widgetOptions = {};
-        _widgetOptions.cost_secondary_data_field = 'additional_info.Usage Type Details';
-        delete (_widgetOptions as any).cost_group_by;
-        _widgetOptions.filters = {
-            cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
-        };
-        return _widgetOptions;
-    }
-    if (storedWidgetName === 'awsDataTransferCostTrend') {
-        let _widgetOptions = widgetOptions;
-        if (!_widgetOptions) _widgetOptions = {};
-        _widgetOptions.cost_data_field = 'additional_info.Usage Type Details';
-        delete (_widgetOptions as any).cost_group_by;
-        _widgetOptions.filters = {
-            cost_product: [{ k: 'product', v: ['AWSDataTransfer'], o: '=' }],
-        };
-        return _widgetOptions;
-    }
-    if (storedWidgetName === 'awsCloudFrontCost') {
-        let _widgetOptions = widgetOptions;
-        if (!_widgetOptions) _widgetOptions = {};
-        _widgetOptions.cost_secondary_data_field = 'additional_info.Usage Type Details';
-        delete (_widgetOptions as any).cost_group_by;
-        _widgetOptions.filters = {
-            cost_product: [{ k: 'product', v: ['AmazonCloudFront'], o: '=' }],
-        };
-        return _widgetOptions;
-    }
-
-    if (!widgetOptions || isEmpty(widgetOptions)) return widgetOptions;
-
-    Object.entries(widgetOptions).forEach(([k, v]) => {
-        if (k === 'cost_group_by') {
-            (widgetOptions as any).cost_data_field = v;
-            delete widgetOptions[k];
-        } else if (k === 'asset_group_by') {
-            (widgetOptions as any).asset_data_field = v;
-            delete widgetOptions[k];
-        }
-    });
-
-    return widgetOptions;
-};
-const getConvertedSchemaProperties = (storedSchemaProperties?: string[]): string[]|undefined => {
-    if (!storedSchemaProperties?.length) return undefined;
-
-    // Change deprecated name from order
-    const _storedSchemaProperties = cloneDeep(storedSchemaProperties);
-    const index = _storedSchemaProperties.indexOf('asset_query_set');
-    if (index > -1) {
-        _storedSchemaProperties.splice(index, 1, WIDGET_OPTIONS_SCHEMA_PROPERTIES.cloud_service_query_set.key);
-    }
-    return _storedSchemaProperties;
-};
-const getConvertedWidgetName = (storedWidgetName: string): string => {
-    if (storedWidgetName === 'awsDataTransferCostTrend') {
-        return 'costTrend';
-    }
-    if (storedWidgetName === 'awsDataTransferByRegion') {
-        return 'costByRegionMultiFields';
-    }
-    if (storedWidgetName === 'awsCloudFrontCost') {
-        return 'costSummaryMultiFields';
-    }
-    return storedWidgetName;
-};
-
-const getConvertedVariablesSchema = (storedVariablesSchema: DashboardVariablesSchema, labels: string[]): DashboardVariablesSchema => {
-    if (isEmpty(storedVariablesSchema)) return storedVariablesSchema;
-
-    const variablesSchema = cloneDeep(storedVariablesSchema);
-    Object.entries(variablesSchema.properties).forEach(([k, property]) => {
-        if (property.variable_type === 'MANAGED') {
-            if (MANAGED_DASH_VAR_SCHEMA.properties[k]) {
-                variablesSchema.properties[k] = {
-                    ...MANAGED_DASH_VAR_SCHEMA.properties[k],
-                    use: property.use,
-                };
-            } else if (k === 'asset_query_set') {
-                const schema = {
-                    ...MANAGED_DASH_VAR_SCHEMA.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key],
-                };
-                schema.use = property.use;
-                if (labels.includes('Asset')) {
-                    schema.fixed = true;
-                }
-                variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = schema;
-                delete variablesSchema.properties[k];
-            } else {
-                console.error(new Error(`conversion failed: ${k}: ${JSON.stringify(property)}`));
-            }
-        } else {
-            const options = getConvertedCustomOptions(property.options);
-            variablesSchema.properties[k] = {
-                ...property, options,
-            };
-        }
-
-        // Remove `fixed` property that is not appropriate for the dashboard label
-        if (!labels.includes(DASHBOARD_LABEL.ASSET) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]) {
-            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key].fixed = false;
-        }
-        if (!labels.includes(DASHBOARD_LABEL.COST) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]) {
-            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key].fixed = false;
-        }
-
-        // Add fixed property for the dashboard label
-        if (labels.includes(DASHBOARD_LABEL.ASSET) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key]) {
-            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key].fixed = true;
-        }
-        if (labels.includes(DASHBOARD_LABEL.COST) && variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key]) {
-            variablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key].fixed = true;
-        }
-
-        // Change deprecated name from order
-        const index = variablesSchema.order.indexOf('asset_query_set');
-        if (index > -1) {
-            variablesSchema.order.splice(index, 1, MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key);
-        }
-    });
-    return variablesSchema;
-};
-const getConvertedCustomOptions = (storedOptions?: DeprecatedCustomVariableOptions|DashboardVariableSchemaProperty['options']): DashboardVariableSchemaProperty['options']|undefined => {
-    // early return if storedOptions is empty or already in the new format.
-    if (!storedOptions || Array.isArray(storedOptions)) return storedOptions;
-
-    const options = storedOptions as DeprecatedCustomVariableOptions;
-
-    // only ENUM type was supported for custom options in old dashboard variable schema.
-    if (options.type === 'ENUM') {
-        if (options.values[0]?.label) {
-            return [{
-                type: 'ENUM',
-                values: options.values.map((value) => ({ key: value.key, name: value.label })),
-            }];
-        }
-    }
-
-    console.error(new Error(`getConvertedCustomOptions: conversion failed ${JSON.stringify(storedOptions)}`));
-    return undefined;
-};
-const getConvertedVariables = (storedVariables: DashboardVariables): DashboardVariables => {
-    if (isEmpty(storedVariables)) return storedVariables;
-
-    const variables = cloneDeep(storedVariables);
-    Object.entries(variables).forEach(([k, v]) => {
-        if (k === 'asset_query_set') {
-            variables[MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key] = v;
-            delete variables[k];
-        }
-    });
-    return variables;
-};
-// only ENUM type was supported for custom options in old dashboard variable schema.
-type DeprecatedCustomVariableOptions = {
-    type: 'ENUM';
-    values: { key: string; label: string; }[];
-};
