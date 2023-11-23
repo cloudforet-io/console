@@ -2,9 +2,9 @@ import {
     keyBy, merge, sortBy, values,
 } from 'lodash';
 
-import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
+import type { CostDataField } from '@/schema/dashboard/_types/widget-type';
 
-import type { CostDataField } from '@/services/dashboards/widgets/_configs/config';
+import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 interface RawData {
     [key: string]: any;

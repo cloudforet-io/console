@@ -32,11 +32,11 @@ import type {
     BackLink, LNBItem, LNBMenu, TopTitle,
 } from '@/common/modules/navigations/lnb/type';
 
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/stores/cloud-service-detail-page-store';
 import type {
     CloudServiceDetailPageParams,
-} from '@/services/asset-inventory/cloud-service/cloud-service-detail/type';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
-import { useCloudServiceDetailPageStore } from '@/services/asset-inventory/store/cloud-service-detail-page-store';
+} from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
 
 export default defineComponent({

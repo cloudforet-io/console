@@ -15,7 +15,8 @@ import { DEFAULT_CATEGORY_FIELD_NAME, DEFAULT_DATE_FIELD_NAME } from '@/common/c
 
 import { gray } from '@/styles/colors';
 
-import type { UnitMap } from '@/services/dashboards/widgets/_components/type';
+
+type UnitMap = 'B'|'KB'|'MB'|'GB'|'PB'|'TB';
 
 // Chart
 const createXYChart = (root: Root, settings?: IXYChartSettings): am5xy.XYChart => {

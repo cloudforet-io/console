@@ -1,5 +1,6 @@
 import type { Getter } from 'vuex';
 
+
 import { languages } from '@/store/modules/user/config';
 
 import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/config';
@@ -9,9 +10,9 @@ import {
     getPagePermissionMapFromRaw, getProperPermissionType,
 } from '@/lib/access-control/page-permission-helper';
 
-import type { RoleType } from '@/services/administration/iam/role/config';
 
 import type { UserState } from './type';
+import type { RoleType } from '@/api-schema/identity/role/model';
 
 export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;

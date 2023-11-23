@@ -1,6 +1,7 @@
-import type { WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
-import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import { GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 
 const totalFailFindingsHistoryWidgetConfig: WidgetConfig = {
     widget_config_id: 'totalFailFindingsHistory',

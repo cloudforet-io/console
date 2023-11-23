@@ -5,12 +5,13 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RoleData } from '@/services/administration/iam/role/type';
+import type { RoleModel } from '@/api-schema/identity/role/model';
+
 
 
 interface RolePageState {
     loading: boolean;
-    roles: RoleData[];
+    roles: RoleModel[];
     totalCount: number;
     selectedIndices: number[];
 }

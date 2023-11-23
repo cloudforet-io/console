@@ -1,9 +1,9 @@
 import { cloneDeep } from 'lodash';
 import { describe, expect, it } from 'vitest';
 
-import type { DashboardVariablesSchema } from '@/services/dashboards/config';
-import type { InheritOptions, WidgetConfig } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetOptionsSchema } from '@/services/dashboards/widgets/_configs/widget-options-schema';
+import type { DashboardVariablesSchema } from '@/schema/dashboard/_types/dashboard-type';
+import type { InheritOptions, WidgetConfig, WidgetOptionsSchema } from '@/schema/dashboard/_types/widget-type';
+
 import {
     getInheritingOptionKeys,
     getInitialWidgetInheritOptions,

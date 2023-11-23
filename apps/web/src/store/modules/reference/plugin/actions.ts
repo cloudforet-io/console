@@ -2,6 +2,7 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { PluginReferenceMap, PluginReferenceState } from '@/store/modules/reference/plugin/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
@@ -10,7 +11,8 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
+import type { RepositoryPluginModel } from '@/api-schema/inventory/collector/model';
+
 
 let lastLoadedTime = 0;
 

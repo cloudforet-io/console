@@ -95,7 +95,7 @@ import GNBSearchDropdown from '@/common/modules/navigations/gnb/modules/gnb-sear
 import GNBSearchInput from '@/common/modules/navigations/gnb/modules/gnb-search/modules/GNBSearchInput.vue';
 import type { DropdownItem, FocusingDirection } from '@/common/modules/navigations/gnb/modules/gnb-search/type';
 
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/route-config';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 interface CloudServiceData {
     id: string;
