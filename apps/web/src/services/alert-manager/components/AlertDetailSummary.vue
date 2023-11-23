@@ -95,6 +95,8 @@ import dayjs from 'dayjs';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 
+import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
+import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -104,10 +106,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red } from '@/styles/colors';
 
 import AlertDetailSummaryAssignModal from '@/services/alert-manager/components/AlertDetailSummaryAssignModal.vue';
-import type { AlertState, AlertUrgency } from '@/services/alert-manager/constants/alert-constant';
-import {
-    ALERT_STATE, ALERT_URGENCY,
-} from '@/services/alert-manager/constants/alert-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 

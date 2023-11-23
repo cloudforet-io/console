@@ -36,6 +36,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
@@ -43,8 +44,8 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
-import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+
 
 export default {
     name: 'AlertDashboardProjectSearchWidgetAlertList',

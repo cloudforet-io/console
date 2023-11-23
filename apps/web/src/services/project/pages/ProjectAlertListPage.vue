@@ -6,12 +6,15 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
+
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/types/alert-type';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+
 
 interface Props {
     id?: string;

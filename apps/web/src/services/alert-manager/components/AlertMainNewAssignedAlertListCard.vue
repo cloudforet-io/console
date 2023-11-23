@@ -48,6 +48,7 @@ import { get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -56,9 +57,9 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
-import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertManagerSettingsStore } from '@/services/alert-manager/stores/alert-manager-settings-store';
+
 
 export default {
     name: 'AlertMainNewAssignedAlertListCard',

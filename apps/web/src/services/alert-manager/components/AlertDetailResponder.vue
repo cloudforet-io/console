@@ -14,6 +14,7 @@ import { differenceBy } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -22,15 +23,13 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
-import type {
-    AlertDataModel,
-} from '@/services/alert-manager/types/alert-type';
 
 import TranslateResult = VueI18n.TranslateResult;
 
+
 interface Props {
     id?: string;
-    alertData?: AlertDataModel;
+    alertData?: AlertModel;
     manageDisabled?: boolean;
 }
 interface Rule {

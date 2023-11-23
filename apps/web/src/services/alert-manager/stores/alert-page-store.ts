@@ -2,9 +2,9 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 
-import type { AlertDataModel } from '@/services/alert-manager/types/alert-type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export interface UpdateAlertParams {
@@ -14,7 +14,7 @@ export interface UpdateAlertParams {
 
 export const useAlertPageStore = defineStore('alert-page', {
     state: () => ({
-        alertData: null as Partial<AlertDataModel>|null,
+        alertData: null as Partial<AlertModel>|null,
     }),
     actions: {
         async getAlertData(alertId: string): Promise<void|Error> {

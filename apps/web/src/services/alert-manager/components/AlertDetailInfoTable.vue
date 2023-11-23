@@ -97,6 +97,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ALERT_SEVERITY } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -107,14 +108,26 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import {
+    blue, coral, gray, red, violet, yellow,
+} from '@/styles/colors';
+
 import AlertDetailInfoTableDescription
     from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import AlertDetailInfoTableProject from '@/services/alert-manager/components/AlertDetailInfoTableProject.vue';
 import AlertTriggeredBy from '@/services/alert-manager/components/AlertMainDataTableTriggeredByField.vue';
-import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
+
+const ALERT_SEVERITY_COLORS: Record<keyof typeof ALERT_SEVERITY, string> = {
+    CRITICAL: red[600],
+    ERROR: coral[600],
+    WARNING: yellow[600],
+    INFO: blue[600],
+    NOT_AVAILABLE: violet[800],
+    NONE: gray[500],
+};
 
 export default {
     name: 'AlertDetailInfoTable',

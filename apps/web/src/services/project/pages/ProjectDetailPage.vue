@@ -17,6 +17,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectModel } from '@/schema/identity/project/model';
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -36,7 +37,6 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
 import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
 import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
 import ProjectDetailProjectFormModal from '@/services/project/components/ProjectDetailProjectFormModal.vue';

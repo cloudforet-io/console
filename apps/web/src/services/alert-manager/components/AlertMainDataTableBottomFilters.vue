@@ -50,9 +50,10 @@ import {
 
 import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
 
+import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertBottomFilters,
 } from '@/services/alert-manager/types/alert-type';

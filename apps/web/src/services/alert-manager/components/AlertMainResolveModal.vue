@@ -30,6 +30,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -37,8 +38,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type { AlertStateUpdateParams } from '@/services/alert-manager/types/alert-type';
+
 
 export default {
     name: 'AlertMainResolveModal',
