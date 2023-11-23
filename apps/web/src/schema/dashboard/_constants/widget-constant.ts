@@ -57,7 +57,7 @@ export const COST_DATA_FIELD_MAP = {
     SERVICE_ACCOUNT: { name: 'service_account_id', label: 'Service Account' },
     REGION: { name: 'region_code', label: 'Region' },
     // cost reference
-    USAGE_TYPE: { name: 'cost_usage_type', label: 'Type' },
+    USAGE_TYPE: { name: 'usage_type', label: 'Type' },
     PRODUCT: { name: 'product', label: 'Product' },
 } as const;
 
