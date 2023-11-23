@@ -20,6 +20,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
@@ -126,9 +127,9 @@ const getValue = (item:string|number|object, field: Field):string|number => {
         valueKey = 'Unknown';
     }
     if (typeof item === 'object') {
-        return textFormatter(getValueByPath(item, valueKey), field.textOptions, item);
+        return textFormatter(getValueByPath(item, valueKey), field.textOptions, item) ?? '';
     }
-    return textFormatter(item, field.textOptions, item);
+    return textFormatter(item, field.textOptions, item) ?? '';
 };
 const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
     if (typeof option === 'string' || typeof option === 'boolean') {
@@ -140,14 +141,15 @@ const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], 
 const getColSlotProps = (item, field, colIndex, rowIndex) => ({
     item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
 });
+
+
+const { getTextOverflowState } = useTextOverflowState({ targetRef: labelRef, targetClass: 'common-text-box' });
 const isEllipsisActive = (rowIndex: number, colIndex: number): boolean => {
     if (props.fields[colIndex].detailOptions?.type === 'popover') return false;
     const tdIndex = props.fields.length * rowIndex + colIndex;
-    if (labelRef.value?.length && labelRef.value) {
-        const labelElement = labelRef.value[tdIndex]?.getElementsByClassName('common-text-box')[0] as HTMLElement;
-        return (labelElement?.offsetWidth < labelElement?.scrollWidth);
-    } return false;
+    return getTextOverflowState(tdIndex);
 };
+
 const tableRef = ref<null|HTMLElement>(null);
 const tableWidth = ref<number>(0);
 useResizeObserver(tableRef, throttle((entries) => {
