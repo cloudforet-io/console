@@ -1,6 +1,6 @@
 <template>
     <div v-if="!loading"
-         class="alert-detail-page"
+         class="alert-detail-note"
     >
         <p-heading :title="alertPageState.alertData?.title"
                    show-back-button
@@ -24,21 +24,25 @@
         </p-heading>
         <section class="detail-contents-wrapper">
             <div class="left-wrapper">
-                <alert-summary :id="id"
-                               class="header"
-                               :manage-disabled="!hasManagePermission"
+                <alert-detail-summary
+                    :id="id"
+                    class="header"
+                    :manage-disabled="!hasManagePermission"
                 />
 
-                <alert-key-info :id="id"
-                                class="info"
-                                :manage-disabled="!hasManagePermission"
+                <alert-detail-info-table
+                    :id="id"
+                    class="info"
+                    :manage-disabled="!hasManagePermission"
                 />
-                <alert-status-update :id="id"
-                                     :manage-disabled="!hasManagePermission"
-                                     class="status-update"
+                <alert-detail-status-update
+                    :id="id"
+                    :manage-disabled="!hasManagePermission"
+                    class="status-update"
                 />
-                <alert-timeline-and-event :id="id"
-                                          class="timeline-and-event"
+                <alert-detail-tabs
+                    :id="id"
+                    class="timeline-and-event"
                 />
             </div>
             <div class="right-wrapper">
@@ -47,12 +51,13 @@
                                  :alert-data="alertPageState.alertData"
                                  :manage-disabled="!hasManagePermission"
                 />
-                <alert-note :id="id"
-                            :manage-disabled="!hasManagePermission"
-                            class="note"
+                <alert-detail-note
+                    :id="id"
+                    :manage-disabled="!hasManagePermission"
+                    class="note"
                 />
-                <alert-project-dependency :id="id"
-                                          class="project-dependency"
+                <alert-detail-project-dependency :id="id"
+                                                 class="project-dependency"
                 />
             </div>
         </section>
@@ -61,10 +66,11 @@
                       :contents="$t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
                       @confirm="alertDeleteConfirm"
         />
-        <alert-title-edit-modal v-if="alertTitleEditFormVisible"
-                                :visible.sync="alertTitleEditFormVisible"
-                                :alert-id="id"
-                                @confirm="alertTitleEditConfirm"
+        <alert-detail-title-edit-modal
+            v-if="alertTitleEditFormVisible"
+            :visible.sync="alertTitleEditFormVisible"
+            :alert-id="id"
+            @confirm="alertTitleEditConfirm"
         />
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -93,30 +99,30 @@ import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import AlertKeyInfo from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/AlertKeyInfo.vue';
-import AlertResponder from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/AlertResponder.vue';
-import AlertSummary from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/AlertSummary.vue';
-import AlertNote from '@/services/alert-manager/alert/alert-detail/modules/AlertNote.vue';
-import AlertProjectDependency
-    from '@/services/alert-manager/alert/alert-detail/modules/AlertProjectDependency.vue';
-import AlertStatusUpdate
-    from '@/services/alert-manager/alert/alert-detail/modules/AlertStatusUpdate.vue';
-import AlertTimelineAndEvent from '@/services/alert-manager/alert/alert-detail/modules/AlertTimelineAndEvent.vue';
-import AlertTitleEditModal from '@/services/alert-manager/alert/alert-detail/modules/AlertTitleEditModal.vue';
+import AlertDetailInfoTable from '@/services/alert-manager/components/AlertDetailInfoTable.vue';
+import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote.vue';
+import AlertDetailProjectDependency
+    from '@/services/alert-manager/components/AlertDetailProjectDependency.vue';
+import AlertResponder from '@/services/alert-manager/components/AlertDetailResponder.vue';
+import AlertDetailStatusUpdate
+    from '@/services/alert-manager/components/AlertDetailStatusUpdate.vue';
+import AlertDetailSummary from '@/services/alert-manager/components/AlertDetailSummary.vue';
+import AlertDetailTabs from '@/services/alert-manager/components/AlertDetailTabs.vue';
+import AlertDetailTitleEditModal from '@/services/alert-manager/components/AlertDetailTitleEditModal.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 export default {
     name: 'AlertDetailPage',
     components: {
-        AlertStatusUpdate,
-        AlertProjectDependency,
-        AlertTitleEditModal,
-        AlertNote,
-        AlertTimelineAndEvent,
+        AlertDetailStatusUpdate,
+        AlertDetailProjectDependency,
+        AlertDetailTitleEditModal,
+        AlertDetailNote,
+        AlertDetailTabs,
         AlertResponder,
-        AlertKeyInfo,
-        AlertSummary,
+        AlertDetailInfoTable,
+        AlertDetailSummary,
         DeleteModal,
         PHeading,
         PIconButton,
@@ -196,7 +202,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.alert-detail-page {
+.alert-detail-note {
     @apply bg-gray-100;
 }
 .alert-number {

@@ -58,8 +58,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
-import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
+import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
+import EscalationPolicyForm from '@/services/alert-manager/components/EscalationPolicyForm.vue';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
 
 enum FORM_MODE {

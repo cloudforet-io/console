@@ -2,15 +2,16 @@
     <div class="alert-page">
         <p-heading :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
         <div class="content-wrapper grid grid-cols-12 gap-4">
-            <new-assigned-alert-list-card class="col-span-12" />
-            <assigned-alert-info-panel @select="onSelectAlertState" />
-            <alert-data-table :alert-state="alertState"
-                              :urgency="urgency"
-                              :assigned="assigned"
-                              :filters="filters"
-                              :manage-disabled="!hasManagePermission"
-                              class="grid grid-cols-12 col-span-12 gap-4"
-                              @update="onUpdateTable"
+            <alert-main-new-assigned-alert-list-card class="col-span-12" />
+            <alert-main-assigned-alert-panel @select="onSelectAlertState" />
+            <alert-main-data-table
+                :alert-state="alertState"
+                :urgency="urgency"
+                :assigned="assigned"
+                :filters="filters"
+                :manage-disabled="!hasManagePermission"
+                class="grid grid-cols-12 col-span-12 gap-4"
+                @update="onUpdateTable"
             />
         </div>
     </div>
@@ -30,9 +31,9 @@ import { i18n } from '@/translations';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
-import AssignedAlertInfoPanel from '@/services/alert-manager/alert/modules/AssignedAlertInfoPanel.vue';
-import NewAssignedAlertListCard from '@/services/alert-manager/alert/modules/NewAssignedAlertListCard.vue';
+import AlertMainAssignedAlertPanel from '@/services/alert-manager/components/AlertMainAssignedAlertPanel.vue';
+import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
+import AlertMainNewAssignedAlertListCard from '@/services/alert-manager/components/AlertMainNewAssignedAlertListCard.vue';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertListPageUrlQuery, AlertListTableFilters,
@@ -41,9 +42,9 @@ import type {
 export default {
     name: 'AlertPage',
     components: {
-        AssignedAlertInfoPanel,
-        NewAssignedAlertListCard,
-        AlertDataTable,
+        AlertMainAssignedAlertPanel,
+        AlertMainNewAssignedAlertListCard,
+        AlertMainDataTable,
         PHeading,
     },
     setup() {

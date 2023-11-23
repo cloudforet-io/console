@@ -2,19 +2,22 @@
     <div class="alert-dashboard-page">
         <p-heading :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
         <div class="widget-wrapper">
-            <alert-state-widget :activated-projects="activatedProjects"
-                                class="alert-state-widget"
+            <alert-dashboard-alert-state-widget
+                :activated-projects="activatedProjects"
+                class="alert-state-widget"
             />
-            <alert-history-widget :activated-projects="activatedProjects"
-                                  class="alert-history-widget"
+            <alert-dashboard-alert-history-widget
+                :activated-projects="activatedProjects"
+                class="alert-history-widget"
             />
             <h2 class="widget-title">
                 {{ $t('MONITORING.ALERT.DASHBOARD.PROJECT_HEALTH_BOARD') }}
             </h2>
-            <current-project-status-widget class="current-project-status-widget" />
-            <top5-project-activity-widget class="top5-project-activity-widget" />
-            <project-search-widget :activated-projects="activatedProjects"
-                                   class="col-span-12"
+            <alert-dashboard-current-project-status-widget class="current-project-status-widget" />
+            <alert-dashboard-top5-project-activity-widget class="top5-project-activity-widget" />
+            <alert-dashboard-project-search-widget
+                :activated-projects="activatedProjects"
+                class="col-span-12"
             />
         </div>
     </div>
@@ -30,20 +33,20 @@ import { PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import AlertHistoryWidget from '@/services/alert-manager/alert-dashboard/modules/alert-history-widget/AlertHistoryWidget.vue';
-import AlertStateWidget from '@/services/alert-manager/alert-dashboard/modules/AlertStateWidget.vue';
-import CurrentProjectStatusWidget from '@/services/alert-manager/alert-dashboard/modules/CurrentProjectStatusWidget.vue';
-import ProjectSearchWidget from '@/services/alert-manager/alert-dashboard/modules/project-search-widget/ProjectSearchWidget.vue';
-import Top5ProjectActivityWidget from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityWidget.vue';
+import AlertDashboardAlertHistoryWidget from '@/services/alert-manager/components/AlertDashboardAlertHistoryWidget.vue';
+import AlertDashboardAlertStateWidget from '@/services/alert-manager/components/AlertDashboardAlertStateWidget.vue';
+import AlertDashboardCurrentProjectStatusWidget from '@/services/alert-manager/components/AlertDashboardCurrentProjectStatusWidget.vue';
+import AlertDashboardProjectSearchWidget from '@/services/alert-manager/components/AlertDashboardProjectSearchWidget.vue';
+import AlertDashboardTop5ProjectActivityWidget from '@/services/alert-manager/components/AlertDashboardTop5ProjectActivityWidget.vue';
 
 export default {
     name: 'AlertDashboardPage',
     components: {
-        ProjectSearchWidget,
-        Top5ProjectActivityWidget,
-        CurrentProjectStatusWidget,
-        AlertHistoryWidget,
-        AlertStateWidget,
+        AlertDashboardProjectSearchWidget,
+        AlertDashboardTop5ProjectActivityWidget,
+        AlertDashboardCurrentProjectStatusWidget,
+        AlertDashboardAlertHistoryWidget,
+        AlertDashboardAlertStateWidget,
         PHeading,
     },
     setup() {
