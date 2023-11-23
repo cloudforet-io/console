@@ -1,5 +1,4 @@
-import type { UserModel } from '@/schema/inventory/job-task/model';
-
+import type { UserModel } from '@/schema/identity/user/model';
 
 export interface User extends UserModel {
 	api_key_count?: number;

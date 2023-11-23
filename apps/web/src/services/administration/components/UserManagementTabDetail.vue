@@ -84,7 +84,7 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { UserModel } from '@/schema/inventory/job-task/model';
+import type { UserModel } from '@/schema/identity/user/model';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
