@@ -9,6 +9,8 @@ import { setI18nLocale } from '@/translations';
 import { ERROR_ROUTE, errorRoutes } from '@/router/error-routes';
 import { serviceRoutes } from '@/router/service-routes';
 
+import { useWorkspaceStore } from '@/store/modules/workspace/workspace-store';
+
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts } from '@/lib/site-initializer/amcharts';
@@ -23,6 +25,10 @@ import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 
 const initConfig = async () => {
     await config.init();
+};
+const initWorkspace = () => {
+    const workspaceStore = useWorkspaceStore();
+    workspaceStore.load();
 };
 
 const initQueryHelper = () => {
@@ -53,6 +59,7 @@ const init = async () => {
     const domainName = await initDomain(store, config);
 
     if (domainName) {
+        initWorkspace();
         prefetchResources();
         initI18n();
         initDayjs();
