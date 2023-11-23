@@ -32,6 +32,9 @@ import { getVariableModelMenuHandler } from '@/lib/variable-models/variable-mode
 import DashboardCostWidgetValueOptionDropdown
     from '@/services/dashboards/components/DashboardCostWidgetValueOptionDropdown.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
+import {
+    COST_VALUE_WIDGET_OPTION_CONFIGS,
+} from '@/services/dashboards/widgets/_constants/widget-options-schema-constant.js';
 import { getWidgetOptionKeyByVariableKey } from '@/services/dashboards/widgets/_helpers/widget-schema-helper';
 
 const props = defineProps<{
