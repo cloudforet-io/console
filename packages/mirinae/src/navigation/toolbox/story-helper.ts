@@ -223,6 +223,24 @@ export const getToolboxArgTypes = (): ArgTypes => ({
             options: { min: 0 },
         },
     },
+    hasNextPage: {
+        name: 'hasNextPage',
+        type: { name: 'boolean' },
+        description: 'Whether to show indication that there is next page or not.  It cannot be used with totalCount prop.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     sortBy: {
         name: 'sortBy',
         type: { name: 'string' },

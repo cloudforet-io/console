@@ -349,13 +349,8 @@ watch(() => props.legends, () => {
              class="table-pagination-wrapper"
         >
             <p-text-pagination :this-page.sync="state.proxyThisPage"
-                               :disable-next-page="!props.showNextPage"
-            >
-                <template #default>
-                    <span class="this-page">{{ state.proxyThisPage }}</span>
-                    <span v-if="props.showNextPage"> / ...</span>
-                </template>
-            </p-text-pagination>
+                               :has-next-page="props.showNextPage"
+            />
         </div>
     </div>
 </template>
@@ -523,9 +518,6 @@ watch(() => props.legends, () => {
     .table-pagination-wrapper {
         flex-shrink: 0;
         text-align: center;
-        .this-page {
-            font-weight: bold;
-        }
     }
 
     &.print-mode {

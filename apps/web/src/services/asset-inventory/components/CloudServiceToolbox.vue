@@ -32,18 +32,17 @@ import CloudServiceFilterModal from '@/services/asset-inventory/components/Cloud
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 
-
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
 
 interface Props {
-    totalCount: number;
+    hasNextPage: boolean;
     handlers: Handlers;
     queryTags?: QueryTag[];
 }
 
 
 const props = withDefaults(defineProps<Props>(), {
-    totalCount: 0,
+    hasNextPage: false,
     handlers: () => ({}),
     queryTags: () => [],
 });
@@ -285,14 +284,11 @@ const handleExport = () => {
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}
                 </p-button>
             </div>
-            <div class="total-result-wrapper">
-                <span class="total-result">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.TOTAL_RESULT') }}</span><span class="total-result-value">{{ props.totalCount }}</span>
-            </div>
         </div>
         <p-toolbox filters-visible
                    exportable
                    search-type="query"
-                   :total-count="props.totalCount"
+                   :has-next-page="props.hasNextPage"
                    :query-tags="state.queryTags"
                    :key-item-sets="state.keyItemSets"
                    :value-handler-map="props.handlers?.valueHandlerMap ?? {}"
@@ -331,18 +327,6 @@ const handleExport = () => {
     .filters-count {
         margin-right: 0.5rem;
         font-size: 0.875rem;
-    }
-}
-.total-result-wrapper {
-    @apply text-sm flex flex-wrap gap-2;
-    flex-shrink: 0;
-    line-height: 1.09375rem;
-    min-width: 5.875rem;
-    .total-result {
-        @apply text-gray-600;
-    }
-    .total-result-value {
-        @apply text-gray-800;
     }
 }
 </style>

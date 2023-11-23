@@ -2126,7 +2126,6 @@
 				"SHOW_CHARTS": "チャートの表示",
 				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "{provider} クラウドサービス",
-				"TOTAL_RESULT": "検索結果",
 				"USAGE_OVERVIEW": "利用概要",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}の利用状況"
 			},

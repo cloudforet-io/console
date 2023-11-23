@@ -71,6 +71,24 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    hasNextPage: {
+        name: 'hasNextPage',
+        type: { name: 'boolean' },
+        description: 'Whether to show indication that there is next page or not. It cannot be used with allPage prop.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     /* slot */
     defaultSlot: {
         name: 'default',

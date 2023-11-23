@@ -30,6 +30,7 @@
                     <p-text-pagination v-else
                                        :this-page="proxyState.thisPage"
                                        :all-page="allPage"
+                                       :has-next-page="hasNextPage"
                                        @pageChange="onChangeThisPage"
                     />
                 </div>
@@ -180,7 +181,11 @@ export default defineComponent<ToolboxProps>({
         },
         totalCount: {
             type: Number,
-            default: 0,
+            default: undefined,
+        },
+        hasNextPage: {
+            type: Boolean,
+            default: false,
         },
         sortBy: {
             type: String,
@@ -226,7 +231,12 @@ export default defineComponent<ToolboxProps>({
         const sortByOptionsData = (props.sortable ? groupBy(props.sortByOptions, 'name') : undefined);
         const state = reactive({
             pageStart: computed(() => ((proxyState.thisPage - 1) * proxyState.pageSize) + 1),
-            allPage: computed(() => Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1),
+            allPage: computed<number|undefined>(() => {
+                if (props.totalCount !== undefined) {
+                    return Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1;
+                }
+                return undefined;
+            }),
             pageMenu: computed(() => {
                 if (!Array.isArray(props.pageSizeOptions)) return [];
                 return props.pageSizeOptions.map((d) => ({
