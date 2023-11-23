@@ -79,6 +79,10 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { ListModel } from '@/schema/_common/model';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectModel } from '@/schema/identity/project/model';
+import type { RoleBindingModel } from '@/schema/inventory/cloud-service-query-set/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -94,10 +98,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
-import type { ProjectGroupInfo, ProjectModel } from '@/services/project/type';
-
-import type { ListModel } from '@/api-schema/common/model';
-import type { RoleBindingModel } from '@/api-schema/identity/role-binding/model';
 
 
 interface UnDeletableRole {
@@ -107,7 +107,7 @@ interface UnDeletableRole {
     assignTo: { resource_id: string; resource_type: string };
     project?: {
         project_info: ProjectModel | undefined;
-        project_group_info: ProjectGroupInfo | undefined;
+        project_group_info: ProjectGroupModel | undefined;
     };
 }
 

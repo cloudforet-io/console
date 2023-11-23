@@ -80,6 +80,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
+import type { RepositoryPluginModel } from '@/schema/inventory/collector/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useLastItemObserver } from '@/common/composables/last-item-observer';
 
@@ -92,7 +94,6 @@ import CollectPluginContents
     from '@/services/asset-inventory/components/CollectorPluginContents.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
-import type { RepositoryPluginModel } from '@/api-schema/inventory/collector/model';
 
 const emit = defineEmits([
     'update:currentStep',

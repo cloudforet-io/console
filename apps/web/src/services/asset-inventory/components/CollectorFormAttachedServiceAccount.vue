@@ -11,6 +11,7 @@ import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/d
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import { i18n } from '@/translations';
 
 import SelectBox from '@/common/components/select/SelectBox.vue';
@@ -19,7 +20,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { red } from '@/styles/colors';
 
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
 import type {
     AttachedServiceAccount,
     AttachedServiceAccountType, ServiceAccountFilterOption,

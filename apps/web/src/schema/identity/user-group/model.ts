@@ -1,4 +1,4 @@
-import type { Tags, TimeStamp } from '@/api-schema/common/model';
+import type { Tags, TimeStamp } from '@/schema/_common/model';
 
 export interface PolicyModel {
     created_at: TimeStamp;

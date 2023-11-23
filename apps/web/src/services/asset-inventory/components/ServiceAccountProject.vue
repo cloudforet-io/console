@@ -56,6 +56,8 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -66,8 +68,7 @@ import ServiceAccountProjectDetail
     from '@/services/asset-inventory/components/ServiceAccountProjectDetail.vue';
 import ServiceAccountProjectForm
     from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
-import type { ProjectForm, AccountType, PageMode } from '@/services/asset-inventory/types/service-account-page-type';
+import type { ProjectForm, PageMode } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {
     serviceAccountId?: string;

@@ -59,6 +59,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CollectorCreateParameter, CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -72,7 +73,6 @@ import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
 
-import type { CollectorCreateParameter, CollectorModel } from '@/api-schema/inventory/collector/model';
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;

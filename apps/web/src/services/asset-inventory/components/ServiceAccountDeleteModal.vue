@@ -37,6 +37,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -45,7 +46,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { ServiceAccountModel } from '@/services/asset-inventory/types/service-account-page-type';
+
 
 export default {
     name: 'ServiceAccountDeleteModal',

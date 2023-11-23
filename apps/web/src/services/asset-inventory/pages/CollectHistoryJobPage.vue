@@ -10,6 +10,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { JobModel } from '@/schema/inventory/collector/model';
+import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -18,9 +20,7 @@ import JobBasicInformation from '@/services/asset-inventory/components/Collector
 import JobStatusChart from '@/services/asset-inventory/components/CollectorHistoryJobStatusChart.vue';
 import JobTaskDetails from '@/services/asset-inventory/components/CollectorHistoryJobTaskDetails.vue';
 import JobTable from '@/services/asset-inventory/components/CollectorHistoryJobTaskTable.vue';
-import type { JobTaskData } from '@/services/asset-inventory/types/collector-history-job-type';
 
-import type { JobModel } from '@/api-schema/inventory/collector/model';
 
 interface Props {
     jobId: string;
@@ -32,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const state = reactive({
     job: {} as JobModel,
-    selectedItem: null as null|JobTaskData,
+    selectedItem: null as null|JobTaskModel,
 });
 
 /* API */

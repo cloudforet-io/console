@@ -1,7 +1,8 @@
+import type { Tags, TimeStamp } from '@/schema/_common/model';
 import type { USER_TYPE } from '@/schema/identity/user/constant';
+import type { RoleBindingModel } from '@/schema/inventory/cloud-service-query-set/model';
 
-import type { Tags, TimeStamp } from '@/api-schema/common/model';
-import type { RoleBindingModel } from '@/api-schema/identity/role-binding/model';
+import type { JobTaskError } from '@/services/asset-inventory/types/collector-history-job-type';
 
 export interface UserModel {
     created_at: TimeStamp;
@@ -21,3 +22,23 @@ export interface UserModel {
 }
 
 export type UserType = typeof USER_TYPE[keyof typeof USER_TYPE];
+
+export interface JobTaskModel {
+    job_task_id: string;
+    status: string;
+    create_count: number;
+    updated_count: number;
+    failure_count: number;
+    deleted_count: number;
+    disconnected_count: number;
+    errors: JobTaskError[];
+    job_id: string;
+    secret_id: string;
+    provider: string;
+    service_account_id: string;
+    project_id: string;
+    domain_id: string;
+    created_at: string;
+    started_at: string;
+    finished_at: string;
+}

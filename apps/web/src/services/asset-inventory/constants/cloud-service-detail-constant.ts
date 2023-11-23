@@ -14,3 +14,9 @@ export const CLOUD_SERVICE_TAG_TYPE_BADGE_OPTION = Object.freeze({
 });
 
 export const BASE_INFORMATION = 'Base Information';
+/* History Tab */
+export const HISTORY_ACTION_MAP = {
+    UPDATE: { label: 'Updated', color: 'GREEN' },
+    CREATE: { label: 'Created', color: 'BLUE' },
+    DELETE: { label: 'Deleted', color: 'RED' },
+} as const;

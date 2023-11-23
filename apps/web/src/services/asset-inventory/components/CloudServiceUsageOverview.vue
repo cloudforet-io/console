@@ -54,15 +54,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
+import type { CloudServiceTypeInfo } from '@/schema/inventory/cloud-service-type/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CloudServiceUsageOverviewDetailModal
     from '@/services/asset-inventory/components/CloudServiceUsageOverviewDetailModal.vue';
 import CloudServiceUsageOverviewSummary
     from '@/services/asset-inventory/components/CloudServiceUsageOverviewSummary.vue';
-import type {
-    CloudServiceTypeInfo,
-} from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Props {

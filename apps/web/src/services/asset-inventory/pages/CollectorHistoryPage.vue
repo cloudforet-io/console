@@ -34,6 +34,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import NoCollectorModal from '@/services/asset-inventory/components/CollectorHistoryNoCollectorModal.vue';
+import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     statusClassFormatter,
     statusIconColorFormatter,
@@ -43,7 +44,7 @@ import {
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-history-page-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
+
 
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },

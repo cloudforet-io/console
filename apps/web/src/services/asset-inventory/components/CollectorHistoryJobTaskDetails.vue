@@ -17,8 +17,10 @@ import type { Vue } from 'vue/types/vue';
 
 import { PTab } from '@spaceone/design-system';
 
+import type { JobTaskModel } from '@/schema/inventory/job-task/model';
+
 import JobTaskErrorList from '@/services/asset-inventory/components/CollectorHistoryJobTaskErrorList.vue';
-import type { JobTaskData } from '@/services/asset-inventory/types/collector-history-job-type';
+
 
 export default {
     name: 'JobTaskDetails',
@@ -28,7 +30,7 @@ export default {
     },
     props: {
         selectedItem: {
-            type: Object as () => JobTaskData,
+            type: Object as () => JobTaskModel,
             default: () => ({}),
             required: true,
         },

@@ -1,7 +1,4 @@
-
-import type { UserModel } from '@/api-schema/identity/user/model';
-
-
+import type { UserModel } from '@/schema/inventory/job-task/model';
 
 
 export interface User extends UserModel {

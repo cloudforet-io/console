@@ -96,6 +96,9 @@ import { render } from 'ejs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProviderModel } from '@/schema/identity/provider/model';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -113,8 +116,6 @@ import ServiceAccountCredentials
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
 import ServiceAccountProject from '@/services/asset-inventory/components/ServiceAccountProject.vue';
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
-import type { ProviderModel, ServiceAccountModel } from '@/services/asset-inventory/types/service-account-page-type';
 
 export default defineComponent({
     name: 'ServiceAccountDetailPage',

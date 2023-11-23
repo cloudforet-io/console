@@ -157,14 +157,14 @@ export type JobStatus = |
 export interface JobModel {
     job_id: string;
     status: JobStatus;
-    remained_tasks: number;
     total_tasks: number;
-    failure_tasks: number;
+    remained_tasks: number;
     success_tasks: number;
+    failure_tasks: number;
     collector_id: string;
-    plugin_id: string;
-    created_at: string;
-    finished_at: string;
-    updated_at: string;
     secret_id?: string;
+    plugin_id: string;
+    created_at?: string;
+    updated_at?: string;
+    finished_at: string;
 }

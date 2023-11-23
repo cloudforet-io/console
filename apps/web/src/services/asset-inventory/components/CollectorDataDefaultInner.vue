@@ -21,10 +21,11 @@
 <script setup lang="ts">
 import { PLazyImg } from '@spaceone/design-system';
 
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/types/collector-data-modal-type';
+
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;

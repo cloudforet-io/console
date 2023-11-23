@@ -4,13 +4,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 
+import type { ListModel } from '@/schema/_common/model';
+import type { PolicyModel } from '@/schema/identity/user-group/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
 import type { PolicyType } from '@/services/administration/types/policy-type';
 
-import type { ListModel } from '@/api-schema/common/model';
-import type { PolicyModel } from '@/api-schema/identity/policy/model';
 
 
 

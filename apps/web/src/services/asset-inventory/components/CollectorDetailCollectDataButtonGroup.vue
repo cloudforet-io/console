@@ -9,10 +9,11 @@ import {
 } from '@spaceone/design-system';
 
 
+import type { JobModel } from '@/schema/inventory/collector/model';
+
 import CollectorCurrentStatus from '@/services/asset-inventory/components/CollectorCurrentStatus.vue';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
-import type { JobModel } from '@/api-schema/inventory/collector/model';
 
 const emit = defineEmits<{(e: 'collect'): void;
 }>();

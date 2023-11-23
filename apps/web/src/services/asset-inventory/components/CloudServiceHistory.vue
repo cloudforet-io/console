@@ -114,6 +114,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { NoteModel } from '@/schema/inventory/note/model';
 import { store } from '@/store';
 
 import VerticalTimeline from '@/common/components/vertical-timeline/VerticalTimeline.vue';
@@ -123,11 +124,11 @@ import CloudServiceHistoryDateSelectDropdown
     from '@/services/asset-inventory/components/CloudServiceHistoryDateSelectDropdown.vue';
 import CloudServiceHistoryDetailOverlay
     from '@/services/asset-inventory/components/CloudServiceHistoryDetailOverlay.vue';
+import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import type {
     CloudServiceHistoryItem,
-    NoteModel,
+
 } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
-import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
 
 const makeCustomValueHandler = (distinctKey: string, cloudServiceId: string): ValueHandler => async (inputText: string) => {
