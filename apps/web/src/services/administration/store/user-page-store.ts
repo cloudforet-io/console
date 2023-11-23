@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import { USER_TYPE } from '@/api-schema/identity/user/constant';
+import { USER_TYPE } from '@/schema/identity/user/constant';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

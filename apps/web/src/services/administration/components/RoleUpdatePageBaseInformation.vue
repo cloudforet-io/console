@@ -66,7 +66,7 @@ import {
     PPaneLayout, PHeading, PFieldGroup, PFieldTitle, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 
-import { ROLE_TYPE } from '@/api-schema/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';

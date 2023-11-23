@@ -1,4 +1,4 @@
-import type { ROLE_TYPE } from '@/api-schema/identity/role/constant';
+import type { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 

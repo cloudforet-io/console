@@ -5,7 +5,7 @@ import { PButtonModal, PBoxTab } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { USER_TYPE } from '@/api-schema/identity/user/constant';
+import { USER_TYPE } from '@/schema/identity/user/constant';
 import { store } from '@/store';
 
 import config from '@/lib/config';
