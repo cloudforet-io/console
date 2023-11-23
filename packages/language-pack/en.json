@@ -974,8 +974,23 @@
 			"INFO": "Info"
 		},
 		"MFA_MODAL": {
+			"ALT": {
+				"DESC": "To turn off, you need to verifiy with your email.",
+				"DISABLED": "Disable",
+				"TITLE": "Are you sure you want to disable MFA?"
+			},
+			"CHANGE": {
+				"CANCEL": "Cancel",
+				"CONFIRM_BTN": "Enter New Email",
+				"DESC": "Please verify your email before changing to a new one.",
+				"TITLE": "Email Change Verification",
+				"TOOLTIP": "If you close it without entering\nthe new email address, the\nMFA will remain turned off."
+			},
 			"COLLAPSE_DESC": "Check your junk mail folder or wait a few minutes. if you're still having\ntrouble,",
 			"COLLAPSE_TITLE": "Didn't get verification code?",
+			"EDIT": {
+				"TITLE": "Enter New Email Address"
+			},
 			"EMAIL": "Email",
 			"INVALID_CODE": "Invalid code. Please check the email try again.",
 			"SEND_CODE": "Send Code",
