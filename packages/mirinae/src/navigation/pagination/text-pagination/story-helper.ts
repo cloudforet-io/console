@@ -21,7 +21,7 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
     allPage: {
         name: 'allPage',
         description: 'Total page number.',
-        defaultValue: 3,
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'boolean',
@@ -46,7 +46,7 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
             },
             category: 'props',
             defaultValue: {
-                summary: true,
+                summary: 'true',
             },
         },
         control: {
@@ -57,14 +57,14 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
         name: 'disableNextPage',
         type: { name: 'boolean' },
         description: 'This prop used only for "only this page number". When allPage is undefined, you can use disableNextPage to activate the next icons',
-        defaultValue: true,
+        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
             },
             category: 'props',
             defaultValue: {
-                summary: true,
+                summary: 'false',
             },
         },
         control: {
@@ -75,14 +75,14 @@ export const getTextPaginationArgTypes = (): ArgTypes => ({
         name: 'hasNextPage',
         type: { name: 'boolean' },
         description: 'Whether to show indication that there is next page or not. It cannot be used with allPage prop.',
-        defaultValue: true,
+        defaultValue: false,
         table: {
             type: {
                 summary: 'boolean',
             },
             category: 'props',
             defaultValue: {
-                summary: true,
+                summary: 'false',
             },
         },
         control: {
