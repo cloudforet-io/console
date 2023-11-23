@@ -40,7 +40,7 @@ import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 export default {
     name: 'AlertProjectDependency',

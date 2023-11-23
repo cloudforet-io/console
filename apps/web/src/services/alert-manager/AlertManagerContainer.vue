@@ -30,7 +30,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 
 import AlertManagerLNB from '@/services/alert-manager/AlertManagerLNB.vue';
-import { useAlertManagerSettingsStore } from '@/services/alert-manager/store/alert-manager-settings-store';
+import { useAlertManagerSettingsStore } from '@/services/alert-manager/stores/alert-manager-settings-store';
 
 export default {
     name: 'AlertManagerContainer',

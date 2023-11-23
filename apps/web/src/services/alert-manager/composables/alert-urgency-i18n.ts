@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
-import type { AlertUrgency } from '@/services/alert-manager/lib/config';
+import type { AlertUrgency } from '@/services/alert-manager/constants/alert-constant';
 
 export const useAlertUrgencyI18n = (): ComputedRef<Record<AlertUrgency, TranslateResult>> => computed(() => ({
     ALL: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL'),

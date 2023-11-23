@@ -44,7 +44,7 @@ import { toRefs } from 'vue';
 import { PTextarea, PButton, PTextBeautifier } from '@spaceone/design-system';
 
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
-import { EDIT_MODE } from '@/services/alert-manager/lib/config';
+import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
 
 export default {
     name: 'AlertInfoDescription',

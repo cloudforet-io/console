@@ -1,9 +1,9 @@
 import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 
-import type { ScopeType } from '@/services/alert-manager/lib/config';
-import { FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
-import type { Rule, EscalationPolicyDataModel } from '@/services/alert-manager/type';
+import type { ScopeType } from '@/services/alert-manager/constants/alert-constant';
+import { FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
+import type { Rule, EscalationPolicyDataModel } from '@/services/alert-manager/types/alert-type';
 
 
 interface EscalationPolicyFormState {

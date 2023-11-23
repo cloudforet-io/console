@@ -83,7 +83,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useAlertInfoItem } from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/composables';
-import { EDIT_MODE } from '@/services/alert-manager/lib/config';
+import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
 
 export default {
     name: 'AlertInfoProject',

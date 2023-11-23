@@ -24,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
 import type {
     AlertDataModel,
-} from '@/services/alert-manager/type';
+} from '@/services/alert-manager/types/alert-type';
 
 import TranslateResult = VueI18n.TranslateResult;
 

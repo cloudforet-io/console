@@ -71,8 +71,8 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
-import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
+import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
+import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 
 export default {
     name: 'EscalationPolicyDataTable',

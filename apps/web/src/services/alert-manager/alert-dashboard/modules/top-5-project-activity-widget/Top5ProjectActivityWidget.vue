@@ -96,8 +96,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red, yellow } from '@/styles/colors';
 
 import Top5ProjectActivityTooltip from '@/services/alert-manager/alert-dashboard/modules/top-5-project-activity-widget/Top5ProjectActivityTooltip.vue';
-import { ALERT_STATE_FILTER } from '@/services/alert-manager/lib/config';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import { ALERT_STATE_FILTER } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
 const ACTIVITY = {
     HIGH: 'HIGH',

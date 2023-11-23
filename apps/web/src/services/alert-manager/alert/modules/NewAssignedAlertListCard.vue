@@ -55,10 +55,10 @@ import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
-import AlertListItem from '@/services/alert-manager/modules/AlertListItem.vue';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { useAlertManagerSettingsStore } from '@/services/alert-manager/store/alert-manager-settings-store';
+import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
+import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+import { useAlertManagerSettingsStore } from '@/services/alert-manager/stores/alert-manager-settings-store';
 
 export default {
     name: 'NewAssignedAlertListCard',

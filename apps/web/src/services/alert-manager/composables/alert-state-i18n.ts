@@ -4,7 +4,7 @@ import type { TranslateResult } from 'vue-i18n';
 
 import { i18n } from '@/translations';
 
-import type { AlertState } from '@/services/alert-manager/lib/config';
+import type { AlertState } from '@/services/alert-manager/constants/alert-constant';
 
 export const useAlertStateI18n = (): ComputedRef<Record<AlertState, TranslateResult>> => computed(() => ({
     TRIGGERED: i18n.t('MONITORING.ALERT.ALERT_LIST.TRIGGERED'),

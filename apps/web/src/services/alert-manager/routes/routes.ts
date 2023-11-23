@@ -6,14 +6,14 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
 const AlertManagerContainer = () => import('@/services/alert-manager/AlertManagerContainer.vue');
 
-const AlertDashboardPage = () => import('@/services/alert-manager/alert-dashboard/AlertDashboardPage.vue');
-const AlertPage = () => import('@/services/alert-manager/alert/AlertPage.vue');
-const EscalationPolicyPage = () => import('@/services/alert-manager/escalation-policy/EscalationPolicyPage.vue');
-const AlertDetailPage = () => import('@/services/alert-manager/alert/alert-detail/AlertDetailPage.vue');
+const AlertDashboardPage = () => import('@/services/alert-manager/pages/AlertDashboardPage.vue');
+const AlertPage = () => import('@/services/alert-manager/pages/AlertPage.vue');
+const EscalationPolicyPage = () => import('@/services/alert-manager/pages/EscalationPolicyPage.vue');
+const AlertDetailPage = () => import('@/services/alert-manager/pages/AlertDetailPage.vue');
 
 const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',

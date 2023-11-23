@@ -163,12 +163,12 @@ import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-st
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
 import {
     ALERT_STATE, ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE,
-} from '@/services/alert-manager/lib/config';
-import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+} from '@/services/alert-manager/constants/alert-constant';
+import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import type {
     AlertBottomFilters, AlertListTableFilters,
-} from '@/services/alert-manager/type';
+} from '@/services/alert-manager/types/alert-type';
 
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';

@@ -116,10 +116,10 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { useFormValidator } from '@/common/composables/form-validator';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
 import EscalationRulesInputForm from '@/services/alert-manager/escalation-policy/modules/EscalationRulesInputForm.vue';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
-import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
-import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
+import type { EscalationPolicyDataModel } from '@/services/alert-manager/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 

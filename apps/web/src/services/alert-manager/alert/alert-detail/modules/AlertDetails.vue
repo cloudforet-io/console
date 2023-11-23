@@ -49,7 +49,7 @@ import { iso8601Formatter } from '@cloudforet/core-lib';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 export default {
     name: 'AlertDetails',

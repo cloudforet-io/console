@@ -60,7 +60,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
 
 enum FORM_MODE {
     select = 'select',

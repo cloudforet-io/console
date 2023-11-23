@@ -42,7 +42,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 export default {
     name: 'AlertTitleEditModal',

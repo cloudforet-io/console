@@ -8,9 +8,9 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { EditMode } from '@/services/alert-manager/lib/config';
-import { EDIT_MODE } from '@/services/alert-manager/lib/config';
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+import type { EditMode } from '@/services/alert-manager/constants/alert-constant';
+import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 interface AlertDetailItemState {
 	isEditMode: boolean;

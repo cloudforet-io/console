@@ -37,10 +37,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import EscalationPolicyForm from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
-import { ACTION } from '@/services/alert-manager/lib/config';
-import type { EscalationPolicyDataModel } from '@/services/alert-manager/type';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
+import type { EscalationPolicyDataModel } from '@/services/alert-manager/types/alert-type';
 
 
 export default {

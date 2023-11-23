@@ -180,9 +180,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/escalation-policy/store/escalation-policy-form';
-import { SCOPE } from '@/services/alert-manager/lib/config';
-import type { Rule } from '@/services/alert-manager/type';
+import { SCOPE } from '@/services/alert-manager/constants/alert-constant';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
+import type { Rule } from '@/services/alert-manager/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 

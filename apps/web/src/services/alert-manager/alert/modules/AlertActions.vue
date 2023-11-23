@@ -106,9 +106,9 @@ import AlertAcknowledgeModal from '@/services/alert-manager/alert/modules/AlertA
 import AlertResolveModal from '@/services/alert-manager/alert/modules/AlertResolveModal.vue';
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
-import type { AlertAction } from '@/services/alert-manager/lib/config';
-import { ALERT_ACTION, ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/lib/config';
-import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/lib/helper';
+import type { AlertAction } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_ACTION, ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/constants/alert-constant';
+import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';

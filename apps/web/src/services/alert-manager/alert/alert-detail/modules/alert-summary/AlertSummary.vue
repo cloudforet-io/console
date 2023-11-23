@@ -104,11 +104,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red } from '@/styles/colors';
 
 import AlertAssignModal from '@/services/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertAssignModal.vue';
-import type { AlertState, AlertUrgency } from '@/services/alert-manager/lib/config';
+import type { AlertState, AlertUrgency } from '@/services/alert-manager/constants/alert-constant';
 import {
     ALERT_STATE, ALERT_URGENCY,
-} from '@/services/alert-manager/lib/config';
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+} from '@/services/alert-manager/constants/alert-constant';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 
 const calculateTime = (time) => {
