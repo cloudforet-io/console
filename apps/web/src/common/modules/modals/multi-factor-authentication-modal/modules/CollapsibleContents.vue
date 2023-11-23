@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
-import { PButton, PCollapsibleToggle } from '@spaceone/design-system';
+import { PTextButton, PCollapsibleToggle } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
@@ -46,11 +46,12 @@ const handleClickSendEmailButton = async () => {
            class="collapsed-contents"
         >
             {{ $t('COMMON.MFA_MODAL.COLLAPSE_DESC') }}
-            <p-button class="send-code-button"
-                      @click.prevent="handleClickSendEmailButton"
+            <p-text-button class="send-code-button"
+                           style-type="highlight"
+                           @click.prevent="handleClickSendEmailButton"
             >
                 <span class="emphasis">{{ $t('COMMON.MFA_MODAL.SEND_NEW_CODE') }}</span>
-            </p-button>
+            </p-text-button>
         </p>
     </div>
 </template>
@@ -61,14 +62,9 @@ const handleClickSendEmailButton = async () => {
     .collapsed-contents {
         @apply text-paragraph-sm text-gray-500;
         .send-code-button {
-            @apply text-label-xs font-normal text-blue-700;
-            height: 1rem;
-            background: initial;
+            @apply inline-block text-label-xs font-normal text-blue-700;
+            margin-left: 0.25rem;
             padding: 0;
-            margin: 0;
-            .emphasis:hover {
-                text-decoration: underline;
-            }
         }
     }
 }

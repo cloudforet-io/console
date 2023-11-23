@@ -5,9 +5,10 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
+    PButton,
     PButtonModal,
-    PFieldGroup,
-    PTextInput,
+    PFieldGroup, PI,
+    PTextInput, PTooltip,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -21,6 +22,7 @@ import CollapsibleContents
 import EmailInfo from '@/common/modules/modals/multi-factor-authentication-modal/modules/EmailInfo.vue';
 
 interface Props {
+    type: string
     email?: string
     verified?: boolean
     mfaType?: string
@@ -28,6 +30,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    type: 'verify',
     email: '',
     verified: false,
     mfaType: '',
@@ -40,8 +43,24 @@ const state = reactive({
     loading: false,
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
-    proxyVisible: useProxyValue('visible', props, emit),
     isCollapsed: true,
+    isSentCode: false,
+});
+
+const modalState = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    title: computed(() => {
+        if (props.type === 'disabled') {
+            return i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
+        }
+        if (props.type === 'change') {
+            return i18n.t('COMMON.MFA_MODAL.CHANGE.TITLE');
+        }
+        if (props.type === 'new') {
+            return i18n.t('COMMON.MFA_MODAL.EDIT.TITLE');
+        }
+        return i18n.t('COMMON.MFA_MODAL.TITLE');
+    }),
 });
 
 const validationState = reactive({
@@ -56,7 +75,7 @@ const handleChangeInput = (value: string) => {
 };
 const handleClickCancel = () => {
     resetFormData();
-    state.proxyVisible = false;
+    modalState.proxyVisible = false;
 };
 const resetFormData = () => {
     validationState.verificationCode = '';
@@ -72,7 +91,7 @@ const handleClickConfirmButton = async () => {
             domain_id: state.domainId,
             verify_code: validationState.verificationCode,
         });
-        state.proxyVisible = false;
+        modalState.proxyVisible = false;
         resetFormData();
     } catch (e: any) {
         validationState.isValidationCodeValid = true;
@@ -86,8 +105,8 @@ const handleClickConfirmButton = async () => {
 
 <template>
     <p-button-modal
-        :visible="state.proxyVisible"
-        :header-title="$t('COMMON.MFA_MODAL.TITLE')"
+        :visible="modalState.proxyVisible"
+        :header-title="modalState.title"
         class="mfa-email-modal-wrapper"
         size="sm"
         :disabled="validationState.verificationCode === ''"
@@ -98,25 +117,59 @@ const handleClickConfirmButton = async () => {
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <email-info :email="props.email" />
-                <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
-                               :invalid="validationState.isValidationCodeValid"
-                               :invalid-text="validationState.validationCodeInvalidText"
-                               required
-                >
-                    <p-text-input :value="validationState.verificationCode"
-                                  :invalid="validationState.isValidationCodeValid"
-                                  class="text-input"
-                                  @update:value="handleChangeInput"
-                    />
-                </p-field-group>
+                <email-info :email="props.email"
+                            :type="props.type"
+                            :is-sent-code.sync="state.isSentCode"
+                />
+                <div class="validation-code-form">
+                    <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
+                                   :invalid="validationState.isValidationCodeValid"
+                                   :invalid-text="validationState.validationCodeInvalidText"
+                                   required
+                                   class="form"
+                    >
+                        <p-text-input :value="validationState.verificationCode"
+                                      :invalid="validationState.isValidationCodeValid"
+                                      class="text-input"
+                                      @update:value="handleChangeInput"
+                        />
+                    </p-field-group>
+                    <p-button v-if="props.type === 'change'"
+                              style-type="secondary"
+                              :loading="state.loading"
+                              :disabled="!state.isSentCode"
+                    >
+                        {{ $t('COMMON.MFA_MODAL.VERIFY') }}
+                    </p-button>
+                </div>
                 <collapsible-contents :mfa-type="props.mfaType"
                                       :email="props.email"
                 />
             </div>
         </template>
+        <template #close-button>
+            <p-tooltip
+                v-if="props.type === 'change' && !props.verified"
+                :contents="$t('COMMON.MFA_MODAL.CHANGE.TOOLTIP')"
+                position="bottom"
+            >
+                {{ $t('COMMON.MFA_MODAL.CHANGE.CANCEL') }}
+            </p-tooltip>
+        </template>
         <template #confirm-button>
-            {{ $t('COMMON.MFA_MODAL.VERIFY') }}
+            <div v-if="props.type === 'change'"
+                 class="change-confirm-button"
+            >
+                <span>{{ $t('COMMON.MFA_MODAL.CHANGE.CONFIRM_BTN') }}</span>
+                <p-i name="ic_arrow-right"
+                     width="1.25rem"
+                     height="1.25rem"
+                     color="inherit transparent"
+                />
+            </div>
+            <span v-else>
+                {{ $t('COMMON.MFA_MODAL.VERIFY') }}
+            </span>
         </template>
     </p-button-modal>
 </template>
@@ -127,9 +180,21 @@ const handleClickConfirmButton = async () => {
         @apply flex flex-col;
         margin-bottom: 1rem;
 
-        .text-input {
-            width: 100%;
+        .validation-code-form {
+            @apply flex items-end;
+            gap: 1rem;
+            .form {
+                width: 100%;
+                .text-input {
+                    width: 100%;
+                    flex: 1;
+                }
+            }
         }
+    }
+    .change-confirm-button {
+        @apply flex items-center;
+        gap: 0.25rem;
     }
 }
 </style>

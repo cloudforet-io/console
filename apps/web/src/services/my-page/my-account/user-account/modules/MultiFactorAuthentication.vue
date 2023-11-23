@@ -28,15 +28,19 @@ const contextMenuItems = [
 
 const state = reactive({
     loading: false,
-    mfa: computed(() => store.state.user.mfa || undefined),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
+    //
+    mfa: computed(() => store.state.user.mfa || undefined),
     isVerified: false,
     enableMfa: false,
-    isModalVisible: false,
-
     // Currently, only email is supported.
     selectedItem: contextMenuItems[0].name,
+});
+
+const modalState = reactive({
+    isModalVisible: false,
+    modalType: '' as 'verify' | 'disabled' | 'change' | 'new',
 });
 
 /* Components */
@@ -55,13 +59,14 @@ const handleChangeToggle = async () => {
             user_id: state.userId,
             domain_id: state.domainId,
         });
-
-        state.isModalVisible = true;
+        modalState.isModalVisible = true;
+        modalState.modalType = 'disabled';
     }
 };
 const handleClickVerifyButton = async () => {
     if (state.isVerified) {
-        state.isModalVisible = true;
+        modalState.isModalVisible = true;
+        modalState.modalType = 'change';
         return;
     }
 
@@ -76,7 +81,8 @@ const handleClickVerifyButton = async () => {
             },
             domain_id: state.domainId,
         });
-        state.isModalVisible = true;
+        modalState.isModalVisible = true;
+        modalState.modalType = 'verify';
     } finally {
         state.loading = false;
     }
@@ -183,11 +189,12 @@ watch(() => state.mfa, (mfa) => {
                 />
             </div>
         </user-account-module-container>
-        <multi-factor-authentication-email-modal v-if="state.isModalVisible"
+        <multi-factor-authentication-email-modal v-if="modalState.isModalVisible"
+                                                 :type="modalState.modalType"
                                                  :email="email"
                                                  :verified="state.isVerified"
                                                  :mfa-type="state.selectedItem"
-                                                 :visible.sync="state.isModalVisible"
+                                                 :visible.sync="modalState.isModalVisible"
                                                  @refresh="initState"
         />
     </div>
