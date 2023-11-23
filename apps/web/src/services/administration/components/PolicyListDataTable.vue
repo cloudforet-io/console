@@ -87,7 +87,7 @@ import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
-import type { PolicyModel } from '@/schema/identity/user-group/model';
+import type { PolicyModel } from '@/schema/identity/policy/model';
 import type { Policy } from '@/schema/inventory/cloud-service-report/model';
 import { store } from '@/store';
 

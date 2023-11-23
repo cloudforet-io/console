@@ -67,13 +67,14 @@ import {
 } from '@spaceone/design-system';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/inventory/cloud-service-report/model';
+import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import type { BaseInfoFormData } from '@/services/administration/components/RoleUpdateForm.vue';
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+
 
 
 interface RoleTypeForm {label: string; key: string; description: TranslateResult}

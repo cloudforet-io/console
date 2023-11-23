@@ -46,7 +46,7 @@ import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/inventory/cloud-service-report/model';
+import type { RoleType } from '@/schema/identity/role/type';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
@@ -57,6 +57,7 @@ import {
 import RoleUpdatePageAccessMenuItem from '@/services/administration/components/RoleUpdatePageAccessMenuItem.vue';
 import { getPageAccessMenuList } from '@/services/administration/helpers/page-access-menu-list';
 import type { PageAccessMenuItem } from '@/services/administration/types/page-access-menu-type';
+
 
 
 

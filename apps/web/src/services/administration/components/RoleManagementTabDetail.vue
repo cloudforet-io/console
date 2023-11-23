@@ -92,8 +92,8 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { PolicyModel } from '@/schema/identity/user-group/model';
-import type { RoleModel } from '@/schema/inventory/cloud-service-report/model';
+import type { PolicyModel } from '@/schema/identity/policy/model';
+import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 

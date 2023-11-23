@@ -44,7 +44,9 @@ import {
 
 import { PHeading } from '@spaceone/design-system';
 
-import type { Policy, RoleModel, RoleType } from '@/schema/inventory/cloud-service-report/model';
+import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { Policy } from '@/schema/inventory/cloud-service-report/model';
 import { i18n } from '@/translations';
 
 import type { RawPagePermission } from '@/lib/access-control/config';

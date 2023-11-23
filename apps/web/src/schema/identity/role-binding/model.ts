@@ -1,7 +1,7 @@
 import type { TimeStamp } from '@/schema/_common/model';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import type { RoleModel } from '@/schema/inventory/cloud-service-report/model';
+import type { RoleModel } from '@/schema/identity/role/model';
 
 export interface RoleBindingModel {
     created_at: TimeStamp;
