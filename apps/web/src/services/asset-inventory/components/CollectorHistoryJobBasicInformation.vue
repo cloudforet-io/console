@@ -53,7 +53,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { iso8601Formatter } from '@cloudforet/core-lib/index';
 
-import type { JobModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';

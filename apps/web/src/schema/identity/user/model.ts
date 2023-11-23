@@ -1,6 +1,7 @@
 import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserType } from '@/schema/identity/user/type';
-import type { RoleBindingModel } from '@/schema/inventory/cloud-service-query-set/model';
+
 
 export interface UserModel {
     created_at: TimeStamp;

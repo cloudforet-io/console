@@ -79,10 +79,10 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { ListModel } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/model';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import type { RoleBindingModel } from '@/schema/inventory/cloud-service-query-set/model';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -200,7 +200,7 @@ export default {
         };
         const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
             try {
-                const { results }: ListModel<RoleBindingModel> = await SpaceConnector.client.identity.roleBinding.list({ role_id: role.role_id });
+                const { results }: ListResponse<RoleBindingModel> = await SpaceConnector.client.identity.roleBinding.list({ role_id: role.role_id });
                 const roleBindingList: UnDeletableRole[] = results.map((roleBinding) => {
                     const {
                         // eslint-disable-next-line @typescript-eslint/naming-convention

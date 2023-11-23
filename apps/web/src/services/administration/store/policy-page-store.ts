@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 
-import type { ListModel } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/model';
 import type { PolicyModel } from '@/schema/identity/user-group/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -26,7 +26,7 @@ export const usePolicyStore = defineStore('policy-page', {
         async listPolicyData(params: any): Promise<void|Error> {
             this.loading = true;
             try {
-                const { results, total_count }: ListModel<PolicyModel> = await SpaceConnector.client.identity.policy.list({
+                const { results, total_count }: ListResponse<PolicyModel> = await SpaceConnector.client.identity.policy.list({
                     params,
                 });
                 this.policyList = results;

@@ -4,8 +4,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 import type {
-    CollectorModel, SecretModel, JobModel,
+    CollectorModel,
 } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
+import type { SecretModel } from '@/schema/secret/secret/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

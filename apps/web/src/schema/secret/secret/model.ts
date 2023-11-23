@@ -14,3 +14,12 @@ export interface CredentialModel {
     created_at?: TimeStamp;
     tags?: { [key: string]: any; };
 }
+
+export interface SecretModel {
+    secret_id: string;
+    provider: string;
+    service_account_id: string;
+    project_id: string;
+    created_at: string;
+    name: string;
+}

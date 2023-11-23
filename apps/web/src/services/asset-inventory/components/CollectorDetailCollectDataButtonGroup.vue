@@ -9,7 +9,7 @@ import {
 } from '@spaceone/design-system';
 
 
-import type { JobModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
 
 import CollectorCurrentStatus from '@/services/asset-inventory/components/CollectorCurrentStatus.vue';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';

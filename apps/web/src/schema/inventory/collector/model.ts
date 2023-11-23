@@ -1,8 +1,7 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import type { Tags } from '@/schema/_common/model';
-
-import type { MonitoringType } from '@/common/modules/monitoring/config';
+import type { Capability } from '@/schema/repository/plugin/model';
 
 
 // CollectorPluginModel
@@ -31,50 +30,6 @@ export interface CollectorPluginModel {
         schemas?: string[];
         secrets?: string[];
     }
-}
-
-// RepositoryPluginModel
-interface Capability {
-    supported_schemas: string[];
-    use_resource_secret: boolean;
-    monitoring_type: MonitoringType;
-    supported_providers?: string[];
-    [key: string]: any;
-}
-
-export interface RepositoryInfo {
-    created_at: string;
-    endpoint: string;
-    name: string;
-    repository_id: string;
-    repository_type: string;
-}
-
-export interface RepositoryPluginModel {
-    plugin_id: string;
-    name: string;
-    image: string;
-    registry_type: 'DOCKER_HUB'|'AWS_PUBLIC_ECR'|'HARBOR';
-    registry_url: string;
-    registry_config: object;
-    service_type: string;
-    provider?: string;
-    capability: Capability;
-    template: {
-        options: {
-            schema: JsonSchema;
-        }
-    };
-    repository_info: RepositoryInfo;
-    project_id: string;
-    labels: string[];
-    version: string;
-    tags: {
-        icon?: string;
-        description?: string;
-        link?: string;
-        beta?: string;
-    } & Tags;
 }
 
 
@@ -115,16 +70,6 @@ export interface CollectorModel {
     tags: Tags;
 }
 
-// SecretModel
-export interface SecretModel {
-    secret_id: string;
-    provider: string;
-    service_account_id: string;
-    project_id: string;
-    created_at: string;
-    name: string;
-}
-
 // collector api parameters
 export interface CollectorUpdateParameter {
     collector_id: string;
@@ -148,23 +93,3 @@ export interface CollectorUpdatePluginParameter {
     upgrade_mode?: UpgradeMode;
 }
 
-export type JobStatus = |
-    'IN_PROGRESS'| // One or more JobTasks are running
-    'FAILURE'| // When one or more JobTasks are FAILURE or TIMEOUT
-    'CANCELED'| // When a Job is Canceled
-    'SUCCESS'; // When all JobTasks succeed
-
-export interface JobModel {
-    job_id: string;
-    status: JobStatus;
-    total_tasks: number;
-    remained_tasks: number;
-    success_tasks: number;
-    failure_tasks: number;
-    collector_id: string;
-    secret_id?: string;
-    plugin_id: string;
-    created_at?: string;
-    updated_at?: string;
-    finished_at: string;
-}

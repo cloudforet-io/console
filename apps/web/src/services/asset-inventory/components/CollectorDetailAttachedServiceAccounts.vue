@@ -15,7 +15,7 @@ import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { SecretModel } from '@/schema/inventory/collector/model';
+import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 

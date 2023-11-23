@@ -10,8 +10,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { JobModel } from '@/schema/inventory/collector/model';
 import type { JobTaskModel } from '@/schema/inventory/job-task/model';
+import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

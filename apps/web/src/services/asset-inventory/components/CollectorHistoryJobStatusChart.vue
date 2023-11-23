@@ -7,7 +7,7 @@ import {
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
 
-import type { JobModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
 
 import { green, red } from '@/styles/colors';
 

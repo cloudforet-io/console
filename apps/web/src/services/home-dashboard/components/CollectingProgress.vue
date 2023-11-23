@@ -85,7 +85,9 @@ import { range } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { CollectorModel, JobModel, JobStatus } from '@/schema/inventory/collector/model';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobStatus } from '@/schema/inventory/job/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 

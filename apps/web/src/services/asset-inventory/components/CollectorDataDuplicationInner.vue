@@ -89,7 +89,7 @@ import dayjs from 'dayjs';
 
 import { durationFormatter } from '@cloudforet/core-lib/index';
 
-import type { JobModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 
 import { red, green } from '@/styles/colors';

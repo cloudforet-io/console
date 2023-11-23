@@ -80,7 +80,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
-import type { RepositoryPluginModel } from '@/schema/inventory/collector/model';
+import type { PluginModel } from '@/schema/repository/plugin/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useLastItemObserver } from '@/common/composables/last-item-observer';
@@ -105,7 +105,7 @@ const collectorFormState = collectorFormStore.$state;
 
 const state = reactive({
     inputValue: '',
-    pluginList: [] as RepositoryPluginModel[],
+    pluginList: [] as PluginModel[],
     loading: false,
     selectedRepository: '',
     currentPage: 1,
@@ -115,7 +115,7 @@ const state = reactive({
 
 const pluginApiQuery = new ApiQueryHelper();
 const getPluginKey = (item) => `${item.name}-${item.repository_info.repository_id}`;
-const getPlugins = async (): Promise<RepositoryPluginModel[]> => {
+const getPlugins = async (): Promise<PluginModel[]> => {
     try {
         state.loading = true;
         pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
@@ -155,7 +155,7 @@ const handleSearch = async (keyword) => {
     if (!state.inputValue && !keyword) return;
     await updateKeyword(keyword);
 };
-const handleClickNextStep = (item: RepositoryPluginModel) => {
+const handleClickNextStep = (item: PluginModel) => {
     emit('update:currentStep', 2);
     collectorFormStore.setRepositoryPlugin(item);
 };
