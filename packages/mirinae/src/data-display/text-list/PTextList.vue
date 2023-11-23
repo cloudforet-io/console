@@ -9,13 +9,13 @@
                    :target="linkTarget || undefined"
         >
             <slot name="default"
-                  v-bind="{...$props, index: i, item, value: item ?? ''}"
+                  v-bind="{...$props, index: i, item, value: item}"
             >
-                {{ item ?? '' }}
+                {{ item }}
             </slot>
             <slot v-if="i < displayItems.length - 1"
                   name="delimiter"
-                  v-bind="{...$props, index: i, item, value: item ?? ''}"
+                  v-bind="{...$props, index: i, item, value: item}"
             >
                 <span v-if="!isLineBreak"
                       class="delimiter"
@@ -73,7 +73,7 @@ export default defineComponent<TextListProps>({
 
                 if (isNotEmpty(data)) res.push(data);
                 return res;
-            }, [] as string[])),
+            }, [] as string[]).map((item) => item ?? '')),
             isLineBreak: computed(() => ['<br>', '<br/>'].includes(props.delimiter)),
         });
 
