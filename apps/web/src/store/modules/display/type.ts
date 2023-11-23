@@ -17,6 +17,7 @@ export interface DisplayMenu extends Menu {
 }
 
 export interface DisplayState {
+    isAdminMode: boolean;
     visibleSidebar: boolean;
     sidebarType: SidebarType;
     isInitialized: boolean;
