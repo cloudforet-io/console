@@ -10,18 +10,21 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { postEnableMfa, postValidationMfaCode } from '@/lib/helper/multi-factor-authentication-helper';
+import { postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
 
+import { loadAuth } from '@/services/auth/authenticator/loader';
 import CollapsibleContents from '@/services/auth/components/CollapsibleContents.vue';
+import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
 import { AUTH_ROUTE } from '@/services/auth/route-config';
 
 const route = useRoute();
 const router = useRouter();
 
+const { password, userId, userType } = route.params;
+
 const state = reactive({
     loading: false,
     confirmLoading: false,
-    userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
 });
@@ -50,10 +53,10 @@ const handleClickResend = async () => {
     state.loading = true;
 
     await postEnableMfa({
-        user_id: route.query.userId,
+        user_id: userId,
         mfa_type: 'EMAIL',
         options: {
-            email: route.query.userId,
+            email: userId,
         },
         domain_id: state.domainId,
     });
@@ -63,11 +66,16 @@ const handleClickResend = async () => {
 const handleClickConfirmButton = async () => {
     state.confirmLoading = true;
     try {
-        await postValidationMfaCode({
-            user_id: state.userId,
-            domain_id: state.domainId,
-            verify_code: validationState.verificationCode,
-        });
+        const credentials = {
+            password,
+        };
+        await loadAuth().signIn(credentials, userId, userType, validationState.verificationCode);
+        if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
+            await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
+        } else {
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
+            await router.push(defaultRoute);
+        }
         validationState.verificationCode = '';
     } catch (e: any) {
         validationState.isVerificationCodeValid = true;
@@ -76,6 +84,14 @@ const handleClickConfirmButton = async () => {
         state.confirmLoading = false;
     }
 };
+
+
+/* Init */
+(() => {
+    if (!userId) {
+        router.push({ name: AUTH_ROUTE.SIGN_IN._NAME });
+    }
+})();
 </script>
 
 <template>
@@ -105,7 +121,7 @@ const handleClickConfirmButton = async () => {
                          class="icon-envelope"
                     />
                     <strong class="email-text">
-                        {{ route.query.userId }}
+                        {{ userId }}
                     </strong>
                 </div>
             </div>
