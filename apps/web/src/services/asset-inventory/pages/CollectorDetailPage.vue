@@ -106,6 +106,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -126,15 +127,14 @@ import CollectorOptionsSection
 import CollectorScheduleSection from '@/services/asset-inventory/components/CollectorDetailScheduleSection.vue';
 import CollectorServiceAccountsSection
     from '@/services/asset-inventory/components/CollectorDetailServiceAccountsSection.vue';
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
-import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/types/collector-data-modal-type';
 
-import type { CollectorModel } from '@/api-schema/inventory/collector/model';
 
 const props = defineProps<{
     collectorId: string;

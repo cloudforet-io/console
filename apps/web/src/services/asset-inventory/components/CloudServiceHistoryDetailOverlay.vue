@@ -117,8 +117,9 @@ import CloudServiceHistoryDetailNote
     from '@/services/asset-inventory/components/CloudServiceHistoryDetailNoteTab.vue';
 import CloudServiceLogTab
     from '@/services/asset-inventory/components/CloudServiceLogTab.vue';
+import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/constants/cloud-service-detail-constant';
 import type { CloudServiceHistoryItem } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
-import { HISTORY_ACTION_MAP } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+
 
 const TIMELINE_ITEM_LIMIT = 10;
 

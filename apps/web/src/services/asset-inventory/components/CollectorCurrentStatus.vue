@@ -59,8 +59,9 @@ import { numberFormatter } from '@cloudforet/core-lib/index';
 
 import { peacock } from '@/styles/colors';
 
+import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import type { JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
+
 
 const PROGRESS_BAR_COLOR = peacock[500];
 

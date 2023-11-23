@@ -40,6 +40,7 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CredentialModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
@@ -49,7 +50,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CredentialModel } from '@/services/asset-inventory/types/service-account-page-type';
+
 
 interface Props {
     loading: boolean;

@@ -137,15 +137,16 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ProviderModel } from '@/schema/identity/provider/model';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType, ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
 import type {
-    ActiveDataType, CredentialForm, ProviderModel, PageMode, AccountType,
-    ServiceAccountModel,
+    ActiveDataType, CredentialForm, PageMode,
 } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {

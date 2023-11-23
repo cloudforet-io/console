@@ -58,6 +58,9 @@ import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProviderModel } from '@/schema/identity/provider/model';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -68,10 +71,8 @@ import ServiceAccountBaseInformationDetail
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
 import type {
-    BaseInformationForm, PageMode, ProviderModel, ServiceAccountModel,
-    ServiceAccountModelForBinding,
+    BaseInformationForm, PageMode,
 } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {

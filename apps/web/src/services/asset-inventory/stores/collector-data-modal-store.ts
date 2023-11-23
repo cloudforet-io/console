@@ -3,14 +3,17 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
+import type {
+    CollectorModel,
+} from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
+import type { SecretModel } from '@/schema/secret/secret/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/constants/collector-constant';
 import type { CollectDataType } from '@/services/asset-inventory/types/collector-data-modal-type';
-import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/types/collector-data-modal-type';
 
-import type {
-    CollectorModel, SecretModel, JobModel,
-} from '@/api-schema/inventory/collector/model';
 
 /**
     * @name useCollectorDataModalStore

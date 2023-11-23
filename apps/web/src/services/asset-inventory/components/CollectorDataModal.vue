@@ -53,11 +53,10 @@ import CollectorDataDefaultInner
     from '@/services/asset-inventory/components/CollectorDataDefaultInner.vue';
 import CollectorDataDuplicationInner
     from '@/services/asset-inventory/components/CollectorDataDuplicationInner.vue';
+import { COLLECT_DATA_TYPE, JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/types/collector-data-modal-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
 
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorDataModalState = collectorDataModalStore.$state;

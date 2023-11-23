@@ -104,6 +104,9 @@ import { get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { ProviderModel } from '@/schema/identity/provider/model';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -121,11 +124,9 @@ import ServiceAccountBaseInformationForm
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type {
-    AccountType,
-    BaseInformationForm, CredentialForm, ProjectForm, ProviderModel,
+    BaseInformationForm, CredentialForm, ProjectForm,
 } from '@/services/asset-inventory/types/service-account-page-type';
 
 export default {

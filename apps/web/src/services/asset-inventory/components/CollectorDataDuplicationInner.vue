@@ -89,13 +89,13 @@ import dayjs from 'dayjs';
 
 import { durationFormatter } from '@cloudforet/core-lib/index';
 
+import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 
 import { red, green } from '@/styles/colors';
 
+import { COLLECT_DATA_TYPE, JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import { useCollectorDataModalStore } from '@/services/asset-inventory/stores/collector-data-modal-store';
-import { COLLECT_DATA_TYPE } from '@/services/asset-inventory/types/collector-data-modal-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
 
 const SUCCEEDED_COLOR = green[500];
 const FAILED_COLOR = red[400];
@@ -129,8 +129,22 @@ const definitionFields = computed(() => {
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone),
 });
+
+const defaultJob: JobModel = {
+    job_id: '',
+    collector_id: '',
+    plugin_id: '',
+    created_at: '',
+    total_tasks: 0,
+    success_tasks: 0,
+    failure_tasks: 0,
+    status: JOB_STATE.SUCCESS,
+    remained_tasks: 0,
+    finished_at: '',
+};
+
 const state = reactive({
-    recentJob: computed(() => collectorDataModalState.recentJob),
+    recentJob: computed<JobModel>(() => collectorDataModalState.recentJob ?? defaultJob),
     duration: computed(() => durationFormatter(state.recentJob?.created_at, dayjs(), storeState.timezone) || '--'),
     succeededPercentage: computed(() => {
         if (state.recentJob.total_tasks > 0) {

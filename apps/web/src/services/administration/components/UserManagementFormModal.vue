@@ -5,6 +5,7 @@ import { PButtonModal, PBoxTab } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { Tags } from '@/schema/_common/model';
 import { USER_TYPE } from '@/schema/identity/user/constant';
 import { store } from '@/store';
 
@@ -22,7 +23,6 @@ import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
-import type { Tags } from '@/api-schema/common/model';
 
 interface Props {
     headerTitle: string;

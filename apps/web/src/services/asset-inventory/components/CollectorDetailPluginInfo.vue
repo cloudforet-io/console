@@ -4,13 +4,15 @@ import { computed, defineProps, reactive } from 'vue';
 import { PLink, PDivider, PFieldTitle } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { PluginModel } from '@/schema/repository/plugin/model';
+
 import CollectorPluginContents from '@/services/asset-inventory/components/CollectorPluginContents.vue';
 
-import type { CollectorModel, RepositoryPluginModel } from '@/api-schema/inventory/collector/model';
 
 
 const props = defineProps<{
-    plugin?: RepositoryPluginModel;
+    plugin?: PluginModel;
     collector?: CollectorModel|null;
     showMinimal?: boolean;
 }>();

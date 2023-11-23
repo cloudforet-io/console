@@ -7,15 +7,17 @@ import {
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
 
+import type { JobModel } from '@/schema/inventory/job/model';
+
 import { green, red } from '@/styles/colors';
 
+import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     statusIconColorFormatter,
     statusIconFormatter, statusTextFormatter,
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
 
-import type { JobModel } from '@/api-schema/inventory/collector/model';
+
 
 interface Props {
     job: JobModel;

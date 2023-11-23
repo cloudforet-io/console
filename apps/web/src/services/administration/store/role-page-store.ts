@@ -3,9 +3,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { RoleModel } from '@/schema/identity/role/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RoleModel } from '@/api-schema/identity/role/model';
 
 
 

@@ -67,11 +67,12 @@ import { UPGRADE_MODE } from '@/schema/inventory/collector/model';
 import type {
     CollectorModel,
     CollectorPluginModel,
-    JobModel,
     CollectorUpdateParameter,
     CollectorUpdatePluginParameter,
-    RepositoryPluginModel,
+
 } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
+import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -100,7 +101,7 @@ const collectorJobState = collectorJobStore.$state;
 
 const state = reactive({
     collectorPluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
-    repositoryPlugin: null as null|RepositoryPluginModel,
+    repositoryPlugin: null as null|PluginModel,
     isCollectorAutoUpgrade: computed<boolean>(() => collectorFormState.originCollector?.plugin_info?.upgrade_mode === UPGRADE_MODE.AUTO),
     isLatestVersion: computed<boolean>(() => {
         const version = state.collectorPluginInfo?.version;

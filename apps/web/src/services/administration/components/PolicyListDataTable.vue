@@ -87,6 +87,8 @@ import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { PolicyModel } from '@/schema/identity/policy/model';
+import type { Policy } from '@/schema/identity/role/type';
 import { store } from '@/store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -101,8 +103,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
 import { usePolicyStore } from '@/services/administration/store/policy-page-store';
 import type { PolicyType } from '@/services/administration/types/policy-type';
 
-import type { PolicyModel } from '@/api-schema/identity/policy/model';
-import type { Policy } from '@/api-schema/identity/role/model';
+
 
 const getFilteredItems = (queryTags: QueryTag[], policyList: PolicyModel[], selectedType: PolicyType): PolicyModel[] => {
     // 1. filter by type

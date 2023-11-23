@@ -4,8 +4,9 @@ import {
     gray, green, red, violet,
 } from '@/styles/colors';
 
+import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import { JOB_TASK_STATE } from '@/services/asset-inventory/types/collector-history-page-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
+
 
 const SUCCESS_ICON_COLOR = green[500];
 const CANCELED_ICON_COLOR = gray[400];

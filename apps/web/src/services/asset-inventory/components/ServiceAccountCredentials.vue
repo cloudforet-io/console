@@ -62,6 +62,9 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/model';
+import type { CredentialModel } from '@/schema/secret/secret/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -72,9 +75,8 @@ import ServiceAccountCredentialsDetail
     from '@/services/asset-inventory/components/ServiceAccountCredentialsDetail.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
 import type {
-    PageMode, CredentialForm, AccountType, CredentialModel,
+    PageMode, CredentialForm,
 } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {

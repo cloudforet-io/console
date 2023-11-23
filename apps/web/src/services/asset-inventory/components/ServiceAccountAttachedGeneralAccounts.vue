@@ -45,10 +45,12 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type { ServiceAccountModel } from '@/services/asset-inventory/types/service-account-page-type';
+
 
 export default defineComponent({
     name: 'ServiceAccountAttachedGeneralAccounts',

@@ -33,12 +33,12 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceRouter } from '@/router';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
-import type { AccountType } from '@/services/asset-inventory/types/service-account-page-type';
 
 export default {
     name: 'ServiceAccountProjectDetail',
