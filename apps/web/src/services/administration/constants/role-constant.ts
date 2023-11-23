@@ -1,4 +1,4 @@
-import { ROLE_TYPE } from '@/api-schema/identity/role/constant';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { MENU_ID } from '@/lib/menu/config';
 
