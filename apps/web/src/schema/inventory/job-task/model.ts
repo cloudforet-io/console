@@ -2,7 +2,7 @@ import type { JobTaskError } from '@/services/asset-inventory/types/collector-hi
 
 export interface JobTaskModel {
     job_task_id: string;
-status: string;
+    status: string;
     create_count: number;
     updated_count: number;
     failure_count: number;

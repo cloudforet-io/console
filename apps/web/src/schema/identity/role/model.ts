@@ -1,6 +1,5 @@
 import type { Tags, TimeStamp } from '@/schema/_common/model';
-import type { RoleType } from '@/schema/identity/role/type';
-import type { Policy } from '@/schema/inventory/cloud-service-report/model';
+import type { RoleType, Policy } from '@/schema/identity/role/type';
 
 import type { RawPagePermission } from '@/lib/access-control/config';
 

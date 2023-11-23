@@ -88,7 +88,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import type { PolicyModel } from '@/schema/identity/policy/model';
-import type { Policy } from '@/schema/inventory/cloud-service-report/model';
+import type { Policy } from '@/schema/identity/role/type';
 import { store } from '@/store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
