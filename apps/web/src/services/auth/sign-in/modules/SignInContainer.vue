@@ -1,11 +1,17 @@
 <script lang="ts" setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
 import config from '@/lib/config';
 
+import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
+
+const route = useRoute();
+
 const state = reactive({
+    isDomainOwner: false,
     images: computed(() => {
         const domainImage = config.get('DOMAIN_IMAGE');
         if (!isEmpty(domainImage)) {
@@ -18,6 +24,10 @@ const state = reactive({
         return undefined;
     }),
 });
+
+watch(() => route.name, (name) => {
+    state.isDomainOwner = name === 'domainAdminSignIn';
+}, { immediate: true });
 </script>
 
 <template>
@@ -40,7 +50,10 @@ const state = reactive({
                 >
             </template>
         </div>
-        <router-view />
+        <div class="contents-wrapper">
+            <sign-in-left-container :is-domain-owner="state.isDomainOwner" />
+            <router-view />
+        </div>
     </div>
 </template>
 
@@ -65,6 +78,14 @@ const state = reactive({
         @screen tablet {
             @apply hidden;
         }
+    }
+
+    .contents-wrapper {
+        @apply flex absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        bottom: 0;
     }
 }
 </style>

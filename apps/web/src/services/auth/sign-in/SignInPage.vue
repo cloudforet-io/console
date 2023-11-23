@@ -30,7 +30,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getDefaultRouteAfterSignIn } from '@/services/auth/lib/helper';
 import IDPWSignIn from '@/services/auth/sign-in/local/template/ID_PW.vue';
-import SignInLeftContainer from '@/services/auth/sign-in/modules/SignInLeftContainer.vue';
 import SignInRightContainer from '@/services/auth/sign-in/modules/SignInRightContainer.vue';
 
 interface Props {
@@ -94,41 +93,32 @@ watch(() => route.name, () => {
 </script>
 
 <template>
-    <div class="sign-in-page">
-        <sign-in-left-container />
-        <sign-in-right-container
-            class="sign-in-page-right-container"
-            :show-error-message="state.showErrorMessage"
-        >
-            <template #input>
-                <i-d-p-w-sign-in class="id-pw-wrapper"
-                                 @sign-in="onSignIn"
-                />
-                <div v-if="state.component"
-                     class="btn-divider"
-                >
-                    <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
-                </div>
-                <component :is="state.component"
-                           class="sign-in-template"
-                           @sign-in="onSignIn"
-                />
-            </template>
-        </sign-in-right-container>
-    </div>
+    <sign-in-right-container
+        class="sign-in-page-right-container"
+        :show-error-message="state.showErrorMessage"
+    >
+        <template #input>
+            <i-d-p-w-sign-in class="id-pw-wrapper"
+                             @sign-in="onSignIn"
+            />
+            <div v-if="state.component"
+                 class="btn-divider"
+            >
+                <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
+            </div>
+            <component :is="state.component"
+                       class="sign-in-template"
+                       @sign-in="onSignIn"
+            />
+        </template>
+    </sign-in-right-container>
 </template>
 
 <style lang="postcss" scoped>
-.sign-in-page {
-    @apply flex absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    bottom: 0;
+.sign-in-page-right-container {
     .id-pw-wrapper {
         margin-bottom: 1.5rem;
     }
-
     .btn-divider {
         @apply flex items-center text-gray-200;
         flex-basis: 100%;
@@ -146,24 +136,23 @@ watch(() => route.name, () => {
             height: 1px;
         }
     }
-    .sign-in-page-right-container {
-        @media screen and (width < 478px) {
-            .template-wrapper {
-                width: 15rem;
-                margin: auto 2.5rem;
-                align-self: center;
-                .right-logo-character {
-                    @apply mx-auto;
-                    display: block;
-                    width: 33%;
-                    margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
-                }
-                .sign-in-title {
-                    display: none;
-                }
-                .sign-in-subtitle {
-                    display: none;
-                }
+
+    @media screen and (width < 478px) {
+        .template-wrapper {
+            width: 15rem;
+            margin: auto 2.5rem;
+            align-self: center;
+            .right-logo-character {
+                @apply mx-auto;
+                display: block;
+                width: 33%;
+                margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
+            }
+            .sign-in-title {
+                display: none;
+            }
+            .sign-in-subtitle {
+                display: none;
             }
         }
     }
