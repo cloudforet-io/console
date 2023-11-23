@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 export interface Tags {
     [key: string]: any;
 }
@@ -8,7 +7,12 @@ export interface TimeStamp {
     nanos?: number;
 }
 
-export interface ListModel<T> {
+export interface ListResponse<T> {
     results: T[];
-    total_count: number;
+    total_count?: number;
+}
+
+export interface AnalyzeResponse<T> {
+    results: T[];
+    more?: boolean;
 }
