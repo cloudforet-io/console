@@ -9,7 +9,7 @@ import {
     PButtonModal,
     PCollapsibleToggle,
     PFieldGroup,
-    PI, PIconButton,
+    PI,
     PTextInput,
 } from '@spaceone/design-system';
 
@@ -17,9 +17,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { postEnableMfa, postValidationMfaCode } from '@/lib/helper/multi-factor-authentication-helper';
-import { emailValidator } from '@/lib/helper/user-validation-helper';
 
-import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
@@ -40,73 +38,49 @@ const emit = defineEmits<{(e: 'refresh'): void }>();
 
 const state = reactive({
     loading: false,
-    confirmLoading: false,
-
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
     proxyVisible: useProxyValue('visible', props, emit),
     isCollapsed: true,
-    isEditMode: false,
 });
 
 const validationState = reactive({
+    verificationCode: '',
     isValidationCodeValid: undefined as undefined | boolean,
     validationCodeInvalidText: '' as TranslateResult | string,
 });
 
-const {
-    forms: {
-        newEmail,
-        verificationCode,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-} = useFormValidator({
-    newEmail: '',
-    verificationCode: '',
-}, {
-    newEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
-});
-
 /* Components */
-const handleClickEditButton = () => {
-    state.isEditMode = true;
+const handleChangeInput = (value: string) => {
+    validationState.verificationCode = value;
 };
 const handleClickCancel = () => {
     resetFormData();
     state.proxyVisible = false;
 };
 const resetFormData = () => {
-    setForm('newEmail', '');
-    setForm('verificationCode', '');
-    state.isEditMode = false;
+    validationState.verificationCode = '';
     state.isCollapsed = false;
 };
 
 /* API */
 const handleClickSendEmailButton = async () => {
-    state.loading = true;
-
     await postEnableMfa({
         user_id: state.userId,
         mfa_type: props.mfaType,
         options: {
-            email: state.isEditMode ? newEmail.value : props.email,
+            email: props.email,
         },
         domain_id: state.domainId,
     });
-    state.isEditMode = false;
-
-    state.loading = false;
 };
 const handleClickConfirmButton = async () => {
-    state.confirmLoading = true;
+    state.loading = true;
     try {
         await postValidationMfaCode({
             user_id: state.userId,
             domain_id: state.domainId,
-            verify_code: verificationCode.value,
+            verify_code: validationState.verificationCode,
         });
         state.proxyVisible = false;
         resetFormData();
@@ -114,7 +88,7 @@ const handleClickConfirmButton = async () => {
         validationState.isValidationCodeValid = true;
         validationState.validationCodeInvalidText = i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
     } finally {
-        state.confirmLoading = false;
+        state.loading = false;
         emit('refresh');
     }
 };
@@ -122,11 +96,6 @@ const handleClickConfirmButton = async () => {
 /* Watcher */
 watch(() => props.visible, (value) => {
     state.proxyVisible = value;
-    if (value) {
-        if (props.verified) {
-            state.isEditMode = true;
-        }
-    }
 }, { immediate: true });
 </script>
 
@@ -136,8 +105,8 @@ watch(() => props.visible, (value) => {
         :header-title="$t('COMMON.MFA_MODAL.TITLE')"
         class="mfa-email-modal-wrapper"
         size="sm"
-        :disabled="!verificationCode"
-        :loading="state.confirmLoading"
+        :disabled="validationState.verificationCode === ''"
+        :loading="state.loading"
         @confirm="handleClickConfirmButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
@@ -145,9 +114,7 @@ watch(() => props.visible, (value) => {
         <template #body>
             <div class="modal-content-wrapper">
                 <div class="email-info-wrapper">
-                    <div v-if="!state.isEditMode"
-                         class="sent-email-wrapper"
-                    >
+                    <div class="sent-email-wrapper">
                         <div class="contents-wrapper">
                             <p>{{ $t('COMMON.MFA_MODAL.SENT_DESC') }}</p>
                             <div class="email-wrapper">
@@ -157,40 +124,10 @@ watch(() => props.visible, (value) => {
                                      color="inherit"
                                 />
                                 <p class="email-text">
-                                    {{ newEmail || props.email }}
+                                    {{ props.email }}
                                 </p>
                             </div>
                         </div>
-                        <p-icon-button class="icon-edit"
-                                       name="ic_edit"
-                                       size="md"
-                                       color="inherit"
-                                       @click="handleClickEditButton"
-                        />
-                    </div>
-                    <div v-else
-                         class="edit-email-wrapper"
-                    >
-                        <p-field-group :label="$t('COMMON.MFA_MODAL.EMAIL')"
-                                       :invalid="invalidState.newEmail"
-                                       :invalid-text="invalidTexts.newEmail"
-                                       class="email-input-group"
-                                       required
-                        >
-                            <p-text-input :value="newEmail"
-                                          :invalid="invalidState.newEmail"
-                                          class="text-input"
-                                          @update:value="setForm('newEmail', $event)"
-                            />
-                        </p-field-group>
-                        <p-button style-type="secondary"
-                                  :loading="state.loading"
-                                  size="md"
-                                  :disabled="newEmail === '' || invalidState.newEmail"
-                                  @click="handleClickSendEmailButton"
-                        >
-                            {{ $t('COMMON.MFA_MODAL.SEND_CODE') }}
-                        </p-button>
                     </div>
                 </div>
                 <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
@@ -198,10 +135,10 @@ watch(() => props.visible, (value) => {
                                :invalid-text="validationState.validationCodeInvalidText"
                                required
                 >
-                    <p-text-input :value="verificationCode"
+                    <p-text-input :value="validationState.verificationCode"
                                   :invalid="validationState.isValidationCodeValid"
                                   class="text-input"
-                                  @update:value="setForm('verificationCode', $event)"
+                                  @change="handleChangeInput"
                     />
                 </p-field-group>
                 <div class="collapsible-wrapper">
@@ -246,14 +183,6 @@ watch(() => props.visible, (value) => {
                         @apply flex items-center font-bold;
                         gap: 0.375rem;
                     }
-                }
-            }
-            .edit-email-wrapper {
-                @apply flex items-end;
-                margin-bottom: 0.875rem;
-                gap: 1rem;
-                .email-input-group {
-                    flex: 1;
                 }
             }
         }
