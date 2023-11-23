@@ -8,7 +8,7 @@ import type { RouteQueryString } from '@/lib/router-query-string';
 import type {
     ScopeType,
     FINISH_CONDITION, AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
-} from '@/services/alert-manager/lib/config';
+} from '@/services/alert-manager/constants/alert-constant';
 
 
 export interface Rule {

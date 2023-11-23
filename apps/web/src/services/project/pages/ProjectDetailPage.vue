@@ -36,7 +36,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import { ALERT_STATE } from '@/services/alert-manager/lib/config';
+import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
 import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
 import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
 import ProjectDetailProjectFormModal from '@/services/project/components/ProjectDetailProjectFormModal.vue';

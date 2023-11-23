@@ -41,12 +41,15 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
-import type { WebhookState } from '@/services/alert-manager/lib/config';
-import { WEBHOOK_STATE } from '@/services/alert-manager/lib/config';
 import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
 import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
 
 
+const WEBHOOK_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+type WebhookState = 'ENABLED' | 'DISABLED';
 interface Props {
     id?: string;
 }

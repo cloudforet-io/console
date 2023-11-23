@@ -92,7 +92,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { ALERT_URGENCY } from '@/services/alert-manager/lib/config';
+import { ALERT_URGENCY } from '@/services/alert-manager/constants/alert-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 

@@ -103,8 +103,8 @@ import AlertStatusUpdate
     from '@/services/alert-manager/alert/alert-detail/modules/AlertStatusUpdate.vue';
 import AlertTimelineAndEvent from '@/services/alert-manager/alert/alert-detail/modules/AlertTimelineAndEvent.vue';
 import AlertTitleEditModal from '@/services/alert-manager/alert/alert-detail/modules/AlertTitleEditModal.vue';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 export default {
     name: 'AlertDetailPage',

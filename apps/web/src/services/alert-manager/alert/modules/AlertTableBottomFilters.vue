@@ -52,10 +52,10 @@ import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system
 
 import { i18n } from '@/translations';
 
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
+import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertBottomFilters,
-} from '@/services/alert-manager/type';
+} from '@/services/alert-manager/types/alert-type';
 
 export default {
     name: 'AlertTableBottomFilters',

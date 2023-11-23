@@ -83,8 +83,8 @@ import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
-import { FINISH_CONDITION } from '@/services/alert-manager/lib/config';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
+import { FINISH_CONDITION } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
 export default {
     name: 'ProjectAlertSettingsEscalationPolicy',

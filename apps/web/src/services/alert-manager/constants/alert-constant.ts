@@ -2,6 +2,7 @@ import {
     red, coral, yellow, blue, violet, gray,
 } from '@/styles/colors';
 
+
 export enum ACTION {
     create = 'create',
     delete = 'delete',
@@ -33,12 +34,6 @@ export enum FINISH_CONDITION {
     acknowledged = 'ACKNOWLEDGED',
     resolved = 'RESOLVED',
 }
-
-export const WEBHOOK_STATE = {
-    ENABLED: 'ENABLED',
-    DISABLED: 'DISABLED',
-} as const;
-export type WebhookState = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
 
 export const ALERT_STATE = {
     TRIGGERED: 'TRIGGERED',

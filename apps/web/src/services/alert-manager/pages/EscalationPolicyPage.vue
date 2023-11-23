@@ -88,9 +88,9 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
+import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
 import EscalationPolicyDataTable from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
-import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/lib/config';
 
 export default {
     name: 'EscalationPolicyPage',

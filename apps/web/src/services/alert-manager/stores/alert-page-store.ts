@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { AlertDataModel } from '@/services/alert-manager/type';
+import type { AlertDataModel } from '@/services/alert-manager/types/alert-type';
 
 
 export interface UpdateAlertParams {

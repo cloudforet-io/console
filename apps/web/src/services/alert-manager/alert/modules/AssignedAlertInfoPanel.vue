@@ -35,7 +35,7 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ALERT_STATE_FILTER } from '@/services/alert-manager/lib/config';
+import { ALERT_STATE_FILTER } from '@/services/alert-manager/constants/alert-constant';
 
 export default {
     name: 'AssignedAlertInfoPanel',

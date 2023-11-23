@@ -33,10 +33,10 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import AlertDataTable from '@/services/alert-manager/alert/modules/AlertDataTable.vue';
 import AssignedAlertInfoPanel from '@/services/alert-manager/alert/modules/AssignedAlertInfoPanel.vue';
 import NewAssignedAlertListCard from '@/services/alert-manager/alert/modules/NewAssignedAlertListCard.vue';
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/lib/config';
+import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertListPageUrlQuery, AlertListTableFilters,
-} from '@/services/alert-manager/type';
+} from '@/services/alert-manager/types/alert-type';
 
 export default {
     name: 'AlertPage',

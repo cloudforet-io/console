@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { AlertState } from '@/services/alert-manager/lib/config';
+import type { AlertState } from '@/services/alert-manager/constants/alert-constant';
 
 
 export interface AlertCount {

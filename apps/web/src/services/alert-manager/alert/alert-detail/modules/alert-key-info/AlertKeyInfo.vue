@@ -110,9 +110,9 @@ import AlertInfoDescription
     from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoDescription.vue';
 import AlertInfoProject from '@/services/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoProject.vue';
 import AlertTriggeredBy from '@/services/alert-manager/alert/modules/AlertTriggeredBy.vue';
-import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/lib/config';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/route-config';
-import { useAlertPageStore } from '@/services/alert-manager/store/alert-page-store';
+import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 
 export default {

@@ -1,4 +1,5 @@
-import { ALERT_STATE, SCOPE } from '@/services/alert-manager/lib/config';
+import { ALERT_STATE, SCOPE } from '@/services/alert-manager/constants/alert-constant';
+
 
 export const alertStateBadgeStyleTypeFormatter = (alertState) => {
     let style = '';

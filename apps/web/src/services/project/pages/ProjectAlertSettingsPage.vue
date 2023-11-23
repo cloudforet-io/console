@@ -18,8 +18,8 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import { red } from '@/styles/colors';
 
+import { ACTION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
 import EscalationPolicyFormModal from '@/services/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
-import { ACTION, SCOPE } from '@/services/alert-manager/lib/config';
 import ProjectAlertSettingsAutoRecoveryUpdateModal
     from '@/services/project/components/ProjectAlertSettingsAutoRecoveryUpdateModal.vue';
 import ProjectAlertSettingsEscalationPolicy
