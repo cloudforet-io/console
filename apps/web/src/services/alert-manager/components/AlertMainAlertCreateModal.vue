@@ -84,6 +84,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -92,7 +93,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { ALERT_URGENCY } from '@/services/alert-manager/constants/alert-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 

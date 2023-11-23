@@ -2,12 +2,12 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
 import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/model';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
-    ScopeType,
-    FINISH_CONDITION, AlertState, AlertUrgency, AlertSeverity, AlertStateFilter, AssignedState,
+    FINISH_CONDITION, ALERT_STATE_FILTER, ASSIGNED_STATE, SCOPE,
 } from '@/services/alert-manager/constants/alert-constant';
 
 
@@ -16,8 +16,8 @@ export interface Rule {
     escalate_minutes?: number;
 }
 
-export type FinishCondition = FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
-
+type FinishCondition = FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
+export type ScopeType = typeof SCOPE[keyof typeof SCOPE];
 export interface EscalationPolicyDataModel {
     escalation_policy_id: string;
     finish_condition: FinishCondition;
@@ -27,47 +27,6 @@ export interface EscalationPolicyDataModel {
     repeat_count: number;
     rules: Rule[];
     scope: ScopeType;
-}
-
-type Responder = {
-    resource_type: string;
-    resource_id: string;
-};
-
-interface ResourceModel {
-    resource_id?: string;
-    resource_type?: string;
-    name?: string;
-    ip_address?: string;
-}
-
-export interface AlertDataModel {
-    responders: Responder[];
-    alert_number: number;
-    alert_id: string;
-    title: string;
-    state: AlertState;
-    status_message: string;
-    description: string;
-    assignee: string;
-    urgency: AlertUrgency;
-    severity: AlertSeverity;
-    is_snoozed: true;
-    snoozed_end_time: TimeStamp;
-    escalation_step: number;
-    escalation_ttl: number;
-    webhook_id: string;
-    escalation_policy_id: string;
-    project_id: string;
-    project_dependencies: string[];
-    rule: string;
-    resource: ResourceModel;
-    created_at: TimeStamp;
-    updated_at: TimeStamp;
-    acknowledged_at: TimeStamp;
-    resolved_at: TimeStamp;
-    escalated_at: TimeStamp;
-    additional_info: any;
 }
 
 export interface Event {
@@ -88,6 +47,8 @@ export interface Event {
     webhook_id: string;
 }
 
+type AlertStateFilter = typeof ALERT_STATE_FILTER[keyof typeof ALERT_STATE_FILTER];
+type AssignedState = typeof ASSIGNED_STATE[keyof typeof ASSIGNED_STATE];
 export interface AlertBottomFilters {
     state: AlertStateFilter;
     urgency: AlertUrgency;

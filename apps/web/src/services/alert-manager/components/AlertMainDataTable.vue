@@ -143,6 +143,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -164,7 +165,7 @@ import AlertTriggeredBy from '@/services/alert-manager/components/AlertMainDataT
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
 import {
-    ALERT_STATE, ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE,
+    ALERT_STATE_FILTER, ASSIGNED_STATE,
 } from '@/services/alert-manager/constants/alert-constant';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';

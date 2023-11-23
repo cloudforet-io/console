@@ -70,6 +70,7 @@ import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pa
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -80,9 +81,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alert, secondary } from '@/styles/colors';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
-import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type { AlertListPageUrlQuery } from '@/services/alert-manager/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+
 
 const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',

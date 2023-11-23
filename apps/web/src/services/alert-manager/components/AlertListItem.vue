@@ -65,6 +65,7 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 
 import type { ReferenceItem } from '@/store/modules/reference/type';
@@ -76,7 +77,6 @@ import { red } from '@/styles/colors';
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
-import { ALERT_STATE } from '../constants/alert-constant';
 
 const ALERT_URGENCY = Object.freeze({
     HIGH: 'HIGH',

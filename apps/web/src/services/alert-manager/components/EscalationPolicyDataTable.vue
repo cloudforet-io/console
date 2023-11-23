@@ -64,6 +64,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import { capitalize } from 'lodash';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -71,7 +72,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 
 export default {

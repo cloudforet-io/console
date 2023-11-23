@@ -1,15 +1,14 @@
 import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 
-import type { ScopeType } from '@/services/alert-manager/constants/alert-constant';
 import { FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
-import type { Rule, EscalationPolicyDataModel } from '@/services/alert-manager/types/alert-type';
+import type { Rule, EscalationPolicyDataModel, ScopeType } from '@/services/alert-manager/types/alert-type';
 
 
 interface EscalationPolicyFormState {
     escalationPolicyData?: EscalationPolicyDataModel|undefined;
     name?: string;
-    scope: ScopeType
+    scope: ScopeType;
     rules: Rule[];
     finishCondition: FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
     repeatCount: number;

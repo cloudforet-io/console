@@ -90,6 +90,7 @@ import dayjs from 'dayjs';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -106,8 +107,6 @@ import AlertMainAcknowledgeModal from '@/services/alert-manager/components/Alert
 import AlertMainResolveModal from '@/services/alert-manager/components/AlertMainResolveModal.vue';
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
-import type { AlertAction } from '@/services/alert-manager/constants/alert-constant';
-import { ALERT_ACTION, ALERT_STATE, ALERT_URGENCY } from '@/services/alert-manager/constants/alert-constant';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
@@ -126,6 +125,14 @@ const TABLE_FIELDS = [
     { name: 'assignee', label: 'Assigned to' },
     { name: 'webhook_id', label: 'Triggered by' },
 ];
+
+const ALERT_ACTION = {
+    acknowledge: 'acknowledge',
+    resolve: 'resolve',
+    merge: 'merge',
+    delete: 'delete',
+} as const;
+type AlertAction = typeof ALERT_ACTION[keyof typeof ALERT_ACTION];
 
 export default {
     name: 'AlertMainDataTableActions',

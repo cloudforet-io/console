@@ -8,7 +8,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { EditMode } from '@/services/alert-manager/constants/alert-constant';
 import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
@@ -26,6 +25,8 @@ interface ParamType {
 	project_id?: string;
 	reset_description?: boolean;
 }
+
+type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
 export const useAlertInfoItem = (obj: AlertDetailItemState) => {
     const alertPageStore = useAlertPageStore();

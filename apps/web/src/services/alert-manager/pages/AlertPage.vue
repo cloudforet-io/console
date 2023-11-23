@@ -27,6 +27,7 @@ import { PHeading } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
+import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -34,7 +35,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import AlertMainAssignedAlertPanel from '@/services/alert-manager/components/AlertMainAssignedAlertPanel.vue';
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
 import AlertMainNewAssignedAlertListCard from '@/services/alert-manager/components/AlertMainNewAssignedAlertListCard.vue';
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertListPageUrlQuery, AlertListTableFilters,
 } from '@/services/alert-manager/types/alert-type';

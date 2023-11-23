@@ -124,6 +124,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -134,7 +135,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red } from '@/styles/colors';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
-import { ALERT_STATE } from '@/services/alert-manager/constants/alert-constant';
+
 
 const TAB_STATE = Object.freeze({
     OPEN: 'OPEN',
