@@ -208,19 +208,37 @@ export const getToolboxArgTypes = (): ArgTypes => ({
         name: 'totalCount',
         type: { name: 'number' },
         description: 'Total count of data for calculating pagination.',
-        defaultValue: 0,
+        defaultValue: undefined,
         table: {
             type: {
                 summary: 'number',
             },
             category: 'props',
             defaultValue: {
-                summary: 0,
+                summary: 'undefined',
             },
         },
         control: {
             type: 'number',
             options: { min: 0 },
+        },
+    },
+    hasNextPage: {
+        name: 'hasNextPage',
+        type: { name: 'boolean' },
+        description: 'Whether to show indication that there is next page or not.  It cannot be used with totalCount prop.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
         },
     },
     sortBy: {

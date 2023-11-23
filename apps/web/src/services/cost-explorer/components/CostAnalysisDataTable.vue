@@ -190,13 +190,16 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     }
 
     const dateIndex = Number(fieldName.split('.')[1]);
-    const date = item.cost_sum?.[dateIndex].date;
-    const _period = { start: date, end: date };
-    if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
-        _period.start = dayjs.utc(date).format('YYYY-MM-01');
-        _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
+    const date = item.value_sum?.[dateIndex].date;
+    if (date) {
+        const _period = { start: date, end: date };
+        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
+            _period.start = dayjs.utc(date).format('YYYY-MM-01');
+            _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
+        }
+        query.period = objectToQueryString(_period);
     }
-    query.period = objectToQueryString(_period);
+
 
     const filters: ConsoleFilter[] = [];
     if (typeof item.project_id === 'string') {
@@ -417,14 +420,10 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
         >
             <template #pagination-area>
                 <p-text-pagination :this-page.sync="tableState.thisPage"
-                                   :disable-next-page="!tableState.more || tableState.loading"
+                                   :disable-next-page="tableState.loading"
+                                   :has-next-page="tableState.more"
                                    @update:thisPage="handleUpdateThisPage"
-                >
-                    <template #default>
-                        <span class="this-page">{{ tableState.thisPage }}</span>
-                        <span v-if="tableState.more"> / ...</span>
-                    </template>
-                </p-text-pagination>
+                />
             </template>
             <template #toolbox-left>
                 <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->

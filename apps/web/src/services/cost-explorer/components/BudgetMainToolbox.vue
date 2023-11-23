@@ -208,14 +208,9 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
         >
             <template #pagination-area>
                 <p-text-pagination :this-page="state.thisPage"
-                                   :disable-next-page="!props.more"
+                                   :has-next-page="props.more"
                                    @update:thisPage="handleUpdateThisPage"
-                >
-                    <template #default>
-                        <span class="this-page">{{ state.thisPage }}</span>
-                        <span v-if="props.more"> / ...</span>
-                    </template>
-                </p-text-pagination>
+                />
             </template>
             <template #left-area>
                 <div class="left-area">
