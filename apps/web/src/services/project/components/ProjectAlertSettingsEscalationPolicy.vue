@@ -82,7 +82,7 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import ProjectChannelList from '@/services/alert-manager/alert/alert-detail/modules/alert-responder/modules/ProjectChannelList.vue';
+import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
 import { FINISH_CONDITION } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
