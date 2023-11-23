@@ -190,13 +190,16 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     }
 
     const dateIndex = Number(fieldName.split('.')[1]);
-    const date = item.cost_sum?.[dateIndex].date;
-    const _period = { start: date, end: date };
-    if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
-        _period.start = dayjs.utc(date).format('YYYY-MM-01');
-        _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
+    const date = item.value_sum?.[dateIndex].date;
+    if (date) {
+        const _period = { start: date, end: date };
+        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
+            _period.start = dayjs.utc(date).format('YYYY-MM-01');
+            _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
+        }
+        query.period = objectToQueryString(_period);
     }
-    query.period = objectToQueryString(_period);
+
 
     const filters: ConsoleFilter[] = [];
     if (typeof item.project_id === 'string') {

@@ -31,6 +31,7 @@ import CloudServiceFilterModal from '@/services/asset-inventory/components/Cloud
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
 
@@ -38,6 +39,7 @@ interface Props {
     hasNextPage: boolean;
     handlers: Handlers;
     queryTags?: QueryTag[];
+    period?: Period;
 }
 
 
@@ -45,6 +47,7 @@ const props = withDefaults(defineProps<Props>(), {
     hasNextPage: false,
     handlers: () => ({}),
     queryTags: () => [],
+    period: undefined,
 });
 
 const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): void;
@@ -159,7 +162,7 @@ const getExcelQuery = (data) => {
     return excelApiQueryHelper.data;
 };
 const getCloudServiceResourcesPayload = (): ExportOption => {
-    const query = getCloudServiceAnalyzeQuery(excelState.cloudServiceFilters, undefined, undefined);
+    const query = getCloudServiceAnalyzeQuery(excelState.cloudServiceFilters, undefined, props.period);
     // analyze_query at export api does not support field_group
     delete query.field_group;
     delete query.page;

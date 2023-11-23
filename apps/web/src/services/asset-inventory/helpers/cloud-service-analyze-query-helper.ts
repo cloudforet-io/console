@@ -29,7 +29,9 @@ const DEFAULT_SORT = [
 ];
 export const getCloudServiceAnalyzeQuery = (allFilters: ConsoleFilter[], page?: Page, period?: Period): Query => {
     // initialize query helper
-    cloudServiceQueryHelper.setOrFilters([]).setFilters([]);
+    cloudServiceQueryHelper.setOrFilters([])
+        .setFilters([])
+        .setTimezone('UTC');
 
     // set filters by user selection
     cloudServiceQueryHelper.addFilter(...allFilters);
@@ -39,9 +41,9 @@ export const getCloudServiceAnalyzeQuery = (allFilters: ConsoleFilter[], page?: 
 
     // set filters by period
     if (period) {
-        const start = dayjs.utc(period.start).format('YYYY-MM-DD');
-        const end = dayjs.utc(period.end).add(1, 'day').format('YYYY-MM-DD');
-        cloudServiceQueryHelper.addFilter({ k: 'created_at', v: end, o: '<=t' });
+        const start = dayjs.utc(period.start).startOf('millisecond').toISOString();
+        const end = dayjs.utc(period.end).add(1, 'day').startOf('millisecond').toISOString();
+        cloudServiceQueryHelper.addFilter({ k: 'created_at', v: end, o: '<t' });
         cloudServiceQueryHelper.addOrFilter({ k: 'deleted_at', v: start, o: '>t' });
         cloudServiceQueryHelper.addOrFilter({ k: 'deleted_at', v: null, o: '=' });
         cloudServiceQueryHelper.addFilter({ k: 'state', v: ['ACTIVE', 'DELETED'], o: '=' });

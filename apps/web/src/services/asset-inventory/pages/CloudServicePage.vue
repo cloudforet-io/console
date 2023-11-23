@@ -12,6 +12,7 @@
         <p-divider class="cloud-service-divider" />
         <cloud-service-toolbox :has-next-page="hasNextPage"
                                :handlers="handlerState"
+                               :period="cloudServicePageState.period"
                                @update-pagination="handlePaginationUpdate"
         />
 

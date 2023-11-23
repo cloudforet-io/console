@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
 interface UseEllipsisOptions {
-    targetRef: Ref<Vue | HTMLElement | (Vue|HTMLElement|undefined|null)[] | undefined | null>;
+    targetRef: Ref<Vue|HTMLElement|undefined|null | (Vue|HTMLElement|undefined|null)[]>;
     targetClass?: string; // if target is not the element itself, but the child element, you can use this option
     lineClamp?: boolean; // in case of using line-clamp, you can use this option
 }
