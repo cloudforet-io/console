@@ -12,9 +12,10 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
-import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter, ExportOption } from '@/schema/_common/api-verbs/export';
+import { QueryType } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -30,7 +31,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import CloudServiceFilterModal from '@/services/asset-inventory/components/CloudServiceFilterModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-
 
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
@@ -159,17 +159,32 @@ const getExcelQuery = (data) => {
         ]);
     return excelApiQueryHelper.data;
 };
+const FILTER_OR_KEYS = ['provider', 'cloud_service_group', 'cloud_service_type'];
 const getCloudServiceResourcesPayload = (): ExportOption => {
     excelApiQueryHelper.setFilters(excelState.cloudServiceFilters).setMultiSortV2([
         { key: 'provider', desc: true },
         { key: 'cloud_service_group', desc: true },
     ]);
-    return ({
+    const { filter, sort, keyword } = excelApiQueryHelper.data;
+    const filterOr: ApiFilter[] = [];
+    if (keyword) {
+        const values = keyword.split(' ');
+        FILTER_OR_KEYS.forEach((key) => {
+            filterOr.push({
+                k: key,
+                o: 'contain_in',
+                v: values,
+            });
+        });
+    }
+    return {
         name: 'Summary',
         title: 'Summary',
         query_type: QueryType.ANALYZE,
         analyze_query: {
-            ...excelApiQueryHelper.data,
+            filter,
+            sort,
+            filter_or: filterOr,
             group_by: ['provider', 'cloud_service_group', 'cloud_service_type'],
             fields: {
                 total_count: {
@@ -177,7 +192,7 @@ const getCloudServiceResourcesPayload = (): ExportOption => {
                 },
             },
         },
-    });
+    };
 };
 const getExcelPayloadList = async (): Promise<ExportOption[]> => {
     const excelPayloadList: ExportOption[] = [];
@@ -230,7 +245,7 @@ const handleClickSet = () => {
 const handleExport = () => {
     const excelExportFetcher = async () => {
         const excelPayloadList = await getExcelPayloadList();
-        const cloudServiceExcelExportParams:ExportParameter = {
+        const cloudServiceExcelExportParams: ExportParameter = {
             file_name: 'cloud_service_export',
             options: [
                 getCloudServiceResourcesPayload(),
