@@ -18,8 +18,8 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
-import EventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
-import EventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
+import ProjectAlertEventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
+import ProjectAlertEventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
 
 const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',
@@ -174,7 +174,7 @@ const onClickFormCancel = () => {
 </script>
 
 <template>
-    <general-page-layout class="add-service-account-container">
+    <general-page-layout>
         <p-breadcrumbs class="flex-grow"
                        :routes="routeState.routes"
         />
@@ -257,15 +257,17 @@ const onClickFormCancel = () => {
                         </div>
                     </template>
                 </template>
-                <event-rule-form v-if="state.isEditMode && (state.selectedOrder === data.order)"
-                                 :project-id="props.projectId"
-                                 :event-rule-id="data.event_rule_id"
-                                 :mode="EDIT_MODE.UPDATE"
-                                 @confirm="onClickFormConfirm"
-                                 @cancel="onClickFormCancel"
+                <project-alert-event-rule-form
+                    v-if="state.isEditMode && (state.selectedOrder === data.order)"
+                    :project-id="props.projectId"
+                    :event-rule-id="data.event_rule_id"
+                    :mode="EDIT_MODE.UPDATE"
+                    @confirm="onClickFormConfirm"
+                    @cancel="onClickFormCancel"
                 />
-                <event-rule-content v-else
-                                    :data="data"
+                <project-alert-event-rule-content
+                    v-else
+                    :data="data"
                 />
             </p-card>
         </div>
@@ -273,10 +275,11 @@ const onClickFormCancel = () => {
                 style-type="indigo400"
                 :header="$t('PROJECT.EVENT_RULE.ADD_EVENT_RULE')"
         >
-            <event-rule-form :project-id="props.projectId"
-                             :mode="EDIT_MODE.CREATE"
-                             @confirm="onClickFormConfirm"
-                             @cancel="onClickFormCancel"
+            <project-alert-event-rule-form
+                :project-id="props.projectId"
+                :mode="EDIT_MODE.CREATE"
+                @confirm="onClickFormConfirm"
+                @cancel="onClickFormCancel"
             />
         </p-card>
         <p-button v-if="state.cardData.length"
