@@ -104,11 +104,12 @@ const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => 
 };
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
-    const response = await SpaceConnector.client.identity.token.issue({
+    const response = await SpaceConnector.clientV2.identity.token.issue({
         domain_id: signInRequest.domainId,
         user_id: signInRequest.userId || null, // user_id is nullable
         user_type: signInRequest.userType,
         credentials: signInRequest.credentials,
+        verify_code: signInRequest.verify_code,
     }, { skipAuthRefresh: true });
     SpaceConnector.setToken(response.access_token, response.refresh_token);
 

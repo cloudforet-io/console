@@ -4,10 +4,10 @@ import { Authenticator } from '@/services/auth/authenticator';
 
 class SpaceAuth extends Authenticator {
     // eslint-disable-next-line class-methods-use-this
-    static async signIn(userId, credentials, userType?): Promise<void> {
+    static async signIn(userId, credentials, userType?, verify_code?): Promise<void> {
         try {
             store.dispatch('user/startSignIn');
-            await super.signIn(userId, credentials, userType);
+            await super.signIn(userId, credentials, userType, verify_code);
         } finally {
             store.dispatch('user/finishSignIn');
         }

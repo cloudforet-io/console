@@ -47,6 +47,7 @@ export interface SignInRequest {
     userId?: string;
     userType: UserType;
     credentials: any;
+    verify_code?: string;
 }
 
 export interface UpdateUserRequest {

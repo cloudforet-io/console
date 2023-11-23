@@ -89,7 +89,14 @@ const signIn = async () => {
         }
     } catch (e:any) {
         if (e.message.includes('MFA')) {
-            await router.push({ name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTHENTICATION._NAME, query: { userId: state.userId } });
+            await router.push({
+                name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTHENTICATION._NAME,
+                params: {
+                    password: credentials.password,
+                    userId: state.userId?.trim() as string,
+                    userType: props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER',
+                },
+            });
         } else {
             ErrorHandler.handleError(e);
             await store.dispatch('display/showSignInErrorMessage');
