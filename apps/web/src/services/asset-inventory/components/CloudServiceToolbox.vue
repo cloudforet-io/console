@@ -12,7 +12,6 @@ import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ExportParameter, ExportOption } from '@/schema/_common/api-verbs/export';
 import { QueryType } from '@/schema/_common/api-verbs/export';
@@ -30,6 +29,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CloudServiceFilterModal from '@/services/asset-inventory/components/CloudServiceFilterModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
+import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
@@ -158,39 +158,17 @@ const getExcelQuery = (data) => {
         ]);
     return excelApiQueryHelper.data;
 };
-const FILTER_OR_KEYS = ['provider', 'cloud_service_group', 'cloud_service_type'];
 const getCloudServiceResourcesPayload = (): ExportOption => {
-    excelApiQueryHelper.setFilters(excelState.cloudServiceFilters).setMultiSortV2([
-        { key: 'provider', desc: true },
-        { key: 'cloud_service_group', desc: true },
-    ]);
-    const { filter, sort, keyword } = excelApiQueryHelper.data;
-    const filterOr: ApiFilter[] = [];
-    if (keyword) {
-        const values = keyword.split(' ');
-        FILTER_OR_KEYS.forEach((key) => {
-            filterOr.push({
-                k: key,
-                o: 'contain_in',
-                v: values,
-            });
-        });
-    }
+    const query = getCloudServiceAnalyzeQuery(excelState.cloudServiceFilters, undefined, undefined);
+    // analyze_query at export api does not support field_group
+    delete query.field_group;
+    delete query.page;
+
     return {
         name: 'Summary',
         title: 'Summary',
         query_type: QueryType.ANALYZE,
-        analyze_query: {
-            filter,
-            sort,
-            filter_or: filterOr,
-            group_by: ['provider', 'cloud_service_group', 'cloud_service_type'],
-            fields: {
-                total_count: {
-                    operator: 'count',
-                },
-            },
-        },
+        analyze_query: query,
     };
 };
 const getExcelPayloadList = async (): Promise<ExportOption[]> => {
