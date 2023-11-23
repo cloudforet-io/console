@@ -30,7 +30,6 @@
         >
             <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
                                      project-selectable
-                                     class="dropdown"
                                      @select="onSelectProject"
             />
             <div class="button-group ml-2">
