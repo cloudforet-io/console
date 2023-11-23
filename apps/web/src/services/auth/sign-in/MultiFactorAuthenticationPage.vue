@@ -10,7 +10,9 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import CollapsibleContents from '@/services/auth/components/CollapsibleContents.vue';
@@ -21,6 +23,10 @@ const route = useRoute();
 const router = useRouter();
 
 const { password, userId, userType } = route.params;
+
+const credentials = {
+    password,
+};
 
 const state = reactive({
     loading: false,
@@ -48,27 +54,25 @@ const handleClickGoBackButton = () => {
 };
 
 /* API */
-// TODO: need check after API update
 const handleClickResend = async () => {
     state.loading = true;
-
-    await postEnableMfa({
-        user_id: userId,
-        mfa_type: 'EMAIL',
-        options: {
-            email: userId,
-        },
-        domain_id: state.domainId,
-    });
-
-    state.loading = false;
+    try {
+        await loadAuth().signIn(credentials, userId, userType);
+        validationState.verificationCode = '';
+    } catch (e: any) {
+        if (e.message.includes('MFA')) {
+            await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
+        } else {
+            showErrorMessage(e.message, e);
+            ErrorHandler.handleError(e);
+        }
+    } finally {
+        state.loading = false;
+    }
 };
 const handleClickConfirmButton = async () => {
     state.confirmLoading = true;
     try {
-        const credentials = {
-            password,
-        };
         await loadAuth().signIn(credentials, userId, userType, validationState.verificationCode);
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
