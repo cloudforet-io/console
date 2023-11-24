@@ -50,8 +50,8 @@ const CONTINENT_INFO: Record<string, ContinentInfo> = {
 };
 
 export interface Data {
-    cost_sum: { date: string; value: number }[];
-    _total_cost_sum: number;
+    value_sum: { date: string; value: number }[];
+    _total_value_sum: number;
     provider: string;
     [dataField: string]: any;
 }
@@ -90,7 +90,7 @@ const getCostDataByProvider = (results: Data[], regions: RegionReferenceMap): Co
         const providerGroupBy = groupBy(cItem, 'provider');
         Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
             if (continent && continent !== 'undefined' && provider && provider !== 'undefined') {
-                const providerCost = sum(pItem.map((d) => (d as any).cost_sum));
+                const providerCost = sum(pItem.map((d) => (d as any).value_sum));
                 if (result[continent]) result[continent][provider] = providerCost;
                 else result[continent] = { [provider]: providerCost };
             }

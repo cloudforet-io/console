@@ -70,39 +70,3 @@ export const getDateAxisSettings = (dateRange: DateRange, granularity?: Granular
         max: end.valueOf(),
     };
 };
-
-
-type AppendedData<T> = T & {
-    [dataField: string]: string | any;
-};
-/**
- * @name getRefinedPieChartData
- * @description Convert raw data to XYDateChart data.
- * @example(before) [{ provider: 'aws', cost_sum: 100  }, { provider: 'google_cloud', cost_sum: 100  }]
- * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
- */
-export const getRefinedPieChartData = <T extends RawData = RawData>(
-    rawData: T[]|undefined,
-    dataField: string|undefined,
-    allReferenceTypeInfo: AllReferenceTypeInfo,
-): AppendedData<T>[] => {
-    if (!rawData || !dataField) return [];
-
-    const chartData: AppendedData<T>[] = [];
-    rawData.forEach((d) => {
-        let _name = d[dataField];
-        const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField);
-        if (_name && referenceTypeInfo) {
-            const referenceMap = referenceTypeInfo.referenceMap;
-            _name = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-        } else if (!_name) {
-            _name = 'Unknown';
-        }
-        chartData.push({
-            ...d,
-            [dataField]: _name,
-        } as AppendedData<T>);
-    });
-    return chartData;
-};
-

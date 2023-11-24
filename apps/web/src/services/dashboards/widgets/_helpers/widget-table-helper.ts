@@ -13,13 +13,13 @@ import type { Field } from '@/services/dashboards/widgets/_types/widget-data-tab
 /**
  * @name getWidgetTableDateFields
  * @description Get refined PDataTable fields.
- * @example [{ name: 'cost_sum.0.value', label: '2022-09' }, ...]
+ * @example [{ name: 'value_sum.0.value', label: '2022-09' }, ...]
  */
 export const getWidgetTableDateFields = (
     granularity: Granularity|undefined,
     dateRange: DateRange,
     textOptions: Field['textOptions'],
-    fieldsKey = 'cost_sum',
+    fieldsKey = 'value_sum',
 ): Field[] => {
     if (!granularity || !dateRange?.end) return [];
     const dateFields: Field[] = [];
@@ -54,14 +54,14 @@ interface RawData {
 }
 /**
  * @name getRefinedDateTableData
- * @description set data of empty date. This is necessary for index-oriented fields, like `cost_sum.0.value`
+ * @description set data of empty date. This is necessary for index-oriented fields, like `value_sum.0.value`
  * @example (before) [{ date: '2023-01' }]
  * @example (after) [{ date: '2022-10' }, { date: '2022-11' }, { date: '2022-12' }, { date: '2023-01' }]
  */
 export const getRefinedDateTableData = <Data extends RawData = RawData>(
     targetData: Data[],
     dateRange: DateRange,
-    fieldKey:string|string[] = 'cost_sum',
+    fieldKey:string|string[] = 'value_sum',
     dateKey = 'date',
     additionalData = {},
 ): Data[] => {

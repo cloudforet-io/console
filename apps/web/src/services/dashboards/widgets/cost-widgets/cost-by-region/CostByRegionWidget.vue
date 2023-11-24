@@ -60,7 +60,7 @@ const state = reactive({
             label: 'Region', name: COST_DATA_FIELD_MAP.REGION.name, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
-            label: 'Cost', name: 'cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
+            label: 'Cost', name: 'value_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
     legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_DATA_FIELD_MAP.PROVIDER.name, props.allReferenceTypeInfo)),
@@ -94,12 +94,12 @@ const fetchData = async (): Promise<FullData> => {
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'cost_sum', desc: true }],
+                sort: [{ key: 'value_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
