@@ -15,9 +15,9 @@ type ProjectListResponse = ListResponse<ProjectModel>;
 interface ListRequestParams {
     query?: Query;
     author_within?: boolean,
-    parent_project_group_id?: string;
-    project_id?: string;
+    parent_group_id?: string;
     project_group_id?: string;
+    project_id?: string;
 }
 interface ProjectTreeOptions {
     item_type: ProjectTreeItemType;
@@ -41,11 +41,11 @@ interface ProjectTreeSearchResponse {
 const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<Record<string, boolean>> => {
     const res = {};
 
-    const { results: allChildren }: ProjectGroupListResponse = await SpaceConnector.client.identity.projectGroup.list({
+    const { results: allChildren }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list({
         query: {
-            only: ['parent_project_group_info.project_group_id'],
+            only: ['parent_group_id'],
             filter: [{
-                k: 'parent_project_group_id',
+                k: 'parent_group_id',
                 v: groups.map((d) => d.project_group_id),
                 o: 'in',
             }],
@@ -53,8 +53,8 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
     });
 
     allChildren?.forEach((d) => {
-        if (d.parent_project_group_info?.project_group_id) {
-            res[d.parent_project_group_info.project_group_id] = true;
+        if (d.parent_group_id) {
+            res[d.parent_group_id] = true;
         }
     });
 
@@ -63,9 +63,9 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
 const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record<string, boolean>> => {
     const res = {};
 
-    const { results: allChildren }: ProjectListResponse = await SpaceConnector.client.identity.project.list({
+    const { results: allChildren }: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list({
         query: {
-            only: ['project_group_info.project_group_id'],
+            only: ['project_group_id'],
             filter: [{
                 k: 'project_group_id',
                 v: groups.map((d) => d.project_group_id),
@@ -75,7 +75,7 @@ const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record
     });
 
     allChildren?.forEach((d) => {
-        res[d.project_group_info.project_group_id] = true;
+        res[d.project_group_id] = true;
     });
 
     return res;
@@ -104,10 +104,10 @@ const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
             o: 'eq',
         }];
     } else {
-        requestParams.parent_project_group_id = params.item_id;
+        requestParams.parent_group_id = params.item_id;
     }
 
-    const { results }: ProjectGroupListResponse = await SpaceConnector.client.identity.projectGroup.list(requestParams);
+    const { results }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(requestParams);
     if (!results?.length) return [];
 
     let childMap = {};
@@ -140,7 +140,7 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
         project_group_id: params.item_id || null,
     };
 
-    const { results }: ProjectListResponse = await SpaceConnector.client.identity.project.list(reqParams);
+    const { results }: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(reqParams);
     if (!results?.length) return [];
 
     const items: ProjectTreeNodeData[] = [];
@@ -164,7 +164,7 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
 
     if (itemType === 'PROJECT') {
         reqParams.project_id = itemId;
-        const response: ProjectListResponse = await SpaceConnector.client.identity.project.list(reqParams);
+        const response: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(reqParams);
 
         if (response.total_count === 1) {
             const projectInfo = response?.results?.[0];
@@ -175,7 +175,7 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
         }
     } else {
         reqParams.project_group_id = itemId;
-        const response: ProjectGroupListResponse = await SpaceConnector.client.identity.projectGroup.list(reqParams);
+        const response: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(reqParams);
 
         if (response.total_count === 1) {
             const projectGroupInfo = response?.results?.[0];
