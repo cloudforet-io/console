@@ -44,9 +44,11 @@ import {
 
 import { PHeading } from '@spaceone/design-system';
 
-import type { RoleModel, PagePermission } from '@/schema/identity/role/model';
+import type { RoleModel } from '@/schema/identity/role/model';
 import type { RoleType, Policy } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
+
+import type { PagePermission } from '@/lib/access-control/config';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 

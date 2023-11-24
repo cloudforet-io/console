@@ -1,6 +1,8 @@
-import type { PagePermission } from '@/schema/identity/role/model';
+
 import type { RoleType } from '@/schema/identity/role/type';
 import type { AuthType, UserType } from '@/schema/identity/user/model';
+
+import type { PagePermission } from '@/lib/access-control/config';
 
 
 export type LanguageCode = 'ko' | 'en' | string;

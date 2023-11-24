@@ -1,10 +1,9 @@
 import type { Tags, TimeStamp } from '@/schema/_common/model';
 import type { RoleType, Policy } from '@/schema/identity/role/type';
 
-export interface PagePermission {
-    page: string;
-    permission: 'VIEW'|'MANAGE';
-}
+import type { PagePermission } from '@/lib/access-control/config';
+
+
 
 export interface RoleModel {
     role_id: string;

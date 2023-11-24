@@ -17,6 +17,12 @@ export const PAGE_PERMISSION_TYPE = {
 
 export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
 
+export interface PagePermission {
+    page: string;
+    permission: PagePermissionType;
+}
+
+
 export interface AccessInfo {
     referenceMenuIds: MenuId[];
 }

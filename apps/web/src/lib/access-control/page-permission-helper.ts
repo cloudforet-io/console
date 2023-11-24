@@ -1,13 +1,10 @@
 
-
-import type { PagePermission } from '@/schema/identity/role/model';
-import type { RoleType } from '@/schema/identity/role/type';
-
 import type { PageAccessType } from '@/store/modules/user/type';
 
 import type {
     PagePermissionMap,
     PagePermissionTuple, PagePermissionType,
+    PagePermission,
 } from '@/lib/access-control/config';
 import {
     ADMIN_USER_DEFAULT_PERMISSIONS,

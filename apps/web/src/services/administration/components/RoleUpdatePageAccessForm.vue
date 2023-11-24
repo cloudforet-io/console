@@ -46,9 +46,9 @@ import { PPaneLayout, PHeading } from '@spaceone/design-system';
 import { find, isEqual } from 'lodash';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { PagePermission } from '@/schema/identity/role/model';
 import type { RoleType } from '@/schema/identity/role/type';
 
+import type { PagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw,

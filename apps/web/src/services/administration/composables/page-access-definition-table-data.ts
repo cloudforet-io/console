@@ -4,10 +4,10 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
-import type { PagePermission } from '@/schema/identity/role/model';
+
 import { i18n } from '@/translations';
 
-import type { PagePermissionMap, PagePermissionType } from '@/lib/access-control/config';
+import type { PagePermissionMap, PagePermissionType, PagePermission } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw, getPermissionRequiredMenuIds,
 } from '@/lib/access-control/page-permission-helper';

@@ -2,16 +2,15 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import type { PagePermission } from '@/schema/identity/role/model';
+import type { RoleModel } from '@/schema/identity/role/model';
 
-import type { RoleData } from '@/services/administration/iam/role/type';
-
+import type { PagePermission } from '@/lib/access-control/config';
 
 export interface ProjectMemberItem {
     resource_id: string;
     project_info?: ProjectModel;
     project_group_info?: ProjectGroupModel;
-    role_info?: RoleData;
+    role_info?: RoleModel;
     labels?: string[];
 }
 
