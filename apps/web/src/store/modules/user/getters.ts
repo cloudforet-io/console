@@ -66,7 +66,7 @@ export const hasSystemRole = (state: UserState): boolean => {
 
 // CAUTION: you must recover this after new role rebuild
 // export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
-export const hasPermission = (state: UserState): boolean => true;
+export const hasPermission = (): boolean => true;
 
 export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
     if (getters.isDomainOwner) {

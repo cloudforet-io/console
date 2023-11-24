@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import type VueRouter from 'vue-router';
 import type { Getter } from 'vuex';
 
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
