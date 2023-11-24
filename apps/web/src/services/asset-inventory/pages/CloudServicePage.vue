@@ -13,6 +13,7 @@
         <cloud-service-toolbox :has-next-page="hasNextPage"
                                :handlers="handlerState"
                                :period="cloudServicePageState.period"
+                               :page-size="pageLimit"
                                @update-pagination="handlePaginationUpdate"
         />
 
@@ -228,6 +229,7 @@ export default {
         /* event */
         // cloud service toolbox events
         const handlePaginationUpdate = (options: ToolboxOptions) => {
+            console.debug('options', options);
             if (options.pageLimit !== undefined) {
                 state.pageLimit = options.pageLimit;
             }
