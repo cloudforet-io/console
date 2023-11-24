@@ -14,3 +14,20 @@ export interface RoleModel {
     role_type: RoleType;
     tags?: Tags; // [ description: string ]
 }
+
+export interface PagePermission {
+    pages: string[];
+    permission: 'VIEW'|'MANAGE';
+}
+
+export interface RoleModel2 {
+    role_id: string;
+    name: string;
+    role_type: RoleType;
+    policies: Policy[];
+    page_permissions: PagePermission[];
+    tags?: Tags;
+    is_managed: boolean;
+    domain_id: string;
+    created_at: TimeStamp;
+}

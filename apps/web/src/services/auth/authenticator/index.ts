@@ -1,18 +1,17 @@
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { SpaceRouter } from '@/router';
+import type { AuthType } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
-type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 
 abstract class Authenticator {
-    static async signIn(credentials: Record<string, any>, userId?: string, userType?: UserType): Promise<void> {
+    static async signIn(credentials: Record<string, any>, authType: AuthType): Promise<void> {
         await store.dispatch('user/signIn', {
             domainId: store.state.domain.domainId,
             credentials,
-            userType: userType || 'USER',
-            userId,
+            authType,
         });
         await Promise.allSettled([
             // INIT REFERENCE STORE
