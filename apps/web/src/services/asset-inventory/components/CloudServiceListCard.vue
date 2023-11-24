@@ -105,15 +105,16 @@ export default defineComponent<Props>({
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            cloudServiceTypeNameToItemMap: computed(() => {
+            cloudServiceTypeToItemMap: computed(() => {
                 const res: Record<string, CloudServiceTypeReferenceItem> = {};
                 Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
-                    res[item.name] = item;
+                    res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
                 });
                 return res;
             }),
             slicedResources: computed<CloudServiceAnalyzeResultResource[]>(() => {
                 const resources = props.item?.resources ?? [];
+                resources.sort((a, b) => a.cloud_service_type?.localeCompare(b.cloud_service_type ?? '') ?? 0);
                 return resources.slice(0, 2);
             }),
         });
@@ -156,13 +157,16 @@ export default defineComponent<Props>({
         });
 
         const getImageUrl = (item: CloudServiceAnalyzeResult) => {
-            const cloudServiceTypeName = item.resources?.[0]?.cloud_service_type;
-            if (cloudServiceTypeName) {
-                const icon = state.cloudServiceTypeNameToItemMap[cloudServiceTypeName]?.icon;
+            const cloudServiceType = item.resources?.[0]?.cloud_service_type;
+            const provider = item.provider;
+            const group = item.cloud_service_group;
+
+            if (cloudServiceType && provider && group) {
+                const key = `${provider}:${group}:${cloudServiceType}`;
+                const icon = state.cloudServiceTypeToItemMap[key]?.icon;
                 if (icon) return assetUrlConverter(icon);
             }
 
-            const provider = item.provider;
             if (provider) {
                 const icon = state.providers[provider]?.icon;
                 if (icon) return assetUrlConverter(icon);
