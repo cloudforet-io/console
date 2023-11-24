@@ -128,11 +128,11 @@ const getUpdatedDashboardVariableSchemaProperties = (
     const afterVariables = Object.keys(after?.properties ?? {});
     const beforeVariables = Object.keys(before?.properties ?? {});
     union(afterVariables, beforeVariables).forEach((variable) => {
-        if (!after?.properties[variable].use && !before?.properties[variable].use) return;
-        if (after?.properties[variable].use && before?.properties[variable].use) {
-            if (isEqual(after?.properties[variable], before?.properties[variable])) return; /* Not changed variable */
+        if (!after?.properties?.[variable]?.use && !before?.properties?.[variable]?.use) return;
+        if (after?.properties?.[variable]?.use && before?.properties?.[variable]?.use) {
+            if (isEqual(after.properties[variable], before.properties[variable])) return; /* Not changed variable */
             changed.push(variable as WidgetFilterOptionKey);
-        } else if (after?.properties[variable].use && !before?.properties[variable].use) {
+        } else if (after?.properties?.[variable]?.use && !before?.properties?.[variable]?.use) {
             added.push(variable as WidgetFilterOptionKey);
         } else {
             deleted.push(variable as WidgetFilterOptionKey);
