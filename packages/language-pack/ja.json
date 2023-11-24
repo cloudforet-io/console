@@ -974,8 +974,24 @@
 			"INFO": "Info"
 		},
 		"MFA_MODAL": {
+			"ALT": {
+				"DESC": "",
+				"DISABLED": "",
+				"TITLE": "",
+				"VERIFIED": "認証済みです"
+			},
+			"CHANGE": {
+				"CANCEL": "キャンセル",
+				"CONFIRM_BTN": "",
+				"DESC": "",
+				"TITLE": "",
+				"TOOLTIP": ""
+			},
 			"COLLAPSE_DESC": "迷惑メールボックスを含めてご確認下さい。それでもメールが届かない場合は、",
 			"COLLAPSE_TITLE": "認証コードが届きませんか？",
+			"EDIT": {
+				"TITLE": ""
+			},
 			"EMAIL": "メールアドレス",
 			"INVALID_CODE": "無効なコードです。もう一度メールを確認してください。",
 			"SEND_CODE": "認証コードを送信",

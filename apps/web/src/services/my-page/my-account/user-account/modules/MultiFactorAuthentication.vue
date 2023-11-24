@@ -187,7 +187,7 @@ watch(() => state.mfa, (mfa) => {
                                                  :email="email"
                                                  :verified="state.isVerified"
                                                  :mfa-type="state.selectedItem"
-                                                 :visible="state.isModalVisible"
+                                                 :visible.sync="state.isModalVisible"
                                                  @refresh="initState"
         />
     </div>
