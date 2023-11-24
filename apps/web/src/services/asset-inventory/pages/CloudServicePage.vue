@@ -10,8 +10,9 @@
             </template>
         </p-heading>
         <p-divider class="cloud-service-divider" />
-        <cloud-service-toolbox :total-count="totalCount"
+        <cloud-service-toolbox :has-next-page="hasNextPage"
                                :handlers="handlerState"
+                               :period="cloudServicePageState.period"
                                @update-pagination="handlePaginationUpdate"
         />
 
@@ -22,7 +23,7 @@
         >
             <div class="cloud-service-type-wrapper">
                 <cloud-service-list-card v-for="(item, idx) in items"
-                                         :key="`${item.provider}-${item.cloud_service_group}-${idx}`"
+                                         :key="`${item.provider || ''}-${item.cloud_service_group || ''}-${idx}`"
                                          :item="item"
                 />
             </div>
@@ -72,7 +73,6 @@ import {
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@spaceone/design-system';
-import dayjs from 'dayjs';
 import { isEmpty } from 'lodash';
 
 import {
@@ -80,13 +80,11 @@ import {
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
-import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -114,8 +112,10 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 import CloudServiceListCard
     from '@/services/asset-inventory/components/CloudServiceListCard.vue';
 import CloudServiceToolbox from '@/services/asset-inventory/components/CloudServiceToolbox.vue';
+import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
+import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type {
     CloudServiceCategory, CloudServicePageUrlQuery,
     CloudServicePageUrlQueryValue,
@@ -123,6 +123,10 @@ import type {
 import type { Period } from '@/services/asset-inventory/types/type';
 
 
+interface Response {
+    results: CloudServiceAnalyzeResult[];
+    more: boolean;
+}
 export default {
     name: 'CloudServicePage',
     components: {
@@ -180,8 +184,10 @@ export default {
             }),
             // list
             loading: true,
-            items: undefined as any,
-            totalCount: 0,
+            items: undefined as CloudServiceAnalyzeResult[]|undefined,
+            hasNextPage: false,
+            pageStart: 1,
+            pageLimit: 24,
             // url query
             urlQueryString: computed<CloudServicePageUrlQuery>(() => ({
                 provider: cloudServicePageState.selectedProvider === 'all' ? null : primitiveToQueryString(cloudServicePageState.selectedProvider),
@@ -193,33 +199,27 @@ export default {
         });
 
         /* api */
-        const cloudServiceApiQueryHelper = new ApiQueryHelper()
-            .setPageStart(1).setPageLimit(24)
-            .setSort('count', true);
-        const fetcher = getCancellableFetcher(SpaceConnector.client.inventory.cloudServiceType.analyze);
+        const fetcher = getCancellableFetcher<Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+
         const listCloudServiceType = async () => {
             try {
                 state.loading = true;
-                cloudServiceApiQueryHelper.setFilters(cloudServicePageStore.allFilters)
-                    .setMultiSort([{ key: 'is_primary', desc: true }, { key: 'name', desc: false }]);
+
                 const { status, response } = await fetcher({
-                    labels: cloudServicePageStore.selectedCategories,
-                    ...cloudServiceApiQueryHelper.data,
-                    ...(cloudServicePageState.period && {
-                        date_range: {
-                            start: dayjs.utc(cloudServicePageState.period.start).format('YYYY-MM-DD'),
-                            end: dayjs.utc(cloudServicePageState.period.end).add(1, 'day').format('YYYY-MM-DD'),
-                        },
-                    }),
+                    query: getCloudServiceAnalyzeQuery(
+                        cloudServicePageStore.allFilters,
+                        { start: state.pageStart, limit: state.pageLimit },
+                        cloudServicePageState.period,
+                    ),
                 });
                 if (status === 'succeed') {
                     state.items = response.results;
-                    state.totalCount = response.total_count || 0;
+                    state.hasNextPage = response.more ?? false;
                     state.loading = false;
                 }
             } catch (e) {
                 state.items = [];
-                state.totalCount = 0;
+                state.hasNextPage = false;
                 state.loading = false;
                 ErrorHandler.handleError(e);
             }
@@ -228,7 +228,12 @@ export default {
         /* event */
         // cloud service toolbox events
         const handlePaginationUpdate = (options: ToolboxOptions) => {
-            setApiQueryWithToolboxOptions(cloudServiceApiQueryHelper, options, { queryTags: true });
+            if (options.pageLimit !== undefined) {
+                state.pageLimit = options.pageLimit;
+            }
+            if (options.pageStart !== undefined) {
+                state.pageStart = options.pageStart;
+            }
             listCloudServiceType();
         };
 

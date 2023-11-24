@@ -39,10 +39,9 @@ export const currencyMoneyFormatter = (
             maximumFractionDigits: _digit,
             minimumFractionDigits: _digit,
             style: 'currency',
-            currency: options?.currency ?? CURRENCY.USD,
             ...options,
+            currency: options?.currency ?? CURRENCY.USD,
         };
-
         return Intl.NumberFormat(currencyToLocaleMap[_currency], _options).format(_value);
     }
     return value;

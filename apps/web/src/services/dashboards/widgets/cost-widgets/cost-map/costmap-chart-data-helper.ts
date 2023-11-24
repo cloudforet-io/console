@@ -32,8 +32,8 @@ const convertValueToLabel = (value?: string, referenceMap?: ReferenceMap) => {
 };
 
 export type AnalyzeRawData = {
-    cost_sum: number; // valueField
-    _total_cost_sum: number;
+    value_sum: number; // valueField
+    _total_value_sum: number;
 } & Partial<Record<CostDataField, string>>;
 
 interface TreemapChartChild extends AnalyzeRawData {

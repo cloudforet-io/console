@@ -13,6 +13,7 @@
                 <slot>
                     <span class="this-page">{{ thisPage }}</span>
                     <span v-if="allPage"> / {{ allPage }}</span>
+                    <span v-else-if="hasNextPage"> / ...</span>
                 </slot>
             </div>
         </div>
@@ -20,32 +21,39 @@
         <p-icon-button class="text"
                        name="ic_chevron-right"
                        color="inherit transparent"
-                       :disabled="thisPage === allPage || disableNextPage"
+                       :disabled="thisPage === allPage || !hasNextPage || disableNextPage"
                        @click="update(thisPage + 1)"
         />
     </nav>
 </template>
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { watch } from 'vue';
+import { defineComponent, watch } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
-export default {
+interface Props {
+    thisPage?: number;
+    allPage?: number;
+    showPageNumber?: boolean;
+    disableNextPage?: boolean;
+    hasNextPage?: boolean;
+}
+export default defineComponent<Props>({
     name: 'PTextPagination',
     components: { PIconButton },
     props: {
         thisPage: {
             type: Number,
             validator(value) {
-                return value > 0;
+                return typeof value === 'number' ? value > 0 : false;
             },
             default: undefined,
         },
         allPage: {
             type: Number,
             validator(value) {
-                return value > 0;
+                return typeof value === 'number' ? value > 0 : false;
             },
             default: undefined,
         },
@@ -57,6 +65,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        hasNextPage: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }: SetupContext) {
         const update = (page: number) => {
@@ -64,6 +76,7 @@ export default {
             emit('pageChange', page);
         };
         watch([() => props.allPage, () => props.thisPage], ([allPage, thisPage]) => {
+            if (typeof thisPage !== 'number' || typeof allPage !== 'number') return;
             if (thisPage > allPage) {
                 update(allPage);
             }
@@ -73,7 +86,7 @@ export default {
             update,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>

@@ -13,8 +13,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter, ExportOption } from '@/schema/_common/api-verbs/export';
+import { QueryType } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -29,23 +29,25 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CloudServiceFilterModal from '@/services/asset-inventory/components/CloudServiceFilterModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
+import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-
-
+import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
 
 interface Props {
-    totalCount: number;
+    hasNextPage: boolean;
     handlers: Handlers;
     queryTags?: QueryTag[];
+    period?: Period;
 }
 
 
 const props = withDefaults(defineProps<Props>(), {
-    totalCount: 0,
+    hasNextPage: false,
     handlers: () => ({}),
     queryTags: () => [],
+    period: undefined,
 });
 
 const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): void;
@@ -160,24 +162,17 @@ const getExcelQuery = (data) => {
     return excelApiQueryHelper.data;
 };
 const getCloudServiceResourcesPayload = (): ExportOption => {
-    excelApiQueryHelper.setFilters(excelState.cloudServiceFilters).setMultiSortV2([
-        { key: 'provider', desc: true },
-        { key: 'cloud_service_group', desc: true },
-    ]);
-    return ({
+    const query = getCloudServiceAnalyzeQuery(excelState.cloudServiceFilters, undefined, props.period);
+    // analyze_query at export api does not support field_group
+    delete query.field_group;
+    delete query.page;
+
+    return {
         name: 'Summary',
         title: 'Summary',
         query_type: QueryType.ANALYZE,
-        analyze_query: {
-            ...excelApiQueryHelper.data,
-            group_by: ['provider', 'cloud_service_group', 'cloud_service_type'],
-            fields: {
-                total_count: {
-                    operator: 'count',
-                },
-            },
-        },
-    });
+        analyze_query: query,
+    };
 };
 const getExcelPayloadList = async (): Promise<ExportOption[]> => {
     const excelPayloadList: ExportOption[] = [];
@@ -230,7 +225,7 @@ const handleClickSet = () => {
 const handleExport = () => {
     const excelExportFetcher = async () => {
         const excelPayloadList = await getExcelPayloadList();
-        const cloudServiceExcelExportParams:ExportParameter = {
+        const cloudServiceExcelExportParams: ExportParameter = {
             file_name: 'cloud_service_export',
             options: [
                 getCloudServiceResourcesPayload(),
@@ -270,14 +265,11 @@ const handleExport = () => {
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}
                 </p-button>
             </div>
-            <div class="total-result-wrapper">
-                <span class="total-result">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.TOTAL_RESULT') }}</span><span class="total-result-value">{{ props.totalCount }}</span>
-            </div>
         </div>
         <p-toolbox filters-visible
                    exportable
                    search-type="query"
-                   :total-count="props.totalCount"
+                   :has-next-page="props.hasNextPage"
                    :query-tags="state.queryTags"
                    :key-item-sets="state.keyItemSets"
                    :value-handler-map="props.handlers?.valueHandlerMap ?? {}"
@@ -316,18 +308,6 @@ const handleExport = () => {
     .filters-count {
         margin-right: 0.5rem;
         font-size: 0.875rem;
-    }
-}
-.total-result-wrapper {
-    @apply text-sm flex flex-wrap gap-2;
-    flex-shrink: 0;
-    line-height: 1.09375rem;
-    min-width: 5.875rem;
-    .total-result {
-        @apply text-gray-600;
-    }
-    .total-result-value {
-        @apply text-gray-800;
     }
 }
 </style>

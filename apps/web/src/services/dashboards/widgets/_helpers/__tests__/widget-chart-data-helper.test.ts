@@ -16,13 +16,13 @@ const getMockSubData = (length = 10, year = 2023): SubData[] => {
     });
 };
 interface MockData {
-    cost_sum: { date: string; value: number }[];
+    value_sum: { date: string; value: number }[];
     usage_sum: { date: string; value: number }[];
     provider: string;
 }
 const providerList = ['aws', 'azure', 'gcp'];
 const getMockData = (parentLength = 3, arrayLength = 10): MockData[] => range(parentLength).map((i) => ({
-    cost_sum: getMockSubData(arrayLength),
+    value_sum: getMockSubData(arrayLength),
     usage_sum: getMockSubData(arrayLength),
     provider: providerList[i],
 }));
@@ -38,30 +38,30 @@ describe('[WidgetChartDataHelper] getRefinedXYChartData', () => {
         it('should return array data by arrayDataKey which is clustered by categoryKey', () => {
             const data: MockData[] = getMockData(3, 10);
             const result = getRefinedXYChartData<MockData, ChartData>(data, {
-                arrayDataKey: 'cost_sum',
+                arrayDataKey: 'value_sum',
                 categoryKey: 'date',
                 valueKey: 'value',
             });
             expect(result.length).toBe(10);
-            expect(result.map((r) => r.date)).toEqual(data[0].cost_sum.map((d) => d.date));
+            expect(result.map((r) => r.date)).toEqual(data[0].value_sum.map((d) => d.date));
         });
         it('should return array data including all values of categoryKey from each array data', () => {
             const data = [
-                { cost_sum: getMockSubData(10, 2022) },
-                { cost_sum: getMockSubData(10, 2023) },
+                { value_sum: getMockSubData(10, 2022) },
+                { value_sum: getMockSubData(10, 2023) },
             ];
             const result = getRefinedXYChartData(data, {
-                arrayDataKey: 'cost_sum',
+                arrayDataKey: 'value_sum',
                 categoryKey: 'date',
                 valueKey: 'value',
             });
             expect(result.length).toBe(20);
-            expect(result.map((r) => r.date)).toEqual([...data[0].cost_sum.map((d) => d.date), ...data[1].cost_sum.map((d) => d.date)]);
+            expect(result.map((r) => r.date)).toEqual([...data[0].value_sum.map((d) => d.date), ...data[1].value_sum.map((d) => d.date)]);
         });
         it('should return array that have unique value for categoryKey', () => {
             const data: MockData[] = getMockData(3, 10);
             const result = getRefinedXYChartData(data, {
-                arrayDataKey: 'cost_sum',
+                arrayDataKey: 'value_sum',
                 categoryKey: 'date',
                 valueKey: 'value',
             });
@@ -71,21 +71,21 @@ describe('[WidgetChartDataHelper] getRefinedXYChartData', () => {
         it('should not merge value(with valueKey) from each array data but just overwrite it if there is a duplicated categoryKey', () => {
             const data: MockData[] = getMockData(3, 10);
             const result = getRefinedXYChartData(data, {
-                arrayDataKey: 'cost_sum',
+                arrayDataKey: 'value_sum',
                 categoryKey: 'date',
                 valueKey: 'value',
             });
-            expect(result[0].value).toBe(data[2].cost_sum[0].value);
+            expect(result[0].value).toBe(data[2].value_sum[0].value);
         });
         // sort
         it('should sort by categoryKey', () => {
             const costSum = getMockSubData(10);
             costSum.reverse();
             const data = [
-                { cost_sum: costSum },
+                { value_sum: costSum },
             ];
             const result = getRefinedXYChartData(data, {
-                arrayDataKey: 'cost_sum',
+                arrayDataKey: 'value_sum',
                 categoryKey: 'date',
                 valueKey: 'value',
             });
@@ -96,12 +96,12 @@ describe('[WidgetChartDataHelper] getRefinedXYChartData', () => {
         it('should return array data by all arrayDataKeys(array) which is clustered by categoryKey', () => {
             const data: MockData[] = getMockData(1, 10);
             const result = getRefinedXYChartData(data, {
-                arrayDataKey: ['cost_sum', 'usage_sum'],
+                arrayDataKey: ['value_sum', 'usage_sum'],
                 categoryKey: 'date',
                 valueKey: 'value',
             });
             expect(result.length).toBe(10);
-            expect(result.map((r) => r.date)).toEqual(data[0].cost_sum.map((d) => d.date));
+            expect(result.map((r) => r.date)).toEqual(data[0].value_sum.map((d) => d.date));
             expect(result.map((r) => r.value)).toEqual(data[0].usage_sum.sort((a, b) => a.date.localeCompare(b.date)).map((d) => d.value));
         });
     });

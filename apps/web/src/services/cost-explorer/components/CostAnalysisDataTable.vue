@@ -35,20 +35,20 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import CostAnalysisDataTableDataTypeDropdown from '@/services/cost-explorer/components/CostAnalysisDataTableDataTypeDropdown.vue';
-import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     GRANULARITY,
     GROUP_BY,
     GROUP_BY_ITEM_MAP,
     ADDITIONAL_GROUP_BY,
     ADDITIONAL_GROUP_BY_ITEM_MAP,
-    USAGE_TYPE_ADDITIONAL_FILTER_MAP,
 } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import {
     getDataTableCostFields, getTimeUnitByGranularity,
 } from '@/services/cost-explorer/helpers/cost-analysis-data-table-helper';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
-import type { CostAnalyzeResponse, Granularity, Period } from '@/services/cost-explorer/types/cost-explorer-query-type';
+import type {
+    CostAnalyzeResponse, Granularity, Period, DisplayDataType,
+} from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
 type CostAnalyzeRawData = {
@@ -94,7 +94,7 @@ const state = reactive({
         const groupBy = state.isIncludedUsageTypeInGroupBy ? [...costAnalysisPageState.groupBy, 'usage_unit'] : costAnalysisPageState.groupBy;
         const fields = {
             value_sum: {
-                key: state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage ? 'usage_quantity' : 'cost',
+                key: state.selectedDisplayDataType === 'usage' ? 'usage_quantity' : 'cost',
                 operator: 'sum',
             },
         };
@@ -112,14 +112,14 @@ const state = reactive({
         { type: 'item', name: 'cost', label: 'Cost' },
         { type: 'item', name: 'usage', label: 'Usage' },
     ],
-    usageTypeAdditionalFilterSelected: USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost as UsageTypeAdditionalFilter,
+    selectedDisplayDataType: 'cost' as DisplayDataType,
 });
 const tableState = reactive({
     loading: true,
     excelFields: computed<ExcelDataField[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (state.isIncludedUsageTypeInGroupBy && state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage) {
+        if (state.isIncludedUsageTypeInGroupBy && state.selectedDisplayDataType === 'usage') {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -156,7 +156,7 @@ const tableState = reactive({
     fields: computed<DataTableFieldType[]>(() => {
         const fields: DataTableFieldType[] = [];
         if (costAnalysisPageState.groupBy.length) fields.push(...tableState.groupByFields);
-        if (state.isIncludedUsageTypeInGroupBy && state.usageTypeAdditionalFilterSelected === USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage) {
+        if (state.isIncludedUsageTypeInGroupBy && state.selectedDisplayDataType === 'usage') {
             fields.push({
                 name: 'usage_unit',
                 label: 'Usage Unit',
@@ -190,13 +190,16 @@ const getLink = (item: CostAnalyzeRawData, fieldName: string) => {
     }
 
     const dateIndex = Number(fieldName.split('.')[1]);
-    const date = item.cost_sum?.[dateIndex].date;
-    const _period = { start: date, end: date };
-    if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
-        _period.start = dayjs.utc(date).format('YYYY-MM-01');
-        _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
+    const date = item.value_sum?.[dateIndex].date;
+    if (date) {
+        const _period = { start: date, end: date };
+        if (costAnalysisPageState.granularity === GRANULARITY.MONTHLY) {
+            _period.start = dayjs.utc(date).format('YYYY-MM-01');
+            _period.end = dayjs.utc(date).endOf('month').format('YYYY-MM-DD');
+        }
+        query.period = objectToQueryString(_period);
     }
-    query.period = objectToQueryString(_period);
+
 
     const filters: ConsoleFilter[] = [];
     if (typeof item.project_id === 'string') {
@@ -370,7 +373,7 @@ watch(
         () => costAnalysisPageState,
         () => costAnalysisPageStore.selectedDataSourceId,
         () => costAnalysisPageStore.selectedQueryId,
-        () => state.usageTypeAdditionalFilterSelected,
+        () => state.selectedDisplayDataType,
     ],
     async ([, selectedDataSourceId]) => {
         if (!selectedDataSourceId) return;
@@ -385,8 +388,8 @@ watch(
     { immediate: true, deep: true },
 );
 
-const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditionalFilter) => {
-    state.usageTypeAdditionalFilterSelected = selected;
+const handleUpdateselectedDisplayDataType = (selected: DisplayDataType) => {
+    state.selectedDisplayDataType = selected;
 };
 
 // LOAD REFERENCE STORE
@@ -417,18 +420,13 @@ const handleUpdateUsageTypeAdditionalFilterSelected = (selected: UsageTypeAdditi
         >
             <template #pagination-area>
                 <p-text-pagination :this-page.sync="tableState.thisPage"
-                                   :disable-next-page="!tableState.more || tableState.loading"
+                                   :disable-next-page="tableState.loading"
+                                   :has-next-page="tableState.more"
                                    @update:thisPage="handleUpdateThisPage"
-                >
-                    <template #default>
-                        <span class="this-page">{{ tableState.thisPage }}</span>
-                        <span v-if="tableState.more"> / ...</span>
-                    </template>
-                </p-text-pagination>
+                />
             </template>
             <template #toolbox-left>
-                <!--TODO: More features will be added to the dropdown below, and component separation may be required accordingly.-->
-                <cost-analysis-data-table-data-type-dropdown @update-filter="handleUpdateUsageTypeAdditionalFilterSelected" />
+                <cost-analysis-data-table-data-type-dropdown @update-display-data-type="handleUpdateselectedDisplayDataType" />
                 <div class="toggle-wrapper">
                     <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
                     <p-collapsible-toggle :toggle-type="'switch'"

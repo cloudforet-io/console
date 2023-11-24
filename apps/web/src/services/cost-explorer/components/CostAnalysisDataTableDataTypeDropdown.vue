@@ -2,24 +2,27 @@
 import { reactive } from 'vue';
 
 import { PSelectDropdown } from '@spaceone/design-system';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import type { UsageTypeAdditionalFilter } from '@/services/cost-explorer/constants/cost-explorer-constant';
-import { USAGE_TYPE_ADDITIONAL_FILTER_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import type { DisplayDataType } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
-const emit = defineEmits<{(e: 'update-filter', selected: UsageTypeAdditionalFilter): void; }>();
+const emit = defineEmits<{(e: 'update-display-data-type', selected: DisplayDataType): void; }>();
 
-// TODO: This component should be refactored with scalability
+
+interface MenuItem extends SelectDropdownMenuItem {
+    name: DisplayDataType;
+}
 const state = reactive({
     headerMenuItems: [
-        { type: 'item', name: USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost, label: 'Cost' },
-        { type: 'item', name: USAGE_TYPE_ADDITIONAL_FILTER_MAP.usage, label: 'Usage' },
-    ],
-    selected: USAGE_TYPE_ADDITIONAL_FILTER_MAP.cost as UsageTypeAdditionalFilter,
+        { type: 'item', name: 'cost', label: 'Cost' },
+        { type: 'item', name: 'usage', label: 'Usage' },
+    ] as MenuItem[],
+    selected: 'cost' as DisplayDataType,
 });
 
-const handleUpdateSelected = (selected: UsageTypeAdditionalFilter) => {
+const handleUpdateSelected = (selected: DisplayDataType) => {
     state.selected = selected;
-    emit('update-filter', selected);
+    emit('update-display-data-type', selected);
 };
 
 </script>

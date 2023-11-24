@@ -102,7 +102,7 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ERROR_ROUTE } from '@/router/error-routes';
+import { ERROR_ROUTE } from '@/router/constant';
 
 import type { UserState } from '@/store/modules/user/type';
 
