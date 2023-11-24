@@ -95,16 +95,20 @@ const state = reactive({
     groupMemberCount: undefined as number|undefined,
     groupMemberPageVisible: false,
     isPermissionDenied: computed(() => state.groupMemberCount === undefined),
-    createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => [
-        {
-            name: 'project',
-            label: i18n.t('PROJECT.LANDING.PROJECT'),
-        },
-        {
+    createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => {
+        const result: {name: string; label: string}[] = [];
+        if (storeState.groupId) {
+            result.push({
+                name: 'project',
+                label: i18n.t('PROJECT.LANDING.PROJECT') as string,
+            });
+        }
+        result.push({
             name: 'projectGroup',
-            label: i18n.t('PROJECT.LANDING.PROJECT_GROUP'),
-        },
-    ]),
+            label: i18n.t('PROJECT.LANDING.PROJECT_GROUP') as string,
+        });
+        return result;
+    }),
 });
 
 const {
@@ -151,7 +155,7 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     }
 };
 const openProjectGroupCreateForm = () => {
-    projectPageStore.openProjectGroupCreateForm();
+    projectPageStore.openProjectGroupCreateForm(storeState.selectedItem);
 };
 
 /* Member Count */
