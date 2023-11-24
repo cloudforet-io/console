@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import type VueRouter from 'vue-router';
 import type { Getter } from 'vuex';
 
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
@@ -93,9 +94,10 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
-    let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(MENU_LIST);
-    _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
-    _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+    const _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(MENU_LIST);
+    // CAUTION: you must recover this after new role rebuild
+    // _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
+    // _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;
 };
 
