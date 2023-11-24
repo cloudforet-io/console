@@ -146,7 +146,11 @@ const initSelected = async (value: any) => {
     const selectedValues = flattenDeep([value ?? []]);
     const items = await loadOptionItems(selectedValues);
     const selectedItems = items.filter((item) => selectedValues.includes(item.name));
-    state.selected = selectedItems;
+    if (selectedItems.length) {
+        state.selected = selectedItems;
+    } else {
+        await initVariableAndSelected();
+    }
 };
 
 watch(visibleMenu, (_visibleMenu) => {
@@ -191,7 +195,8 @@ const {
     >
         <button ref="targetRef"
                 class="dropdown-box"
-                :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length }"
+                :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length,
+                          invalid: dashboardDetailStore.isAllVariablesInitialized && state.variableProperty?.required && !state.selected.length }"
                 :disabled="state.variableProperty?.readonly || props.disabled"
                 @click="toggleMenu"
         >
@@ -262,6 +267,10 @@ const {
         border-radius: 0.75rem;
         height: 2rem;
         padding: 0 0.25rem 0 0.75rem;
+
+        &.invalid {
+            @apply border-alert;
+        }
 
         &[disabled=disabled] {
             @apply bg-gray-100;

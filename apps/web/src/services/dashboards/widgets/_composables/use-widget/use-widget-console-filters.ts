@@ -30,11 +30,15 @@ export const useWidgetConsoleFilters = (props: WidgetProps, widgetState: UnwrapR
             const cloudServiceQuerySetId = widgetState.options.cloud_service_query_set;
             if (cloudServiceQuerySetId) {
                 const cloudServiceQuerySet = props.allReferenceTypeInfo.cloudServiceQuerySet.referenceMap[cloudServiceQuerySetId];
-                queryHelper.setFilters([
-                    { k: 'provider', v: cloudServiceQuerySet.data?.provider, o: '=' },
-                    { k: 'cloud_service_group', v: cloudServiceQuerySet.data?.cloud_service_group, o: '=' },
-                    { k: 'cloud_service_type', v: cloudServiceQuerySet.data?.cloud_service_type, o: '=' },
-                ]);
+                if (cloudServiceQuerySet) {
+                    queryHelper.setFilters([
+                        { k: 'provider', v: cloudServiceQuerySet.data?.provider, o: '=' },
+                        { k: 'cloud_service_group', v: cloudServiceQuerySet.data?.cloud_service_group, o: '=' },
+                        { k: 'cloud_service_type', v: cloudServiceQuerySet.data?.cloud_service_type, o: '=' },
+                    ]);
+                } else {
+                    queryHelper.setFilters([]);
+                }
             }
             return [
                 ...flattenDeep(Object.values(widgetState.options.filters ?? {})),

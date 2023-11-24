@@ -30,6 +30,7 @@ export const useWidgetLocation = (props: WidgetProps, baseState: UnwrapRef<BaseW
             const cloudServiceQuerySetId = baseState.options.cloud_service_query_set;
             if (!cloudServiceQuerySetId) return undefined;
             const cloudServiceQuerySet = props.allReferenceTypeInfo.cloudServiceQuerySet.referenceMap[cloudServiceQuerySetId];
+            if (!cloudServiceQuerySet) return undefined;
             const consoleFilters = flattenDeep(Object.values(baseState.options.filters ?? {}));
             return {
                 name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
