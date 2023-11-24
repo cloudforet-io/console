@@ -20,6 +20,7 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type {
     ProjectTreeNodeData,
@@ -64,6 +65,7 @@ const state = reactive({
     allProjectRoot: null as any,
     allProjectNode: computed(() => ([i18n.t('PROJECT.LANDING.ALL_PROJECTS')])),
 });
+const projectTreeHelper = useProjectTree();
 
 const toggleOptions = {
     validator: (node) => node.data.has_child || node.children.length > 0,
@@ -126,7 +128,7 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
             params.exclude_type = 'PROJECT';
         }
 
-        const { items } = await SpaceConnector.client.identity.project.tree(params);
+        const items = await projectTreeHelper.getProjectTree(params);
 
         if (!node.data) {
             projectPageStore.hasProjectGroup = Array.isArray(items) ? !!items.length : false;

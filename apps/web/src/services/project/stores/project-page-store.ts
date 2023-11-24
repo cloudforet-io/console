@@ -13,9 +13,11 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import type {
     ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectGroupTreeItem, ProjectTreeRoot,
 } from '@/services/project/types/project-tree-type';
+
 
 interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
 interface ProjectInfo {
@@ -71,6 +73,7 @@ interface ProjectPageAction {
     getPermissionInfo: (ids:string[]) => Promise<Record<string, boolean>>;
 }
 
+const projectTreeHelper = useProjectTree();
 export const useProjectPageStore = defineStore<string, ProjectPageState, ProjectStoreGetters, ProjectPageAction>('project-page', {
     state: () => ({
         isInitiated: false,
@@ -129,7 +132,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             }
 
             try {
-                const res = await SpaceConnector.client.identity.project.tree.search({
+                const res = await projectTreeHelper.getProjectTreeSearchPath({
                     item_id: groupId,
                     item_type: 'PROJECT_GROUP',
                 });
