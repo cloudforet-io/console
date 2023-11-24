@@ -21,7 +21,7 @@ export const load: Action<UserReferenceState, any> = async ({ state, commit }, o
     lastLoadedTime = currentTime;
 
     try {
-        const response = await SpaceConnector.client.identity.user.list({
+        const response = await SpaceConnector.clientV2.identity.user.list({
             query: {
                 only: ['user_id', 'name'],
             },
