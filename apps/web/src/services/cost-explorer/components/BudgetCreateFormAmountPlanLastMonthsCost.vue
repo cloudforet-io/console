@@ -41,7 +41,7 @@ interface BudgetListParams {
         granularity: Granularity;
         sort: { key: string; desc: boolean }[];
         fields: {
-            cost_sum: {
+            value_sum: {
                 key: string;
                 operator: string;
             };
@@ -77,7 +77,7 @@ const state = reactive({
         const data = state.last3MonthsBudgets[i];
         return {
             month: data ? i18nDayjs.value.utc(data.date).format('MMMM YYYY') : month,
-            cost: data ? data.cost_sum : 0,
+            cost: data ? data.value_sum : 0,
         };
     })),
     showList: computed(() => (props.projectId || props.projectGroupId) && props.dataSourceId),
@@ -97,7 +97,7 @@ const state = reactive({
                 end: today.subtract(1, 'month').endOf('month').format('YYYY-MM'),
                 granularity: 'MONTHLY',
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },

@@ -129,7 +129,7 @@ const state = reactive({
         } else if (state.dataType === 'usage_quantity') {
             _textOptions = { type: 'usage', unitPath: 'usage_unit' };
         }
-        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
+        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions);
         const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
 
         // set width of table fields

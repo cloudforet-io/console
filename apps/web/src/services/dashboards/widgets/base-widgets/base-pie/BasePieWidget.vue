@@ -29,8 +29,9 @@ import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/u
 import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
+import { getRefinedPieChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import {
-    getPieChartLegends, getRefinedPieChartData,
+    getPieChartLegends,
 } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getReferenceTypeOfDataField } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
 import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
@@ -43,12 +44,12 @@ interface SubData {
     value: number
 }
 interface Data {
-    cost_sum?: SubData[];
-    _total_cost_sum?: number;
+    value_sum?: SubData[];
+    _total_value_sum?: number;
 }
 type FullData = CostAnalyzeResponse<Data>;
 interface ChartData {
-    cost_sum?: number;
+    value_sum?: number;
     date: string;
     [parsedDataField: string]: string | any;
 }
@@ -90,7 +91,7 @@ const state = reactive({
             },
             {
                 label: 'Cost',
-                name: 'cost_sum',
+                name: 'value_sum',
                 textOptions: { type: 'cost' },
                 textAlign: 'right',
             },
@@ -114,12 +115,12 @@ const fetchData = async (): Promise<FullData> => {
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'cost_sum', desc: true }],
+                sort: [{ key: 'value_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });
@@ -139,7 +140,7 @@ const drawChart = (chartData: ChartData[]) => {
     else chart = chartHelper.createPieChart();
     const seriesSettings = {
         categoryField: widgetState.parsedDataField,
-        valueField: 'cost_sum',
+        valueField: 'value_sum',
     };
     const series = chartHelper.createPieSeries(seriesSettings);
     series.labels.template.set('forceHidden', true);
@@ -147,14 +148,14 @@ const drawChart = (chartData: ChartData[]) => {
     chart.series.push(series);
     chartHelper.setChartColors(chart, colorSet.value);
 
-    if (chartData.some((d) => typeof d.cost_sum === 'number' && d.cost_sum > 0)) {
+    if (chartData.some((d) => typeof d.value_sum === 'number' && d.value_sum > 0)) {
         const tooltip = chartHelper.createTooltip();
         chartHelper.setPieTooltipText(series, tooltip, widgetState.currency);
         series.slices.template.set('tooltip', tooltip);
         series.data.setAll(chartData);
     } else {
         series.data.setAll([{
-            cost_sum: 1,
+            value_sum: 1,
         }]);
         series.slices.template.setAll({
             fill: color(gray[200]),

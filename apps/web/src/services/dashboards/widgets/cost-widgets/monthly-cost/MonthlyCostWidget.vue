@@ -55,8 +55,8 @@ interface SubData {
     value: number;
 }
 interface Data {
-    cost_sum: SubData[];
-    _total_cost_sum: number;
+    value_sum: SubData[];
+    _total_value_sum: number;
 }
 type FullData = CostAnalyzeResponse<Data>;
 interface ChartData {
@@ -78,10 +78,10 @@ const state = reactive({
     chartData: computed<ChartData[]>(() => {
         if (!state.data) return [];
 
-        const dateFilledData = getRefinedDateTableData<Data>(state.data, widgetState.dateRange, 'cost_sum');
+        const dateFilledData = getRefinedDateTableData<Data>(state.data, widgetState.dateRange);
 
         const chartData = getRefinedXYChartData<Data, ChartData>(dateFilledData, {
-            arrayDataKey: 'cost_sum',
+            arrayDataKey: 'value_sum',
             categoryKey: DATE_FIELD_NAME,
             valueKey: VALUE_FIELD_NAME,
         });
@@ -152,7 +152,7 @@ const fetchData = async (): Promise<Data[]|null> => {
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
@@ -173,8 +173,8 @@ const fetchData = async (): Promise<Data[]|null> => {
 
 /* Util */
 const getCostOfMonth = (month: Dayjs): number => {
-    if (!state.data?.[0]?.cost_sum?.length) return 0;
-    const monthlyCost = state.data[0].cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
+    if (!state.data?.[0]?.value_sum?.length) return 0;
+    const monthlyCost = state.data[0].value_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
     return monthlyCost;
 };
 
