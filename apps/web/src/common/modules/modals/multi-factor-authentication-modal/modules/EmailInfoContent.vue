@@ -29,7 +29,7 @@ const state = reactive({
     loading: false,
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
-    proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
+    proxyIsSentCode: useProxyValue('isSentCode', props, emit),
 });
 
 const handleClickSendCodeButton = async () => {
@@ -48,21 +48,25 @@ const handleClickSendCodeButton = async () => {
 
 <template>
     <div class="email-info-wrapper">
-        <div class="change-info-wrapper">
-            <p>{{ $t('COMMON.MFA_MODAL.CHANGE.DESC') }}</p>
-            <p-tooltip
-                :contents="$t('COMMON.MFA_MODAL.CHANGE.TOOLTIP')"
-                position="bottom"
-            >
-                <p-i name="ic_info-circle"
-                     class="icon-info"
-                     height="1rem"
-                     width="1rem"
-                     color="inherit"
-                />
-            </p-tooltip>
+        <div v-if="props.type === 'change'"
+             class="change-info-wrapper"
+        >
+            <div class="change-info">
+                <p>{{ $t('COMMON.MFA_MODAL.CHANGE.DESC') }}</p>
+                <p-tooltip
+                    :contents="$t('COMMON.MFA_MODAL.CHANGE.TOOLTIP')"
+                    position="bottom"
+                >
+                    <p-i name="ic_info-circle"
+                         class="icon-info"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                    />
+                </p-tooltip>
+            </div>
+            <p-divider />
         </div>
-        <p-divider />
         <div class="contents-wrapper">
             <div class="email-info">
                 <p>{{ $t('COMMON.MFA_MODAL.SENT_DESC') }}</p>
@@ -78,7 +82,8 @@ const handleClickSendCodeButton = async () => {
                     </p>
                 </div>
             </div>
-            <p-button style-type="secondary"
+            <p-button v-if="props.type !== 'verify'"
+                      style-type="secondary"
                       :loading="state.loading"
                       :disabled="state.proxyIsSentCode"
                       @click="handleClickSendCodeButton"
@@ -94,12 +99,16 @@ const handleClickSendCodeButton = async () => {
     @apply flex flex-col bg-gray-100 rounded text-label-md text-gray-700;
     margin-bottom: 1rem;
     padding: 0.5rem;
-    gap: 0.25rem;
+    gap: 0.375rem;
     .change-info-wrapper {
-        @apply flex;
-        gap: 0.25rem;
-        .icon-info {
-            @apply text-gray-900;
+        @apply flex flex-col;
+        gap: 0.375rem;
+        .change-info {
+            @apply flex;
+            gap: 0.25rem;
+            .icon-info {
+                @apply text-gray-900;
+            }
         }
     }
     .contents-wrapper {

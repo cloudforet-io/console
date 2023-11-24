@@ -5,33 +5,50 @@ import { PTextButton, PCollapsibleToggle } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import { postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
+import { postDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     mfaType?: string
     email?: string
+    type: string
+    isSentCode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     mfaType: '',
     email: '',
+    type: '',
+    isSentCode: false,
 });
+
+const emit = defineEmits<{(e: 'update:is-sent-code'): void }>();
 
 const state = reactive({
     isCollapsed: true,
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
+    proxyIsSentCode: useProxyValue('is-sent-code', props, emit),
 });
 
 const handleClickSendEmailButton = async () => {
-    await postEnableMfa({
-        user_id: state.userId,
-        mfa_type: props.mfaType,
-        options: {
-            email: props.email,
-        },
-        domain_id: state.domainId,
-    });
+    if (props.type === 'disabled' || props.type === 'change') {
+        await postDisableMfa({
+            user_id: state.userId,
+            domain_id: state.domainId,
+        });
+    } else {
+        await postEnableMfa({
+            user_id: state.userId,
+            mfa_type: props.mfaType,
+            options: {
+                email: props.email,
+            },
+            domain_id: state.domainId,
+        });
+    }
+    state.proxyIsSentCode = true;
 };
 </script>
 
@@ -58,7 +75,7 @@ const handleClickSendEmailButton = async () => {
 
 <style scoped lang="postcss">
 .collapsible-wrapper {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     .collapsed-contents {
         @apply text-paragraph-sm text-gray-500;
         .send-code-button {

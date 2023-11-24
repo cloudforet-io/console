@@ -5,21 +5,20 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton,
-    PButtonModal,
-    PFieldGroup, PI,
-    PTextInput, PTooltip,
+    PButton, PButtonModal, PFieldGroup, PI, PTextInput, PTooltip,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { UserState } from '@/store/modules/user/type';
+
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-authentication-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import CollapsibleContents
-    from '@/common/modules/modals/multi-factor-authentication-modal/modules/CollapsibleContents.vue';
-import EmailInfo from '@/common/modules/modals/multi-factor-authentication-modal/modules/EmailInfo.vue';
+import CollapsibleContent
+    from '@/common/modules/modals/multi-factor-authentication-modal/modules/CollapsibleContent.vue';
+import EmailInfoContent from '@/common/modules/modals/multi-factor-authentication-modal/modules/EmailInfoContent.vue';
 
 interface Props {
     type: string
@@ -30,7 +29,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    type: 'verify',
+    type: '',
     email: '',
     verified: false,
     mfaType: '',
@@ -45,19 +44,22 @@ const state = reactive({
     domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
     isSentCode: false,
+    isNextStep: false,
+    userInfo: {} as UserState,
 });
 
 const modalState = reactive({
+    proxyType: useProxyValue('type', props, emit),
     proxyVisible: useProxyValue('visible', props, emit),
     title: computed(() => {
-        if (props.type === 'disabled') {
+        if (modalState.proxyType === 'new') {
+            return i18n.t('COMMON.MFA_MODAL.EDIT.TITLE');
+        }
+        if (modalState.proxyType === 'disabled') {
             return i18n.t('COMMON.MFA_MODAL.ALT.TITLE');
         }
-        if (props.type === 'change') {
+        if (modalState.proxyType === 'change') {
             return i18n.t('COMMON.MFA_MODAL.CHANGE.TITLE');
-        }
-        if (props.type === 'new') {
-            return i18n.t('COMMON.MFA_MODAL.EDIT.TITLE');
         }
         return i18n.t('COMMON.MFA_MODAL.TITLE');
     }),
@@ -70,35 +72,50 @@ const validationState = reactive({
 });
 
 /* Components */
-const handleChangeInput = (value: string) => {
-    validationState.verificationCode = value;
-};
-const handleClickCancel = () => {
-    resetFormData();
-    modalState.proxyVisible = false;
-};
 const resetFormData = () => {
     validationState.verificationCode = '';
     state.isCollapsed = false;
+    emit('refresh');
+};
+const handleChangeInput = (value: string) => {
+    validationState.verificationCode = value;
+};
+const handleClickCancel = async () => {
+    resetFormData();
+    modalState.proxyVisible = false;
+    await store.dispatch('user/setUser', state.userInfo);
+};
+const handleConfirmButton = () => {
+    if (props.type === 'change') {
+        modalState.proxyType = 'new';
+        state.isNextStep = false;
+    } else {
+        handleClickVerifyButton();
+    }
 };
 
 /* API */
-const handleClickConfirmButton = async () => {
+const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
-        await postValidationMfaCode({
+        const response = await postValidationMfaCode({
             user_id: state.userId,
             domain_id: state.domainId,
             verify_code: validationState.verificationCode,
         });
-        modalState.proxyVisible = false;
+        if (props.type !== 'change') {
+            modalState.proxyVisible = false;
+            await store.dispatch('user/setUser', response);
+            state.userInfo = response as UserState;
+        } else {
+            state.isNextStep = true;
+        }
         resetFormData();
     } catch (e: any) {
         validationState.isValidationCodeValid = true;
         validationState.validationCodeInvalidText = i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
     } finally {
         state.loading = false;
-        emit('refresh');
     }
 };
 </script>
@@ -107,19 +124,25 @@ const handleClickConfirmButton = async () => {
     <p-button-modal
         :visible="modalState.proxyVisible"
         :header-title="modalState.title"
-        class="mfa-email-modal-wrapper"
+        :class="['mfa-modal-wrapper', props.type]"
         size="sm"
-        :disabled="validationState.verificationCode === ''"
-        :loading="state.loading"
-        @confirm="handleClickConfirmButton"
+        :theme-color="modalState.proxyType === 'disabled'? 'alert' : 'primary'"
+        :disabled="modalState.proxyType !== 'change' ? validationState.verificationCode === '' : !(state.isNextStep && state.isSentCode)"
+        :loading="modalState.proxyType !== 'change' ? state.loading : false"
+        @confirm="handleConfirmButton"
         @cancel="handleClickCancel"
         @close="handleClickCancel"
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <email-info :email="props.email"
-                            :type="props.type"
-                            :is-sent-code.sync="state.isSentCode"
+                <span v-if="props.type === 'disabled'"
+                      class="disable-modal-desc"
+                >
+                    {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
+                </span>
+                <email-info-content :email="props.email"
+                                    :type="props.type"
+                                    :is-sent-code.sync="state.isSentCode"
                 />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
@@ -128,6 +151,21 @@ const handleClickConfirmButton = async () => {
                                    required
                                    class="form"
                     >
+                        <template #label-extra>
+                            <span v-if="props.type === 'change' && state.isNextStep && state.isSentCode"
+                                  class="verified"
+                            >
+                                <p-i name="ic_verified"
+                                     height="1rem"
+                                     width="1rem"
+                                     class="verified-icon"
+                                     color="#60B731"
+                                />
+                                <span>
+                                    {{ $t('COMMON.MFA_MODAL.ALT.VERIFIED') }}
+                                </span>
+                            </span>
+                        </template>
                         <p-text-input :value="validationState.verificationCode"
                                       :invalid="validationState.isValidationCodeValid"
                                       class="text-input"
@@ -137,19 +175,22 @@ const handleClickConfirmButton = async () => {
                     <p-button v-if="props.type === 'change'"
                               style-type="secondary"
                               :loading="state.loading"
-                              :disabled="!state.isSentCode"
+                              :disabled="!state.isSentCode || state.isNextStep"
+                              @click="handleClickVerifyButton"
                     >
                         {{ $t('COMMON.MFA_MODAL.VERIFY') }}
                     </p-button>
                 </div>
-                <collapsible-contents :mfa-type="props.mfaType"
-                                      :email="props.email"
+                <collapsible-content :mfa-type="props.mfaType"
+                                     :email="props.email"
+                                     :type="props.type"
+                                     :is-sent-code.sync="state.isSentCode"
                 />
             </div>
         </template>
         <template #close-button>
             <p-tooltip
-                v-if="props.type === 'change' && !props.verified"
+                v-if="modalState.proxyType === 'change' && state.isNextStep"
                 :contents="$t('COMMON.MFA_MODAL.CHANGE.TOOLTIP')"
                 position="bottom"
             >
@@ -157,7 +198,7 @@ const handleClickConfirmButton = async () => {
             </p-tooltip>
         </template>
         <template #confirm-button>
-            <div v-if="props.type === 'change'"
+            <div v-if="modalState.proxyType === 'change'"
                  class="change-confirm-button"
             >
                 <span>{{ $t('COMMON.MFA_MODAL.CHANGE.CONFIRM_BTN') }}</span>
@@ -167,34 +208,47 @@ const handleClickConfirmButton = async () => {
                      color="inherit transparent"
                 />
             </div>
-            <span v-else>
-                {{ $t('COMMON.MFA_MODAL.VERIFY') }}
+            <span v-else-if="modalState.proxyType === 'disabled'">
+                {{ $t('COMMON.MFA_MODAL.ALT.DISABLED') }}
             </span>
+            <span v-else>{{ $t('COMMON.MFA_MODAL.VERIFY') }}</span>
         </template>
     </p-button-modal>
 </template>
 
 <style lang="postcss" scoped>
-.mfa-email-modal-wrapper {
-    .modal-content-wrapper {
-        @apply flex flex-col;
+.mfa-modal-wrapper {
+    .disable-modal-desc {
+        @apply block;
+        margin-top: 1.625rem;
         margin-bottom: 1rem;
-
-        .validation-code-form {
-            @apply flex items-end;
-            gap: 1rem;
-            .form {
+    }
+    .validation-code-form {
+        @apply flex items-end;
+        gap: 1rem;
+        .form {
+            flex: 1;
+            .p-text-input {
                 width: 100%;
-                .text-input {
-                    width: 100%;
-                    flex: 1;
-                }
             }
+        }
+        .verified {
+            @apply inline-flex items-center text-label-md text-green-600;
+            gap: 0.25rem;
         }
     }
     .change-confirm-button {
         @apply flex items-center;
         gap: 0.25rem;
+    }
+}
+
+/* custom design-system component - p-button-modal */
+:deep(.p-button-modal) {
+    &.change {
+        .confirm-button {
+            @apply bg-primary-1;
+        }
     }
 }
 </style>
