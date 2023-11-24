@@ -100,7 +100,7 @@ export default class TokenAPI {
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();
-                const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
+                const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {});
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 if (VERBOSE) {
                     const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);

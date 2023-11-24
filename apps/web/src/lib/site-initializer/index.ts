@@ -27,8 +27,9 @@ const initConfig = async () => {
     await config.init();
 };
 const initWorkspace = () => {
+    const domainId = store.state.domain.domainId;
     const workspaceStore = useWorkspaceStore();
-    workspaceStore.load();
+    workspaceStore.load(domainId);
 };
 
 const initQueryHelper = () => {

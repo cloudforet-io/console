@@ -11,8 +11,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 
-
-
 interface WorkspaceStoreState {
     items: WorkspaceModel[];
     currentItem?: WorkspaceModel;
@@ -26,17 +24,16 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
     });
 
     const getters = reactive({
-        workspaceList: asyncComputed<WorkspaceModel[]>(async () => {
-            await actions.load();
-            return state.items;
-        }),
+        workspaceList: asyncComputed<WorkspaceModel[]>(async () => state.items),
         currentWorkspace: computed<WorkspaceModel|undefined>(() => state.currentItem),
     });
 
     const actions = {
-        async load() {
+        async load(domainId) {
             try {
-                const { results } = await SpaceConnector.clientV2.inventory.workspace.list({});
+                const { results } = await SpaceConnector.clientV2.identity.workspace.list({
+                    domain_id: domainId,
+                });
                 state.items = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
