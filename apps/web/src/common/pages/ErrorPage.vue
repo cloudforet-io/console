@@ -1,5 +1,5 @@
 <script lang="ts">
-// eslint-disable-next-line import/order
+// eslint-disable-next-line import/order,import/no-duplicates
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -15,9 +15,14 @@ export default defineComponent({
 
 <script setup lang="ts">
 /* eslint-disable import/first */
+// eslint-disable-next-line import/no-duplicates
+import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
+
+/* eslint-disable import/no-cycle */
+import { store } from '@/store';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
@@ -28,6 +33,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     statusCode: '404',
 });
+
+const domainName = computed(() => store.state.domain.name);
 
 const route = useRoute();
 const router = useRouter();
@@ -63,7 +70,9 @@ const handleClickHome = () => {
                     {{ $t('COMMON.ERROR.404_MSG') }}
                 </template>
             </h3>
-            <div class="utils-button">
+            <div v-if="domainName"
+                 class="utils-button"
+            >
                 <p-button style-type="transparent"
                           size="lg"
                           icon-left="ic_arrow-left"
