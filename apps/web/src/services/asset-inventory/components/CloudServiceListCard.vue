@@ -10,7 +10,7 @@
                 <div class="service-group-wrapper">
                     <p-lazy-img width="1.25rem"
                                 height="1.25rem"
-                                :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                :src="getImageUrl(item)"
                                 error-icon="ic_cloud-filled"
                                 :alt="item.cloud_service_group"
                                 class="icon"
@@ -63,6 +63,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 
+import type { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceItem } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
@@ -103,6 +104,14 @@ export default defineComponent<Props>({
 
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+            cloudServiceTypeNameToItemMap: computed(() => {
+                const res: Record<string, CloudServiceTypeReferenceItem> = {};
+                Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
+                    res[item.name] = item;
+                });
+                return res;
+            }),
             slicedResources: computed<CloudServiceAnalyzeResultResource[]>(() => {
                 const resources = props.item?.resources ?? [];
                 return resources.slice(0, 2);
@@ -146,9 +155,28 @@ export default defineComponent<Props>({
             lineClamp: true,
         });
 
+        const getImageUrl = (item: CloudServiceAnalyzeResult) => {
+            const cloudServiceTypeName = item.resources?.[0]?.cloud_service_type;
+            if (cloudServiceTypeName) {
+                const icon = state.cloudServiceTypeNameToItemMap[cloudServiceTypeName]?.icon;
+                if (icon) return assetUrlConverter(icon);
+            }
+
+            const provider = item.provider;
+            if (provider) {
+                const icon = state.providers[provider]?.icon;
+                if (icon) return assetUrlConverter(icon);
+            }
+
+            return '';
+        };
+
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('reference/provider/load');
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+            ]);
         })();
 
         return {
@@ -157,6 +185,7 @@ export default defineComponent<Props>({
             getTextOverflowState,
             assetUrlConverter,
             getCloudServiceDetailLink,
+            getImageUrl,
         };
     },
 });

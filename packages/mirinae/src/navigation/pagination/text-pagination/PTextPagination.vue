@@ -21,14 +21,14 @@
         <p-icon-button class="text"
                        name="ic_chevron-right"
                        color="inherit transparent"
-                       :disabled="thisPage === allPage || !hasNextPage || disableNextPage"
+                       :disabled="nextButtonDisabled"
                        @click="update(thisPage + 1)"
         />
     </nav>
 </template>
 <script lang="ts">
 import type { SetupContext } from 'vue';
-import { defineComponent, watch } from 'vue';
+import { computed, defineComponent, watch } from 'vue';
 
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
@@ -71,6 +71,13 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const nextButtonDisabled = computed<boolean>(() => {
+            if (props.disableNextPage) return true;
+            if (props.allPage !== undefined) {
+                return props.thisPage === props.allPage;
+            }
+            return !props.hasNextPage;
+        });
         const update = (page: number) => {
             emit('update:thisPage', page);
             emit('pageChange', page);
@@ -84,6 +91,7 @@ export default defineComponent<Props>({
 
         return {
             update,
+            nextButtonDisabled,
         };
     },
 });
