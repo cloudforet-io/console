@@ -176,8 +176,15 @@ export class SpaceConnector {
         if (mockEndpoint && SpaceConnector.mockInfo.reflection) {
             return async (params: object = {}, config: MockRequestConfig = DEFAULT_MOCK_CONFIG): Promise<any> => {
                 const mockConfig = { ...config };
-                let url = path;
 
+                if (SpaceConnector.mockInfo.apiKey) {
+                    mockConfig.headers = Object.assign(
+                        mockConfig.headers ?? {},
+                        { Authorization: `Bearer ${SpaceConnector.mockInfo.apiKey}` },
+                    );
+                }
+
+                let url = path;
                 const mockApiList = SpaceConnector.mockInfo.apiList?.[version - 1] ?? [];
                 if (SpaceConnector.mockInfo.all || isPathIncluded(mockApiList, path) || mockConfig.mockMode) {
                     mockConfig.baseURL = mockEndpoint;
