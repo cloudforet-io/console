@@ -1,15 +1,15 @@
 
-
-import type { RoleType } from '@/schema/identity/role/type';
+import type { PageAccessType } from '@/store/modules/user/type';
 
 import type {
     PagePermissionMap,
-    PagePermissionTuple, PagePermissionType, RawPagePermission,
+    PagePermissionTuple, PagePermissionType,
+    PagePermission,
 } from '@/lib/access-control/config';
 import {
     ADMIN_USER_DEFAULT_PERMISSIONS,
-    DOMAIN_OWNER_DEFAULT_PERMISSIONS,
-    PROJECT_USER_DEFAULT_PERMISSIONS,
+    DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
+    BASIC_USER_DEFAULT_PERMISSIONS,
     NO_ROLE_USER_DEFAULT_PERMISSIONS,
     PAGE_PERMISSION_TYPE,
     SYSTEM_USER_DEFAULT_PERMISSIONS,
@@ -22,12 +22,10 @@ import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 
 
-export const getDefaultPagePermissionList = (isDomainOwner: boolean, roleType?: RoleType): PagePermissionTuple[] => {
-    if (isDomainOwner) return DOMAIN_OWNER_DEFAULT_PERMISSIONS;
-    if (roleType === 'SYSTEM') return SYSTEM_USER_DEFAULT_PERMISSIONS;
-    // FIXME:: DOMAIN_VIEWER should not get ADMIN_PERMISSION.
-    if (roleType === 'DOMAIN') return ADMIN_USER_DEFAULT_PERMISSIONS;
-    if (roleType === 'PROJECT') return PROJECT_USER_DEFAULT_PERMISSIONS;
+export const getDefaultPagePermissionList = (isAdminMode?: boolean, pageAccessType?: PageAccessType): PagePermissionTuple[] => {
+    if (isAdminMode) return DOMAIN_ADMIN_DEFAULT_PERMISSIONS;
+    if (pageAccessType === 'SYSTEM') return SYSTEM_USER_DEFAULT_PERMISSIONS;
+    if (pageAccessType === 'BASIC') return BASIC_USER_DEFAULT_PERMISSIONS;
     return NO_ROLE_USER_DEFAULT_PERMISSIONS;
 };
 
@@ -40,7 +38,7 @@ const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
 export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => MENU_INFO_MAP[id]?.needPermissionByRole);
 
 const permissionRequiredMenuIds: MenuId[] = getPermissionRequiredMenuIds();
-export const getPagePermissionMapFromRaw = (pagePermissions: RawPagePermission[]): PagePermissionMap => {
+export const getPagePermissionMapFromRaw = (pagePermissions: PagePermission[]): PagePermissionMap => {
     const result = {} as PagePermissionMap;
     pagePermissions.forEach((data) => {
         const { page, permission } = data ?? { page: '' };

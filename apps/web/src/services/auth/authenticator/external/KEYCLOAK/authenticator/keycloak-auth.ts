@@ -58,6 +58,7 @@ class KeycloakAuth extends Authenticator {
                 // eslint-disable-next-line camelcase
                 await super.signIn(
                     { access_token: KeycloakAuth.keycloak.token },
+                    'EXTERNAL',
                 );
             }
         } catch (e) {

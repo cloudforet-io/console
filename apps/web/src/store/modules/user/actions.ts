@@ -70,7 +70,7 @@ const getUserInfoFromToken = (token: string): string[] => {
     return [decodedToken.user_type, decodedToken.aud as string];
 };
 
-const getUserRoleBindings = async (domainId): Promise<Array<UserRole>> => {
+const getUserRoles = async (domainId): Promise<Array<UserRole>> => {
     try {
         const userRoles: Record<string, UserRole> = {};
         const { results } = await SpaceConnector.clientV2.identity.role.list({
@@ -115,7 +115,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
     const userInfo = await getUserInfo(userId, domainId);
     commit('setUser', userInfo);
 
-    const userRoles = await getUserRoleBindings(domainId);
+    const userRoles = await getUserRoles(domainId);
     commit('setRoles', userRoles);
 
     const workspaceStore = useWorkspaceStore();

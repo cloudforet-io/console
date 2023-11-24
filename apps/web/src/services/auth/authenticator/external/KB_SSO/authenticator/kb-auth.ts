@@ -21,7 +21,7 @@ class KbAuth extends Authenticator {
                 clientIP,
             };
 
-            await super.signIn(credentials);
+            await super.signIn(credentials, 'EXTERNAL');
 
             if (onSignInCallback) onSignInCallback();
         } catch (e) {

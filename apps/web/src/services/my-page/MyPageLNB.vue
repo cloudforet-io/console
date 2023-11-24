@@ -49,14 +49,12 @@ export default defineComponent({
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
-            hasDomainRole: computed(() => store.getters['user/hasDomainRole']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
             icon: computed(() => {
                 if (state.isDomainOwner) return 'img_avatar_root-account';
-                if (state.hasDomainRole) return 'img_avatar_admin';
                 return 'img_avatar_user';
             }),
             memberType: computed(() => {

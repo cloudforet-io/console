@@ -48,7 +48,7 @@ import { find, isEqual } from 'lodash';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import type { RawPagePermission } from '@/lib/access-control/config';
+import type { PagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw,
@@ -61,7 +61,7 @@ import type { PageAccessMenuItem } from '@/services/administration/types/page-ac
 
 
 
-const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePermission[] => {
+const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): PagePermission[] => {
     if (menuItem.id === 'all') return [];
 
     // MANAGE permission for menu group
@@ -83,7 +83,7 @@ const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePerm
 
     // each individual menu case
     if (menuItem.subMenuList?.length) {
-        const results: RawPagePermission[] = [];
+        const results: PagePermission[] = [];
         menuItem.subMenuList.forEach((subMenu) => {
             if (!subMenu.isManaged && !subMenu.isViewed) return;
             const permission = subMenu.isManaged ? PAGE_PERMISSION_TYPE.MANAGE : PAGE_PERMISSION_TYPE.VIEW;
@@ -96,21 +96,20 @@ const getIndividualPagePermissions = (menuItem: PageAccessMenuItem): RawPagePerm
 };
 
 
-const getPagePermissions = (menuItems: PageAccessMenuItem[], roleType: RoleType): RawPagePermission[] => {
+const getPagePermissions = (menuItems: PageAccessMenuItem[], roleType: RoleType): PagePermission[] => {
     // all case
     const allItem = find(menuItems, { id: 'all' });
     if (allItem && allItem.isManaged) {
-        if (roleType === ROLE_TYPE.PROJECT) {
-            // wildcard is not available for PROJECT role type
+        if (roleType === ROLE_TYPE.WORKSPACE_OWNER) {
             return menuItems.map((menuItem) => getIndividualPagePermissions(menuItem)).flat();
         }
         return [{ page: '*', permission: PAGE_PERMISSION_TYPE.MANAGE }];
     }
 
-    let results: RawPagePermission[] = [];
+    let results: PagePermission[] = [];
     menuItems.forEach((menu) => {
         // PROJECT role type case
-        if (roleType === ROLE_TYPE.PROJECT) {
+        if (roleType === ROLE_TYPE.WORKSPACE_OWNER) {
             results = results.concat(getIndividualPagePermissions(menu));
             return;
         }
@@ -152,12 +151,12 @@ export default {
     },
     props: {
         initialPagePermissions: {
-            type: Array as PropType<RawPagePermission[]>,
+            type: Array as PropType<PagePermission[]>,
             default: () => ([]),
         },
         roleType: {
             type: String as PropType<RoleType>,
-            default: ROLE_TYPE.PROJECT,
+            default: ROLE_TYPE.WORKSPACE_OWNER,
             validator(roleType: RoleType) {
                 return Object.values(ROLE_TYPE).includes(roleType);
             },
@@ -175,7 +174,7 @@ export default {
         });
         const state = reactive({
             hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),
-            pagePermissions: computed<RawPagePermission[]>(() => getPagePermissions(formState.menuItems, props.roleType)),
+            pagePermissions: computed<PagePermission[]>(() => getPagePermissions(formState.menuItems, props.roleType)),
         });
 
         /* Util */

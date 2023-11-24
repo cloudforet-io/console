@@ -1,14 +1,14 @@
 <template>
     <div class="gnb-toolset">
-        <g-n-b-search v-if="!isDomainOwner"
+        <g-n-b-search v-if="!isAdminMode"
                       :visible="openedMenu === 'search'"
                       @update:visible="updateOpenedMenu('search', $event)"
         />
-        <g-n-b-recent-favorite v-if="!isDomainOwner"
+        <g-n-b-recent-favorite v-if="!isAdminMode"
                                :visible="openedMenu === 'recentFavorite'"
                                @update:visible="updateOpenedMenu('recentFavorite', $event)"
         />
-        <g-n-b-noti v-if="!isDomainOwner"
+        <g-n-b-noti v-if="!isAdminMode"
                     :visible="openedMenu === 'notifications'"
                     @update:visible="updateOpenedMenu('notifications', $event)"
         />
@@ -49,7 +49,7 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isAdminMode: computed(() => store.getters['display/isAdminMode']),
             timezone: computed(() => store.state.user.timezone),
         });
 

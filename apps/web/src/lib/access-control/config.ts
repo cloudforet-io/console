@@ -17,22 +17,29 @@ export const PAGE_PERMISSION_TYPE = {
 
 export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
 
+export interface PagePermission {
+    page: string;
+    permission: PagePermissionType;
+}
+
+
 export interface AccessInfo {
     referenceMenuIds: MenuId[];
 }
 
 // backend data format of page permissions. page includes wildcard('*').
-export interface RawPagePermission {
-    page: string;
-    permission: PagePermissionType;
-}
+// export interface RawPagePermission {
+//     page: string;
+//     permission: PagePermissionType;
+// }
 
 // refined page permission types. page NEVER includes wildcard.
 export type PagePermissionMap = Record<string, PagePermissionType>;
 
 export type PagePermissionTuple = [page: string, permission: PagePermissionType];
 
-export const PROJECT_USER_DEFAULT_PERMISSIONS: PagePermissionTuple[] = [
+export const BASIC_USER_DEFAULT_PERMISSIONS: PagePermissionTuple[] = [
+    // TODO: workspace owner, member role
     [MENU_ID.HOME_DASHBOARD, PAGE_PERMISSION_TYPE.VIEW],
     [MENU_ID.MY_PAGE, PAGE_PERMISSION_TYPE.MANAGE],
     [MENU_ID.MY_PAGE_ACCOUNT, PAGE_PERMISSION_TYPE.MANAGE],
@@ -42,6 +49,9 @@ export const PROJECT_USER_DEFAULT_PERMISSIONS: PagePermissionTuple[] = [
     [MENU_ID.INFO, PAGE_PERMISSION_TYPE.VIEW],
     [MENU_ID.INFO_NOTICE, PAGE_PERMISSION_TYPE.VIEW],
 ];
+
+
+// TODO: this will be changed with DOMAIN ADMIN, WORKSPACE OWNER role.
 export const ADMIN_USER_DEFAULT_PERMISSIONS: PagePermissionTuple[] = [
     [MENU_ID.HOME_DASHBOARD, PAGE_PERMISSION_TYPE.VIEW],
     [MENU_ID.MY_PAGE, PAGE_PERMISSION_TYPE.MANAGE],
@@ -70,7 +80,8 @@ export const NO_ROLE_USER_DEFAULT_PERMISSIONS: PagePermissionTuple[] = [
     [MENU_ID.MY_PAGE_ACCOUNT, PAGE_PERMISSION_TYPE.VIEW],
     [MENU_ID.MY_PAGE_ACCOUNT_PROFILE, PAGE_PERMISSION_TYPE.MANAGE],
 ];
-export const DOMAIN_OWNER_DEFAULT_PERMISSIONS: PagePermissionTuple[] = [
+export const DOMAIN_ADMIN_DEFAULT_PERMISSIONS: PagePermissionTuple[] = [
+    // TODO: add all page
     [MENU_ID.ADMINISTRATION, PAGE_PERMISSION_TYPE.MANAGE],
     [MENU_ID.ADMINISTRATION_IAM, PAGE_PERMISSION_TYPE.MANAGE],
     [MENU_ID.ADMINISTRATION_ROLE, PAGE_PERMISSION_TYPE.MANAGE],
