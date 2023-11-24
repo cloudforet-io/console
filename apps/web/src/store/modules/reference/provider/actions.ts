@@ -24,7 +24,7 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
     ) return;
 
     try {
-        const response = await SpaceConnector.client.identity.provider.list({
+        const response = await SpaceConnector.clientV2.identity.provider.list({
             query: {
                 only: ['provider', 'name', 'tags'],
             },

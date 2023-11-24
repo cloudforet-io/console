@@ -142,9 +142,10 @@ export default defineComponent({
             }
             const credentials = {
                 password: state.password.trim(),
+                user_id: state.userId?.trim(),
             };
             try {
-                await loadAuth().signIn(credentials, state.userId?.trim(), props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER');
+                await loadAuth().signIn(credentials, 'LOCAL');
                 await store.dispatch('display/hideSignInErrorMessage');
                 if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
                     await vm.$router.push({ name: AUTH_ROUTE.PASSWORD._NAME });

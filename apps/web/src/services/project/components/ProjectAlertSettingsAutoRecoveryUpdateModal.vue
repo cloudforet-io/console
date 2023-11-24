@@ -88,7 +88,7 @@ watch([() => props.selectedOption, () => props.visible], ([selectedOption]) => {
                 <div class="select-card-wrapper">
                     <p-select-card v-for="(option, index) in state.selectOptions"
                                    :key="option.name"
-                                   v-model="recoveryMode"
+                                   v-model="state.recoveryMode"
                                    :tab-index="index"
                                    :value="option.name"
                                    :label="option.label"

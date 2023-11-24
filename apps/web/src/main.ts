@@ -12,6 +12,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useWorkspaceStore } from '@/store/modules/workspace/workspace-store';
+
 import { resetStore } from '@/lib/reset-pinia-store';
 import { siteInit } from '@/lib/site-initializer';
 
@@ -39,6 +41,7 @@ Vue.config.devtools = import.meta.env.DEV;
 Vue.config.productionTip = import.meta.env.DEV;
 
 const pinia = createPinia();
+useWorkspaceStore(pinia);
 pinia.use(resetStore);
 
 /** ********** INITIALIZE ************** */

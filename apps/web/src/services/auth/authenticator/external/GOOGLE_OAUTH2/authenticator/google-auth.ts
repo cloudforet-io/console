@@ -42,7 +42,7 @@ class GoogleAuth extends Authenticator {
             const credentials = {
                 access_token: accessToken,
             };
-            await super.signIn(credentials);
+            await super.signIn(credentials, 'EXTERNAL');
         } catch (e: any) {
             await GoogleAuth.signOut();
             await store.dispatch('display/showSignInErrorMessage');

@@ -20,9 +20,9 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
     ) return;
 
     try {
-        const response = await SpaceConnector.client.identity.projectGroup.list({
+        const response = await SpaceConnector.clientV2.identity.projectGroup.list({
             query: {
-                only: ['project_group_id', 'name', 'parent_project_group_info'],
+                only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id'],
             },
         }, { timeout: 3000 });
         const projectGroups: ProjectGroupReferenceMap = {};

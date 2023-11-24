@@ -15,7 +15,8 @@ import {
 import type { UserState } from './type';
 
 
-export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
+// TODO: refactor isDomainOwner
+export const isDomainOwner = (state: UserState): boolean => state.roleType === 'DOMAIN';
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 export const roleNames = (state: UserState): Array<string> => {
     const systemRoleNames: Array<string> = [];
