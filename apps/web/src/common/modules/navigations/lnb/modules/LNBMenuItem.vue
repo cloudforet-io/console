@@ -29,7 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
 
 const state = reactive({
-    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+    isAdminMode: computed(() => store.getters['display/isAdminMode']),
     processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
     isFolded: false,
     isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),

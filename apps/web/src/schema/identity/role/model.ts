@@ -1,7 +1,6 @@
 import type { Tags, TimeStamp } from '@/schema/_common/model';
 import type { RoleType, Policy } from '@/schema/identity/role/type';
 
-import type { RawPagePermission } from '@/lib/access-control/config';
 
 export interface RoleModel {
     created_at: TimeStamp;
@@ -9,14 +8,14 @@ export interface RoleModel {
     domain_id: string;
     name: string;
     policies?: Policy[];
-    page_permissions: RawPagePermission[];
+    page_permissions: PagePermission[];
     role_id: string;
     role_type: RoleType;
     tags?: Tags; // [ description: string ]
 }
 
 export interface PagePermission {
-    pages: string[];
+    page: string;
     permission: 'VIEW'|'MANAGE';
 }
 

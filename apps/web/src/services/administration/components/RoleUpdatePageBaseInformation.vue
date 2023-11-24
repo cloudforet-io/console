@@ -120,10 +120,19 @@ export default {
         const state = reactive({
             roleDescription: undefined as undefined | string,
             roleTypes: computed<RoleTypeForm[]>(() => [
-                { label: ROLE_TYPE_BADGE_OPTION.PROJECT.label, key: ROLE_TYPE.PROJECT, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_PROJECT') },
-                { label: ROLE_TYPE_BADGE_OPTION.DOMAIN.label, key: ROLE_TYPE.DOMAIN, description: i18n.t('IAM.ROLE.FORM.ROLE_TYPE_DOMAIN') },
+                { label: ROLE_TYPE_BADGE_OPTION.DOMAIN_ADMIN.label, key: ROLE_TYPE.DOMAIN_ADMIN, description: i18n.t('Access to all workspaces, including Admin Mode.') },
+                {
+                    label: ROLE_TYPE_BADGE_OPTION.WORKSPACE_OWNER.label,
+                    key: ROLE_TYPE.WORKSPACE_OWNER,
+                    description: i18n.t('Access to all projects within their designated workspace.'),
+                },
+                {
+                    label: ROLE_TYPE_BADGE_OPTION.WORKSPACE_MEMBER.label,
+                    key: ROLE_TYPE.WORKSPACE_MEMBER,
+                    description: i18n.t('Access to projects they are invited to or have been granted permission for.'),
+                },
             ]),
-            selectedRoleType: ROLE_TYPE.PROJECT as RoleType,
+            selectedRoleType: ROLE_TYPE.DOMAIN_ADMIN as RoleType,
             savedRoleType: computed<RoleTypeForm|undefined>(() => {
                 const roleType = props.initialFormData?.roleType;
                 return state.roleTypes.find((type) => type.key === roleType);

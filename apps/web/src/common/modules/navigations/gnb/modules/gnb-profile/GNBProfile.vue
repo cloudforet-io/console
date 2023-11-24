@@ -40,11 +40,7 @@ const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
-    userIcon: computed(() => {
-        if (state.isDomainOwner) return 'img_avatar_root-account';
-        if (state.hasDomainRole) return 'img_avatar_admin';
-        return 'img_avatar_user';
-    }),
+    userIcon: computed(() => 'img_avatar_user'),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
     role: computed(() => {
@@ -55,8 +51,6 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
     userId: computed(() => store.state.user.userId),
-    hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
-    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
     hasPermission: computed(() => store.getters['user/hasPermission']),
     languageMenuVisible: false,
     supportedMenu: computed(() => {

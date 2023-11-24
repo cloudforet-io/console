@@ -2,8 +2,7 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
-
-import type { RawPagePermission } from '@/lib/access-control/config';
+import type { PagePermission } from '@/schema/identity/role/model';
 
 import type { RoleData } from '@/services/administration/iam/role/type';
 
@@ -17,5 +16,5 @@ export interface ProjectMemberItem {
 }
 
 export interface ProjectMemberRoleMenuItem extends SelectDropdownMenuItem {
-    pagePermissions: RawPagePermission[];
+    pagePermissions: PagePermission[];
 }

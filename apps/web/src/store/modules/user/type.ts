@@ -1,7 +1,7 @@
+import type { PagePermission } from '@/schema/identity/role/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { AuthType, UserType } from '@/schema/identity/user/model';
 
-import type { RawPagePermission } from '@/lib/access-control/config';
 
 export type LanguageCode = 'ko' | 'en' | string;
 // export type Timezone = 'UTC' | 'Asia/Seoul' | string;
@@ -10,8 +10,7 @@ export interface UserRole {
     roleId?: string;
     name: string;
     roleType: RoleType;
-    // TODO: refactor with new pagePermission
-    pagePermissions: RawPagePermission[];
+    pagePermissions: PagePermission[];
 }
 
 export interface UserState {
@@ -52,3 +51,6 @@ export interface UpdateUserRequest {
     verify_code?: string
     email_verified?: boolean
 }
+
+
+export type PageAccessType = 'SYSTEM'|'BASIC';
