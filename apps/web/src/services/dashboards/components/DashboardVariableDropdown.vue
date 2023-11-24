@@ -146,7 +146,11 @@ const initSelected = async (value: any) => {
     const selectedValues = flattenDeep([value ?? []]);
     const items = await loadOptionItems(selectedValues);
     const selectedItems = items.filter((item) => selectedValues.includes(item.name));
-    state.selected = selectedItems;
+    if (selectedItems.length) {
+        state.selected = selectedItems;
+    } else {
+        await initVariableAndSelected();
+    }
 };
 
 watch(visibleMenu, (_visibleMenu) => {
