@@ -977,7 +977,8 @@
 			"ALT": {
 				"DESC": "",
 				"DISABLED": "",
-				"TITLE": ""
+				"TITLE": "",
+				"VERIFIED": "認証済みです"
 			},
 			"CHANGE": {
 				"CANCEL": "キャンセル",

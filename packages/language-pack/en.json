@@ -977,7 +977,8 @@
 			"ALT": {
 				"DESC": "To turn off, you need to verifiy with your email.",
 				"DISABLED": "Disable",
-				"TITLE": "Are you sure you want to disable MFA?"
+				"TITLE": "Are you sure you want to disable MFA?",
+				"VERIFIED": "Verified"
 			},
 			"CHANGE": {
 				"CANCEL": "Cancel",
