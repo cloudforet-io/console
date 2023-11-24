@@ -6,7 +6,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
-import { ERROR_ROUTE, errorRoutes } from '@/router/error-routes';
+import { ERROR_ROUTE } from '@/router/constant';
+import { errorRoutes } from '@/router/error-routes';
 import { serviceRoutes } from '@/router/service-routes';
 
 import config from '@/lib/config';

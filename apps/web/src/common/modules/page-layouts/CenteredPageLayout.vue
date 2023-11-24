@@ -17,7 +17,7 @@
 
 import { PCenteredLayout } from '@spaceone/design-system';
 
-import { ROOT_ROUTE } from '@/router/service-routes';
+import { ROOT_ROUTE } from '@/router/constant';
 
 import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 

@@ -1,6 +1,6 @@
 import type { Location } from 'vue-router/types/router';
 
-import { ERROR_ROUTE } from '@/router/error-routes';
+import { ERROR_ROUTE } from '@/router/constant';
 
 import type { PagePermissionType } from '@/lib/access-control/config';
 import type { Menu, MenuId } from '@/lib/menu/config';

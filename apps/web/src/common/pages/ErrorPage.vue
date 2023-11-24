@@ -21,7 +21,6 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
 
-/* eslint-disable import/no-cycle */
 import { store } from '@/store';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
