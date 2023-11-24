@@ -18,7 +18,6 @@ export const MENU_LIST: Menu[] = [
         id: MENU_ID.ASSET_INVENTORY,
         subMenuList: [
             { id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE },
-            { id: MENU_ID.ASSET_INVENTORY_SERVER },
             { id: MENU_ID.ASSET_INVENTORY_COLLECTOR },
             { id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT },
         ],
@@ -45,16 +44,8 @@ export const MENU_LIST: Menu[] = [
                 id: MENU_ID.ADMINISTRATION_IAM,
                 subMenuList: [
                     { id: MENU_ID.ADMINISTRATION_USER },
-                    { id: MENU_ID.ADMINISTRATION_ROLE },
-                    { id: MENU_ID.ADMINISTRATION_POLICY },
                 ],
             },
-            // {
-            //     id: MENU_ID.ADMINISTRATION_SETTINGS,
-            //     subMenuList: [
-            //         { id: MENU_ID.ADMINISTRATION_PROVIDER },
-            //     ],
-            // },
         ],
     },
     {
@@ -68,6 +59,62 @@ export const MENU_LIST: Menu[] = [
                     { id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE },
                     { id: MENU_ID.MY_PAGE_API_KEY },
                     { id: MENU_ID.MY_PAGE_NOTIFICATIONS },
+                ],
+            },
+        ],
+    },
+    {
+        id: MENU_ID.INFO,
+        hideOnGNB: true,
+        hideOnSiteMap: true,
+        subMenuList: [
+            { id: MENU_ID.INFO_NOTICE },
+        ],
+    },
+];
+
+export const ADMIN_MENU_LIST: Menu[] = [
+    {
+        id: MENU_ID.HOME_DASHBOARD,
+        hideOnGNB: true,
+    },
+    {
+        id: MENU_ID.DASHBOARDS,
+        subMenuList: [
+            { id: MENU_ID.DASHBOARDS_WORKSPACE },
+            { id: MENU_ID.DASHBOARDS_PROJECT },
+        ],
+    },
+    {
+        id: MENU_ID.ASSET_INVENTORY,
+        subMenuList: [
+            { id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE },
+            { id: MENU_ID.ASSET_INVENTORY_COLLECTOR },
+        ],
+    },
+    {
+        id: MENU_ID.COST_EXPLORER,
+        subMenuList: [
+            { id: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
+            { id: MENU_ID.COST_EXPLORER_BUDGET },
+        ],
+    },
+    {
+        id: MENU_ID.ADMINISTRATION,
+        subMenuList: [
+            {
+                id: MENU_ID.ADMINISTRATION_IAM,
+                subMenuList: [
+                    { id: MENU_ID.ADMINISTRATION_USER },
+                    { id: MENU_ID.ADMINISTRATION_ROLE },
+                    { id: MENU_ID.ADMINISTRATION_POLICY },
+                ],
+            },
+            {
+                id: MENU_ID.ADMINISTRAION_PREFERENCE,
+                subMenuList: [
+                    { id: MENU_ID.ADMINISTRATION_DOMAIN_SETTINGS },
+                    { id: MENU_ID.ADMINISTRATION_WORKSPACES },
                 ],
             },
         ],

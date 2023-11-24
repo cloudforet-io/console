@@ -12,7 +12,7 @@ import type {
 
 import type { PagePermissionTuple } from '@/lib/access-control/config';
 import type { Menu, MenuInfo } from '@/lib/menu/config';
-import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
@@ -94,8 +94,11 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
-    const _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(MENU_LIST);
-    // CAUTION: you must recover this after new role rebuild
+    let _allGnbMenuList: DisplayMenu[];
+    if (state.isAdminMode) {
+        _allGnbMenuList = getDisplayMenuList(ADMIN_MENU_LIST);
+    } else _allGnbMenuList = getDisplayMenuList(MENU_LIST);
+    // TODO: you must recover this after new role rebuild
     // _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     // _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;

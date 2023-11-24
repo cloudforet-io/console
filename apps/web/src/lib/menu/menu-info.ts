@@ -53,6 +53,10 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         icon: 'ic_service_cost-explorer',
         needPermissionByRole: true,
     },
+    [MENU_ID.COST_EXPLORER_LANDING]: {
+        translationId: 'MENU.COST_EXPLORER_LANDING',
+        needPermissionByRole: true,
+    },
     [MENU_ID.COST_EXPLORER_COST_ANALYSIS]: {
         translationId: 'MENU.COST_EXPLORER_COST_ANALYSIS',
         needPermissionByRole: true,
@@ -99,14 +103,18 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.ADMINISTRATION_POLICY',
         needPermissionByRole: true,
     },
-    // [MENU_ID.ADMINISTRATION_SETTINGS]: {
-    //     translationId: 'MENU.ADDITIONAL_SETTINGS',
-    //     needPermissionByRole: true,
-    // },
-    // [MENU_ID.ADMINISTRATION_PROVIDER]: {
-    //     translationId: 'MENU.PROVIDER',
-    //     needPermissionByRole: true,
-    // },
+    [MENU_ID.ADMINISTRAION_PREFERENCE]: {
+        translationId: 'MENU.ADMINISTRATION_PREFRENCE',
+        needPermissionByRole: true,
+    },
+    [MENU_ID.ADMINISTRATION_DOMAIN_SETTINGS]: {
+        translationId: 'MENU.ADMINISTRATION_DOMAIN_SETTINGS',
+        needPermissionByRole: true,
+    },
+    [MENU_ID.ADMINISTRATION_WORKSPACES]: {
+        translationId: 'MENU.ADMINISTRATION_WORKSPACES',
+        needPermissionByRole: true,
+    },
     [MENU_ID.MY_PAGE]: {
         translationId: 'MENU.MY_PAGE',
         icon: 'ic_service_my-page',
