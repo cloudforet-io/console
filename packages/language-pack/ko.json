@@ -3185,7 +3185,7 @@
 			"ACTION_DELETE_THIS_GROUP": "선택한 그룹 삭제 ",
 			"ACTION_EDIT_GROUP_NAME": "선택한 그룹 편집 ",
 			"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가 ",
-			"ALL_PROJECT": "모든 프로젝트 ",
+			"ALL_PROJECTS": "모든 프로젝트 ",
 			"ALT_E_CREATE_PROJECT": "프로젝트 생성 실패",
 			"ALT_E_CREATE_PROJECT_GROUP": "프로젝트 그룹 생성 실패",
 			"ALT_E_DELETE_PROJECT_GROUP": "프로젝트 그룹 삭제 실패",
@@ -3221,9 +3221,12 @@
 				"TITLE": "프로젝트 그룹 삭제 "
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
+			"NO_PROJECT_GROUP_MSG": "",
 			"PLACE_HOLDER_EXAMPLE": "예) 프로젝트/프로젝트 그룹",
 			"PLACE_HOLDER_PROJECT": "프로젝트 ",
 			"PLACE_HOLDER_SHOW_MORE": "더보기",
+			"PROJECT": "프로젝트",
+			"PROJECT_GROUP": "프로젝트 그룹 ",
 			"PROJECT_GROUPS": "프로젝트 그룹 ",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "생성",

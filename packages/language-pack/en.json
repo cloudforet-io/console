@@ -3185,7 +3185,7 @@
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
 			"ADD_SERVICE_ACCOUNT": "Add service account",
-			"ALL_PROJECT": "All Project",
+			"ALL_PROJECTS": "All Projects",
 			"ALT_E_CREATE_PROJECT": "Failed to Create Project",
 			"ALT_E_CREATE_PROJECT_GROUP": "Failed to Create Project Group",
 			"ALT_E_DELETE_PROJECT_GROUP": "Failed to Delete Project Group",
@@ -3221,9 +3221,12 @@
 				"TITLE": "Delete Project Group "
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
+			"NO_PROJECT_GROUP_MSG": "Getting started with grouping your scattered resource and accounts with your own project.",
 			"PLACE_HOLDER_EXAMPLE": "e.g. project/project group",
 			"PLACE_HOLDER_PROJECT": "Project",
 			"PLACE_HOLDER_SHOW_MORE": "more",
+			"PROJECT": "Project",
+			"PROJECT_GROUP": "Project Group",
 			"PROJECT_GROUPS": "Project Groups",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "Create",
