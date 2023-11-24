@@ -3185,7 +3185,7 @@
 			"ACTION_DELETE_THIS_GROUP": "選択したグループ削除",
 			"ACTION_EDIT_GROUP_NAME": "選択したグループ編集",
 			"ADD_SERVICE_ACCOUNT": "サービスアカウント追加",
-			"ALL_PROJECT": "すべてのプロジェクト",
+			"ALL_PROJECTS": "すべてのプロジェクト",
 			"ALT_E_CREATE_PROJECT": "プロジェクト作成に失敗",
 			"ALT_E_CREATE_PROJECT_GROUP": "プロジェクトグループ作成失敗",
 			"ALT_E_DELETE_PROJECT_GROUP": "プロジェクトグループの削除に失敗",
@@ -3221,9 +3221,12 @@
 				"TITLE": "プロジェクトグループ削除"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
+			"NO_PROJECT_GROUP_MSG": "",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",
+			"PROJECT": "プロジェクト",
+			"PROJECT_GROUP": "プロジェクトグループ",
 			"PROJECT_GROUPS": "プロジェクトグループ",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "作成",
