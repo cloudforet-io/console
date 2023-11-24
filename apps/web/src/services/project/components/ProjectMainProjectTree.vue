@@ -62,7 +62,7 @@ const state = reactive({
         },
     })),
     allProjectRoot: null as any,
-    allProjectNode: computed(() => ([i18n.t('PROJECT.LANDING.ALL_PROJECT')])),
+    allProjectNode: computed(() => ([i18n.t('PROJECT.LANDING.ALL_PROJECTS')])),
 });
 
 const toggleOptions = {

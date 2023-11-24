@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PSkeleton, PI, PButton, PToolbox, PDataLoader, PEmpty,
+    PSkeleton, PI, PToolbox, PDataLoader, PEmpty,
 } from '@spaceone/design-system';
 import type { CancelTokenSource } from 'axios';
 import axios from 'axios';
@@ -75,7 +75,6 @@ const state = reactive({
     hoveredGroupId: '',
     isAll: computed(() => !state.groupId),
     groupId: computed(() => projectPageStore.groupId),
-    searchText: computed(() => projectPageStore.searchText),
     noProjectGroup: computed(() => !projectPageStore.hasProjectGroup),
     projectFormVisible: computed({
         get() { return projectPageStore.projectFormVisible; },
@@ -112,22 +111,13 @@ const getProjectGroupName = (parentGroups, projectItem) => {
 
 const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
 const listAllProjectApi = SpaceConnector.client.identity.project.list;
-const listQuery = new ApiQueryHelper();
+const listApiQueryHelper = new ApiQueryHelper();
 
-const getParams = (id?, text?) => {
-    listQuery.setPageStart(state.pageStart)
+const getParams = (id?) => {
+    listApiQueryHelper.setPageStart(state.pageStart)
         .setPageLimit(state.pageSize);
-
-    if (text) {
-        listQuery.setFilters([{ k: 'name', v: text, o: '' }]);
-    } else {
-        listQuery.setFilters([]);
-    }
-
-    const params: any = { include_provider: true, query: listQuery.data };
+    const params: any = { include_provider: true, query: listApiQueryHelper.data };
     if (id) params.project_group_id = id;
-    // if (state.showAllProjects) params.recursive = true;
-
     return params;
 };
 
@@ -168,9 +158,8 @@ const getCardSummary = async (items) => {
 };
 
 let listProjectToken: CancelTokenSource | undefined;
-const getData = async (_id?, _text?) => {
+const getData = async (_id?) => {
     const id = _id || state.groupId;
-    const text = _text || state.searchText;
 
     // if request is already exist, cancel the request
     if (listProjectToken) {
@@ -182,8 +171,8 @@ const getData = async (_id?, _text?) => {
     state.loading = true;
     try {
         let res;
-        if (state.isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
-        else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
+        if (state.isAll) res = await listAllProjectApi(getParams(undefined), { cancelToken: listProjectToken.token });
+        else res = await listProjectApi(getParams(id), { cancelToken: listProjectToken.token });
         state.items = res.results;
         state.totalCount = res.total_count;
         projectPageStore.$patch({ projectCount: state.totalCount });
@@ -201,7 +190,10 @@ const getData = async (_id?, _text?) => {
     }
 };
 
-const onChange = async (options: any) => {
+const handleChange = async (options: any) => {
+    if (options.searchText !== undefined) {
+        listApiQueryHelper.setFilters([{ v: options.searchText }]);
+    }
     if (options.pageLimit !== undefined) {
         state.pageSize = options.pageLimit;
     }
@@ -217,9 +209,9 @@ const resetAll = () => {
     state.pageSize = 24;
 };
 
-const listProjects = async (groupId?, searchText?, reset = true) => {
+const listProjects = async (groupId?, reset = true) => {
     if (reset) resetAll();
-    await getData(groupId, searchText);
+    await getData(groupId);
 };
 
 const queryHelper = new QueryHelper();
@@ -241,8 +233,8 @@ watch(() => state.shouldUpdateProjectList, async () => {
 });
 
 /* Init */
-watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
-    if (isInitiated) await listProjects(groupId, searchText);
+watch([() => projectPageStore.isInitiated, () => state.groupId], async ([isInitiated, groupId]) => {
+    if (isInitiated) await listProjects(groupId);
 }, { immediate: true });
 
 // LOAD REFERENCE STORE
@@ -254,11 +246,10 @@ watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.sear
 </script>
 
 <template>
-    <div class="project-card-list">
-        <p-toolbox :searchable="false"
-                   :page-size="state.pageSize"
+    <div class="project-main-card-list">
+        <p-toolbox :page-size="state.pageSize"
                    :total-count="state.totalCount"
-                   @change="onChange"
+                   @change="handleChange"
                    @refresh="getData()"
         />
         <p-data-loader class="flex-grow"
@@ -355,61 +346,28 @@ watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.sear
                     </router-link>
                 </div>
             </div>
-            <template #no-data>
-                <p-empty
-                    v-if="state.noProjectGroup"
-                    show-button
-                >
-                    <div class="description-content">
-                        <p class="title">
-                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>
-                        </p>
-                        <p class="content">
-                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT') }}
-                        </p>
-                        <p class="content-order">
-                            <strong>1.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1') }}
-                        </p>
-                        <p class="content-order">
-                            <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
-                        </p>
-                    </div>
-                    <template #button>
-                        <p-button style-type="primary"
-                                  class="mt-6"
-                                  icon-left="ic_plus_bold"
-                                  :disabled="props.manageDisabled"
-                                  @click="$emit('create-project-group')"
-                        >
-                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
-                        </p-button>
-                    </template>
-                </p-empty>
-                <p-empty
-                    v-if="state.noProject"
-                    show-image
-                >
-                    <template #image>
-                        <img alt="empty-image"
-                             src="@/assets/images/illust_star.svg"
-                        >
-                    </template>
-                    {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
-                </p-empty>
-            </template>
+            <p-empty
+                v-if="state.noProjectGroup || state.noProject"
+                show-image
+            >
+                <div class="description-content">
+                    <p>{{ state.noProjectGroup ? $t('PROJECT.LANDING.NO_PROJECT_GROUP_MSG') : $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}</p>
+                </div>
+            </p-empty>
+            <template #no-data />
         </p-data-loader>
 
         <project-detail-project-form-modal
             v-if="state.groupId && state.projectFormVisible"
             :visible.sync="state.projectFormVisible"
             :project-group-id="state.groupId"
-            @complete="listProjects(state.groupId, state.searchText)"
+            @complete="listProjects(state.groupId)"
         />
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.project-card-list {
+.project-main-card-list {
     @apply flex flex-col h-full;
 }
 .show-all-wrapper {
@@ -431,6 +389,12 @@ watch([() => projectPageStore.isInitiated, () => state.groupId, () => state.sear
             @apply border-l border-gray-200 bg-blue-100;
         }
     }
+}
+
+.description-content {
+    width: 20rem;
+
+    @apply text-primary-2;
 }
 
 .favorite-wrapper {
