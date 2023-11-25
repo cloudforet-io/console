@@ -1,44 +1,82 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
+
+import { get } from 'lodash';
 
 import {
     PPaneLayout, PHeading, PDynamicLayout,
 } from '@spaceone/design-system';
 
+import { useCodeEditor } from '@/composables/use-code-editor';
+import type { SchemaType } from '@/lib/schema';
+import { getSchema } from '@/lib/schema';
+
 import CodeEditor from '@/components/CodeEditor.vue';
 import CodeEditorModal from '@/components/CodeEditorModal.vue';
 
+type Title = 'Resource Type' | 'Resource';
+
+const {
+    state: resourceTypeState,
+    handleUpdateCode: handleUpdateResourceTypeCode,
+    handleUpdateCodeType: handleUpdateResourceTypeCodeType,
+    handleUpdateParsedObject: handleUpdateResourceTypeData,
+} = useCodeEditor();
+
+const {
+    state: resourceState,
+    handleUpdateCode: handleUpdateResourceCode,
+    handleUpdateCodeType: handleUpdateResourceCodeType,
+    handleUpdateParsedObject: handleUpdateResourceData,
+} = useCodeEditor();
+
 const state = reactive({
-    schema: null as null|object,
-    data: null as null|object,
     modalVisible: false,
-    modalTitle: '',
-    schemaCode: '',
-    schemaCodeType: 'Json' as string,
-    dataCode: '',
-    dataCodeType: 'Json' as string,
+    modalTitle: 'Resource Type' as Title,
+    code: computed<string>(() => (state.modalTitle === 'Resource Type' ? resourceTypeState.code : resourceState.code)),
+    codeType: computed<string>(() => (state.modalTitle === 'Resource Type' ? resourceTypeState.codeType : resourceState.codeType)),
+    parsedObject: computed<null|object>(() => (state.modalTitle === 'Resource Type' ? resourceTypeState.parsedObject : resourceState.parsedObject)),
+    schemaType: 'table' as SchemaType,
+    schema: computed(() => {
+        const schema = getSchema({
+            schemaType: state.schemaType,
+            resourceData: resourceState.parsedObject,
+            resourceTypeData: resourceTypeState.parsedObject,
+        });
+        return schema;
+    }),
+    schemaCode: computed(() => JSON.stringify(state.schema, null, 2)),
+    data: computed(() => {
+        let data;
+        if (state.schemaType === 'table') data = resourceState.parsedObject;
+        else data = resourceTypeState.parsedObject;
+
+        if (Array.isArray(data)) {
+            return data.map((item) => {
+                if (get(item, 'data')) return item;
+                return get(item, 'resource');
+            });
+        }
+        if (get(data, 'data')) return data;
+        return get(data, 'resource');
+    }),
+    dataCode: computed(() => JSON.stringify(state.data, null, 2)),
 });
 
-const handleUpdateSchema = (schema: object) => {
-    state.schema = schema;
-};
-const handleUpdateData = (data: object) => {
-    state.data = data;
-};
-const handleExpand = (title: string) => {
+const handleExpand = (title: Title) => {
     state.modalTitle = title;
     state.modalVisible = true;
 };
 const handleModalConfirm = (code: string, codeType: string, parsedObject: object) => {
     state.modalVisible = false;
-    if (state.modalTitle === 'Schema') {
-        state.schemaCode = code;
-        state.schemaCodeType = codeType;
-        state.schema = parsedObject;
+    if (state.modalTitle === 'Resource Type') {
+        handleUpdateResourceTypeCode(code);
+        handleUpdateResourceTypeCodeType(codeType);
+        handleUpdateResourceTypeData(parsedObject);
     } else {
-        state.dataCode = code;
-        state.dataCodeType = codeType;
-        state.data = parsedObject;
+        handleUpdateResourceCode(code);
+        handleUpdateResourceCodeType(codeType);
+        handleUpdateResourceData(parsedObject);
     }
 };
 </script>
@@ -47,49 +85,80 @@ const handleModalConfirm = (code: string, codeType: string, parsedObject: object
     <div class="main-page">
         <p-heading>Playground</p-heading>
         <div class="page-contents">
-            <section class="input-sections-wrapper">
-                <div class="input-section">
+            <section class="data-input-section-wrapper">
+                <div class="data-input-wrapper">
                     <p-heading heading-type="sub">
-                        Schema
+                        Resource Type Data
                     </p-heading>
                     <p-pane-layout class="edit-wrapper">
-                        <code-editor :code="state.schemaCode"
-                                     :code-type="state.schemaCodeType"
-                                     @update:code="state.schemaCode = $event"
-                                     @update:code-type="state.schemaCodeType = $event"
-                                     @update:parsed-object="handleUpdateSchema"
-                                     @expand="handleExpand('Schema')"
+                        <code-editor :code="resourceTypeState.code"
+                                     :code-type="resourceTypeState.codeType"
+                                     @update:code="handleUpdateResourceTypeCode"
+                                     @update:code-type="handleUpdateResourceTypeCodeType"
+                                     @update:parsed-object="handleUpdateResourceTypeData"
+                                     @expand="handleExpand('Resource Type')"
                         />
                     </p-pane-layout>
                 </div>
-                <div class="input-section">
+                <div class="data-input-wrapper">
                     <p-heading heading-type="sub">
-                        Data
+                        Resources Data (Array)
+                    </p-heading>
+                    <p-pane-layout class="edit-wrapper">
+                        <code-editor :code="resourceState.code"
+                                     :code-type="resourceState.codeType"
+                                     @update:code="handleUpdateResourceCode"
+                                     @update:code-type="handleUpdateResourceCodeType"
+                                     @update:parsed-object="handleUpdateResourceData"
+                                     @expand="handleExpand('Resource')"
+                        />
+                    </p-pane-layout>
+                </div>
+            </section>
+            <section class="data-view-section-wrapper">
+                <div class="data-view-wrapper">
+                    <p-heading heading-type="sub">
+                        Output Schema
+                    </p-heading>
+                    <p-pane-layout class="edit-wrapper">
+                        <code-editor :code="state.schemaCode"
+                                     code-type="Json"
+                                     readonly
+                        />
+                    </p-pane-layout>
+                </div>
+                <div class="data-view-wrapper">
+                    <p-heading heading-type="sub">
+                        Output Data
                     </p-heading>
                     <p-pane-layout class="edit-wrapper">
                         <code-editor :code="state.dataCode"
-                                     :code-type="state.dataCodeType"
-                                     @update:code="state.dataCode = $event"
-                                     @update:code-type="state.dataCodeType = $event"
-                                     @update:parsed-object="handleUpdateData"
-                                     @expand="handleExpand('Data')"
+                                     code-type="Json"
+                                     readonly
                         />
                     </p-pane-layout>
                 </div>
             </section>
             <section>
-                <p-heading heading-type="sub">
-                    Dynamic UI
-                </p-heading>
-                <p-pane-layout class="dynamic-ui-wrapper">
-                    <p-dynamic-layout :schema="state.schema" />
-                </p-pane-layout>
+                <div class="input-section">
+                    <p-heading heading-type="sub">
+                        Dynamic UI
+                    </p-heading>
+                    <p-pane-layout class="dynamic-ui-wrapper">
+                        <p-dynamic-layout v-if="state.schema"
+                                          :name="state.schema?.name"
+                                          :type="state.schema?.type"
+                                          :options="state.schema?.options ?? {}"
+                                          :data="state.data"
+                        />
+                    </p-pane-layout>
+                </div>
             </section>
         </div>
         <code-editor-modal :visible="state.modalVisible"
                            :title="state.modalTitle"
-                           :code="state.modalTitle === 'Schema' ? state.schemaCode : state.dataCode"
-                           :code-type="state.modalTitle === 'Schema' ? state.schemaCodeType : state.dataCodeType"
+                           :code="state.code"
+                           :code-type="state.codeType"
                            @close="state.modalVisible = false"
                            @confirm="handleModalConfirm"
         />
@@ -104,11 +173,11 @@ const handleModalConfirm = (code: string, codeType: string, parsedObject: object
         flex-direction: column;
         gap: 2rem;
     }
-    .input-sections-wrapper {
+    .data-input-section-wrapper {
         display: flex;
         gap: 1rem;
         overflow: hidden;
-        .input-section {
+        .data-input-wrapper {
             width: calc(50% - 0.5rem);
         }
         .edit-wrapper {
@@ -117,6 +186,17 @@ const handleModalConfirm = (code: string, codeType: string, parsedObject: object
 
         @screen tablet {
             flex-direction: column;
+        }
+    }
+    .data-view-section-wrapper {
+        display: flex;
+        gap: 1rem;
+        overflow: hidden;
+        .data-view-wrapper {
+            width: calc(50% - 0.5rem);
+        }
+        .edit-wrapper {
+            padding: 1rem;
         }
     }
     .dynamic-ui-wrapper {

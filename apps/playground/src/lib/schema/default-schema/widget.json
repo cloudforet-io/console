@@ -1,0 +1,13 @@
+{
+  "name": "Total Count",
+  "type": "card",
+  "query": {
+    "aggregate": [
+      {
+        "count": {
+          "name": "value"
+        }
+      }
+    ]
+  }
+}

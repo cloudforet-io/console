@@ -7,6 +7,7 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 const props = defineProps<{
     codeType?: string;
     showExpandButton?: boolean;
+    readonly?: boolean;
 }>();
 const emit = defineEmits<{(event: 'click-beautify'): void;
     (event: 'click-expand'): void;
@@ -40,15 +41,17 @@ watch(() => props.codeType, (codeType) => {
         <p-select-dropdown :menu="state.codeTypes"
                            style-type="transparent"
                            :selected="[state.codeType]"
+                           :readonly="props.readonly"
                            @select="handleClickChangeCodeType"
         />
-        <p-button size="sm"
+        <p-button v-if="!props.readonly"
+                  size="sm"
                   style-type="secondary"
                   @click="handleClickBeautify"
         >
             Beautify
         </p-button>
-        <p-icon-button v-if="props.showExpandButton"
+        <p-icon-button v-if="!props.readonly && props.showExpandButton"
                        name="ic_arrows-expand-all"
                        size="sm"
                        shape="square"

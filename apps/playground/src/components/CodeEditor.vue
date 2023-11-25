@@ -12,6 +12,7 @@ const props = defineProps<{
     code?: string;
     codeType?: string;
     fullMode?: boolean;
+    readonly?: boolean;
 }>();
 const emit = defineEmits<{(event: 'update:parsed-object', parsedObject: object): void;
     (event: 'update:code', code: string): void;
@@ -21,33 +22,48 @@ const emit = defineEmits<{(event: 'update:parsed-object', parsedObject: object):
 }>();
 const state = reactive({
     code: props.code ?? '',
-    codeType: 'Json' as string,
     parsedObject: {} as object,
     parsingError: null as null|Error,
 });
 
 const updateCode = (code: string) => {
-    state.code = code;
-    emit('update:code', state.code);
+    emit('update:code', code);
 };
-const handleUpdateCodeType = (codeType: string) => {
-    emit('update:code-type', codeType);
-
+const updateCodeByCodeType = (codeType: string) => {
     if (state.parsingError) {
-        handleUpdateCode(state.code);
+        handleUpdateCode(props.code);
         return;
     }
 
-    if (props.codeType === 'Json') {
+    if (codeType === 'Json') {
         updateCode(JSON.stringify(state.parsedObject, null, 2));
     } else {
         updateCode(Yaml.stringify(state.parsedObject));
     }
 };
+const handleUpdateCodeType = (codeType: string) => {
+    emit('update:code-type', codeType);
+    updateCodeByCodeType(codeType);
+};
 
 const parseCode = (trimmedCode: string) => {
     if (props.codeType === 'Json') return JSON.parse(trimmedCode);
-    return Yaml.parse(trimmedCode);
+    let parsed = null as null|object;
+    let error = null as null|Error;
+    try {
+        parsed = Yaml.parse(trimmedCode);
+    } catch (e: unknown) {
+        error = e as Error;
+        try {
+            parsed = Yaml.parseAllDocuments(trimmedCode);
+            parsed = (parsed as any[]).map((item) => Yaml.stringify(item)).map((str) => Yaml.parse(str));
+            error = null;
+        } catch (e2: unknown) {
+            error = e2 as Error;
+        }
+    }
+    if (error) throw error;
+    return parsed;
 };
 const handleUpdateCode = (code?: string) => {
     updateCode(code ?? '');
@@ -82,8 +98,8 @@ const handleClickBeautify = () => {
 watch(() => state.parsedObject, (parsedObject) => {
     emit('update:parsed-object', parsedObject);
 });
-watch(() => props.code, (code) => {
-    state.code = code ?? '';
+watch(() => props.codeType, (codeType) => {
+    updateCodeByCodeType(codeType ?? 'Json');
 });
 </script>
 
@@ -91,21 +107,24 @@ watch(() => props.code, (code) => {
     <div class="code-editor">
         <div class="tools-wrapper">
             <code-editor-toolbox :code-type="props.codeType"
+                                 :readonly="props.readonly"
                                  :show-expand-button="!props.fullMode"
                                  @update:code-type="handleUpdateCodeType"
                                  @click-expand="handleClickExpand"
                                  @click-beautify="handleClickBeautify"
             />
         </div>
-        <p-text-editor :code="state.code"
+        <p-text-editor :code="props.code"
                        disable-auto-reformat
+                       :read-only="props.readonly"
+                       :folded="props.readonly"
                        :style="{
                            'min-height': props.fullMode ? 'auto' : '300px',
                            'max-height': props.fullMode ? 'auto' : '300px',
                        }"
                        @update:code="handleUpdateCode"
         />
-        <error-message v-if="!props.fullMode"
+        <error-message v-if="!props.readonly && !props.fullMode"
                        :error="state.parsingError"
         />
     </div>
