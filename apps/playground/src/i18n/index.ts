@@ -4,6 +4,8 @@ import type { LocaleMessageObject } from 'vue-i18n';
 
 import { messages } from '@spaceone/design-system';
 
+import { loadFonts } from '@/styles/fonts';
+
 Vue.use(VueI18n);
 
 const componentEN = messages.en;
@@ -20,7 +22,24 @@ const removeEmpty = (obj: any): LocaleMessageObject => Object.keys(obj)
         {},
     );
 
+const loadLocaleFiles = async (lang: string) => {
+    // load necessary files
+    await Promise.allSettled([
+        loadFonts(lang),
+    ]);
+};
 
+const supportLanguages = ['en', 'ko', 'ja'] as const;
+type SupportLanguage = typeof supportLanguages[number];
+export const setI18nLocale = async (_lang: string) => {
+    let lang = _lang;
+    if (!supportLanguages.includes(lang as SupportLanguage)) {
+        console.error(`Not supported language: ${lang}`);
+        lang = 'en';
+    }
+    await loadLocaleFiles(lang);
+    i18n.locale = lang as string;
+};
 
 export const i18n = new VueI18n({
     locale: 'en', // set locale
@@ -33,3 +52,5 @@ export const i18n = new VueI18n({
     silentTranslationWarn: true,
     silentFallbackWarn: true,
 });
+
+setI18nLocale('en');

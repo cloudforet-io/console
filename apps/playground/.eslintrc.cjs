@@ -20,6 +20,11 @@ module.exports = {
                         position: 'before',
                     },
                     {
+                        pattern: '*',
+                        group: 'external',
+                        position: 'before',
+                    },
+                    {
                         pattern: '{@spaceone/design-system/**}',
                         group: 'external',
                         position: 'after',

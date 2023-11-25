@@ -1,8 +1,9 @@
 import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
-import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
+
+import SpaceDesignSystem from '@spaceone/design-system';
 
 import { i18n } from '@/i18n';
 import { router } from '@/router';
@@ -11,8 +12,8 @@ import App from './App.vue';
 
 import '@/styles/style.pcss';
 // eslint-disable-next-line
-import '@spaceone/design-system/css/light-style.css';
 import '@spaceone/design-system/dist/style.css';
+import '@spaceone/design-system/css/light-style.css';
 
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(Fragment.Plugin);

@@ -35,7 +35,8 @@
     "vue-fragment": "^1.5.1",
     "vue-i18n": "^8.15.5",
     "vue-router": "^3.6.5",
-    "webfontloader": "^1.6.28"
+    "webfontloader": "^1.6.28",
+    "yaml": "^2.3.4"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.21.4",
