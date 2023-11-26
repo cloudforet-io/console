@@ -44,6 +44,7 @@ export interface UserDetailData {
 	created_at?: TimeStamp;
 	domain_id: string;
 	email_verified?: boolean;
+	mfa_state: string;
 }
 
 export interface User extends UserData {

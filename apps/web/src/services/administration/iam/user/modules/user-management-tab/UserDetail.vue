@@ -57,6 +57,7 @@ const state = reactive({
             { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
             { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
             ...additionalFields,
+            { name: 'mfa_state', label: i18n.t('IDENTITY.USER.MAIN.MFA') },
             { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
             { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
             { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
@@ -81,6 +82,8 @@ const getUserDetailData = async (userId) => {
         state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
         state.data.email = response.email;
         state.data.email_verified = response.email_verified;
+        // TODO: The issue of not receiving data from other users needs to be investigated.
+        state.data.mfa_state = response.mfa.state === 'ENABLED' ? 'On' : 'Off';
         state.loading = false;
     } catch (e) {
         ErrorHandler.handleError(e);
