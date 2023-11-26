@@ -82,9 +82,10 @@ const handleClickCancel = async () => {
     await resetFormData();
 };
 const handleConfirmButton = () => {
-    if (props.type === 'change') {
+    if (modalState.proxyType === 'change') {
         modalState.proxyType = 'new';
         state.isNextStep = false;
+        state.isSentCode = false;
     } else {
         handleClickVerifyButton();
     }
@@ -99,7 +100,7 @@ const handleClickVerifyButton = async () => {
             domain_id: state.domainId,
             verify_code: validationState.verificationCode,
         });
-        if (props.type !== 'change') {
+        if (modalState.proxyType !== 'change') {
             modalState.proxyVisible = false;
         } else {
             state.isNextStep = true;
@@ -118,7 +119,7 @@ const handleClickVerifyButton = async () => {
     <p-button-modal
         :visible="modalState.proxyVisible"
         :header-title="modalState.title"
-        :class="['mfa-modal-wrapper', props.type]"
+        :class="['mfa-modal-wrapper', modalState.proxyType]"
         size="sm"
         :theme-color="modalState.proxyType === 'disabled'? 'alert' : 'primary'"
         :disabled="modalState.proxyType !== 'change' ? validationState.verificationCode === '' : !(state.isNextStep && state.isSentCode)"
@@ -129,13 +130,14 @@ const handleClickVerifyButton = async () => {
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <span v-if="props.type === 'disabled'"
+                <span v-if="modalState.proxyType === 'disabled'"
                       class="disable-modal-desc"
                 >
                     {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
                 </span>
                 <email-info-content :email="props.email"
                                     :type="modalState.proxyType"
+                                    :mfa-type="props.mfaType"
                                     :is-sent-code.sync="state.isSentCode"
                 />
                 <div class="validation-code-form">
@@ -146,7 +148,7 @@ const handleClickVerifyButton = async () => {
                                    class="form"
                     >
                         <template #label-extra>
-                            <span v-if="props.type === 'change' && state.isNextStep && state.isSentCode"
+                            <span v-if="modalState.proxyType === 'change' && state.isNextStep && state.isSentCode"
                                   class="verified"
                             >
                                 <p-i name="ic_verified"
@@ -163,10 +165,11 @@ const handleClickVerifyButton = async () => {
                         <p-text-input :value="validationState.verificationCode"
                                       :invalid="validationState.isValidationCodeValid"
                                       class="text-input"
+                                      :disabled="modalState.proxyType === 'new' && !state.isSentCode"
                                       @update:value="handleChangeInput"
                         />
                     </p-field-group>
-                    <p-button v-if="props.type === 'change'"
+                    <p-button v-if="modalState.proxyType === 'change'"
                               style-type="secondary"
                               :loading="state.loading"
                               :disabled="!state.isSentCode || state.isNextStep"
@@ -177,7 +180,7 @@ const handleClickVerifyButton = async () => {
                 </div>
                 <collapsible-content :mfa-type="props.mfaType"
                                      :email="props.email"
-                                     :type="props.type"
+                                     :type="modalState.proxyType"
                                      :is-sent-code.sync="state.isSentCode"
                 />
             </div>
