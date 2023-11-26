@@ -11,8 +11,6 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserState } from '@/store/modules/user/type';
-
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-authentication-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -45,7 +43,6 @@ const state = reactive({
     isCollapsed: true,
     isSentCode: false,
     isNextStep: false,
-    userInfo: {} as UserState,
 });
 
 const modalState = reactive({
@@ -81,9 +78,8 @@ const handleChangeInput = (value: string) => {
     validationState.verificationCode = value;
 };
 const handleClickCancel = async () => {
-    resetFormData();
     modalState.proxyVisible = false;
-    await store.dispatch('user/setUser', state.userInfo);
+    await resetFormData();
 };
 const handleConfirmButton = () => {
     if (props.type === 'change') {
@@ -98,15 +94,13 @@ const handleConfirmButton = () => {
 const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
-        const response = await postValidationMfaCode({
+        await postValidationMfaCode({
             user_id: state.userId,
             domain_id: state.domainId,
             verify_code: validationState.verificationCode,
         });
         if (props.type !== 'change') {
             modalState.proxyVisible = false;
-            await store.dispatch('user/setUser', response);
-            state.userInfo = response as UserState;
         } else {
             state.isNextStep = true;
         }
@@ -141,7 +135,7 @@ const handleClickVerifyButton = async () => {
                     {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
                 </span>
                 <email-info-content :email="props.email"
-                                    :type="props.type"
+                                    :type="modalState.proxyType"
                                     :is-sent-code.sync="state.isSentCode"
                 />
                 <div class="validation-code-form">
@@ -233,21 +227,28 @@ const handleClickVerifyButton = async () => {
             }
         }
         .verified {
-            @apply inline-flex items-center text-label-md text-green-600;
+            @apply inline-flex items-center text-label-md font-normal text-green-600;
             gap: 0.25rem;
+        }
+
+        /* custom design-system component - p-field-group */
+        :deep(.p-field-group) {
+            .title-wrapper .title {
+                @apply flex items-center;
+                gap: 0.5rem;
+            }
         }
     }
     .change-confirm-button {
         @apply flex items-center;
         gap: 0.25rem;
     }
-}
-
-/* custom design-system component - p-button-modal */
-:deep(.p-button-modal) {
     &.change {
-        .confirm-button {
-            @apply bg-primary-1;
+        /* custom design-system component - p-button */
+        :deep(.p-button) {
+            &.confirm-button:not(.disabled) {
+                @apply bg-primary-1;
+            }
         }
     }
 }
