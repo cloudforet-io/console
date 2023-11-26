@@ -162,6 +162,7 @@ export default {
             { name: 'user_id', label: 'User ID' },
             { name: 'name', label: 'Name' },
             { name: 'state', label: 'State' },
+            { name: 'mfa', label: 'Multi-Factor Auth' },
             { name: 'user_type', label: 'Access Control' },
             { name: 'api_key_count', label: 'API Key', sortable: false },
             { name: 'role_name', label: 'Role', sortable: false },

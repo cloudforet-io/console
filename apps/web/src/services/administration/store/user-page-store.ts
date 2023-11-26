@@ -45,7 +45,7 @@ export const useUserPageStore = defineStore('user-page', {
                 // TODO: need to check V2 API
                 const res = await SpaceConnector.client.identity.user.list({
                     query: apiQuery,
-                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags'],
+                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags', 'mfa'],
                     include_role_binding: true,
                 });
                 this.users = res.results.map((d) => ({
