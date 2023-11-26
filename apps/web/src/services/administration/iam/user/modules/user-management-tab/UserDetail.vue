@@ -83,7 +83,7 @@ const getUserDetailData = async (userId) => {
         state.data.email = response.email;
         state.data.email_verified = response.email_verified;
         // TODO: The issue of not receiving data from other users needs to be investigated.
-        state.data.mfa_state = response.mfa.state === 'ENABLED' ? 'On' : 'Off';
+        state.data.mfa_state = response?.mfa?.state === 'ENABLED' ? 'On' : 'Off';
         state.loading = false;
     } catch (e) {
         ErrorHandler.handleError(e);
