@@ -74,7 +74,7 @@ const state = reactive({
 const getUserDetailData = async (userId) => {
     state.loading = true;
     try {
-        const response = await SpaceConnector.client.identity.user.get({
+        const response = await SpaceConnector.clientV2.identity.user.get({
             user_id: userId || props.userId,
         });
         state.data = response;
