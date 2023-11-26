@@ -20,7 +20,7 @@ interface UserMfaOptions {
     email?: string;
 }
 
-interface UserMfa {
+export interface UserMfa {
     state: MfaState;
     mfaType: MfaType;
     options?: UserMfaOptions;

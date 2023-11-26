@@ -12,6 +12,8 @@ import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AdminRole from '@/services/administration/iam/user/modules/user-management-modal/modules/AdminRole.vue';
+import MultiFactorAuth
+    from '@/services/administration/iam/user/modules/user-management-modal/modules/MultiFactorAuth.vue';
 import NotificationEmailForm
     from '@/services/administration/iam/user/modules/user-management-modal/modules/NotificationEmailForm.vue';
 import PasswordForm from '@/services/administration/iam/user/modules/user-management-modal/modules/PasswordForm.vue';
@@ -103,7 +105,7 @@ const handleChangeVerify = (status) => {
 const getUserDetailData = async (userId) => {
     if (userId === undefined) return;
     try {
-        state.data = await SpaceConnector.client.identity.user.get({
+        state.data = await SpaceConnector.clientV2.identity.user.get({
             user_id: userId,
         });
     } catch (e) {
@@ -225,6 +227,10 @@ const initAuthTypeList = async () => {
                         :item="state.data"
                         @change-input="handleChangeInputs"
                         @change-verify="handleChangeVerify"
+                    />
+                    <multi-factor-auth :state="state.data?.mfa?.state"
+                                       :user-id="state.data?.user_id"
+                                       :domain-id="state.data?.domain_id"
                     />
                     <password-form
                         v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL && state.data.user_type !== USER_TYPE.API_USER"
