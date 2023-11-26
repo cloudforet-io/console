@@ -1947,6 +1947,7 @@
 				"LANGUAGE": "言語",
 				"LAST_ACTIVITY": "最終アクセス時間",
 				"MFA": "",
+				"MFA_DESC": "",
 				"MOBILE": "連絡先",
 				"MY_ACCOUNT": "マイアカウント",
 				"NAME": "名前",
