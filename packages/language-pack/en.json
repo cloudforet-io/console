@@ -1946,6 +1946,7 @@
 				"GROUP": "Group/Company",
 				"LANGUAGE": "Language",
 				"LAST_ACTIVITY": "Last Activity",
+				"MFA": "Multi-factor Auth",
 				"MOBILE": "Mobile",
 				"MY_ACCOUNT": "My Account",
 				"NAME": "Name",
