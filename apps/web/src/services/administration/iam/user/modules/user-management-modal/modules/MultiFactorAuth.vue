@@ -1,52 +1,30 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { reactive } from 'vue';
 
 import {
     PI, PTooltip, PFieldTitle, PToggleButton,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
-import { postDisableMfa } from '@/lib/helper/multi-factor-authentication-helper';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
-    state?: string
-    userId?: string
-    domainId?: string
+    isToggled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    state: undefined,
-    userId: undefined,
-    domainId: undefined,
+    isToggled: undefined,
 });
 
+const emit = defineEmits<{(e: 'update:isToggled', type: string): void }>();
+
 const state = reactive({
-    loginUserId: computed(() => store.state.user.userId),
-    mfa: computed(() => store.state.user.mfa),
-    isToggled: false,
+    proxyIsToggled: useProxyValue('isToggled', props, emit),
 });
 
 const handleUpdateToggle = async () => {
-    await postDisableMfa({
-        user_id: props.userId,
-        domain_id: props.domainId,
-        force: true,
-    });
-    if (state.loginUserId === props.userId) {
-        await store.dispatch('user/setUser', {
-            mfa: {
-                ...state.mfa,
-                state: 'DISABLED',
-            },
-        });
-    }
-    state.isToggled = false;
+    state.proxyIsToggled = false;
 };
 
-watch(() => props.state, (value) => {
-    state.isToggled = value === 'ENABLED';
-});
 </script>
 
 <template>
@@ -54,8 +32,8 @@ watch(() => props.state, (value) => {
         <p-field-title :label="$t('IDENTITY.USER.MAIN.MFA')">
             <template #left>
                 <p-toggle-button
-                    :value="state.isToggled"
-                    :disabled="!state.isToggled"
+                    :value="state.proxyIsToggled"
+                    :disabled="!state.proxyIsToggled"
                     class="toggle-button"
                     @change-toggle="handleUpdateToggle"
                 />

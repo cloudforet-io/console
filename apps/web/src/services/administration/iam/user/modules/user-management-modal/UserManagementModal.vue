@@ -8,6 +8,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 
 import config from '@/lib/config';
+import { postDisableMfa } from '@/lib/helper/multi-factor-authentication-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -40,6 +42,8 @@ const state = reactive({
     data: {} as User,
     selectedId: computed(() => props.item?.user_id),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    mfa: computed(() => store.state.user.mfa),
+    loginUserId: computed(() => store.state.user.userId),
 });
 
 const emit = defineEmits<{(e: 'confirm', data: UserManagementData, roleId: string|null): void; }>();
@@ -59,6 +63,7 @@ const formState = reactive({
     passwordType: '',
     passwordManual: false,
     tags: {},
+    isToggled: false,
 });
 
 const validationState = reactive({
@@ -108,6 +113,7 @@ const getUserDetailData = async (userId) => {
         state.data = await SpaceConnector.clientV2.identity.user.get({
             user_id: userId,
         });
+        formState.isToggled = state.data.mfa?.state === 'ENABLED';
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -132,6 +138,34 @@ const confirm = async () => {
     }
     if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
         data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
+    }
+
+    if (!formState.isToggled) {
+        userPageStore.$patch({
+            modalLoading: true,
+        });
+        try {
+            await postDisableMfa({
+                user_id: state.data.user_id,
+                domain_id: state.data.domain_id,
+                force: true,
+            });
+            if (state.loginUserId === state.data.user_id) {
+                await store.dispatch('user/setUser', {
+                    mfa: {
+                        ...state.data?.mfa,
+                        state: 'DISABLED',
+                    },
+                });
+            }
+        } catch (e: any) {
+            showErrorMessage(e.message, e);
+            ErrorHandler.handleError(e);
+        } finally {
+            userPageStore.$patch({
+                modalLoading: false,
+            });
+        }
     }
 
     if (formState.domainRole !== undefined) {
@@ -228,10 +262,7 @@ const initAuthTypeList = async () => {
                         @change-input="handleChangeInputs"
                         @change-verify="handleChangeVerify"
                     />
-                    <multi-factor-auth :state="state.data?.mfa?.state"
-                                       :user-id="state.data?.user_id"
-                                       :domain-id="state.data?.domain_id"
-                    />
+                    <multi-factor-auth :is-toggled.sync="formState.isToggled" />
                     <password-form
                         v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL && state.data.user_type !== USER_TYPE.API_USER"
                         :item="state.data"
