@@ -10,11 +10,6 @@ import {
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import {
-    isInstanceOfAuthorizationError,
-} from '@cloudforet/core-lib/space-connector/error';
-
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -28,7 +23,6 @@ import {
 } from '@/lib/helper/config-data-helper';
 
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
@@ -67,7 +61,6 @@ const storeState = reactive({
     selectedItem: computed(() => projectPageStore.selectedItem),
     selectedNodeData: computed(() => projectPageStore.selectedNodeData),
     parentGroups: computed(() => projectPageStore.parentGroups),
-    hasProjectGroup: computed(() => projectPageStore.hasProjectGroup),
     projectCount: computed(() => projectPageStore.projectCount),
     projects: computed(() => store.getters['reference/projectItems']),
     favoriteProjects: computed(() => store.state.favorite.projectItems),
@@ -92,9 +85,7 @@ const state = reactive({
         }
         return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
     }),
-    groupMemberCount: undefined as number|undefined,
     groupMemberPageVisible: false,
-    isPermissionDenied: computed(() => state.groupMemberCount === undefined),
     createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const result: {name: string; label: string}[] = [];
         if (storeState.groupId) {
@@ -157,47 +148,6 @@ const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
 const openProjectGroupCreateForm = () => {
     projectPageStore.openProjectGroupCreateForm(storeState.selectedItem);
 };
-
-/* Member Count */
-const getMemberCount = async (groupId: string) => {
-    if (groupId) {
-        try {
-            const res = await SpaceConnector.client.identity.projectGroup.member.list({
-                project_group_id: groupId,
-            });
-            state.groupMemberCount = res.total_count;
-        } catch (e: any) {
-            if (!isInstanceOfAuthorizationError(e)) {
-                ErrorHandler.handleError(e);
-            }
-            state.groupMemberCount = undefined;
-        }
-    } else {
-        state.groupMemberCount = undefined;
-    }
-};
-
-watch(() => storeState.groupId, async (groupId) => {
-    if (groupId) await getMemberCount(groupId);
-});
-
-// refresh permission info when get back from project group member page
-watch(() => state.groupMemberPageVisible, async (visible) => {
-    if (storeState.groupId && !visible) {
-        await getMemberCount(storeState.groupId);
-        if (state.isPermissionDenied) {
-            projectPageStore.addPermissionInfo({
-                [storeState.groupId]: false,
-            });
-        }
-    }
-});
-
-watch(() => state.isPermissionDenied, (isPermissionDenied) => {
-    if (!isPermissionDenied) {
-        store.commit('error/setVisibleAuthorizationError', false);
-    }
-});
 
 watch(() => route.query, async (after, before) => {
     if (after?.select_pg !== before?.select_pg && !Array.isArray(after.select_pg)) {
@@ -269,7 +219,7 @@ onUnmounted(() => {
                     >
                         <template #title-right-extra>
                             <div class="favorite-btn-wrapper">
-                                <favorite-button v-if="storeState.groupId && !state.isPermissionDenied"
+                                <favorite-button v-if="storeState.groupId"
                                                  :favorite-items="state.favoriteItems"
                                                  :item-id="storeState.groupId"
                                                  :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"

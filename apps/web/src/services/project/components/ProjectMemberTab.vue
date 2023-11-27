@@ -60,17 +60,13 @@
 
         <project-member-add-modal v-if="memberAddFormVisible"
                                   :visible.sync="memberAddFormVisible"
-                                  :is-project-group="isProjectGroup"
                                   :project-id="projectId"
-                                  :project-group-id="projectGroupId"
                                   @confirm="handleConfirm"
         />
         <project-member-update-modal v-if="memberUpdateFormVisible"
                                      :visible.sync="memberUpdateFormVisible"
                                      :selected-member="selectedItems[0]"
                                      :project-id="projectId"
-                                     :is-project-group="isProjectGroup"
-                                     :project-group-id="projectGroupId"
                                      @confirm="handleConfirm"
         />
         <p-table-check-modal :visible.sync="checkMemberDeleteState.visible"
@@ -235,19 +231,11 @@ export default {
             state.loading = true;
             state.selectIndex = [];
             try {
-                let res;
-                if (props.isProjectGroup) {
-                    res = await SpaceConnector.client.identity.projectGroup.member.list({
-                        project_group_id: props.projectGroupId,
-                        query: apiQueryHelper.data,
-                    });
-                } else {
-                    res = await SpaceConnector.client.identity.project.member.list({
-                        project_id: props.projectId,
-                        query: apiQueryHelper.data,
-                        include_parent_member: true,
-                    });
-                }
+                const res = await SpaceConnector.client.identity.project.member.list({
+                    project_id: props.projectId,
+                    query: apiQueryHelper.data,
+                    include_parent_member: true,
+                });
                 state.items = res.results.map((d) => {
                     let assigned;
                     if (d.project_info) assigned = projects[d.project_info?.project_id]?.label;
@@ -271,17 +259,6 @@ export default {
             try {
                 await SpaceConnector.client.identity.project.member.remove({
                     project_id: props.projectId,
-                    users: items.map((it) => it.resource_id),
-                });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
-            }
-        };
-        const deleteProjectGroupMember = async (items) => {
-            try {
-                await SpaceConnector.client.identity.projectGroup.member.remove({
-                    project_group_id: props.projectGroupId,
                     users: items.map((it) => it.resource_id),
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
@@ -317,8 +294,7 @@ export default {
             }
         };
         const handleConfirmDeleteMember = async (items) => {
-            if (props.isProjectGroup) await deleteProjectGroupMember(items);
-            else await deleteProjectMember(items);
+            await deleteProjectMember(items);
 
             checkMemberDeleteState.visible = false;
             await listMembers(storeState.projects);
