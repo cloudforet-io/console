@@ -1,7 +1,7 @@
 import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { ProjectType } from '@/schema/identity/project/type';
 
 
-type ProjectType = 'PRIVATE' | 'PUBLIC';
 export interface ProjectModel {
     project_id: string;
     name: string;
