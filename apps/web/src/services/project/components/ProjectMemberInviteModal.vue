@@ -312,7 +312,7 @@ watch(() => state.activeTab, () => {
 
 <template>
     <p-button-modal
-        class="project-member-add-modal"
+        class="project-member-invite-modal"
         :header-title="$t('PROJECT.DETAIL.MEMBER.MODAL_INVITE_MEMBER_TITLE')"
         :fade="true"
         :backdrop="true"
@@ -437,7 +437,7 @@ watch(() => state.activeTab, () => {
 </template>
 
 <style lang="postcss" scoped>
-.project-member-add-modal {
+.project-member-invite-modal {
     /* custom design-system component - p-box-tab */
     :deep(.p-box-tab) {
         .tab-pane {
