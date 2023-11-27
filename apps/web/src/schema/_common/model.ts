@@ -8,8 +8,8 @@ export interface TimeStamp {
 }
 
 export interface ListResponse<T> {
-    results: T[];
-    total_count: number;
+    results?: T[];
+    total_count?: number;
 }
 
 export interface AnalyzeResponse<T> {
