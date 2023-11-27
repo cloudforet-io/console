@@ -32,7 +32,6 @@ import ProjectMainCardList from '@/services/project/components/ProjectMainCardLi
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
 import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
-import ProjectMemberOverlay from '@/services/project/components/ProjectMemberOverlay.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type {
     ProjectGroupTreeNodeData, ProjectGroupTreeItem,
@@ -85,7 +84,6 @@ const state = reactive({
         }
         return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
     }),
-    groupMemberPageVisible: false,
     createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => {
         const result: {name: string; label: string}[] = [];
         if (storeState.groupId) {
@@ -273,13 +271,6 @@ onUnmounted(() => {
                     <project-main-project-group-form-modal v-if="storeState.projectGroupFormVisible" />
 
                     <project-main-project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
-
-                    <project-member-overlay
-                        :visible="!!(state.groupMemberPageVisible && storeState.groupId)"
-                        :group-id="storeState.groupId"
-                        :manage-disabled="!state.hasManagePermission"
-                        @close="state.groupMemberPageVisible = false"
-                    />
                 </div>
             </template>
         </p-vertical-page-layout>
