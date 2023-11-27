@@ -54,6 +54,7 @@ export const useUserPageStore = defineStore('user-page', {
                     user_type: _getUserType(d.user_type),
                     role_name: (_getArrayWithNotDuplicatedItem(d.role_bindings.map((data) => data.role_info.name))).join(', '),
                     last_accessed_at: calculateTime(d.last_accessed_at, this.timezone),
+                    mfa: d?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
                 }));
                 this.totalCount = res.total_count;
                 this.selectedIndices = [];

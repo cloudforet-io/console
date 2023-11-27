@@ -41,6 +41,11 @@
                           class="capitalize"
                 />
             </template>
+            <template #col-mfa-format="{value}">
+                <p-status v-bind="userMfaFormatter(value)"
+                          class="capitalize"
+                />
+            </template>
             <template #col-last_accessed_at-format="{ value }">
                 <span v-if="value === -1">
                     No Activity
@@ -119,7 +124,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userSearchHandlers } from '@/services/administration/iam/user/lib/config';
-import { userStateFormatter } from '@/services/administration/iam/user/lib/helper';
+import { userMfaFormatter, userStateFormatter } from '@/services/administration/iam/user/lib/helper';
 import UserManagementModal from '@/services/administration/iam/user/modules/user-management-modal/UserManagementModal.vue';
 import UserStatusModal
     from '@/services/administration/iam/user/modules/user-management-modal/UserStatusModal.vue';
@@ -404,6 +409,7 @@ export default {
             userPageState,
             userFormState,
             userStateFormatter,
+            userMfaFormatter,
             modalState,
             fields,
             clickAdd,
