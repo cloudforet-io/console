@@ -64,7 +64,7 @@ const modalState = reactive({
 
 const validationState = reactive({
     verificationCode: '',
-    isValidationCodeValid: undefined as undefined | boolean,
+    isValidationCodeValid: true as undefined | boolean,
     validationCodeInvalidText: '' as TranslateResult | string,
 });
 
@@ -107,7 +107,7 @@ const handleClickVerifyButton = async () => {
         }
         resetFormData();
     } catch (e: any) {
-        validationState.isValidationCodeValid = true;
+        validationState.isValidationCodeValid = false;
         validationState.validationCodeInvalidText = i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
     } finally {
         state.loading = false;
@@ -142,7 +142,7 @@ const handleClickVerifyButton = async () => {
                 />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
-                                   :invalid="validationState.isValidationCodeValid"
+                                   :invalid="!validationState.isValidationCodeValid"
                                    :invalid-text="validationState.validationCodeInvalidText"
                                    required
                                    class="form"
@@ -163,7 +163,7 @@ const handleClickVerifyButton = async () => {
                             </span>
                         </template>
                         <p-text-input :value="validationState.verificationCode"
-                                      :invalid="validationState.isValidationCodeValid"
+                                      :invalid="!validationState.isValidationCodeValid"
                                       class="text-input"
                                       :disabled="modalState.proxyType === 'new' && !state.isSentCode"
                                       @update:value="handleChangeInput"
