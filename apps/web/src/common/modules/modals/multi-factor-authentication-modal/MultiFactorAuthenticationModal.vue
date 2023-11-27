@@ -11,8 +11,6 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserState } from '@/store/modules/user/type';
-
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-authentication-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -45,7 +43,6 @@ const state = reactive({
     isCollapsed: true,
     isSentCode: false,
     isNextStep: false,
-    userInfo: {} as UserState,
 });
 
 const modalState = reactive({
@@ -67,7 +64,7 @@ const modalState = reactive({
 
 const validationState = reactive({
     verificationCode: '',
-    isValidationCodeValid: undefined as undefined | boolean,
+    isValidationCodeValid: true as undefined | boolean,
     validationCodeInvalidText: '' as TranslateResult | string,
 });
 
@@ -81,14 +78,14 @@ const handleChangeInput = (value: string) => {
     validationState.verificationCode = value;
 };
 const handleClickCancel = async () => {
-    resetFormData();
     modalState.proxyVisible = false;
-    await store.dispatch('user/setUser', state.userInfo);
+    await resetFormData();
 };
 const handleConfirmButton = () => {
-    if (props.type === 'change') {
+    if (modalState.proxyType === 'change') {
         modalState.proxyType = 'new';
         state.isNextStep = false;
+        state.isSentCode = false;
     } else {
         handleClickVerifyButton();
     }
@@ -98,21 +95,19 @@ const handleConfirmButton = () => {
 const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
-        const response = await postValidationMfaCode({
+        await postValidationMfaCode({
             user_id: state.userId,
             domain_id: state.domainId,
             verify_code: validationState.verificationCode,
         });
-        if (props.type !== 'change') {
+        if (modalState.proxyType !== 'change') {
             modalState.proxyVisible = false;
-            await store.dispatch('user/setUser', response);
-            state.userInfo = response as UserState;
         } else {
             state.isNextStep = true;
         }
         resetFormData();
     } catch (e: any) {
-        validationState.isValidationCodeValid = true;
+        validationState.isValidationCodeValid = false;
         validationState.validationCodeInvalidText = i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
     } finally {
         state.loading = false;
@@ -124,7 +119,7 @@ const handleClickVerifyButton = async () => {
     <p-button-modal
         :visible="modalState.proxyVisible"
         :header-title="modalState.title"
-        :class="['mfa-modal-wrapper', props.type]"
+        :class="['mfa-modal-wrapper', modalState.proxyType]"
         size="sm"
         :theme-color="modalState.proxyType === 'disabled'? 'alert' : 'primary'"
         :disabled="modalState.proxyType !== 'change' ? validationState.verificationCode === '' : !(state.isNextStep && state.isSentCode)"
@@ -135,24 +130,25 @@ const handleClickVerifyButton = async () => {
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <span v-if="props.type === 'disabled'"
+                <span v-if="modalState.proxyType === 'disabled'"
                       class="disable-modal-desc"
                 >
                     {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
                 </span>
                 <email-info-content :email="props.email"
-                                    :type="props.type"
+                                    :type="modalState.proxyType"
+                                    :mfa-type="props.mfaType"
                                     :is-sent-code.sync="state.isSentCode"
                 />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
-                                   :invalid="validationState.isValidationCodeValid"
+                                   :invalid="!validationState.isValidationCodeValid"
                                    :invalid-text="validationState.validationCodeInvalidText"
                                    required
                                    class="form"
                     >
                         <template #label-extra>
-                            <span v-if="props.type === 'change' && state.isNextStep && state.isSentCode"
+                            <span v-if="modalState.proxyType === 'change' && state.isNextStep && state.isSentCode"
                                   class="verified"
                             >
                                 <p-i name="ic_verified"
@@ -167,12 +163,13 @@ const handleClickVerifyButton = async () => {
                             </span>
                         </template>
                         <p-text-input :value="validationState.verificationCode"
-                                      :invalid="validationState.isValidationCodeValid"
+                                      :invalid="!validationState.isValidationCodeValid"
                                       class="text-input"
+                                      :disabled="modalState.proxyType === 'new' && !state.isSentCode"
                                       @update:value="handleChangeInput"
                         />
                     </p-field-group>
-                    <p-button v-if="props.type === 'change'"
+                    <p-button v-if="modalState.proxyType === 'change'"
                               style-type="secondary"
                               :loading="state.loading"
                               :disabled="!state.isSentCode || state.isNextStep"
@@ -183,7 +180,7 @@ const handleClickVerifyButton = async () => {
                 </div>
                 <collapsible-content :mfa-type="props.mfaType"
                                      :email="props.email"
-                                     :type="props.type"
+                                     :type="modalState.proxyType"
                                      :is-sent-code.sync="state.isSentCode"
                 />
             </div>
@@ -233,21 +230,28 @@ const handleClickVerifyButton = async () => {
             }
         }
         .verified {
-            @apply inline-flex items-center text-label-md text-green-600;
+            @apply inline-flex items-center text-label-md font-normal text-green-600;
             gap: 0.25rem;
+        }
+
+        /* custom design-system component - p-field-group */
+        :deep(.p-field-group) {
+            .title-wrapper .title {
+                @apply flex items-center;
+                gap: 0.5rem;
+            }
         }
     }
     .change-confirm-button {
         @apply flex items-center;
         gap: 0.25rem;
     }
-}
-
-/* custom design-system component - p-button-modal */
-:deep(.p-button-modal) {
     &.change {
-        .confirm-button {
-            @apply bg-primary-1;
+        /* custom design-system component - p-button */
+        :deep(.p-button) {
+            &.confirm-button:not(.disabled) {
+                @apply bg-primary-1;
+            }
         }
     }
 }
