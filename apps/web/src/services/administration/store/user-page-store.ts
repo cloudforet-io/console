@@ -42,9 +42,10 @@ export const useUserPageStore = defineStore('user-page', {
         async listUsers(apiQuery: Query) {
             this.loading = true;
             try {
+                // TODO: need to check V2 API
                 const res = await SpaceConnector.client.identity.user.list({
                     query: apiQuery,
-                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags'],
+                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags', 'mfa'],
                     include_role_binding: true,
                 });
                 this.users = res.results.map((d) => ({
@@ -53,6 +54,7 @@ export const useUserPageStore = defineStore('user-page', {
                     user_type: _getUserType(d.user_type),
                     role_name: (_getArrayWithNotDuplicatedItem(d.role_bindings.map((data) => data.role_info.name))).join(', '),
                     last_accessed_at: calculateTime(d.last_accessed_at, this.timezone),
+                    mfa: d?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
                 }));
                 this.totalCount = res.total_count;
                 this.selectedIndices = [];

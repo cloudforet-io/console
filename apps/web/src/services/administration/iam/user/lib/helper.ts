@@ -2,7 +2,11 @@ import dayjs from 'dayjs';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 
-import { pluginStateColor, userStateColor } from '@/services/administration/iam/user/lib/config';
+import {
+    pluginStateColor,
+    USER_MFA_COLOR,
+    userStateColor,
+} from '@/services/administration/iam/user/lib/config';
 
 const colorBindFactory = (colorMapping, textFnc) => (value) => ({
     text: textFnc(value),
@@ -40,5 +44,5 @@ export const utcToTimezoneFormatter = (hour, timezone) => {
 };
 
 export const userStateFormatter = colorBindFactory(userStateColor, (value) => value.toLowerCase());
-
+export const userMfaFormatter = colorBindFactory(USER_MFA_COLOR, (value) => value.toLowerCase());
 export const pluginStateFormatter = colorBindFactory(pluginStateColor, (value) => value);

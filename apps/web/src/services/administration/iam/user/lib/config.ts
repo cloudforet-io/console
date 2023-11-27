@@ -83,6 +83,17 @@ export const userStateColor = Object.freeze({
     },
 });
 
+export const USER_MFA_COLOR = {
+    ON: {
+        iconColor: styles.safe,
+        textColor: styles.gray[900],
+    },
+    OFF: {
+        iconColor: styles.gray[400],
+        textColor: styles.gray[400],
+    },
+} as const;
+
 export const pluginStateColor = Object.freeze({
     ACTIVE: {
         iconColor: styles.safe,
