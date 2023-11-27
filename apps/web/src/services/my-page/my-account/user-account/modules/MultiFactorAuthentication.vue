@@ -10,13 +10,13 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { postDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
+import { postEnableMfa } from '@/lib/helper/multi-factor-authentication-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
-import MultiFactorAuthenticationEmailModal
-    from '@/common/modules/modals/multi-factor-authentication-modal/MultiFactorAuthenticationEmailModal.vue';
+import MultiFactorAuthenticationModal
+    from '@/common/modules/modals/multi-factor-authentication-modal/MultiFactorAuthenticationModal.vue';
 
 import UserAccountModuleContainer
     from '@/services/my-page/my-account/user-account/modules/UserAccountModuleContainer.vue';
@@ -28,15 +28,19 @@ const contextMenuItems = [
 
 const state = reactive({
     loading: false,
-    mfa: computed(() => store.state.user.mfa || undefined),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
-    isVerified: false,
+    //
+    mfa: computed(() => store.state.user.mfa || undefined),
+    isVerified: computed(() => state.mfa?.state === 'ENABLED'),
     enableMfa: false,
-    isModalVisible: false,
-
     // Currently, only email is supported.
     selectedItem: contextMenuItems[0].name,
+});
+
+const modalState = reactive({
+    isModalVisible: false,
+    modalType: '' as 'verify' | 'disabled' | 'change' | 'new',
 });
 
 /* Components */
@@ -45,41 +49,35 @@ const handleSelectDropdownItem = (selected: string) => {
 };
 const initState = () => {
     state.enableMfa = state.mfa?.state === 'ENABLED';
-    state.isVerified = state.enableMfa && (state.mfa?.mfa_type !== undefined && state.mfa?.mfa_type !== '');
 };
 
 /* API */
 const handleChangeToggle = async () => {
     if (state.isVerified && !state.enableMfa) {
-        await postDisableMfa({
-            user_id: state.userId,
-            domain_id: state.domainId,
-        });
-
-        state.isModalVisible = true;
+        modalState.isModalVisible = true;
+        modalState.modalType = 'disabled';
     }
 };
 const handleClickVerifyButton = async () => {
     if (state.isVerified) {
-        state.isModalVisible = true;
-        return;
+        modalState.modalType = 'change';
+    } else {
+        state.loading = true;
+        try {
+            await postEnableMfa({
+                user_id: state.userId,
+                mfa_type: state.selectedItem,
+                options: {
+                    email: email.value,
+                },
+                domain_id: state.domainId,
+            });
+            modalState.modalType = 'verify';
+        } finally {
+            state.loading = false;
+        }
     }
-
-    state.loading = true;
-
-    try {
-        await postEnableMfa({
-            user_id: state.userId,
-            mfa_type: state.selectedItem,
-            options: {
-                email: email.value,
-            },
-            domain_id: state.domainId,
-        });
-        state.isModalVisible = true;
-    } finally {
-        state.loading = false;
-    }
+    modalState.isModalVisible = true;
 };
 
 const {
@@ -115,7 +113,9 @@ watch(() => state.mfa, (mfa) => {
                     <p class="form-title">
                         {{ $t('MY_PAGE.MFA.TITLE') }}
                     </p>
-                    <div class="verify-status-wrapper">
+                    <div v-if="state.enableMfa"
+                         class="verify-status-wrapper"
+                    >
                         <div v-if="state.isVerified"
                              class="verified"
                         >
@@ -183,12 +183,13 @@ watch(() => state.mfa, (mfa) => {
                 />
             </div>
         </user-account-module-container>
-        <multi-factor-authentication-email-modal v-if="state.isModalVisible"
-                                                 :email="email"
-                                                 :verified="state.isVerified"
-                                                 :mfa-type="state.selectedItem"
-                                                 :visible.sync="state.isModalVisible"
-                                                 @refresh="initState"
+        <multi-factor-authentication-modal v-if="modalState.isModalVisible"
+                                           :type="modalState.modalType"
+                                           :email="email"
+                                           :verified="state.isVerified"
+                                           :mfa-type="state.selectedItem"
+                                           :visible.sync="modalState.isModalVisible"
+                                           @refresh="initState"
         />
     </div>
 </template>

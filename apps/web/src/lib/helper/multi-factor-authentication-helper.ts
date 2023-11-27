@@ -35,13 +35,13 @@ export const postDisableMfa = async (body): Promise<void|Error> => {
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
+        throw e;
     }
 };
 
 export const postValidationMfaCode = async (body): Promise<void|Error> => {
     try {
-        const response = await SpaceConnector.clientV2.identity.user.confirmMfa(body);
-        await store.dispatch('user/setUser', response);
+        return await SpaceConnector.clientV2.identity.user.confirmMfa(body);
     } catch (e: any) {
         ErrorHandler.handleError(e);
         throw e;
