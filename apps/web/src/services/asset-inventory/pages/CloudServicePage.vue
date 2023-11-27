@@ -13,6 +13,7 @@
         <cloud-service-toolbox :has-next-page="hasNextPage"
                                :handlers="handlerState"
                                :period="cloudServicePageState.period"
+                               :page-size="pageLimit"
                                @update-pagination="handlePaginationUpdate"
         />
 
