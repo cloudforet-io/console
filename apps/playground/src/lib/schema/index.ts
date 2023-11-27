@@ -1,5 +1,9 @@
 import { render } from 'ejs';
-import { get, isArray, set } from 'lodash';
+import {
+    get, isArray, merge, set,
+} from 'lodash';
+
+import type { SearchSchema, TableOptions, DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import detailsSchema from './default-schema/details.json';
 import { defaultSearchSchemaTemplate } from './default-schema/search-template';
@@ -23,16 +27,16 @@ interface GetSchemaParams {
     };
 }
 
-const getMetadataSchema = (metadata: object, key: string, isMultiple: boolean) => {
-    let metadataSchema = [] as any;
+const getMetadataSchema = <T extends object>(metadata: object|null, key: string, isMultiple: boolean): null|T|T[] => {
+    let metadataSchema = [] as T[];
 
-    if (!metadata) return metadataSchema;
+    if (!metadata) return isMultiple ? [] as T : null;
 
     if ('view' in metadata) {
         if (isMultiple) {
-            metadataSchema = get(metadata, key) || [];
+            metadataSchema = get(metadata, key) ?? [];
         } else {
-            metadataSchema = get(metadata, key) || {};
+            metadataSchema = get(metadata, key) ?? null;
         }
     } else {
         Object.keys(metadata).forEach((provider) => {
@@ -74,84 +78,113 @@ const getCloudServiceTypeInfo = (referenceData: any, options: SubDataOptions) =>
     }
     return null;
 };
-export const getSchema = ({
-    schemaType, resourceTypeData, resourceData, referenceData, options = {},
-}: GetSchemaParams) => {
+export const getSchema = (params: GetSchemaParams) => {
+    const { schemaType } = params;
     if (schemaType === 'details') {
-        const cloudServiceInfo = resourceData;
-
-        let cloudServiceTypeSubDataLayouts = [] as any;
-        const subDataReferences = getMetadataSchema(cloudServiceInfo.metadata, 'view.sub_data.reference', true);
-        subDataReferences.forEach((subDataReference: any) => {
-            const subDataOptions = subDataReference.options || {};
-
-            if (referenceData && subDataOptions.provider && subDataOptions.cloud_service_group && subDataOptions.cloud_service_type) {
-                const cloudServiceTypeInfo = getCloudServiceTypeInfo(referenceData, subDataOptions);
-                const subDataLayout = getMetadataSchema(cloudServiceTypeInfo.metadata, 'view.sub_data.layouts', false);
-                cloudServiceTypeSubDataLayouts = [...cloudServiceTypeSubDataLayouts, ...subDataLayout];
-            }
-        });
-
-        const subDataLayouts = getMetadataSchema(cloudServiceInfo.metadata, 'view.sub_data.layouts', true);
-
-        return {
-            details: [
-                detailsSchema,
-                ...cloudServiceTypeSubDataLayouts,
-                ...subDataLayouts,
-                {
-                    name: 'Raw Data',
-                    type: 'raw',
-                    options: {
-                        translation_id: 'PAGE_SCHEMA.RAW_DATA',
-                    },
-                },
-            ],
-        };
+        return getDetailsSchema(params);
     }
-    const metadata = get(resourceTypeData, 'metadata') ?? get(resourceTypeData, 'resource.metadata');
     if (schemaType === 'widget') {
-        const customWidgets = getMetadataSchema(metadata, 'view.widget', false);
-        const schemaData = {
-            widget: [
-                ...customWidgets,
-            ],
-        };
-
-        schemaData.widget.forEach((widget: any) => {
-            if (widget.type === 'summary') {
-                set(widget, 'options.value_options.key', 'value');
-                set(widget, 'options.value_options.options.default', 0);
-            }
-        });
-
-        if (options.widget_type) {
-            schemaData.widget = schemaData.widget.filter((widget) => widget.type === options.widget_type);
-        }
-
-        if (options.limit) {
-            schemaData.widget = schemaData.widget.slice(0, options.limit);
-        }
-
-        return schemaData;
-    } if (schemaType === 'table') {
-        const defaultSort = getMetadataSchema(metadata, 'view.table.layout.options.default_sort', false);
-        const tableFields = getMetadataSchema(metadata, 'view.table.layout.options.fields', false);
-
-        const schemaJSON = render(defaultTableSchemaTemplate, { fields: tableFields });
-        const schemaData = JSON.parse(schemaJSON);
-
-        set(schemaData, 'options.default_sort', defaultSort);
-        set(schemaData, 'options.fields', schemaData.options.fields?.filter((d) => !d.options?.is_optional) ?? []);
-
-        const searchFields = getMetadataSchema(metadata, 'view.search', false);
-        const searchSchemaJSON = render(defaultSearchSchemaTemplate, { fields: searchFields });
-        const searchSchemaData = JSON.parse(searchSchemaJSON);
-
-        schemaData.options.search = searchSchemaData.search;
-        return schemaData;
+        return getWidgetSchema(params);
     }
-    const searchFields = getMetadataSchema(metadata, 'view.search', false);
-    const searchSchemaJSON = render(defaultSearchSchemaTemplate, { fields: searchFields });
-    return JSON.parse(searchSchemaJSON);
+    if (schemaType === 'table') {
+        return getTableSchema(params);
+    }
+    if (schemaType === 'search') {
+        return getSearchSchema(params);
+    }
+
+    return null;
+};
+
+
+const getDetailsSchema = ({ resourceData, referenceData }: GetSchemaParams) => {
+    const cloudServiceInfo = resourceData;
+
+    let cloudServiceTypeSubDataLayouts = [] as DynamicLayout[];
+    const subDataReferences = getMetadataSchema(cloudServiceInfo.metadata, 'view.sub_data.reference', true) as DynamicLayout[];
+    subDataReferences.forEach((subDataReference: any) => {
+        const subDataOptions = subDataReference.options || {};
+
+        if (referenceData && subDataOptions.provider && subDataOptions.cloud_service_group && subDataOptions.cloud_service_type) {
+            const cloudServiceTypeInfo = getCloudServiceTypeInfo(referenceData, subDataOptions);
+            const subDataLayout = getMetadataSchema(cloudServiceTypeInfo.metadata, 'view.sub_data.layouts', false) as DynamicLayout[];
+            cloudServiceTypeSubDataLayouts = [...cloudServiceTypeSubDataLayouts, ...subDataLayout];
+        }
+    });
+
+    const subDataLayouts = getMetadataSchema(cloudServiceInfo.metadata, 'view.sub_data.layouts', true) as DynamicLayout[];
+
+    return {
+        details: [
+            detailsSchema,
+            ...cloudServiceTypeSubDataLayouts,
+            ...subDataLayouts,
+            {
+                name: 'Raw Data',
+                type: 'raw',
+                options: {
+                    translation_id: 'PAGE_SCHEMA.RAW_DATA',
+                },
+            },
+        ],
+    };
+};
+
+const getWidgetSchema = ({ resourceTypeData, options }: GetSchemaParams) => {
+    const metadata = get(resourceTypeData, 'metadata') ?? get(resourceTypeData, 'resource.metadata');
+    const customWidgets = getMetadataSchema(metadata, 'view.widget', false) as DynamicLayout[];
+    const schemaData = {
+        widget: [
+            ...customWidgets,
+        ],
+    };
+
+    schemaData.widget.forEach((widget: any) => {
+        if (widget.type === 'summary') {
+            set(widget, 'options.value_options.key', 'value');
+            set(widget, 'options.value_options.options.default', 0);
+        }
+    });
+
+    if (options?.widget_type) {
+        schemaData.widget = schemaData.widget.filter((widget) => widget.type === options.widget_type);
+    }
+
+    if (options?.limit) {
+        schemaData.widget = schemaData.widget.slice(0, options.limit);
+    }
+
+    return schemaData;
+};
+
+const DEFAULT_TABLE_OPTION_SCHEMA_FOR_RENDER = { fields: [] };
+const getTableSchema = (params: GetSchemaParams): DynamicLayout => {
+    const { resourceTypeData } = params;
+    const metadata: null|object = get(resourceTypeData, 'metadata') ?? get(resourceTypeData, 'resource.metadata');
+    const metadataTableSchema = getMetadataSchema(metadata, 'view.table.layout', false) as DynamicLayout|null;
+
+    // get table options
+    const renderData = merge({ ...DEFAULT_TABLE_OPTION_SCHEMA_FOR_RENDER }, metadataTableSchema?.options ?? {});
+    const defaultTableOptionSchemaJSON = render(defaultTableSchemaTemplate, renderData);
+    const tableOptions: TableOptions = JSON.parse(defaultTableOptionSchemaJSON);
+
+    const tableSchemaData: Required<DynamicLayout> = merge({ options: tableOptions }, metadataTableSchema);
+
+    tableSchemaData.options.search = getSearchSchema(params);
+    return tableSchemaData;
+};
+
+const getSearchSchema = ({ resourceTypeData }: GetSchemaParams): SearchSchema[] => {
+    const metadata = get(resourceTypeData, 'metadata') ?? get(resourceTypeData, 'resource.metadata');
+    const metadataSearchSchemaFields: any = getMetadataSchema(metadata, 'view.search', false) ?? [];
+
+    const renderData = { fields: metadataSearchSchemaFields };
+    const defaultSearchFieldsJSON = render(defaultSearchSchemaTemplate, renderData);
+    const defaultSearchSchema: SearchSchema[] = JSON.parse(defaultSearchFieldsJSON);
+    const mergedSearchSchema = defaultSearchSchema;
+
+    const firstItems = merge([], mergedSearchSchema[0].items, metadataSearchSchemaFields);
+    mergedSearchSchema[0].items = firstItems;
+
+    return mergedSearchSchema;
 };

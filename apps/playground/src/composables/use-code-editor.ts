@@ -18,6 +18,11 @@ export const useCodeEditor = () => {
 
     return {
         state,
+        handlers: {
+            updateCode: handleUpdateCode,
+            updateCodeType: handleUpdateCodeType,
+            updateParsedObject: handleUpdateParsedObject,
+        },
         handleUpdateCode,
         handleUpdateCodeType,
         handleUpdateParsedObject,

@@ -1,5 +1,4 @@
-export const defaultSearchSchemaTemplate = `{
-  "search": [
+export const defaultSearchSchemaTemplate = `[
     {
       "title":"Properties",
       "items":[
@@ -89,5 +88,4 @@ export const defaultSearchSchemaTemplate = `{
         }
       ]
     }
-  ]
-}`;
+  ]`;

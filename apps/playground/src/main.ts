@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Fragment from 'vue-fragment';
 
+import { cloneDeep } from 'lodash';
+import { PiniaVuePlugin, createPinia } from 'pinia';
 import PortalVue from 'portal-vue';
 
 import SpaceDesignSystem from '@spaceone/design-system';
@@ -18,13 +20,20 @@ import '@spaceone/design-system/css/light-style.css';
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(Fragment.Plugin);
 Vue.use(PortalVue);
-
+Vue.use(PiniaVuePlugin);
 Vue.use(SpaceDesignSystem, { vueI18n: i18n });
 
 /** ********** SET VUE CONFIG ************** */
 
 Vue.config.devtools = import.meta.env.DEV;
 Vue.config.productionTip = import.meta.env.DEV;
+
+const pinia = createPinia();
+const resetStore = ({ store }) => {
+    const initialState = cloneDeep(store.$state);
+    store.$reset = () => store.$patch(cloneDeep(initialState));
+};
+pinia.use(resetStore);
 
 
 /** ********** INITIALIZE ************** */
@@ -36,4 +45,5 @@ new Vue({
         App,
     },
     template: '<App/>',
+    pinia,
 });
