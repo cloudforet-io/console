@@ -6,7 +6,7 @@ import {
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PHeading, PBreadcrumbs, PButton, PContextMenu, useContextMenuController,
+    PI, PHeading, PBreadcrumbs, PButton, PContextMenu, useContextMenuController, PIconButton,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
@@ -134,6 +134,14 @@ const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroupTre
     if (item.data) await projectPageStore.selectNode(item.data.id);
 };
 
+/* Event */
+const handleClickProjectGroupEditButton = () => {
+    projectPageStore.openProjectGroupUpdateForm(storeState.selectedItem);
+};
+const handleClickProjectGroupDeleteButton = () => {
+    projectPageStore.openProjectGroupDeleteCheckModal(storeState.selectedItem);
+};
+
 /* Handling Forms */
 const handleClickCreateButton = () => {
     showContextMenu();
@@ -218,11 +226,20 @@ onUnmounted(() => {
                                :total-count="storeState.projectCount || 0"
                     >
                         <template #title-right-extra>
-                            <div class="favorite-btn-wrapper">
-                                <favorite-button v-if="storeState.groupId"
-                                                 :favorite-items="state.favoriteItems"
+                            <div v-if="storeState.groupId"
+                                 class="title-right-button-wrapper"
+                            >
+                                <favorite-button :favorite-items="state.favoriteItems"
                                                  :item-id="storeState.groupId"
                                                  :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
+                                />
+                                <p-icon-button name="ic_edit-text"
+                                               style-type="transparent"
+                                               @click="handleClickProjectGroupEditButton"
+                                />
+                                <p-icon-button name="ic_delete"
+                                               style-type="transparent"
+                                               @click="handleClickProjectGroupDeleteButton"
                                 />
                             </div>
                             <div class="top-button-box">
@@ -291,9 +308,11 @@ onUnmounted(() => {
     @apply pb-5 border-b border-gray-200;
 }
 
-.favorite-btn-wrapper {
+.title-right-button-wrapper {
     margin-right: 0.5rem;
     display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 .top-button-box {
     display: inline-block;
