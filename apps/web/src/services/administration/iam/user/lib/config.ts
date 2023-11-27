@@ -83,7 +83,7 @@ export const userStateColor = Object.freeze({
     },
 });
 
-export const userMfaColor = Object.freeze({
+export const userMfaColor = {
     ON: {
         iconColor: styles.safe,
         textColor: styles.gray[900],
@@ -92,7 +92,7 @@ export const userMfaColor = Object.freeze({
         iconColor: styles.gray[400],
         textColor: styles.gray[400],
     },
-});
+} as const;
 
 export const pluginStateColor = Object.freeze({
     ACTIVE: {
