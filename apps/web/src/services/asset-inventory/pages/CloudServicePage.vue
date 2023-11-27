@@ -229,7 +229,6 @@ export default {
         /* event */
         // cloud service toolbox events
         const handlePaginationUpdate = (options: ToolboxOptions) => {
-            console.debug('options', options);
             if (options.pageLimit !== undefined) {
                 state.pageLimit = options.pageLimit;
             }
