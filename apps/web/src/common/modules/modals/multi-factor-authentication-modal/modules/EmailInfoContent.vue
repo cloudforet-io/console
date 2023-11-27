@@ -63,10 +63,11 @@ const handleClickSendCodeButton = async () => {
                 domain_id: state.domainId,
             });
         } else {
-            await postDisableMfa({
+            const response = await postDisableMfa({
                 user_id: state.userId,
                 domain_id: state.domainId,
             });
+            await store.dispatch('user/setUser', response);
         }
         state.proxyIsSentCode = true;
     } finally {

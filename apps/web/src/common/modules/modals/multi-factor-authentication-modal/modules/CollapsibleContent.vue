@@ -34,10 +34,11 @@ const state = reactive({
 
 const handleClickSendEmailButton = async () => {
     if (props.type === 'disabled' || props.type === 'change') {
-        await postDisableMfa({
+        const response = await postDisableMfa({
             user_id: state.userId,
             domain_id: state.domainId,
         });
+        await store.dispatch('user/setUser', response);
     } else {
         await postEnableMfa({
             user_id: state.userId,

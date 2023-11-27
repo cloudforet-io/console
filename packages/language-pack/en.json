@@ -1947,6 +1947,7 @@
 				"LANGUAGE": "Language",
 				"LAST_ACTIVITY": "Last Activity",
 				"MFA": "Multi-factor Auth",
+				"MFA_DESC": "Set up a multi-factor authentication option \nto enhance your account security.",
 				"MOBILE": "Mobile",
 				"MY_ACCOUNT": "My Account",
 				"NAME": "Name",

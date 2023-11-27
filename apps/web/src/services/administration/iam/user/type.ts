@@ -3,6 +3,8 @@ import type { Location } from 'vue-router';
 
 import type { Tags, TimeStamp } from '@/models';
 
+import type { UserMfa } from '@/store/modules/user/type';
+
 import type { RoleBindingType } from '@/services/administration/type';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -27,6 +29,7 @@ interface UserData {
 	user_id: string;
 	backend: string;
 	role_bindings?: RoleBindingType[];
+	mfa?: UserMfa;
 }
 
 export interface UserDetailData {

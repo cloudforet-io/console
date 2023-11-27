@@ -3,6 +3,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { UserState } from '@/store/modules/user/type';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -19,7 +21,7 @@ export const postEnableMfa = async (body): Promise<void|Error> => {
     }
 };
 
-export const postDisableMfa = async (body): Promise<void|Error> => {
+export const postDisableMfa = async (body): Promise<UserState|Error> => {
     const {
         user_id, domain_id, force,
     } = body;
@@ -27,11 +29,12 @@ export const postDisableMfa = async (body): Promise<void|Error> => {
         const response = await SpaceConnector.clientV2.identity.user.disableMfa({
             user_id,
             domain_id,
+            force,
         });
-        await store.dispatch('user/setUser', response);
         if (!force) {
             await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
         }
+        return response;
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
