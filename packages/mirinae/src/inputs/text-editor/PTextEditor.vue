@@ -25,31 +25,30 @@
  * PTextEditor can get any types,
  * CodeMirror can get String ONLY
  */
-
 import type { PropType } from 'vue';
 import {
     computed, defineComponent,
-    getCurrentInstance, onBeforeUnmount,
+    nextTick, onBeforeUnmount,
     reactive, toRefs, watch,
 } from 'vue';
 
 import type { EditorConfiguration } from 'codemirror';
 import CodeMirror from 'codemirror';
-import { forEach } from 'lodash';
+import { forEach, isEqual } from 'lodash';
 
 import PDataLoader from '@/feedbacks/loading/data-loader/PDataLoader.vue';
 
-import('codemirror/mode/javascript/javascript');
-import('codemirror/addon/fold/brace-fold');
-import('codemirror/addon/fold/comment-fold');
-import('codemirror/addon/fold/foldcode');
-import('codemirror/addon/fold/foldgutter');
-import('codemirror/addon/fold/indent-fold');
-import('codemirror/addon/fold/markdown-fold');
-import('codemirror/addon/fold/xml-fold');
-import('codemirror/addon/lint/json-lint');
-import('codemirror/addon/edit/closebrackets');
-import('codemirror/addon/edit/closetag');
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/addon/fold/brace-fold';
+import 'codemirror/addon/fold/comment-fold';
+import 'codemirror/addon/fold/foldcode';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/indent-fold';
+import 'codemirror/addon/fold/markdown-fold';
+import 'codemirror/addon/fold/xml-fold';
+import 'codemirror/addon/lint/json-lint';
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/addon/edit/closetag';
 
 interface Props {
     code: string|Record<string, any>|Array<any>;
@@ -108,7 +107,6 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             content: '',
             cmInstance: null as CodeMirror.Editor|null,
@@ -141,8 +139,8 @@ export default defineComponent<Props>({
             return JSON.stringify(code, undefined, 4);
         };
 
-        const forceFold = (cmInstance) => {
-            if (props.folded && cmInstance && props.code && cmInstance.foldCode) {
+        const forceFold = (cmInstance: CodeMirror.Editor) => {
+            if (cmInstance && props.code && cmInstance.foldCode) {
                 cmInstance.operation(() => {
                     for (let l = cmInstance.firstLine() + 1;
                         l <= cmInstance.lastLine(); ++l) {
@@ -152,7 +150,7 @@ export default defineComponent<Props>({
             }
         };
 
-        const setCode = (cmInstance, code) => {
+        const setCode = (cmInstance: CodeMirror.Editor, code: string) => {
             if (code !== cmInstance.getValue()) {
                 const scrollInfo = cmInstance.getScrollInfo();
                 cmInstance.setValue(code);
@@ -160,7 +158,7 @@ export default defineComponent<Props>({
             }
         };
 
-        const setHighlightLines = (cmInstance, lines: Array<number>|undefined) => {
+        const setHighlightLines = (cmInstance: CodeMirror.Editor, lines: Array<number>|undefined) => {
             forEach(lines, (line) => {
                 cmInstance.setGutterMarker(line, 'CodeMirror-addedline', (() => {
                     const marker = document.createElement('span');
@@ -173,46 +171,48 @@ export default defineComponent<Props>({
             });
         };
 
-        const refresh = (cmInstance) => {
-            vm.$nextTick(() => {
-                cmInstance.refresh();
+        const setOptions = (cmInstance: CodeMirror.Editor, options: EditorConfiguration) => {
+            forEach(options, (d, k) => {
+                cmInstance.setOption(k as keyof EditorConfiguration, d);
             });
         };
 
-        const destroy = (cmInstance) => {
+        const refresh = async (cmInstance: CodeMirror.Editor) => {
+            await nextTick();
+            cmInstance.refresh();
+        };
+
+        const destroy = (cmInstance: CodeMirror.Editor|null) => {
             // garbage cleanup
-            const element = cmInstance?.doc?.cm?.getWrapperElement();
+            if (!cmInstance) return;
+            let element: HTMLElement|null = null;
+            if ((cmInstance as any).doc) element = (cmInstance as any).doc?.cm?.getWrapperElement();
+            else element = cmInstance.getWrapperElement();
             if (element?.remove) element.remove();
             state.cmInstance = null;
         };
 
-        const init = (textareaRef: HTMLTextAreaElement) => {
+        const initCodeMirrorInstance = (textareaRef: HTMLTextAreaElement): CodeMirror.Editor => {
             const editor = CodeMirror.fromTextArea(textareaRef, state.mergedOptions);
-
-            watch(() => state.mergedOptions, (options) => {
-                if (options && editor) {
-                    forEach(options, (d, k) => {
-                        editor.setOption(k as keyof EditorConfiguration, d);
-                    });
-                }
-            }, { deep: true });
 
             editor.on('change', (cm) => {
                 emit('update:code', cm.getValue());
             });
-
-            state.cmInstance = editor;
+            return editor;
         };
 
-        watch([() => state.textareaRef, () => props.code, () => props.disableAutoReformat], ([textareaRef, code]) => {
+        watch([() => state.textareaRef, () => props.code, () => props.disableAutoReformat, () => state.mergedOptions], async ([textareaRef, code, , options], [,,, prevOptions]) => {
             if (!textareaRef) return;
-            if (!state.cmInstance) init(textareaRef);
+            if (!state.cmInstance) state.cmInstance = initCodeMirrorInstance(textareaRef);
 
-            setCode(state.cmInstance, refineCode(code));
-            if (props.highlightLines) setHighlightLines(state.cmInstance, props.highlightLines);
-            forceFold(state.cmInstance);
-            refresh(state.cmInstance);
+            const editor = state.cmInstance as CodeMirror.Editor;
+            if (!isEqual(options, prevOptions)) setOptions(editor, options);
+            setCode(editor, refineCode(code));
+            if (props.highlightLines) setHighlightLines(editor, props.highlightLines);
+            if (props.folded) forceFold(editor);
+            await refresh(editor);
         }, { immediate: true });
+
 
         onBeforeUnmount(() => {
             destroy(state.cmInstance);
@@ -236,10 +236,13 @@ export default defineComponent<Props>({
     min-height: 5rem;
     > .p-data-loader {
         min-height: inherit;
+        max-height: inherit;
         > .data-loader-container {
             min-height: inherit;
+            max-height: inherit;
             > .data-wrapper {
                 min-height: inherit;
+                max-height: inherit;
                 > textarea {
                     display: none;
                 }

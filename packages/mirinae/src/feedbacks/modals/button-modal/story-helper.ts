@@ -366,4 +366,60 @@ export const getButtonModalArgTypes = (): ArgTypes => ({
             defaultValue: 'Confirm',
         },
     },
+    // events
+    onConfirm: {
+        name: 'confirm',
+        description: 'Emitted when confirm button is clicked.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onCancel: {
+        name: 'cancel',
+        description: 'Emitted when click cancel button or close button',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onReturn: {
+        name: 'return',
+        description: 'Emitted when click reset button',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onClose: {
+        name: 'close',
+        description: 'Emitted when close modal',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onUpdateVisible: {
+        name: 'update:visible',
+        description: 'Emitted when update visible',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 });
