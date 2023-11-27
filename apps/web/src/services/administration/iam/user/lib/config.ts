@@ -83,7 +83,7 @@ export const userStateColor = Object.freeze({
     },
 });
 
-export const userMfaColor = {
+export const USER_MFA_COLOR = {
     ON: {
         iconColor: styles.safe,
         textColor: styles.gray[900],
