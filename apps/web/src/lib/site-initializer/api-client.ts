@@ -51,6 +51,7 @@ const getMockInfo = (config): MockInfo => ({
     reflection: config.get('MOCK.REFLECTION'),
     skipTokenCheck: config.get('MOCK.SKIP_TOKEN_CHECK'),
     apiList: [config.get('MOCK.API_LIST_V1'), config.get('MOCK.API_LIST_V2')],
+    apiKey: config.get('MOCK.API_KEY'),
 });
 
 export const initApiClient = async (store, config) => {

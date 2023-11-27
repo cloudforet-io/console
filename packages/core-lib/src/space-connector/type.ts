@@ -92,4 +92,5 @@ export interface MockInfo {
     reflection?: boolean;
     skipTokenCheck?: boolean;
     apiList?: string[][]; // [[v1_api_1, v1_api_2], [v2_api_1, v2_api_2, v2_api_3]]
+    apiKey?: string;
 }
