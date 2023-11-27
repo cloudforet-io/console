@@ -38,9 +38,7 @@ type ExternalItemErrorCode = 'DUPLICATED'|'EMAIL_FORMAT'|'ALREADY_EXIST'|'NOT_FO
 
 interface Props {
     visible?: boolean;
-    isProjectGroup?: boolean;
     projectId?: string;
-    projectGroupId?: string;
 }
 interface ExternalItemsError {
     all?: ExternalItemErrorCode;
@@ -49,9 +47,7 @@ interface ExternalItemsError {
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    isProjectGroup: false,
     projectId: undefined,
-    projectGroupId: undefined,
 });
 
 const emit = defineEmits<{(e: 'confirm'): void;
@@ -212,13 +208,8 @@ const addMember = async () => {
             labels: labels.value.map((d) => d.name),
             is_external_user: state.activeTab !== AUTH_TYPE.INTERNAL_USER,
         };
-        if (props.isProjectGroup) {
-            params.project_group_id = props.projectGroupId;
-            await SpaceConnector.client.identity.projectGroup.member.add(params);
-        } else {
-            params.project_id = props.projectId;
-            await SpaceConnector.client.identity.project.member.add(params);
-        }
+        params.project_id = props.projectId;
+        await SpaceConnector.client.identity.project.member.add(params);
         showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'));
@@ -226,16 +217,9 @@ const addMember = async () => {
 };
 const listMember = async () => {
     try {
-        let res;
-        if (props.isProjectGroup) {
-            res = await SpaceConnector.client.identity.projectGroup.member.list({
-                project_group_id: props.projectGroupId,
-            });
-        } else {
-            res = await SpaceConnector.client.identity.project.member.list({
-                project_id: props.projectId,
-            });
-        }
+        const res = await SpaceConnector.client.identity.project.member.list({
+            project_id: props.projectId,
+        });
         state.members = res.results;
     } catch (e) {
         ErrorHandler.handleError(e);

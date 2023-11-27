@@ -24,17 +24,13 @@ import type { ProjectMemberItem, ProjectMemberRoleMenuItem } from '@/services/pr
 
 interface Props {
     visible?: boolean;
-    isProjectGroup?: boolean;
     projectId?: string;
-    projectGroupId?: string;
     selectedMember?: ProjectMemberItem;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    isProjectGroup: false,
     projectId: undefined,
-    projectGroupId: '',
     selectedMember: undefined,
 });
 
@@ -87,17 +83,10 @@ const listRole = async () => {
 };
 const deleteMember = async () => {
     try {
-        if (props.isProjectGroup) {
-            await SpaceConnector.client.identity.projectGroup.member.remove({
-                project_group_id: props.projectGroupId,
-                users: [state.userId],
-            });
-        } else {
-            await SpaceConnector.client.identity.project.member.remove({
-                project_id: props.projectId,
-                users: [state.userId],
-            });
-        }
+        await SpaceConnector.client.identity.project.member.remove({
+            project_id: props.projectId,
+            users: [state.userId],
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -109,15 +98,9 @@ const createMember = async () => {
             users: [state.userId],
             labels: labels.value.map((d) => d.name),
         };
-        if (props.isProjectGroup) {
-            params.project_group_id = props.projectGroupId;
-            await SpaceConnector.client.identity.projectGroup.member.add(params);
-            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '');
-        } else {
-            params.project_id = props.projectId;
-            await SpaceConnector.client.identity.project.member.add(params);
-            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '');
-        }
+        params.project_id = props.projectId;
+        await SpaceConnector.client.identity.project.member.add(params);
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
     }
@@ -128,15 +111,9 @@ const updateMember = async () => {
         labels: labels.value.map((d) => d.name),
     };
     try {
-        if (props.isProjectGroup) {
-            params.project_group_id = props.projectGroupId;
-            await SpaceConnector.client.identity.projectGroup.member.modify(params);
-            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '');
-        } else {
-            params.project_id = props.projectId;
-            await SpaceConnector.client.identity.project.member.modify(params);
-            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '');
-        }
+        params.project_id = props.projectId;
+        await SpaceConnector.client.identity.project.member.modify(params);
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'));
     }
