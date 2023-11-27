@@ -168,6 +168,7 @@ export default defineComponent({
             serviceAccountType: computed(() => state.item.service_account_type),
             deleteModalVisible: false,
             isManagedTrustedAccount: computed(() => state.item.tags?.is_managed === 'true'),
+            domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
         });
 
         /* Api */
@@ -186,7 +187,8 @@ export default defineComponent({
         };
         const getProviderData = async (provider) => {
             try {
-                state.providerData = await SpaceConnector.client.identity.provider.get({
+                state.providerData = await SpaceConnector.clientV2.identity.provider.get({
+                    domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                     provider,
                 });
             } catch (e) {

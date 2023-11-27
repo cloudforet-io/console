@@ -10,7 +10,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 let lastLoadedTime = 0;
 
-export const load: Action<ProjectReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
+export const load: Action<ProjectReferenceState, any> = async ({ state, commit, rootState }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -21,6 +21,7 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit }
 
     try {
         const response = await SpaceConnector.clientV2.identity.project.list({
+            domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['project_id', 'name', 'project_group_id', 'workspace_id'],
             },

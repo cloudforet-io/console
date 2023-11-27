@@ -121,6 +121,7 @@ export default {
             selectedProvider: undefined,
             selectedProviderName: computed(() => state.providers[state.selectedProvider]?.label),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
+            domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
         });
 
         /** States for Dynamic Layout(search table type) * */
@@ -197,7 +198,10 @@ export default {
         const listServiceAccountData = async () => {
             typeOptionState.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.serviceAccount.list({ query: getQuery() });
+                const res = await SpaceConnector.clientV2.identity.serviceAccount.list({
+                    domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                    query: getQuery(),
+                });
 
                 tableState.items = serviceAccountPreprocessor(res.results);
                 typeOptionState.totalCount = res.total_count;

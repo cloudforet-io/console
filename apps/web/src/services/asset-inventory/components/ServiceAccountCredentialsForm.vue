@@ -230,6 +230,7 @@ export default defineComponent<Props>({
                 return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
             }),
             baseInformationSchema: computed<JsonSchema>(() => state.providerData.template?.service_account?.schema ?? null),
+            domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
         });
         const formState = reactive({
             hasCredentialKey: true,
@@ -295,7 +296,8 @@ export default defineComponent<Props>({
         /* Api */
         const getProviderData = async (provider: string) => {
             try {
-                const result = await SpaceConnector.client.identity.provider.get({
+                const result = await SpaceConnector.clientV2.identity.provider.get({
+                    domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                     provider,
                 });
                 state.providerData = result;
