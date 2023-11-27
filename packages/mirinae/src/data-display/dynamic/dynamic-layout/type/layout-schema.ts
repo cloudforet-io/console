@@ -70,7 +70,7 @@ export interface TableOptions extends CommonOptions {
 
 export interface QuerySearchTableOptions extends CommonOptions {
     fields: DynamicField[];
-    search: SearchSchema;
+    search: SearchSchema[];
     disable_search?: boolean;
     default_sort?: Sort;
 }
