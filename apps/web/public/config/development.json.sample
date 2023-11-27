@@ -15,6 +15,7 @@
     "REFLECTION":false,
     "SKIP_TOKEN_CHECK": false,
     "API_LIST_V1": [],
-    "API_LIST_V2": []
+    "API_LIST_V2": ["/identity/*"],
+    "API_KEY": "api-key"
   },
 }

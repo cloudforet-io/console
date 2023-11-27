@@ -180,10 +180,17 @@ export class SpaceConnector {
         if (mockEndpoint && SpaceConnector.mockInfo.reflection) {
             return async (params: object = {}, config: MockRequestConfig = DEFAULT_MOCK_CONFIG): Promise<any> => {
                 const mockConfig = { ...config };
-                let url = path;
 
+                if (SpaceConnector.mockInfo.apiKey) {
+                    mockConfig.headers = Object.assign(
+                        mockConfig.headers ?? {},
+                        { Authorization: `Bearer ${SpaceConnector.mockInfo.apiKey}` },
+                    );
+                }
+
+                let url = path;
                 const mockApiList = SpaceConnector.mockInfo.apiList?.[version - 1] ?? [];
-                if (SpaceConnector.mockInfo.all || mockApiList.includes(path) || mockConfig.mockMode) {
+                if (SpaceConnector.mockInfo.all || isPathIncluded(mockApiList, path) || mockConfig.mockMode) {
                     mockConfig.baseURL = mockEndpoint;
                     if (mockConfig.mockPath) {
                         url += mockConfig.mockPath;
@@ -206,3 +213,17 @@ export class SpaceConnector {
         };
     }
 }
+
+const isPathIncluded = (apiList: string[], path: string): boolean => {
+    const isInclude = apiList.includes(path);
+    if (isInclude) return true;
+
+    return apiList.some((apiPath) => {
+        if (apiPath === '/*' || apiPath === '*') return true;
+        if (apiPath.includes('/*')) {
+            const parentPath = apiPath.split('/*')[0];
+            return path.startsWith(parentPath);
+        }
+        return false;
+    });
+};
