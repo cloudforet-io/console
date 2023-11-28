@@ -104,6 +104,7 @@ import { get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { ProviderGetRequestParams } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';
@@ -189,7 +190,7 @@ export default {
                 state.providerData = await SpaceConnector.clientV2.identity.provider.get({
                     domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                     provider: props.provider,
-                });
+                } as ProviderGetRequestParams);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.providerData = {};
