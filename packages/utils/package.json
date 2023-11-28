@@ -1,0 +1,47 @@
+{
+  "name": "@cloudforet/utils",
+  "version": "1.12.0-dev11",
+  "description": "Cloudforet Front-end Utils",
+  "scripts": {
+    "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "dev": "rimraf dist && tsc-watch --project tsconfig.build.json --outDir ./dist --onSuccess \"tsc-alias -w -p tsconfig.build.json\"",
+    "lint": "eslint --ext .js,.ts src",
+    "format": "eslint --fix --ext .js,.ts src",
+    "test": "vitest run",
+    "test:watch": "vitest watch --ui"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudforet-io/console.git"
+  },
+  "author": "Cloudforet",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "axios-auth-refresh": "^3.2.2",
+    "bytes": "^3.1.2",
+    "dayjs": "^1.10.7",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/bytes": "^3.1.1",
+    "@types/node": "^16.11.43",
+    "concurrently": "^7.6.0",
+    "cross-env": "^7.0.3",
+    "eslint-config-custom": "*",
+    "rimraf": "^3.0.2",
+    "tsc-alias": "^1.6.11",
+    "tsc-watch": "^6.0.0",
+    "tsconfig": "*",
+    "vite": "^4.3.9"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    ">=3.1": {
+      "*": [
+        "./dist/*"
+      ]
+    }
+  }
+}
