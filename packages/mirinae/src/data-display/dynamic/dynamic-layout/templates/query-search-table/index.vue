@@ -152,6 +152,12 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
             keyItemSets: computed<KeyItemSet[]>(() => {
                 if (props.typeOptions?.keyItemSets) return props.typeOptions?.keyItemSets;
+                // if (Array.isArray(props.options.search) {
+                //     const searchKeyGroups = props.options.search;
+                //     searchKeyGroups.forEach((d) => {
+                //         d.items
+                //     });
+                // }
                 if (!props.options.fields) return [];
 
                 return [{

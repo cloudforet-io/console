@@ -21,7 +21,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import {
     dynamicFieldsToExcelDataFields,
-} from '@/lib/component-util/dynamic-layout';
+} from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 

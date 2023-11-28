@@ -4,6 +4,7 @@ import {
 } from 'vue';
 import type { ComputedRef } from 'vue';
 
+import type { SearchSchema } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import {
@@ -17,11 +18,10 @@ import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
 
-const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemSet[] => {
+const getKeyItemSets = (searchKeyGroups: SearchSchema, storeState): KeyItemSet[] => {
     const keyItemSets: KeyItemSet[] = [];
-    schemaList.forEach((schema) => {
+    searchKeyGroups.forEach((schema) => {
         const keyItems: KeyItem[] = [];
         schema.items.forEach((item) => {
             const keyItem: any = {
@@ -48,9 +48,9 @@ const getKeyItemSets = (schemaList: ConsoleSearchSchema[], storeState): KeyItemS
     });
     return keyItemSets;
 };
-const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: string, filters?: ApiFilter[], providers?: ProviderReferenceMap): ValueHandlerMap => {
+const getValueHandlerMap = (searchKeyGroups: SearchSchema, resourceType: string, filters?: ApiFilter[], providers?: ProviderReferenceMap): ValueHandlerMap => {
     const valueHandlerMap: ValueHandlerMap = {};
-    schemaList.forEach((schema) => {
+    searchKeyGroups.forEach((schema) => {
         schema.items.forEach((item) => {
             if (item.enums) {
                 valueHandlerMap[item.key] = makeEnumValueHandler(item.enums);
@@ -76,7 +76,7 @@ const getValueHandlerMap = (schemaList: ConsoleSearchSchema[], resourceType: str
  * @param filters
  */
 export function useQuerySearchPropsWithSearchSchema(
-    searchSchema: ComputedRef<ConsoleSearchSchema[]>,
+    searchSchema: ComputedRef<SearchSchema>,
     resourceType: string,
     filters?: ComputedRef<ApiFilter[]>,
 ): { keyItemSets: ComputedRef<KeyItemSet[]>, valueHandlerMap: ComputedRef<ValueHandlerMap>, isAllLoaded: ComputedRef<boolean> } {

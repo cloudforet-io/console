@@ -1,10 +1,10 @@
-<h1 align="center">SpaceONE Console Core Library</h1>  
+<h1 align="center">Cloudforet Console Front-end App Core Library</h1>  
 
 <br/>
 
 <div align="center" style="display:flex; flex-direction: column;">
     <div>
-        <img width="245" src="https://user-images.githubusercontent.com/35549653/76694897-de236300-66bb-11ea-9ace-b9edde9c12da.png">
+        <img width="300" src="https://user-images.githubusercontent.com/65589909/197983716-71a1bd21-4d6a-4217-b509-177afbadf5bc.png">
     </div>
 <br/>
 <div>
