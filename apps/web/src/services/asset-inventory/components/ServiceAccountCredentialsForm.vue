@@ -298,10 +298,10 @@ export default defineComponent<Props>({
         /* Api */
         const getProviderData = async (provider: string) => {
             try {
-                const result = await SpaceConnector.clientV2.identity.provider.get({
+                const result = await SpaceConnector.clientV2.identity.provider.get<ProviderGetRequestParams>({
                     domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                     provider,
-                } as ProviderGetRequestParams);
+                });
                 state.providerData = result;
                 const supportedSchema = result?.capability?.supported_schema;
                 formState.selectedSecretType = supportedSchema ? supportedSchema[0] : '';

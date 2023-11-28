@@ -28,12 +28,12 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state,
     ) return;
 
     try {
-        const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list({
+        const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListRequestParams>({
             domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['provider', 'name', 'tags'],
             },
-        } as ProviderListRequestParams, { timeout: 3000 });
+        }, { timeout: 3000 });
         const providers: ProviderReferenceMap = {};
 
         (response.results ?? []).forEach((providerInfo): void => {

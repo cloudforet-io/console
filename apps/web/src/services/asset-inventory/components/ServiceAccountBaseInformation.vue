@@ -127,10 +127,10 @@ export default defineComponent<Props>({
         /* Api */
         const getProvider = async () => {
             try {
-                state.providerData = await SpaceConnector.clientV2.identity.provider.get({
+                state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetRequestParams>({
                     domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-                    provider: props.provider,
-                } as ProviderGetRequestParams);
+                    provider: props.provider ?? '',
+                });
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.providerData = {};
