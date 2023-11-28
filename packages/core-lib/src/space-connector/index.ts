@@ -28,6 +28,10 @@ type AfterCallApiMap = Record<string, AfterCallApi>;
 
 const DEFAULT_MOCK_CONFIG = Object.freeze({ mockMode: false });
 
+interface ApiHandler {
+    <Params = any, Response = any>(params?: Params, config?: AxiosRequestConfig): Promise<Response>;
+    [key: string]: ApiHandler;
+}
 export class SpaceConnector {
     private static instance: SpaceConnector;
 
@@ -85,14 +89,14 @@ export class SpaceConnector {
         }
     }
 
-    static get client(): any {
+    static get client(): ApiHandler {
         if (SpaceConnector.instance) {
             return SpaceConnector.instance._client;
         }
         throw new Error('Not initialized client!');
     }
 
-    static get clientV2(): any {
+    static get clientV2(): ApiHandler {
         if (SpaceConnector.instance) {
             return SpaceConnector.instance._clientV2;
         }
