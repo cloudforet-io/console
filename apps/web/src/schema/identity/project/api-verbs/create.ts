@@ -6,7 +6,6 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 export interface ProjectCreateRequestParams {
     name: string;
     project_type: ProjectType;
-    workspace_id: string;
     //
     tags?: Tag;
     project_group_id?: string;

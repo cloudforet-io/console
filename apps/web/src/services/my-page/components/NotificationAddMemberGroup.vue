@@ -55,7 +55,6 @@ const listProjectMember = async () => {
     state.loading = true;
     try {
         const params: ProjectGetRequestParams = {
-            workspace_id: '', // TODO: workspace_id
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);

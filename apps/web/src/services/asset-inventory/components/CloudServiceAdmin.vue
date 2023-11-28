@@ -64,7 +64,6 @@ const getProjectUserData = async () => {
     state.loading = true;
     try {
         const params: ProjectGetRequestParams = {
-            workspace_id: '', // TODO: workspace_id
             project_id: props.cloudServiceProjectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);

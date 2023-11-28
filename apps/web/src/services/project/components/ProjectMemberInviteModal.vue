@@ -177,7 +177,6 @@ const addMember = async () => {
     try {
         const params: ProjectAddUsersRequestParams = {
             project_id: props.projectId,
-            workspace_id: '', // TODO: workspace_id
             users: state.activeTab === AUTH_TYPE.INTERNAL_USER ? selectedInternalUserItems.value.map((d) => d.name) : selectedExternalUserItems.value.map((d) => d.name),
         };
         await SpaceConnector.clientV2.identity.project.addUsers(params);
@@ -189,7 +188,6 @@ const addMember = async () => {
 const getProjectUserData = async () => {
     try {
         const params: ProjectGetRequestParams = {
-            workspace_id: '', // TODO: workspace_id
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
