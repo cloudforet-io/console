@@ -61,11 +61,12 @@ const state = reactive({
             user_id: d,
             user_name: storeState.users[d]?.name ?? d,
         }));
-        return users.filter((d) => {
+        const filteredUsers = users.filter((d) => {
             const searchText = state.searchText.toLowerCase();
             return d.user_id.toLowerCase().includes(searchText)
-                        || d.user_name.toLowerCase().includes(searchText);
+                || d.user_name.toLowerCase().includes(searchText);
         });
+        return filteredUsers.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
     }),
     totalCount: 0,
     searchText: '',
@@ -97,7 +98,6 @@ const getProjectUserData = async () => {
     try {
         state.loading = true;
         const params: ProjectGetRequestParams = {
-            workspace_id: '', // TODO: workspace_id
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
@@ -141,7 +141,7 @@ const handleChangeTable = async (options: any = {}) => {
                              selectable
                              :multi-select="false"
                              :fields="state.fields"
-                             :items="state.refinedItems.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1)"
+                             :items="state.refinedItems"
                              :select-index.sync="state.selectIndex"
                              :loading="state.loading"
                              :total-count="state.totalCount"

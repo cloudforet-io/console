@@ -66,23 +66,24 @@ const state = reactive({
         { label: 'User Name', name: 'user_name' },
     ] as DataTableField[],
     projectUserIdList: [] as string[],
-    refinedUserItems: computed<UserItem[]>(() => {
+    refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
             user_id: d,
             user_name: storeState.users[d]?.name ?? d,
         }));
-        return users.filter((d) => {
+        const filteredUsers = users.filter((d) => {
             const searchText = state.searchText.toLowerCase();
             return d.user_id.toLowerCase().includes(searchText)
                 || d.user_name.toLowerCase().includes(searchText);
         });
+        return filteredUsers.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
     }),
     items: [] as MemberDataTableItem[],
     loading: true,
     totalCount: 0,
     pageLimit: 15,
     pageStart: 1,
-    selectedItems: computed(() => state.selectIndex.map((i) => state.refinedUserItems[i])),
+    selectedItems: computed(() => state.selectIndex.map((i) => state.refinedItems[i])),
     dropdownMenu: computed(() => ([
         {
             type: 'item',
@@ -101,7 +102,6 @@ const getProjectUserData = async () => {
     state.selectIndex = [];
     try {
         const params: ProjectGetRequestParams = {
-            workspace_id: '', // TODO: workspace_id
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
@@ -118,7 +118,6 @@ const getProjectUserData = async () => {
 const deleteProjectUser = async (items) => {
     try {
         const params: ProjectRemoveUsersRequestParams = {
-            workspace_id: '', // TODO: workspace_id
             project_id: props.projectId,
             users: items.map((it) => it.user_id),
         };
@@ -131,6 +130,7 @@ const deleteProjectUser = async (items) => {
 
 /* Event */
 const handleChangeTable = async (options: ToolboxOptions = {}) => {
+    state.selectIndex = [];
     if (options.searchText !== undefined) {
         state.searchText = options.searchText;
         const filters = [{ v: options.searchText }];
@@ -138,7 +138,6 @@ const handleChangeTable = async (options: ToolboxOptions = {}) => {
     }
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
-    await getProjectUserData();
 };
 const handleClickInviteMember = () => {
     state.memberInviteFormVisible = true;
@@ -159,7 +158,7 @@ const handleConfirmDeleteMember = async (items) => {
     state.memberDeleteModalVisible = false;
     await getProjectUserData();
 };
-const handleConfirm = () => {
+const handleConfirmInvite = () => {
     getProjectUserData();
 };
 
@@ -184,7 +183,7 @@ watch(() => store.state.reference.project.items, (projects) => {
                          selectable
                          sortable
                          :fields="state.fields"
-                         :items="state.refinedUserItems.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1)"
+                         :items="state.refinedItems"
                          :select-index.sync="state.selectIndex"
                          :loading="state.loading"
                          :total-count="state.totalCount"
@@ -220,7 +219,7 @@ watch(() => store.state.reference.project.items, (projects) => {
             v-if="state.memberInviteFormVisible"
             :visible.sync="state.memberInviteFormVisible"
             :project-id="projectId"
-            @confirm="handleConfirm"
+            @confirm="handleConfirmInvite"
         />
         <p-table-check-modal :visible.sync="state.memberDeleteModalVisible"
                              theme-color="alert"
