@@ -79,19 +79,67 @@ import {
 
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import type { DynamicFieldHandler, DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
-import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicField, TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     QuerySearchTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
 import type { DynamicLayoutFetchOptions, DynamicLayoutTypeOptions } from '@/data-display/dynamic/dynamic-layout/type';
-import type { QuerySearchTableOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { QuerySearchTableOptions, SearchSchema } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { getValueByPath } from '@/data-display/dynamic/helper';
 import PHeading from '@/data-display/heading/PHeading.vue';
 import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import type { ToolboxTableOptions } from '@/data-display/tables/toolbox-table/type';
-import type { KeyItemSet } from '@/inputs/search/query-search/type';
+import type { KeyItemSet, ValueSet } from '@/inputs/search/query-search/type';
 
+const getKeyItemSetsFromSearchSchema = (searchSchema: SearchSchema): KeyItemSet[] => searchSchema.map((d) => {
+    const keyItems = d.items.map((item) => {
+        let valueSet: ValueSet|undefined;
+        if (item.enums && typeof item.enums === 'object') {
+            if (Array.isArray(item.enums)) {
+                valueSet = {};
+                item.enums.forEach((v) => { (valueSet as ValueSet)[v] = { label: v, name: v }; });
+            } else {
+                Object.entries(item.enums).forEach(([key, val]) => {
+                    if (typeof val === 'string') {
+                        valueSet = {};
+                        (valueSet as ValueSet)[key] = { label: val, name: key };
+                    } else if (typeof val === 'object') {
+                        valueSet = {};
+                        (valueSet as ValueSet)[key] = { label: val.label, name: key, imageUrl: val.icon?.image };
+                    }
+                });
+            }
+        }
+
+        const keyItem = {
+            label: item.name,
+            name: item.key,
+            valueSet,
+            dataType: item.data_type,
+            reference: item.reference,
+        };
+        return keyItem;
+    });
+    return { title: d.title, items: keyItems };
+});
+
+const getMergedKeyItemSets = (keyItemSets: KeyItemSet[], fields: DynamicField[]): KeyItemSet[] => {
+    const targetItemSet = keyItemSets.find((d) => d.title === 'Properties') ?? keyItemSets[0];
+
+    const keyItemsMap = {};
+    targetItemSet.items.forEach((d) => { keyItemsMap[d.label] = d; });
+    fields.forEach((d) => {
+        if (!d.name || !keyItemsMap[d.name]) {
+            targetItemSet.items.push({
+                label: d.name ?? d.key,
+                name: d.key,
+            });
+        }
+    });
+
+    return keyItemSets;
+};
 
 export default defineComponent<QuerySearchTableDynamicLayoutProps>({
     name: 'PDynamicLayoutQuerySearchTable',
@@ -152,12 +200,14 @@ export default defineComponent<QuerySearchTableDynamicLayoutProps>({
             totalCount: computed(() => (props.typeOptions?.totalCount || 0)),
             keyItemSets: computed<KeyItemSet[]>(() => {
                 if (props.typeOptions?.keyItemSets) return props.typeOptions?.keyItemSets;
-                // if (Array.isArray(props.options.search) {
-                //     const searchKeyGroups = props.options.search;
-                //     searchKeyGroups.forEach((d) => {
-                //         d.items
-                //     });
-                // }
+
+                const searchKeyGroups = props.options.search;
+                if (Array.isArray(searchKeyGroups)) {
+                    const keyItemSets = getKeyItemSetsFromSearchSchema(searchKeyGroups);
+                    if (!props.options.fields) return keyItemSets;
+                    return getMergedKeyItemSets(keyItemSets, props.options.fields);
+                }
+
                 if (!props.options.fields) return [];
 
                 return [{
