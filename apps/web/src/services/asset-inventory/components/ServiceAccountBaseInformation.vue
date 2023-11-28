@@ -58,6 +58,7 @@ import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProviderGetRequestParams } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
@@ -126,9 +127,9 @@ export default defineComponent<Props>({
         /* Api */
         const getProvider = async () => {
             try {
-                state.providerData = await SpaceConnector.clientV2.identity.provider.get({
+                state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetRequestParams>({
                     domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-                    provider: props.provider,
+                    provider: props.provider ?? '',
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
