@@ -12,7 +12,7 @@
       "cache": true
     },
     "@cloudforet/core-lib#build": {
-      "dependsOn": ["@spaceone/design-system#build"],
+      "dependsOn": ["@spaceone/design-system#transpile"],
       "outputs": ["./dist/**"],
       "inputs": [
         "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
@@ -48,6 +48,10 @@
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
         "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
+      "cache": true
+    },
+    "transpile": {
+      "outputs": ["./types/**"],
       "cache": true
     },
     "dev": {
