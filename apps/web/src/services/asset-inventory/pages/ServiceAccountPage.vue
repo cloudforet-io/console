@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { useWindowSize } from '@vueuse/core';
 import type Vue from 'vue';
 import {
     computed, reactive, watch, getCurrentInstance,
 } from 'vue';
 
 import {
-    PHeading, PDynamicLayout, PButton, PSelectStatus,
+    PHeading, PDynamicLayout, PButton, PSelectStatus, PPaneLayout, screens, PTab,
 } from '@spaceone/design-system';
 import type {
     DynamicLayoutEventListener,
@@ -41,6 +42,9 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
+const { width } = useWindowSize();
+
 
 const vm = getCurrentInstance()?.proxy as Vue;
 const { query } = SpaceRouter.router.currentRoute;
@@ -79,11 +83,10 @@ const tableState = reactive({
     schema: null as null|DynamicLayout,
     visibleCustomFieldModal: false,
     accountTypeList: computed(() => [
-        { name: 'all', label: 'All' },
-        { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
         { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
+        { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
     ]),
-    selectedAccountType: 'all',
+    selectedAccountType: ACCOUNT_TYPE.GENERAL,
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
 });
 
@@ -268,48 +271,52 @@ watch(() => tableState.selectedAccountType, () => {
         />
         <provider-list :provider-list="state.providerList"
                        :selected-provider.sync="state.selectedProvider"
+                       class="service-account-provider-list"
         />
-        <p-dynamic-layout v-if="tableState.schema"
-                          class="service-account-table"
-                          type="query-search-table"
-                          :options="tableState.schema.options"
-                          :data="tableState.items"
-                          :fetch-options="fetchOptionState"
-                          :type-options="{
-                              ...typeOptionState,
-                              keyItemSets,
-                              valueHandlerMap,
-                          }"
-                          :field-handler="fieldHandler"
-                          @fetch="handleDynamicLayoutFetch"
-                          @export="exportServiceAccountData"
-                          @click-settings="handleClickSettings"
-                          @click-row="handleClickRow"
+        <component :is="width > screens.tablet.max ? PTab : PPaneLayout"
+                   :tabs="tableState.accountTypeList"
+                   :active-tab.sync="tableState.selectedAccountType"
         >
-            <template #toolbox-left>
-                <p-button style-type="primary"
-                          icon-left="ic_plus_bold"
-                          :disabled="!tableState.hasManagePermission"
-                          @click="clickAddServiceAccount"
+            <div class="account-type-filter">
+                <span class="label">{{ $t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE') }}</span>
+                <p-select-status v-for="(status, idx) in tableState.accountTypeList"
+                                 :key="`${status.name}-${idx}`"
+                                 :selected="tableState.selectedAccountType"
+                                 :value="status.name"
+                                 :multi-selectable="false"
+                                 @change="handleSelectServiceAccountType"
                 >
-                    {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
-                </p-button>
-            </template>
-            <template #toolbox-bottom>
-                <div class="account-type-filter">
-                    <span class="label">{{ $t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE') }}</span>
-                    <p-select-status v-for="(status, idx) in tableState.accountTypeList"
-                                     :key="`${status.name}-${idx}`"
-                                     :selected="tableState.selectedAccountType"
-                                     :value="status.name"
-                                     :multi-selectable="false"
-                                     @change="handleSelectServiceAccountType"
+                    {{ status.label }}
+                </p-select-status>
+            </div>
+            <p-dynamic-layout v-if="tableState.schema"
+                              class="service-account-table"
+                              type="query-search-table"
+                              :options="tableState.schema.options"
+                              :data="tableState.items"
+                              :fetch-options="fetchOptionState"
+                              :type-options="{
+                                  ...typeOptionState,
+                                  keyItemSets,
+                                  valueHandlerMap,
+                              }"
+                              :field-handler="fieldHandler"
+                              @fetch="handleDynamicLayoutFetch"
+                              @export="exportServiceAccountData"
+                              @click-settings="handleClickSettings"
+                              @click-row="handleClickRow"
+            >
+                <template #toolbox-left>
+                    <p-button style-type="primary"
+                              icon-left="ic_plus_bold"
+                              :disabled="!tableState.hasManagePermission"
+                              @click="clickAddServiceAccount"
                     >
-                        {{ status.label }}
-                    </p-select-status>
-                </div>
-            </template>
-        </p-dynamic-layout>
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
+                    </p-button>
+                </template>
+            </p-dynamic-layout>
+        </component>
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
                             :options="{provider: state.selectedProvider}"
@@ -319,33 +326,37 @@ watch(() => tableState.selectedAccountType, () => {
 </template>
 
 <style lang="postcss" scoped>
-.service-account-page {
+
+.service-account-provider-list {
+    margin-bottom: 1.5rem;
+}
+
+.account-type-filter {
+    @apply flex gap-4 items-center border-b border-gray-200;
+    display: none;
+    padding: 1.125rem 1rem;
+    font-size: 0.875rem;
+    line-height: 125%;
+
+    .label {
+        @apply text-gray-900;
+        font-weight: bold;
+        font-size: 0.875rem;
+    }
+}
+
+@screen tablet {
     .account-type-filter {
-        @apply flex gap-4 items-center border-t border-gray-200;
-        padding: 0.75rem 1rem;
+        @apply flex gap-4 items-center border-b border-gray-200;
+        display: flex;
+        padding: 1.125rem 1rem;
         font-size: 0.875rem;
         line-height: 125%;
 
         .label {
-            @apply text-gray-500;
+            @apply text-gray-900;
+            font-weight: bold;
             font-size: 0.875rem;
-        }
-    }
-    .service-account-table {
-        @apply overflow-hidden border border-gray-200 rounded-lg;
-        margin-top: 1rem;
-    }
-
-    /* custom design-system component -  p-dynamic-layout */
-    :deep(.service-account-table) {
-        overflow: unset;
-        .p-toolbox-table {
-            @apply rounded-lg;
-        }
-        .p-data-table {
-            .row-height-fixed {
-                cursor: pointer;
-            }
         }
     }
 }
