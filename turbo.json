@@ -51,7 +51,17 @@
       "cache": true
     },
     "transpile": {
+      "dependsOn": ["^transpile"],
       "outputs": ["./types/**"],
+      "cache": true
+    },
+    "@spaceone/design-system#transpile": {
+      "outputs": ["./types/**"],
+        "inputs": [
+          "src/**",
+          "package.json", "tsconfig.build.json", "vite.config.js",
+          "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+        ],
       "cache": true
     },
     "dev": {
