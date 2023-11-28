@@ -4,8 +4,6 @@ import {
 
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import type { CostDataField } from '@/services/dashboards/widgets/_configs/config';
-
 interface RawData {
     [key: string]: any;
 }
@@ -13,7 +11,7 @@ interface RawData {
 interface RefineOptions<T extends RawData, S extends RawData> {
     dataField?: keyof S & keyof T; // if given, set the value to the dataField property. { [dataField]: valueData }
     allReferenceTypeInfo?: AllReferenceTypeInfo; // if both this and dataField are given, get dataField label and set the value to the label property. { [dataFieldLabel]: valueData }
-    arrayDataKey: keyof T|(keyof T)[]; // = 'cost_sum' or ['cost_sum', 'budget_sum']
+    arrayDataKey: keyof T|(keyof T)[]; // = 'value_sum' or ['value_sum', 'budget_sum']
     categoryKey: keyof S; // merge by this key.  = 'date' pr ['date', 'Usage Type Details']
     valueKey: keyof S // 'value'
     useDataKeyAsRefinedValue?: boolean; // only works for vertical chart.
@@ -117,19 +115,18 @@ const getDataFieldLabel = <T extends RawData, S extends RawData>(data: T, dataFi
 };
 
 
-
 type AppendedData<T> = T & {
     [dataField: string]: string | any;
 };
 /**
  * @name getRefinedPieChartData
  * @description Convert raw data to XYDateChart data.
- * @example(before) [{ provider: 'aws', cost_sum: 100  }, { provider: 'google_cloud', cost_sum: 100  }]
- * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
+ * @example(before) [{ provider: 'aws', value_sum: 100  }, { provider: 'google_cloud', value_sum: 100  }]
+ * @example(after) [{ provider: 'AWS', value_sum: 100  }, { provider: 'Google Cloud', value_sum: 100  }]
  */
 export const getRefinedPieChartData = <T extends RawData = RawData>(
-    rawData: T[],
-    dataField: CostDataField,
+    rawData: T[]|undefined,
+    dataField: string|undefined,
     allReferenceTypeInfo: AllReferenceTypeInfo,
 ): AppendedData<T>[] => {
     if (!rawData || !dataField) return [];

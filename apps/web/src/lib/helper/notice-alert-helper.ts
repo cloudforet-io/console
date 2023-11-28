@@ -1,6 +1,6 @@
 import Vue from 'vue';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+import getRandomId from '@/lib/random-id-generator';
 
 
 /** * @function
@@ -55,7 +55,7 @@ export const showSuccessMessage = (successTitle, successMessage) => {
  *   @returns
  */
 export const showLoadingMessage = (loadingTitle, loadingMessage, id?, group = 'toastTopCenter'):string => {
-    const uuid = getUUID();
+    const uuid = getRandomId();
     if (Vue) {
         (Vue as any).notify({
             id: id ?? uuid,

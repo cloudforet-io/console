@@ -13,22 +13,25 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { Field } from '@/services/dashboards/widgets/_components/type';
 import WidgetDataTable from '@/services/dashboards/widgets/_components/WidgetDataTable.vue';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
-import { COST_DATA_FIELD_MAP } from '@/services/dashboards/widgets/_configs/config';
-import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-import { useWidgetPagination } from '@/services/dashboards/widgets/_hooks/use-widget-pagination';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
+import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
 // eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
+import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
+import { getXYChartLegends } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
+import type { Field } from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type {
+    WidgetExpose, WidgetProps, WidgetEmit, Legend, CostAnalyzeResponse,
+} from '@/services/dashboards/widgets/_types/widget-type';
 import type {
     Data,
     MapChartData,
@@ -36,7 +39,6 @@ import type {
 import {
     getRefinedMapChartData,
 } from '@/services/dashboards/widgets/cost-widgets/cost-by-region/cost-by-region-data-hleper';
-import type { Legend, CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
 
 
 type FullData = CostAnalyzeResponse<Data>;
@@ -58,7 +60,7 @@ const state = reactive({
             label: 'Region', name: COST_DATA_FIELD_MAP.REGION.name, textOptions: { type: 'reference', referenceType: 'region' }, width: '50%',
         },
         {
-            label: 'Cost', name: 'cost_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
+            label: 'Cost', name: 'value_sum', textOptions: { type: 'cost' }, textAlign: 'right', width: '30%',
         },
     ]),
     legends: computed<Legend[]>(() => getXYChartLegends(state.data?.results, COST_DATA_FIELD_MAP.PROVIDER.name, props.allReferenceTypeInfo)),
@@ -92,12 +94,12 @@ const fetchData = async (): Promise<FullData> => {
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'cost_sum', desc: true }],
+                sort: [{ key: 'value_sum', desc: true }],
                 ...apiQueryHelper.data,
             },
         });

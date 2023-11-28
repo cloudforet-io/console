@@ -53,6 +53,7 @@ import {
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { NoticePostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 
 import type { FileInfo } from '@/lib/file-manager/type';
@@ -62,8 +63,8 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
-import { getPostBadgeInfo } from '@/services/info/notice/helper';
-import type { NoticePostBadgeInfo, NoticePostModel } from '@/services/info/notice/type';
+import { getPostBadgeInfo } from '@/services/info/helpers/notice-helper';
+import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
 
 export default {
     name: 'NoticePopupItem',

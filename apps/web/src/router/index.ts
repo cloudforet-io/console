@@ -5,15 +5,15 @@ import VueRouter from 'vue-router';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { ERROR_ROUTE } from '@/router/error-routes';
+import { ERROR_ROUTE } from '@/router/constant';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { GTag } from '@/lib/gtag';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
 
-import { AUTH_ROUTE } from '@/services/auth/route-config';
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/route-config';
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 

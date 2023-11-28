@@ -20,7 +20,7 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBMenu } from '@/common/modules/navigations/lnb/type';
 
-import { INFO_ROUTE } from '@/services/info/route-config';
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 export default defineComponent({
     name: 'InfoLNB',

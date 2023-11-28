@@ -2,14 +2,15 @@ import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
 import type { IDateAxisSettings } from '@amcharts/amcharts5/xy';
 import dayjs from 'dayjs';
 
+import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { Granularity } from '@/schema/dashboard/_types/widget-type';
+
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
-import type { DateRange } from '@/services/dashboards/config';
-import type { Granularity } from '@/services/dashboards/widgets/_configs/config';
-import { COST_DATA_FIELD_MAP, GRANULARITY } from '@/services/dashboards/widgets/_configs/config';
 import type {
     Legend,
-} from '@/services/dashboards/widgets/type';
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 interface RawData {
@@ -69,39 +70,3 @@ export const getDateAxisSettings = (dateRange: DateRange, granularity?: Granular
         max: end.valueOf(),
     };
 };
-
-
-type AppendedData<T> = T & {
-    [dataField: string]: string | any;
-};
-/**
- * @name getRefinedPieChartData
- * @description Convert raw data to XYDateChart data.
- * @example(before) [{ provider: 'aws', cost_sum: 100  }, { provider: 'google_cloud', cost_sum: 100  }]
- * @example(after) [{ provider: 'AWS', cost_sum: 100  }, { provider: 'Google Cloud', cost_sum: 100  }]
- */
-export const getRefinedPieChartData = <T extends RawData = RawData>(
-    rawData: T[]|undefined,
-    dataField: string|undefined,
-    allReferenceTypeInfo: AllReferenceTypeInfo,
-): AppendedData<T>[] => {
-    if (!rawData || !dataField) return [];
-
-    const chartData: AppendedData<T>[] = [];
-    rawData.forEach((d) => {
-        let _name = d[dataField];
-        const referenceTypeInfo = Object.values(allReferenceTypeInfo).find((info) => info.key === dataField);
-        if (_name && referenceTypeInfo) {
-            const referenceMap = referenceTypeInfo.referenceMap;
-            _name = referenceMap[_name]?.label ?? referenceMap[_name]?.name ?? _name;
-        } else if (!_name) {
-            _name = 'Unknown';
-        }
-        chartData.push({
-            ...d,
-            [dataField]: _name,
-        } as AppendedData<T>);
-    });
-    return chartData;
-};
-

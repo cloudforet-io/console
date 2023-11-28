@@ -46,7 +46,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import HandbookButton from '@/common/modules/portals/HandbookButton.vue';
 
-import UserAPIKeyHandbook from '@/services/my-page/my-account/user-api-key/modules/APIKeyHandbook.vue';
+import UserAPIKeyHandbook from '@/services/my-page/components/UserAPIKeyHandbook.vue';
 import MyPageLNB from '@/services/my-page/MyPageLNB.vue';
 
 export default defineComponent({

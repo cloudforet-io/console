@@ -2,10 +2,9 @@ import type { AsyncComponent } from 'vue';
 
 import { mergeWith } from 'lodash';
 
-import type {
-    BaseConfigInfo, WidgetConfig,
-} from '@/services/dashboards/widgets/_configs/config';
-import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_configs/widget-list-config';
+import type { BaseConfigInfo, WidgetConfig } from '@/schema/dashboard/_types/widget-type';
+
+import { BASE_WIDGET_CONFIGS, CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-list-constant';
 
 const mergeCustomizer = (val1, val2) => {
     if (Array.isArray(val1)) return [...new Set(val1.concat(val2))];

@@ -3,12 +3,55 @@ import { groupBy, sum } from 'lodash';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 
-import { CONTINENT_INFO } from '@/services/dashboards/widgets/_configs/continent-config';
+interface ContinentInfo {
+    continent_code: string;
+    continent_label: string;
+    latitude: number;
+    longitude: number;
+}
 
+const CONTINENT_INFO: Record<string, ContinentInfo> = {
+    africa: {
+        continent_code: 'africa',
+        continent_label: 'Africa',
+        latitude: 11.081385,
+        longitude: 21.621094,
+    },
+    europe: {
+        continent_code: 'europe',
+        continent_label: 'Europe',
+        latitude: 50.896104,
+        longitude: 19.160156,
+    },
+    north_america: {
+        continent_code: 'north_america',
+        continent_label: 'North America',
+        latitude: 39.563353,
+        longitude: -99.316406,
+    },
+    south_america: {
+        continent_code: 'south_america',
+        continent_label: 'South America',
+        latitude: -13.6631791,
+        longitude: -69.6417454,
+    },
+    asia_pacific: {
+        continent_code: 'asia_pacific',
+        continent_label: 'Asia Pacific',
+        longitude: 103.183594,
+        latitude: 47.212106,
+    },
+    middle_east: {
+        continent_code: 'middle_east',
+        continent_label: 'Middle East',
+        longitude: 26.3842897,
+        latitude: 26.8448363,
+    },
+};
 
 export interface Data {
-    cost_sum: { date: string; value: number }[];
-    _total_cost_sum: number;
+    value_sum: { date: string; value: number }[];
+    _total_value_sum: number;
     provider: string;
     [dataField: string]: any;
 }
@@ -47,7 +90,7 @@ const getCostDataByProvider = (results: Data[], regions: RegionReferenceMap): Co
         const providerGroupBy = groupBy(cItem, 'provider');
         Object.entries(providerGroupBy).forEach(([provider, pItem]) => {
             if (continent && continent !== 'undefined' && provider && provider !== 'undefined') {
-                const providerCost = sum(pItem.map((d) => (d as any).cost_sum));
+                const providerCost = sum(pItem.map((d) => (d as any).value_sum));
                 if (result[continent]) result[continent][provider] = providerCost;
                 else result[continent] = { [provider]: providerCost };
             }

@@ -2,25 +2,31 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+
+
+import type { ListResponse } from '@/schema/_common/model';
+import type { PolicyModel } from '@/schema/identity/policy/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { PolicyDataModel, PolicyListDataModel } from '@/services/administration/iam/policy/lib/type';
-import type { PolicyType } from '@/services/administration/store/type';
-import { POLICY_TYPE } from '@/services/administration/store/type';
+import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
+import type { PolicyType } from '@/services/administration/types/policy-type';
+
+
 
 
 export const usePolicyStore = defineStore('policy-page', {
     state: () => ({
         loading: false,
         totalCount: 0,
-        policyData: null as PolicyDataModel | null,
-        policyList: [] as PolicyDataModel[],
+        policyData: null as PolicyModel | null,
+        policyList: [] as PolicyModel[],
     }),
     actions: {
         async listPolicyData(params: any): Promise<void|Error> {
             this.loading = true;
             try {
-                const { results, total_count }: PolicyListDataModel = await SpaceConnector.client.identity.policy.list({
+                const { results, total_count }: ListResponse<PolicyModel> = await SpaceConnector.client.identity.policy.list({
                     params,
                 });
                 this.policyList = results;

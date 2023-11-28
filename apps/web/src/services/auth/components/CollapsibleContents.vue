@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { PTextButton, PDataLoader } from '@spaceone/design-system';
 
-
 interface Props {
     loading: boolean
 }

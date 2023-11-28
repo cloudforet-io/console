@@ -109,13 +109,12 @@ import {
     PDataLoader, PButtonModal, PI, PLink, PDefinitionTable, PButton, PEmpty,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { CancelTokenSource } from 'axios';
-import axios from 'axios';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
 import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
@@ -129,7 +128,7 @@ import { NOTIFICATION_TYPE_ICONS } from '@/common/modules/navigations/gnb/module
 
 import { safe } from '@/styles/colors';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/route-config';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 
 interface NotificationItem {
     notificationId: string;
@@ -247,32 +246,22 @@ export default {
         };
         const notificationApiHelper = new ApiQueryHelper();
         initApiHelper(notificationApiHelper);
-        let listNotificationApiToken: CancelTokenSource | undefined;
+        const fetcher = getCancellableFetcher(SpaceConnector.client.notification.notification.list);
         const listNotifications = async () => {
-            if (listNotificationApiToken) {
-                listNotificationApiToken.cancel();
-                listNotificationApiToken = undefined;
-            }
-
             state.loading = true;
-            listNotificationApiToken = axios.CancelToken.source();
             try {
-                const { results, total_count } = await SpaceConnector.client.notification.notification.list({
+                const { status, response } = await fetcher({
                     query: notificationApiHelper.data,
-                }, {
-                    cancelToken: listNotificationApiToken.token,
                 });
-                listNotificationApiToken = undefined;
-                state.proxyCount = total_count;
-                state.items = state.items.concat(convertNotificationItem(results));
-                await setReadNotifications(results);
-
-                // update last read
-                await store.commit('settings/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
-            } catch (e: any) {
-                if (!axios.isCancel(e.axiosError)) {
-                    ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+                if (status === 'succeed') {
+                    state.proxyCount = response.total_count;
+                    state.items = state.items.concat(convertNotificationItem(response.results));
+                    await setReadNotifications(response.results);
+                    // update last read
+                    await store.commit('settings/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
                 }
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
             } finally {
                 state.loading = false;
             }
@@ -347,10 +336,6 @@ export default {
         /* Watcher */
         watch(() => props.visible, (visible) => {
             if (visible) init();
-            else if (listNotificationApiToken) {
-                listNotificationApiToken.cancel();
-                listNotificationApiToken = undefined;
-            }
         }, { immediate: true });
 
         onMounted(() => {

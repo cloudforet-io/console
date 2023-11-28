@@ -57,6 +57,7 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { numberFormatter } from '@cloudforet/core-lib';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -65,7 +66,7 @@ import { useNoticeStore } from '@/store/notice';
 import GNBNoticeTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNoticeTab.vue';
 import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotificationsTab.vue';
 
-import { NOTICE_POST_TYPE } from '@/services/info/notice/config';
+
 
 interface Props {
     visible: boolean

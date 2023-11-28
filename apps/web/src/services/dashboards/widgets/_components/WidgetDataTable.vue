@@ -20,15 +20,17 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { usageUnitFormatter } from '@/lib/helper/usage-formatter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
+import { useTextOverflowState } from '@/common/composables/text-overflow-state';
 
 import { gray } from '@/styles/colors';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import type {
-    Field, TableSize, WidgetTableData,
-} from '@/services/dashboards/widgets/_components/type';
-import { TABLE_SIZE } from '@/services/dashboards/widgets/_components/type';
-import type { Legend } from '@/services/dashboards/widgets/type';
+    Field, WidgetTableData,
+} from '@/services/dashboards/widgets/_types/widget-data-table-type';
+import type { Legend } from '@/services/dashboards/widgets/_types/widget-type';
+
+type TableSize = 'sm' | 'md';
 
 interface Props {
     loading: boolean;
@@ -56,7 +58,7 @@ const props = withDefaults(defineProps<Props>(), {
     legends: () => [],
     currency: CURRENCY.USD,
     widgetKey: '',
-    size: TABLE_SIZE.sm,
+    size: 'sm',
     allReferenceTypeInfo: () => ({}) as AllReferenceTypeInfo,
     colorSet: () => [],
     disableEllipsis: false,
@@ -125,9 +127,9 @@ const getValue = (item:string|number|object, field: Field):string|number => {
         valueKey = 'Unknown';
     }
     if (typeof item === 'object') {
-        return textFormatter(getValueByPath(item, valueKey), field.textOptions, item);
+        return textFormatter(getValueByPath(item, valueKey), field.textOptions, item) ?? '';
     }
-    return textFormatter(item, field.textOptions, item);
+    return textFormatter(item, field.textOptions, item) ?? '';
 };
 const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], item): string|boolean|undefined => {
     if (typeof option === 'string' || typeof option === 'boolean') {
@@ -139,14 +141,15 @@ const getHandler = (option: Field['icon']|Field['link']|Field['rapidIncrease'], 
 const getColSlotProps = (item, field, colIndex, rowIndex) => ({
     item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
 });
+
+
+const { getTextOverflowState } = useTextOverflowState({ targetRef: labelRef, targetClass: 'common-text-box' });
 const isEllipsisActive = (rowIndex: number, colIndex: number): boolean => {
     if (props.fields[colIndex].detailOptions?.type === 'popover') return false;
     const tdIndex = props.fields.length * rowIndex + colIndex;
-    if (labelRef.value?.length && labelRef.value) {
-        const labelElement = labelRef.value[tdIndex]?.getElementsByClassName('common-text-box')[0] as HTMLElement;
-        return (labelElement?.offsetWidth < labelElement?.scrollWidth);
-    } return false;
+    return getTextOverflowState(tdIndex);
 };
+
 const tableRef = ref<null|HTMLElement>(null);
 const tableWidth = ref<number>(0);
 useResizeObserver(tableRef, throttle((entries) => {
@@ -348,13 +351,8 @@ watch(() => props.legends, () => {
              class="table-pagination-wrapper"
         >
             <p-text-pagination :this-page.sync="state.proxyThisPage"
-                               :disable-next-page="!props.showNextPage"
-            >
-                <template #default>
-                    <span class="this-page">{{ state.proxyThisPage }}</span>
-                    <span v-if="props.showNextPage"> / ...</span>
-                </template>
-            </p-text-pagination>
+                               :has-next-page="props.showNextPage"
+            />
         </div>
     </div>
 </template>
@@ -522,9 +520,6 @@ watch(() => props.legends, () => {
     .table-pagination-wrapper {
         flex-shrink: 0;
         text-align: center;
-        .this-page {
-            font-weight: bold;
-        }
     }
 
     &.print-mode {

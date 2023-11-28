@@ -13,6 +13,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { CurrencySymbol } from '@/store/modules/settings/type';
 
@@ -24,17 +26,17 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { green, red, gray } from '@/styles/colors';
 
-import type { DateRange } from '@/services/dashboards/config';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
-import type { WidgetExpose, WidgetProps, WidgetEmit } from '@/services/dashboards/widgets/_configs/config';
+import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
+import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
+// eslint-disable-next-line import/no-cycle
+import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';
 import { getRefinedDateTableData } from '@/services/dashboards/widgets/_helpers/widget-table-helper';
-import { useWidgetColorSet } from '@/services/dashboards/widgets/_hooks/use-widget-color-set';
-import { useWidgetLifecycle } from '@/services/dashboards/widgets/_hooks/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
-import { useWidget } from '@/services/dashboards/widgets/_hooks/use-widget/use-widget';
-import type { CostAnalyzeResponse } from '@/services/dashboards/widgets/type';
+import type {
+    WidgetExpose, WidgetProps, WidgetEmit, CostAnalyzeResponse,
+} from '@/services/dashboards/widgets/_types/widget-type';
 
 
 const chartContext = ref<HTMLElement | null>(null);
@@ -53,8 +55,8 @@ interface SubData {
     value: number;
 }
 interface Data {
-    cost_sum: SubData[];
-    _total_cost_sum: number;
+    value_sum: SubData[];
+    _total_value_sum: number;
 }
 type FullData = CostAnalyzeResponse<Data>;
 interface ChartData {
@@ -76,10 +78,10 @@ const state = reactive({
     chartData: computed<ChartData[]>(() => {
         if (!state.data) return [];
 
-        const dateFilledData = getRefinedDateTableData<Data>(state.data, widgetState.dateRange, 'cost_sum');
+        const dateFilledData = getRefinedDateTableData<Data>(state.data, widgetState.dateRange);
 
         const chartData = getRefinedXYChartData<Data, ChartData>(dateFilledData, {
-            arrayDataKey: 'cost_sum',
+            arrayDataKey: 'value_sum',
             categoryKey: DATE_FIELD_NAME,
             valueKey: VALUE_FIELD_NAME,
         });
@@ -150,7 +152,7 @@ const fetchData = async (): Promise<Data[]|null> => {
                 start: widgetState.dateRange.start,
                 end: widgetState.dateRange.end,
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
@@ -171,8 +173,8 @@ const fetchData = async (): Promise<Data[]|null> => {
 
 /* Util */
 const getCostOfMonth = (month: Dayjs): number => {
-    if (!state.data?.[0]?.cost_sum?.length) return 0;
-    const monthlyCost = state.data[0].cost_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
+    if (!state.data?.[0]?.value_sum?.length) return 0;
+    const monthlyCost = state.data[0].value_sum.find((costData) => costData.date === month.format(DATE_FORMAT))?.value || 0;
     return monthlyCost;
 };
 

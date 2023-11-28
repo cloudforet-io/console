@@ -3,14 +3,16 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { RoleModel } from '@/schema/identity/role/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RoleData } from '@/services/administration/iam/role/type';
+
 
 
 interface RolePageState {
     loading: boolean;
-    roles: RoleData[];
+    roles: RoleModel[];
     totalCount: number;
     selectedIndices: number[];
 }

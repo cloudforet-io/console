@@ -2,6 +2,9 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+
+import type { PluginModel } from '@/schema/repository/plugin/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { PluginReferenceMap, PluginReferenceState } from '@/store/modules/reference/plugin/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
@@ -10,7 +13,7 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RepositoryPluginModel } from '@/services/asset-inventory/collector/model';
+
 
 let lastLoadedTime = 0;
 
@@ -40,7 +43,7 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
                 repository_id: repoInfo.repository_id,
             }, { timeout: 3000 });
 
-            pluginResponse.results.forEach((pluginInfo: RepositoryPluginModel): void => {
+            pluginResponse.results.forEach((pluginInfo: PluginModel): void => {
                 plugins[pluginInfo.plugin_id] = {
                     key: pluginInfo.plugin_id,
                     label: pluginInfo.name,

@@ -47,7 +47,7 @@ import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import { useCloudServicePageStore } from '@/services/asset-inventory/store/cloud-service-page-store';
+import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 
 
 export default {

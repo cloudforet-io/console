@@ -11,21 +11,21 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
+import { GRANULARITY, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
+import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
+import type { Granularity, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 
-import { getUUID } from '@/lib/component-util/getUUID';
+import getRandomId from '@/lib/random-id-generator';
 
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 import { red } from '@/styles/colors';
 
-import type { DateRange } from '@/services/dashboards/config';
-import type { Granularity, WidgetSize } from '@/services/dashboards/widgets/_configs/config';
-import { GRANULARITY, WIDGET_SIZE } from '@/services/dashboards/widgets/_configs/config';
-import type { WidgetTheme } from '@/services/dashboards/widgets/_configs/view-config';
+import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 
 
 export interface WidgetFrameProps {
@@ -209,10 +209,10 @@ const handleClickViewModeButton = () => {
             <div class="widget-footer-wrapper">
                 <div class="footer-left">
                     <template v-if="state.dateLabel">
-                        <p-tooltip v-if="props.size === WIDGET_SIZE.sm"
+                        <p-tooltip v-if="props.size === WIDGET_SIZE.sm && props.dataCriteria !== 'realtime'"
                                    :contents="state.dateLabel"
                         >
-                            <p-i :name="props.dataCriteria === 'realtime' ? 'ic_time_realtime' : 'ic_time'"
+                            <p-i :name="'ic_time'"
                                  width="1rem"
                                  height="1rem"
                             />
@@ -264,7 +264,7 @@ const handleClickViewModeButton = () => {
             <div class="button-group">
                 <template v-for="icon in state.editModeIconButtonList">
                     <p-icon-button v-if="icon.isAvailable"
-                                   :key="`${icon.name}-${getUUID()}`"
+                                   :key="`${icon.name}-${getRandomId()}`"
                                    :name="icon.name"
                                    shape="square"
                                    style-type="tertiary"

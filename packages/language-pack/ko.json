@@ -2167,7 +2167,6 @@
 				"SHOW_CHARTS": "차트 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
 				"TITLE": "{provider} 클라우드 서비스 ",
-				"TOTAL_RESULT": "검색 결과",
 				"USAGE_OVERVIEW": "이용 현황",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
 			},

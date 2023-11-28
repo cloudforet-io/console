@@ -1,7 +1,7 @@
+import type { CostDataField } from '@/schema/dashboard/_types/widget-type';
+
 import type { ReferenceMap } from '@/store/modules/reference/type';
 import type { AllReferenceTypeInfo } from '@/store/reference/all-reference-store';
-
-import type { CostDataField } from '@/services/dashboards/widgets/_configs/config';
 
 /**
  * @name getRefinedTreemapChartData
@@ -32,8 +32,8 @@ const convertValueToLabel = (value?: string, referenceMap?: ReferenceMap) => {
 };
 
 export type AnalyzeRawData = {
-    cost_sum: number; // valueField
-    _total_cost_sum: number;
+    value_sum: number; // valueField
+    _total_value_sum: number;
 } & Partial<Record<CostDataField, string>>;
 
 interface TreemapChartChild extends AnalyzeRawData {

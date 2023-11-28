@@ -64,7 +64,7 @@ import type {
     GNBDashboardMenuItem,
 } from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/type';
 
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/route-config';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 interface Props {
     visible: boolean;
