@@ -10,7 +10,7 @@ interface Options {
 export interface ExcelDataField {
     key: string;
     name: string;
-    type?: 'datetime'|'enum'|'currency';
+    type?: 'datetime'|'enum'|'currency'|'size';
     enum_items?: any;
     reference?: Reference;
     options?: DynamicFieldOptions | Options;

@@ -51,7 +51,7 @@ import {
 } from '@spaceone/design-system';
 
 
-import type { AccountType } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
 
 export default defineComponent({
     name: 'ServiceAccountAccountType',

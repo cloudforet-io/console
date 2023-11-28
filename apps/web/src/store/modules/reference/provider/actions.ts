@@ -14,7 +14,7 @@ import { indigo } from '@/styles/colors';
 
 let lastLoadedTime = 0;
 
-export const load: Action<ProviderReferenceState, any> = async ({ commit, state }, options: ReferenceLoadOptions): Promise<void|Error> => {
+export const load: Action<ProviderReferenceState, any> = async ({ commit, state, rootState }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -25,6 +25,7 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
 
     try {
         const response = await SpaceConnector.clientV2.identity.provider.list({
+            domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['provider', 'name', 'tags'],
             },

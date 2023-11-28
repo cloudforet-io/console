@@ -61,6 +61,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -119,12 +120,14 @@ export default defineComponent<Props>({
             serviceAccountData: undefined as ServiceAccountModel|undefined,
             baseInformationForm: {} as BaseInformationForm,
             originBaseInformationForm: {} as BaseInformationForm,
+            domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
         });
 
         /* Api */
         const getProvider = async () => {
             try {
-                state.providerData = await SpaceConnector.client.identity.provider.get({
+                state.providerData = await SpaceConnector.clientV2.identity.provider.get({
+                    domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                     provider: props.provider,
                 });
             } catch (e) {

@@ -57,7 +57,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

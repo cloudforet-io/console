@@ -139,7 +139,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType, ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -230,6 +231,7 @@ export default defineComponent<Props>({
                 return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
             }),
             baseInformationSchema: computed<JsonSchema>(() => state.providerData.template?.service_account?.schema ?? null),
+            domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
         });
         const formState = reactive({
             hasCredentialKey: true,
@@ -295,7 +297,8 @@ export default defineComponent<Props>({
         /* Api */
         const getProviderData = async (provider: string) => {
             try {
-                const result = await SpaceConnector.client.identity.provider.get({
+                const result = await SpaceConnector.clientV2.identity.provider.get({
+                    domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                     provider,
                 });
                 state.providerData = result;
