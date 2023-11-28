@@ -5,7 +5,7 @@ import type { IDateAxisSettings, IXYChartSettings, IXYSeriesSettings } from '@am
 import * as am5xy from '@amcharts/amcharts5/xy';
 import bytes from 'bytes';
 
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import type { Currency } from '@/store/modules/settings/type';
 

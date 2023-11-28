@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import {
     pluginStateColor,

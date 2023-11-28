@@ -94,8 +94,8 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_SEVERITY } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';

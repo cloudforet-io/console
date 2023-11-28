@@ -3,8 +3,16 @@
     "turbo.json", "package.json", "package-lock.json"
   ],
   "pipeline": {
+    "@cloudforet/utils#build": {
+      "outputs": ["./dist/**"],
+      "inputs": [
+        "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+      ],
+      "cache": true
+    },
     "@cloudforet/core-lib#build": {
-      "dependsOn": ["@spaceone/design-system#build"],
+      "dependsOn": ["@spaceone/design-system#transpile"],
       "outputs": ["./dist/**"],
       "inputs": [
         "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
@@ -40,6 +48,20 @@
         "tsconfig.json", "tailwind.config.js", "postcss.config.js", ".storybook/**/*",
         "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
       ],
+      "cache": true
+    },
+    "transpile": {
+      "dependsOn": ["^transpile"],
+      "outputs": ["./types/**"],
+      "cache": true
+    },
+    "@spaceone/design-system#transpile": {
+      "outputs": ["./types/**"],
+        "inputs": [
+          "src/**",
+          "package.json", "tsconfig.build.json", "vite.config.js",
+          "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+        ],
       "cache": true
     },
     "dev": {

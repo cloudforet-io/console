@@ -8,8 +8,8 @@ import {
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

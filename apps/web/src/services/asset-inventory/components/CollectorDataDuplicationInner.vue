@@ -87,7 +87,7 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { durationFormatter } from '@cloudforet/core-lib/index';
+import { durationFormatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';

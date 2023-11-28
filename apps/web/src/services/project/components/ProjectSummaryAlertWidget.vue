@@ -65,10 +65,10 @@ import {
 } from '@spaceone/design-system';
 import { find } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { getAllPage, getPageStart } from '@cloudforet/core-lib/component-util/pagination';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';

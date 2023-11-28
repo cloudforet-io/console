@@ -8,10 +8,10 @@ import {
 } from '@spaceone/design-system';
 import { sortBy } from 'lodash';
 
-import { getRGBFromHex, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { getRGBFromHex, numberFormatter } from '@cloudforet/utils';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

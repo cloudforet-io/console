@@ -14,8 +14,8 @@ import {
     cloneDeep, forEach, orderBy, range,
 } from 'lodash';
 
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
