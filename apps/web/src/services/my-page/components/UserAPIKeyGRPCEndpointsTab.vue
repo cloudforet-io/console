@@ -28,7 +28,7 @@ const state = reactive({
 const listEndpoints = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.client.identity.endpoint.list();
+        const { results } = await SpaceConnector.clientV2.identity.endpoint.list();
         state.items = results;
     } catch (e) {
         ErrorHandler.handleError(e);
