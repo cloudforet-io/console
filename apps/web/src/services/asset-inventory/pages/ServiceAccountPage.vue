@@ -219,7 +219,7 @@ const getTableSchema = async () => {
             options: {
                 provider: state.selectedProvider,
             },
-        }, { mockPath: '?resource=serviceaccount' });
+        });
     } catch (e) {
         tableState.schema = null;
     }
