@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButtonModal, PFieldGroup, PBoxTab, PSelectDropdown, PTooltip, PI, PTextInput,
+    PButtonModal, PFieldGroup, PBoxTab, PSelectDropdown, PTextInput,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
@@ -12,13 +12,14 @@ import { debounce, union } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectAddUsersRequestParams } from '@/schema/identity/project/api-verbs/add-users';
+import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
-import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
-import { getPagePermissionMapFromRaw } from '@/lib/access-control/page-permission-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -26,7 +27,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { checkEmailFormat } from '@/services/administration/helpers/user-management-form-validations';
-import type { ProjectMemberItem, ProjectMemberRoleMenuItem } from '@/services/project/types/project-member-type';
 
 
 const AUTH_TYPE = {
@@ -58,7 +58,7 @@ const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     authType: computed(() => store.state.domain.extendedAuthType),
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-    members: [] as ProjectMemberItem[],
+    projectUserIdList: [] as string[],
     //
     tabs: computed(() => {
         const tabs = [
@@ -76,16 +76,13 @@ const state = reactive({
         return tabs;
     }),
     activeTab: AUTH_TYPE.INTERNAL_USER,
-    roleItems: [] as ProjectMemberRoleMenuItem[],
     internalUserItems: [] as SelectDropdownMenuItem[],
     externalUserItems: [] as InputItem[],
     invalidUserList: [] as string[],
     existingMemberList: [] as string[],
     searchText: '',
     labelText: '',
-    showRoleWarning: false,
 });
-const isLabelDuplicated = ref<boolean>(false);
 const externalItemsErrors = ref<ExternalItemsError>({});
 const externalItemsInvalidTexts = computed(() => {
     const errorCodes = union(Object.values(externalItemsErrors.value)).filter((code) => !!code);
@@ -100,27 +97,17 @@ const externalItemsInvalidTexts = computed(() => {
 const selectedExternalUserItems = ref<InputItem[]>([]);
 const {
     forms: {
-        labels, selectedRoleItems, selectedInternalUserItems,
+        selectedInternalUserItems,
     },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
     initForm,
 } = useFormValidator({
-    labels: [] as InputItem[],
-    selectedRoleItems: [] as ProjectMemberRoleMenuItem[],
     selectedInternalUserItems: [] as SelectDropdownMenuItem[],
 }, {
     selectedInternalUserItems: (val: SelectDropdownMenuItem[]) => {
         if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
-        return true;
-    },
-    selectedRoleItems: (val: ProjectMemberRoleMenuItem[]) => {
-        if (!val.length) return i18n.t('PROJECT.DETAIL.MEMBER.MODAL_VALIDATION_REQUIRED');
-        return true;
-    },
-    labels: (val: InputItem[]) => {
-        if (val.length > 5) return i18n.t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT');
         return true;
     },
 });
@@ -128,7 +115,6 @@ const {
 /* Util */
 const _setInternalMenuItems = () => {
     state.internalUserItems = [];
-    const memberIdList: string[] = state.members.map((d) => d.resource_id);
     Object.keys(state.users).forEach((userId) => {
         const userName = state.users[userId]?.name;
         const singleItem = {
@@ -136,7 +122,7 @@ const _setInternalMenuItems = () => {
             label: userName ? `${userId} (${userName})` : userId,
             disabled: false,
         };
-        if (memberIdList.includes(userId)) {
+        if (state.projectUserIdList.includes(userId)) {
             singleItem.disabled = true;
         }
         state.internalUserItems.push(singleItem);
@@ -144,14 +130,13 @@ const _setInternalMenuItems = () => {
 };
 const _getExternalMenuItems = (users: {user_id: string; name: string;}[]): InputItem[] => {
     const externalUserItems: InputItem[] = [];
-    const memberIdList = state.members.map((d) => d.resource_id);
     users.forEach((user) => {
         const singleItem = {
             name: user.user_id,
             label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
             disabled: false,
         };
-        if (memberIdList.includes(user.user_id)) {
+        if (state.projectUserIdList.includes(user.user_id)) {
             singleItem.disabled = true;
         }
         externalUserItems.push(singleItem);
@@ -174,8 +159,7 @@ const setExternalItemsInvalidTexts = async (userItem: InputItem): Promise<Extern
     }
 
     /* 2. check member list */
-    const memberIdList: string[] = state.members.map((d) => d.resource_id);
-    if (memberIdList.includes(userItem.name ?? '')) {
+    if (state.projectUserIdList.includes(userItem.name ?? '')) {
         return 'ALREADY_EXIST';
     }
 
@@ -189,41 +173,28 @@ const setExternalItemsInvalidTexts = async (userItem: InputItem): Promise<Extern
 };
 
 /* Api */
-const listRoles = async () => {
-    const { results } = await SpaceConnector.client.identity.role.list({
-        role_type: 'PROJECT',
-    });
-    state.roleItems = results.map((d) => ({
-        type: 'item',
-        label: d.name,
-        name: d.role_id,
-        pagePermissions: d.page_permissions,
-    }));
-};
 const addMember = async () => {
     try {
-        const params: any = {
-            role_id: selectedRoleItems.value[0].name,
+        const params: ProjectAddUsersRequestParams = {
+            project_id: props.projectId,
             users: state.activeTab === AUTH_TYPE.INTERNAL_USER ? selectedInternalUserItems.value.map((d) => d.name) : selectedExternalUserItems.value.map((d) => d.name),
-            labels: labels.value.map((d) => d.name),
-            is_external_user: state.activeTab !== AUTH_TYPE.INTERNAL_USER,
         };
-        params.project_id = props.projectId;
-        await SpaceConnector.client.identity.project.member.add(params);
+        await SpaceConnector.clientV2.identity.project.addUsers(params);
         showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'));
     }
 };
-const listMember = async () => {
+const getProjectUserData = async () => {
     try {
-        const res = await SpaceConnector.client.identity.project.member.list({
+        const params: ProjectGetRequestParams = {
             project_id: props.projectId,
-        });
-        state.members = res.results;
+        };
+        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
+        state.projectUserIdList = res.users;
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.members = [];
+        state.projectUserIdList = [];
     }
 };
 const listExternalUser = debounce(async () => {
@@ -254,10 +225,6 @@ const handleSearchExternalUser = (text) => {
     state.searchText = text;
     if (text.trim().length) listExternalUser();
 };
-const handleUpdateLabel = (inputLabels: InputItem[], isValid: boolean) => {
-    isLabelDuplicated.value = !isValid;
-    setForm('labels', inputLabels);
-};
 const handleUpdateExternalUser = async (inputUserItems: InputItem[], isValid: boolean) => {
     if (inputUserItems.length === selectedExternalUserItems.value.length) return;
 
@@ -284,19 +251,11 @@ const handleUpdateExternalUser = async (inputUserItems: InputItem[], isValid: bo
     selectedExternalUserItems.value = [...selectedExternalUserItems.value, _addedUserItem];
     externalItemsErrors.value = errors;
 };
-const handleSelectRoleItem = (roleItems: ProjectMemberRoleMenuItem[]) => {
-    if (!roleItems.length) return;
-    const roleItem = { ...roleItems[0] };
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleItem.pagePermissions);
-    setForm('selectedRoleItems', roleItems);
-    state.showRoleWarning = !pagePermissionMap.project || pagePermissionMap.project === PAGE_PERMISSION_TYPE.VIEW;
-};
 
 /* Init */
 (async () => {
     await Promise.allSettled([
-        listMember(),
-        listRoles(),
+        getProjectUserData(),
         // LOAD REFERENCE STORE
         store.dispatch('reference/user/load'),
     ]);
@@ -317,7 +276,7 @@ watch(() => state.activeTab, () => {
         :fade="true"
         :backdrop="true"
         :visible.sync="state.proxyVisible"
-        :disabled="!isAllValid || isLabelDuplicated || !!externalItemsInvalidTexts.length"
+        :disabled="!isAllValid || !!externalItemsInvalidTexts.length"
         @confirm="handleConfirm"
     >
         <template #body>
@@ -381,56 +340,6 @@ watch(() => state.activeTab, () => {
                         />
                     </template>
                 </p-field-group>
-                <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.ROLE')"
-                               required
-                               :help-text="$t('PROJECT.DETAIL.MEMBER.ROLE_HELP_TEXT')"
-                               :invalid="invalidState.selectedRoleItems"
-                               :invalid-text="invalidTexts.selectedRoleItems"
-                >
-                    <template #label-extra>
-                        <p-tooltip class="help-icon"
-                                   :contents="$t('PROJECT.DETAIL.MEMBER.ROLE_TOOLTIP')"
-                                   position="bottom"
-                        >
-                            <p-i name="ic_question-mark-circle"
-                                 width="0.875rem"
-                                 height="0.875rem"
-                                 color="inherit"
-                            />
-                        </p-tooltip>
-                        <span v-if="state.showRoleWarning"
-                              class="role-warning-text"
-                        >{{ $t('PROJECT.DETAIL.MEMBER.ROLE_WARNING') }}</span>
-                    </template>
-                    <template #default="{invalid}">
-                        <p-select-dropdown
-                            :menu="state.roleItems"
-                            :selected="selectedRoleItems"
-                            show-select-marker
-                            is-filterable
-                            show-delete-all-button
-                            use-fixed-menu-style
-                            :invalid="invalid"
-                            @update:selected="handleSelectRoleItem"
-                        />
-                    </template>
-                </p-field-group>
-                <p-field-group
-                    :label="$t('PROJECT.DETAIL.MEMBER.LABEL_LABEL')"
-                    :help-text="$t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT')"
-                    :invalid="invalidState.labels || isLabelDuplicated"
-                    :invalid-text="invalidTexts.labels || $t('PROJECT.DETAIL.MEMBER.DUPLICATED_VALUE')"
-                >
-                    <template #default="{invalid}">
-                        <p-text-input :selected="labels"
-                                      :invalid="invalid"
-                                      multi-input
-                                      appearance-type="stack"
-                                      block
-                                      @update="handleUpdateLabel"
-                        />
-                    </template>
-                </p-field-group>
             </div>
         </template>
     </p-button-modal>
@@ -452,15 +361,6 @@ watch(() => state.activeTab, () => {
             font-size: 1.375rem;
             line-height: 1.25;
             padding-bottom: 1rem;
-        }
-
-        .help-icon {
-            @apply text-gray-400;
-        }
-        .role-warning-text {
-            @apply text-red-500;
-            font-size: 0.75rem;
-            padding-left: 0.5rem;
         }
     }
 }

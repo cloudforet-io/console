@@ -6,14 +6,18 @@ import {
 import {
     PSelectDropdown,
 } from '@spaceone/design-system';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface Props {
     projectId?: string;
@@ -27,16 +31,18 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'change', value: any): void; }>();
 
+const storeState = reactive({
+    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+});
 const state = reactive({
     loading: true,
-    allMember: [] as any[],
-    allMemberItems: computed(() => state.allMember.map((d) => ({
-        name: d.resource_id,
-        label: state.users[d.resource_id]?.label,
+    projectUserIdList: [] as string[],
+    allMemberItems: computed<SelectDropdownMenuItem[]>(() => state.projectUserIdList.map((d) => ({
+        name: d,
+        label: storeState.users[d]?.name ?? d,
         type: 'item',
     }))),
     selectedMemberItems: props.users.map((d) => ({ name: d, label: d })),
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
 });
 
 const emitChange = () => {
@@ -45,24 +51,17 @@ const emitChange = () => {
     });
 };
 
-const removeDuplicatedElement = (duplicatedArr) => {
-    const res = duplicatedArr.filter((item, i) => (
-        duplicatedArr.findIndex((item2) => item.resource_id === item2.resource_id) === i
-    ));
-    return res;
-};
-
 const listProjectMember = async () => {
     state.loading = true;
     try {
-        const { results } = await SpaceConnector.client.identity.project.member.list({
+        const params: ProjectGetRequestParams = {
             project_id: props.projectId,
-            include_parent_member: true,
-        });
-        state.allMember = removeDuplicatedElement(results);
+        };
+        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
+        state.projectUserIdList = res.users ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.allMember = [];
+        state.projectUserIdList = [];
     } finally {
         state.loading = false;
     }

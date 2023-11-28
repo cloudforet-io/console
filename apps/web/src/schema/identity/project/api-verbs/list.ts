@@ -7,5 +7,4 @@ export interface ProjectListRequestParams {
     user_id?: string;
     user_group_id?: string;
     project_group_id?: string;
-    workspace_id?: string;
 }

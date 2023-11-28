@@ -13,11 +13,12 @@ import {
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectRemoveUsersRequestParams } from '@/schema/identity/project/api-verbs/remove-users';
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -35,6 +36,10 @@ import type { ProjectMemberItem } from '@/services/project/types/project-member-
 interface MemberDataTableItem extends ProjectMemberItem {
     user_id: string;
 }
+interface UserItem {
+    user_id: string;
+    user_name: string;
+}
 
 interface Props {
     projectId?: string;
@@ -49,22 +54,36 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update-filters', filters: any): void;
 }>();
 
-const apiQueryHelper = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
 });
 const state = reactive({
-    searchText: apiQueryHelper.filters.map((d) => d.v).join(' ') || '',
+    searchText: props.filters.map((d) => d.v).join(' ') || '',
     selectIndex: [] as number[],
     fields: [
         { label: 'User ID', name: 'user_id' },
-        { label: 'User Name', name: 'resource_id' },
+        { label: 'User Name', name: 'user_name' },
     ] as DataTableField[],
+    projectUserIdList: [] as string[],
+    refinedItems: computed<UserItem[]>(() => {
+        const users: UserItem[] = state.projectUserIdList.map((d) => ({
+            user_id: d,
+            user_name: storeState.users[d]?.name ?? d,
+        }));
+        const filteredUsers = users.filter((d) => {
+            const searchText = state.searchText.toLowerCase();
+            return d.user_id.toLowerCase().includes(searchText)
+                || d.user_name.toLowerCase().includes(searchText);
+        });
+        return filteredUsers.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
+    }),
     items: [] as MemberDataTableItem[],
     loading: true,
     totalCount: 0,
-    selectedItems: computed(() => state.selectIndex.map((i) => state.items[i])),
+    pageLimit: 15,
+    pageStart: 1,
+    selectedItems: computed(() => state.selectIndex.map((i) => state.refinedItems[i])),
     dropdownMenu: computed(() => ([
         {
             type: 'item',
@@ -74,44 +93,35 @@ const state = reactive({
         },
     ] as MenuItem[])),
     memberInviteFormVisible: false,
-});
-const checkMemberDeleteState = reactive({
-    fields: computed(() => [
-        { name: 'resource_id', label: 'User ID' },
-        { name: 'role_info.name', label: 'Role' },
-    ]),
-    visible: false,
+    memberDeleteModalVisible: false,
 });
 
 /* Api */
-const listMembers = async () => {
+const getProjectUserData = async () => {
     state.loading = true;
     state.selectIndex = [];
     try {
-        const res = await SpaceConnector.client.identity.project.member.list({
+        const params: ProjectGetRequestParams = {
             project_id: props.projectId,
-            query: apiQueryHelper.data,
-            include_parent_member: true,
-        });
-        state.items = res.results.map((d) => ({
-            ...d,
-            user_id: d.resource_id,
-        }));
-        state.totalCount = res.total_count;
+        };
+        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
+        state.projectUserIdList = res.users ?? [];
+        state.totalCount = res.users?.length ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.items = [];
+        state.projectUserIdList = [];
         state.totalCount = 0;
     } finally {
         state.loading = false;
     }
 };
-const deleteProjectMember = async (items) => {
+const deleteProjectUser = async (items) => {
     try {
-        await SpaceConnector.client.identity.project.member.remove({
+        const params: ProjectRemoveUsersRequestParams = {
             project_id: props.projectId,
-            users: items.map((it) => it.resource_id),
-        });
+            users: items.map((it) => it.user_id),
+        };
+        await SpaceConnector.clientV2.identity.project.removeUsers(params);
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
@@ -120,19 +130,21 @@ const deleteProjectMember = async (items) => {
 
 /* Event */
 const handleChangeTable = async (options: ToolboxOptions = {}) => {
-    setApiQueryWithToolboxOptions(apiQueryHelper, options);
+    state.selectIndex = [];
     if (options.searchText !== undefined) {
+        state.searchText = options.searchText;
         const filters = [{ v: options.searchText }];
         emit('update-filters', filters);
     }
-    await listMembers();
+    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
 const handleClickInviteMember = () => {
     state.memberInviteFormVisible = true;
 };
 
 const clickDeleteMember = () => {
-    checkMemberDeleteState.visible = true;
+    state.memberDeleteModalVisible = true;
 };
 const handleSelectDropdown = (name) => {
     switch (name) {
@@ -141,13 +153,13 @@ const handleSelectDropdown = (name) => {
     }
 };
 const handleConfirmDeleteMember = async (items) => {
-    await deleteProjectMember(items);
+    await deleteProjectUser(items);
 
-    checkMemberDeleteState.visible = false;
-    await listMembers();
+    state.memberDeleteModalVisible = false;
+    await getProjectUserData();
 };
-const handleConfirm = () => {
-    listMembers();
+const handleConfirmInvite = () => {
+    getProjectUserData();
 };
 
 /* Init */
@@ -161,7 +173,7 @@ const handleConfirm = () => {
 
 /* Watcher */
 watch(() => store.state.reference.project.items, (projects) => {
-    if (projects) listMembers();
+    if (projects) getProjectUserData();
 }, { immediate: true });
 </script>
 
@@ -171,7 +183,7 @@ watch(() => store.state.reference.project.items, (projects) => {
                          selectable
                          sortable
                          :fields="state.fields"
-                         :items="state.items"
+                         :items="state.refinedItems"
                          :select-index.sync="state.selectIndex"
                          :loading="state.loading"
                          :total-count="state.totalCount"
@@ -201,21 +213,18 @@ watch(() => store.state.reference.project.items, (projects) => {
                                    @select="handleSelectDropdown"
                 />
             </template>
-            <template #col-resource_id-format="{ value }">
-                {{ storeState.users[value] ? storeState.users[value].name : value }}
-            </template>
         </p-toolbox-table>
 
         <project-member-invite-modal
             v-if="state.memberInviteFormVisible"
             :visible.sync="state.memberInviteFormVisible"
             :project-id="projectId"
-            @confirm="handleConfirm"
+            @confirm="handleConfirmInvite"
         />
-        <p-table-check-modal :visible.sync="checkMemberDeleteState.visible"
+        <p-table-check-modal :visible.sync="state.memberDeleteModalVisible"
                              theme-color="alert"
                              modal-size="md"
-                             :fields="checkMemberDeleteState.fields"
+                             :fields="state.fields"
                              :items="state.selectedItems"
                              :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE')"
                              :sub-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT')"
