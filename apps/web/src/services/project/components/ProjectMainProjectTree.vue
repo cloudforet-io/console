@@ -9,6 +9,11 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type {
+    ProjectGroupChangeParentGroupRequestParams,
+} from '@/schema/identity/project-group/api-verbs/change-parent-group';
+import type { ProjectGroupUpdateRequestParams } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectChangeProjectGroupRequestParams } from '@/schema/identity/project/api-verbs/change-project-group';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -122,7 +127,6 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
         }
 
         if (projectPageStore.treeEditMode) {
-            params.include_permission = true;
             if (projectOnly) params.exclude_type = 'PROJECT_GROUP';
         } else {
             params.exclude_type = 'PROJECT';
@@ -187,12 +191,12 @@ watch(() => projectPageStore.treeEditMode, async (treeEditMode) => {
 
 const onFinishEdit = async (node, editText: string) => {
     try {
-        const params = {
+        const params: ProjectGroupUpdateRequestParams = {
             project_group_id: node.data.id,
             name: editText,
         };
 
-        await SpaceConnector.client.identity.projectGroup.update(params);
+        await SpaceConnector.clientV2.identity.projectGroup.update(params);
 
         dataSetter(editText, node);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
@@ -202,16 +206,12 @@ const onFinishEdit = async (node, editText: string) => {
 };
 
 const updateProjectGroup = async (node, oldParent, parent) => {
-    const params: any = {
+    const params: ProjectGroupChangeParentGroupRequestParams = {
         project_group_id: node.data.id,
+        parent_group_id: parent?.data?.id || undefined,
     };
-    if (parent) {
-        params.parent_project_group_id = parent.data.id;
-    } else {
-        params.release_parent_project_group = true;
-    }
     try {
-        await SpaceConnector.client.identity.projectGroup.update(params);
+        await SpaceConnector.clientV2.identity.projectGroup.update(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
@@ -220,16 +220,12 @@ const updateProjectGroup = async (node, oldParent, parent) => {
 };
 
 const updateProject = async (node, oldParent, parent) => {
-    const params: any = {
-        project_id: node.data.id,
-    };
-    if (parent) {
-        params.project_group_id = parent.data.id;
-    } else {
-        params.release_parent_project_group = true;
-    }
     try {
-        await SpaceConnector.client.identity.project.update(params);
+        const params: ProjectChangeProjectGroupRequestParams = {
+            project_id: node.data.id,
+            project_group_id: parent?.data?.id || undefined,
+        };
+        await SpaceConnector.clientV2.identity.project.changeProjectGroup(params);
 
         // this is for refresh project list cards
         if (projectPageStore.groupId === oldParent?.data.id || projectPageStore.groupId === parent.data.id) {
