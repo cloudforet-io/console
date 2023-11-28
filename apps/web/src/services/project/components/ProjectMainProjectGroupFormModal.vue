@@ -9,6 +9,10 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ProjectGroupCreateRequestParams } from '@/schema/identity/project-group/api-verbs/create';
+import type { ProjectGroupGetRequestParams } from '@/schema/identity/project-group/api-verbs/get';
+import type { ProjectGroupListRequestParams } from '@/schema/identity/project-group/api-verbs/list';
+import type { ProjectGroupUpdateRequestParams } from '@/schema/identity/project-group/api-verbs/update';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -55,24 +59,24 @@ const state = reactive({
 
 const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
 const getProjectGroupNames = async () => {
-    const res = await SpaceConnector.client.identity.projectGroup.list({
+    const params: ProjectGroupListRequestParams = {
         query: projectGroupNameApiQuery.data,
-    });
+    };
+    const res = await SpaceConnector.clientV2.identity.projectGroup.list(params);
     state.projectGroupNames = res.results.map((d) => d.name);
 };
 
-const projectGroupApiQuery = new ApiQueryHelper().setOnly('project_group_id', 'name');
 const getProjectGroup = async () => {
-    const res = await SpaceConnector.client.identity.projectGroup.get({
+    const params: ProjectGroupGetRequestParams = {
         project_group_id: state.currentGroupId,
-        query: projectGroupApiQuery.data,
-    });
+    };
+    const res = await SpaceConnector.clientV2.identity.projectGroup.get(params);
     state.projectGroupName = res.name;
 };
 
-const createProjectGroup = async (item) => {
+const createProjectGroup = async (params: ProjectGroupCreateRequestParams) => {
     try {
-        await projectPageStore.createProjectGroup(item);
+        await projectPageStore.createProjectGroup(params);
         await store.dispatch('reference/projectGroup/load');
         projectPageStore.$patch({ shouldUpdateProjectList: true });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
@@ -81,9 +85,9 @@ const createProjectGroup = async (item) => {
     }
 };
 
-const updateProjectGroup = async (item) => {
+const updateProjectGroup = async (params: Partial<ProjectGroupUpdateRequestParams>) => {
     try {
-        await projectPageStore.updateProjectGroup(item);
+        await projectPageStore.updateProjectGroup(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
@@ -96,14 +100,14 @@ const confirm = async () => {
     if (!state.isValid) return;
 
     state.loading = true;
-    const item = {
+    const params: ProjectGroupCreateRequestParams | Partial<ProjectGroupUpdateRequestParams> = {
         name: state.projectGroupName,
     };
 
     state.showValidation = false;
 
-    if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(item);
-    else await updateProjectGroup(item);
+    if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateRequestParams);
+    else await updateProjectGroup(params);
 
     state.loading = false;
     projectPageStore.$patch({ projectGroupFormVisible: false });

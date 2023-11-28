@@ -30,7 +30,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant.js';
-import ProjectDetailProjectFormModal from '@/services/project/components/ProjectDetailProjectFormModal.vue';
+import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectGroupTreeNodeData } from '@/services/project/types/project-tree-type';
@@ -357,7 +357,7 @@ watch([() => projectPageStore.isInitiated, () => state.groupId], async ([isIniti
             <template #no-data />
         </p-data-loader>
 
-        <project-detail-project-form-modal
+        <project-form-modal
             v-if="state.groupId && state.projectFormVisible"
             :visible.sync="state.projectFormVisible"
             :project-group-id="state.groupId"

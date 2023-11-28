@@ -8,8 +8,11 @@ import { useRouter } from 'vue-router/composables';
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { ProjectCreateRequestParams } from '@/schema/identity/project/api-verbs/create';
+import type { ProjectListRequestParams } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectUpdateRequestParams } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -68,36 +71,45 @@ const state = reactive({
     loading: false,
 });
 
-const apiQuery = new ApiQueryHelper();
 const getProjectNames = async () => {
-    apiQuery.setOnly('name');
-    const res = await SpaceConnector.client.identity.projectGroup.listProjects({
-        // eslint-disable-next-line camelcase
-        project_group_id: props.projectGroupId,
-        query: apiQuery.data,
-    });
-    state.projectNames = res.results.map((d) => d.name);
+    try {
+        const params: ProjectListRequestParams = {
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            project_group_id: props.projectGroupId,
+        };
+        const { results }: ListResponse<ProjectModel> = await SpaceConnector.clientV2.identity.project.list(params);
+        state.projectNames = results?.map((d) => d.name);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
-const createProject = async (params): Promise<ProjectModel|undefined> => {
+const createProject = async (): Promise<ProjectModel|undefined> => {
+    const params: ProjectCreateRequestParams = {
+        name: state.projectName.trim(),
+        project_type: 'PRIVATE', // TODO: project_type
+        project_group_id: props.projectGroupId,
+    };
     const projectInfo = await projectPageStore.createProject(params);
     await store.dispatch('reference/project/load');
     return projectInfo;
 };
 
-const updateProject = async (params): Promise<ProjectModel|undefined> => {
-    let projectInfo:ProjectModel|undefined;
+const updateProject = async (): Promise<ProjectModel|undefined> => {
+    let updatedProject: ProjectModel|undefined;
     try {
-        projectInfo = await SpaceConnector.client.identity.project.update({
-            ...params,
+        const params: ProjectUpdateRequestParams = {
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            name: state.projectName.trim(),
             project_id: props.project?.project_id || router.currentRoute.params.id,
-        });
+        };
+        updatedProject = await SpaceConnector.clientV2.identity.project.update(params);
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
         throw new Error(e);
     }
-    return projectInfo;
+    return updatedProject;
 };
 
 const confirm = async () => {
@@ -106,17 +118,13 @@ const confirm = async () => {
     if (!state.isProjectNameValid) return;
 
     state.loading = true;
-    const params = {
-        project_group_id: props.projectGroupId,
-        name: state.projectName.trim(),
-    };
 
     try {
         let projectInfo:ProjectModel|undefined;
         if (state.updateMode) {
-            projectInfo = await updateProject(params);
+            projectInfo = await updateProject();
         } else {
-            projectInfo = await createProject(params);
+            projectInfo = await createProject();
         }
         emit('complete', projectInfo);
     } catch (e) {
