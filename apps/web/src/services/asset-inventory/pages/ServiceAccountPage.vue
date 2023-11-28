@@ -21,9 +21,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/model';
+import type { ServiceAccountListParameter } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
-import type { ServiceAccountListParameter } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
