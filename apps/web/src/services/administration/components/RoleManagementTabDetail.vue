@@ -89,8 +89,8 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { PolicyModel } from '@/schema/identity/policy/model';
 import type { RoleModel } from '@/schema/identity/role/model';

@@ -1,5 +1,5 @@
-import { iso8601Formatter } from '@cloudforet/core-lib';
 import type { KeyDataType, ValueHandler, ValueItem } from '@cloudforet/core-lib/component-util/query-search/type';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { TimeStamp } from '@/schema/_common/model';
 import type { PolicyModel } from '@/schema/identity/policy/model';

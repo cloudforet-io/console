@@ -8,10 +8,10 @@ import type { Color } from '@amcharts/amcharts5/.internal/core/util/Color';
 import { PDataLoader, PTooltip, PI } from '@spaceone/design-system';
 import { isEmpty, sum } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 

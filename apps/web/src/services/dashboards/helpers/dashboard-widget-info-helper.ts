@@ -1,6 +1,6 @@
 import { cloneDeep, isEmpty, isEqual } from 'lodash';
 
-import { isObjectEqual } from '@cloudforet/core-lib';
+import { isObjectEqual } from '@cloudforet/utils';
 
 import type {
     InheritOptions, WidgetConfig, WidgetFiltersMap, WidgetOptions,

@@ -119,9 +119,9 @@ import {
     PBadge, PButton, PDataLoader, PDivider, PI, PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
 import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
