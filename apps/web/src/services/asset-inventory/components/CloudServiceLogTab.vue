@@ -90,8 +90,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

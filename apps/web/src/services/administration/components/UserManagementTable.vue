@@ -115,7 +115,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';

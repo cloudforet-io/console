@@ -19,7 +19,7 @@ import { store } from '@/store';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 

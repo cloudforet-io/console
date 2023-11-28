@@ -12,7 +12,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { resetStore } from '@/lib/reset-pinia-store';
+import { resetStore } from '@/store/reset-pinia-store';
+
 import { siteInit } from '@/lib/site-initializer';
 
 import App from './App.vue';

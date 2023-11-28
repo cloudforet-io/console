@@ -6,6 +6,7 @@ import { useRoute } from 'vue-router/composables';
 import {
     PHorizontalLayout, PDynamicLayout, PHeading, PButton,
 } from '@spaceone/design-system';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions,
     DynamicLayoutFieldHandler,
@@ -17,7 +18,6 @@ import type {
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 
-import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -27,7 +27,7 @@ import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
+import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
