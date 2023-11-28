@@ -9,6 +9,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -28,7 +29,7 @@ const EDIT_MODE = Object.freeze({
 type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
 interface Props {
-    projectId?: string;
+    projectId: string;
 }
 const props = defineProps<Props>();
 
@@ -68,9 +69,10 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
 /* api */
 const getProject = async () => {
     try {
-        state.project = await SpaceConnector.client.identity.project.get({
+        const params: ProjectGetRequestParams = {
             project_id: props.projectId,
-        });
+        };
+        state.project = await SpaceConnector.clientV2.identity.project.get(params);
     } catch (e) {
         ErrorHandler.handleError(e);
         state.project = {};

@@ -6,8 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PTab, PHeading, PButtonModal,
-    PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
+    PBadge, PBreadcrumbs, PButton, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
@@ -16,13 +15,15 @@ import { numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectDeleteRequestParams } from '@/schema/identity/project/api-verbs/delete';
+import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -39,7 +40,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
 import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
-import ProjectDetailProjectFormModal from '@/services/project/components/ProjectDetailProjectFormModal.vue';
+import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
@@ -53,26 +54,27 @@ const router = useRouter();
 
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.$state;
+const storeState = reactive({
+    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+});
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
     hasAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
     loading: true,
     item: null as null|ProjectModel,
     projectId: computed(() => projectDetailPageState.projectId),
-    projectName: computed(() => state.item?.name || ''),
-    projectGroupId: computed(() => state.item?.project_group_info?.project_group_id || ''),
-    projectGroupName: computed(() => state.item?.project_group_info?.name || ''),
-    projectGroupNames: [],
+    projectGroupId: computed<string>(() => state.item?.project_group_id || ''),
+    projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
+    // projectGroupNames: [],
     pageNavigation: computed(() => [
         { name: i18n.t('MENU.PROJECT'), path: '/project' },
-        { name: state.projectGroupName, path: `/project?select_pg=${state.projectGroupId}` },
+        { name: state.projectGroupInfo?.name || '', path: `/project?select_pg=${state.projectGroupId}` },
         // ...state.projectGroupNames.map(d => ({
         //     name: d.name,
         //     path: `/project?select_pg=${d.project_group_id}`,
         // })),
-        { name: state.projectName },
+        { name: state.item?.name || '' },
     ]),
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
     maintenanceWindowFormVisible: false,
     counts: computed(() => ({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
@@ -80,17 +82,17 @@ const state = reactive({
 });
 
 /* api */
-const getProject = async (id) => {
-    state.loading = true;
+const getProject = async (projectId: string) => {
     try {
-        const resp = await SpaceConnector.client.identity.project.get({
-            project_id: id,
-        });
-        state.item = resp;
+        state.loading = true;
+        const params: ProjectGetRequestParams = {
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            project_id: projectId,
+        };
+        state.item = await SpaceConnector.clientV2.identity.project.get(params);
     } catch (e) {
         state.item = null;
         ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
-        // forceRouteToProjectPage();
     } finally {
         state.loading = false;
     }
@@ -146,9 +148,10 @@ const projectDeleteFormConfirm = async () => {
 
     formState.modalLoading = true;
     try {
-        await SpaceConnector.client.identity.project.delete({
+        const params: ProjectDeleteRequestParams = {
             project_id: state.projectId,
-        });
+        };
+        await SpaceConnector.clientV2.identity.project.delete(params);
         // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.go(-1);
@@ -217,7 +220,7 @@ onUnmounted(() => {
             <div v-if="state.item"
                  class="top-wrapper"
             >
-                <p-heading :title="state.item.name"
+                <p-heading :title="state.item?.name"
                            show-back-button
                            @click-back-button="$router.go(-1)"
                 >
@@ -302,7 +305,7 @@ onUnmounted(() => {
             </template>
         </p-button-modal>
 
-        <project-detail-project-form-modal
+        <project-form-modal
             v-if="formState.projectEditFormVisible"
             :visible.sync="formState.projectEditFormVisible"
             :project-group-id="state.projectGroupId"
