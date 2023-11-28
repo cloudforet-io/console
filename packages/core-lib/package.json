@@ -1,7 +1,7 @@
 {
   "name": "@cloudforet/core-lib",
   "version": "1.12.0-dev11",
-  "description": "Cloudforet Console Core Library",
+  "description": "Cloudforet Console Front-end Core Library",
   "scripts": {
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "dev": "rimraf dist && tsc-watch --project tsconfig.build.json --outDir ./dist --onSuccess \"tsc-alias -w -p tsconfig.build.json\"",
@@ -25,6 +25,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@spaceone/design-system": "*",
     "@types/bytes": "^3.1.1",
     "@types/node": "^16.11.43",
     "concurrently": "^7.6.0",
@@ -34,8 +35,7 @@
     "tsc-alias": "^1.6.11",
     "tsc-watch": "^6.0.0",
     "tsconfig": "*",
-    "vite": "^4.3.9",
-    "@spaceone/design-system": "*"
+    "vite": "^4.3.9"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -51,7 +51,7 @@ import {
 import { PLink, PLazyImg, PPaneLayout } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';

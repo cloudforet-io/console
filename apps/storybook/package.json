@@ -17,7 +17,6 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "postcss-config-custom": "*",
     "@babel/preset-env": "7.12.11",
     "@babel/preset-typescript": "7.12.7",
     "@storybook/addon-a11y": "6.3.12",
@@ -33,6 +32,7 @@
     "babel-preset-vue": "2.0.2",
     "css-loader": "3.2.0",
     "eslint-config-custom": "*",
+    "postcss-config-custom": "*",
     "sass": "1.49.11",
     "sass-loader": "10.3.1",
     "storybook-addon-designs": "6.2.0",

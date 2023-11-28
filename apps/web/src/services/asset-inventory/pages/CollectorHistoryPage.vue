@@ -16,9 +16,9 @@ import {
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';

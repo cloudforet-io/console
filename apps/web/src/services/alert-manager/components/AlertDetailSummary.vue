@@ -93,7 +93,7 @@ import {
 } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/model';

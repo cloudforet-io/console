@@ -12,7 +12,7 @@ import {
 import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

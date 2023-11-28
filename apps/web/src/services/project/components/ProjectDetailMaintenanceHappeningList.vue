@@ -3,7 +3,7 @@ import { computed, reactive } from 'vue';
 
 import { PListCard, PI } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 

@@ -62,9 +62,9 @@ import type { Location } from 'vue-router';
 import { PSkeleton, PDataLoader, PEmpty } from '@spaceone/design-system';
 import { range } from 'lodash';
 
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

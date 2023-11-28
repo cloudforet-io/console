@@ -45,10 +45,10 @@ import {
     PButtonModal, PBoxTab,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
