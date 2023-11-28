@@ -4,21 +4,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query, Sort } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/model';
+import type { ProjectGroupListRequestParams } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectListRequestParams } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import { store } from '@/store';
 
 import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
 type ProjectGroupListResponse = ListResponse<ProjectGroupModel>;
 type ProjectListResponse = ListResponse<ProjectModel>;
-interface ListRequestParams {
-    query?: Query;
-    author_within?: boolean,
-    parent_group_id?: string;
-    project_group_id?: string;
-    project_id?: string;
-}
+type ListRequestParams = ProjectGroupListRequestParams | ProjectListRequestParams;
 interface ProjectTreeOptions {
     item_type: ProjectTreeItemType;
     item_id?: string;
@@ -42,6 +39,7 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
     const res = {};
 
     const { results: allChildren }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['parent_group_id'],
             filter: [{
@@ -50,7 +48,7 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
                 o: 'in',
             }],
         },
-    });
+    }, { mockMode: true }); // TODO: delete mockMode
 
     allChildren?.forEach((d) => {
         if (d.parent_group_id) {
@@ -61,9 +59,10 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
     return res;
 };
 const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record<string, boolean>> => {
-    const res = {};
+    const res: Record<string, boolean> = {};
 
-    const { results: allChildren }: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list({
+    const params: ListRequestParams = {
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['project_group_id'],
             filter: [{
@@ -72,7 +71,8 @@ const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record
                 o: 'in',
             }],
         },
-    });
+    };
+    const { results: allChildren }: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(params);
 
     allChildren?.forEach((d) => {
         res[d.project_group_id] = true;
@@ -93,13 +93,14 @@ const getChildMap = async (groups: ProjectGroupModel[], excludeType: ProjectTree
     return res;
 };
 const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
-    const requestParams: ListRequestParams = {
+    const requestParams: ProjectGroupListRequestParams = {
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query ?? {},
     };
 
     if (params.item_type === 'ROOT') {
         (requestParams as Required<ListRequestParams>).query.filter = [{
-            k: 'parent_project_group',
+            k: 'parent_group_id',
             v: null,
             o: 'eq',
         }];
@@ -107,7 +108,7 @@ const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
         requestParams.parent_group_id = params.item_id;
     }
 
-    const { results }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(requestParams);
+    const { results }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(requestParams, { mockMode: true }); // TODO: delete mockMode
     if (!results?.length) return [];
 
     let childMap = {};
@@ -135,7 +136,8 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
         return [];
     }
 
-    const reqParams: ListRequestParams = {
+    const reqParams: ProjectListRequestParams = {
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query,
         project_group_id: params.item_id || null,
     };
@@ -158,13 +160,12 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
     return items;
 };
 const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, openItems: string[] = []): Promise<string[]> => {
-    const reqParams: any = {
-        query: {},
-    };
-
     if (itemType === 'PROJECT') {
-        reqParams.project_id = itemId;
-        const response: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(reqParams);
+        const params: ProjectListRequestParams = {
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            project_id: itemId,
+        };
+        const response: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(params);
 
         if (response.total_count === 1) {
             const projectInfo = response?.results?.[0];
@@ -174,14 +175,17 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
             if (parentItemId) await getParentItem(parentItemId, 'PROJECT_GROUP', openItems);
         }
     } else {
-        reqParams.project_group_id = itemId;
-        const response: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(reqParams);
+        const params: ProjectGroupListRequestParams = {
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            parent_group_id: itemId,
+        };
+        const response: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(params, { mockMode: true }); // TODO: delete mockMode
 
         if (response.total_count === 1) {
             const projectGroupInfo = response?.results?.[0];
             if (projectGroupInfo) openItems.unshift(projectGroupInfo.project_group_id);
 
-            const parentItemId = get(projectGroupInfo, 'parent_project_group_info.project_group_id');
+            const parentItemId = get(projectGroupInfo, 'parent_group_id');
             if (parentItemId) await getParentItem(parentItemId, 'PROJECT_GROUP', openItems);
         }
     }
