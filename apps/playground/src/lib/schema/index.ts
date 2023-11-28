@@ -3,10 +3,10 @@ import {
     get, isArray, merge, set,
 } from 'lodash';
 
-import type { SearchSchema, TableOptions, DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { SearchSchema, DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import detailsSchema from './default-schema/details.json';
-import { defaultSearchSchemaTemplate } from './default-schema/search-template';
+// import { defaultSearchSchemaTemplate } from './default-schema/search-template';
 import { defaultTableSchemaTemplate } from './default-schema/table-template';
 // import widgetSchema from './default-schema/widget.json';
 
@@ -165,26 +165,26 @@ const getTableSchema = (params: GetSchemaParams): DynamicLayout => {
 
     // get table options
     const renderData = merge({ ...DEFAULT_TABLE_OPTION_SCHEMA_FOR_RENDER }, metadataTableSchema?.options ?? {});
-    const defaultTableOptionSchemaJSON = render(defaultTableSchemaTemplate, renderData);
-    const tableOptions: TableOptions = JSON.parse(defaultTableOptionSchemaJSON);
+    const defaultTableSchemaJSON = render(defaultTableSchemaTemplate, renderData);
+    const defaultTableSchema = JSON.parse(defaultTableSchemaJSON);
 
-    const tableSchemaData: Required<DynamicLayout> = merge({ options: tableOptions }, metadataTableSchema);
+    const tableSchemaData: Required<DynamicLayout> = merge(defaultTableSchema, metadataTableSchema);
 
     tableSchemaData.options.search = getSearchSchema(params);
     return tableSchemaData;
 };
 
-const getSearchSchema = ({ resourceTypeData }: GetSchemaParams): SearchSchema[] => {
+const getSearchSchema = ({ resourceTypeData }: GetSchemaParams): SearchSchema => {
     const metadata = get(resourceTypeData, 'metadata') ?? get(resourceTypeData, 'resource.metadata');
     const metadataSearchSchemaFields: any = getMetadataSchema(metadata, 'view.search', false) ?? [];
 
-    const renderData = { fields: metadataSearchSchemaFields };
-    const defaultSearchFieldsJSON = render(defaultSearchSchemaTemplate, renderData);
-    const defaultSearchSchema: SearchSchema[] = JSON.parse(defaultSearchFieldsJSON);
-    const mergedSearchSchema = defaultSearchSchema;
+    // const renderData = { fields: metadataSearchSchemaFields };
+    // const defaultSearchFieldsJSON = render(defaultSearchSchemaTemplate, renderData);
+    // const defaultSearchSchema: SearchSchema = JSON.parse(defaultSearchFieldsJSON);
+    // const mergedSearchSchema = defaultSearchSchema;
 
-    const firstItems = merge([], mergedSearchSchema[0].items, metadataSearchSchemaFields);
-    mergedSearchSchema[0].items = firstItems;
-
-    return mergedSearchSchema;
+    return [{
+        title: 'Properties',
+        items: metadataSearchSchemaFields,
+    }];
 };
