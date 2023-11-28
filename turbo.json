@@ -50,6 +50,18 @@
       ],
       "cache": true
     },
+    "playground#build": {
+      "dependsOn": ["@spaceone/design-system#build", "@cloudforet/core-lib#build"],
+      "outputs": ["./dist/**"],
+      "inputs": [
+        "public/**",
+        "src/**",
+        "package.json", "package-lock.json", "tsconfig.json",
+        "vite.config.js", "postcss.config.cjs", "tailwind.config.cjs",
+        "!./**/__tests__/**", "!./**/*.babel", "!./**/LICENSE", "!./**/AUTHORS", "!./**/README.md", "!./**/CHANGELOG.md"
+      ],
+      "cache": true
+    },
     "transpile": {
       "dependsOn": ["^transpile"],
       "outputs": ["./types/**"],
