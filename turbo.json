@@ -4,6 +4,7 @@
   ],
   "pipeline": {
     "@cloudforet/core-lib#build": {
+      "dependsOn": ["@spaceone/design-system#build"],
       "outputs": ["./dist/**"],
       "inputs": [
         "src/**", "package.json", "package-lock.json", "tsconfig.build.json",
@@ -21,7 +22,7 @@
       "cache": true
     },
     "web#build": {
-      "dependsOn": ["@cloudforet/core-lib#build","@spaceone/design-system#build"],
+      "dependsOn": ["@spaceone/design-system#build", "@cloudforet/core-lib#build"],
       "outputs": ["./dist/**"],
       "inputs": [
         "public/**", "!public/config/development.json",

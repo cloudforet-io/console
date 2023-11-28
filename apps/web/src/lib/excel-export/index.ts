@@ -1,26 +1,18 @@
 import type { DynamicFieldOptions, ListOptions } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
-import type { DynamicLayoutType } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import { forEach } from 'lodash';
 
-import type { ConsoleDynamicField, Reference } from '@/lib/component-util/dynamic-layout/type';
 
 interface ExcelDataField {
     key: string;
     name: string;
     type?: 'datetime'|'enum'|'size';
     enum_items?: any;
-    reference?: Reference;
+    reference?: DynamicField['reference'];
     options?: DynamicFieldOptions;
 }
 
-/**
- * @name isTableTypeInDynamicLayoutType
- * @description returns boolean value that match with dynamic layout type with camelcase.
- * @param type
- */
-export const isTableTypeInDynamicLayoutType = (type: DynamicLayoutType): boolean => (['raw-table', 'table', 'query-search-table'].includes(type));
-
-export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[], rootPathForUnwind?:string): ExcelDataField[] => fields.map((d) => {
+export const dynamicFieldsToExcelDataFields = (fields: DynamicField[], rootPathForUnwind?:string): ExcelDataField[] => fields.map((d) => {
     const res: ExcelDataField = { key: rootPathForUnwind ? `${rootPathForUnwind}.${d.key}` : d.key, name: d.name ?? d.key, options: d.options };
 
     // lis type case will be deprecated
@@ -50,8 +42,3 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[], ro
 
     return res;
 });
-
-export default {
-    getApiActionByLayoutType: isTableTypeInDynamicLayoutType,
-    dynamicFieldsToExcelDataFields,
-};

@@ -13,8 +13,8 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useWorkspaceStore } from '@/store/modules/workspace/workspace-store';
+import { resetStore } from '@/store/reset-pinia-store';
 
-import { resetStore } from '@/lib/reset-pinia-store';
 import { siteInit } from '@/lib/site-initializer';
 
 import App from './App.vue';

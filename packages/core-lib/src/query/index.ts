@@ -1,15 +1,15 @@
+import type { QueryTag as Tag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
+import type {
+    KeyItem,
+    KeyItemSet,
+    OperatorType,
+    QueryItem,
+} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { flatten, forEach } from 'lodash';
 
-import type {
-    QueryTag as Tag,
-    KeyItem,
-    KeyItemSet,
-    OperatorType,
-    QueryItem,
-} from '@/component-util/query-search/type';
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap,

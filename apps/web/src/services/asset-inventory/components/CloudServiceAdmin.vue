@@ -15,7 +15,7 @@ import { store } from '@/store';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

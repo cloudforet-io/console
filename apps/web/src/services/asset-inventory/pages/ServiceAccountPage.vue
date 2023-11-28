@@ -12,7 +12,10 @@ import type {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
-import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type {
+    DynamicLayout,
+    SearchSchema,
+} from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -28,9 +31,8 @@ import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
-import type { ConsoleSearchSchema } from '@/lib/component-util/dynamic-layout/type';
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
@@ -94,7 +96,7 @@ const tableState = reactive({
 
 const searchFilter = new ApiQueryHelper();
 const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSearchSchema(
-    computed(() => tableState.schema?.options?.search as unknown as ConsoleSearchSchema[] ?? []),
+    computed<SearchSchema>(() => tableState.schema?.options?.search as unknown as SearchSchema ?? []),
     'identity.ServiceAccount',
     computed(() => searchFilter.setFilters([
         { k: 'provider', v: state.selectedProvider, o: '=' },

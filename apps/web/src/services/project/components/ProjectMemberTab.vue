@@ -12,8 +12,8 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
-import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';

@@ -1,5 +1,5 @@
-import { GTag } from '@/lib/gtag';
-import { Gtm } from '@/lib/gtm';
+import { GTag } from '@/lib/site-analytics/gtag';
+import { Gtm } from '@/lib/site-analytics/gtm';
 
 export const initGtag = (store, config) => {
     if (config.get('GTAG_ID') === 'DISABLED') return;

@@ -102,4 +102,8 @@ export interface DynamicField {
     name?: string;
     type: DynamicFieldType;
     options?: DynamicFieldOptions;
+    reference?: {
+        resource_type: string;
+        reference_key?: string;
+    };
 }

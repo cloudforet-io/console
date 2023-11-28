@@ -21,7 +21,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 
 import {
     dynamicFieldsToExcelDataFields,
-} from '@/lib/component-util/dynamic-layout';
+} from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
@@ -40,6 +40,7 @@ interface Props {
     handlers: Handlers;
     queryTags?: QueryTag[];
     period?: Period;
+    pageSize?: number;
 }
 
 
@@ -48,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
     handlers: () => ({}),
     queryTags: () => [],
     period: undefined,
+    pageSize: undefined,
 });
 
 const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): void;
@@ -215,7 +217,8 @@ const handleChange = (options: ToolboxOptions = {}) => {
         cloudServicePageStore.$patch((_state) => {
             _state.searchFilters = searchQueryHelper.filters;
         });
-    } else {
+    }
+    if (options.pageStart !== undefined || options.pageLimit !== undefined) {
         emit('update-pagination', options);
     }
 };
@@ -273,6 +276,7 @@ const handleExport = () => {
                    :query-tags="state.queryTags"
                    :key-item-sets="state.keyItemSets"
                    :value-handler-map="props.handlers?.valueHandlerMap ?? {}"
+                   :page-size="props.pageSize"
                    @change="handleChange"
                    @refresh="handleChange()"
                    @export="handleExport"

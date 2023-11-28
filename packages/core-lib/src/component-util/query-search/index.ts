@@ -1,15 +1,14 @@
+import type { SearchEnums, SearchEnumItem } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
+import type {
+    KeyDataType, KeyItem,
+    KeyItemSet,
+    ValueHandler, ValueHandlerMap,
+    ValueItem,
+} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import {
     map, size, flatMap, flatten, uniq, cloneDeep,
 } from 'lodash';
 
-import type { SearchEnumItem, SearchEnums } from '@/component-util/dynamic-layout/layout-schema';
-import type {
-    KeyDataType,
-    KeyItem, KeyItemSet,
-    ValueHandler,
-    ValueHandlerMap,
-    ValueItem,
-} from '@/component-util/query-search/type';
 import { SpaceConnector } from '@/space-connector';
 import type { ApiFilter } from '@/space-connector/type';
 
@@ -99,7 +98,7 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
         distinct_key: distinct,
     };
 
-    return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+    return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
         const param = cloneDeep(staticParam);
         param.search = inputText;
         if (currentDataType === 'object') {
@@ -146,7 +145,7 @@ export function makeReferenceValueHandler(resourceType: string, dataType?: KeyDa
 
     const param = { resource_type: resourceType, options: { limit: limit || 10 } };
 
-    return async (inputText: string) => {
+    return async (inputText: string|number) => {
         try {
             const res = await SpaceConnector.client.addOns.autocomplete.resource({
                 ...param, search: inputText,
@@ -185,10 +184,11 @@ export function makeEnumValueHandler(
         return { label: d.label, name: k, icon: d.icon };
     }) as unknown as ValueItem[];
 
-    return async (inputText: string) => {
+    return async (inputText: string|number) => {
         let res: ValueItem[] = [...allItems];
-        if (inputText) {
-            const regex = RegExp(inputText, 'i');
+        const value = inputText.toString();
+        if (value) {
+            const regex = RegExp(value, 'i');
             res = allItems.reduce((result, d) => {
                 if (regex.test(d.label) || regex.test(d.name)) result.push(d);
                 return result;
@@ -251,7 +251,7 @@ export function makeCloudServiceTagValueHandler(
         distinct_key: distinct,
     };
 
-    return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+    return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
         if (!subPath) {
             let providerMenuItemList = [
                 ...Object.values(providers ?? {}).map((provider) => ({
@@ -265,7 +265,8 @@ export function makeCloudServiceTagValueHandler(
                     icon: 'ic_cloud-filled',
                 },
             ];
-            providerMenuItemList = providerMenuItemList.filter((item) => item.label.toLowerCase().includes(inputText));
+            const value: string = inputText.toString().toLowerCase();
+            providerMenuItemList = providerMenuItemList.filter((item) => item.label.toLowerCase().includes(value));
             return {
                 results: providerMenuItemList,
                 totalCount: providerMenuItemList.length,
