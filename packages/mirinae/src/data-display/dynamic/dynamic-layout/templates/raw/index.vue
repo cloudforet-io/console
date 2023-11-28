@@ -60,8 +60,8 @@ export default {
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
             rootData: computed<any[]>(() => {
                 if (props.options.root_path) {
-                    const rootData = getValueByPath(props.data, props.options.root_path) ?? [];
-                    return Array.isArray(rootData) ? rootData : [rootData];
+                    const rootData = getValueByPath(props.data, props.options.root_path) ?? {};
+                    return rootData;
                 }
                 if (props.data === null || props.data === undefined) return {};
                 return props.data;
