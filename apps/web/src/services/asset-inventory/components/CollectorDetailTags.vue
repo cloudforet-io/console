@@ -3,7 +3,7 @@ import { computed } from 'vue';
 
 import { PTag, PFieldTitle, PEmpty } from '@spaceone/design-system';
 
-import { isNotEmpty } from '@cloudforet/core-lib/index';
+import { isNotEmpty } from '@cloudforet/utils';
 
 import type { Tags } from '@/schema/_common/model';
 

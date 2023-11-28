@@ -62,9 +62,9 @@ import {
     PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { NoteModel } from '@/schema/inventory/note/model';
 import { store } from '@/store';

@@ -12,9 +12,9 @@ import {
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';

@@ -37,6 +37,7 @@
   "scripts": {
     "build": "NODE_OPTIONS=--max_old_space_size=8192 vite build && npm run css && npm run vue-tsc || true && npm run tsc-alias",
     "dev": "concurrently \"npm run build:watch\" \"npm run tsc:watch\"",
+    "transpile": "npm run vue-tsc || true && npm run tsc-alias",
     "build:watch": "NODE_OPTIONS=--max_old_space_size=8192 vite build --watch",
     "tsc:watch": "tsc-watch --compiler vue-tsc/bin/vue-tsc.js -p tsconfig.build.json --silent --onCompilationComplete \"tsc-alias -w -p tsconfig.alias.json\"",
     "vue-tsc": "vue-tsc -p tsconfig.build.json",
@@ -117,7 +118,6 @@
     "postcss-config-custom": "*",
     "resolve-url-loader": "^3.1.5",
     "rollup-plugin-copy": "^3.4.0",
-    "vue-router": "^3.6.5",
     "ts-loader": "^8.4.0",
     "tsc-alias": "^1.6.11",
     "tsc-watch": "^6.0.0",
@@ -126,6 +126,7 @@
     "vite": "^4.3.9",
     "vite-plugin-stylelint": "^3.3.3",
     "vitest": "^0.26.3",
+    "vue-router": "^3.6.5",
     "vue-tsc": "^1.2.0"
   },
   "browserslist": [

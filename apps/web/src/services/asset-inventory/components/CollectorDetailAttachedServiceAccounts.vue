@@ -11,9 +11,9 @@ import type { DefinitionField } from '@spaceone/design-system/types/data-display
 import type { ToolboxTableOptions } from '@spaceone/design-system/types/data-display/tables/toolbox-table/type';
 
 import { makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';

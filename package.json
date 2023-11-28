@@ -10,6 +10,7 @@
     "start:web": "npm run build:packages && turbo run dev --filter=web",
     "build": "turbo run build",
     "build:packages": "turbo run build --filter=./packages/* --parallel",
+    "transpile": "turbo run transpile",
     "dev": "turbo run dev",
     "lint": "turbo run lint --parallel",
     "format": "turbo run format",

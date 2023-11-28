@@ -3,7 +3,7 @@ import { computed, reactive, watch } from 'vue';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { getNumberFromString, numberFormatter } from '@cloudforet/core-lib';
+import { getNumberFromString, numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 

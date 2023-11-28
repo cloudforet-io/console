@@ -7,7 +7,7 @@ import type { XYChart } from '@amcharts/amcharts5/xy';
 import { PDataLoader, PSkeleton } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { useAmcharts5 } from '@/common/composables/amcharts5';
 

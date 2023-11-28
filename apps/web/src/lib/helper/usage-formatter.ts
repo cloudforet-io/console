@@ -1,6 +1,6 @@
 import bytes from 'bytes';
 
-import { byteFormatter, numberFormatter } from '@cloudforet/core-lib';
+import { byteFormatter, numberFormatter } from '@cloudforet/utils';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
