@@ -5,27 +5,13 @@
                    :total-count="totalCount"
         />
         <p-toolbox-table :fields="fields"
-                         :items="items"
+                         :items="refinedItems.slice(pageStart - 1, pageStart + pageLimit - 1)"
                          :loading="loading"
                          :total-count="totalCount"
-                         sortable
-                         @change="onChange"
-        >
-            <template #col-resource_id-format="{ value }">
-                {{ users[value].name }}
-            </template>
-            <template #col-labels-format="{value}">
-                <p v-if="value.length === 0" />
-                <p-badge v-for="(label, idx) in value"
-                         :key="idx"
-                         badge-type="subtle"
-                         style-type="gray200"
-                         class="mr-2"
-                >
-                    {{ label }}
-                </p-badge>
-            </template>
-        </p-toolbox-table>
+                         @export="handleExport"
+                         @change="handleChangeTable"
+                         @refresh="handleChangeTable()"
+        />
     </div>
 </template>
 
@@ -35,13 +21,13 @@ import {
 } from 'vue';
 
 import {
-    PHeading, PBadge, PToolboxTable,
+    PHeading, PToolboxTable,
 } from '@spaceone/design-system';
-import type { SearchTableListeners } from '@spaceone/design-system/types/data-display/tables/search-table/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
@@ -51,11 +37,15 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
+interface UserItem {
+    user_id: string;
+    user_name: string;
+}
 export default {
     name: 'CloudServiceAdmin',
     components: {
         PHeading,
-        PBadge,
         PToolboxTable,
     },
     props: {
@@ -65,79 +55,63 @@ export default {
         },
     },
     setup(props) {
-        const state = reactive({
+        const storeState = reactive({
             users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+        });
+        const state = reactive({
             fields: [
                 { label: 'User ID', name: 'user_id' },
-                { label: 'User Name', name: 'resource_id' },
-                { label: 'Role', name: 'role_info.name' },
-                { label: 'Labels', name: 'labels' },
+                { label: 'User Name', name: 'user_name' },
             ],
-            items: [],
+            projectUserIdList: [] as string[],
+            refinedItems: computed<UserItem[]>(() => {
+                const users: UserItem[] = state.projectUserIdList.map((d) => ({
+                    user_id: d,
+                    user_name: storeState.users[d]?.name ?? d,
+                }));
+                return users.filter((d) => {
+                    const searchText = state.searchText.toLowerCase();
+                    return d.user_id.toLowerCase().includes(searchText)
+                        || d.user_name.toLowerCase().includes(searchText);
+                });
+            }),
             loading: true,
             totalCount: 0,
-            options: {
-                sortBy: 'user_id',
-                sortDesc: true,
-                pageStart: 1,
-                pageLimit: 15,
-                searchText: '',
-            },
+            searchText: '',
+            pageLimit: 15,
+            pageStart: 1,
             timezone: computed(() => store.state.user.timezone ?? 'UTC'),
         });
 
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
-            .setPage(
-                state.options.pageStart,
-                state.options.pageLimit,
-            )
-            .setFilters([
-                { v: state.options.searchText },
-            ])
-            .data;
-
-        const api = SpaceConnector.client.identity.project.member.list;
-        const listAdmin = async () => {
+        const getProjectUserData = async () => {
             state.loading = true;
-
             try {
-                const res = await api({
-                    include_parent_member: true,
+                const params: ProjectGetRequestParams = {
+                    workspace_id: '', // TODO: workspace_id
                     project_id: props.cloudServiceProjectId,
-                    query: getQuery(),
-                });
-                state.items = res.results.map((d) => ({
-                    ...d,
-                    user_id: d.resource_id,
-                }));
-                state.totalCount = res.total_count;
+                };
+                const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
+                state.projectUserIdList = res.users ?? [];
+                state.totalCount = res.users?.length ?? 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.items = [];
+                state.projectUserIdList = [];
             } finally {
                 state.loading = false;
             }
         };
 
-        const onChange: SearchTableListeners['change'] = async (options) => {
-            state.options = { ...state.options, ...options };
-            await listAdmin();
+        const handleChangeTable = async (options: any = {}) => {
+            // TODO: check it's working
+            if (options.searchText !== undefined) state.searchText = options.searchText;
+            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
         };
 
-        const onExport = async () => {
+        const handleExport = async () => {
             await downloadExcel({
-                url: '/inventory/cloud-service/member/list',
-                param: {
-                    cloud_services: props.cloudServiceProjectId,
-                    query: getQuery(),
-                },
-                fields: [
-                    { name: 'User ID', key: 'user_info.user_id' },
-                    { name: 'Name', key: 'user_info.name' },
-                    { name: 'Email', key: 'user_info.email' },
-                    { name: 'Labels', key: 'labels' },
-                ],
+                data: state.refinedItems,
+                fields: state.fields,
                 file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 timezone: state.timezone,
             });
@@ -145,8 +119,8 @@ export default {
 
         watch(() => props.cloudServiceProjectId, (after, before) => {
             if (!after) {
-                state.items = [];
-            } else if (after !== before) listAdmin();
+                state.projectUserIdList = [];
+            } else if (after !== before) getProjectUserData();
         }, { immediate: true });
 
         // LOAD REFERENCE STORE
@@ -156,8 +130,8 @@ export default {
 
         return {
             ...toRefs(state),
-            onChange,
-            onExport,
+            handleChangeTable,
+            handleExport,
         };
     },
 };
