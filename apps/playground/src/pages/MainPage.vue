@@ -6,24 +6,25 @@ import { get } from 'lodash';
 import {
     PPaneLayout, PHeading, PDynamicLayout, PIconButton,
 } from '@spaceone/design-system';
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import type { SchemaType } from '@/lib/schema';
 import { getSchema } from '@/lib/schema';
-import { useResourceInputDataStore, useResourceTypeInputDataStore } from '@/stores/input-data-store';
+import { useResourceInputDataStore, useMetadataSchemaInputDataStore } from '@/stores/input-data-store';
 
 import InputPanel from '@/components/InputPanel.vue';
 import OutputPanel from '@/components/OutputPanel.vue';
 
-const resourceTypeStore = useResourceTypeInputDataStore();
+const metadataSchemaStore = useMetadataSchemaInputDataStore();
 const resourceStore = useResourceInputDataStore();
 
 const state = reactive({
     schemaType: 'table' as SchemaType,
-    schema: computed(() => {
+    schema: computed<DynamicLayout|null>(() => {
+        const metadataSchema = metadataSchemaStore.state.parsedObject;
+        if (!metadataSchema) return null;
         const schema = getSchema({
-            schemaType: state.schemaType,
-            resourceData: resourceStore.state.parsedObject,
-            resourceTypeData: resourceTypeStore.state.parsedObject,
+            metadataSchema,
         });
         console.debug('schema', schema);
         return schema;
@@ -31,7 +32,7 @@ const state = reactive({
     data: computed(() => {
         let data;
         if (state.schemaType === 'table') data = resourceStore.state.parsedObject;
-        else data = resourceTypeStore.state.parsedObject;
+        else data = metadataSchemaStore.state.parsedObject;
 
         if (Array.isArray(data)) {
             return data.map((item) => {

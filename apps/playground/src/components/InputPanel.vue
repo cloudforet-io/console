@@ -2,22 +2,22 @@
 
 import { computed, reactive } from 'vue';
 
-import { useResourceInputDataStore, useResourceTypeInputDataStore } from '@/stores/input-data-store';
+import { useResourceInputDataStore, useMetadataSchemaInputDataStore } from '@/stores/input-data-store';
 
 import CodeEditor from '@/components/CodeEditor.vue';
 import CodeEditorModal from '@/components/CodeEditorModal.vue';
 import ViewPanel from '@/components/ViewPanel.vue';
 
 
-const resourceTypeStore = useResourceTypeInputDataStore();
+const metadataSchemaStore = useMetadataSchemaInputDataStore();
 const resourceStore = useResourceInputDataStore();
 
-type Title = 'Resource Type' | 'Resource';
+type Title = 'Metadata Schema' | 'Resource';
 const state = reactive({
     modalVisible: false,
-    modalTitle: 'Resource Type' as Title,
-    code: computed<string>(() => (state.modalTitle === 'Resource Type' ? resourceTypeStore.state.code : resourceStore.state.code)),
-    codeType: computed<string>(() => (state.modalTitle === 'Resource Type' ? resourceTypeStore.state.codeType : resourceStore.state.codeType)),
+    modalTitle: 'Metadata Schema' as Title,
+    code: computed<string>(() => (state.modalTitle === 'Metadata Schema' ? metadataSchemaStore.state.code : resourceStore.state.code)),
+    codeType: computed<string>(() => (state.modalTitle === 'Metadata Schema' ? metadataSchemaStore.state.codeType : resourceStore.state.codeType)),
 });
 
 const handleExpand = (title: string) => {
@@ -27,10 +27,10 @@ const handleExpand = (title: string) => {
 
 const handleModalConfirm = (code: string, codeType: string, parsedObject: object) => {
     state.modalVisible = false;
-    if (state.modalTitle === 'Resource Type') {
-        resourceTypeStore.updateCode(code);
-        resourceTypeStore.updateCodeType(codeType);
-        resourceTypeStore.updateParsedObject(parsedObject);
+    if (state.modalTitle === 'Metadata Schema') {
+        metadataSchemaStore.updateCode(code);
+        metadataSchemaStore.updateCodeType(codeType);
+        metadataSchemaStore.updateParsedObject(parsedObject);
     } else {
         resourceStore.updateCode(code);
         resourceStore.updateCodeType(codeType);
@@ -43,15 +43,15 @@ const handleModalConfirm = (code: string, codeType: string, parsedObject: object
     <div>
         <view-panel>
             <template #title-resource-type>
-                Resource Type
+                Metadata Schema
             </template>
             <template #contents-resource-type>
-                <code-editor :code="resourceTypeStore.state.code"
-                             :code-type="resourceTypeStore.state.codeType"
-                             @update:code="resourceTypeStore.updateCode"
-                             @update:code-type="resourceTypeStore.updateCodeType"
-                             @update:parsed-object="resourceTypeStore.updateParsedObject"
-                             @expand="handleExpand('Resource Type')"
+                <code-editor :code="metadataSchemaStore.state.code"
+                             :code-type="metadataSchemaStore.state.codeType"
+                             @update:code="metadataSchemaStore.updateCode"
+                             @update:code-type="metadataSchemaStore.updateCodeType"
+                             @update:parsed-object="metadataSchemaStore.updateParsedObject"
+                             @expand="handleExpand('Metadata Schema')"
                 />
             </template>
             <template #title-resource>

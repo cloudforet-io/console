@@ -1,10 +1,12 @@
+import type { UnwrapRef } from 'vue';
 import { reactive } from 'vue';
 
-export const useCodeEditor = () => {
+
+export const useCodeEditor = <T = any>() => {
     const state = reactive({
         code: '',
         codeType: 'Yaml',
-        parsedObject: null as object|null,
+        parsedObject: null as T|null,
     });
     const handleUpdateCode = (code: string) => {
         state.code = code;
@@ -12,8 +14,8 @@ export const useCodeEditor = () => {
     const handleUpdateCodeType = (codeType: string) => {
         state.codeType = codeType;
     };
-    const handleUpdateParsedObject = (parsedObject: object|null) => {
-        state.parsedObject = parsedObject;
+    const handleUpdateParsedObject = (parsedObject: T|null) => {
+        state.parsedObject = parsedObject as UnwrapRef<T>;
     };
 
     return {
