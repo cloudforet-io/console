@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { iso8601Formatter } from '@cloudforet/core-lib';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 export default {
     name: 'AlertDetailTabsPushedEventVerticalTimeline',

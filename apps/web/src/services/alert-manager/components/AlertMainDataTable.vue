@@ -136,12 +136,12 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import dayjs from 'dayjs';
 
-import { durationFormatter, iso8601Formatter } from '@cloudforet/core-lib';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';

@@ -54,8 +54,8 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import { store } from '@/store';

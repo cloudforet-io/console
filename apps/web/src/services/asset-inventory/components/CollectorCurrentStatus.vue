@@ -55,7 +55,7 @@ import { computed, reactive } from 'vue';
 import { PI, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { numberFormatter } from '@cloudforet/core-lib/index';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { peacock } from '@/styles/colors';
 

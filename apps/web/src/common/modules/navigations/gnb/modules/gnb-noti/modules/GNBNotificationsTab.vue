@@ -112,10 +112,10 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';

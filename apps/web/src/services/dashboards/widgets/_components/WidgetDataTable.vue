@@ -10,7 +10,7 @@ import {
 } from '@spaceone/design-system';
 import { throttle } from 'lodash';
 
-import { numberFormatter, getValueByPath } from '@cloudforet/core-lib';
+import { numberFormatter, getValueByPath } from '@cloudforet/utils';
 
 import { CURRENCY } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';

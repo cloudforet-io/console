@@ -4,7 +4,7 @@ import type { Location } from 'vue-router';
 
 import { PCopyButton, PFieldTitle } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
