@@ -139,7 +139,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType, ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 

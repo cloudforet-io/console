@@ -20,8 +20,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
+import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
+import type { ServiceAccountListParameter } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -129,13 +131,13 @@ const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBindin
 const listServiceAccountData = async () => {
     typeOptionState.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.identity.serviceAccount.list({
+        const res:ListResponse<ServiceAccountModel> = await SpaceConnector.clientV2.identity.serviceAccount.list({
             domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             query: getQuery(),
-        });
+        } as ServiceAccountListParameter);
 
-        tableState.items = serviceAccountPreprocessor(res.results);
-        typeOptionState.totalCount = res.total_count;
+        tableState.items = serviceAccountPreprocessor(res.results || []);
+        typeOptionState.totalCount = res.total_count ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
         tableState.items = [];
@@ -210,15 +212,14 @@ const handleDynamicLayoutFetch = (changed) => {
 /** ******* Page Init ******* */
 const getTableSchema = async () => {
     try {
-        const schema = await SpaceConnector.client.addOns.pageSchema.get({
+        tableState.schema = await SpaceConnector.client.addOns.pageSchema.get({
             // eslint-disable-next-line camelcase
             resource_type: 'identity.ServiceAccount',
             schema: 'table',
             options: {
                 provider: state.selectedProvider,
             },
-        });
-        tableState.schema = schema;
+        }, { mockPath: '?resource=serviceaccount' });
     } catch (e) {
         tableState.schema = null;
     }

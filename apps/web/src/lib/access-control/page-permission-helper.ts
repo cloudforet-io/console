@@ -7,7 +7,6 @@ import type {
     PagePermission,
 } from '@/lib/access-control/config';
 import {
-    ADMIN_USER_DEFAULT_PERMISSIONS,
     DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
     BASIC_USER_DEFAULT_PERMISSIONS,
     NO_ROLE_USER_DEFAULT_PERMISSIONS,

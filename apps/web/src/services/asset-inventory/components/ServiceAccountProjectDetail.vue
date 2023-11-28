@@ -34,7 +34,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceRouter } from '@/router';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
