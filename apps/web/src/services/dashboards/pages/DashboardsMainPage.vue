@@ -78,13 +78,16 @@ import {
 import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
 } from '@spaceone/design-system';
+import type {
+    HandlerResponse,
+    KeyDataType,
+    KeyItem,
+    KeyItemSet,
+    ValueHandler, ValueMenuItem,
+} from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type {
-    KeyItemSet, ValueHandler, KeyDataType, KeyItem, ValueMenuItem,
-    HandlerResponse,
-} from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
@@ -195,7 +198,7 @@ export default {
             const domainLabelsValueHandler = makeDistinctValueHandler('dashboard.DomainDashboard', 'labels');
             if (!projectLabelsValueHandler && !domainLabelsValueHandler) return undefined;
 
-            return async (inputText: string, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+            return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
                 const results = [] as ValueMenuItem[];
                 const promises = [] as (HandlerResponse | Promise<HandlerResponse>)[];
 

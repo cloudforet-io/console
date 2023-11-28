@@ -80,10 +80,10 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { QueryTag } from '@spaceone/design-system/types/inputs/search/query-search-tags/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { filter, capitalize } from 'lodash';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';

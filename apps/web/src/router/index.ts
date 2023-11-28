@@ -9,8 +9,8 @@ import { ERROR_ROUTE } from '@/router/constant';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { GTag } from '@/lib/gtag';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
+import { GTag } from '@/lib/site-analytics/gtag';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';

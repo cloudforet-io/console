@@ -1,4 +1,4 @@
-import type { OperatorType } from '@/component-util/query-search/type';
+import type { OperatorType } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 export type DatetimeOperator = '<t' | '<=t' | '>t' | '>=t' | '=t';
 export type TimeDiffOperator = '<td' | '<=td' | '>td' | '>=td';

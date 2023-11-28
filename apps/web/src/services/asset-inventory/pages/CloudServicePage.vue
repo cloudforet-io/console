@@ -74,6 +74,7 @@ import {
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@spaceone/design-system';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { isEmpty } from 'lodash';
 
 import {
@@ -81,7 +82,6 @@ import {
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
-import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';

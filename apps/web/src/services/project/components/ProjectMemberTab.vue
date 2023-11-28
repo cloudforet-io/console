@@ -103,9 +103,9 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
