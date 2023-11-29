@@ -64,6 +64,7 @@ const state = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     mfa: computed(() => store.state.user.mfa),
     loginUserId: computed(() => store.state.user.userId),
+    isChangedToggle: false,
 });
 
 const emit = defineEmits<{(e: 'confirm', data: UserManagementData, roleId: string|null): void; }>();
@@ -83,7 +84,6 @@ const formState = reactive({
     passwordType: '',
     passwordManual: false,
     tags: {},
-    isToggled: false,
 });
 
 const validationState = reactive({
@@ -136,7 +136,6 @@ const getUserDetailData = async (userId) => {
         state.data = await SpaceConnector.clientV2.identity.user.get({
             user_id: userId,
         });
-        formState.isToggled = state.data.mfa?.state === 'ENABLED';
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -163,7 +162,7 @@ const confirm = async () => {
         data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
     }
 
-    if (!formState.isToggled) {
+    if (state.isChangedToggle) {
         userPageStore.$patch({
             modalLoading: true,
         });
@@ -285,7 +284,9 @@ const initAuthTypeList = async () => {
                         @change-input="handleChangeInputs"
                         @change-verify="handleChangeVerify"
                     />
-                    <user-management-form-multi-factor-auth :is-toggled.sync="formState.isToggled" />
+                    <user-management-form-multi-factor-auth :state="state.data.mfa?.state"
+                                                            :is-changed-toggle.sync="state.isChangedToggle"
+                    />
                     <user-management-form-password-form
                         v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL && state.data.user_type !== USER_TYPE.API_USER"
                         :item="state.data"
