@@ -35,6 +35,7 @@ const state = reactive({
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
     proxyIsSentCode: useProxyValue('isSentCode', props, emit),
+    originEmail: props.email,
 });
 
 const {
@@ -136,7 +137,7 @@ const handleClickSendCodeButton = async () => {
                              class="icon-envelope"
                         />
                         <p class="email-text">
-                            {{ props.email }}
+                            {{ props.email || state.originEmail }}
                         </p>
                     </div>
                 </div>
