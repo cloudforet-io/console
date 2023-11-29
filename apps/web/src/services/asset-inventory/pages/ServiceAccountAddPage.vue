@@ -23,13 +23,12 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import InfoButton from '@/common/modules/portals/InfoButton.vue';
 
-import ServiceAccountAccountType
-    from '@/services/asset-inventory/components/ServiceAccountAccountType.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
+import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type {
     BaseInformationForm, CredentialForm, ProjectForm,
@@ -38,6 +37,7 @@ import type {
 
 const props = defineProps<{
     provider?: string;
+    serviceAccountType?: AccountType;
 }>();
 
 const state = reactive({
@@ -58,7 +58,7 @@ const state = reactive({
 const formState = reactive({
     baseInformationForm: {} as BaseInformationForm,
     isBaseInformationFormValid: false,
-    accountType: 'GENERAL' as AccountType,
+    accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
     credentialForm: {} as CredentialForm,
     isCredentialFormValid: false,
     projectForm: {} as ProjectForm,
@@ -169,12 +169,6 @@ const handleGoBack = () => {
     if (nextPath) SpaceRouter.router.push(nextPath);
     else SpaceRouter.router.back();
 };
-const handleChangeAccountType = (accountType: AccountType) => {
-    formState.accountType = accountType;
-    if (accountType === ACCOUNT_TYPE.TRUSTED) {
-        formState.projectForm = { selectedProjectId: null };
-    }
-};
 const handleChangeBaseInformationForm = (baseInformationForm) => {
     formState.baseInformationForm = baseInformationForm;
 };
@@ -201,7 +195,7 @@ const handleChangeProjectForm = (projectForm) => {
     <div class="service-account-add-page">
         <p-heading class="mb-6"
                    show-back-button
-                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
+                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', { type: ACCOUNT_TYPE_BADGE_OPTION[props.serviceAccountType].label })"
                    @click-back-button="handleGoBack"
         >
             <template #title-left-extra>
@@ -229,11 +223,6 @@ const handleChangeProjectForm = (projectForm) => {
         </p-heading>
 
         <div class="content-wrapper">
-            <service-account-account-type :provider="provider"
-                                          :account-type.sync="formState.accountType"
-                                          :show-trusted-account="state.showTrustedAccount"
-                                          @change="handleChangeAccountType"
-            />
             <p-pane-layout class="form-wrapper">
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
@@ -262,7 +251,7 @@ const handleChangeProjectForm = (projectForm) => {
                 />
                 <service-account-credentials-form
                     :service-account-type="formState.accountType"
-                    :provider="props.provider"
+                    :provider="props.provider ?? ''"
                     :is-valid.sync="formState.isCredentialFormValid"
                     @change="handleChangeCredentialForm"
                 />
