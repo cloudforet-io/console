@@ -42,10 +42,6 @@ jobs:
         with:
           context: .
           file: ./apps/web/Dockerfile
-          build-args: |
-            TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
-            TURBO_TEAM=${{ secrets.TURBO_TEAM }}
-            TURBO_API=http://172.17.0.1:3000
           push: true
           tags: |
             cloudforetdev/${{ github.event.repository.name }}:latest

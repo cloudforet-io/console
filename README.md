@@ -119,8 +119,6 @@ You can see the description of the Mirinae in the [Mirinae package](./packages/m
 
 ## Contributing
 
-- [Develop with local turbo cache server](./dev/turbo-cache-server.md)
-
 TBU
 
 ## 👨‍👩‍👧 Author  
