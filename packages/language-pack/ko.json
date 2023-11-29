@@ -1738,7 +1738,7 @@
 				"TAG_DESC_1": "{name}의 태그를 설정합니다.",
 				"TAG_DESC_2": "키는 문자, 숫자 및 밑줄만 사용할 수 있습니다.",
 				"TAG_LABEL": "태그",
-				"TITLE": "서비스 어카운트 추가",
+				"TITLE": "{type} 추가",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "특정 Trusted Account를 선택하여 연결하게 될 경우, 해당 어카운트의 리소스에 접근할 수 있습니다. "
 			},
 			"MAIN": {
