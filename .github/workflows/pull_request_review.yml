@@ -6,7 +6,6 @@ on:
     path-ignores:
       - '.github/**'
       - '**/deploy/**'
-      - '**/skaffold.template.yaml'
       - '**/Dockerfile'
       - '**/*.dockerfile'
       - '**/*.dockerignore'
