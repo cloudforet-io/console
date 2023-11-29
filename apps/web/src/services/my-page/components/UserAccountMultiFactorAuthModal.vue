@@ -14,8 +14,9 @@ import { i18n } from '@/translations';
 import { postValidationMfaCode } from '@/lib/helper/multi-factor-auth-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
-import CollapsibleContent from '@/common/modules/modals/multi-factor-auth-modal/modules/CollapsibleContent.vue';
-import EmailInfoContent from '@/common/modules/modals/multi-factor-auth-modal/modules/EmailInfoContent.vue';
+
+import UserAccountMultiFactorAuthModalEmailInfo from '@/services/my-page/components/UserAccountMultiFactorAuthModalEmailInfo.vue';
+import UserAccountMultiFactorAuthModalFolding from '@/services/my-page/components/UserAccountMultiFactorAuthModalFolding.vue';
 
 interface Props {
     type: string
@@ -134,10 +135,10 @@ const handleClickVerifyButton = async () => {
                 >
                     {{ $t('COMMON.MFA_MODAL.ALT.DESC') }}
                 </span>
-                <email-info-content :email="props.email"
-                                    :type="modalState.proxyType"
-                                    :mfa-type="props.mfaType"
-                                    :is-sent-code.sync="state.isSentCode"
+                <user-account-multi-factor-auth-modal-email-info :email="props.email"
+                                                                 :type="modalState.proxyType"
+                                                                 :mfa-type="props.mfaType"
+                                                                 :is-sent-code.sync="state.isSentCode"
                 />
                 <div class="validation-code-form">
                     <p-field-group :label="$t('COMMON.MFA_MODAL.VERIFICATION_CODE')"
@@ -177,10 +178,10 @@ const handleClickVerifyButton = async () => {
                         {{ $t('COMMON.MFA_MODAL.VERIFY') }}
                     </p-button>
                 </div>
-                <collapsible-content :mfa-type="props.mfaType"
-                                     :email="props.email"
-                                     :type="modalState.proxyType"
-                                     :is-sent-code.sync="state.isSentCode"
+                <user-account-multi-factor-auth-modal-folding :mfa-type="props.mfaType"
+                                                              :email="props.email"
+                                                              :type="modalState.proxyType"
+                                                              :is-sent-code.sync="state.isSentCode"
                 />
             </div>
         </template>
