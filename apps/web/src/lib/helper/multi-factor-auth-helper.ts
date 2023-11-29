@@ -32,7 +32,7 @@ export const postDisableMfa = async (body): Promise<UserState|Error> => {
             force,
         });
         if (!force) {
-            await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
+            await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
         }
         return response;
     } catch (e: any) {

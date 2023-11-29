@@ -983,7 +983,7 @@
 				"TITLE": "Are you sure you want to disable MFA?",
 				"VERIFIED": "Verified"
 			},
-			"ALT_S_SENT_EMAIL": "A verification code has been sent to the entered email.",
+			"ALT_S_SENT_EMAIL": "A verification code has been sent to your email.",
 			"CHANGE": {
 				"CANCEL": "Cancel",
 				"CONFIRM_BTN": "Enter New Email",

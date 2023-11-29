@@ -983,7 +983,7 @@
 				"TITLE": "",
 				"VERIFIED": "認証済みです"
 			},
-			"ALT_S_SENT_EMAIL": "認証コード入力されたメールに送信されました。",
+			"ALT_S_SENT_EMAIL": "認証コードがメールで送信されました。",
 			"CHANGE": {
 				"CANCEL": "キャンセル",
 				"CONFIRM_BTN": "",

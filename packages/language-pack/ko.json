@@ -983,7 +983,7 @@
 				"TITLE": "",
 				"VERIFIED": "인증됨"
 			},
-			"ALT_S_SENT_EMAIL": "인증 코드가 입력한 이메일로 전송되었습니다.",
+			"ALT_S_SENT_EMAIL": "인증 코드가 이메일로 전송되었습니다.",
 			"CHANGE": {
 				"CANCEL": "취소",
 				"CONFIRM_BTN": "",
