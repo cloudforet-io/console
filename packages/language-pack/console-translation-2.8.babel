@@ -620,6 +620,27 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
+                                <name>AUTHENTICATION_CODE_LOWER</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description/>
+                                <comment/>
+                                <default_text/>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
                                 <name>CONFIRM</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
@@ -642,6 +663,27 @@
                             </concept_node>
                             <concept_node>
                                 <name>EMAIL_INFO</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description/>
+                                <comment/>
+                                <default_text/>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>ENTER_CODE</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
                                 <comment/>
