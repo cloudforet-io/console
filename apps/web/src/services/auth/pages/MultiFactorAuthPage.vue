@@ -8,7 +8,8 @@ import {
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
+// CAUTION: To prevent the issue of i18n imported in the template not being applied in the 'script setup' structure.
+import { i18n as _i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -61,7 +62,7 @@ const handleClickResend = async () => {
         validationState.verificationCode = '';
     } catch (e: any) {
         if (e.message.includes('MFA')) {
-            await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
+            await showSuccessMessage(_i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
         } else {
             showErrorMessage(e.message, e);
             ErrorHandler.handleError(e);
@@ -83,7 +84,7 @@ const handleClickConfirmButton = async () => {
         validationState.verificationCode = '';
     } catch (e: any) {
         validationState.isVerificationCodeValid = true;
-        validationState.verificationCodeInvalidText = i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
+        validationState.verificationCodeInvalidText = _i18n.t('COMMON.MFA_MODAL.INVALID_CODE');
     } finally {
         state.confirmLoading = false;
     }
@@ -113,7 +114,7 @@ const handleClickConfirmButton = async () => {
                 <span class="email-info-desc">
                     <i18n path="AUTH.MFA.EMAIL_INFO">
                         <template #code>
-                            <strong>{{ $t('AUTH.MFA.AUTHENTICATION_CODE') }}</strong>
+                            <strong>{{ $t('AUTH.MFA.AUTHENTICATION_CODE_LOWER') }}</strong>
                         </template>
                     </i18n>
                 </span>
@@ -202,10 +203,11 @@ const handleClickConfirmButton = async () => {
         }
         .email-info-wrapper {
             .email-info-desc {
-                @apply text-label-lg text-gray-900;
+                @apply block text-label-lg text-gray-900;
+                margin-bottom: 0.5rem;
             }
             .email-wrapper {
-                @apply flex items-center bg-gray-100 rounded;
+                @apply inline-flex items-center bg-gray-100 rounded;
                 width: auto;
                 padding: 0.5rem 1rem;
                 gap: 0.25rem;
