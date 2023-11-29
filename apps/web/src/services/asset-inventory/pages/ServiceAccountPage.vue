@@ -190,7 +190,7 @@ const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = 
 const clickAddServiceAccount = () => {
     SpaceRouter.router.push({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-        params: { provider: state.selectedProvider },
+        params: { provider: state.selectedProvider, serviceAccountType: tableState.selectedAccountType },
         query: { nextPath: vm.$route.fullPath },
     });
 };

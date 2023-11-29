@@ -1738,7 +1738,7 @@
 				"TAG_DESC_1": "{name}のタグを設定します",
 				"TAG_DESC_2": "キーは、文字、数字、およびアンダースコアのみ使用できます。",
 				"TAG_LABEL": "タグ",
-				"TITLE": "サービスアカウントの追加",
+				"TITLE": "{type} 追加",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
 			},
 			"MAIN": {

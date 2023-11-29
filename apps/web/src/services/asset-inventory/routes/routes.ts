@@ -8,6 +8,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
+import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetInventoryContainer.vue');
@@ -163,9 +164,14 @@ const assetInventoryRoute: RouteConfig = {
                     component: ServiceAccountSearchPage,
                 },
                 {
-                    path: 'add/:provider',
+                    path: 'add/:provider/:serviceAccountType',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: { translationId: 'IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: {
+                        translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
+                            type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
+                        }]),
+                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
+                    },
                     props: true,
                     component: ServiceAccountAddPage as any,
                 },
