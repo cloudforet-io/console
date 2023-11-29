@@ -979,9 +979,11 @@
 			"ALT": {
 				"DESC": "To turn off, you need to verifiy with your email.",
 				"DISABLED": "Disable",
+				"EMAIL_INFO": "Send verification code to the email",
 				"TITLE": "Are you sure you want to disable MFA?",
 				"VERIFIED": "Verified"
 			},
+			"ALT_S_SENT_EMAIL": "A verification code has been sent to the entered email.",
 			"CHANGE": {
 				"CANCEL": "Cancel",
 				"CONFIRM_BTN": "Enter New Email",

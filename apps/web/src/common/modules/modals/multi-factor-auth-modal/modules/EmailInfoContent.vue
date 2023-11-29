@@ -127,7 +127,7 @@ const handleClickSendCodeButton = async () => {
             </div>
             <div class="contents-wrapper">
                 <div class="email-info">
-                    <p>{{ $t('COMMON.MFA_MODAL.SENT_DESC') }}</p>
+                    <p>{{ props.type === 'verify' ? $t('COMMON.MFA_MODAL.SENT_DESC') : $t('COMMON.MFA_MODAL.ALT.EMAIL_INFO') }}</p>
                     <div class="email-wrapper">
                         <p-i name="ic_envelope-filled"
                              height="0.875rem"

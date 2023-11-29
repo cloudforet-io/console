@@ -978,10 +978,12 @@
 		"MFA_MODAL": {
 			"ALT": {
 				"DESC": "",
-				"DISABLED": "",
+				"DISABLED": "無効化",
+				"EMAIL_INFO": "入力されたメールに認証コードを送信してください。",
 				"TITLE": "",
 				"VERIFIED": "認証済みです"
 			},
+			"ALT_S_SENT_EMAIL": "認証コード入力されたメールに送信されました。",
 			"CHANGE": {
 				"CANCEL": "キャンセル",
 				"CONFIRM_BTN": "",
