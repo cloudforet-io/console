@@ -40,8 +40,10 @@
 		},
 		"MFA": {
 			"AUTHENTICATION_CODE": "Authentication code",
+			"AUTHENTICATION_CODE_LOWER": "authentication code",
 			"CONFIRM": "Confirm",
 			"EMAIL_INFO": "An {code} has been sent to an email at:",
+			"ENTER_CODE": "Enter Code",
 			"GO_BACK": "Back to Sign in",
 			"SUB_TITLE": "Your account required to verify with email MFA.",
 			"TITLE": "Multi-factor\nauthentication"

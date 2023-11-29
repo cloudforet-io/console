@@ -40,8 +40,10 @@
 		},
 		"MFA": {
 			"AUTHENTICATION_CODE": "",
+			"AUTHENTICATION_CODE_LOWER": "",
 			"CONFIRM": "確認",
 			"EMAIL_INFO": "",
+			"ENTER_CODE": "",
 			"GO_BACK": "",
 			"SUB_TITLE": "",
 			"TITLE": ""
