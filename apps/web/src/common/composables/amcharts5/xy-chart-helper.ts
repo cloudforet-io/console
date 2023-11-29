@@ -284,7 +284,7 @@ export const setXYSharedTooltipTextWithRate = (chart: am5xy.XYChart, tooltip: am
         });
         let _text = `Total: [bold; fontSize: 14px]${numberFormatter(totalValue)}[/]`;
         seriesList.forEach((s) => {
-            const rate = Math.round((s.value / totalValue) * 100);
+            const rate = totalValue ? Math.round((s.value / totalValue) * 100) : 0;
             _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${numberFormatter(s.value)}[/] (${rate}%)`;
         });
         return _text;
