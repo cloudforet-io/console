@@ -20,7 +20,7 @@ import {
     (route: Route): TranslateResult|TranslateResult[];
   }
   interface RouteTranslationIdFormatter {
-    (route: Route): string|string[];
+    (route: Route): string | [id: string, values: Record<string, string|number|boolean>];
   }
   interface RouteBreadcrumbsFormatter {
       (route: Route): Breadcrumb[];
