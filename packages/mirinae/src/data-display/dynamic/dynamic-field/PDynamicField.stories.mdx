@@ -308,15 +308,18 @@ interface DatetimeOptions extends CommonOptions {
             components: { PDynamicField },
             template: `
             <div>
-                <p class="font-bold text-lg">with iso8601 source type</p><br/>
+                <p class="font-bold text-lg">with 'iso8601' source_type</p><br/>
                 <span>basic: </span>
                 <p-dynamic-field type="datetime" :options="{source_type: 'iso8601'}" :data="new Date().toISOString()"></p-dynamic-field>
                 <br/><br/>
-                <span>with different display format: </span>
+                <span>with different display_format: </span>
                 <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', display_format: 'YY.MM.DD hh:mm:ss'}" :data="new Date().toISOString()"></p-dynamic-field>
                 <br/><br/>
-                <p class="font-bold text-lg">with timestamp source type</p><br/>
+                <p class="font-bold text-lg">with 'timestamp' source_type, 'seconds' source_format</p><br/>
                 <p-dynamic-field type="datetime" :options="{source_type: 'timestamp', source_format: 'seconds'}" :data="{seconds: '1616034252', nanos: 345000000}"></p-dynamic-field>
+                <br/><br/>
+                <p class="font-bold text-lg">with 'timestamp' source_type, 'seconds' source_format, 'YYYY-MM-DD HH:mm:ss' display_format </p><br/>
+                <p-dynamic-field type="datetime" :options="{source_type: 'timestamp', source_format: 'seconds', display_format: 'YYYY-MM-DD HH:mm:ss'}" :data="3600"></p-dynamic-field>
                 <br/><br/>
                 <p class="font-bold my-4 text-lg">postfix ( - ISO8601)</p>
                 <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', postfix: ' - ISO8601'}" :data="new Date().toISOString()"></p-dynamic-field>
