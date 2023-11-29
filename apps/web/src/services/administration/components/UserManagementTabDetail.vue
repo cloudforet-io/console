@@ -57,7 +57,7 @@ const state = reactive({
             { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
             { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
             ...additionalFields,
-            { name: 'mfa', label: i18n.t('IDENTITY.USER.MAIN.MFA') },
+            { name: 'mfa', label: i18n.t('IDENTITY.USER.MAIN.MFA'), disableCopy: true },
             { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
             { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
             { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 import {
     PI, PTooltip, PFieldTitle, PToggleButton,
@@ -8,23 +8,30 @@ import {
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
-    isToggled?: boolean
+    state?: string
+    isChangedToggle?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    isToggled: undefined,
+    state: undefined,
+    isChangedToggle: false,
 });
 
-const emit = defineEmits<{(e: 'update:isToggled', type: string): void }>();
+const emit = defineEmits<{(e: 'update:isChangedToggle', type: string): void }>();
 
 const state = reactive({
-    proxyIsToggled: useProxyValue('isToggled', props, emit),
+    isToggleActive: false,
+    proxyIsChangedToggle: useProxyValue('isChangedToggle', props, emit),
 });
 
 const handleUpdateToggle = async () => {
-    state.proxyIsToggled = false;
+    state.isToggleActive = false;
+    state.proxyIsChangedToggle = true;
 };
 
+watch(() => props.state, (value) => {
+    state.isToggleActive = value === 'ENABLED';
+});
 </script>
 
 <template>
@@ -32,8 +39,8 @@ const handleUpdateToggle = async () => {
         <p-field-title :label="$t('IDENTITY.USER.MAIN.MFA')">
             <template #left>
                 <p-toggle-button
-                    :value="state.proxyIsToggled"
-                    :disabled="!state.proxyIsToggled"
+                    :value="state.isToggleActive"
+                    :disabled="!state.isToggleActive"
                     class="toggle-button"
                     @change-toggle="handleUpdateToggle"
                 />
