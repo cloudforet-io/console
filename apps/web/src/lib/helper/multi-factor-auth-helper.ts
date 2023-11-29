@@ -13,7 +13,7 @@ export const postEnableMfa = async (body): Promise<void|Error> => {
     try {
         const response = await SpaceConnector.clientV2.identity.user.enableMfa(body);
         await store.dispatch('user/setUser', response);
-        await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
+        await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
@@ -32,7 +32,7 @@ export const postDisableMfa = async (body): Promise<UserState|Error> => {
             force,
         });
         if (!force) {
-            await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
+            await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
         }
         return response;
     } catch (e: any) {
