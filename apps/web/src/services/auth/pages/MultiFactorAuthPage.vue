@@ -137,6 +137,7 @@ const handleClickConfirmButton = async () => {
             >
                 <p-text-input :value="validationState.verificationCode"
                               :invalid="validationState.isVerificationCodeValid"
+                              :placeholder="$t('AUTH.MFA.ENTER_CODE')"
                               class="text-input"
                               @update:value="handleChangeInput"
                               @keyup.enter="handleClickConfirmButton"
