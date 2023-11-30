@@ -177,7 +177,7 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
     } else {
         const params: ProjectGroupListRequestParams = {
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
-            parent_group_id: itemId,
+            project_group_id: itemId,
         };
         const response: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(params);
 
