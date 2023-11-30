@@ -113,15 +113,15 @@ Follow the example at `apps/web/public/config/development.sample.json`.
 
 Configuration for `DEV.MOCK` in the config file.
 
-| Name          | Description                                                                                                                                                                         | Required |
-|---------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-| ENABLED       | boolean(false). Whether apply mock mode to api requests except for reflection apis.                                                                                                 | X        |
-| REFLECTION_V1 | boolean(false). Whether to apply mock mode to reflection api v1 or not.                                                                                                             | X        |
-| REFLECTION_V2 | boolean(false). Whether to apply mock mode to reflection api v2 or not.                                                                                                             | X        |
-| ENDPOINT_V1   | string(""). Mock server endpoint for console api v1.                                                                                                                                | X        |
-| ENDPOINT_V2   | string(""). Mock server endpoint for console api v2.                                                                                                                                | X        |
-| API_LIST_V1   | array of string([]). List of api v1 to enable mock mock mode. Refer to the [Rules for API_LIST](##### Rules for DEV.MOCK.API_LIST_V1 and DEV.MOCK.API_LIST_V2) section for details. | X        |
-| API_LIST_V2   | List of api v2 to enable mock mock mode. Refer to the [Rules for API_LIST](##### Rules for DEV.MOCK.API_LIST_V1 and DEV.MOCK.API_LIST_V2) section for details.                      | X        |
+| Name          | Description                                                                                                                                                                       | Required |
+|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| ENABLED       | boolean(false). Whether apply mock mode to api requests except for reflection apis.                                                                                               | X        |
+| REFLECTION_V1 | boolean(false). Whether to apply mock mode to reflection api v1 or not.                                                                                                           | X        |
+| REFLECTION_V2 | boolean(false). Whether to apply mock mode to reflection api v2 or not.                                                                                                           | X        |
+| ENDPOINT_V1   | string(""). Mock server endpoint for console api v1.                                                                                                                              | X        |
+| ENDPOINT_V2   | string(""). Mock server endpoint for console api v2.                                                                                                                              | X        |
+| API_LIST_V1   | array of string([]). List of api v1 to enable mock mock mode. Refer to the [Rules for API_LIST](#####Rules for DEV.MOCK.API_LIST_V1 and DEV.MOCK.API_LIST_V2) section for details. | X        |
+| API_LIST_V2   | List of api v2 to enable mock mock mode. Refer to the [Rules for API_LIST](#####Rules for DEV.MOCK.API_LIST_V1 and DEV.MOCK.API_LIST_V2) section for details.                     | X        |
 
 ##### Rules for DEV.MOCK.API_LIST_V1 and DEV.MOCK.API_LIST_V2
 
