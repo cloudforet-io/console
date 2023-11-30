@@ -1,92 +1,5 @@
-<template>
-    <div class="service-account-detail-page">
-        <p-heading :title="item.name"
-                   show-back-button
-                   class="page-title"
-                   @click-back-button="$router.go(-1)"
-        >
-            <template #title-left-extra>
-                <p-lazy-img :src="providerIcon"
-                            :loading="providerLoading || loading"
-                            error-icon="ic_cloud-filled"
-                />
-            </template>
-            <template v-if="hasManagePermission && !isManagedTrustedAccount"
-                      #title-right-extra
-            >
-                <div class="title-right-wrapper">
-                    <p-icon-button name="ic_delete"
-                                   class="w-full delete-button"
-                                   @click="handleOpenDeleteModal"
-                    />
-                </div>
-            </template>
-            <template v-if="hasManagePermission && !isManagedTrustedAccount"
-                      #extra
-            >
-                <p-button style-type="tertiary"
-                          class="link-button"
-                >
-                    <p-link :href="consoleLink"
-                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                    >
-                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
-                    </p-link>
-                </p-button>
-            </template>
-        </p-heading>
-        <div class="content-wrapper">
-            <p-pane-layout class="service-account-account-type">
-                <p-heading heading-type="sub"
-                           :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')"
-                />
-                <div class="badge-wrapper">
-                    <service-account-badge :account-type="item.service_account_type"
-                                           :is-managed="isManagedTrustedAccount"
-                    />
-                </div>
-            </p-pane-layout>
-            <service-account-project :project-id="projectId"
-                                     :service-account-loading="loading"
-                                     :service-account-id="serviceAccountId"
-                                     :service-account-type="serviceAccountType"
-                                     :editable="hasManagePermission && serviceAccountType === ACCOUNT_TYPE.GENERAL"
-                                     @change-project="handleChangeProject"
-            />
-            <service-account-attached-general-accounts v-if="item.service_account_type === ACCOUNT_TYPE.TRUSTED"
-                                                       :service-account-id="serviceAccountId"
-                                                       :attached-general-accounts.sync="attachedGeneralAccounts"
-            />
-            <service-account-base-information :provider="providerKey"
-                                              :service-account-loading="loading"
-                                              :service-account-id="serviceAccountId"
-                                              :editable="hasManagePermission && !isManagedTrustedAccount"
-                                              @refresh="handleRefresh"
-            />
-            <service-account-credentials :provider="providerKey"
-                                         :service-account-id="serviceAccountId"
-                                         :service-account-type="serviceAccountType"
-                                         :service-account-name="item.name"
-                                         :project-id="projectId"
-                                         :attached-trusted-account-id="attachedTrustedAccountId"
-                                         :editable="hasManagePermission && !isManagedTrustedAccount"
-                                         :has-manage-permission="hasManagePermission"
-                                         @refresh="handleRefresh"
-            />
-        </div>
-        <service-account-delete-modal :visible.sync="deleteModalVisible"
-                                      :service-account-id="serviceAccountId"
-                                      :service-account-name="item.name"
-                                      :attached-general-accounts="attachedGeneralAccounts"
-                                      :provider-id="providerId"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from 'vue';
+<script setup lang="ts">
+import { computed, reactive, watch } from 'vue';
 
 import {
     PLink, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
@@ -118,124 +31,179 @@ import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
 import ServiceAccountProject from '@/services/asset-inventory/components/ServiceAccountProject.vue';
 
-export default defineComponent({
-    name: 'ServiceAccountDetailPage',
-    components: {
-        ServiceAccountDeleteModal,
-        ServiceAccountProject,
-        ServiceAccountCredentials,
-        ServiceAccountAttachedGeneralAccounts,
-        ServiceAccountBaseInformation,
-        ServiceAccountBadge,
-        PIconButton,
-        PHeading,
-        PButton,
-        PLink,
-        PLazyImg,
-        PPaneLayout,
-    },
-    props: {
-        serviceAccountId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const storeState = reactive({
-            providerLoading: true,
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-        });
-        const state = reactive({
-            loading: true,
-            hasManagePermission: useManagePermissionState(),
-            item: {} as ServiceAccountModel,
-            attachedGeneralAccounts: [] as ServiceAccountModel[],
-            attachedTrustedAccountId: computed(() => state.item.trusted_service_account_id),
-            providerData: {} as ProviderModel,
-            providerId: computed(() => state.item?.provider),
-            provider: computed(() => {
-                if (!storeState.providerLoading && !state.loading) {
-                    return storeState.providers[state.providerId] || undefined;
-                }
-                return undefined;
-            }),
-            providerKey: computed(() => state.provider?.key),
-            providerIcon: computed(() => state.provider?.icon),
-            consoleLink: computed(() => {
-                if (state.provider?.linkTemplate) return render(state.provider.linkTemplate, state.item);
-                return '';
-            }),
-            projectId: computed(() => state.item.project_info?.project_id),
-            serviceAccountType: computed(() => state.item.service_account_type),
-            deleteModalVisible: false,
-            isManagedTrustedAccount: computed(() => state.item.tags?.is_managed === 'true'),
-            domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
-        });
+const props = defineProps<{
+    serviceAccountId: string;
+}>();
 
-        /* Api */
-        const getServiceAccount = async (serviceAccountId: string) => {
-            try {
-                state.loading = true;
-                state.item = await SpaceConnector.client.identity.serviceAccount.get({
-                    service_account_id: serviceAccountId,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.item = {};
-            } finally {
-                state.loading = false;
-            }
-        };
-        const getProviderData = async (provider:string) => {
-            try {
-                state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetRequestParams>({
-                    domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-                    provider,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.providerData = {};
-            }
-        };
-
-        /* Event */
-        const handleOpenDeleteModal = () => {
-            state.deleteModalVisible = true;
-        };
-        const handleChangeProject = () => {
-            getServiceAccount(props.serviceAccountId);
-        };
-        const handleRefresh = () => {
-            getServiceAccount(props.serviceAccountId);
-        };
-
-        /* Init */
-        (async () => {
-            storeState.providerLoading = true;
-            await store.dispatch('reference/provider/load');
-            storeState.providerLoading = false;
-        })();
-
-        /* Watcher */
-        watch(() => props.serviceAccountId, async (serviceAccountId) => {
-            if (serviceAccountId) {
-                await getServiceAccount(serviceAccountId);
-                await getProviderData(state.providerId);
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            ...toRefs(storeState),
-            ACCOUNT_TYPE,
-            ACTION_ICON,
-            handleOpenDeleteModal,
-            handleChangeProject,
-            handleRefresh,
-        };
-    },
+const storeState = reactive({
+    providerLoading: true,
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
+const state = reactive({
+    loading: true,
+    hasManagePermission: useManagePermissionState(),
+    item: {} as ServiceAccountModel,
+    attachedGeneralAccounts: [] as ServiceAccountModel[],
+    attachedTrustedAccountId: computed(() => state.item.trusted_service_account_id),
+    providerData: {} as ProviderModel,
+    providerId: computed(() => state.item?.provider),
+    provider: computed(() => {
+        if (!storeState.providerLoading && !state.loading) {
+            return storeState.providers[state.providerId] || undefined;
+        }
+        return undefined;
+    }),
+    providerKey: computed(() => state.provider?.key),
+    providerIcon: computed(() => state.provider?.icon),
+    consoleLink: computed(() => {
+        if (state.provider?.linkTemplate) return render(state.provider.linkTemplate, state.item);
+        return '';
+    }),
+    projectId: computed(() => state.item.project_info?.project_id),
+    serviceAccountType: computed(() => state.item.service_account_type),
+    deleteModalVisible: false,
+    isManagedTrustedAccount: computed(() => state.item.tags?.is_managed === 'true'),
+    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
+});
+
+/* Api */
+const getServiceAccount = async (serviceAccountId: string) => {
+    try {
+        state.loading = true;
+        state.item = await SpaceConnector.client.identity.serviceAccount.get({
+            service_account_id: serviceAccountId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.item = {};
+    } finally {
+        state.loading = false;
+    }
+};
+const getProviderData = async (provider:string) => {
+    try {
+        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetRequestParams>({
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+            provider,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.providerData = {};
+    }
+};
+
+/* Event */
+const handleOpenDeleteModal = () => {
+    state.deleteModalVisible = true;
+};
+const handleChangeProject = () => {
+    getServiceAccount(props.serviceAccountId);
+};
+const handleRefresh = () => {
+    getServiceAccount(props.serviceAccountId);
+};
+
+/* Init */
+(async () => {
+    storeState.providerLoading = true;
+    await store.dispatch('reference/provider/load');
+    storeState.providerLoading = false;
+})();
+
+/* Watcher */
+watch(() => props.serviceAccountId, async (serviceAccountId) => {
+    if (serviceAccountId) {
+        await getServiceAccount(serviceAccountId);
+        await getProviderData(state.providerId);
+    }
+}, { immediate: true });
+
 </script>
+
+<template>
+    <div class="service-account-detail-page">
+        <p-heading :title="state.item.name"
+                   show-back-button
+                   class="page-title"
+                   @click-back-button="$router.go(-1)"
+        >
+            <template #title-left-extra>
+                <p-lazy-img :src="state.providerIcon"
+                            :loading="storeState.providerLoading || state.loading"
+                            error-icon="ic_cloud-filled"
+                />
+            </template>
+            <template v-if="state.hasManagePermission && !state.isManagedTrustedAccount"
+                      #title-right-extra
+            >
+                <div class="title-right-wrapper">
+                    <p-icon-button name="ic_delete"
+                                   class="w-full delete-button"
+                                   @click="handleOpenDeleteModal"
+                    />
+                </div>
+            </template>
+            <template v-if="state.hasManagePermission && !state.isManagedTrustedAccount"
+                      #extra
+            >
+                <p-button style-type="tertiary"
+                          class="link-button"
+                >
+                    <p-link :href="state.consoleLink"
+                            :action-icon="ACTION_ICON.EXTERNAL_LINK"
+                    >
+                        {{ $t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CONNECT_TO_CONSOLE') }}
+                    </p-link>
+                </p-button>
+            </template>
+        </p-heading>
+        <div class="content-wrapper">
+            <p-pane-layout class="service-account-account-type">
+                <p-heading heading-type="sub"
+                           :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')"
+                />
+                <div class="badge-wrapper">
+                    <service-account-badge :account-type="state.item.service_account_type"
+                                           :is-managed="state.isManagedTrustedAccount"
+                    />
+                </div>
+            </p-pane-layout>
+            <service-account-project :project-id="state.projectId"
+                                     :service-account-loading="state.loading"
+                                     :service-account-id="serviceAccountId"
+                                     :service-account-type="state.serviceAccountType"
+                                     :editable="state.hasManagePermission && state.serviceAccountType === ACCOUNT_TYPE.GENERAL"
+                                     @change-project="handleChangeProject"
+            />
+            <service-account-attached-general-accounts v-if="state.item.service_account_type === ACCOUNT_TYPE.TRUSTED"
+                                                       :service-account-id="serviceAccountId"
+                                                       :attached-general-accounts.sync="state.attachedGeneralAccounts"
+            />
+            <service-account-base-information :provider="state.providerKey"
+                                              :service-account-loading="state.loading"
+                                              :service-account-id="props.serviceAccountId"
+                                              :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
+                                              @refresh="handleRefresh"
+            />
+            <service-account-credentials :provider="state.providerKey"
+                                         :service-account-id="props.serviceAccountId"
+                                         :service-account-type="state.serviceAccountType"
+                                         :service-account-name="state.item.name"
+                                         :project-id="state.projectId"
+                                         :attached-trusted-account-id="state.attachedTrustedAccountId"
+                                         :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
+                                         :has-manage-permission="state.hasManagePermission"
+                                         @refresh="handleRefresh"
+            />
+        </div>
+        <service-account-delete-modal :visible.sync="state.deleteModalVisible"
+                                      :service-account-id="serviceAccountId"
+                                      :service-account-name="state.item.name"
+                                      :attached-general-accounts="state.attachedGeneralAccounts"
+                                      :provider-id="state.providerId"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .service-account-detail-page {
