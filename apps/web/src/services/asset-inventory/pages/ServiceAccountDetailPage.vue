@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PLink, PButton, PIconButton, PHeading, PLazyImg, PPaneLayout,
+    PLink, PButton, PIconButton, PHeading, PLazyImg,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { render } from 'ejs';
@@ -22,14 +22,12 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import ServiceAccountAttachedGeneralAccounts
     from '@/services/asset-inventory/components/ServiceAccountAttachedGeneralAccounts.vue';
-import ServiceAccountBadge from '@/services/asset-inventory/components/ServiceAccountBadge.vue';
 import ServiceAccountBaseInformation
     from '@/services/asset-inventory/components/ServiceAccountBaseInformation.vue';
 import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
-import ServiceAccountProject from '@/services/asset-inventory/components/ServiceAccountProject.vue';
 
 const props = defineProps<{
     serviceAccountId: string;
@@ -43,6 +41,7 @@ const state = reactive({
     loading: true,
     hasManagePermission: useManagePermissionState(),
     item: {} as ServiceAccountModel,
+    serviceAccountType: computed(() => (state.item.trusted_account_id ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL)),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
     attachedTrustedAccountId: computed(() => state.item.trusted_service_account_id),
     providerData: {} as ProviderModel,
@@ -60,7 +59,6 @@ const state = reactive({
         return '';
     }),
     projectId: computed(() => state.item.project_info?.project_id),
-    serviceAccountType: computed(() => state.item.service_account_type),
     deleteModalVisible: false,
     isManagedTrustedAccount: computed(() => state.item.tags?.is_managed === 'true'),
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
@@ -95,9 +93,6 @@ const getProviderData = async (provider:string) => {
 /* Event */
 const handleOpenDeleteModal = () => {
     state.deleteModalVisible = true;
-};
-const handleChangeProject = () => {
-    getServiceAccount(props.serviceAccountId);
 };
 const handleRefresh = () => {
     getServiceAccount(props.serviceAccountId);
@@ -158,32 +153,15 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             </template>
         </p-heading>
         <div class="content-wrapper">
-            <p-pane-layout class="service-account-account-type">
-                <p-heading heading-type="sub"
-                           :title="$t('PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE')"
-                />
-                <div class="badge-wrapper">
-                    <service-account-badge :account-type="state.item.service_account_type"
-                                           :is-managed="state.isManagedTrustedAccount"
-                    />
-                </div>
-            </p-pane-layout>
-            <service-account-project :project-id="state.projectId"
-                                     :service-account-loading="state.loading"
-                                     :service-account-id="serviceAccountId"
-                                     :service-account-type="state.serviceAccountType"
-                                     :editable="state.hasManagePermission && state.serviceAccountType === ACCOUNT_TYPE.GENERAL"
-                                     @change-project="handleChangeProject"
-            />
-            <service-account-attached-general-accounts v-if="state.item.service_account_type === ACCOUNT_TYPE.TRUSTED"
-                                                       :service-account-id="serviceAccountId"
-                                                       :attached-general-accounts.sync="state.attachedGeneralAccounts"
-            />
             <service-account-base-information :provider="state.providerKey"
                                               :service-account-loading="state.loading"
                                               :service-account-id="props.serviceAccountId"
                                               :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
+            />
+            <service-account-attached-general-accounts v-if="state.serviceAccountType === ACCOUNT_TYPE.TRUSTED"
+                                                       :service-account-id="props.serviceAccountId"
+                                                       :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
             <service-account-credentials :provider="state.providerKey"
                                          :service-account-id="props.serviceAccountId"
