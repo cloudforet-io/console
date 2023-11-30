@@ -27,12 +27,9 @@ import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
 import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
-import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
 import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type {
-    BaseInformationForm, CredentialForm, ProjectForm,
-} from '@/services/asset-inventory/types/service-account-page-type';
+import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 
 const props = defineProps<{
@@ -61,13 +58,10 @@ const formState = reactive({
     accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
     credentialForm: {} as CredentialForm,
     isCredentialFormValid: false,
-    projectForm: {} as ProjectForm,
-    isProjectFormValid: undefined,
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
         if (formState.accountType === ACCOUNT_TYPE.TRUSTED) return true;
-        if (!formState.isProjectFormValid) return false;
         return true;
     }),
     formLoading: false,
@@ -101,7 +95,7 @@ const createServiceAccount = async (): Promise<string|undefined> => {
             tags: formState.baseInformationForm.tags,
             service_account_type: formState.accountType,
             trusted_service_account_id: formState.credentialForm.attachedTrustedAccountId,
-            project_id: formState.projectForm.selectedProjectId,
+            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
         });
         return res.service_account_id;
     } catch (e) {
@@ -131,7 +125,7 @@ const createSecret = async (serviceAccountId: string): Promise<boolean> => {
             schema: formState.credentialForm.selectedSecretType,
             secret_type: 'CREDENTIALS',
             service_account_id: serviceAccountId,
-            project_id: formState.projectForm.selectedProjectId,
+            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
             trusted_secret_id: formState.credentialForm.attachedTrustedSecretId,
         });
 
@@ -174,9 +168,6 @@ const handleChangeBaseInformationForm = (baseInformationForm) => {
 };
 const handleChangeCredentialForm = (credentialForm) => {
     formState.credentialForm = credentialForm;
-};
-const handleChangeProjectForm = (projectForm) => {
-    formState.projectForm = projectForm;
 };
 
 /* Init */
@@ -229,18 +220,8 @@ const handleChangeProjectForm = (projectForm) => {
                 />
                 <service-account-base-information-form :schema="state.baseInformationSchema"
                                                        :is-valid.sync="formState.isBaseInformationFormValid"
+                                                       :account-type="formState.accountType"
                                                        @change="handleChangeBaseInformationForm"
-                />
-            </p-pane-layout>
-            <p-pane-layout v-if="formState.accountType === ACCOUNT_TYPE.GENERAL"
-                           class="form-wrapper"
-            >
-                <p-heading heading-type="sub"
-                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
-                />
-                <service-account-project-form
-                    :is-valid.sync="formState.isProjectFormValid"
-                    @change="handleChangeProjectForm"
                 />
             </p-pane-layout>
             <p-pane-layout v-if="state.enableCredentialInput"
