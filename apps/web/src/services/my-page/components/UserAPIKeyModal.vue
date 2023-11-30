@@ -12,6 +12,8 @@ import type { ApiKeyModel } from '@/schema/identity/api-key/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useEndpointStore } from '@/services/my-page/stores/endpoint-store';
+
 enum FileType {
     JSON = 'json',
     YAML = 'yaml'
@@ -20,11 +22,12 @@ enum FileType {
 const props = defineProps<{
     visible: boolean;
     apiKeyItem?: ApiKeyModel;
-    endpoints: Record<string, string>;
 }>();
 const emit = defineEmits<{(event: 'visible', visible: boolean): void;
     (event: 'clickButton'): void;
 }>();
+const endpointStore = useEndpointStore();
+const endpointGetters = endpointStore.getters;
 interface State {
     proxyVisible: Ref<boolean>;
     isAPICollapsed: boolean;
@@ -59,8 +62,12 @@ const onClickConfirm = () => {
     emit('clickButton');
 };
 
+const makeJsonItem = () => {
+    state.apiKeyItemCode = JSON.stringify(props.apiKeyItem, null, 4);
+};
+
 const makeYamlItem = () => {
-    const endpoints = props.endpoints;
+    const endpoints = endpointGetters.endpointLinks;
     const yamlItem = {
         api_key: props.apiKeyItem?.api_key,
         endpoints,
@@ -72,10 +79,11 @@ const makeYamlItem = () => {
     });
 };
 
-watch(() => props.visible, (visible) => {
+watch(() => props.visible, async (visible) => {
     if (!visible) return;
     if (!props.apiKeyItem) return;
-    state.apiKeyItemCode = JSON.stringify(props.apiKeyItem, null, 2);
+    await endpointStore.listEndpoints();
+    makeJsonItem();
     makeYamlItem();
 }, { immediate: true });
 

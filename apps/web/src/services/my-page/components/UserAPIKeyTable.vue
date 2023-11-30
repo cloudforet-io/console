@@ -21,8 +21,6 @@ import type { ApiKeyDisableParameters } from '@/schema/identity/api-key/api-verb
 import type { ApiKeyEnableParameters } from '@/schema/identity/api-key/api-verbs/enable';
 import type { ApiKeyListParameters, ApiKeyListResponse } from '@/schema/identity/api-key/api-verbs/list';
 import type { ApiKeyModel } from '@/schema/identity/api-key/model';
-import type { EndpointListParameters, EndpointListResponse } from '@/schema/identity/endpoint/api-verbs/list';
-import type { EndpointModel } from '@/schema/identity/endpoint/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -53,7 +51,6 @@ interface State {
     user: string;
     timezone: ComputedRef<string>;
     disableCreateBtn: ComputedRef<boolean>;
-    endpoints?: EndpointModel[];
 }
 const state = reactive({
     loading: false,
@@ -88,29 +85,17 @@ const state = reactive({
     user: props.userId || '',
     timezone: computed(() => store.state.user.timezone),
     disableCreateBtn: computed(() => state.items.length >= 2 || !!props.disabled),
-    endpoints: undefined,
 }) as UnwrapRef<State>;
 
 interface ModalState {
     visible: boolean;
     loading: boolean;
     item?: ApiKeyModel;
-    endpoints: ComputedRef<Record<string, string>>;
 }
 const modalState = reactive({
     visible: false,
     loading: false,
     item: undefined,
-    endpoints: computed(() => {
-        const endpoints = {};
-        if (!state.endpoints) return endpoints;
-        state.endpoints.forEach((data) => {
-            const service = data.service;
-            const link = data.endpoint;
-            endpoints[service] = link;
-        });
-        return endpoints;
-    }),
 }) as UnwrapRef<ModalState>;
 
 
@@ -261,26 +246,12 @@ const checkModalConfirm = async (item: ApiKeyModel) => {
     checkModalState.loading = false;
 };
 
-const listEndpoints = async () => {
-    state.loading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.endpoint.list<EndpointListParameters, EndpointListResponse>();
-
-        state.endpoints = results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.endpoints = undefined;
-    } finally {
-        state.loading = false;
-    }
-};
 
 watch(() => props.userId, async (userId) => {
     if (userId) {
         state.user = userId;
         await Promise.all([
             listAPIKey(state.user),
-            listEndpoints(),
         ]);
     }
 }, { immediate: true });
@@ -334,7 +305,6 @@ watch(() => props.userId, async (userId) => {
         <user-a-p-i-key-modal v-if="modalState.visible && !modalState.loading"
                               :visible.sync="modalState.visible"
                               :api-key-item="modalState.item"
-                              :endpoints="modalState.endpoints"
                               @clickButton="confirm"
         />
         <p-table-check-modal :visible.sync="checkModalState.visible"
