@@ -1,26 +1,30 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
 
-import {
-    PFieldGroup, PJsonSchemaForm, PTextInput,
-} from '@spaceone/design-system';
+import { PFieldGroup, PJsonSchemaForm, PTextInput } from '@spaceone/design-system';
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import { i18n } from '@/translations';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { BaseInformationForm, PageMode } from '@/services/asset-inventory/types/service-account-page-type';
+import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
+import type { BaseInformationForm, PageMode, ProjectForm } from '@/services/asset-inventory/types/service-account-page-type';
+
+
 
 interface Props {
     editMode: PageMode;
     schema: any;
     isValid: boolean;
-    originForm: BaseInformationForm;
+    originForm?: BaseInformationForm;
+    accountType: AccountType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -31,6 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
         accountName: '',
         customSchemaForm: {},
         tags: {},
+        accountType: ACCOUNT_TYPE.GENERAL,
+        projectForm: {
+            selectedProjectId: null,
+        },
     }),
 });
 
@@ -62,12 +70,16 @@ const state = reactive({
     isCustomSchemaFormValid: undefined,
     tags: {},
     isTagsValid: true,
+    projectForm: {} as ProjectForm,
+    isProjectFormValid: undefined,
     formData: computed<BaseInformationForm>(() => ({
         accountName: serviceAccountName.value,
         customSchemaForm: state.customSchemaForm,
+        projectForm: state.projectForm,
         tags: state.tags,
     })),
     isAllValid: computed(() => !invalidState.serviceAccountName
+                && ((props.accountType === ACCOUNT_TYPE.TRUSTED) ?? state.isProjectFormValid)
                 && state.isTagsValid
                 && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid)),
 });
@@ -95,6 +107,10 @@ const handleUpdateTags = (tags: Tag) => {
 };
 const handleAccountValidate = (isValid) => {
     state.isCustomSchemaFormValid = isValid;
+};
+
+const handleChangeProjectForm = (projectForm) => {
+    state.formData.projectForm = projectForm;
 };
 
 /* Init */
@@ -138,6 +154,14 @@ watch(() => props.originForm, (originForm) => {
                             :language="$store.state.user.language"
                             @validate="handleAccountValidate"
         />
+        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
+                       class="account-tags"
+        >
+            <service-account-project-form v-if="props.accountType === ACCOUNT_TYPE.GENERAL"
+                                          :is-valid.sync="state.isProjectFormValid"
+                                          @change="handleChangeProjectForm"
+            />
+        </p-field-group>
         <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TAG_LABEL')"
                        :help-text="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.BASE_INFO_HELP_TEXT')"
                        class="account-tags"
