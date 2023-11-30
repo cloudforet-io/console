@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
-import type { UnwrapRef } from 'vue';
+import type { ComputedRef } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import type { Vue } from 'vue/types/vue';
 
 import {
     PButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { TimeStamp } from '@/schema/_common/model';
+import type { ApiKeyModel } from '@/schema/identity/api-key/model';
+import type { EndpointListParameters, EndpointListResponse } from '@/schema/identity/endpoint/api-verbs/list';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -28,45 +29,32 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import UserAPIKeyModal from '@/services/my-page/components/UserAPIKeyModal.vue';
 
-
-export interface APIKeyItem {
-    api_key: string;
-    api_key_id: string;
-    created_at: TimeStamp;
-    domain_id?: string;
-    last_accessed_at?: TimeStamp;
-    state?: string;
-    user_id?: string;
-}
-
-interface ModalItem {
-    loading?: boolean;
-    items: APIKeyItem;
-    endpoints: any;
-}
-
-interface EndpointItem {
-    endpoint: string;
-    name: string;
-    service: string;
-    state?: string;
-    version?: string;
-}
+type CheckModalMode = 'enable' | 'disable' | 'delete';
 
 const props = defineProps<{
     userId: string;
     disabled?: boolean;
 }>();
 
-const vm = getCurrentInstance()?.proxy as Vue;
-const state = reactive({
+const state = reactive<{
+    loading: boolean;
+    fields: DataTableField[];
+    items: ApiKeyModel[];
+    selectedIndex: number[];
+    selectedItems: ComputedRef<ApiKeyModel[]>;
+    dropdownMenu: ComputedRef<MenuItem[]>;
+    visible: boolean;
+    user: string;
+    timezone: ComputedRef<string>;
+    disableCreateBtn: ComputedRef<boolean>;
+}>({
     loading: false,
     fields: [
         { name: 'api_key_id', label: 'API Key ID' },
         { name: 'state', label: 'State' },
         { name: 'created_at', label: 'Created' },
     ],
-    items: [] as APIKeyItem[],
+    items: [],
     selectedIndex: [],
     selectedItems: computed(() => state.selectedIndex.map((i) => state.items[i])),
     dropdownMenu: computed(() => ([
@@ -87,30 +75,43 @@ const state = reactive({
         {
             type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: state.selectedIndex.length !== 1,
         },
-    ] as MenuItem[])),
+    ])),
     visible: false,
     user: props.userId || '',
     timezone: computed(() => store.state.user.timezone),
-    disableCreateBtn: computed(() => state.items.length >= 2 || props.disabled),
+    disableCreateBtn: computed(() => state.items.length >= 2 || !!props.disabled),
 });
 
-const modalState: UnwrapRef<ModalItem> = reactive({
+const modalState = reactive<{
+    visible: boolean;
+    loading: boolean;
+    item?: ApiKeyModel;
+    endpoints: Record<string, string>;
+}>({
+    visible: false,
     loading: false,
-    items: [] as unknown as APIKeyItem,
+    item: undefined,
     endpoints: {},
 });
 
-const checkModalState = reactive({
-    fields: computed(() => [
+const checkModalState = reactive<{
+    fields: DataTableField[];
+    mode?: CheckModalMode;
+    title: TranslateResult;
+    subTitle: TranslateResult;
+    themeColor?: string;
+    visible: boolean;
+    loading: boolean;
+}>({
+    fields: [
         { name: 'api_key_id', label: 'API Key ID' },
         { name: 'state', label: 'State' },
         { name: 'created_at', label: 'Created' },
-    ]),
-    mode: '',
-    items: {} as APIKeyItem,
-    title: '' as TranslateResult,
-    subTitle: '' as TranslateResult,
-    themeColor: undefined as string | undefined,
+    ],
+    mode: undefined,
+    title: '',
+    subTitle: '',
+    themeColor: undefined,
     visible: false,
     loading: false,
 });
@@ -142,10 +143,10 @@ const openAPIKeyConfirmModal = async () => {
         const resp = await SpaceConnector.client.identity.apiKey.create({
             user_id: state.user,
         });
-        modalState.items = resp;
-        state.visible = true;
+        modalState.item = resp;
+        modalState.visible = true;
     } catch (e) {
-        ErrorHandler.handleRequestError(e, vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'));
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'));
     } finally {
         modalState.loading = false;
         if (loadingMessageId) hideLoadingMessage(loadingMessageId);
@@ -154,7 +155,7 @@ const openAPIKeyConfirmModal = async () => {
 };
 
 const confirm = () => {
-    state.visible = false;
+    modalState.visible = false;
 };
 
 const enableAPIKey = async (item) => {
@@ -244,7 +245,7 @@ const checkModalConfirm = async (item) => {
 const listEndpoints = async () => {
     state.loading = true;
     try {
-        const { results }: { results: EndpointItem[] } = await SpaceConnector.clientV2.identity.endpoint.list();
+        const { results } = await SpaceConnector.clientV2.identity.endpoint.list<EndpointListParameters, EndpointListResponse>();
 
         const endpoints = {};
         results.forEach((data) => {
@@ -252,9 +253,7 @@ const listEndpoints = async () => {
             const link = data.endpoint;
             endpoints[service] = link;
         });
-        modalState.endpoints = {
-            endpoints,
-        };
+        modalState.endpoints = endpoints;
     } catch (e) {
         ErrorHandler.handleError(e);
         modalState.endpoints = {};
@@ -321,15 +320,15 @@ watch(() => props.userId, async (after) => {
                 </template>
             </p-data-table>
         </p-pane-layout>
-        <user-a-p-i-key-modal v-if="visible && !modalState.loading"
-                              :visible.sync="state.visible"
-                              :api-key-item="modalState.items"
+        <user-a-p-i-key-modal v-if="modalState.visible && !modalState.loading"
+                              :visible.sync="modalState.visible"
+                              :api-key-item="modalState.item"
                               :endpoints="modalState.endpoints"
                               @clickButton="confirm"
         />
         <p-table-check-modal :visible.sync="checkModalState.visible"
                              :fields="checkModalState.fields"
-                             :items="sstate.electedItems"
+                             :items="state.selectedItems"
                              :header-title="checkModalState.title"
                              :sub-title="checkModalState.subTitle"
                              :theme-color="checkModalState.themeColor"

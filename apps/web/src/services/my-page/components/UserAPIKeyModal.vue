@@ -1,12 +1,14 @@
 <script setup lang="ts">
-
-import { reactive } from 'vue';
+import type { Ref } from 'vue';
+import { reactive, watch } from 'vue';
 
 import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import yaml from 'js-yaml';
+
+import type { ApiKeyModel } from '@/schema/identity/api-key/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -15,30 +17,33 @@ enum FileType {
     YAML = 'yaml'
 }
 
-interface APIItem {
-    api_key: string;
-}
-
 const props = defineProps<{
     visible: boolean;
-    apiKeyItem: APIItem|null;
-    endpoints: object;
+    apiKeyItem?: ApiKeyModel;
+    endpoints: Record<string, string>;
 }>();
 const emit = defineEmits<{(event: 'visible', visible: boolean): void;
     (event: 'clickButton'): void;
 }>();
-const state = reactive({
+const state = reactive<{
+    proxyVisible: Ref<boolean>;
+    isAPICollapsed: boolean;
+    isSpacectlCollapsed: boolean;
+    apiKeyItemCode: string;
+    yamlItem: string;
+    githubLink: string;
+}>({
     proxyVisible: useProxyValue('visible', props, emit),
     isAPICollapsed: true,
     isSpacectlCollapsed: true,
-    apiItem: {} as APIItem,
+    apiKeyItemCode: '',
     yamlItem: '',
     githubLink: 'https://github.com/cloudforet-io/spacectl',
 });
 
 const onClickDownloadFile = (fileType: FileType) => {
     let blob;
-    if (fileType === FileType.JSON) blob = new Blob([JSON.stringify(state.apiItem)], { type: 'application/json' });
+    if (fileType === FileType.JSON) blob = new Blob([state.apiKeyItemCode], { type: 'application/json' });
     if (fileType === FileType.YAML) blob = new Blob([state.yamlItem], { type: 'application/x-yaml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -54,11 +59,11 @@ const onClickConfirm = () => {
 };
 
 const makeYamlItem = () => {
-    const apiItem = {
+    const endpoints = props.endpoints;
+    const yamlItem = {
         api_key: props.apiKeyItem?.api_key,
+        endpoints,
     };
-    const endpoint = props.endpoints;
-    const yamlItem = { ...apiItem, ...endpoint };
 
     state.yamlItem = yaml.dump(yamlItem, {
         noArrayIndent: false,
@@ -66,15 +71,17 @@ const makeYamlItem = () => {
     });
 };
 
-(async () => {
-    if (props.apiKeyItem) state.apiItem = props.apiKeyItem;
+watch(() => props.visible, (visible) => {
+    if (!visible) return;
+    if (!props.apiKeyItem) return;
+    state.apiKeyItemCode = JSON.stringify(props.apiKeyItem, null, 2);
     makeYamlItem();
-})();
+}, { immediate: true });
 
 </script>
 
 <template>
-    <p-icon-modal :visible.sync="state.roxyVisible"
+    <p-icon-modal :visible.sync="state.proxyVisible"
                   icon-name="ic_check-circle"
                   size="md"
                   :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
@@ -97,7 +104,7 @@ const makeYamlItem = () => {
                     {{ $t('IDENTITY.USER.API_KEY.ID') }}
                 </span>
                 <p class="box-contents">
-                    {{ props.apiKeyItem.api_key_id }}
+                    {{ props.apiKeyItem?.api_key_id }}
                     <p-collapsible-toggle :is-collapsed.sync="state.isAPICollapsed"
                                           class="collapsible-toggle"
                     >
@@ -105,7 +112,7 @@ const makeYamlItem = () => {
                     </p-collapsible-toggle>
                     <p-text-editor v-if="!state.isAPICollapsed"
                                    class="m-4"
-                                   :code="state.apiItem"
+                                   :code="state.apiKeyItemCode"
                                    folded
                                    read-only
                     />
@@ -145,7 +152,7 @@ const makeYamlItem = () => {
                     <p-collapsible-toggle :is-collapsed.sync="state.isSpacectlCollapsed"
                                           class="collapsible-toggle"
                     >
-                        {{ isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
+                        {{ state.isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
                     <p-text-editor v-if="!state.isSpacectlCollapsed"
                                    class="m-4"
