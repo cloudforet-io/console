@@ -133,10 +133,10 @@ const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBindin
 const listServiceAccountData = async () => {
     typeOptionState.loading = true;
     try {
-        const res:ListResponse<ServiceAccountModel> = await SpaceConnector.clientV2.identity.serviceAccount.list({
+        const res = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
             domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             query: getQuery(),
-        } as ServiceAccountListParameters);
+        });
 
         tableState.items = serviceAccountPreprocessor(res.results || []);
         typeOptionState.totalCount = res.total_count ?? 0;
