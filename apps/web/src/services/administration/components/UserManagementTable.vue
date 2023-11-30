@@ -6,7 +6,7 @@
             selectable
             sortable
             :loading="userPageState.loading"
-            :items="userPageState.users"
+            :items="refinedUserItems"
             :select-index="userPageState.selectedIndices"
             :fields="fields"
             sort-by="name"
@@ -78,12 +78,7 @@
                                       :mode="modalState.mode"
                                       @confirm="handleUserStatusModalConfirm()"
         />
-        <user-management-form-modal v-if="userPageState.visibleCreateModal"
-                                    :header-title="userFormState.headerTitle"
-                                    :item="userFormState.item"
-                                    @confirm="handleUserFormConfirm"
-        />
-        <user-management-form-modal v-if="userPageState.visibleUpdateModal"
+        <user-management-form-modal v-if="userPageState.visibleCreateModal || userPageState.visibleUpdateModal"
                                     :header-title="userFormState.headerTitle"
                                     :item="userFormState.item"
                                     @confirm="handleUserFormConfirm"
@@ -107,6 +102,14 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { RoleCreateRequestParams } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleDeleteRequestParams } from '@/schema/identity/role-binding/api-verbs/delete';
+import type { RoleListRequestParams } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { UserCreateRequestParams } from '@/schema/identity/user/api-verbs/create';
+import { USER_TYPE } from '@/schema/identity/user/constant';
+import type { UserType } from '@/schema/identity/user/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -122,10 +125,17 @@ import UserManagementFormModal from '@/services/administration/components/UserMa
 import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
 import { userSearchHandlers } from '@/services/administration/constants/user-table-constant';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
+
+const getUserType = (userType: UserType) => {
+    let formattedUserType: string;
+    if (userType === USER_TYPE.API_USER) formattedUserType = 'API Only';
+    else formattedUserType = 'Console, API';
+    return formattedUserType;
+};
 
 export default {
     name: 'UserManagementTable',
@@ -184,6 +194,11 @@ export default {
         ];
 
         const state = reactive({
+            refinedUserItems: computed(() => userPageState.users.map((user) => ({
+                ...user,
+                user_type: getUserType(user.user_type),
+                last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
+            }))),
             isSelected: computed(() => userPageState.selectedIndices.length > 0),
             dropdownMenu: computed(() => ([
                 {
@@ -305,23 +320,22 @@ export default {
         };
 
         const bindRole = async (userId, roleId) => {
-            await SpaceConnector.client.identity.roleBinding.create({
-                resource_type: 'identity.User',
-                resource_id: userId,
+            await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateRequestParams>({
+                user_id: userId,
                 role_id: roleId,
-                domain_id: store.state.domain.domainId,
+                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
         };
         const unbindRole = async (userId) => {
-            const res = await SpaceConnector.client.identity.roleBinding.list({
-                resource_id: userId,
-                domain_id: store.state.domain.domainId,
+            const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListRequestParams, ListResponse<RoleBindingModel>>({
+                user_id: userId,
+                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
-            const roleBindingId = res.results[0].role_binding_id;
-            if (res.total_count > 0) {
-                await SpaceConnector.client.identity.roleBinding.delete({
+            const roleBindingId = results?.[0].role_binding_id;
+            if (roleBindingId) {
+                await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteRequestParams>({
                     role_binding_id: roleBindingId,
-                    domain_id: store.state.domain.domainId,
+                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 });
             }
         };
@@ -330,7 +344,7 @@ export default {
                 modalLoading: true,
             });
             try {
-                await SpaceConnector.client.identity.user.create({
+                await SpaceConnector.clientV2.identity.user.create<UserCreateRequestParams>({
                     ...item,
                 });
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');

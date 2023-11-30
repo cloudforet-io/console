@@ -14,6 +14,9 @@ import { differenceBy } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { UserListRequestParams } from '@/schema/identity/user/api-verbs/list';
+import type { UserModel } from '@/schema/identity/user/model';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -25,6 +28,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
+
 
 
 interface Props {
@@ -56,7 +60,7 @@ const state = reactive({
 
 const responderState = reactive({
     loading: true,
-    allMember: [] as any[],
+    allMember: [] as UserModel[],
     allMemberItems: computed(() => responderState.allMember.map((d) => {
         const userName = responderState.users[d.user_id]?.name;
         return {
@@ -90,7 +94,7 @@ const listProjectChannel = async () => {
 const listMember = async () => {
     responderState.loading = true;
     try {
-        const res = await SpaceConnector.client.identity.user.list();
+        const res = await SpaceConnector.clientV2.identity.user.list<UserListRequestParams, ListResponse<UserModel>>();
         responderState.allMember = res.results;
     } catch (e) {
         ErrorHandler.handleError(e);

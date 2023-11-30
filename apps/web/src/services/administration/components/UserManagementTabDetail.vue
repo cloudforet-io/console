@@ -84,7 +84,9 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { UserGetRequestParams } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -130,6 +132,8 @@ const state = reactive({
             ...additionalFields,
             { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
             { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
+            { name: 'workspace_role_type', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE_TYPE') }, // TODO: change to real data
+            { name: 'workspace_role', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE') }, // TODO: change to real data
             { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
             { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
             { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
@@ -142,16 +146,18 @@ const state = reactive({
 const getUserDetailData = async (userId) => {
     state.loading = true;
     try {
-        const response = await SpaceConnector.client.identity.user.get({
+        const response = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParams, UserModel>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             user_id: userId || props.userId,
         });
-        state.data = response;
-        state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
-        state.data.email = response.email;
-        state.data.email_verified = response.email_verified;
-        state.loading = false;
+        state.data = {
+            ...response,
+            last_accessed_at: calculateTime(state.data.last_accessed_at, props.timezone as string) || 0,
+        };
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
     }
 };
 
