@@ -1,6 +1,6 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
-import type { MockInfo } from '@cloudforet/core-lib/space-connector/type';
+import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/space-connector/type';
 
 
 const getAfterCallApiMap = (store) => ({
@@ -45,23 +45,30 @@ const getApiEndpoints = (config) => {
         throw new Error('ApiClient init failed: There are no endpoint v1.');
     } else throw new Error('ApiClient init failed: There are no endpoint v2.');
 };
-const getMockInfo = (config): MockInfo => ({
-    endpoints: [config.get('MOCK.ENDPOINT_V1'), config.get('MOCK.ENDPOINT_V2')],
-    all: config.get('MOCK.ALL'),
-    reflection: config.get('MOCK.REFLECTION'),
-    skipTokenCheck: config.get('MOCK.SKIP_TOKEN_CHECK'),
-    apiList: [config.get('MOCK.API_LIST_V1'), config.get('MOCK.API_LIST_V2')],
-    apiKey: config.get('MOCK.API_KEY'),
+const getMockConfig = (config): MockConfig => ({
+    enabled: config.get('DEV.MOCK.ENABLED'),
+    endpoints: [config.get('DEV.MOCK.ENDPOINT_V1'), config.get('DEV.MOCK.ENDPOINT_V2')],
+    reflection: [config.get('DEV.MOCK.REFLECTION_V1'), config.get('DEV.MOCK.REFLECTION_V2')],
+    apiList: [config.get('DEV.MOCK.API_LIST_V1'), config.get('DEV.MOCK.API_LIST_V2')],
+});
+
+const getAuthConfig = (config): AuthConfig => ({
+    skipTokenCheck: config.get('DEV.AUTH.SKIP_TOKEN_CHECK'),
+    apiKey: config.get('DEV.AUTH.API_KEY'),
 });
 
 export const initApiClient = async (store, config) => {
-    const mockInfo = getMockInfo(config);
-    const endpoints = mockInfo.all ? mockInfo.endpoints as string[] : getApiEndpoints(config);
+    const endpoints = getApiEndpoints(config);
     const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback(store));
+    const devConfig: DevConfig = {
+        enabled: config.get('DEV.ENABLED'),
+        mockConfig: getMockConfig(config),
+        authConfig: getAuthConfig(config),
+    };
     await SpaceConnector.init(
         endpoints,
         tokenApi,
-        getMockInfo(config),
+        devConfig,
         getAfterCallApiMap(store),
     );
     const isTokenAlive = SpaceConnector.isTokenAlive;
