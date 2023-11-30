@@ -21,7 +21,7 @@ const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupMod
         const params: ProjectGroupGetRequestParams = {
             project_group_id: projectGroupId,
         };
-        return await SpaceConnector.clientV2.identity.projectGroup.get(params, { mockMode: true }); // TODO: delete mockMode
+        return await SpaceConnector.clientV2.identity.projectGroup.get(params);
     } catch (e) {
         ErrorHandler.handleError(e);
         return undefined;
@@ -42,7 +42,7 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
                 only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id'],
             },
         };
-        const response = await SpaceConnector.clientV2.identity.projectGroup.list(params, { timeout: 3000, mockMode: true }); // TODO: delete mockMode
+        const response = await SpaceConnector.clientV2.identity.projectGroup.list(params, { timeout: 3000 });
         const projectGroups: ProjectGroupReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax

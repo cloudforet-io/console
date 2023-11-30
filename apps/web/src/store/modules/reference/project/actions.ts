@@ -23,7 +23,7 @@ const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupMod
         const params: ProjectGroupGetRequestParams = {
             project_group_id: projectGroupId,
         };
-        return await SpaceConnector.clientV2.identity.projectGroup.get(params, { mockMode: true }); // TODO: delete mockMode
+        return await SpaceConnector.clientV2.identity.projectGroup.get(params);
     } catch (e) {
         ErrorHandler.handleError(e);
         return undefined;
