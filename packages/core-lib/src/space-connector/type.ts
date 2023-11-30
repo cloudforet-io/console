@@ -86,10 +86,18 @@ export interface Query {
     count_only?: boolean;
 }
 
-export interface MockInfo {
-    all?: boolean;
+export interface MockConfig {
+    enabled?: boolean;
     endpoints?: string[]; // [v1_endpoint, v2_endpoint]
-    reflection?: boolean;
-    skipTokenCheck?: boolean;
+    reflection?: boolean[]; // [v1_reflection, v2_reflection]
     apiList?: string[][]; // [[v1_api_1, v1_api_2], [v2_api_1, v2_api_2, v2_api_3]]
+}
+export interface AuthConfig {
+    skipTokenCheck?: boolean;
+    apiKey?: string;
+}
+export interface DevConfig {
+    enabled?: boolean;
+    mockConfig?: MockConfig;
+    authConfig?: AuthConfig;
 }
