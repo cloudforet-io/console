@@ -2,7 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { ComputedRef } from 'vue';
+import type { ComputedRef, UnwrapRef } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -15,8 +15,14 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ApiKeyCreateParameters } from '@/schema/identity/api-key/api-verbs/create';
+import type { ApiKeyDeleteParameters } from '@/schema/identity/api-key/api-verbs/delete';
+import type { ApiKeyDisableParameters } from '@/schema/identity/api-key/api-verbs/disable';
+import type { ApiKeyEnableParameters } from '@/schema/identity/api-key/api-verbs/enable';
+import type { ApiKeyListParameters, ApiKeyListResponse } from '@/schema/identity/api-key/api-verbs/list';
 import type { ApiKeyModel } from '@/schema/identity/api-key/model';
 import type { EndpointListParameters, EndpointListResponse } from '@/schema/identity/endpoint/api-verbs/list';
+import type { EndpointModel } from '@/schema/identity/endpoint/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -36,7 +42,7 @@ const props = defineProps<{
     disabled?: boolean;
 }>();
 
-const state = reactive<{
+interface State {
     loading: boolean;
     fields: DataTableField[];
     items: ApiKeyModel[];
@@ -47,7 +53,9 @@ const state = reactive<{
     user: string;
     timezone: ComputedRef<string>;
     disableCreateBtn: ComputedRef<boolean>;
-}>({
+    endpoints?: EndpointModel[];
+}
+const state = reactive({
     loading: false,
     fields: [
         { name: 'api_key_id', label: 'API Key ID' },
@@ -80,21 +88,33 @@ const state = reactive<{
     user: props.userId || '',
     timezone: computed(() => store.state.user.timezone),
     disableCreateBtn: computed(() => state.items.length >= 2 || !!props.disabled),
-});
+    endpoints: undefined,
+}) as UnwrapRef<State>;
 
-const modalState = reactive<{
+interface ModalState {
     visible: boolean;
     loading: boolean;
     item?: ApiKeyModel;
-    endpoints: Record<string, string>;
-}>({
+    endpoints: ComputedRef<Record<string, string>>;
+}
+const modalState = reactive({
     visible: false,
     loading: false,
     item: undefined,
-    endpoints: {},
-});
+    endpoints: computed(() => {
+        const endpoints = {};
+        if (!state.endpoints) return endpoints;
+        state.endpoints.forEach((data) => {
+            const service = data.service;
+            const link = data.endpoint;
+            endpoints[service] = link;
+        });
+        return endpoints;
+    }),
+}) as UnwrapRef<ModalState>;
 
-const checkModalState = reactive<{
+
+interface CheckModalState {
     fields: DataTableField[];
     mode?: CheckModalMode;
     title: TranslateResult;
@@ -102,7 +122,8 @@ const checkModalState = reactive<{
     themeColor?: string;
     visible: boolean;
     loading: boolean;
-}>({
+}
+const checkModalState = reactive({
     fields: [
         { name: 'api_key_id', label: 'API Key ID' },
         { name: 'state', label: 'State' },
@@ -114,7 +135,7 @@ const checkModalState = reactive<{
     themeColor: undefined,
     visible: false,
     loading: false,
-});
+}) as UnwrapRef<CheckModalState>;
 
 const apiQueryHelper = new ApiQueryHelper();
 const listAPIKey = async (userId) => {
@@ -123,7 +144,7 @@ const listAPIKey = async (userId) => {
         apiQueryHelper.setSort('created_at')
             .setFilters([{ k: 'user_id', v: userId, o: '=' }]);
 
-        const res = await SpaceConnector.client.identity.apiKey.list({
+        const res = await SpaceConnector.clientV2.identity.apiKey.list<ApiKeyListParameters, ApiKeyListResponse>({
             query: apiQueryHelper.data,
         });
         state.items = res.results;
@@ -140,7 +161,7 @@ const openAPIKeyConfirmModal = async () => {
     try {
         modalState.loading = true;
         loadingMessageId = showLoadingMessage('Create API Key', '');
-        const resp = await SpaceConnector.client.identity.apiKey.create({
+        const resp = await SpaceConnector.clientV2.identity.apiKey.create<ApiKeyCreateParameters, ApiKeyModel>({
             user_id: state.user,
         });
         modalState.item = resp;
@@ -158,9 +179,9 @@ const confirm = () => {
     modalState.visible = false;
 };
 
-const enableAPIKey = async (item) => {
+const enableAPIKey = async (item: ApiKeyModel) => {
     try {
-        await SpaceConnector.client.identity.apiKey.enable({
+        await SpaceConnector.clientV2.identity.apiKey.enable<ApiKeyEnableParameters, ApiKeyModel>({
             api_key_id: item[0].api_key_id,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '');
@@ -171,10 +192,9 @@ const enableAPIKey = async (item) => {
         checkModalState.visible = false;
     }
 };
-
-const disableAPIKey = async (item) => {
+const disableAPIKey = async (item: ApiKeyModel) => {
     try {
-        await SpaceConnector.client.identity.apiKey.disable({
+        await SpaceConnector.clientV2.identity.apiKey.disable<ApiKeyDisableParameters, ApiKeyModel>({
             api_key_id: item[0].api_key_id,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_DISABLE_API_KEY'), '');
@@ -185,10 +205,9 @@ const disableAPIKey = async (item) => {
         checkModalState.visible = false;
     }
 };
-
-const deleteAPIKey = async (item) => {
+const deleteAPIKey = async (item: ApiKeyModel) => {
     try {
-        await SpaceConnector.client.identity.apiKey.delete({
+        await SpaceConnector.clientV2.identity.apiKey.delete<ApiKeyDeleteParameters, ApiKeyModel>({
             api_key_id: item[0].api_key_id,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_DELETE_API_KEY'), '');
@@ -234,7 +253,7 @@ const onSelectDropdown = (name) => {
     }
 };
 
-const checkModalConfirm = async (item) => {
+const checkModalConfirm = async (item: ApiKeyModel) => {
     checkModalState.loading = true;
     if (checkModalState.mode === 'delete') await deleteAPIKey(item);
     else if (checkModalState.mode === 'enable') await enableAPIKey(item);
@@ -247,32 +266,24 @@ const listEndpoints = async () => {
     try {
         const { results } = await SpaceConnector.clientV2.identity.endpoint.list<EndpointListParameters, EndpointListResponse>();
 
-        const endpoints = {};
-        results.forEach((data) => {
-            const service = data.service;
-            const link = data.endpoint;
-            endpoints[service] = link;
-        });
-        modalState.endpoints = endpoints;
+        state.endpoints = results;
     } catch (e) {
         ErrorHandler.handleError(e);
-        modalState.endpoints = {};
+        state.endpoints = undefined;
     } finally {
         state.loading = false;
     }
 };
 
-watch(() => props.userId, async (after) => {
-    if (after) {
-        state.user = after;
-        await listAPIKey(state.user);
+watch(() => props.userId, async (userId) => {
+    if (userId) {
+        state.user = userId;
+        await Promise.all([
+            listAPIKey(state.user),
+            listEndpoints(),
+        ]);
     }
 }, { immediate: true });
-
-(async () => {
-    await listAPIKey(state.user);
-    await listEndpoints();
-})();
 
 </script>
 

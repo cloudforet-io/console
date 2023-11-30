@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Ref } from 'vue';
+import type { Ref, UnwrapRef } from 'vue';
 import { reactive, watch } from 'vue';
 
 import {
@@ -25,21 +25,22 @@ const props = defineProps<{
 const emit = defineEmits<{(event: 'visible', visible: boolean): void;
     (event: 'clickButton'): void;
 }>();
-const state = reactive<{
+interface State {
     proxyVisible: Ref<boolean>;
     isAPICollapsed: boolean;
     isSpacectlCollapsed: boolean;
     apiKeyItemCode: string;
     yamlItem: string;
     githubLink: string;
-}>({
+}
+const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     isAPICollapsed: true,
     isSpacectlCollapsed: true,
     apiKeyItemCode: '',
     yamlItem: '',
     githubLink: 'https://github.com/cloudforet-io/spacectl',
-});
+}) as UnwrapRef<State>;
 
 const onClickDownloadFile = (fileType: FileType) => {
     let blob;
