@@ -2,15 +2,32 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectGroupGetRequestParams } from '@/schema/identity/project-group/api-verbs/get';
+import type { ProjectGroupListRequestParams } from '@/schema/identity/project-group/api-verbs/list';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ProjectGroupReferenceMap, ProjectGroupReferenceState } from '@/store/modules/reference/project-group/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
 let lastLoadedTime = 0;
 
-export const load: Action<ProjectGroupReferenceState, any> = async ({ state, commit, rootState }, options: ReferenceLoadOptions): Promise<void|Error> => {
+const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupModel|undefined> => {
+    if (!projectGroupId) return undefined;
+    try {
+        const params: ProjectGroupGetRequestParams = {
+            project_group_id: projectGroupId,
+        };
+        return await SpaceConnector.clientV2.identity.projectGroup.get(params, { mockMode: true }); // TODO: delete mockMode
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return undefined;
+    }
+};
+export const load: Action<ProjectGroupReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -20,16 +37,17 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
     ) return;
 
     try {
-        const response = await SpaceConnector.clientV2.identity.projectGroup.list({
-            domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
+        const params: ProjectGroupListRequestParams = {
             query: {
                 only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id'],
             },
-        }, { timeout: 3000 });
+        };
+        const response = await SpaceConnector.clientV2.identity.projectGroup.list(params, { timeout: 3000, mockMode: true }); // TODO: delete mockMode
         const projectGroups: ProjectGroupReferenceMap = {};
 
-        response.results.forEach((projectGroupInfo: any): void => {
-            const parentGroup = projectGroupInfo.parent_project_group_info;
+        // eslint-disable-next-line no-restricted-syntax
+        for await (const projectGroupInfo of response.results) {
+            const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id);
             projectGroups[projectGroupInfo.project_group_id] = {
                 key: projectGroupInfo.project_group_id,
                 label: (parentGroup)
@@ -42,7 +60,7 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
                     } : undefined,
                 },
             };
-        });
+        }
 
         commit('setProjectGroups', projectGroups);
         lastLoadedTime = currentTime;
@@ -51,8 +69,8 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
     }
 };
 
-export const sync: Action<ProjectGroupReferenceState, any> = ({ state, commit }, projectGroupInfo): void => {
-    const parentGroup = projectGroupInfo.parent_project_group_info;
+export const sync: Action<ProjectGroupReferenceState, any> = async ({ state, commit }, projectGroupInfo: ProjectGroupModel): void => {
+    const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id);
     const projectGroups: ProjectGroupReferenceMap = {
         ...state.items,
         [projectGroupInfo.project_group_id]: {
