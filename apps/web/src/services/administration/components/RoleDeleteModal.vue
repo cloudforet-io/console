@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PDataTable, PBadge, PLink } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
@@ -9,7 +10,6 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/model';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectModel } from '@/schema/identity/project/model';
@@ -50,6 +50,8 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const rolePageStore = useRolePageStore();
+
+const router = useRouter();
 
 const emit = defineEmits<{(e: ':update:visible'): void,
     (e: 'refresh'): void,
@@ -114,12 +116,12 @@ const getProjectLink = (value) => {
     const projectId = value?.project_info?.project_id;
     let link;
     if (projectId) {
-        link = SpaceRouter.router.resolve(referenceRouter(projectId, {
+        link = router.resolve(referenceRouter(projectId, {
             resource_type: 'identity.Project',
         }));
     } else {
         const projectGroupId = value?.project_group_info?.project_group_id;
-        link = SpaceRouter.router.resolve(referenceRouter(projectGroupId, {
+        link = router.resolve(referenceRouter(projectGroupId, {
             resource_type: 'identity.ProjectGroup',
         }));
     }

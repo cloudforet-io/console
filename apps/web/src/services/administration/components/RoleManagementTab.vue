@@ -2,6 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PEmpty, PTab, PDataTable, PBadge, PButton,
@@ -9,7 +10,6 @@ import {
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
 import RoleManagementTabDetail from '@/services/administration/components/RoleManagementTabDetail.vue';
@@ -19,6 +19,8 @@ import { useRolePageStore } from '@/services/administration/store/role-page-stor
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
+
+const router = useRouter();
 
 const state = reactive({
     fields: computed<DataTableField[]>(() => ([
@@ -45,7 +47,7 @@ const multiItemTabState = reactive({
     activeTab: 'data',
 });
 
-const handleEditRole = (id: string) => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
+const handleEditRole = (id: string) => { router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
 </script>
 
 <template>

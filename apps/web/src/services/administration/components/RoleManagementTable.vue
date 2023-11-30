@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PToolboxTable, PSelectDropdown,
@@ -15,7 +16,6 @@ import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/t
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -56,7 +56,9 @@ const props = withDefaults(defineProps<Props>(), {
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 
-const currentRoute = SpaceRouter.router.currentRoute;
+const router = useRouter();
+
+const currentRoute = router.currentRoute;
 const roleListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
     .setSort('name', true)
@@ -117,12 +119,12 @@ const openDeleteModal = () => {
     state.deleteModalVisible = true;
 };
 // event
-const handleCreateRole = () => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME }); };
-const handleEditRole = (id: string) => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
+const handleCreateRole = () => { router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME }); };
+const handleEditRole = (id: string) => { router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
 const handleSelectDropdown = (name) => {
     switch (name) {
     case 'edit':
-        SpaceRouter.router.push({
+        router.push({
             name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
             params: { id: rolePageStore.selectedRoles[0].role_id },
         });
