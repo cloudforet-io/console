@@ -1,6 +1,5 @@
-
 import type { RoleType } from '@/schema/identity/role/type';
-import type { AuthType, UserType } from '@/schema/identity/user/model';
+import type { AuthType, UserType } from '@/schema/identity/user/type';
 
 import type { PagePermission } from '@/lib/access-control/config';
 

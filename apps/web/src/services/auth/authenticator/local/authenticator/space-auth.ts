@@ -1,6 +1,5 @@
-import type { AuthType } from '@/schema/identity/user/model';
+import type { AuthType } from '@/schema/identity/user/type';
 import { store } from '@/store';
-
 
 import { Authenticator } from '@/services/auth/authenticator';
 
