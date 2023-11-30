@@ -11,6 +11,7 @@ import { uniq } from 'lodash';
 import { getAllPage } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { byteFormatter } from '@cloudforet/utils';
 
@@ -114,24 +115,13 @@ const getProjectGroupName = (projectItem: ProjectModel, parentGroups?: ProjectGr
     return result;
 };
 
-// const fetchCloudService = async (projectId: string) => {
-//     try {
-//         const res = await SpaceConnector.clientV2.inventory.cloudService.analyze({
-//             query: {
-//             },
-//         });
-//     } catch (e) {
-//         ErrorHandler.handleError(e);
-//     }
-// };
 const getCardSummary = async () => {
     if (state.items.length === 0) return;
 
     const cardSummary: CardSummary = {};
     state.cardSummaryLoading = true;
     try {
-        // TODO: change to cloud-service analyze api (see console-api!)
-        // TODO: add_to_set provider
+        // HACK: get cloud service summary
         // const ids = state.items?.map((item) => item.project_id);
         // const res = await SpaceConnector.client.statistics.topic.projectPage({
         //     projects: ids,
@@ -152,6 +142,7 @@ const getCardSummary = async () => {
     }
 };
 
+const listProjectFetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.project.list<ProjectListRequestParams, ListResponse<ProjectModel>>);
 const listApiQueryHelper = new ApiQueryHelper();
 const fetchProjectList = async (projectGroupId?: string) => {
     const _projectGroupId = projectGroupId || state.groupId;
@@ -177,21 +168,23 @@ const fetchProjectList = async (projectGroupId?: string) => {
 
     try {
         state.loading = true;
-        const res = await SpaceConnector.clientV2.identity.project.list<ProjectListRequestParams, ListResponse<ProjectModel>>({
+        const { status, response } = await listProjectFetcher({
             query: listApiQueryHelper.data,
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
-        state.items = res.results || [];
-        state.totalCount = res.total_count || 0;
-        projectPageStore.$patch({ projectCount: state.totalCount });
-        await getCardSummary();
+        if (status === 'succeed') {
+            state.items = response.results || [];
+            state.totalCount = response.total_count || 0;
+            projectPageStore.$patch({ projectCount: state.totalCount });
+            state.loading = false;
+            await getCardSummary();
+        }
     } catch (e: any) {
         state.items = [];
         state.totalCount = 0;
+        state.loading = false;
         projectPageStore.$patch({ projectCount: 0 });
         ErrorHandler.handleError(e);
-    } finally {
-        state.loading = false;
     }
 };
 
