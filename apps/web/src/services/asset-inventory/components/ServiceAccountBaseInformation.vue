@@ -10,6 +10,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProviderGetRequestParams } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
+import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
@@ -82,8 +83,10 @@ const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBindin
 const getServiceAccount = async (serviceAccountId) => {
     try {
         state.loading = true;
-        const result = await SpaceConnector.client.identity.serviceAccount.get({
+        const result = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             service_account_id: serviceAccountId,
+            // workspace_id: ws-xxxxx   # TODO: add workspace_id after store is ready
         });
 
         state.serviceAccountData = serviceAccountPreprocessor(result);

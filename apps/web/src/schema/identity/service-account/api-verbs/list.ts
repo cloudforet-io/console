@@ -1,4 +1,4 @@
-export interface ServiceAccountListParameter {
+export interface ServiceAccountListParameters {
     domain_id?: string;
     query?: any;
     service_account_id?: string;

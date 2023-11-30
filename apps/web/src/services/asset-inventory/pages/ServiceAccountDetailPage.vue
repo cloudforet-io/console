@@ -11,6 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProviderGetRequestParams } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
+import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
@@ -68,8 +69,10 @@ const state = reactive({
 const getServiceAccount = async (serviceAccountId: string) => {
     try {
         state.loading = true;
-        state.item = await SpaceConnector.client.identity.serviceAccount.get({
+        state.item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             service_account_id: serviceAccountId,
+            // workspace_id: ws-xxxxx   # TODO: add workspace_id after store is ready
         });
     } catch (e) {
         ErrorHandler.handleError(e);

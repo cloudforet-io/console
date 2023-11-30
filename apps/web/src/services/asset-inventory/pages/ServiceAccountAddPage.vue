@@ -11,7 +11,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import type { ProviderGetRequestParams } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
+import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -88,13 +90,13 @@ const deleteServiceAccount = async (serviceAccountId: string) => {
 const createServiceAccount = async (): Promise<string|undefined> => {
     try {
         formState.formLoading = true;
-        const res = await SpaceConnector.client.identity.serviceAccount.create({
+        if (!(props.provider && formState.baseInformationForm.projectForm.selectedProjectId)) throw new Error('Invalid parameter');
+        const res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
             provider: props.provider,
             name: formState.baseInformationForm.accountName.trim(),
             data: formState.baseInformationForm.customSchemaForm,
             tags: formState.baseInformationForm.tags,
-            service_account_type: formState.accountType,
-            trusted_service_account_id: formState.credentialForm.attachedTrustedAccountId,
+            trusted_account_id: formState.credentialForm.attachedTrustedAccountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,
         });
         return res.service_account_id;

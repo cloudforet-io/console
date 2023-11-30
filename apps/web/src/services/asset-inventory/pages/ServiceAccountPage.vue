@@ -24,7 +24,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/model';
-import type { ServiceAccountListParameter } from '@/schema/identity/service-account/api-verbs/list';
+import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
@@ -136,7 +136,7 @@ const listServiceAccountData = async () => {
         const res:ListResponse<ServiceAccountModel> = await SpaceConnector.clientV2.identity.serviceAccount.list({
             domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             query: getQuery(),
-        } as ServiceAccountListParameter);
+        } as ServiceAccountListParameters);
 
         tableState.items = serviceAccountPreprocessor(res.results || []);
         typeOptionState.totalCount = res.total_count ?? 0;
