@@ -1,3 +1,11 @@
+<script lang="ts" setup>
+import { PLink, PDivider } from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+
+</script>
+
 <template>
     <section>
         <article class="desc-wrapper">
@@ -62,27 +70,6 @@
         </p>
     </section>
 </template>
-
-<script lang="ts">
-import { PLink, PDivider } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-
-export default {
-    name: 'RoleCreateEditHandbook',
-    components: {
-        PLink,
-        PDivider,
-    },
-    setup() {
-        return {
-            ADMINISTRATION_ROUTE,
-            ACTION_ICON,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .header2 {
