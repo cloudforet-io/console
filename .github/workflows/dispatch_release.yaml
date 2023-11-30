@@ -68,7 +68,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
 
       - name: Restore cached node_modules
         id: restore-node-cache
@@ -143,10 +143,6 @@ jobs:
         with:
           context: .
           file: ./apps/web/Dockerfile
-          build-args: |
-            TURBO_TOKEN=${{ secrets.TURBO_TOKEN }}
-            TURBO_TEAM=${{ secrets.TURBO_TEAM }}
-            TURBO_API=http://172.17.0.1:3000
           platforms: ${{ env.ARCH }}
           push: true
           cache-from: ${{ vars.DOCKER_REPO_OWNER }}/${{ github.event.repository.name }}:latest
