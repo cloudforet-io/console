@@ -15,9 +15,10 @@ import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
-import MultiFactorAuthModal from '@/common/modules/modals/multi-factor-auth-modal/MultiFactorAuthModal.vue';
 
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
+import UserAccountMultiFactorAuthModal from '@/services/my-page/components/UserAccountMultiFactorAuthModal.vue';
+
 
 
 // Currently, only email is supported.
@@ -182,13 +183,13 @@ watch(() => state.mfa, (mfa) => {
                 />
             </div>
         </user-account-module-container>
-        <multi-factor-auth-modal v-if="modalState.isModalVisible"
-                                 :type="modalState.modalType"
-                                 :email="email"
-                                 :verified="state.isVerified"
-                                 :mfa-type="state.selectedItem"
-                                 :visible.sync="modalState.isModalVisible"
-                                 @refresh="initState"
+        <user-account-multi-factor-auth-modal v-if="modalState.isModalVisible"
+                                              :type="modalState.modalType"
+                                              :email="email"
+                                              :verified="state.isVerified"
+                                              :mfa-type="state.selectedItem"
+                                              :visible.sync="modalState.isModalVisible"
+                                              @refresh="initState"
         />
     </div>
 </template>
