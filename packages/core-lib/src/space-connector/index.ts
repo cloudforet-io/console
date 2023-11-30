@@ -215,6 +215,19 @@ export class SpaceConnector {
 }
 
 const isPathIncluded = (apiList: string[], path: string): boolean => {
+    const isExclude = apiList.includes(`!${path}`);
+    if (isExclude) return false;
+
+    const isChildrenExcluded = apiList.some((apiPath) => {
+        if (apiPath.startsWith('!') && apiPath.endsWith('/*')) {
+            const parentPath = apiPath.split('/*')[0]?.slice(1);
+            console.debug('parentPath', parentPath);
+            return path.startsWith(parentPath);
+        }
+        return false;
+    });
+    if (isChildrenExcluded) return false;
+
     const isInclude = apiList.includes(path);
     if (isInclude) return true;
 
