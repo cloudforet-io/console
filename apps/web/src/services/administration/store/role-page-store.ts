@@ -7,9 +7,6 @@ import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
-
-
 interface RolePageState {
     loading: boolean;
     roles: RoleModel[];
@@ -31,7 +28,7 @@ export const useRolePageStore = defineStore('role-page', {
         async listRoles(apiQuery: Query) {
             this.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.role.list({
+                const res = await SpaceConnector.clientV2.identity.role.list({
                     query: apiQuery,
                 });
                 this.roles = res.results;
