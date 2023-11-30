@@ -84,20 +84,16 @@ const state = reactive({
         }
         return [{ name: i18n.t('MENU.PROJECT'), data: null }, ...result];
     }),
-    createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => {
-        const result: {name: string; label: string}[] = [];
-        if (storeState.groupId) {
-            result.push({
-                name: 'project',
-                label: i18n.t('PROJECT.LANDING.PROJECT') as string,
-            });
-        }
-        result.push({
+    createDropdownMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
+        {
+            name: 'project',
+            label: i18n.t('PROJECT.LANDING.PROJECT') as string,
+        },
+        {
             name: 'projectGroup',
             label: i18n.t('PROJECT.LANDING.PROJECT_GROUP') as string,
-        });
-        return result;
-    }),
+        },
+    ])),
 });
 
 const {
