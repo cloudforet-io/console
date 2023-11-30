@@ -200,11 +200,13 @@ export class SpaceConnector {
                 }
 
                 let url = path;
-                const mockApiList = SpaceConnector.mockConfig.apiList?.[version - 1] ?? [];
-                if (SpaceConnector.mockConfig.enabled || isPathIncluded(mockApiList, path) || axiosConfig.mockMode) {
-                    axiosConfig.baseURL = mockEndpoint;
-                    if (axiosConfig.mockPath) {
-                        url += axiosConfig.mockPath;
+                if (SpaceConnector.mockConfig.enabled) {
+                    const mockApiList = SpaceConnector.mockConfig.apiList?.[version - 1] ?? [];
+                    if (isPathIncluded(mockApiList, path) || axiosConfig.mockMode) {
+                        axiosConfig.baseURL = mockEndpoint;
+                        if (axiosConfig.mockPath) {
+                            url += axiosConfig.mockPath;
+                        }
                     }
                 }
 
