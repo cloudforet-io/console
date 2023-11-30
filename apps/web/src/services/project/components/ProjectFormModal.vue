@@ -88,8 +88,8 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
     const params: ProjectCreateRequestParams = {
         name: state.projectName.trim(),
         project_type: 'PRIVATE', // TODO: project_type
-        project_group_id: props.projectGroupId,
     };
+    if (props.projectGroupId) params.project_group_id = props.projectGroupId;
     const projectInfo = await projectPageStore.createProject(params);
     await store.dispatch('reference/project/load');
     return projectInfo;
