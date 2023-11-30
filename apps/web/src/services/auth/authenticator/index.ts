@@ -1,7 +1,7 @@
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 
 import { SpaceRouter } from '@/router';
-import type { AuthType } from '@/schema/identity/user/model';
+import type { AuthType } from '@/schema/identity/user/type';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 

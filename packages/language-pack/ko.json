@@ -1926,6 +1926,8 @@
 				"UPDATE": "수정",
 				"USER_ID": "아이디",
 				"USER_MANAGEMENT": "사용자 관리 ",
+				"WORKSPACE_ROLE": "",
+				"WORKSPACE_ROLE_TYPE": "",
 				"YESTERDAY": "어제 "
 			},
 			"NOTIFICATION": {

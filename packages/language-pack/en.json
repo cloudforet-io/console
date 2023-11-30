@@ -1926,6 +1926,8 @@
 				"UPDATE": "Update",
 				"USER_ID": "ID",
 				"USER_MANAGEMENT": "User Management",
+				"WORKSPACE_ROLE": "Workspace Role",
+				"WORKSPACE_ROLE_TYPE": "Workspace Role Type",
 				"YESTERDAY": "Yesterday"
 			},
 			"NOTIFICATION": {
