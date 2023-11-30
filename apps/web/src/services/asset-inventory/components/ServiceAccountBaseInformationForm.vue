@@ -23,7 +23,7 @@ interface Props {
     editMode: PageMode;
     schema: any;
     isValid: boolean;
-    originForm?: BaseInformationForm;
+    originForm: Partial<BaseInformationForm>;
     accountType: AccountType;
 }
 
@@ -31,15 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     editMode: 'CREATE',
     schema: () => ({}),
     isValid: false,
-    originForm: () => ({
-        accountName: '',
-        customSchemaForm: {},
-        tags: {},
-        accountType: ACCOUNT_TYPE.GENERAL,
-        projectForm: {
-            selectedProjectId: null,
-        },
-    }),
+    originForm: () => ({}),
 });
 
 const emit = defineEmits<{(e:'update:isValid', isValid: boolean): void;
@@ -85,8 +77,8 @@ const state = reactive({
 });
 
 /* Util */
-const initFormData = (originForm: BaseInformationForm) => {
-    setForm('serviceAccountName', originForm?.accountName ?? '');
+const initFormData = (originForm: Partial<BaseInformationForm>) => {
+    setForm('serviceAccountName', originForm?.accountName);
     state.customSchemaForm = originForm?.customSchemaForm ?? {};
     state.tags = originForm?.tags ?? {};
     // init validation
