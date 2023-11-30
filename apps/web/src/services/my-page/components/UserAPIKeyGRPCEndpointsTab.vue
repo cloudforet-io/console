@@ -1,46 +1,20 @@
 <script setup lang="ts">
 
-import { reactive } from 'vue';
-
 import { PDataTable } from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { useEndpointStore } from '@/services/my-page/stores/endpoint-store';
 
+const endpointStore = useEndpointStore();
+const endpointState = endpointStore.state;
+const fields: DataTableField[] = [
+    { name: 'service', label: 'Service' },
+    { name: 'name', label: 'Name' },
+    { name: 'endpoint', label: 'Endpoint' },
+];
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
+endpointStore.listEndpoints();
 
-interface EndpointItem {
-    endpoint: string;
-    name: string;
-    service: string;
-    state?: string;
-}
-
-const state = reactive({
-    loading: true,
-    fields: [
-        { name: 'service', label: 'Service' },
-        { name: 'name', label: 'Name' },
-        { name: 'endpoint', label: 'Endpoint' },
-    ],
-    items: [] as EndpointItem[],
-});
-const listEndpoints = async () => {
-    state.loading = true;
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.endpoint.list();
-        state.items = results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.items = [];
-    } finally {
-        state.loading = false;
-    }
-};
-
-(async () => {
-    await listEndpoints();
-})();
 </script>
 
 <template>
@@ -51,9 +25,9 @@ const listEndpoints = async () => {
             gRPC {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
         </div>
         <p-data-table
-            :items="state.items"
-            :loading="state.loading"
-            :fields="state.fields"
+            :items="endpointState.endpoints"
+            :loading="endpointState.loading"
+            :fields="fields"
             :striped="false"
         />
     </div>
