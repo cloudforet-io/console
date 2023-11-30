@@ -34,7 +34,6 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant.js';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
-import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectGroupTreeNodeData } from '@/services/project/types/project-tree-type';
@@ -94,7 +93,6 @@ const state = reactive({
     ]),
     shouldUpdateProjectList: computed<boolean>(() => projectPageStore.shouldUpdateProjectList),
 });
-const projectTreeHelper = useProjectTree();
 
 const getItemSummaryCount = (summaryType: SummaryType, projectId: string) => {
     if (state.cardSummary) {
@@ -153,24 +151,12 @@ const fetchProjectList = async (projectGroupId?: string) => {
         listApiQueryHelper.setFilters([{ v: state.searchText }]);
     }
 
-    // HACK: check it's working
-    if (state.groupId) {
-        const { open_path: projectGroupIdList } = await projectTreeHelper.getProjectTreeSearchPath({
-            item_type: 'PROJECT_GROUP',
-            item_id: _projectGroupId,
-        });
-        listApiQueryHelper.addFilter({
-            k: 'project_group_id',
-            v: projectGroupIdList,
-            o: '=',
-        });
-    }
-
     try {
         state.loading = true;
         const { status, response } = await listProjectFetcher({
             query: listApiQueryHelper.data,
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            project_group_id: _projectGroupId,
         });
         if (status === 'succeed') {
             state.items = response.results || [];
