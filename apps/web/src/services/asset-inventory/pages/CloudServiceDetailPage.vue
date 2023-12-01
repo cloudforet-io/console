@@ -269,8 +269,8 @@ const handleDynamicLayoutFetch = (changed) => {
 };
 
 watch(urlQueryStringFilters, (queryStringFilters) => {
-    const filterQueryString = route.query.filters ?? '';
-    if (queryStringFilters !== JSON.stringify(filterQueryString)) {
+    const routeQueryString = route.query.filters ?? '';
+    if (JSON.stringify(queryStringFilters) !== JSON.stringify(routeQueryString)) {
         replaceUrlQuery('filters', queryStringFilters);
     }
 });
