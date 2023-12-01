@@ -131,12 +131,12 @@ export class SpaceConnector {
     }
 
     static setRequestInterceptor(interceptor: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig): void {
-        // if (SpaceConnector.interceptorIds[0] !== undefined) {
-        //     SpaceConnector.instance.serviceApi.instance.interceptors.request.eject(SpaceConnector.interceptorIds[0]);
-        // }
-        // if (SpaceConnector.interceptorIds[1] !== undefined) {
-        //     SpaceConnector.instance.serviceApiV2.instance.interceptors.request.eject(SpaceConnector.interceptorIds[1]);
-        // }
+        if (SpaceConnector.interceptorIds[0] !== undefined) {
+            SpaceConnector.instance.serviceApi.instance.interceptors.request.eject(SpaceConnector.interceptorIds[0]);
+        }
+        if (SpaceConnector.interceptorIds[1] !== undefined) {
+            SpaceConnector.instance.serviceApiV2.instance.interceptors.request.eject(SpaceConnector.interceptorIds[1]);
+        }
         SpaceConnector.interceptorIds[0] = SpaceConnector.instance.serviceApi.instance.interceptors.request.use(interceptor);
         SpaceConnector.interceptorIds[1] = SpaceConnector.instance.serviceApiV2.instance.interceptors.request.use(interceptor);
     }
