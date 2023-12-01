@@ -9,7 +9,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 
@@ -63,7 +63,7 @@ const state = reactive({
 const getProjectUserData = async () => {
     state.loading = true;
     try {
-        const params: ProjectGetRequestParams = {
+        const params: ProjectGetParameters = {
             project_id: props.cloudServiceProjectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);

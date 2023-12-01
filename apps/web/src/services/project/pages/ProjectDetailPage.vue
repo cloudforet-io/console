@@ -15,8 +15,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
-import type { ProjectDeleteRequestParams } from '@/schema/identity/project/api-verbs/delete';
-import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
+import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
@@ -85,7 +85,7 @@ const state = reactive({
 const getProject = async (projectId: string) => {
     try {
         state.loading = true;
-        const params: ProjectGetRequestParams = {
+        const params: ProjectGetParameters = {
             project_id: projectId,
         };
         state.item = await SpaceConnector.clientV2.identity.project.get(params);
@@ -147,7 +147,7 @@ const projectDeleteFormConfirm = async () => {
 
     formState.modalLoading = true;
     try {
-        const params: ProjectDeleteRequestParams = {
+        const params: ProjectDeleteParameters = {
             project_id: state.projectId,
         };
         await SpaceConnector.clientV2.identity.project.delete(params);

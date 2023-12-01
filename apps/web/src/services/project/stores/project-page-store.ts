@@ -6,11 +6,11 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ProjectGroupCreateRequestParams } from '@/schema/identity/project-group/api-verbs/create';
-import type { ProjectGroupDeleteRequestParams } from '@/schema/identity/project-group/api-verbs/delete';
-import type { ProjectGroupListRequestParams } from '@/schema/identity/project-group/api-verbs/list';
-import type { ProjectGroupUpdateRequestParams } from '@/schema/identity/project-group/api-verbs/update';
-import type { ProjectCreateRequestParams } from '@/schema/identity/project/api-verbs/create';
+import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
+import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
+import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
+import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { i18n } from '@/translations';
 
@@ -61,10 +61,10 @@ interface ProjectPageAction {
     openProjectGroupCreateForm: (target?: ProjectGroupTreeItem) => void;
     openProjectGroupUpdateForm: (target?: ProjectGroupTreeItem) => void;
     openProjectGroupDeleteCheckModal: (target?: ProjectGroupTreeItem) => void;
-    createProjectGroup: (params: ProjectGroupCreateRequestParams) => Promise<void>;
-    updateProjectGroup: (params: Partial<ProjectGroupUpdateRequestParams>) => Promise<void>;
+    createProjectGroup: (params: ProjectGroupCreateParameters) => Promise<void>;
+    updateProjectGroup: (params: Partial<ProjectGroupUpdateParameters>) => Promise<void>;
     deleteProjectGroup: () => Promise<void>;
-    createProject: (params: ProjectCreateRequestParams) => Promise<ProjectModel|undefined>;
+    createProject: (params: ProjectCreateParameters) => Promise<ProjectModel|undefined>;
     refreshPermissionInfo: () => Promise<void>;
     addPermissionInfo: (permissionInfo: any) => void;
     openProjectCreateForm: (target?: ProjectGroupTreeItem) => void;
@@ -165,10 +165,10 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             this.permissionInfo = { ...this.permissionInfo, ...permissionInfo };
         },
         async createProjectGroup(
-            params: ProjectGroupCreateRequestParams,
+            params: ProjectGroupCreateParameters,
         ) {
             try {
-                const _params: ProjectGroupCreateRequestParams = { ...params };
+                const _params: ProjectGroupCreateParameters = { ...params };
                 if (this.actionTargetNodeData) {
                     _params.parent_group_id = this.actionTargetNodeData.id;
                 }
@@ -206,12 +206,12 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             }
         },
         async updateProjectGroup(
-            params: Partial<ProjectGroupUpdateRequestParams>,
+            params: Partial<ProjectGroupUpdateParameters>,
         ) {
             if (!this.rootNode || !this.actionTargetNodeData) return;
 
             try {
-                const _params: ProjectGroupUpdateRequestParams = {
+                const _params: ProjectGroupUpdateParameters = {
                     project_group_id: this.actionTargetNodeData.id,
                     ...params,
                 };
@@ -234,7 +234,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 throw new Error('No Target for deletion');
             }
 
-            const params: ProjectGroupDeleteRequestParams = {
+            const params: ProjectGroupDeleteParameters = {
                 project_group_id: this.actionTargetNodeData.id,
             };
             await SpaceConnector.clientV2.identity.projectGroup.delete(params);
@@ -255,7 +255,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 permissionApiQueryHelper.setOnly('project_group_id')
                     .setFilters([{ k: 'project_group_id', v: ids }]);
 
-                const params: ProjectGroupListRequestParams = {
+                const params: ProjectGroupListParameters = {
                     query: permissionApiQueryHelper.data,
                 };
                 const { results } = await SpaceConnector.clientV2.identity.projectGroup.list(params);
@@ -269,7 +269,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             return permissionInfo;
         },
         async createProject(
-            params: ProjectCreateRequestParams,
+            params: ProjectCreateParameters,
         ):Promise<ProjectModel|undefined> {
             try {
                 const res = await SpaceConnector.clientV2.identity.project.create(params);

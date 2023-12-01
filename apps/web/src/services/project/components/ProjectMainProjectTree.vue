@@ -10,10 +10,10 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type {
-    ProjectGroupChangeParentGroupRequestParams,
+    ProjectGroupChangeParentGroupParameters,
 } from '@/schema/identity/project-group/api-verbs/change-parent-group';
-import type { ProjectGroupUpdateRequestParams } from '@/schema/identity/project-group/api-verbs/update';
-import type { ProjectChangeProjectGroupRequestParams } from '@/schema/identity/project/api-verbs/change-project-group';
+import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -191,7 +191,7 @@ watch(() => projectPageStore.treeEditMode, async (treeEditMode) => {
 
 const onFinishEdit = async (node, editText: string) => {
     try {
-        const params: ProjectGroupUpdateRequestParams = {
+        const params: ProjectGroupUpdateParameters = {
             project_group_id: node.data.id,
             name: editText,
         };
@@ -206,7 +206,7 @@ const onFinishEdit = async (node, editText: string) => {
 };
 
 const updateProjectGroup = async (node, oldParent, parent) => {
-    const params: ProjectGroupChangeParentGroupRequestParams = {
+    const params: ProjectGroupChangeParentGroupParameters = {
         project_group_id: node.data.id,
         parent_group_id: parent?.data?.id || undefined,
     };
@@ -221,7 +221,7 @@ const updateProjectGroup = async (node, oldParent, parent) => {
 
 const updateProject = async (node, oldParent, parent) => {
     try {
-        const params: ProjectChangeProjectGroupRequestParams = {
+        const params: ProjectChangeProjectGroupParameters = {
             project_id: node.data.id,
             project_group_id: parent?.data?.id || undefined,
         };

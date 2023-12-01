@@ -47,9 +47,9 @@ import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { UserDeleteRequestParameters } from '@/schema/identity/user/api-verbs/delete';
-import type { UserDisableRequestParameters } from '@/schema/identity/user/api-verbs/disable';
-import type { UserEnableRequestParameters } from '@/schema/identity/user/api-verbs/enable';
+import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
+import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
+import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -104,7 +104,7 @@ export default {
 
         const deleteUser = async (userId: string): Promise<boolean> => {
             try {
-                await SpaceConnector.clientV2.identity.user.delete<UserDeleteRequestParameters>({
+                await SpaceConnector.clientV2.identity.user.delete<UserDeleteParameters>({
                     user_id: userId,
                 });
                 return true;
@@ -114,7 +114,7 @@ export default {
         };
         const enableUser = async (userId: string): Promise<boolean> => {
             try {
-                await SpaceConnector.clientV2.identity.user.enable<UserEnableRequestParameters>({
+                await SpaceConnector.clientV2.identity.user.enable<UserEnableParameters>({
                     user_id: userId,
                 });
                 return true;
@@ -124,7 +124,7 @@ export default {
         };
         const disableUser = async (userId: string): Promise<boolean> => {
             try {
-                await SpaceConnector.clientV2.identity.user.disable<UserDisableRequestParameters>({
+                await SpaceConnector.clientV2.identity.user.disable<UserDisableParameters>({
                     user_id: userId,
                 });
                 return true;

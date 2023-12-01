@@ -3,9 +3,9 @@ import type { Action } from 'vuex';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { ProjectGroupGetRequestParams } from '@/schema/identity/project-group/api-verbs/get';
+import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectListRequestParams } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
@@ -20,7 +20,7 @@ let lastLoadedTime = 0;
 const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupModel|undefined> => {
     if (!projectGroupId) return undefined;
     try {
-        const params: ProjectGroupGetRequestParams = {
+        const params: ProjectGroupGetParameters = {
             project_group_id: projectGroupId,
         };
         return await SpaceConnector.clientV2.identity.projectGroup.get(params);
@@ -39,7 +39,7 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit }
     ) return;
 
     try {
-        const params: ProjectListRequestParams = {
+        const params: ProjectListParameters = {
             query: {
                 only: ['project_id', 'name', 'project_group_id', 'workspace_id'],
             },

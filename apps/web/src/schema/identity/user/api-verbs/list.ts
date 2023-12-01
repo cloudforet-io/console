@@ -3,7 +3,7 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import type { AuthType, UserState } from '@/schema/identity/user/type';
 
 
-export interface UserListRequestParameters {
+export interface UserListParameters {
     query?: Query;
     user_id?: string;
     name?: string;

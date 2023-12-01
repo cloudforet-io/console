@@ -62,7 +62,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { Tags } from '@/schema/_common/model';
-import type { UserGetRequestParameters } from '@/schema/identity/user/api-verbs/get';
+import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -135,7 +135,7 @@ export default {
         const getUserDetailData = async (userId) => {
             baseState.loading = true;
             try {
-                const res = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParameters, UserModel>({
+                const res = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
                     user_id: userId,
                 });
 

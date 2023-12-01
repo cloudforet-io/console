@@ -14,8 +14,9 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
-import type { BaseInfoFormData } from '@/services/administration/components/RoleUpdateForm.vue';
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+import type { BaseInfoFormData } from '@/services/administration/types/role-form-type';
+
 
 interface RoleTypeForm {label: string; key: string; description: TranslateResult}
 interface Props {
