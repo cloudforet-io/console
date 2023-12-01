@@ -31,8 +31,19 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
             state.items = results || [];
         },
         setCurrentWorkspace(workspaceId?: string) {
-            state.currentItem = state.items.find((workspace) => workspace.workspace_id === workspaceId);
-            // TDOO: set current workspace id to api client
+            if (!workspaceId) {
+                state.currentItem = undefined;
+                return;
+            }
+
+            const found = state.items.find((workspace) => workspace.workspace_id === workspaceId);
+            if (found) {
+                state.currentItem = found;
+            } else {
+                state.currentItem = state.items[0];
+            }
+
+            setDefaultParamsToSpaceConnector(state.currentItem?.workspace_id);
         },
     };
 
@@ -41,3 +52,37 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
         ...actions,
     };
 });
+
+
+const setDefaultParamsToSpaceConnector = (workspaceId: string) => {
+    SpaceConnector.setRequestInterceptor((request) => {
+        if (!request.url) return request;
+
+        if (excludedWorkspaceApiMap.has(request.url)) {
+            return request;
+        }
+
+        if (request.data) {
+            request.data = { workspace_id: workspaceId, ...request.data };
+        }
+        return request;
+    });
+};
+
+const EXCLUDED_WORKSPACE_API_LIST = [
+    // inventory
+    '/inventory/cloud-service/analyze',
+    '/inventory/cloud-service-query-set/list',
+    '/inventory/cloud-service-stats/analyze',
+    // dashboard
+    '/dashboard/domain-dashboard/list',
+    '/dashboard/domain-dashboard/get',
+    '/dashboard/project-dashboard/list',
+    '/dashboard/project-dashboard/get',
+    // cost-analysis
+    '/cost-analysis/data-source/list',
+    '/cost-analysis/cost-query-set/list',
+    '/cost-analysis/cost/analyze',
+    '/cost-analysis/budget-usage/analyze',
+];
+const excludedWorkspaceApiMap = new Map<string, boolean>(EXCLUDED_WORKSPACE_API_LIST.map((url) => [url, true]));

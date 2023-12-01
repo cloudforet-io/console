@@ -1,4 +1,4 @@
-import type { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { camelCase } from 'lodash';
 
@@ -54,6 +54,8 @@ export class SpaceConnector {
     private static isDevMode = false;
 
     private readonly afterCallApiMap: AfterCallApiMap;
+
+    private static interceptorIds: number[] = []; // [v1 id, v2 id]
 
     constructor(
         endpoints: string[],
@@ -126,6 +128,17 @@ export class SpaceConnector {
     static get isTokenAlive(): boolean {
         if (SpaceConnector.isDevMode && SpaceConnector.authConfig.skipTokenCheck) return true;
         return TokenAPI.checkToken();
+    }
+
+    static setRequestInterceptor(interceptor: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig): void {
+        // if (SpaceConnector.interceptorIds[0] !== undefined) {
+        //     SpaceConnector.instance.serviceApi.instance.interceptors.request.eject(SpaceConnector.interceptorIds[0]);
+        // }
+        // if (SpaceConnector.interceptorIds[1] !== undefined) {
+        //     SpaceConnector.instance.serviceApiV2.instance.interceptors.request.eject(SpaceConnector.interceptorIds[1]);
+        // }
+        SpaceConnector.interceptorIds[0] = SpaceConnector.instance.serviceApi.instance.interceptors.request.use(interceptor);
+        SpaceConnector.interceptorIds[1] = SpaceConnector.instance.serviceApiV2.instance.interceptors.request.use(interceptor);
     }
 
     protected async loadAPI(version: number): Promise<void> {
