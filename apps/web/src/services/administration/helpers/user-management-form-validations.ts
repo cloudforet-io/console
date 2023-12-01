@@ -2,10 +2,14 @@ import VueI18n from 'vue-i18n';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { UserListRequestParameters } from '@/schema/identity/user/api-verbs/list';
+import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
+
 
 export interface Validation {
 	isValid: boolean;
@@ -29,8 +33,10 @@ export const checkDuplicateID = async (userID: string) => {
         isValid: true,
         invalidText: '' as TranslateResult,
     };
-    const { total_count } = await SpaceConnector.client.identity.user.list({ user_id: userID });
-    if (total_count > 0) {
+    const { total_count } = await SpaceConnector.clientV2.identity.user.list<UserListRequestParameters, ListResponse<UserModel>>({
+        user_id: userID,
+    });
+    if (total_count && total_count > 0) {
         validation.isValid = false;
         validation.invalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
     }

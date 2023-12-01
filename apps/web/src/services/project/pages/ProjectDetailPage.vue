@@ -86,7 +86,6 @@ const getProject = async (projectId: string) => {
     try {
         state.loading = true;
         const params: ProjectGetRequestParams = {
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: projectId,
         };
         state.item = await SpaceConnector.clientV2.identity.project.get(params);

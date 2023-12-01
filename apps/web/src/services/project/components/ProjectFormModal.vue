@@ -74,7 +74,6 @@ const state = reactive({
 const getProjectNames = async () => {
     try {
         const params: ProjectListRequestParams = {
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: props.projectGroupId,
         };
         const { results }: ListResponse<ProjectModel> = await SpaceConnector.clientV2.identity.project.list(params);
@@ -99,7 +98,6 @@ const updateProject = async (): Promise<ProjectModel|undefined> => {
     let updatedProject: ProjectModel|undefined;
     try {
         const params: ProjectUpdateRequestParams = {
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             name: state.projectName.trim(),
             project_id: props.project?.project_id || router.currentRoute.params.id,
         };

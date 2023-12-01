@@ -2,9 +2,10 @@ import type { Tags } from '@/schema/_common/model';
 import type { AuthType } from '@/schema/identity/user/type';
 
 
-export interface UserCreateRequestParameters {
+export interface UserCreateWorkspaceUserRequestParameters {
     user_id: string;
     auth_type: AuthType;
+    role_id: string;
     //
     password?: string;
     name?: string;
@@ -13,5 +14,5 @@ export interface UserCreateRequestParameters {
     timezone?: string;
     tags?: Tags;
     reset_password?: boolean;
-    role_id?: string;
+    workspace_id?: string;
 }

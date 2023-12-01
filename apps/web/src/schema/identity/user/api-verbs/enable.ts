@@ -1,3 +1,3 @@
-export interface UserEnableRequestParams {
+export interface UserEnableRequestParameters {
     user_id: string;
 }

@@ -62,6 +62,8 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { Tags } from '@/schema/_common/model';
+import type { UserGetRequestParameters } from '@/schema/identity/user/api-verbs/get';
+import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -133,19 +135,18 @@ export default {
         const getUserDetailData = async (userId) => {
             baseState.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.user.get({
+                const res = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParameters, UserModel>({
                     user_id: userId,
-                    // eslint-disable-next-line camelcase
-                    include_role_binding: true,
                 });
 
                 baseState.items = res.role_bindings.map((d) => ({
                     ...d,
                 }));
-                baseState.loading = false;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 baseState.items = [];
+            } finally {
+                baseState.loading = false;
             }
         };
 

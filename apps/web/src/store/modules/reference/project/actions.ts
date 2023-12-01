@@ -29,7 +29,7 @@ const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupMod
         return undefined;
     }
 };
-export const load: Action<ProjectReferenceState, any> = async ({ state, commit, rootState }, options: ReferenceLoadOptions): Promise<void|Error> => {
+export const load: Action<ProjectReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -40,7 +40,6 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit, 
 
     try {
         const params: ProjectListRequestParams = {
-            domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['project_id', 'name', 'project_group_id', 'workspace_id'],
             },

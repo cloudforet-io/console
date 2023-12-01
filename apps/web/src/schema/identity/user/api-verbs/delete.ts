@@ -1,3 +1,3 @@
-export interface UserDeleteRequestParams {
+export interface UserDeleteRequestParameters {
     user_id: string;
 }

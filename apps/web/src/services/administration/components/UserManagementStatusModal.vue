@@ -47,7 +47,9 @@ import { map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { i18n } from '@/translations';
+import type { UserDeleteRequestParameters } from '@/schema/identity/user/api-verbs/delete';
+import type { UserDisableRequestParameters } from '@/schema/identity/user/api-verbs/disable';
+import type { UserEnableRequestParameters } from '@/schema/identity/user/api-verbs/enable';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -100,46 +102,62 @@ export default {
             ])),
         });
 
-        const getUsersParam = (items) => ({ users: map(items, 'user_id') });
+        const deleteUser = async (userId: string): Promise<boolean> => {
+            try {
+                await SpaceConnector.clientV2.identity.user.delete<UserDeleteRequestParameters>({
+                    user_id: userId,
+                });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        };
+        const enableUser = async (userId: string): Promise<boolean> => {
+            try {
+                await SpaceConnector.clientV2.identity.user.enable<UserEnableRequestParameters>({
+                    user_id: userId,
+                });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        };
+        const disableUser = async (userId: string): Promise<boolean> => {
+            try {
+                await SpaceConnector.clientV2.identity.user.disable<UserDisableRequestParameters>({
+                    user_id: userId,
+                });
+                return true;
+            } catch (e) {
+                return false;
+            }
+        };
+        const checkModalConfirm = async (items) => {
+            let responses: boolean[] = [];
+            let languagePrefix = 'DELETE';
 
-        const deleteUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.delete(getUsersParam(items));
+            if (props.mode === 'delete') {
+                responses = await Promise.all(map(items, (item) => deleteUser(item.user_id)));
                 userPageStore.$patch({ selectedIndices: [] });
-                showSuccessMessage(i18n.tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', userPageState.selectedIndices.length), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', userPageState.selectedIndices.length));
-            } finally {
-                emit('confirm');
-                userPageStore.$patch({ visibleStatusModal: false });
+            } else if (props.mode === 'enable') {
+                languagePrefix = 'ENABLE';
+                responses = await Promise.all(map(items, (item) => enableUser(item.user_id)));
+            } else if (props.mode === 'disable') {
+                languagePrefix = 'DISABLE';
+                responses = await Promise.all(map(items, (item) => disableUser(item.user_id)));
             }
-        };
-        const enableUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.enable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', userPageState.selectedIndices.length), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', userPageState.selectedIndices.length));
-            } finally {
-                emit('confirm');
-                userPageStore.$patch({ visibleStatusModal: false });
+
+            const successCount = responses.filter((d) => d).length;
+            const failCount = responses.length - successCount;
+            if (successCount > 0) {
+                const languageCode = `IDENTITY.USER.MAIN.ALT_S_${languagePrefix}_USER`;
+                showSuccessMessage(vm.$tc(languageCode, successCount), '');
+            } if (failCount > 0) {
+                const languageCode = `IDENTITY.USER.MAIN.ALT_E_${languagePrefix}_USER`;
+                ErrorHandler.handleRequestError(new Error(''), vm.$tc(languageCode, failCount));
             }
-        };
-        const disableUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.disable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', userPageState.selectedIndices.length), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', userPageState.selectedIndices.length));
-            } finally {
-                emit('confirm');
-                userPageStore.$patch({ visibleStatusModal: false });
-            }
-        };
-        const checkModalConfirm = async (item) => {
-            if (props.mode === 'delete') await deleteUser(item);
-            else if (props.mode === 'enable') await enableUser(item);
-            else if (props.mode === 'disable') await disableUser(item);
+            emit('confirm');
+            userPageStore.$patch({ visibleStatusModal: false });
         };
 
         const handleClose = () => {
