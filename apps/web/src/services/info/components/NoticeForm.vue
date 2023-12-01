@@ -11,7 +11,10 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
+import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
+import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
+import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -30,7 +33,7 @@ import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 interface Props {
     boardId?: string;
     type?: NoticeFormType;
-    noticePostData?: Partial<NoticePostModel>;
+    noticePostData?: Partial<PostModel>;
 }
 interface DomainItem {
     name: string;
@@ -147,7 +150,7 @@ const handleSelectDomain = (domain: Array<DomainItem>) => {
 
 const getDomainList = async () => {
     try {
-        const { results } = await SpaceConnector.client.identity.domain.list();
+        const { results } = await SpaceConnector.clientV2.identity.domain.list<DomainListParameters, DomainListResponse>();
         state.domainList = results.map((d) => ({
             name: d.domain_id,
             label: d.name,
@@ -175,10 +178,10 @@ watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
     if (isAllDomain) state.selectedDomain = [];
 });
 
-watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
+watch(() => props.noticePostData, async (d: Partial<PostModel>) => {
     if (!Object.keys(d).length) return;
     if (d?.domain_id) {
-        const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: d.domain_id });
+        const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: d.domain_id });
         state.domainName = name;
     }
 

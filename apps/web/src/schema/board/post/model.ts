@@ -5,7 +5,7 @@ import type { FileInfo } from '@/lib/file-manager/type';
 
 
 
-export interface NoticePostModel {
+export interface PostModel {
     board_id: string;
     post_id: string,
     post_type: NoticePostType,

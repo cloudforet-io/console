@@ -19,7 +19,7 @@ import { PHeading } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -45,7 +45,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            noticePostData: {} as Partial<NoticePostModel>,
+            noticePostData: {} as Partial<PostModel>,
         });
 
         /* Api */

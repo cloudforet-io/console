@@ -67,7 +67,9 @@ import dayjs from 'dayjs';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
+import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
+import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -82,7 +84,7 @@ interface Props {
     inputText: string;
     isNew: boolean;
     postDirection: 'prev' | 'next' | undefined;
-    post: NoticePostModel;
+    post: PostModel;
 }
 
 export default defineComponent<Props>({
@@ -95,7 +97,7 @@ export default defineComponent<Props>({
     },
     props: {
         post: {
-            type: Object as PropType<NoticePostModel|undefined>,
+            type: Object as PropType<PostModel|undefined>,
             default: undefined,
         },
         inputText: {
@@ -134,7 +136,7 @@ export default defineComponent<Props>({
                 return;
             }
             try {
-                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: props.post.domain_id });
+                const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: props.post.domain_id });
                 state.domainName = name;
             } catch (e) {
                 ErrorHandler.handleError(e);

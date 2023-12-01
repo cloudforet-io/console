@@ -6,6 +6,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -90,8 +91,11 @@ export const useNoticeStore = ({ userId }: {
     const noticeApiHelper = new ApiQueryHelper().setOnly('post_id');
     const fetchNoticeCount = async () => {
         try {
-            if (!boardId.value) boardId.value = await getNoticeBoardId();
-            const { results, total_count } = await SpaceConnector.client.board.post.list({
+            if (!boardId.value) {
+                boardId.value = await getNoticeBoardId();
+                if (!boardId.value) throw new Error('Notice board not found');
+            }
+            const { results, total_count } = await SpaceConnector.client.board.post.list<PostListParameters, PostListResponse>({
                 board_id: boardId.value,
                 query: noticeApiHelper.data,
                 domain_id: null,
