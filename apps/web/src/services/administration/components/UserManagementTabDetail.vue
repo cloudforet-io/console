@@ -132,8 +132,8 @@ const state = reactive({
             ...additionalFields,
             { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
             { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
-            { name: 'workspace_role_type', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE_TYPE') }, // TODO: change to real data
-            { name: 'workspace_role', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE') }, // TODO: change to real data
+            { name: 'role_type', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE_TYPE') },
+            { name: 'role_id', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE') },
             { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
             { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
             { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
@@ -155,6 +155,7 @@ const getUserDetailData = async (userId) => {
             last_accessed_at: calculateTime(state.data.last_accessed_at, props.timezone as string) || 0,
         };
     } catch (e) {
+        state.data = {} as UserModel;
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;

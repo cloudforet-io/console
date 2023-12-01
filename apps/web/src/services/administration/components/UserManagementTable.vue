@@ -103,9 +103,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { RoleCreateRequestParams } from '@/schema/identity/role-binding/api-verbs/create';
-import type { RoleDeleteRequestParams } from '@/schema/identity/role-binding/api-verbs/delete';
-import type { RoleListRequestParams } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleCreateRequestParameters } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleDeleteRequestParameters } from '@/schema/identity/role-binding/api-verbs/delete';
+import type { RoleListRequestParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateRequestParams } from '@/schema/identity/user/api-verbs/create';
 import { USER_TYPE } from '@/schema/identity/user/constant';
@@ -320,20 +320,20 @@ export default {
         };
 
         const bindRole = async (userId, roleId) => {
-            await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateRequestParams>({
+            await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateRequestParameters>({
                 user_id: userId,
                 role_id: roleId,
                 domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
         };
         const unbindRole = async (userId) => {
-            const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListRequestParams, ListResponse<RoleBindingModel>>({
+            const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListRequestParameters, ListResponse<RoleBindingModel>>({
                 user_id: userId,
                 domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
             const roleBindingId = results?.[0].role_binding_id;
             if (roleBindingId) {
-                await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteRequestParams>({
+                await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteRequestParameters>({
                     role_binding_id: roleBindingId,
                     domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 });
