@@ -5,4 +5,5 @@ export interface ProjectGroupUpdateRequestParams {
     project_group_id: string;
     name?: string;
     tags?: Tag;
+    workspace_id?: string;
 }

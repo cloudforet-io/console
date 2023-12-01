@@ -6,4 +6,5 @@ export interface ProjectGroupListRequestParams {
     project_group_id?: string;
     name?: string;
     parent_group_id?: string;
+    workspace_id?: string;
 }

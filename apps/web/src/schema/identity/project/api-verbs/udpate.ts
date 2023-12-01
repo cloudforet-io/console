@@ -6,4 +6,5 @@ export interface ProjectUpdateRequestParams {
     //
     name?: string;
     tags?: Tag;
+    workspace_id?: string;
 }

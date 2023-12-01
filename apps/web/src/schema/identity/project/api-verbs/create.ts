@@ -9,4 +9,5 @@ export interface ProjectCreateRequestParams {
     //
     tags?: Tag;
     project_group_id?: string;
+    workspace_id?: string;
 }

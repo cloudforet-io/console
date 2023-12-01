@@ -5,4 +5,5 @@ export interface ProjectGroupCreateRequestParams {
     name: string;
     tags?: Tag;
     parent_group_id?: string;
+    workspace_id?: string;
 }
