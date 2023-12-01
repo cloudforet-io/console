@@ -99,6 +99,8 @@ import { PButton, PDataLoader } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
+import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -142,7 +144,7 @@ export default {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
             loading: false,
-            domainList: [],
+            domainList: [] as DomainModel[],
             selectedDomainId: '',
             extraParams: computed<ExtraParams>(() => {
                 const params: ExtraParams = {};
@@ -158,7 +160,7 @@ export default {
 
             state.loading = true;
             try {
-                const { results } = await SpaceConnector.client.identity.domain.list();
+                const { results } = await SpaceConnector.clientV2.identity.domain.list<DomainListParameters, DomainListResponse>();
                 state.domainList = results;
             } catch (e) {
                 ErrorHandler.handleError(e);

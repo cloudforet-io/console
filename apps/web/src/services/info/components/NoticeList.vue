@@ -83,8 +83,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
 import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
 import type { NoticePostType } from '@/schema/board/post/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -135,7 +136,7 @@ export default defineComponent<Props>({
             ]),
             selectedPostType: 'ALL' as NoticePostType | 'ALL',
             loading: false,
-            noticeItems: [] as NoticePostModel[],
+            noticeItems: [] as PostModel[],
             noticeItemTotalCount: 0,
             boardId: undefined as undefined | string,
             searchText: undefined as undefined | string,
@@ -161,7 +162,8 @@ export default defineComponent<Props>({
         const listNotice = async () => {
             state.loading = true;
             try {
-                const { results, total_count } = await SpaceConnector.client.board.post.list({
+                if (!state.boardId) throw new Error('boardId is undefined');
+                const { results, total_count } = await SpaceConnector.client.board.post.list<PostListParameters, PostListResponse>({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
                     domain_id: null,
@@ -225,7 +227,7 @@ export default defineComponent<Props>({
             state.loading = true;
             state.boardId = await getNoticeBoardId();
             if (state.boardId) {
-                await Promise.allSettled([fetchNoticeReadState(state.boardId), listNotice()]);
+                await Promise.allSettled([fetchNoticeReadState(), listNotice()]);
             }
             state.loading = false;
         })();

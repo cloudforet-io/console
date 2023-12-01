@@ -84,5 +84,10 @@ const EXCLUDED_WORKSPACE_API_LIST = [
     '/cost-analysis/cost-query-set/list',
     '/cost-analysis/cost/analyze',
     '/cost-analysis/budget-usage/analyze',
+    // board
+    '/board/board/list',
+    '/board/board/get',
+    '/board/post/list',
+    '/board/post/get',
 ];
 const excludedWorkspaceApiMap = new Map<string, boolean>(EXCLUDED_WORKSPACE_API_LIST.map((url) => [url, true]));
