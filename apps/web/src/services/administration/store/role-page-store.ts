@@ -60,7 +60,7 @@ export const useRolePageStore = defineStore('role-page', {
         },
         async createRole(params: RoleCreateParameters) {
             try {
-                await SpaceConnector.clientV2.identity.role.create(params);
+                await SpaceConnector.clientV2.identity.role.create<RoleCreateParameters, RoleModel>(params);
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_CREATE_ROLE'));
                 throw e;
