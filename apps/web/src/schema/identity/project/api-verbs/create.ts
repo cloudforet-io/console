@@ -3,7 +3,7 @@ import type { ProjectType } from '@/schema/identity/project/type';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 
-export interface ProjectCreateRequestParams {
+export interface ProjectCreateRequestParameters {
     name: string;
     project_type: ProjectType;
     //

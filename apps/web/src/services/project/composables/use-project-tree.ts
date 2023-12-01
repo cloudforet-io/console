@@ -4,9 +4,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query, Sort } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { ProjectGroupListRequestParams } from '@/schema/identity/project-group/api-verbs/list';
+import type { ProjectGroupListRequestParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectListRequestParams } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectListRequestParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 
 import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
@@ -14,7 +14,7 @@ import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/projec
 
 type ProjectGroupListResponse = ListResponse<ProjectGroupModel>;
 type ProjectListResponse = ListResponse<ProjectModel>;
-type ListRequestParams = ProjectGroupListRequestParams | ProjectListRequestParams;
+type ListRequestParams = ProjectGroupListRequestParameters | ProjectListRequestParameters;
 interface ProjectTreeOptions {
     item_type: ProjectTreeItemType;
     item_id?: string;
@@ -90,7 +90,7 @@ const getChildMap = async (groups: ProjectGroupModel[], excludeType: ProjectTree
     return res;
 };
 const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
-    const requestParams: ProjectGroupListRequestParams = {
+    const requestParams: ProjectGroupListRequestParameters = {
         query: params.query ?? {},
     };
 
@@ -132,7 +132,7 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
         return [];
     }
 
-    const reqParams: ProjectListRequestParams = {
+    const reqParams: ProjectListRequestParameters = {
         query: params.query,
         project_group_id: params.item_id || null,
     };
@@ -156,7 +156,7 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
 };
 const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, openItems: string[] = []): Promise<string[]> => {
     if (itemType === 'PROJECT') {
-        const params: ProjectListRequestParams = {
+        const params: ProjectListRequestParameters = {
             project_id: itemId,
         };
         const response: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(params);
@@ -169,7 +169,7 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
             if (parentItemId) await getParentItem(parentItemId, 'PROJECT_GROUP', openItems);
         }
     } else {
-        const params: ProjectGroupListRequestParams = {
+        const params: ProjectGroupListRequestParameters = {
             project_group_id: itemId,
         };
         const response: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(params);

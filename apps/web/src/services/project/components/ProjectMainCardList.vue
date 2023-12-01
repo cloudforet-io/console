@@ -16,7 +16,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { byteFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { ProjectListRequestParams } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectListRequestParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -140,7 +140,7 @@ const getCardSummary = async () => {
     }
 };
 
-const listProjectFetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.project.list<ProjectListRequestParams, ListResponse<ProjectModel>>);
+const listProjectFetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.project.list<ProjectListRequestParameters, ListResponse<ProjectModel>>);
 const listApiQueryHelper = new ApiQueryHelper();
 const fetchProjectList = async (projectGroupId?: string) => {
     const _projectGroupId = projectGroupId || state.groupId;

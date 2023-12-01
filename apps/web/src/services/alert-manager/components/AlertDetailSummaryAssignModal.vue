@@ -7,7 +7,7 @@ import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectGetRequestParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -97,7 +97,7 @@ const handleClickReassign = async () => {
 const getProjectUserData = async () => {
     try {
         state.loading = true;
-        const params: ProjectGetRequestParams = {
+        const params: ProjectGetRequestParameters = {
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);

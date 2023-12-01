@@ -9,7 +9,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ProjectGetRequestParams } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectGetRequestParameters } from '@/schema/identity/project/api-verbs/get';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -69,7 +69,7 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
 /* api */
 const getProject = async () => {
     try {
-        const params: ProjectGetRequestParams = {
+        const params: ProjectGetRequestParameters = {
             project_id: props.projectId,
         };
         state.project = await SpaceConnector.clientV2.identity.project.get(params);

@@ -9,10 +9,10 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ProjectGroupCreateRequestParams } from '@/schema/identity/project-group/api-verbs/create';
-import type { ProjectGroupGetRequestParams } from '@/schema/identity/project-group/api-verbs/get';
-import type { ProjectGroupListRequestParams } from '@/schema/identity/project-group/api-verbs/list';
-import type { ProjectGroupUpdateRequestParams } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectGroupCreateRequestParameters } from '@/schema/identity/project-group/api-verbs/create';
+import type { ProjectGroupGetRequestParameters } from '@/schema/identity/project-group/api-verbs/get';
+import type { ProjectGroupListRequestParameters } from '@/schema/identity/project-group/api-verbs/list';
+import type { ProjectGroupUpdateRequestParameters } from '@/schema/identity/project-group/api-verbs/update';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -59,7 +59,7 @@ const state = reactive({
 
 const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
 const getProjectGroupNames = async () => {
-    const params: ProjectGroupListRequestParams = {
+    const params: ProjectGroupListRequestParameters = {
         query: projectGroupNameApiQuery.data,
     };
     const res = await SpaceConnector.clientV2.identity.projectGroup.list(params);
@@ -67,14 +67,14 @@ const getProjectGroupNames = async () => {
 };
 
 const getProjectGroup = async () => {
-    const params: ProjectGroupGetRequestParams = {
+    const params: ProjectGroupGetRequestParameters = {
         project_group_id: state.currentGroupId,
     };
     const res = await SpaceConnector.clientV2.identity.projectGroup.get(params);
     state.projectGroupName = res.name;
 };
 
-const createProjectGroup = async (params: ProjectGroupCreateRequestParams) => {
+const createProjectGroup = async (params: ProjectGroupCreateRequestParameters) => {
     try {
         await projectPageStore.createProjectGroup(params);
         await store.dispatch('reference/projectGroup/load');
@@ -85,7 +85,7 @@ const createProjectGroup = async (params: ProjectGroupCreateRequestParams) => {
     }
 };
 
-const updateProjectGroup = async (params: Partial<ProjectGroupUpdateRequestParams>) => {
+const updateProjectGroup = async (params: Partial<ProjectGroupUpdateRequestParameters>) => {
     try {
         await projectPageStore.updateProjectGroup(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
@@ -100,13 +100,13 @@ const confirm = async () => {
     if (!state.isValid) return;
 
     state.loading = true;
-    const params: ProjectGroupCreateRequestParams | Partial<ProjectGroupUpdateRequestParams> = {
+    const params: ProjectGroupCreateRequestParameters | Partial<ProjectGroupUpdateRequestParameters> = {
         name: state.projectGroupName,
     };
 
     state.showValidation = false;
 
-    if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateRequestParams);
+    if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateRequestParameters);
     else await updateProjectGroup(params);
 
     state.loading = false;

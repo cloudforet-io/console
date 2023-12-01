@@ -1,7 +1,7 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 
-export interface ProjectGroupListRequestParams {
+export interface ProjectGroupListRequestParameters {
     query?: Query;
     project_group_id?: string;
     name?: string;
