@@ -18,6 +18,7 @@ import type {
 import dayjs from 'dayjs';
 import { isEmpty, get } from 'lodash';
 
+import type { ToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -263,11 +264,6 @@ const fetchTableData = async (changed: DynamicLayoutFetchOptions = {}) => {
     typeOptionState.selectIndex = [];
 };
 
-const handleDynamicLayoutFetch = (changed) => {
-    if (tableState.schema === null || !isAllLoaded.value) return;
-    fetchTableData(changed);
-};
-
 watch(urlQueryStringFilters, (queryStringFilters) => {
     const filterQueryString = route.query.filters ?? '';
     if (queryStringFilters !== JSON.stringify(filterQueryString)) {
@@ -279,14 +275,13 @@ watch(urlQueryStringFilters, (queryStringFilters) => {
 const excelState = reactive({
     visible: false,
 });
+const excelQuery = new ApiQueryHelper()
+    .setMultiSortV2([{ key: 'created_at', desc: true }]);
 const exportCloudServiceData = async () => {
     if (!props.isServerPage) excelState.visible = true;
     else {
         const excelExportFetcher = () => {
-            const excelQuery = new ApiQueryHelper()
-                .setMultiSortV2([{ key: 'created_at', desc: true }])
-                .setFilters(hiddenFilters.value);
-
+            hiddenFilters.value.forEach((filter) => excelQuery.addFilter(filter));
             const cloudServiceExcelExportParams: ExportParameter = {
                 options: [
                     {
@@ -324,9 +319,18 @@ const handleClickSettings = () => {
 
 
 /* Actions */
+const handleDynamicLayoutFetch = (changed: ToolboxOptions = {}) => {
+    if (changed.queryTags !== undefined) {
+        apiQuery.setFiltersAsQueryTag(changed.queryTags);
+        excelQuery.setFiltersAsQueryTag(changed.queryTags);
+        cloudServiceDetailPageStore.$patch((_state) => {
+            _state.searchFilters = excelQuery.filters;
+        });
+    }
+    if (tableState.schema === null || !isAllLoaded.value) return;
+    fetchTableData(changed);
+};
 const handleClickConnectToConsole = () => { window.open(tableState.consoleLink, '_blank'); };
-
-
 /* Usage Overview */
 const handlePeriodUpdate = (period?: Period) => {
     overviewState.period = period;
