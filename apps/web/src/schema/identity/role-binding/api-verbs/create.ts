@@ -1,6 +1,6 @@
 import type { PermissionGroup } from '@/schema/identity/role-binding/type';
 
-export interface RoleCreateRequestParameters {
+export interface RoleCreateParameters {
     user_id: string;
     role_id: string;
     permission_group: PermissionGroup;

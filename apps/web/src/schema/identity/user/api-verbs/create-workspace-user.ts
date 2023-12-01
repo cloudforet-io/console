@@ -2,7 +2,7 @@ import type { Tags } from '@/schema/_common/model';
 import type { AuthType } from '@/schema/identity/user/type';
 
 
-export interface UserCreateWorkspaceUserRequestParameters {
+export interface UserCreateWorkspaceUserParameters {
     user_id: string;
     auth_type: AuthType;
     role_id: string;

@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-export interface ProjectListRequestParameters {
+export interface ProjectListParameters {
     project_id?: string;
     query?: Query;
     name?: string;

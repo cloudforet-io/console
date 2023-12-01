@@ -10,7 +10,7 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ProjectGetRequestParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 
@@ -54,7 +54,7 @@ const emitChange = () => {
 const listProjectMember = async () => {
     state.loading = true;
     try {
-        const params: ProjectGetRequestParameters = {
+        const params: ProjectGetParameters = {
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);

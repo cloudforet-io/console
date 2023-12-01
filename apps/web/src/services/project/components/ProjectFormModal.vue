@@ -10,9 +10,9 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { ProjectCreateRequestParameters } from '@/schema/identity/project/api-verbs/create';
-import type { ProjectListRequestParameters } from '@/schema/identity/project/api-verbs/list';
-import type { ProjectUpdateRequestParameters } from '@/schema/identity/project/api-verbs/udpate';
+import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
+import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -73,7 +73,7 @@ const state = reactive({
 
 const getProjectNames = async () => {
     try {
-        const params: ProjectListRequestParameters = {
+        const params: ProjectListParameters = {
             project_group_id: props.projectGroupId,
         };
         const { results }: ListResponse<ProjectModel> = await SpaceConnector.clientV2.identity.project.list(params);
@@ -84,7 +84,7 @@ const getProjectNames = async () => {
 };
 
 const createProject = async (): Promise<ProjectModel|undefined> => {
-    const params: ProjectCreateRequestParameters = {
+    const params: ProjectCreateParameters = {
         name: state.projectName.trim(),
         project_type: 'PRIVATE', // TODO: project_type
     };
@@ -97,7 +97,7 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
 const updateProject = async (): Promise<ProjectModel|undefined> => {
     let updatedProject: ProjectModel|undefined;
     try {
-        const params: ProjectUpdateRequestParameters = {
+        const params: ProjectUpdateParameters = {
             name: state.projectName.trim(),
             project_id: props.project?.project_id || router.currentRoute.params.id,
         };

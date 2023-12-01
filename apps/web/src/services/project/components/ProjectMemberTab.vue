@@ -16,8 +16,8 @@ import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/to
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ProjectGetRequestParameters } from '@/schema/identity/project/api-verbs/get';
-import type { ProjectRemoveUsersRequestParameters } from '@/schema/identity/project/api-verbs/remove-users';
+import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -101,7 +101,7 @@ const getProjectUserData = async () => {
     state.loading = true;
     state.selectIndex = [];
     try {
-        const params: ProjectGetRequestParameters = {
+        const params: ProjectGetParameters = {
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
@@ -117,7 +117,7 @@ const getProjectUserData = async () => {
 };
 const deleteProjectUser = async (items) => {
     try {
-        const params: ProjectRemoveUsersRequestParameters = {
+        const params: ProjectRemoveUsersParameters = {
             project_id: props.projectId,
             users: items.map((it) => it.user_id),
         };

@@ -103,11 +103,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { RoleCreateRequestParameters } from '@/schema/identity/role-binding/api-verbs/create';
-import type { RoleDeleteRequestParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import type { RoleListRequestParameters } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
+import type { RoleListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { UserCreateRequestParameters } from '@/schema/identity/user/api-verbs/create';
+import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import { USER_TYPE } from '@/schema/identity/user/constant';
 import type { UserType } from '@/schema/identity/user/type';
 import { store } from '@/store';
@@ -320,18 +320,18 @@ export default {
         };
 
         const bindRole = async (userId, roleId) => {
-            await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateRequestParameters>({
+            await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters>({
                 user_id: userId,
                 role_id: roleId,
             });
         };
         const unbindRole = async (userId) => {
-            const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListRequestParameters, ListResponse<RoleBindingModel>>({
+            const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListParameters, ListResponse<RoleBindingModel>>({
                 user_id: userId,
             });
             const roleBindingId = results?.[0].role_binding_id;
             if (roleBindingId) {
-                await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteRequestParameters>({
+                await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteParameters>({
                     role_binding_id: roleBindingId,
                 });
             }
@@ -341,7 +341,7 @@ export default {
                 modalLoading: true,
             });
             try {
-                await SpaceConnector.clientV2.identity.user.create<UserCreateRequestParameters>({
+                await SpaceConnector.clientV2.identity.user.create<UserCreateParameters>({
                     ...item,
                 });
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');

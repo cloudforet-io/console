@@ -12,8 +12,8 @@ import { debounce, union } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ProjectAddUsersRequestParameters } from '@/schema/identity/project/api-verbs/add-users';
-import type { ProjectGetRequestParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectAddUsersParameters } from '@/schema/identity/project/api-verbs/add-users';
+import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -175,7 +175,7 @@ const setExternalItemsInvalidTexts = async (userItem: InputItem): Promise<Extern
 /* Api */
 const addMember = async () => {
     try {
-        const params: ProjectAddUsersRequestParameters = {
+        const params: ProjectAddUsersParameters = {
             project_id: props.projectId,
             users: state.activeTab === AUTH_TYPE.INTERNAL_USER ? selectedInternalUserItems.value.map((d) => d.name) : selectedExternalUserItems.value.map((d) => d.name),
         };
@@ -187,7 +187,7 @@ const addMember = async () => {
 };
 const getProjectUserData = async () => {
     try {
-        const params: ProjectGetRequestParameters = {
+        const params: ProjectGetParameters = {
             project_id: props.projectId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
