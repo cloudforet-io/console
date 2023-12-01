@@ -29,12 +29,12 @@ import { POLICY_TYPE } from '@/services/administration/constants/policy-constant
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
 import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helper';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
 import type { PolicyType } from '@/services/administration/types/policy-type';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;
 };
-
 interface Props {
     roleId: string;
 }
@@ -42,6 +42,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     roleId: '',
 });
+
+const RolePageStore = useRolePageStore();
 
 const baseInfoState = reactive({
     title: computed(() => i18n.t('IAM.ROLE.DETAIL.BASE_INFORMATION')),
@@ -97,9 +99,7 @@ const getRoleDetailData = async (roleId) => {
     baseInfoState.loading = true;
     pageAccessState.loading = true;
     try {
-        baseInfoState.data = await SpaceConnector.client.identity.role.get({
-            role_id: roleId,
-        });
+        baseInfoState.data = await RolePageStore.getRoleDetail({ role_id: roleId });
     } catch (e) {
         ErrorHandler.handleError(e);
         baseInfoState.data = {};

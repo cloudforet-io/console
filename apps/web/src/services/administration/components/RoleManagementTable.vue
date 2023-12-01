@@ -140,7 +140,7 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', roleListApiQueryHelper.rawQueryStrings);
     }
-    await rolePageStore.listRoles(roleListApiQuery);
+    await rolePageStore.listRoles({ query: roleListApiQuery });
 };
 const handleExport = async () => {
     try {
@@ -166,7 +166,7 @@ watch(() => rolePageState.selectedIndices, (after) => {
 });
 
 (async () => {
-    await rolePageStore.listRoles(roleListApiQuery);
+    await rolePageStore.listRoles({ query: roleListApiQuery });
 })();
 </script>
 
