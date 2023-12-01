@@ -57,6 +57,13 @@ export const getCloudServiceAnalyzeQuery = (allFilters: ConsoleFilter[], page?: 
     } = cloudServiceQueryHelper.apiQuery;
     const filter_or: ApiFilter[] = filterOr ?? [];
 
+    // change the 'labels' key to 'ref_cloud_service_type.labels' key
+    filter.forEach((condition) => {
+        if (condition.k === 'labels') {
+            condition.k = 'ref_cloud_service_type.labels';
+        }
+    });
+
     // set filterOr by keyword since analyze api doesn't support keyword filter.
     if (keyword) {
         const values = keyword.split(' ');

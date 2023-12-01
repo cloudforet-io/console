@@ -98,54 +98,53 @@ const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
         { key: 'provider', desc: false },
         { key: 'cloud_service_group', desc: false },
     ]);
-const getCloudServiceResources = async () => {
+
+interface CloudServiceResource {
+    provider: string;
+    cloud_service_group: string;
+    cloud_service_type: string
+}
+
+const getCloudServiceResources = async (): Promise<CloudServiceResource[]> => {
     try {
         cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
-        const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-            {
-                labels: cloudServicePageStore.selectedCategories,
-                query: cloudServiceResourcesApiQueryHelper.data,
-            },
+        const query = getCloudServiceAnalyzeQuery(
+            cloudServicePageStore.allFilters,
+            undefined,
+            props.period,
         );
-        return results;
+        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+            query,
+        });
+        return results.map((d) => d.resources?.map((r) => ({
+            ...r,
+            provider: d.provider,
+            cloud_service_group: d.cloud_service_group,
+        })) ?? []).flat();
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
     }
 };
 
-const getExcelFields = async (data): Promise<ExcelDataField[]> => {
+const getExcelFields = async (data: CloudServiceResource): Promise<ExcelDataField[]> => {
     let schema: DynamicLayout;
     let excelField;
-    if (data.resource_type === 'inventory.Server') {
-        try {
-            schema = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: 'inventory.Server',
-                schema: 'table',
-            });
-            if (schema.options) {
-                excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
+    try {
+        schema = await SpaceConnector.client.addOns.pageSchema.get({
+            resource_type: 'inventory.CloudService',
+            schema: 'table',
+            options: {
+                provider: data.provider,
+                cloud_service_group: data.cloud_service_group,
+                cloud_service_type: data.cloud_service_type,
+            },
+        });
+        if (schema.options) {
+            excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
         }
-    } else {
-        try {
-            schema = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: 'inventory.CloudService',
-                schema: 'table',
-                options: {
-                    provider: data.provider,
-                    cloud_service_group: data.cloud_service_group,
-                    cloud_service_type: data.cloud_service_type,
-                },
-            });
-            if (schema.options) {
-                excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
     return excelField;
 };
