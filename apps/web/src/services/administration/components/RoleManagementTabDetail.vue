@@ -101,7 +101,6 @@ const getRoleDetailData = async (roleId) => {
     try {
         baseInfoState.data = await RolePageStore.getRoleDetail({ role_id: roleId });
     } catch (e) {
-        ErrorHandler.handleError(e);
         baseInfoState.data = {};
     } finally {
         baseInfoState.loading = false;

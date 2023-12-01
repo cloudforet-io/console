@@ -4,39 +4,35 @@ import { useRouter } from 'vue-router/composables';
 
 import { PHeading, PButton } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
 import RoleUpdateForm from '@/services/administration/components/RoleUpdateForm.vue';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
 
 const router = useRouter();
+
+const rolePageStore = useRolePageStore();
 
 const state = reactive({
     loading: false,
     isAllValid: false,
-    formData: {} as Partial<RoleModel>,
+    formData: {} as RoleCreateParameters,
 });
 const handleClickConfirm = async () => {
     state.loading = true;
     try {
-        await SpaceConnector.client.identity.role.create(state.formData);
+        await rolePageStore.createRole(state.formData);
         showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_CREATE_ROLE'), '');
-        SpaceRouter.router.go(-1);
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_CREATE_ROLE'));
+        router.go(-1);
     } finally {
         state.loading = false;
     }
 };
 const handleFormValidate = (isAllValid) => { state.isAllValid = isAllValid; };
-const handleUpdateForm = (data: Partial<RoleModel>) => {
+const handleUpdateForm = (data: RoleCreateParameters) => {
     state.formData = data;
 };
 </script>
