@@ -10,8 +10,6 @@ import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 import { serviceRoutes } from '@/router/service-routes';
 
-import { useWorkspaceStore } from '@/store/modules/workspace/workspace-store';
-
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
 import { initAmcharts } from '@/lib/site-initializer/amcharts';
@@ -21,16 +19,14 @@ import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
+import { initPiniaStore } from '@/lib/site-initializer/pinia-store';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
+import { initWorkspace } from '@/lib/site-initializer/workspace';
+
 
 const initConfig = async () => {
     await config.init();
-};
-const initWorkspace = () => {
-    const domainId = store.state.domain.domainId;
-    const workspaceStore = useWorkspaceStore();
-    workspaceStore.load(domainId);
 };
 
 const initQueryHelper = () => {
@@ -56,12 +52,13 @@ const removeInitializer = () => {
 
 const init = async () => {
     /* Init SpaceONE Console */
+    initPiniaStore();
     await initConfig();
     await initApiClient(store, config);
     const domainName = await initDomain(store, config);
+    await initWorkspace();
 
     if (domainName) {
-        initWorkspace();
         prefetchResources();
         initI18n();
         initDayjs();

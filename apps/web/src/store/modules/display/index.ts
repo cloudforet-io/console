@@ -6,7 +6,6 @@ import * as mutations from './mutations';
 import type { DisplayState } from './type';
 
 const state: DisplayState = {
-    isAdminMode: false,
     visibleSidebar: false,
     sidebarType: SIDEBAR_TYPE.info,
     isInitialized: false,
