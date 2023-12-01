@@ -8,5 +8,5 @@ export interface RoleListRequestParameters {
     user_id?: string;
     role_id?: string;
     role_type?: RoleType;
-    // permission_group: string;
+    workspace_id?: string;
 }
