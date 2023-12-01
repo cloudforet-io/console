@@ -127,7 +127,6 @@ const getUserDetailData = async (userId) => {
     if (userId === undefined) return;
     try {
         state.data = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParameters, UserModel>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             user_id: userId,
         });
     } catch (e) {

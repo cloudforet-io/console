@@ -136,7 +136,6 @@ export default {
             baseState.loading = true;
             try {
                 const res = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParameters, UserModel>({
-                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                     user_id: userId,
                 });
 

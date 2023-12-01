@@ -38,7 +38,6 @@ export const useUserPageStore = defineStore('user-page', {
             this.loading = true;
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListRequestParameters, ListResponse<UserModel>>({
-                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                     query: apiQuery,
                 });
                 this.users = res.results || [];

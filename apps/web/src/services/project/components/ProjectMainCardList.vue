@@ -155,7 +155,6 @@ const fetchProjectList = async (projectGroupId?: string) => {
         state.loading = true;
         const { status, response } = await listProjectFetcher({
             query: listApiQueryHelper.data,
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: _projectGroupId,
         });
         if (status === 'succeed') {

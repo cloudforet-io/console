@@ -86,7 +86,6 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { UserGetRequestParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -147,7 +146,6 @@ const getUserDetailData = async (userId) => {
     state.loading = true;
     try {
         const response = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParameters, UserModel>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             user_id: userId || props.userId,
         });
         state.data = {

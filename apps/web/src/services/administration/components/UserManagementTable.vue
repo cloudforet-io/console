@@ -323,19 +323,16 @@ export default {
             await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateRequestParameters>({
                 user_id: userId,
                 role_id: roleId,
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
         };
         const unbindRole = async (userId) => {
             const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListRequestParameters, ListResponse<RoleBindingModel>>({
                 user_id: userId,
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
             const roleBindingId = results?.[0].role_binding_id;
             if (roleBindingId) {
                 await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteRequestParameters>({
                     role_binding_id: roleBindingId,
-                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 });
             }
         };

@@ -8,7 +8,6 @@ import type { ProjectGroupListRequestParams } from '@/schema/identity/project-gr
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListRequestParams } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 
 import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
@@ -39,7 +38,6 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
     const res = {};
 
     const { results: allChildren }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list({
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['parent_group_id'],
             filter: [{
@@ -62,7 +60,6 @@ const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record
     const res: Record<string, boolean> = {};
 
     const params: ListRequestParams = {
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['project_group_id'],
             filter: [{
@@ -94,7 +91,6 @@ const getChildMap = async (groups: ProjectGroupModel[], excludeType: ProjectTree
 };
 const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
     const requestParams: ProjectGroupListRequestParams = {
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query ?? {},
     };
 
@@ -137,7 +133,6 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
     }
 
     const reqParams: ProjectListRequestParams = {
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query,
         project_group_id: params.item_id || null,
     };
@@ -162,7 +157,6 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
 const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, openItems: string[] = []): Promise<string[]> => {
     if (itemType === 'PROJECT') {
         const params: ProjectListRequestParams = {
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: itemId,
         };
         const response: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(params);
@@ -176,7 +170,6 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
         }
     } else {
         const params: ProjectGroupListRequestParams = {
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: itemId,
         };
         const response: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(params);
