@@ -4,6 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
+import type { RoleDeleteParameters } from '@/schema/identity/role/api-verbs/delete';
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
@@ -75,6 +76,17 @@ export const useRolePageStore = defineStore('role-page', {
                 showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_UPDATE_ROLE'), '');
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_UPDATE_ROLE'));
+                throw e;
+            }
+        },
+        async deleteRole(params: RoleDeleteParameters) {
+            const { role_id } = params;
+            try {
+                await SpaceConnector.client.identity.role.delete({
+                    role_id,
+                });
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
                 throw e;
             }
         },
