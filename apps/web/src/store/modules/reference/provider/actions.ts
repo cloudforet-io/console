@@ -3,7 +3,7 @@ import type { Action } from 'vuex';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { ProviderListRequestParams } from '@/schema/identity/provider/api-verbs/list';
+import type { ProviderListParameters } from '@/schema/identity/provider/api-verbs/list';
 import type { ProviderModel } from '@/schema/identity/provider/model';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
@@ -28,7 +28,7 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state,
     ) return;
 
     try {
-        const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListRequestParams>({
+        const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters>({
             domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['provider', 'name', 'tags'],
