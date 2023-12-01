@@ -19,7 +19,6 @@ import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
-import { initPiniaStore } from '@/lib/site-initializer/pinia-store';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
@@ -52,13 +51,12 @@ const removeInitializer = () => {
 
 const init = async () => {
     /* Init SpaceONE Console */
-    initPiniaStore();
     await initConfig();
     await initApiClient(store, config);
     const domainName = await initDomain(store, config);
-    await initWorkspace();
 
     if (domainName) {
+        await initWorkspace();
         prefetchResources();
         initI18n();
         initDayjs();
