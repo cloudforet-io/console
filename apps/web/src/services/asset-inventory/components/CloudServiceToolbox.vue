@@ -31,6 +31,7 @@ import CloudServiceFilterModal from '@/services/asset-inventory/components/Cloud
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
 import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
+import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
 import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
@@ -100,23 +101,22 @@ const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
     ]);
 
 interface CloudServiceResource {
-    provider: string;
-    cloud_service_group: string;
-    cloud_service_type: string
+    provider?: string;
+    cloud_service_group?: string;
+    cloud_service_type?: string
 }
 
 const getCloudServiceResources = async (): Promise<CloudServiceResource[]> => {
     try {
         cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
-        const query = getCloudServiceAnalyzeQuery(
-            cloudServicePageStore.allFilters,
-            undefined,
-            props.period,
-        );
         const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
-            query,
+            query: getCloudServiceAnalyzeQuery(
+                cloudServicePageStore.allFilters,
+                undefined,
+                props.period,
+            ),
         });
-        return results.map((d) => d.resources?.map((r) => ({
+        return (results as CloudServiceAnalyzeResult[]).map((d) => d.resources?.map((r) => ({
             ...r,
             provider: d.provider,
             cloud_service_group: d.cloud_service_group,
@@ -193,7 +193,7 @@ const getExcelPayloadList = async (): Promise<ExportOption[]> => {
         let sheetName = `${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
         sheetName = removeErrorString(sheetName);
 
-        const provider = excelItems[idx].provider;
+        const provider = excelItems[idx].provider ?? '';
         const providerName = state.providers[provider]?.label || provider;
 
         excelPayloadList.push({
