@@ -107,7 +107,7 @@ import type { RoleCreateRequestParameters } from '@/schema/identity/role-binding
 import type { RoleDeleteRequestParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleListRequestParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { UserCreateRequestParams } from '@/schema/identity/user/api-verbs/create';
+import type { UserCreateRequestParameters } from '@/schema/identity/user/api-verbs/create';
 import { USER_TYPE } from '@/schema/identity/user/constant';
 import type { UserType } from '@/schema/identity/user/type';
 import { store } from '@/store';
@@ -344,7 +344,7 @@ export default {
                 modalLoading: true,
             });
             try {
-                await SpaceConnector.clientV2.identity.user.create<UserCreateRequestParams>({
+                await SpaceConnector.clientV2.identity.user.create<UserCreateRequestParameters>({
                     ...item,
                 });
                 showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');

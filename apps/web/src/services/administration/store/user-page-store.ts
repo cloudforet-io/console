@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { UserListRequestParams } from '@/schema/identity/user/api-verbs/list';
+import type { UserListRequestParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 
@@ -37,7 +37,7 @@ export const useUserPageStore = defineStore('user-page', {
         async listUsers(apiQuery: Query) {
             this.loading = true;
             try {
-                const res = await SpaceConnector.clientV2.identity.user.list<UserListRequestParams, ListResponse<UserModel>>({
+                const res = await SpaceConnector.clientV2.identity.user.list<UserListRequestParameters, ListResponse<UserModel>>({
                     domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                     query: apiQuery,
                 });

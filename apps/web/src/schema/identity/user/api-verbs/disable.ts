@@ -1,3 +1,3 @@
-export interface UserDisableRequestParams {
+export interface UserDisableRequestParameters {
     user_id: string;
 }

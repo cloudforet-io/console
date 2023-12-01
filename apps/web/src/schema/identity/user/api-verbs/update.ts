@@ -1,7 +1,7 @@
 import type { Tags } from '@/schema/_common/model';
 
 
-export interface UserUpdateRequestParams {
+export interface UserUpdateRequestParameters {
     user_id: string;
     password?: string;
     name?: string;

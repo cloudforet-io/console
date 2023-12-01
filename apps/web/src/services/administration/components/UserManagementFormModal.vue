@@ -6,7 +6,7 @@ import { PButtonModal, PBoxTab } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { Tags } from '@/schema/_common/model';
-import type { UserGetRequestParams } from '@/schema/identity/user/api-verbs/get';
+import type { UserGetRequestParameters } from '@/schema/identity/user/api-verbs/get';
 import { USER_TYPE } from '@/schema/identity/user/constant';
 import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
@@ -126,7 +126,7 @@ const handleChangeVerify = (status) => {
 const getUserDetailData = async (userId) => {
     if (userId === undefined) return;
     try {
-        state.data = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParams, UserModel>({
+        state.data = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParameters, UserModel>({
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             user_id: userId,
         });

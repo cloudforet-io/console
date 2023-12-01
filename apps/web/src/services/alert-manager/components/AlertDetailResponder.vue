@@ -15,7 +15,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { UserListRequestParams } from '@/schema/identity/user/api-verbs/list';
+import type { UserListRequestParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
@@ -94,7 +94,7 @@ const listProjectChannel = async () => {
 const listMember = async () => {
     responderState.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.identity.user.list<UserListRequestParams, ListResponse<UserModel>>();
+        const res = await SpaceConnector.clientV2.identity.user.list<UserListRequestParameters, ListResponse<UserModel>>();
         responderState.allMember = res.results;
     } catch (e) {
         ErrorHandler.handleError(e);

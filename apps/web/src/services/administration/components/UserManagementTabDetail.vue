@@ -84,7 +84,7 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { UserGetRequestParams } from '@/schema/identity/user/api-verbs/get';
+import type { UserGetRequestParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -146,7 +146,7 @@ const state = reactive({
 const getUserDetailData = async (userId) => {
     state.loading = true;
     try {
-        const response = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParams, UserModel>({
+        const response = await SpaceConnector.clientV2.identity.user.get<UserGetRequestParameters, UserModel>({
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             user_id: userId || props.userId,
         });
