@@ -6,8 +6,11 @@ import type { ListResponse } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -63,6 +66,15 @@ export const useRolePageStore = defineStore('role-page', {
                 await SpaceConnector.clientV2.identity.role.create<RoleCreateParameters, RoleModel>(params);
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_CREATE_ROLE'));
+                throw e;
+            }
+        },
+        async updateRole(params: RoleUpdateParameters) {
+            try {
+                await SpaceConnector.clientV2.identity.role.update<RoleUpdateParameters, RoleModel>(params);
+                showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_UPDATE_ROLE'), '');
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_UPDATE_ROLE'));
                 throw e;
             }
         },

@@ -4,51 +4,45 @@ import { useRouter } from 'vue-router/composables';
 
 import { PHeading, PButton } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
+import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
 import type { RoleModel } from '@/schema/identity/role/model';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import RoleUpdateForm from '@/services/administration/components/RoleUpdateForm.vue';
 import { FORM_TYPE } from '@/services/administration/constants/role-constant';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
 
 const router = useRouter();
 const roleId = router.currentRoute.params.id;
+
+const rolePageStore = useRolePageStore();
 
 const state = reactive({
     loading: false,
     isAllValid: false,
     initialRoleData: {} as RoleModel,
-    formData: {} as Partial<RoleModel>,
+    formData: {} as RoleUpdateParameters,
 });
+
 const handleFormValidate = (isAllValid) => { state.isAllValid = isAllValid; };
-const handleUpdateForm = (data: Partial<RoleModel>) => {
+const handleUpdateForm = (data: RoleUpdateParameters) => {
     state.formData = data;
 };
 const handleClickConfirm = async () => {
     state.loading = true;
     try {
-        await SpaceConnector.client.identity.role.update({
-            role_id: roleId,
+        await rolePageStore.updateRole({
             ...state.formData,
+            role_id: roleId,
         });
-        showSuccessMessage(i18n.t('IAM.ROLE.FORM.ALT_S_UPDATE_ROLE'), '');
         router.go(-1);
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_UPDATE_ROLE'));
     } finally {
         state.loading = false;
     }
 };
 const getRoleData = async () => {
     try {
-        state.initialRoleData = await SpaceConnector.client.identity.role.get({ role_id: roleId });
+        state.initialRoleData = await rolePageStore.getRoleDetail({ role_id: roleId });
     } catch (e) {
-        ErrorHandler.handleError(e);
         state.initialRoleData = {} as RoleModel;
     }
 };
