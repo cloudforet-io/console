@@ -1,7 +1,12 @@
 import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { pinia } from '@/store/pinia';
 
 
-export const initWorkspace = async () => {
+
+export const initWorkspace = async (): Promise<string|undefined> => {
+    // NOTE: this is to use pinia store outside vue component
+    useWorkspaceStore(pinia);
+
     const workspaceStore = useWorkspaceStore();
 
     /* Workspace Load */
@@ -14,5 +19,8 @@ export const initWorkspace = async () => {
     if (!workspacePath || workspacePath === 'admin') {
         workspaceId = undefined;
     } else workspaceId = workspacePath;
+
     workspaceStore.setCurrentWorkspace(workspaceId);
+
+    return workspaceStore.getters.currentWorkspaceId;
 };

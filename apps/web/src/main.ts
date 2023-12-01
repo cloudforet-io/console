@@ -12,8 +12,9 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { pinia } from '@/store/pinia';
+
 import { siteInit } from '@/lib/site-initializer';
-import { pinia } from '@/lib/site-initializer/pinia-store';
 
 import App from './App.vue';
 
