@@ -11,7 +11,6 @@ export interface RoleModel {
     page_permissions: PagePermission[];
     tags?: Tags;
     is_managed: boolean;
-    domain_id: string;
     created_at: TimeStamp;
     updated_at: TimeStamp;
 }

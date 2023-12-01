@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/model';
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
@@ -30,11 +31,11 @@ export const useRolePageStore = defineStore('role-page', {
             const { query } = params;
             this.loading = true;
             try {
-                const res = await SpaceConnector.clientV2.identity.role.list<RoleListParameters>({
+                const { results, total_count } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
                     query,
                 });
-                this.roles = res.results;
-                this.totalCount = res.total_count;
+                this.roles = results || [];
+                this.totalCount = total_count || 0;
                 this.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
