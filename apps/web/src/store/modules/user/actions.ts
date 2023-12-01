@@ -5,7 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { setI18nLocale } from '@/translations';
 
-import { useWorkspaceStore } from '@/store/modules/workspace/workspace-store';
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
@@ -119,7 +119,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
     commit('setRoles', userRoles);
 
     const workspaceStore = useWorkspaceStore();
-    await workspaceStore.load(domainId);
+    await workspaceStore.load();
 
     commit('setIsSessionExpired', false);
 };

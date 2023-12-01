@@ -27,7 +27,3 @@ export const setIsSignInFailed: Mutation<DisplayState> = (state, isSignInFailed:
 export const setVisibleMobileGuideModal: Mutation<DisplayState> = (state, visibleMobileGuideModal: boolean): void => {
     state.visibleMobileGuideModal = visibleMobileGuideModal;
 };
-
-export const setIsAdminMode: Mutation<DisplayState> = (state, isAdminMode: boolean): void => {
-    state.isAdminMode = isAdminMode;
-};

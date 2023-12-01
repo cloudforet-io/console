@@ -17,8 +17,6 @@ import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
-export const isAdminMode: Getter<DisplayState, any> = (state): boolean => state.isAdminMode;
-
 export const isHandbookVisible: Getter<DisplayState, any> = (state): boolean => state.visibleSidebar && state.sidebarType === SIDEBAR_TYPE.handbook;
 
 export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarProps> => {

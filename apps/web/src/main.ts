@@ -3,7 +3,7 @@ import Fragment from 'vue-fragment';
 
 import LottieVuePlayer from '@lottiefiles/vue-lottie-player';
 import SpaceDesignSystem from '@spaceone/design-system';
-import { PiniaVuePlugin, createPinia } from 'pinia';
+import { PiniaVuePlugin } from 'pinia';
 import PortalVue from 'portal-vue';
 import VTooltip from 'v-tooltip';
 
@@ -12,10 +12,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useWorkspaceStore } from '@/store/modules/workspace/workspace-store';
-import { resetStore } from '@/store/reset-pinia-store';
-
 import { siteInit } from '@/lib/site-initializer';
+import { pinia } from '@/lib/site-initializer/pinia-store';
 
 import App from './App.vue';
 
@@ -23,6 +21,7 @@ import '@/styles/style.pcss';
 // eslint-disable-next-line
 import '@spaceone/design-system/css/light-style.css';
 import '@spaceone/design-system/dist/style.css';
+
 
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(Fragment.Plugin);
@@ -39,10 +38,6 @@ Vue.use(SpaceDesignSystem, { vueI18n: i18n });
 
 Vue.config.devtools = import.meta.env.DEV;
 Vue.config.productionTip = import.meta.env.DEV;
-
-const pinia = createPinia();
-useWorkspaceStore(pinia);
-pinia.use(resetStore);
 
 /** ********** INITIALIZE ************** */
 (async () => {
