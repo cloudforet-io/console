@@ -5,7 +5,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -39,23 +38,6 @@ export const checkDuplicateID = async (userID: string) => {
     if (total_count && total_count > 0) {
         validation.isValid = false;
         validation.invalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
-    }
-    return validation;
-};
-
-export const checkOauth = async (userID: string) => {
-    const validation = {
-        isValid: true,
-        invalidText: '' as TranslateResult,
-    };
-    try {
-        await SpaceConnector.client.identity.user.find({
-            search: { user_id: userID },
-            domain_id: store.state.domain.domainId,
-        });
-    } catch (e) {
-        validation.isValid = false;
-        validation.invalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
     }
     return validation;
 };
