@@ -93,13 +93,6 @@ const excelState = reactive({
 });
 
 /* excel */
-const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
-    .setPageLimit(0).setPageStart(1)
-    .setMultiSort([
-        { key: 'provider', desc: false },
-        { key: 'cloud_service_group', desc: false },
-    ]);
-
 interface CloudServiceResource {
     provider?: string;
     cloud_service_group?: string;
@@ -108,7 +101,6 @@ interface CloudServiceResource {
 
 const getCloudServiceResources = async (): Promise<CloudServiceResource[]> => {
     try {
-        cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
         const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
             query: getCloudServiceAnalyzeQuery(
                 cloudServicePageStore.allFilters,
