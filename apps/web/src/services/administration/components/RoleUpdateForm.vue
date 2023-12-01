@@ -17,12 +17,9 @@ import PolicyListDataTable from '@/services/administration/components/PolicyList
 import RoleUpdatePageAccessForm from '@/services/administration/components/RoleUpdatePageAccessForm.vue';
 import RoleUpdatePageBaseInformation from '@/services/administration/components/RoleUpdatePageBaseInformation.vue';
 import { FORM_TYPE } from '@/services/administration/constants/role-constant';
+import type { BaseInfoFormData } from '@/services/administration/types/role-form-type';
 
-export interface BaseInfoFormData {
-    roleName: string;
-    roleDescription?: string;
-    roleType: RoleType;
-}
+
 interface FormData {
     name: string;
     role_type: RoleType;
