@@ -288,20 +288,6 @@ export default {
         const handleBackToListButtonClick = () => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
         };
-        // TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외
-        // const handleSendEmailConfirm = async () => {
-        //     try {
-        //         await SpaceConnector.client.board.post.sendNotification({
-        //             post_id: props.postId,
-        //             board_id: props.boardId,
-        //         });
-        //         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_SEND_EMAIL'), '');
-        //     } catch (e) {
-        //         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_SEND_EMAIL'));
-        //     } finally {
-        //         modalState.sendEmailModalVisible = false;
-        //     }
-        // };
         const handleDeleteNoticeConfirm = async () => {
             try {
                 await SpaceConnector.client.board.post.delete({
