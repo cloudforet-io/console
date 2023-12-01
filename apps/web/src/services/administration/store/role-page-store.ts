@@ -3,9 +3,11 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/model';
+import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
+import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -53,6 +55,14 @@ export const useRolePageStore = defineStore('role-page', {
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
+        async createRole(params: RoleCreateParameters) {
+            try {
+                await SpaceConnector.clientV2.identity.role.create(params);
+            } catch (e: any) {
+                ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.FORM.ALT_E_CREATE_ROLE'));
                 throw e;
             }
         },

@@ -5,8 +5,9 @@ import {
 
 import { PHeading } from '@spaceone/design-system';
 
+import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleModel } from '@/schema/identity/role/model';
-import type { RoleType, Policy } from '@/schema/identity/role/type';
+import type { Policy } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
 import type { PagePermission } from '@/lib/access-control/config';
@@ -19,16 +20,6 @@ import RoleUpdatePageBaseInformation from '@/services/administration/components/
 import { FORM_TYPE } from '@/services/administration/constants/role-constant';
 import type { BaseInfoFormData } from '@/services/administration/types/role-form-type';
 
-
-interface FormData {
-    name: string;
-    role_type: RoleType;
-    policies: Policy[];
-    page_permissions: PagePermission[];
-    tags: {
-        description?: string;
-    };
-}
 interface Props {
     initialRoleData?: RoleModel;
     formType?: string;
@@ -40,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
-    (e: 'update-form-data', after: FormData): void,
+    (e: 'update-form-data', after: RoleCreateParameters): void,
 }>();
 
 const state = reactive({
@@ -49,10 +40,11 @@ const state = reactive({
     pageAccessFormData: [] as PagePermission[],
     initialSelectedPolicyList: [] as Policy[],
     isAllValid: computed<boolean>(() => isPolicySectionValid.value && state.isBaseInformationValid),
-    formData: computed<FormData>(() => ({
+    formData: computed<RoleCreateParameters>(() => ({
         name: state.baseInfoFormData.roleName?.trim(),
         role_type: state.baseInfoFormData.roleType,
-        policies: selectedPolicyList.value,
+        // TODO: will be check after api is merged
+        api_permissions: [],
         page_permissions: state.pageAccessFormData,
         tags: {
             description: state.baseInfoFormData.roleDescription,
@@ -62,22 +54,22 @@ const state = reactive({
 
 const {
     forms: {
-        selectedPolicyList,
+        selectedApiPermissionList,
     },
     setForm,
     invalidState,
     invalidTexts,
     isAllValid: isPolicySectionValid,
 } = useFormValidator({
-    selectedPolicyList: [] as Policy[],
+    selectedApiPermissionList: [] as string[],
 }, {
-    selectedPolicyList(val: Policy[]) {
+    selectedApiPermissionList(val: string[]) {
         if (!val.length) return i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY');
         return true;
     },
 });
 
-const handleUpdatePolicy = (value) => { setForm('selectedPolicyList', value); };
+const handleUpdatePolicy = (value) => { setForm('selectedApiPermissionList', value); };
 const handleBaseInfoValidate = (value: boolean) => {
     state.isBaseInformationValid = value;
 };
@@ -99,9 +91,9 @@ watch(() => props.initialRoleData, (initialRoleData) => {
         roleType: initialRoleData?.role_type,
     };
     state.pageAccessFormData = props.initialRoleData?.page_permissions;
-    if (initialRoleData?.policies?.length) {
-        state.initialSelectedPolicyList = initialRoleData.policies;
-        setForm('selectedPolicyList', initialRoleData.policies);
+    if (initialRoleData?.api_permissions?.length) {
+        state.initialSelectedPolicyList = initialRoleData.api_permissions;
+        setForm('selectedApiPermissionList', initialRoleData.api_permissions);
     }
 });
 </script>
@@ -127,16 +119,16 @@ watch(() => props.initialRoleData, (initialRoleData) => {
                            :title="$t('IAM.ROLE.DETAIL.API_POLICY')"
                 >
                     <template #extra>
-                        <span class="selected-count">({{ selectedPolicyList.length }} {{ $t('IAM.ROLE.FORM.SELECTED') }})</span>
+                        <span class="selected-count">({{ selectedApiPermissionList.length }} {{ $t('IAM.ROLE.FORM.SELECTED') }})</span>
                     </template>
                 </p-heading>
             </template>
             <template #toolbox-table-bottom>
                 <div class="help-text-wrapper">
-                    <p v-if="invalidState.selectedPolicyList"
+                    <p v-if="invalidState.selectedApiPermissionList"
                        class="policy-list-invalid-text"
                     >
-                        {{ invalidTexts.selectedPolicyList }}
+                        {{ invalidTexts.selectedApiPermissionList }}
                     </p>
                 </div>
             </template>
