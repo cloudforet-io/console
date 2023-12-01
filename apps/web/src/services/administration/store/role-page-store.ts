@@ -1,14 +1,13 @@
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-
-
 
 interface RolePageState {
     loading: boolean;
@@ -28,14 +27,15 @@ export const useRolePageStore = defineStore('role-page', {
         selectedRoles: (state) => state.selectedIndices.map((d) => state.roles[d]) || [],
     },
     actions: {
-        async listRoles(apiQuery: Query) {
+        async listRoles(params: RoleListParameters) {
+            const { query } = params;
             this.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.role.list({
-                    query: apiQuery,
+                const { results, total_count } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+                    query,
                 });
-                this.roles = res.results;
-                this.totalCount = res.total_count;
+                this.roles = results || [];
+                this.totalCount = total_count || 0;
                 this.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -43,6 +43,17 @@ export const useRolePageStore = defineStore('role-page', {
                 this.totalCount = 0;
             } finally {
                 this.loading = false;
+            }
+        },
+        async getRoleDetail(params: RoleGetParameters) {
+            const { role_id } = params;
+            try {
+                return await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
+                    role_id,
+                });
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
             }
         },
     },

@@ -2,7 +2,6 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { MENU_ID } from '@/lib/menu/config';
 
-
 export const ROLE_TYPE_BADGE_OPTION = {
     [ROLE_TYPE.DOMAIN_ADMIN]: { label: 'Admin', styleType: 'primary1' },
     [ROLE_TYPE.WORKSPACE_OWNER]: { label: 'Workspace Owner', styleType: 'secondary1' },

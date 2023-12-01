@@ -57,13 +57,12 @@ const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 
 const router = useRouter();
-
 const currentRoute = router.currentRoute;
+
 const roleListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
     .setSort('name', true)
     .setFiltersAsRawQueryString(currentRoute.query?.filters);
-
 const roleSearchHandler = reactive({
     keyItemSets: [{
         title: 'Properties',
@@ -81,6 +80,7 @@ const roleSearchHandler = reactive({
         created_at: makeDistinctValueHandler('identity.Role', 'created_at', 'datetime'),
     },
 });
+
 const state = reactive({
     dropdownMenu: computed(() => ([
         {
@@ -118,7 +118,6 @@ let roleListApiQuery = roleListApiQueryHelper.data;
 const openDeleteModal = () => {
     state.deleteModalVisible = true;
 };
-// event
 const handleCreateRole = () => { router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME }); };
 const handleEditRole = (id: string) => { router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
 const handleSelectDropdown = (name) => {
@@ -141,7 +140,7 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', roleListApiQueryHelper.rawQueryStrings);
     }
-    await rolePageStore.listRoles(roleListApiQuery);
+    await rolePageStore.listRoles({ query: roleListApiQuery });
 };
 const handleExport = async () => {
     try {
@@ -158,10 +157,6 @@ const handleExport = async () => {
         ErrorHandler.handleError(e);
     }
 };
-(async () => {
-    await rolePageStore.listRoles(roleListApiQuery);
-})();
-
 const saveSelectedValueToStore = (selectedIndices: number[]) => {
     rolePageStore.$patch({ selectedIndices });
 };
@@ -169,6 +164,10 @@ const saveSelectedValueToStore = (selectedIndices: number[]) => {
 watch(() => rolePageState.selectedIndices, (after) => {
     saveSelectedValueToStore(after);
 });
+
+(async () => {
+    await rolePageStore.listRoles({ query: roleListApiQuery });
+})();
 </script>
 
 <template>
