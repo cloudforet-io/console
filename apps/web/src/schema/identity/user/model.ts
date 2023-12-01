@@ -26,11 +26,4 @@ export interface UserSummaryModel {
     user_id: string;
     name: string;
     state: UserState;
-    email: string;
-    auth_type: AuthType;
-    role_type: RoleType;
-    tags: Tags;
-    domain_id: string;
-    created_at: TimeStamp;
-    last_accessed_at: TimeStamp;
 }
