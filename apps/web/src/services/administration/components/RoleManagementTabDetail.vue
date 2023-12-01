@@ -1,16 +1,155 @@
+<script lang="ts" setup>
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+
+import {
+    PLink, PBadge, PDataTable, PDefinitionTable, PHeading,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import type { PolicyModel } from '@/schema/identity/policy/model';
+import type { RoleModel } from '@/schema/identity/role/model';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import {
+    usePageAccessDefinitionTableData,
+} from '@/services/administration/composables/page-access-definition-table-data';
+import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helper';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import type { PolicyType } from '@/services/administration/types/policy-type';
+
+type DataTableTranslationField = DataTableField | {
+    label?: TranslateResult | string;
+};
+
+interface Props {
+    roleId: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    roleId: '',
+});
+
+const baseInfoState = reactive({
+    title: computed(() => i18n.t('IAM.ROLE.DETAIL.BASE_INFORMATION')),
+    loading: true,
+    timezone: computed(() => store.state.user.timezone || 'UTC'),
+    fields: computed<DataTableTranslationField[]>(() => [
+        { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') },
+        { name: 'tags.description', label: i18n.t('IAM.ROLE.DETAIL.DESCRIPTION') },
+        { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE'), disableCopy: true },
+        { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
+    ]),
+    data: {} as Partial<RoleModel>,
+    pagePermissions: computed(() => baseInfoState.data?.page_permissions),
+});
+const pageAccessState = reactive({
+    title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
+    loading: false,
+    pageAccessDataList: usePageAccessDefinitionTableData(computed(() => baseInfoState.pagePermissions ?? [])),
+});
+const policyState = reactive({
+    fields: [
+        { name: 'name', label: 'Policy Name' },
+        { name: 'policy_type', label: 'Policy Type' },
+        { name: 'policy_id', label: 'Policy ID', sortable: false },
+        { name: 'tags.description', label: 'Policy Description', sortable: false },
+    ] as DataTableField[],
+    items: [] as (PolicyModel | { policy_type: PolicyType })[],
+});
+
+/* Api */
+const getPolicy = async (policy) => {
+    try {
+        let res;
+        if (policy.policy_type === POLICY_TYPE.MANAGED) {
+            res = await SpaceConnector.client.repository.policy.get({
+                policy_id: policy.policy_id,
+                policy_type: policy.policy_type,
+            });
+        } else {
+            res = await SpaceConnector.client.identity.policy.get({
+                policy_id: policy.policy_id,
+                policy_type: policy.policy_type,
+            });
+        }
+        res.policy_type = policy.policy_type;
+        return res;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return undefined;
+    }
+};
+const getRoleDetailData = async (roleId) => {
+    baseInfoState.loading = true;
+    pageAccessState.loading = true;
+    try {
+        baseInfoState.data = await SpaceConnector.client.identity.role.get({
+            role_id: roleId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        baseInfoState.data = {};
+    } finally {
+        baseInfoState.loading = false;
+        pageAccessState.loading = false;
+    }
+};
+const convertPagePermissionLabel = (data) => {
+    switch (data) {
+    case PAGE_PERMISSION_TYPE.MANAGE:
+        return i18n.t('IAM.ROLE.FORM.MANAGE');
+    case PAGE_PERMISSION_TYPE.VIEW:
+        return i18n.t('IAM.ROLE.FORM.VIEW');
+    default:
+        return '--';
+    }
+};
+
+/* Init */
+const initPolicy = async (policies) => {
+    policyState.items = [];
+    await Promise.all(policies.map(async (policy) => {
+        const result = await getPolicy(policy);
+        if (result) policyState.items.push(result);
+    }));
+};
+
+/* Watcher */
+watch(() => props.roleId, async () => {
+    const roleId = props.roleId;
+    await getRoleDetailData(roleId);
+    //
+    await initPolicy(baseInfoState.data.policies ?? []);
+}, { immediate: true });
+</script>
+
 <template>
     <div>
         <p-heading heading-type="sub"
-                   :title="title"
+                   :title="baseInfoState.title"
         />
-        <p-definition-table :fields="fields"
+        <p-definition-table :fields="policyState.fields"
                             :data="data"
-                            :loading="loading"
+                            :loading="baseInfoState.loading"
                             :skeleton-rows="4"
                             v-on="$listeners"
         >
             <template #data-created_at="{ data }">
-                {{ iso8601Formatter(data, timezone) }}
+                {{ iso8601Formatter(data, baseInfoState.timezone) }}
             </template>
             <template #data-role_type="{ data }">
                 <p-badge v-if="data"
@@ -48,7 +187,7 @@
         </p-heading>
         <p-data-table :fields="policyState.fields"
                       :items="policyState.items"
-                      :loading="loading"
+                      :loading="baseInfoState.loading"
                       :sortable="true"
                       sort-by="name"
                       :sort-desc="true"
@@ -77,169 +216,6 @@
     </div>
 </template>
 
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-import type { TranslateResult } from 'vue-i18n';
-
-import {
-    PLink, PBadge, PDataTable, PDefinitionTable, PHeading,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { iso8601Formatter } from '@cloudforet/utils';
-
-import type { PolicyModel } from '@/schema/identity/policy/model';
-import type { RoleModel } from '@/schema/identity/role/model';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import {
-    usePageAccessDefinitionTableData,
-} from '@/services/administration/composables/page-access-definition-table-data';
-import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
-import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helper';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import type { PolicyType } from '@/services/administration/types/policy-type';
-
-
-type DataTableTranslationField = DataTableField | {
-    label?: TranslateResult | string;
-};
-
-export default {
-    name: 'RoleManagementTabDetail',
-    components: {
-        PDefinitionTable,
-        PHeading,
-        PBadge,
-        PDataTable,
-        PLink,
-    },
-    props: {
-        roleId: {
-            type: String,
-            required: true,
-            default: '',
-        },
-    },
-    setup(props) {
-        const baseInfoState = reactive({
-            title: computed(() => i18n.t('IAM.ROLE.DETAIL.BASE_INFORMATION')),
-            loading: true,
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
-            fields: computed<DataTableTranslationField[]>(() => [
-                { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') },
-                { name: 'tags.description', label: i18n.t('IAM.ROLE.DETAIL.DESCRIPTION') },
-                { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE'), disableCopy: true },
-                { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
-            ]),
-            data: {} as Partial<RoleModel>,
-            pagePermissions: computed(() => baseInfoState.data?.page_permissions),
-        });
-        const pageAccessState = reactive({
-            title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
-            loading: false,
-            pageAccessDataList: usePageAccessDefinitionTableData(computed(() => baseInfoState.pagePermissions ?? [])),
-        });
-        const policyState = reactive({
-            fields: [
-                { name: 'name', label: 'Policy Name' },
-                { name: 'policy_type', label: 'Policy Type' },
-                { name: 'policy_id', label: 'Policy ID', sortable: false },
-                { name: 'tags.description', label: 'Policy Description', sortable: false },
-            ] as DataTableField[],
-            items: [] as (PolicyModel | { policy_type: PolicyType })[],
-        });
-
-        /* Api */
-        const getPolicy = async (policy) => {
-            try {
-                let res;
-                if (policy.policy_type === POLICY_TYPE.MANAGED) {
-                    res = await SpaceConnector.client.repository.policy.get({
-                        policy_id: policy.policy_id,
-                        policy_type: policy.policy_type,
-                    });
-                } else {
-                    res = await SpaceConnector.client.identity.policy.get({
-                        policy_id: policy.policy_id,
-                        policy_type: policy.policy_type,
-                    });
-                }
-                res.policy_type = policy.policy_type;
-                return res;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return undefined;
-            }
-        };
-        const getRoleDetailData = async (roleId) => {
-            baseInfoState.loading = true;
-            pageAccessState.loading = true;
-            try {
-                baseInfoState.data = await SpaceConnector.client.identity.role.get({
-                    role_id: roleId,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                baseInfoState.data = {};
-            } finally {
-                baseInfoState.loading = false;
-                pageAccessState.loading = false;
-            }
-        };
-        const convertPagePermissionLabel = (data) => {
-            switch (data) {
-            case PAGE_PERMISSION_TYPE.MANAGE:
-                return i18n.t('IAM.ROLE.FORM.MANAGE');
-            case PAGE_PERMISSION_TYPE.VIEW:
-                return i18n.t('IAM.ROLE.FORM.VIEW');
-            default:
-                return '--';
-            }
-        };
-
-        /* Init */
-        const initPolicy = async (policies) => {
-            policyState.items = [];
-            await Promise.all(policies.map(async (policy) => {
-                const result = await getPolicy(policy);
-                if (result) policyState.items.push(result);
-            }));
-        };
-
-        /* Watcher */
-        watch(() => props.roleId, async () => {
-            const roleId = props.roleId;
-            await getRoleDetailData(roleId);
-            //
-            await initPolicy(baseInfoState.data.policies ?? []);
-        }, { immediate: true });
-
-        return {
-            ...toRefs(baseInfoState),
-            pageAccessState,
-            policyState,
-            iso8601Formatter,
-            ROLE_TYPE_BADGE_OPTION,
-            PAGE_PERMISSION_TYPE,
-            convertPagePermissionLabel,
-            policyTypeBadgeColorFormatter,
-            ADMINISTRATION_ROUTE,
-            ACTION_ICON,
-        };
-    },
-};
-</script>
 <style lang="postcss" scoped>
 .definition-table-header {
     @apply ml-4 mb-3 text-violet-700 font-bold;

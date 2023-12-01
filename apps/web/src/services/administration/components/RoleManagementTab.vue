@@ -1,3 +1,55 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+import { useRouter } from 'vue-router/composables';
+
+import {
+    PEmpty, PTab, PDataTable, PBadge, PButton,
+} from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+
+import { i18n } from '@/translations';
+
+import RoleManagementTabDetail from '@/services/administration/components/RoleManagementTabDetail.vue';
+import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
+const rolePageStore = useRolePageStore();
+const rolePageState = rolePageStore.$state;
+
+const router = useRouter();
+
+const state = reactive({
+    fields: computed<DataTableField[]>(() => ([
+        { name: 'name', label: 'Name' },
+        { name: 'tags.description', label: 'Description', sortable: false },
+        { name: 'role_type', label: 'Role Type' },
+        { name: 'created_at', label: 'Created', sortable: false },
+        { name: 'edit_button', label: ' ', sortable: false },
+    ])),
+    selectedRoleId: computed(() => rolePageStore.selectedRoles[0]?.role_id),
+});
+
+const singleItemTabState = reactive({
+    tabs: computed<TabItem[]>(() => ([
+        { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
+    ])),
+    activeTab: 'detail',
+});
+
+const multiItemTabState = reactive({
+    tabs: computed<TabItem[]>(() => ([
+        { name: 'data', label: i18n.t('IAM.ROLE.DETAIL.SELECTED_DATA'), keepAlive: true },
+    ])),
+    activeTab: 'data',
+});
+
+const handleEditRole = (id: string) => { router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
+</script>
+
 <template>
     <section>
         <p-tab v-if="rolePageState.selectedIndices.length === 1"
@@ -5,7 +57,7 @@
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <role-management-tab-detail :role-id="selectedRoleId" />
+                <role-management-tab-detail :role-id="state.selectedRoleId" />
             </template>
         </p-tab>
         <p-tab v-else-if="rolePageState.selectedIndices.length > 1"
@@ -13,7 +65,7 @@
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table :fields="fields"
+                <p-data-table :fields="state.fields"
                               :sortable="false"
                               :selectable="false"
                               :items="rolePageStore.selectedRoles"
@@ -53,81 +105,6 @@
         </div>
     </section>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PEmpty, PTab, PDataTable, PBadge, PButton,
-} from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
-
-import RoleManagementTabDetail from '@/services/administration/components/RoleManagementTabDetail.vue';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import { useRolePageStore } from '@/services/administration/store/role-page-store';
-
-
-export default {
-    name: 'RoleManagementTab',
-    components: {
-        PEmpty,
-        PTab,
-        PDataTable,
-        PBadge,
-        PButton,
-        RoleManagementTabDetail,
-    },
-    setup() {
-        const rolePageStore = useRolePageStore();
-        const rolePageState = rolePageStore.$state;
-
-        const state = reactive({
-            fields: computed<DataTableField[]>(() => ([
-                { name: 'name', label: 'Name' },
-                { name: 'tags.description', label: 'Description', sortable: false },
-                { name: 'role_type', label: 'Role Type' },
-                { name: 'created_at', label: 'Created', sortable: false },
-                { name: 'edit_button', label: ' ', sortable: false },
-            ])),
-            selectedRoleId: computed(() => rolePageStore.selectedRoles[0]?.role_id),
-        });
-
-        const singleItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => ([
-                { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
-            ])),
-            activeTab: 'detail',
-        });
-
-        const multiItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => ([
-                { name: 'data', label: i18n.t('IAM.ROLE.DETAIL.SELECTED_DATA'), keepAlive: true },
-            ])),
-            activeTab: 'data',
-        });
-
-        const handleEditRole = (id: string) => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
-
-        return {
-            ...toRefs(state),
-            singleItemTabState,
-            multiItemTabState,
-            rolePageStore,
-            rolePageState,
-            handleEditRole,
-            ROLE_TYPE_BADGE_OPTION,
-        };
-    },
-
-};
-</script>
 
 <style lang="postcss" scoped>
 #empty-space {
