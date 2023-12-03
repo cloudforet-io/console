@@ -31,19 +31,20 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state,
         const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters>({
             domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
-                only: ['provider', 'name', 'tags'],
+                only: ['provider', 'name'],
             },
+            workspace_id: undefined,
         }, { timeout: 3000 });
         const providers: ProviderReferenceMap = {};
 
         (response.results ?? []).forEach((providerInfo): void => {
             providers[providerInfo.provider] = {
                 key: providerInfo.provider,
-                label: providerInfo.tags.label || providerInfo.name,
+                label: providerInfo.alias || providerInfo.name,
                 name: providerInfo.name,
-                icon: assetUrlConverter(providerInfo.tags.icon),
-                color: providerInfo.tags.color || indigo[400],
-                linkTemplate: providerInfo.tags.external_link_template,
+                icon: assetUrlConverter(providerInfo.icon),
+                color: providerInfo.color || indigo[400],
+                linkTemplate: providerInfo.tags?.external_link_template,
             };
         });
 
@@ -59,11 +60,11 @@ export const sync: Action<ProviderReferenceState, any> = ({ state, commit }, pro
         ...state.items,
         [providerInfo.provider]: {
             key: providerInfo.provider,
-            label: providerInfo.tags.label || providerInfo.name,
+            label: providerInfo.alias || providerInfo.name,
             name: providerInfo.name,
-            icon: assetUrlConverter(providerInfo.tags.icon),
-            color: providerInfo.tags.color || indigo[400],
-            linkTemplate: providerInfo.tags.external_link_template,
+            icon: assetUrlConverter(providerInfo.icon),
+            color: providerInfo.color || indigo[400],
+            linkTemplate: providerInfo.tags?.external_link_template,
         },
     };
     commit('setProviders', providers);

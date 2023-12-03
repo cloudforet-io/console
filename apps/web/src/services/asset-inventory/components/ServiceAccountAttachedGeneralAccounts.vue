@@ -45,6 +45,8 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -86,8 +88,8 @@ export default defineComponent({
         const getAttachedGeneralAccountList = async () => {
             state.loading = true;
             try {
-                const { results } = await SpaceConnector.client.identity.serviceAccount.list({
-                    trusted_service_account_id: props.serviceAccountId,
+                const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+                    trusted_account_id: props.serviceAccountId,
                     query: apiQueryHelper.setSort(state.sortBy, state.sortDesc).data,
                 });
                 state.items = results;

@@ -62,7 +62,9 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { CredentialModel } from '@/schema/secret/secret/model';
 import { i18n } from '@/translations';
@@ -233,10 +235,9 @@ export default defineComponent<Props>({
         };
         const updateServiceAccount = async () => {
             try {
-                await SpaceConnector.client.identity.serviceAccount.update({
+                await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
                     service_account_id: props.serviceAccountId,
-                    trusted_service_account_id: state.credentialForm.attachedTrustedAccountId ?? '',
-                    release_trusted_service_account: !state.credentialForm.attachedTrustedAccountId,
+                    trusted_account_id: state.credentialForm.attachedTrustedAccountId ?? '',
                 });
             } catch (e) {
                 ErrorHandler.handleError(e);
