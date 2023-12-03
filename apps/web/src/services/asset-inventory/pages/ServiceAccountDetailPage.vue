@@ -86,6 +86,7 @@ const getProviderData = async (provider:string) => {
         state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>({
             domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             provider,
+            workspace_id: undefined,
         });
     } catch (e) {
         ErrorHandler.handleError(e);

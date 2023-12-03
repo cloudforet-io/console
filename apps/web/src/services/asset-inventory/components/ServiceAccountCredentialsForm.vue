@@ -301,6 +301,7 @@ export default defineComponent<Props>({
                 const result = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters>({
                     domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                     provider,
+                    workspace_id: undefined,
                 });
                 state.providerData = result;
                 const supportedSchema = result?.capability?.supported_schema;
