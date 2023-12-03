@@ -166,7 +166,7 @@ export const useQueryTags = ({ keyItemSets, referenceStore }: Options) => {
         keyItemSets: computed(() => state.keyItemSets),
         filters: computed<ConsoleFilter[]>(() => state.filters),
         queryTags: computed<QueryTag[]>(() => state.queryTags),
-        urlQueryStringFilters: computed<string>(() => ''),
+        urlQueryStringFilters: computed<string[]>(() => queryHelper.setFilters(state.filters).rawQueryStrings),
         setKeyItemSets,
         setFilters,
         getFilters,

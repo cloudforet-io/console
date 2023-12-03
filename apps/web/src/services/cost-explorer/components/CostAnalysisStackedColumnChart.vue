@@ -83,6 +83,12 @@ const drawChart = () => {
     else if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) timeUnit = 'year';
     xAxis.get('baseInterval').timeUnit = timeUnit;
 
+    // get stacked chart data of daily chart
+    let _chartData = cloneDeep(props.chartData);
+    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
+        _chartData = getStackedChartData(props.chartData, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
+    }
+
     // set date format for daily chart
     if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
         xAxis.setAll({
@@ -93,20 +99,20 @@ const drawChart = () => {
     }
 
     // set label adapter of yAxis
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    yAxis.get('renderer').remove('labels');
     yAxis.get('renderer').labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
-            return numberFormatter(Number(convertedText));
+            const num = Number(convertedText);
+            if (Number.isNaN(num)) return text;
+            return numberFormatter(num) ?? '';
         }
         return text;
     });
 
-    // get stacked chart data of daily chart
-    let _chartData = cloneDeep(props.chartData);
-    if (costAnalysisPageState.granularity === GRANULARITY.DAILY) {
-        _chartData = getStackedChartData(props.chartData, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
-    }
-
+    // set min value of yAxis
     const _tooltipDateFormat = getTooltipDateFormatByGranularity(costAnalysisPageState.granularity);
     props.legends.forEach((legend) => {
         // create series
@@ -118,6 +124,7 @@ const drawChart = () => {
         };
         if (legend.color) seriesSettings.fill = chartHelper.color(legend.color);
         const series = chartHelper.createXYColumnSeries(chart, seriesSettings);
+
         chart.series.push(series);
 
         // set data processor
@@ -140,7 +147,7 @@ const drawChart = () => {
         });
         const seriesColor = series.get('fill')?.toString();
         tooltip.label.adapters.add('text', (text, target) => {
-            const dataContext = target?.dataItem?.dataContext;
+            const dataContext = target?.dataItem?.dataContext as XYChartData|undefined;
             if (dataContext) {
                 const date = dayjs.utc(dataContext.date).format(_tooltipDateFormat);
                 let value = dataContext[legend.name];
@@ -154,7 +161,7 @@ const drawChart = () => {
         // set opacity if today / this month / this year
         const today = dayjs.utc();
         series.columns.template.adapters.add('fillOpacity', (fillOpacity, target) => {
-            const _targetData = target.dataItem?.dataContext?.date;
+            const _targetData = (target.dataItem?.dataContext as XYChartData|undefined)?.date;
             if (_targetData && today.isSame(dayjs.utc(_targetData), timeUnit)) {
                 return 0.5;
             }

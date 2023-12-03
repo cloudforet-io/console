@@ -44,6 +44,7 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const cloudServiceDetailPageStoreState = cloudServiceDetailPageStore.$state;
 
 
 const MAIN_TABLE = 'Main Table';
@@ -66,7 +67,7 @@ const state = reactive({
 const apiQuery = new ApiQueryHelper();
 const getCloudServiceListQuery = () => {
     apiQuery.setMultiSortV2([{ key: 'created_at', desc: true }])
-        .setFilters(props.hiddenFilters);
+        .setFilters(props.hiddenFilters.concat(cloudServiceDetailPageStoreState.searchFilters));
     return apiQuery.data;
 };
 

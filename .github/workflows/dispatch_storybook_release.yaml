@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 20
 
       - name: Restore cached node_modules
         id: restore-node-cache
@@ -37,9 +37,6 @@ jobs:
       - name: Build
         env:
           NODE_ENV: "production"
-          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-          TURBO_API: "http://localhost:3000"
         run: |
           npm run build -- --filter=storybook --output-logs=new-only
 

@@ -103,9 +103,11 @@ export const createXYDateChart = (root: Root, settings?: IXYChartSettings, dateA
     yRenderer.labels.template.adapters.add('text', (text) => {
         if (text) {
             const convertedText = text.replace(/,/g, '');
-            return numberFormatter(Number(convertedText), { notation: 'compact' });
+            const num = Number(convertedText);
+            if (Number.isNaN(num)) return text;
+            return numberFormatter(num, { notation: 'compact' }) ?? '';
         }
-        return text;
+        return text ?? '';
     });
     const yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {
         renderer: yRenderer,
@@ -282,7 +284,7 @@ export const setXYSharedTooltipTextWithRate = (chart: am5xy.XYChart, tooltip: am
         });
         let _text = `Total: [bold; fontSize: 14px]${numberFormatter(totalValue)}[/]`;
         seriesList.forEach((s) => {
-            const rate = Math.round((s.value / totalValue) * 100);
+            const rate = totalValue ? Math.round((s.value / totalValue) * 100) : 0;
             _text += `\n[${s.color}; fontSize: 10px]●[/] [fontSize: 14px;}]${s.name}:[/] [bold; fontSize: 14px]${numberFormatter(s.value)}[/] (${rate}%)`;
         });
         return _text;

@@ -38,10 +38,6 @@ commitlint.config.cjs
 **/playwright.config.ts
 **/__tests__
 
-# Skaffold
-**/skaffold.template.yaml
-**/skaffold-*.yaml
-
 # Metadata
 **/LICENSE
 **/AUTHORS

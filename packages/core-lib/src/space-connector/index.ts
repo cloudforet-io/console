@@ -3,7 +3,7 @@ import axios from 'axios';
 import { camelCase } from 'lodash';
 
 import type {
-    APIInfo, MockInfo, AxiosPostResponse,
+    APIInfo, MockConfig, AxiosPostResponse, AuthConfig, DevConfig,
 } from '@/space-connector/type';
 
 import ServiceAPI from './service-api';
@@ -26,12 +26,12 @@ interface AfterCallApi {
 
 type AfterCallApiMap = Record<string, AfterCallApi>;
 
-const DEFAULT_MOCK_CONFIG = Object.freeze({ mockMode: false });
 
 interface ApiHandler {
     <Params = any, Response = any>(params?: Params, config?: AxiosRequestConfig): Promise<Response>;
     [key: string]: ApiHandler;
 }
+const DEFAULT_MOCK_CONFIG: MockRequestConfig = Object.freeze({ mockMode: false });
 export class SpaceConnector {
     private static instance: SpaceConnector;
 
@@ -47,17 +47,23 @@ export class SpaceConnector {
 
     private _clientV2: any = {};
 
-    private static mockInfo: MockInfo;
+    private static mockConfig: MockConfig;
+
+    private static authConfig: AuthConfig;
+
+    private static isDevMode = false;
 
     private readonly afterCallApiMap: AfterCallApiMap;
 
     constructor(
         endpoints: string[],
         tokenApi: TokenAPI,
-        mockInfo: MockInfo,
+        devConfig: DevConfig|undefined,
         afterCallApiMap: AfterCallApiMap,
     ) {
-        SpaceConnector.mockInfo = mockInfo;
+        SpaceConnector.mockConfig = devConfig?.mockConfig ?? {};
+        SpaceConnector.authConfig = devConfig?.authConfig ?? {};
+        SpaceConnector.isDevMode = devConfig?.enabled ?? false;
         this.tokenApi = tokenApi;
         this.serviceApi = new ServiceAPI(endpoints[0], this.tokenApi);
         this.serviceApiV2 = new ServiceAPI(endpoints[1], this.tokenApi);
@@ -77,9 +83,9 @@ export class SpaceConnector {
         }
     }
 
-    static async init(endpoints: string[], tokenApi: TokenAPI, mockInfo: MockInfo = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
+    static async init(endpoints: string[], tokenApi: TokenAPI, devConfig: DevConfig = {}, afterCallApiMap: AfterCallApiMap = {}): Promise<void> {
         if (!SpaceConnector.instance) {
-            SpaceConnector.instance = new SpaceConnector(endpoints, tokenApi, mockInfo, afterCallApiMap);
+            SpaceConnector.instance = new SpaceConnector(endpoints, tokenApi, devConfig, afterCallApiMap);
             await Promise.allSettled([
                 SpaceConnector.instance.loadAPI(1),
                 SpaceConnector.instance.loadAPI(2),
@@ -118,19 +124,25 @@ export class SpaceConnector {
     }
 
     static get isTokenAlive(): boolean {
-        if (SpaceConnector.mockInfo.skipTokenCheck) return true;
+        if (SpaceConnector.isDevMode && SpaceConnector.authConfig.skipTokenCheck) return true;
         return TokenAPI.checkToken();
     }
 
     protected async loadAPI(version: number): Promise<void> {
         try {
             let reflectionApi;
-            const mockEndpoint = SpaceConnector.mockInfo.endpoints?.[version - 1];
-            if (SpaceConnector.mockInfo.reflection && mockEndpoint) {
-                reflectionApi = axios.create({
-                    headers: { 'Content-Type': 'application/json' },
-                    baseURL: mockEndpoint,
-                });
+            if (SpaceConnector.isDevMode) {
+                const mockEndpoint = SpaceConnector.mockConfig.endpoints?.[version - 1];
+                const mockReflection = SpaceConnector.mockConfig.reflection?.[version - 1];
+                if (mockReflection) {
+                    if (!mockEndpoint) throw new Error(`Mock endpoint for api version ${version} is not defined`);
+                    reflectionApi = axios.create({
+                        headers: { 'Content-Type': 'application/json' },
+                        baseURL: mockEndpoint,
+                    });
+                } else {
+                    reflectionApi = version === 2 ? this.serviceApiV2.instance : this.serviceApi.instance;
+                }
             } else {
                 reflectionApi = version === 2 ? this.serviceApiV2.instance : this.serviceApi.instance;
             }
@@ -170,27 +182,35 @@ export class SpaceConnector {
     }
 
     protected getAPIHandler(path: string, afterCall: AfterCallApi, version: number) {
-        const mockEndpoint = SpaceConnector.mockInfo.endpoints?.[version - 1];
         const serviceApi = version === 2 ? this.serviceApiV2 : this.serviceApi;
-        /*
-            NOTE: It is separated by if mock endpoint exists because it's pretty slow to check if it's mock mode every time especially in the production environment.
-            Usually in the development environment, the mock endpoint exists, so it is necessary to check. (if statement)
-            In the production environment, the mock endpoint does not exist, so it is not necessary to check. (else statement)
-         */
-        if (mockEndpoint && SpaceConnector.mockInfo.reflection) {
-            return async (params: object = {}, config: MockRequestConfig = DEFAULT_MOCK_CONFIG): Promise<any> => {
-                const mockConfig = { ...config };
-                let url = path;
 
-                const mockApiList = SpaceConnector.mockInfo.apiList?.[version - 1] ?? [];
-                if (SpaceConnector.mockInfo.all || mockApiList.includes(path) || mockConfig.mockMode) {
-                    mockConfig.baseURL = mockEndpoint;
-                    if (mockConfig.mockPath) {
-                        url += mockConfig.mockPath;
+        // NOTE: Separate the api handler by environment.
+        if (SpaceConnector.isDevMode) {
+            const mockEndpoint = SpaceConnector.mockConfig.endpoints?.[version - 1];
+            if (!mockEndpoint) throw new Error(`Mock endpoint for api version ${version} is not defined`);
+            return async (params: object = {}, config: MockRequestConfig = DEFAULT_MOCK_CONFIG): Promise<any> => {
+                const axiosConfig = { ...config };
+
+                // set api key
+                if (SpaceConnector.authConfig.apiKey) {
+                    axiosConfig.headers = Object.assign(
+                        axiosConfig.headers ?? {},
+                        { Authorization: `Bearer ${SpaceConnector.authConfig.apiKey}` },
+                    );
+                }
+
+                let url = path;
+                if (SpaceConnector.mockConfig.enabled) {
+                    const mockApiList = SpaceConnector.mockConfig.apiList?.[version - 1] ?? [];
+                    if (isPathIncluded(mockApiList, path) || axiosConfig.mockMode) {
+                        axiosConfig.baseURL = mockEndpoint;
+                        if (axiosConfig.mockPath) {
+                            url += axiosConfig.mockPath;
+                        }
                     }
                 }
 
-                const response: AxiosPostResponse = await serviceApi.instance.post(url, params, mockConfig);
+                const response: AxiosPostResponse = await serviceApi.instance.post(url, params, axiosConfig);
 
                 if (afterCall) afterCall(response.data);
 
@@ -206,3 +226,29 @@ export class SpaceConnector {
         };
     }
 }
+
+const isPathIncluded = (apiList: string[], path: string): boolean => {
+    const isExclude = apiList.includes(`!${path}`);
+    if (isExclude) return false;
+
+    const isChildrenExcluded = apiList.some((apiPath) => {
+        if (apiPath.startsWith('!') && apiPath.endsWith('/*')) {
+            const parentPath = apiPath.split('/*')[0]?.slice(1);
+            return path.startsWith(parentPath);
+        }
+        return false;
+    });
+    if (isChildrenExcluded) return false;
+
+    const isInclude = apiList.includes(path);
+    if (isInclude) return true;
+
+    return apiList.some((apiPath) => {
+        if (apiPath === '/*' || apiPath === '*') return true;
+        if (apiPath.includes('/*')) {
+            const parentPath = apiPath.split('/*')[0];
+            return path.startsWith(parentPath);
+        }
+        return false;
+    });
+};
