@@ -17,6 +17,7 @@ import type {
     SearchSchema,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
+import type { DynamicLayoutOptions } from '@cloudforet/core-lib/component-util/dynamic-layout/layout-schema';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -27,8 +28,12 @@ import type { ListResponse } from '@/schema/_common/model';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -53,6 +58,8 @@ const { width } = useWindowSize();
 const vm = getCurrentInstance()?.proxy as Vue;
 const { query } = SpaceRouter.router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
+
+const workspaceStore = useWorkspaceStore();
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -85,12 +92,22 @@ const tableState = reactive({
     hasManagePermission: useManagePermissionState(),
     items: [] as ServiceAccountModelForBinding[],
     schema: null as null|DynamicLayout,
+    schemaOptions: computed<DynamicLayoutOptions>(() => {
+        const option = tableState.schema?.options ?? {};
+        if (tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED) {
+            return {
+                ...option,
+                fields: option.fields?.filter((d) => d.key !== 'project_id') ?? [],
+            };
+        }
+        return option;
+    }),
     visibleCustomFieldModal: false,
     accountTypeList: computed(() => [
         { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
         { name: ACCOUNT_TYPE.TRUSTED, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.TRUSTED].label },
     ]),
-    selectedAccountType: ACCOUNT_TYPE.GENERAL,
+    selectedAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
 });
 
@@ -105,16 +122,22 @@ const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSea
     /** Handling API with SpaceConnector * */
 
 const apiQuery = new ApiQueryHelper();
-const getQuery = () => {
+const getQuery = (type: AccountType) => {
+    const isTrustedAccount = type === ACCOUNT_TYPE.TRUSTED;
     apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
             { k: 'provider', v: state.selectedProvider, o: '=' },
+            ...(isTrustedAccount ? [{ k: 'workspace_id', v: [workspaceStore.getters.currentWorkspaceId, null], o: '=' }] : []),
             ...tableState.searchFilters,
         ]);
     const fields = tableState.schema?.options?.fields;
     if (fields) {
-        apiQuery.setOnly(...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.')), 'service_account_id', 'tags');
+        apiQuery.setOnly(
+            ...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.') && !(d === 'project_id')),
+            type === ACCOUNT_TYPE.TRUSTED ? 'trusted_account_id' : 'service_account_id',
+            'tags',
+        );
     }
     return apiQuery.data;
 };
@@ -133,10 +156,20 @@ const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBindin
 const listServiceAccountData = async () => {
     typeOptionState.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            query: getQuery(),
-        });
+        let res;
+        if (tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED) {
+            res = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                query: getQuery(tableState.selectedAccountType),
+                workspace_id: undefined,
+            });
+        } else {
+            res = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                query: getQuery(tableState.selectedAccountType),
+            });
+        }
+
 
         tableState.items = serviceAccountPreprocessor(res.results || []);
         typeOptionState.totalCount = res.total_count ?? 0;
@@ -171,7 +204,7 @@ const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
 const exportServiceAccountData = async () => {
     await downloadExcel({
         url: '/identity/service-account/list',
-        param: { query: getQuery() },
+        param: { query: getQuery(tableState.selectedAccountType) },
         fields: dynamicFieldsToExcelDataFields(tableState.schema?.options?.fields ?? []),
         file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
         timezone: state.timezone,
@@ -295,7 +328,7 @@ watch(() => tableState.selectedAccountType, () => {
             <p-dynamic-layout v-if="tableState.schema"
                               class="service-account-table"
                               type="query-search-table"
-                              :options="tableState.schema.options"
+                              :options="tableState.schemaOptions"
                               :data="tableState.items"
                               :fetch-options="fetchOptionState"
                               :type-options="{
