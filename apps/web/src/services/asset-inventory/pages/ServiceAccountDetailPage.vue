@@ -160,6 +160,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <service-account-base-information :provider="state.providerKey"
                                               :service-account-loading="state.loading"
                                               :service-account-id="props.serviceAccountId"
+                                              :service-account-type="state.serviceAccountType"
                                               :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
             />

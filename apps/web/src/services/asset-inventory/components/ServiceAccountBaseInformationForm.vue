@@ -6,8 +6,12 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
@@ -24,7 +28,7 @@ interface Props {
     schema: any;
     isValid: boolean;
     originForm: Partial<BaseInformationForm>;
-    accountType: AccountType;
+    accountType?: AccountType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
     schema: () => ({}),
     isValid: false,
     originForm: () => ({}),
+    accountType: ACCOUNT_TYPE.GENERAL,
 });
 
 const emit = defineEmits<{(e:'update:isValid', isValid: boolean): void;
@@ -63,17 +68,18 @@ const state = reactive({
     tags: {},
     isTagsValid: true,
     projectForm: {} as ProjectForm,
-    isProjectFormValid: undefined,
+    isProjectFormValid: true,
     formData: computed<BaseInformationForm>(() => ({
         accountName: serviceAccountName.value,
         customSchemaForm: state.customSchemaForm,
         projectForm: state.projectForm,
         tags: state.tags,
     })),
-    isAllValid: computed(() => !invalidState.serviceAccountName
-                && ((props.accountType === ACCOUNT_TYPE.TRUSTED) ?? state.isProjectFormValid)
-                && state.isTagsValid
-                && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid)),
+    isAllValid: computed(() => (!invalidState.serviceAccountName
+        && ((props.accountType === ACCOUNT_TYPE.TRUSTED) ? true : state.isProjectFormValid)
+        && state.isTagsValid
+        && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
+    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
 /* Util */
@@ -87,10 +93,13 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
 
 /* Api */
 const listServiceAccounts = async () => {
-    const { results } = await SpaceConnector.client.identity.serviceAccount.list({
-        only: 'name',
+    const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
+        domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+        query: {
+            only: ['name'],
+        },
     });
-    state.serviceAccountNames = results.map((v) => v.name);
+    state.serviceAccountNames = (results ?? []).map((v) => v.name);
 };
 
 /* Event */
@@ -113,7 +122,7 @@ const handleChangeProjectForm = (projectForm) => {
 /* Watcher */
 watch(() => state.isAllValid, (isAllValid) => {
     emit('update:isValid', isAllValid);
-});
+}, { immediate: true });
 watch(() => state.formData, (formData) => {
     emit('change', formData);
 });
