@@ -10,6 +10,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectModel } from '@/schema/identity/project/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,6 +23,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import ProjectAlertEventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
 import ProjectAlertEventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
+
 
 const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',
@@ -69,10 +72,10 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
 /* api */
 const getProject = async () => {
     try {
-        const params: ProjectGetParameters = {
+        state.project = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: props.projectId,
-        };
-        state.project = await SpaceConnector.clientV2.identity.project.get(params);
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
         state.project = {};

@@ -101,10 +101,10 @@ const getProjectUserData = async () => {
     state.loading = true;
     state.selectIndex = [];
     try {
-        const params: ProjectGetParameters = {
+        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.projectId,
-        };
-        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        });
         state.projectUserIdList = res.users ?? [];
         state.totalCount = res.users?.length ?? 0;
     } catch (e) {
@@ -117,11 +117,11 @@ const getProjectUserData = async () => {
 };
 const deleteProjectUser = async (items) => {
     try {
-        const params: ProjectRemoveUsersParameters = {
+        await SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters>({
             project_id: props.projectId,
             users: items.map((it) => it.user_id),
-        };
-        await SpaceConnector.clientV2.identity.project.removeUsers(params);
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));

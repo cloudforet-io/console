@@ -54,10 +54,10 @@ const emitChange = () => {
 const listProjectMember = async () => {
     state.loading = true;
     try {
-        const params: ProjectGetParameters = {
+        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.projectId,
-        };
-        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        });
         state.projectUserIdList = res.users ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);

@@ -63,10 +63,10 @@ const state = reactive({
 const getProjectUserData = async () => {
     state.loading = true;
     try {
-        const params: ProjectGetParameters = {
+        const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.cloudServiceProjectId,
-        };
-        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        });
         state.projectUserIdList = res.users ?? [];
         state.totalCount = res.users?.length ?? 0;
     } catch (e) {

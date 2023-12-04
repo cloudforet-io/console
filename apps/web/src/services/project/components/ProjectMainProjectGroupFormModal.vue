@@ -9,10 +9,12 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/model';
 import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
 import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -59,18 +61,18 @@ const state = reactive({
 
 const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
 const getProjectGroupNames = async () => {
-    const params: ProjectGroupListParameters = {
+    const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: projectGroupNameApiQuery.data,
-    };
-    const res = await SpaceConnector.clientV2.identity.projectGroup.list(params);
-    state.projectGroupNames = res.results.map((d) => d.name);
+    });
+    state.projectGroupNames = res.results?.map((d) => d.name) ?? [];
 };
 
 const getProjectGroup = async () => {
-    const params: ProjectGroupGetParameters = {
+    const res = await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         project_group_id: state.currentGroupId,
-    };
-    const res = await SpaceConnector.clientV2.identity.projectGroup.get(params);
+    });
     state.projectGroupName = res.name;
 };
 
