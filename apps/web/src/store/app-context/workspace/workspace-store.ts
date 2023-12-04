@@ -32,6 +32,10 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
             const userId = store.state.user.userId;
             // TODO: remove this
             const domainId = store.state.domain.domainId;
+            if (!userId) {
+                state.items = [];
+                return;
+            }
             const { results } = await SpaceConnector.clientV2.identity.user.getWorkspaces<GetWorkspacesParameters, ListResponse<WorkspaceModel>>({
                 user_id: userId,
                 domain_id: domainId,
