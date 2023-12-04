@@ -106,7 +106,7 @@ export default {
         });
         const onSignIn = async () => {
             try {
-                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
+                const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
 
                 if (!props.nextPath) {
                     await vm.$router.push(defaultRoute);
@@ -114,7 +114,7 @@ export default {
                 }
 
                 const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-                const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
+                const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainOwner'], store.getters['user/pagePermissionList']);
                 if (isAccessible) {
                     await vm.$router.push(props.nextPath);
                 } else {

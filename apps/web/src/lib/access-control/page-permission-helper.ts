@@ -7,24 +7,21 @@ import type {
     PagePermission,
 } from '@/lib/access-control/config';
 import {
-    DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
     BASIC_USER_DEFAULT_PERMISSIONS,
     NO_ROLE_USER_DEFAULT_PERMISSIONS,
     PAGE_PERMISSION_TYPE,
     SYSTEM_USER_DEFAULT_PERMISSIONS,
 } from '@/lib/access-control/config';
-import type { MenuId } from '@/lib/menu/config';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+import type { Menu } from '@/lib/menu/config';
 
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 
 
 
-export const getDefaultPagePermissionList = (isAdminMode?: boolean, pageAccessType?: PageAccessType): PagePermissionTuple[] => {
-    if (isAdminMode) return DOMAIN_ADMIN_DEFAULT_PERMISSIONS;
+export const getDefaultPagePermissionList = (pageAccessType?: PageAccessType): PagePermissionTuple[] => {
     if (pageAccessType === 'SYSTEM') return SYSTEM_USER_DEFAULT_PERMISSIONS;
-    if (pageAccessType === 'BASIC') return BASIC_USER_DEFAULT_PERMISSIONS;
+    if (pageAccessType === 'USER') return BASIC_USER_DEFAULT_PERMISSIONS;
     return NO_ROLE_USER_DEFAULT_PERMISSIONS;
 };
 
@@ -33,27 +30,43 @@ export const getProperPermissionType = (permissionA: PagePermissionType = PAGE_P
     return PAGE_PERMISSION_TYPE.VIEW;
 };
 
-const menuIdList = Object.keys(MENU_INFO_MAP) as MenuId[];
-export const getPermissionRequiredMenuIds = (): MenuId[] => menuIdList.filter((id) => MENU_INFO_MAP[id]?.needPermissionByRole);
+const flattenMenu = (menuList: Menu[]) => menuList.flatMap((menu) => [
+    { id: menu.id, needPermissionByRole: menu.needPermissionByRole },
+    ...menu.subMenuList?.map((subMenu) => ({
+        id: subMenu.id,
+        needPermissionByRole: subMenu.needPermissionByRole,
+    })) ?? [],
+]);
 
-const permissionRequiredMenuIds: MenuId[] = getPermissionRequiredMenuIds();
-export const getPagePermissionMapFromRaw = (pagePermissions: PagePermission[]): PagePermissionMap => {
+const filterMenuByPermission = (menuList: Menu[]): Menu[] => menuList.filter((menu) => menu.needPermissionByRole)
+    .map((menu) => ({
+        ...menu,
+        subMenulist: menu.subMenuList ? filterMenuByPermission(menu.subMenuList) : [],
+    }));
+
+
+export const getPagePermissionMapFromRaw = (pagePermissions: PagePermission[], menuList: Menu[]): PagePermissionMap => {
     const result = {} as PagePermissionMap;
+    const filterdMenuListByRequiredPermission = filterMenuByPermission(menuList);
+    const flattendPermissionRequiredMenuList = flattenMenu(filterdMenuListByRequiredPermission);
+
     pagePermissions.forEach((data) => {
         const { page, permission } = data ?? { page: '' };
 
         // in case of wildcard
         if (page === '*') {
-            permissionRequiredMenuIds.forEach((id) => {
+            flattendPermissionRequiredMenuList.forEach(({ id }) => {
                 result[id] = getProperPermissionType(permission, result[id]);
             });
             // in case of service wildcard
         } else if (page.endsWith('*')) {
             const menuId = page.replace('.*', '');
-            const menuIds = permissionRequiredMenuIds.filter((id) => id.split('.')[0] === menuId);
-            menuIds.forEach((id) => {
+            const foundServiceMenuById = filterdMenuListByRequiredPermission.find(({ id }) => id === menuId);
+            if (!foundServiceMenuById) return;
+            flattenMenu([foundServiceMenuById]).forEach(({ id }) => {
                 result[id] = getProperPermissionType(permission, result[id]);
             });
+
             // general case
         } else {
             result[page] = getProperPermissionType(permission, result[page]);
@@ -79,15 +92,19 @@ export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList
     return results;
 }, [] as LNBMenu[]);
 
-export const getPermissionOfPage = (routeName: string, pagePermissions: PagePermissionTuple[]): PagePermissionType|undefined => {
+export const getPermissionOfPage = (menuId: string, pagePermissions: PagePermissionTuple[], menuList: Menu[]): PagePermissionType|undefined => {
     let result: PagePermissionType|undefined;
+    const filterdMenuListByRequiredPermission = filterMenuByPermission(menuList);
+
     pagePermissions.some(([id, permission]) => {
-        if (id === routeName) {
+        if (id === menuId) {
             result = permission;
             return true;
         }
+
         // return VIEW permission if user has permission to children menu
-        if (id.startsWith(`${routeName}.`)) {
+        const foundServiceMenuById = filterdMenuListByRequiredPermission.find((menu) => menu.id === menuId);
+        if (foundServiceMenuById) {
             result = PAGE_PERMISSION_TYPE.VIEW;
             return true;
         }

@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 // eslint-disable-next-line import/no-cycle
 import dashboard from './modules/dashboard';
+// eslint-disable-next-line import/no-cycle
 import display from './modules/display';
 import domain from './modules/domain';
 import error from './modules/error';

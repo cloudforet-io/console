@@ -60,7 +60,7 @@ export class SpaceRouter {
             // CAUTION: you must recover this after new role rebuild
             const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);
+            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainOwner'], userPagePermissions, isTokenAlive);
 
 
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];

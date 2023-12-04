@@ -9,7 +9,7 @@ import { i18n } from '@/translations';
 
 import type { PagePermissionMap, PagePermissionType, PagePermission } from '@/lib/access-control/config';
 import {
-    getPagePermissionMapFromRaw, getPermissionRequiredMenuIds,
+    getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
@@ -46,11 +46,10 @@ const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, s
 };
 // eslint-disable-next-line max-len
 export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<PagePermission[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
-    const pagePermissionMap = getPagePermissionMapFromRaw(pagePermissionData.value);
+    const pagePermissionMap = getPagePermissionMapFromRaw(pagePermissionData.value, MENU_LIST);
     const results: PageAccessDefinitionTableData[] = [];
     MENU_LIST.forEach((menu) => {
-        const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
-        if (!permissionRequiredMenuIdList.includes(menu.id)) return;
+        if (!menu.needPermissionByRole) return;
         const menuInfo = MENU_INFO_MAP[menu.id];
         results.push({
             label: i18n.t(menuInfo.translationId),

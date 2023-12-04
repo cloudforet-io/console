@@ -3,8 +3,13 @@
 import type VueRouter from 'vue-router';
 import type { Getter } from 'vuex';
 
+import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+// eslint-disable-next-line import/no-cycle
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type {
     DisplayState, DisplayMenu, SidebarProps,
@@ -80,25 +85,28 @@ const filterMenuByPermission = (menuList: DisplayMenu[], pagePermissionList: Pag
     return results;
 }, [] as DisplayMenu[]);
 
-const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d) => {
+const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
+    const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
     return {
         ...d,
+        id: d.id,
         label: i18n.t(menuInfo.translationId),
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
-        to: { name: d.id },
-        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList) : [],
+        to: { name: routeName },
+        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode) : [],
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
+    const appContextStore = useAppContextStore();
+    const isAdminMode = appContextStore.getters.isAdminMode;
+    const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
     let _allGnbMenuList: DisplayMenu[];
-    if (state.isAdminMode) {
-        _allGnbMenuList = getDisplayMenuList(ADMIN_MENU_LIST);
-    } else _allGnbMenuList = getDisplayMenuList(MENU_LIST);
-    // TODO: you must recover this after new role rebuild
-    // _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
-    // _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+
+    _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode);
+    _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
+    _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;
 };
 
