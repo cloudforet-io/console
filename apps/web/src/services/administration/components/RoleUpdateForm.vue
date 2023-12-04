@@ -6,6 +6,7 @@ import {
 import { PHeading } from '@spaceone/design-system';
 
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
+import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { Policy } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
@@ -31,7 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
-    (e: 'update-form-data', after: RoleCreateParameters): void,
+    (e: 'update-form-data', after: RoleCreateParameters|RoleUpdateParameters): void,
 }>();
 
 const state = reactive({
@@ -40,16 +41,26 @@ const state = reactive({
     pageAccessFormData: [] as PagePermission[],
     initialSelectedPolicyList: [] as Policy[],
     isAllValid: computed<boolean>(() => isPolicySectionValid.value && state.isBaseInformationValid),
-    formData: computed<RoleCreateParameters>(() => ({
-        name: state.baseInfoFormData.roleName?.trim(),
-        role_type: state.baseInfoFormData.roleType,
-        // TODO: will be check after api is merged
-        api_permissions: [],
-        page_permissions: state.pageAccessFormData,
-        tags: {
-            description: state.baseInfoFormData.roleDescription,
-        },
-    })),
+    formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
+        const baseData = {
+            name: state.baseInfoFormData.roleName.trim(),
+            // TODO: will be check after api is merged
+            api_permissions: [],
+            page_permissions: state.pageAccessFormData,
+            tags: {
+                description: state.baseInfoFormData.roleDescription,
+            },
+        };
+        return props.formType === FORM_TYPE.CREATE
+            ? {
+                ...baseData,
+                role_type: state.baseInfoFormData.roleType,
+            }
+            : {
+                ...baseData,
+                role_id: props.initialRoleData.role_id,
+            };
+    }),
 });
 
 const {

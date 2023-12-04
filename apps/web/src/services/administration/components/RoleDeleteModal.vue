@@ -85,11 +85,8 @@ const handleDelete = async () => {
     let isAllSucceed = true;
     await Promise.all(rolePageStore.selectedRoles.map(async (role) => {
         try {
-            await SpaceConnector.client.identity.role.delete({
-                role_id: role.role_id,
-            });
+            await rolePageStore.deleteRole({ role_id: role.role_id });
         } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
             isAllSucceed = false;
         }
     }));
