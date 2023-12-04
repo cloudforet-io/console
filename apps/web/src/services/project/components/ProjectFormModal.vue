@@ -73,10 +73,10 @@ const state = reactive({
 
 const getProjectNames = async () => {
     try {
-        const params: ProjectListParameters = {
+        const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
             project_group_id: props.projectGroupId,
-        };
-        const { results }: ListResponse<ProjectModel> = await SpaceConnector.clientV2.identity.project.list(params);
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        });
         state.projectNames = results?.map((d) => d.name);
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -97,11 +97,11 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
 const updateProject = async (): Promise<ProjectModel|undefined> => {
     let updatedProject: ProjectModel|undefined;
     try {
-        const params: ProjectUpdateParameters = {
+        updatedProject = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
             name: state.projectName.trim(),
             project_id: props.project?.project_id || router.currentRoute.params.id,
-        };
-        updatedProject = await SpaceConnector.clientV2.identity.project.update(params);
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));

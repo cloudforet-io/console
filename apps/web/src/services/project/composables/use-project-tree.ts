@@ -8,6 +8,7 @@ import type { ProjectGroupListParameters } from '@/schema/identity/project-group
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import { store } from '@/store';
 
 import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
@@ -37,7 +38,8 @@ interface ProjectTreeSearchResponse {
 const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<Record<string, boolean>> => {
     const res = {};
 
-    const { results: allChildren }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list({
+    const { results: allChildren } = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ProjectGroupListResponse>({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['parent_group_id'],
             filter: [{
@@ -59,7 +61,8 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
 const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record<string, boolean>> => {
     const res: Record<string, boolean> = {};
 
-    const params: ListRequestParams = {
+    const { results: allChildren } = await SpaceConnector.clientV2.identity.project.list<ListRequestParams, ProjectListResponse>({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['project_group_id'],
             filter: [{
@@ -68,8 +71,7 @@ const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record
                 o: 'in',
             }],
         },
-    };
-    const { results: allChildren }: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(params);
+    });
 
     allChildren?.forEach((d) => {
         res[d.project_group_id] = true;
@@ -91,6 +93,7 @@ const getChildMap = async (groups: ProjectGroupModel[], excludeType: ProjectTree
 };
 const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
     const requestParams: ProjectGroupListParameters = {
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query ?? {},
     };
 
@@ -104,7 +107,7 @@ const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
         requestParams.parent_group_id = params.item_id;
     }
 
-    const { results }: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(requestParams);
+    const { results } = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ProjectGroupListResponse>(requestParams);
     if (!results?.length) return [];
 
     let childMap = {};
@@ -132,12 +135,11 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
         return [];
     }
 
-    const reqParams: ProjectListParameters = {
+    const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ProjectListResponse>({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query,
         project_group_id: params.item_id || null,
-    };
-
-    const { results }: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(reqParams);
+    });
     if (!results?.length) return [];
 
     const items: ProjectTreeNodeData[] = [];
@@ -156,10 +158,10 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
 };
 const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, openItems: string[] = []): Promise<string[]> => {
     if (itemType === 'PROJECT') {
-        const params: ProjectListParameters = {
+        const response = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ProjectListResponse>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: itemId,
-        };
-        const response: ProjectListResponse = await SpaceConnector.clientV2.identity.project.list(params);
+        });
 
         if (response.total_count === 1) {
             const projectInfo = response?.results?.[0];
@@ -169,10 +171,10 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
             if (parentItemId) await getParentItem(parentItemId, 'PROJECT_GROUP', openItems);
         }
     } else {
-        const params: ProjectGroupListParameters = {
+        const response = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ProjectGroupListResponse>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: itemId,
-        };
-        const response: ProjectGroupListResponse = await SpaceConnector.clientV2.identity.projectGroup.list(params);
+        });
 
         if (response.total_count === 1) {
             const projectGroupInfo = response?.results?.[0];

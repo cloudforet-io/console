@@ -140,7 +140,7 @@ const getCardSummary = async () => {
     }
 };
 
-const listProjectFetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>);
+const listProjectFetcher = getCancellableFetcher<ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
 const listApiQueryHelper = new ApiQueryHelper();
 const fetchProjectList = async (projectGroupId?: string) => {
     const _projectGroupId = projectGroupId || state.groupId;
@@ -153,10 +153,12 @@ const fetchProjectList = async (projectGroupId?: string) => {
 
     try {
         state.loading = true;
-        const { status, response } = await listProjectFetcher({
+        const params: ProjectListParameters = {
             query: listApiQueryHelper.data,
             project_group_id: _projectGroupId,
-        });
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        };
+        const { status, response } = await listProjectFetcher(params);
         if (status === 'succeed') {
             state.items = response.results || [];
             state.totalCount = response.total_count || 0;
@@ -327,15 +329,13 @@ watch([() => projectPageStore.isInitiated, () => state.groupId], async ([isIniti
                     </router-link>
                 </div>
             </div>
-            <p-empty
-                v-if="state.noProjectGroup || state.noProject"
-                show-image
-            >
-                <div class="description-content">
-                    <p>{{ state.noProjectGroup ? $t('PROJECT.LANDING.NO_PROJECT_GROUP_MSG') : $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}</p>
-                </div>
-            </p-empty>
-            <template #no-data />
+            <template #no-data>
+                <p-empty show-image>
+                    <div class="description-content">
+                        <p>{{ state.noProjectGroup ? $t('PROJECT.LANDING.NO_PROJECT_GROUP_MSG') : $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}</p>
+                    </div>
+                </p-empty>
+            </template>
         </p-data-loader>
 
         <project-form-modal

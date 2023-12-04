@@ -85,10 +85,10 @@ const state = reactive({
 const getProject = async (projectId: string) => {
     try {
         state.loading = true;
-        const params: ProjectGetParameters = {
+        state.item = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: projectId,
-        };
-        state.item = await SpaceConnector.clientV2.identity.project.get(params);
+        });
     } catch (e) {
         state.item = null;
         ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
@@ -147,10 +147,10 @@ const projectDeleteFormConfirm = async () => {
 
     formState.modalLoading = true;
     try {
-        const params: ProjectDeleteParameters = {
+        await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: state.projectId,
-        };
-        await SpaceConnector.clientV2.identity.project.delete(params);
+        });
         // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
         router.go(-1);
