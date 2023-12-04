@@ -65,8 +65,8 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             isDomainScope: true,
-            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
-            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
         });
 
         const handleSelectScope = (scopeType: DashboardScope) => {

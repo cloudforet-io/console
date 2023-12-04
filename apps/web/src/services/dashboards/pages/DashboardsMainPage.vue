@@ -122,11 +122,11 @@ export default {
             viewersStatus: computed(() => store.state.dashboard.viewers),
             scopeStatus: computed(() => store.state.dashboard.scope),
             loading: computed(() => store.state.dashboard.loading),
-            workspaceDashboardList: computed(() => (state.pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] ? store.getters['dashboard/getDomainItems'] : [])),
-            projectDashboardList: computed(() => (state.pagePermission[MENU_ID.DASHBOARDS_PROJECT] ? store.getters['dashboard/getProjectItems'] : [])),
+            workspaceDashboardList: computed(() => (state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] ? store.getters['dashboard/getDomainItems'] : [])),
+            projectDashboardList: computed(() => (state.pagePermission[MENU_ID.PROJECT_DASHBOARDS] ? store.getters['dashboard/getProjectItems'] : [])),
             dashboardTotalCount: computed(() => {
-                const domainDashboardCount = state.pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] ? store.getters['dashboard/getDomainDashboardCount'] : 0;
-                const projectDashboardCount = state.pagePermission[MENU_ID.DASHBOARDS_PROJECT] ? store.getters['dashboard/getProjectDashboardCount'] : 0;
+                const domainDashboardCount = state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] ? store.getters['dashboard/getDomainDashboardCount'] : 0;
+                const projectDashboardCount = state.pagePermission[MENU_ID.PROJECT_DASHBOARDS] ? store.getters['dashboard/getProjectDashboardCount'] : 0;
                 return domainDashboardCount + projectDashboardCount;
             }),
             filteredDashboardStatus: computed(() => {
@@ -138,8 +138,8 @@ export default {
                 }
                 return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
             }),
-            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
-            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
             hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
             pagePermission: computed(() => store.getters['user/pagePermissionMap']),
         });

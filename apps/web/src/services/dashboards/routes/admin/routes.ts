@@ -1,10 +1,9 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { MENU_ID } from '@/lib/menu/config';
 
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
@@ -17,31 +16,29 @@ const DashboardCreatePage = () => import('@/services/dashboards/pages/DashboardC
 const DashboardCustomizePage = () => import('@/services/dashboards/pages/DashboardCustomizePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardDetailPage.vue');
 
-const dashboardsRoute: RouteConfig = {
+const adminDashboardsRoute: RouteConfig = {
     path: 'dashboards',
-    name: DASHBOARDS_ROUTE._NAME,
-    meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    name: makeAdminRouteName(DASHBOARDS_ROUTE._NAME),
+    meta: { menuId: MENU_ID.DASHBOARDS },
     component: DashboardsContainer,
     children: [
         {
             path: '/',
             component: { template: '<router-view/>' },
-            redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+            redirect: () => ({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) }),
             children: [
                 {
                     path: 'all',
-                    name: DASHBOARDS_ROUTE.ALL._NAME,
+                    name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME),
                     meta: { lnbVisible: true, translationId: 'DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL' },
                     component: DashboardsMainPage,
                 },
                 {
                     path: 'create',
-                    name: DASHBOARDS_ROUTE.CREATE._NAME,
+                    name: makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME),
                     meta: {
                         centeredLayout: true,
                         translationId: 'DASHBOARDS.CREATE.TITLE',
-                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                         accessInfo: {
                             /*
                             * The 'referenceMenuIds' array is used to specify multiple menu IDs for access level checks.
@@ -59,30 +56,29 @@ const dashboardsRoute: RouteConfig = {
                 },
                 {
                     path: 'project',
-                    name: DASHBOARDS_ROUTE.PROJECT._NAME,
+                    name: makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT._NAME),
                     meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.PROJECT' },
-                    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+                    redirect: () => ({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) }),
                     props: true,
                     component: { template: '<router-view/>' },
                     children: [
                         {
                             path: 'detail/:dashboardId',
-                            name: DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
+                            name: makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME),
                             meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                             props: true,
                             component: DashboardDetailPage,
                         },
                         {
                             path: 'customize/:dashboardId?',
-                            name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
+                            name: makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME),
                             meta: {
-                                accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
                                             name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
-                                                name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
+                                                name: makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME),
                                             },
                                         },
                                     ];
@@ -90,7 +86,7 @@ const dashboardsRoute: RouteConfig = {
                                         breadcrumbs.push({
                                             name: params.dashboardId,
                                             to: {
-                                                name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
+                                                name: makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME),
                                                 params: {
                                                     dashboardId: params.dashboardId,
                                                 },
@@ -108,30 +104,29 @@ const dashboardsRoute: RouteConfig = {
                 },
                 {
                     path: 'workspace',
-                    name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
+                    name: makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE._NAME),
                     meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE' },
-                    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+                    redirect: () => ({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) }),
                     props: true,
                     component: { template: '<router-view/>' },
                     children: [
                         {
                             path: 'detail/:dashboardId',
-                            name: DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
+                            name: makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME),
                             meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                             props: true,
                             component: DashboardDetailPage,
                         },
                         {
                             path: 'customize/:dashboardId?',
-                            name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+                            name: makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME),
                             meta: {
-                                accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                                 breadcrumbs: ({ params }) => {
                                     const breadcrumbs: Breadcrumb[] = [
                                         {
                                             name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
                                             to: {
-                                                name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+                                                name: makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME),
                                             },
                                         },
                                     ];
@@ -139,7 +134,7 @@ const dashboardsRoute: RouteConfig = {
                                         breadcrumbs.push({
                                             name: params.dashboardId,
                                             to: {
-                                                name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+                                                name: makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME),
                                                 params: {
                                                     dashboardId: params.dashboardId,
                                                 },
@@ -161,4 +156,4 @@ const dashboardsRoute: RouteConfig = {
     ],
 };
 
-export default dashboardsRoute;
+export default adminDashboardsRoute;
