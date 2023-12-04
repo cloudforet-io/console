@@ -29,7 +29,7 @@ export default {
             menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission(lnbMenuIds.map((id) => {
                 const menuInfo = MENU_INFO_MAP[id];
                 return ({
-                    type: 'item', id, label: i18n.t(menuInfo.translationId), to: { name: id },
+                    type: 'item', id, label: i18n.t(menuInfo.translationId), to: { name: menuInfo.routeName },
                 });
             }), store.getters['user/pagePermissionList'])),
         });
