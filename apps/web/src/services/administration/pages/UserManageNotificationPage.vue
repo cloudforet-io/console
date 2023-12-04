@@ -35,7 +35,7 @@ export default {
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
-            isManageable: computed(() => store.getters['user/isDomainOwner'] || store.getters['user/hasDomainRole']),
+            isManageable: computed(() => store.getters['user/isDomainAdmin'] || store.getters['user/hasDomainRole']),
         });
         const routeState = reactive({
             routes: computed(() => ([

@@ -60,7 +60,7 @@ export class SpaceRouter {
             // CAUTION: you must recover this after new role rebuild
             const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);
+            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
 
 
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
@@ -101,8 +101,8 @@ export class SpaceRouter {
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
 
-            const isDomainOwner = store.getters['user/isDomainOwner'];
-            if (!isDomainOwner) {
+            const isDomainAdmin = store.getters['user/isDomainAdmin'];
+            if (!isDomainAdmin) {
                 const recent = getRecentConfig(to);
                 if (recent) {
                     store.dispatch('recent/addItem', {

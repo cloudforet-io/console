@@ -51,5 +51,4 @@ export interface MenuInfo {
     translationId: string;
     icon?: string;
     highlightTag?: HighlightTagType;
-    needPermissionByRole?: boolean;
 }

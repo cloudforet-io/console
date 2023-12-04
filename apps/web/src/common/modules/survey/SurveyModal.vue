@@ -82,7 +82,7 @@ export default {
             visible: false,
             isSessionExpired: computed(() => store.state.user.isSessionExpired),
             userId: computed(() => store.state.user.userId),
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
             answerItems1: computed(() => [
                 {
                     name: 1,

@@ -8,13 +8,14 @@ import {
     getDefaultPagePermissionList,
     getPagePermissionMapFromRaw, getProperPermissionType,
 } from '@/lib/access-control/page-permission-helper';
-
+import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
 import type { UserState, PageAccessType } from './type';
 
 
-// TODO: refactor isDomainOwner
-export const isDomainOwner = (state: UserState): boolean => state.roleType === 'DOMAIN_ADMIN';
+// TODO: temporary defence
+// export const isDomainOwner = (state: UserState): boolean => state.roleType === 'DOMAIN_ADMIN';
+export const isDomainAdmin = (): boolean => true;
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 export const roleNames = (state: UserState): Array<string> => {
     const systemRoleNames: Array<string> = [];
@@ -55,11 +56,10 @@ export const isNoRoleUser = (state: UserState): boolean => !state.roles?.length;
 // TODO: refactor hasDomainRole
 // export const hasDomainRole = (state: UserState): boolean => {
 //     if (state.roles) {
-//         return state.roles.some((role) => role.roleType === 'DOMAIN');
+//         return state.roleType === 'DOMAIN_ADMIN';
 //     }
 //
 //     return false;
-// };
 export const hasDomainRole = (): boolean => true;
 
 export const hasSystemRole = (state: UserState): boolean => {
@@ -76,12 +76,12 @@ export const hasPermission = (): boolean => true;
 
 export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
     const roleBasePagePermissions = state.roles?.flatMap((role) => role.pagePermissions) ?? [];
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions);
+    const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions, MENU_LIST);
     // merge role based page permissions and default page permissions
     let pageAccessType: PageAccessType|undefined;
     if (getters.hasSystemRole) pageAccessType = 'SYSTEM';
-    else if (getters.hasPermission) pageAccessType = 'BASIC';
-    getDefaultPagePermissionList(false, pageAccessType).forEach(([page, permission]) => {
+    else if (getters.hasPermission) pageAccessType = 'USER';
+    getDefaultPagePermissionList(pageAccessType).forEach(([page, permission]) => {
         pagePermissionMap[page] = getProperPermissionType(permission, pagePermissionMap[page]);
     });
     return Object.entries(pagePermissionMap);

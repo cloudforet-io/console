@@ -14,6 +14,7 @@ import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
+import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
 import RoleUpdatePageAccessMenuItem from '@/services/administration/components/RoleUpdatePageAccessMenuItem.vue';
 import { getPageAccessMenuList } from '@/services/administration/helpers/page-access-menu-list';
@@ -103,7 +104,7 @@ watch(() => state.pagePermissions, (pagePermissions, prevPagePermissions) => {
 });
 watch(() => props.initialPagePermissions, (initialPagePermissions) => {
     // init formState.menuItems
-    const pagePermissions = getPagePermissionMapFromRaw(initialPagePermissions);
+    const pagePermissions = getPagePermissionMapFromRaw(initialPagePermissions, MENU_LIST);
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, key] of Object.entries(pagePermissions)) {
         const itemAttribute = (key === PAGE_PERMISSION_TYPE.MANAGE) ? 'isManaged' : 'isViewed';

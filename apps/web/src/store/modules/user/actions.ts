@@ -8,9 +8,6 @@ import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { setI18nLocale } from '@/translations';
 
-// eslint-disable-next-line import/no-cycle
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
-
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
 } from './type';
@@ -105,9 +102,6 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
     const userRoles = await getUserRoles(domainId);
     commit('setRoles', userRoles);
-
-    const workspaceStore = useWorkspaceStore();
-    await workspaceStore.load(userId);
 
     commit('setIsSessionExpired', false);
 };
