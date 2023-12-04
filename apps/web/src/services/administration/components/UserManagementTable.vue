@@ -20,14 +20,11 @@ import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-ve
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
-import { USER_TYPE } from '@/schema/identity/user/constant';
-import type { UserType } from '@/schema/identity/user/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -36,8 +33,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
 import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
-import { userSearchHandlers } from '@/services/administration/constants/user-table-constant';
-import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { calculateTime } from '@/services/administration/composables/refined-user-data';
+import {
+    userExcelFields,
+    userSearchHandlers,
+    userTableFields,
+} from '@/services/administration/constants/user-table-constant';
+import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
@@ -61,35 +63,10 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true)
     .setFiltersAsRawQueryString(route.query.filters);
 
-const fields = [
-    { name: 'user_id', label: 'User ID' },
-    { name: 'name', label: 'Name' },
-    { name: 'state', label: 'State' },
-    { name: 'user_type', label: 'Access Control' },
-    { name: 'api_key_count', label: 'API Key', sortable: false },
-    { name: 'role_name', label: 'Role', sortable: false },
-    { name: 'tags', label: 'Tags', sortable: false },
-    { name: 'backend', label: 'Auth Type' },
-    { name: 'last_accessed_at', label: 'Last Activity' },
-    { name: 'timezone', label: 'Timezone' },
-];
-
-const excelFields:ExcelDataField[] = [
-    { key: 'user_id', name: 'User ID' },
-    { key: 'name', name: 'Name' },
-    { key: 'state', name: 'State' },
-    { key: 'user_type', name: 'Access Control' },
-    { key: 'api_key_count', name: 'API Key' },
-    { key: 'role_bindings.role_info.name', name: 'Role' },
-    { key: 'backend', name: 'Auth Type' },
-    { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },
-    { key: 'timezone', name: 'Timezone' },
-];
-
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
-        user_type: getUserType(user.user_type),
+        // api_key_count: d.api_key_count || 0,
         last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
@@ -115,8 +92,9 @@ const state = reactive({
     valueHandlerMap: userSearchHandlers.valueHandlerMap,
     tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets).queryTags,
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    // TODO: will be removed after the backend is ready
+    domain_id: computed(() => store.state.domain.domainId),
 });
-
 const modalState = reactive({
     mode: '',
     title: '',
@@ -132,7 +110,15 @@ const userFormState = reactive({
     roleOfSelectedUser: '',
 });
 
+/* API */
 let userListApiQuery = userListApiQueryHelper.data;
+
+const getUserList = () => {
+    userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
+};
 
 const saveRoleOfSelectedUser = (index) => {
     const selectedUser = userPageState.users[index];
@@ -151,7 +137,7 @@ const handleChange = async (options: any = {}) => {
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
     }
-    await userPageStore.listUsers(userListApiQuery);
+    await getUserList();
 };
 
 const handleExport = async () => {
@@ -161,17 +147,12 @@ const handleExport = async () => {
             query: userListApiQuery,
             include_role_binding: true,
         },
-        fields: excelFields,
+        fields: userExcelFields,
         file_name_prefix: FILE_NAME_PREFIX.user,
         timezone: state.timezone,
     });
 };
-const getUserType = (userType: UserType) => {
-    let formattedUserType: string;
-    if (userType === USER_TYPE.API_USER) formattedUserType = 'API Only';
-    else formattedUserType = 'Console, API';
-    return formattedUserType;
-};
+
 
 /* Modal */
 const clickAdd = () => {
@@ -283,7 +264,7 @@ const updateUser = async (item, roleId) => {
             ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
         }
     } finally {
-        await userPageStore.listUsers(userListApiQuery);
+        await getUserList();
         userPageStore.$patch({
             selectedIndices: [],
             visibleUpdateModal: false,
@@ -298,14 +279,15 @@ const handleUserFormConfirm = async (item, roleId) => {
     } else {
         await addUser(item, roleId);
     }
-    await userPageStore.listUsers(userListApiQuery);
+    await getUserList();
 };
 const handleUserStatusModalConfirm = () => {
-    userPageStore.listUsers(userListApiQuery);
+    getUserList();
 };
 
+/* Init */
 (async () => {
-    await userPageStore.listUsers(userListApiQuery);
+    await getUserList();
 })();
 </script>
 
@@ -319,7 +301,7 @@ const handleUserStatusModalConfirm = () => {
             :loading="userPageState.loading"
             :items="state.refinedUserItems"
             :select-index="userPageState.selectedIndices"
-            :fields="fields"
+            :fields="userTableFields"
             sort-by="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
