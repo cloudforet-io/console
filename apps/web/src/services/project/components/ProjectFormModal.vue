@@ -9,7 +9,7 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';

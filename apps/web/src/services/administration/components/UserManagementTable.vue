@@ -14,10 +14,10 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import type { RoleListParameters } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import { USER_TYPE } from '@/schema/identity/user/constant';
@@ -225,7 +225,7 @@ const bindRole = async (userId, roleId) => {
     });
 };
 const unbindRole = async (userId) => {
-    const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListParameters, ListResponse<RoleBindingModel>>({
+    const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
         user_id: userId,
     });
     const roleBindingId = results?.[0].role_binding_id;
