@@ -64,36 +64,38 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setFiltersAsRawQueryString(route.query.filters);
 
 const state = reactive({
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    // TODO: will be removed after the backend is ready
+    domain_id: computed(() => store.state.domain.domainId),
+    dropdownMenu: computed(() => ([
+        {
+            type: 'item',
+            name: 'update',
+            label: i18n.t('IDENTITY.USER.MAIN.UPDATE'),
+            disabled: userPageState.selectedIndices.length > 1 || !tableState.isSelected,
+        },
+        {
+            type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: !tableState.isSelected,
+        },
+        { type: 'divider' },
+        {
+            type: 'item', name: 'enable', label: i18n.t('IDENTITY.USER.MAIN.ENABLE'), disabled: !tableState.isSelected,
+        },
+        {
+            type: 'item', name: 'disable', label: i18n.t('IDENTITY.USER.MAIN.DISABLE'), disabled: !tableState.isSelected,
+        },
+    ] as MenuItem[])),
+});
+const tableState = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
         // api_key_count: d.api_key_count || 0,
         last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
-    dropdownMenu: computed(() => ([
-        {
-            type: 'item',
-            name: 'update',
-            label: i18n.t('IDENTITY.USER.MAIN.UPDATE'),
-            disabled: userPageState.selectedIndices.length > 1 || !state.isSelected,
-        },
-        {
-            type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: !state.isSelected,
-        },
-        { type: 'divider' },
-        {
-            type: 'item', name: 'enable', label: i18n.t('IDENTITY.USER.MAIN.ENABLE'), disabled: !state.isSelected,
-        },
-        {
-            type: 'item', name: 'disable', label: i18n.t('IDENTITY.USER.MAIN.DISABLE'), disabled: !state.isSelected,
-        },
-    ] as MenuItem[])),
     keyItemSets: userSearchHandlers.keyItemSets as KeyItemSet[],
     valueHandlerMap: userSearchHandlers.valueHandlerMap,
     tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets).queryTags,
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    // TODO: will be removed after the backend is ready
-    domain_id: computed(() => store.state.domain.domainId),
 });
 const modalState = reactive({
     mode: '',
@@ -110,28 +112,17 @@ const userFormState = reactive({
     roleOfSelectedUser: '',
 });
 
-/* API */
-let userListApiQuery = userListApiQueryHelper.data;
-
-const getUserList = () => {
-    userPageStore.listUsers({
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    });
-};
-
+/* Component */
 const saveRoleOfSelectedUser = (index) => {
     const selectedUser = userPageState.users[index];
     const roleBindingsData = selectedUser?.role_bindings?.find((data) => data.role_info?.role_type === 'DOMAIN');
     if (roleBindingsData) userFormState.roleOfSelectedUser = roleBindingsData.role_info?.role_id;
     else userFormState.roleOfSelectedUser = '';
 };
-
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
     if (index.length === 1) saveRoleOfSelectedUser(index);
 };
-
 const handleChange = async (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
@@ -139,20 +130,26 @@ const handleChange = async (options: any = {}) => {
     }
     await getUserList();
 };
-
-const handleExport = async () => {
-    await downloadExcel({
-        url: '/identity/user/list',
-        param: {
-            query: userListApiQuery,
-            include_role_binding: true,
-        },
-        fields: userExcelFields,
-        file_name_prefix: FILE_NAME_PREFIX.user,
-        timezone: state.timezone,
-    });
+const handleSelectDropdown = (name) => {
+    switch (name) {
+    case 'enable': clickEnable(); break;
+    case 'disable': clickDisable(); break;
+    case 'delete': clickDelete(); break;
+    case 'update': clickUpdate(); break;
+    default: break;
+    }
 };
-
+const handleUserFormConfirm = async (item, roleId) => {
+    if (userFormState.updateMode) {
+        await updateUser(item, roleId);
+    } else {
+        await addUser(item, roleId);
+    }
+    await getUserList();
+};
+const handleUserStatusModalConfirm = () => {
+    getUserList();
+};
 
 /* Modal */
 const clickAdd = () => {
@@ -189,16 +186,26 @@ const clickDisable = () => {
     userPageStore.$patch({ visibleStatusModal: true });
 };
 
-const handleSelectDropdown = (name) => {
-    switch (name) {
-    case 'enable': clickEnable(); break;
-    case 'disable': clickDisable(); break;
-    case 'delete': clickDelete(); break;
-    case 'update': clickUpdate(); break;
-    default: break;
-    }
+/* API */
+let userListApiQuery = userListApiQueryHelper.data;
+const getUserList = () => {
+    userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
 };
-
+const handleExport = async () => {
+    await downloadExcel({
+        url: '/identity/user/list',
+        param: {
+            query: userListApiQuery,
+            include_role_binding: true,
+        },
+        fields: userExcelFields,
+        file_name_prefix: FILE_NAME_PREFIX.user,
+        timezone: state.timezone,
+    });
+};
 const bindRole = async (userId, roleId) => {
     await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters>({
         user_id: userId,
@@ -273,18 +280,6 @@ const updateUser = async (item, roleId) => {
     }
 };
 
-const handleUserFormConfirm = async (item, roleId) => {
-    if (userFormState.updateMode) {
-        await updateUser(item, roleId);
-    } else {
-        await addUser(item, roleId);
-    }
-    await getUserList();
-};
-const handleUserStatusModalConfirm = () => {
-    getUserList();
-};
-
 /* Init */
 (async () => {
     await getUserList();
@@ -299,15 +294,15 @@ const handleUserStatusModalConfirm = () => {
             selectable
             sortable
             :loading="userPageState.loading"
-            :items="state.refinedUserItems"
+            :items="tableState.refinedUserItems"
             :select-index="userPageState.selectedIndices"
             :fields="userTableFields"
             sort-by="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
-            :key-item-sets="state.keyItemSets"
-            :value-handler-map="state.valueHandlerMap"
-            :query-tags="state.tags"
+            :key-item-sets="tableState.keyItemSets"
+            :value-handler-map="tableState.valueHandlerMap"
+            :query-tags="tableState.tags"
             :style="{height: `${props.tableHeight}px`}"
             @select="handleSelect"
             @change="handleChange"
