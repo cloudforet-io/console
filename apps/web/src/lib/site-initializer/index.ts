@@ -56,7 +56,7 @@ const init = async () => {
     const domainName = await initDomain(store, config);
 
     if (domainName) {
-        await initWorkspace();
+        await initWorkspace(store);
         prefetchResources();
         initI18n();
         initDayjs();

@@ -28,8 +28,7 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
     });
 
     const actions = {
-        async load() {
-            const userId = store.state.user.userId;
+        async load(userId?: string) {
             // TODO: remove this
             const domainId = store.state.domain.domainId;
             if (!userId) {

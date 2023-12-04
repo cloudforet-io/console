@@ -16,19 +16,19 @@ interface LinkFormatter {
 
 const queryHelper = new QueryHelper();
 
-const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = { name, query };
-    let filters: any[] = [];
-    if (data) {
-        queryHelper.setFilters([{ k: 'server_id', v: data, o: '=' }]);
-        filters.push(...queryHelper.rawQueryStrings);
-        if (query?.filters) {
-            filters = concat(queryHelper.rawQueryStrings, query?.filters);
-        }
-    }
-    location.query = { filters };
-    return location;
-};
+// const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+//     const location = { name, query };
+//     let filters: any[] = [];
+//     if (data) {
+//         queryHelper.setFilters([{ k: 'server_id', v: data, o: '=' }]);
+//         filters.push(...queryHelper.rawQueryStrings);
+//         if (query?.filters) {
+//             filters = concat(queryHelper.rawQueryStrings, query?.filters);
+//         }
+//     }
+//     location.query = { filters };
+//     return location;
+// };
 
 const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     if (data) {

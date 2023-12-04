@@ -3,14 +3,16 @@ import { pinia } from '@/store/pinia';
 
 
 
-export const initWorkspace = async (): Promise<string|undefined> => {
+export const initWorkspace = async (store): Promise<string|undefined> => {
+    const userId = store.state.user.userId;
+
     // NOTE: this is to use pinia store outside vue component
     useWorkspaceStore(pinia);
 
     const workspaceStore = useWorkspaceStore();
 
     /* Workspace Load */
-    await workspaceStore.load();
+    await workspaceStore.load(userId);
 
     /* Set Default Workspace */
     const { pathname } = window.location;
