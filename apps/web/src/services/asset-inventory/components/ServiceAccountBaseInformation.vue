@@ -18,6 +18,7 @@ import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType, ServiceAccountModelForBinding } from '@/schema/identity/service-account/type';
 import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
+import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -116,13 +117,24 @@ const getServiceAccount = async (serviceAccountId:string) => {
 };
 const updateServiceAccount = async () => {
     try {
-        state.serviceAccountData = await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            service_account_id: props.serviceAccountId,
-            name: state.baseInformationForm.accountName,
-            data: state.baseInformationForm.customSchemaForm,
-            tags: state.baseInformationForm.tags,
-        });
+        if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
+            state.serviceAccountData = await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                trusted_account_id: props.serviceAccountId,
+                name: state.baseInformationForm.accountName,
+                data: state.baseInformationForm.customSchemaForm,
+                tags: state.baseInformationForm.tags,
+            });
+        } else {
+            state.serviceAccountData = await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                service_account_id: props.serviceAccountId,
+                name: state.baseInformationForm.accountName,
+                data: state.baseInformationForm.customSchemaForm,
+                tags: state.baseInformationForm.tags,
+            });
+        }
+
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
@@ -214,7 +226,7 @@ watch(() => props.serviceAccountId, (serviceAccountId) => {
                                                    :schema="state.baseInformationSchema.schema"
                                                    :is-valid.sync="state.isFormValid"
                                                    :origin-form="state.originBaseInformationForm"
-                                                   :aacount-type="props.serviceAccountType"
+                                                   :account-type="props.serviceAccountType"
                                                    @change="handleChangeForm"
             />
         </div>
