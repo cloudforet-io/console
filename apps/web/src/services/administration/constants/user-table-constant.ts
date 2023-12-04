@@ -2,84 +2,15 @@ import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItem } from '@cloudforet/core-lib/component-util/query-search/type';
+
+import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
 import * as styles from '@/styles/colors';
-
-
-const USER_TYPE_LABEL = {
-    API_USER: {
-        label: 'API Only',
-    },
-    USER: {
-        label: 'Console, API',
-    },
-} as const;
 
 const USER_STATE = {
     ENABLE: 'ENABLED',
     DISABLE: 'DISABLED',
 } as const;
-
-export const userSearchHandlers = {
-    keyItemSets: [{
-        title: 'Properties',
-        items: [
-            {
-                name: 'user_id',
-                label: 'User ID',
-            },
-            {
-                name: 'name',
-                label: 'Name',
-            },
-            {
-                name: 'state',
-                label: 'State',
-            },
-            {
-                name: 'email',
-                label: 'E-mail',
-            },
-            {
-                name: 'user_type',
-                label: 'Access Control',
-            },
-            {
-                name: 'backend',
-                label: 'Auth Type',
-            },
-            {
-                name: 'last_accessed_at',
-                label: 'Last Activity',
-                dataType: 'datetime',
-            },
-            {
-                name: 'timezone',
-                label: 'Timezone',
-            },
-        ] as KeyItem[],
-    },
-    {
-        title: 'Advanced',
-        items: [{
-            name: 'tags',
-            label: 'Tags',
-            dataType: 'object',
-        }],
-    }],
-    valueHandlerMap: {
-        user_id: makeDistinctValueHandler('identity.User', 'user_id'),
-        name: makeDistinctValueHandler('identity.User', 'name'),
-        state: makeEnumValueHandler(USER_STATE),
-        email: makeDistinctValueHandler('identity.User', 'email'),
-        user_type: makeEnumValueHandler(USER_TYPE_LABEL),
-        backend: makeDistinctValueHandler('identity.User', 'backend'),
-        last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at', 'datetime'),
-        timezone: makeDistinctValueHandler('identity.User', 'timezone'),
-        tags: makeDistinctValueHandler('identity.User', 'tags'),
-    },
-};
 
 export const userStateColor = {
     ENABLED: {
@@ -106,3 +37,81 @@ export const pluginStateColor = {
         textColor: styles.gray[400],
     },
 } as const;
+
+export const userSearchHandlers = {
+    keyItemSets: [{
+        title: 'Properties',
+        items: [
+            {
+                name: 'user_id',
+                label: 'User ID',
+            },
+            {
+                name: 'name',
+                label: 'Name',
+            },
+            {
+                name: 'state',
+                label: 'State',
+            },
+            {
+                name: 'email',
+                label: 'E-mail',
+            },
+            {
+                name: 'backend',
+                label: 'Auth Type',
+            },
+            {
+                name: 'last_accessed_at',
+                label: 'Last Activity',
+                dataType: 'datetime',
+            },
+            {
+                name: 'timezone',
+                label: 'Timezone',
+            },
+        ],
+    },
+    {
+        title: 'Advanced',
+        items: [{
+            name: 'tags',
+            label: 'Tags',
+            dataType: 'object',
+        }],
+    }],
+    valueHandlerMap: {
+        user_id: makeDistinctValueHandler('identity.User', 'user_id'),
+        name: makeDistinctValueHandler('identity.User', 'name'),
+        state: makeEnumValueHandler(USER_STATE),
+        email: makeDistinctValueHandler('identity.User', 'email'),
+        backend: makeDistinctValueHandler('identity.User', 'backend'),
+        last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at', 'datetime'),
+        timezone: makeDistinctValueHandler('identity.User', 'timezone'),
+        tags: makeDistinctValueHandler('identity.User', 'tags'),
+    },
+};
+
+export const userTableFields = [
+    { name: 'user_id', label: 'User ID', sortable: false },
+    { name: 'name', label: 'Name', sortable: false },
+    { name: 'state', label: 'State', sortable: false },
+    { name: 'api_key_count', label: 'API Key' },
+    { name: 'role_type', label: 'Role' },
+    { name: 'tags', label: 'Tags' },
+    { name: 'auth_type', label: 'Auth Type', sortable: false },
+    { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
+    { name: 'timezone', label: 'Timezone', sortable: false },
+];
+
+export const userExcelFields:ExcelDataField[] = [
+    { key: 'user_id', name: 'User ID' },
+    { key: 'name', name: 'Name' },
+    { key: 'state', name: 'State' },
+    { key: 'api_key_count', name: 'API Key' },
+    { key: 'role_type', name: 'Role' },
+    { key: 'auth_type', name: 'Auth Type' },
+    { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },
+    { key: 'timezone', name: 'Timezone' },
+];
