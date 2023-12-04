@@ -31,7 +31,7 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state,
         const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters>({
             domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
-                only: ['provider', 'name'],
+                only: ['provider', 'name', 'icon', 'alias', 'color'],
             },
             workspace_id: undefined,
         }, { timeout: 3000 });

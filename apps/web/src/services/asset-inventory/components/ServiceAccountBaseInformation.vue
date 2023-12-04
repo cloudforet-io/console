@@ -15,8 +15,11 @@ import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
+import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -57,7 +60,7 @@ const state = reactive({
     mode: 'READ' as PageMode,
     isFormValid: undefined,
     baseInformationSchema: {} as Partial<SchemaModel>,
-    serviceAccountData: undefined as ServiceAccountModel|undefined,
+    serviceAccountData: undefined as ServiceAccountModel|TrustedAccountModel|undefined,
     baseInformationForm: {} as BaseInformationForm,
     originBaseInformationForm: {} as BaseInformationForm,
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
@@ -76,31 +79,32 @@ const getProvider = async () => {
         state.providerData = {};
     }
 };
-
-// add TRUSTED MANAGED directly
-const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBinding): ServiceAccountModelForBinding => {
-    if (serviceAccount.service_account_type === ACCOUNT_TYPE.TRUSTED && serviceAccount.tags?.is_managed === 'true') {
-        return {
-            ...serviceAccount,
-            service_account_type: 'TRUSTED-MANAGED',
-        };
-    }
-    return serviceAccount;
-};
-const getServiceAccount = async (serviceAccountId) => {
+const getServiceAccount = async (serviceAccountId:string) => {
     try {
         state.loading = true;
-        const result = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            service_account_id: serviceAccountId,
-            // workspace_id: ws-xxxxx   # TODO: add workspace_id after store is ready
-        });
+        let res;
+        if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
+            res = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                trusted_account_id: serviceAccountId,
+                workspace_id: undefined,
+            });
+        } else {
+            res = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                service_account_id: serviceAccountId,
+            });
+        }
 
-        state.serviceAccountData = serviceAccountPreprocessor(result);
+        state.serviceAccountData = res;
         state.baseInformationForm = {
-            accountName: result.name,
-            customSchemaForm: result.data,
-            tags: result.tags,
+            accountName: res.name,
+            customSchemaForm: res.data,
+            tags: res.tags,
+            projectForm: res.project_info ?? {
+                project_id: '',
+                project_name: '',
+            },
         };
         state.originBaseInformationForm = cloneDeep(state.baseInformationForm);
     } catch (e) {
@@ -112,13 +116,24 @@ const getServiceAccount = async (serviceAccountId) => {
 };
 const updateServiceAccount = async () => {
     try {
-        state.serviceAccountData = await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            service_account_id: props.serviceAccountId,
-            name: state.baseInformationForm.accountName,
-            data: state.baseInformationForm.customSchemaForm,
-            tags: state.baseInformationForm.tags,
-        });
+        if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
+            state.serviceAccountData = await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                trusted_account_id: props.serviceAccountId,
+                name: state.baseInformationForm.accountName,
+                data: state.baseInformationForm.customSchemaForm,
+                tags: state.baseInformationForm.tags,
+            });
+        } else {
+            state.serviceAccountData = await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                service_account_id: props.serviceAccountId,
+                name: state.baseInformationForm.accountName,
+                data: state.baseInformationForm.customSchemaForm,
+                tags: state.baseInformationForm.tags,
+            });
+        }
+
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
@@ -210,7 +225,7 @@ watch(() => props.serviceAccountId, (serviceAccountId) => {
                                                    :schema="state.baseInformationSchema.schema"
                                                    :is-valid.sync="state.isFormValid"
                                                    :origin-form="state.originBaseInformationForm"
-                                                   :aacount-type="props.serviceAccountType"
+                                                   :account-type="props.serviceAccountType"
                                                    @change="handleChangeForm"
             />
         </div>
