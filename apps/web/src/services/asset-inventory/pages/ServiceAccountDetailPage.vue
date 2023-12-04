@@ -14,6 +14,9 @@ import type { ProviderModel } from '@/schema/identity/provider/model';
 import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -31,7 +34,7 @@ import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
 
 const props = defineProps<{
-    serviceAccountId: string;
+    serviceAccountId?: string;
 }>();
 
 const storeState = reactive({
@@ -42,7 +45,7 @@ const state = reactive({
     loading: true,
     hasManagePermission: useManagePermissionState(),
     item: {} as ServiceAccountModel,
-    serviceAccountType: computed(() => (state.item.trusted_account_id ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL)),
+    serviceAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
     attachedGeneralAccounts: [] as ServiceAccountModel[],
     attachedTrustedAccountId: computed(() => state.item.trusted_account_id),
     providerData: {} as ProviderModel,
@@ -66,14 +69,21 @@ const state = reactive({
 });
 
 /* Api */
-const getServiceAccount = async (serviceAccountId: string) => {
+const getAccount = async (serviceAccountId: string) => {
+    state.loading = true;
     try {
-        state.loading = true;
-        state.item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            service_account_id: serviceAccountId,
-            // workspace_id: ws-xxxxx   # TODO: add workspace_id after store is ready
-        });
+        if (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
+            state.item = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                trusted_account_id: serviceAccountId,
+                workspace_id: undefined,
+            });
+        } else {
+            state.item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                service_account_id: serviceAccountId,
+            });
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
         state.item = {};
@@ -99,7 +109,7 @@ const handleOpenDeleteModal = () => {
     state.deleteModalVisible = true;
 };
 const handleRefresh = () => {
-    getServiceAccount(props.serviceAccountId);
+    if (props.serviceAccountId) getAccount(props.serviceAccountId);
 };
 
 /* Init */
@@ -112,7 +122,8 @@ const handleRefresh = () => {
 /* Watcher */
 watch(() => props.serviceAccountId, async (serviceAccountId) => {
     if (serviceAccountId) {
-        await getServiceAccount(serviceAccountId);
+        state.serviceAccountType = (serviceAccountId?.startsWith('ta') ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
+        await getAccount(serviceAccountId);
         await getProviderData(state.providerId);
     }
 }, { immediate: true });
@@ -164,7 +175,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                               :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
             />
-            <service-account-attached-general-accounts v-if="state.serviceAccountType === ACCOUNT_TYPE.TRUSTED"
+            <service-account-attached-general-accounts v-if="state.serviceAccountType === ACCOUNT_TYPE.TRUSTED && props.serviceAccountId"
                                                        :service-account-id="props.serviceAccountId"
                                                        :attached-general-accounts.sync="state.attachedGeneralAccounts"
             />
@@ -180,7 +191,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             />
         </div>
         <service-account-delete-modal :visible.sync="state.deleteModalVisible"
-                                      :service-account-id="serviceAccountId"
+                                      :service-account-id="props.serviceAccountId"
                                       :service-account-name="state.item.name"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
                                       :provider-id="state.providerId"

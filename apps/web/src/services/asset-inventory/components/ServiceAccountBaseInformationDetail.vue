@@ -48,7 +48,7 @@ const getDetailSchema = async (provider) => {
             options: {
                 provider,
             },
-        });
+        }, { mockPath: '?resource=sa-aws-baseinfo' });
         state.detailSchema = result.details[0];
     } catch (e) {
         ErrorHandler.handleError(e);

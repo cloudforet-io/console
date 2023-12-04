@@ -15,8 +15,10 @@ import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
-import type { AccountType } from '@/schema/identity/service-account/type';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType, ServiceAccountModelForBinding } from '@/schema/identity/service-account/type';
+import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -28,6 +30,7 @@ import ServiceAccountBaseInformationDetail
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
+import { serviceAccountPreprocessor } from '@/services/asset-inventory/helpers/service-account-preprocesseor';
 import type {
     BaseInformationForm, PageMode,
 } from '@/services/asset-inventory/types/service-account-page-type';
@@ -57,7 +60,7 @@ const state = reactive({
     mode: 'READ' as PageMode,
     isFormValid: undefined,
     baseInformationSchema: {} as Partial<SchemaModel>,
-    serviceAccountData: undefined as ServiceAccountModel|undefined,
+    serviceAccountData: undefined as ServiceAccountModelForBinding|undefined,
     baseInformationForm: {} as BaseInformationForm,
     originBaseInformationForm: {} as BaseInformationForm,
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
@@ -76,31 +79,32 @@ const getProvider = async () => {
         state.providerData = {};
     }
 };
-
-// add TRUSTED MANAGED directly
-const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBinding): ServiceAccountModelForBinding => {
-    if (serviceAccount.service_account_type === ACCOUNT_TYPE.TRUSTED && serviceAccount.tags?.is_managed === 'true') {
-        return {
-            ...serviceAccount,
-            service_account_type: 'TRUSTED-MANAGED',
-        };
-    }
-    return serviceAccount;
-};
-const getServiceAccount = async (serviceAccountId) => {
+const getServiceAccount = async (serviceAccountId:string) => {
     try {
         state.loading = true;
-        const result = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            service_account_id: serviceAccountId,
-            // workspace_id: ws-xxxxx   # TODO: add workspace_id after store is ready
-        });
+        let res;
+        if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
+            res = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                trusted_account_id: serviceAccountId,
+                workspace_id: undefined,
+            });
+        } else {
+            res = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
+                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+                service_account_id: serviceAccountId,
+            });
+        }
 
-        state.serviceAccountData = serviceAccountPreprocessor(result);
+        state.serviceAccountData = serviceAccountPreprocessor(res);
         state.baseInformationForm = {
-            accountName: result.name,
-            customSchemaForm: result.data,
-            tags: result.tags,
+            accountName: res.name,
+            customSchemaForm: res.data,
+            tags: res.tags,
+            projectForm: res.project_info ?? {
+                project_id: '',
+                project_name: '',
+            },
         };
         state.originBaseInformationForm = cloneDeep(state.baseInformationForm);
     } catch (e) {
