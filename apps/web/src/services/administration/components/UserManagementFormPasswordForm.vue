@@ -1,78 +1,3 @@
-<template>
-    <div>
-        <p-field-group :label="userPageState.visibleUpdateModal ? $t('COMMON.PROFILE.PASSWORD') : ''"
-                       required
-                       class="password-form-wrapper"
-        >
-            <div class="password-form-view">
-                <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
-                    <p-radio v-for="(type, idx) in state.passwordTypeArr"
-                             :key="type.name"
-                             v-model="state.passwordStatus"
-                             :value="idx"
-                             :disabled="type.disabled"
-                             @change="handleClickRadio(idx)"
-                    >
-                        {{ type.label }}
-                    </p-radio>
-                </p-radio-group>
-                <p-divider />
-                <form class="form">
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD')"
-                        :required="true"
-                        :invalid="invalidState.password"
-                        :invalid-text="invalidTexts.password"
-                        class="input-form"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input :value="password"
-                                          type="password"
-                                          autocomplete="current-password"
-                                          appearance-type="masking"
-                                          class="text-input password"
-                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
-                                          :invalid="invalid"
-                                          @update:value="handleChangeInput('password', $event)"
-                            />
-                        </template>
-                    </p-field-group>
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                        :required="true"
-                        :invalid="invalidState.passwordCheck"
-                        :invalid-text="invalidTexts.passwordCheck"
-                        class="input-form"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input :value="passwordCheck"
-                                          type="password"
-                                          class="text-input password-check"
-                                          autocomplete="new-password"
-                                          appearance-type="masking"
-                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
-                                          :invalid="invalid"
-                                          @update:value="handleChangeInput('passwordCheck', $event)"
-                            />
-                        </template>
-                    </p-field-group>
-                </form>
-            </div>
-        </p-field-group>
-        <div v-if="userPageState.visibleUpdateModal && !props.item.email_verified"
-             class="help-text-wrapper"
-        >
-            <p-i name="ic_info-circle"
-                 height="0.875rem"
-                 width="0.875rem"
-                 class="info-icon"
-                 color="inherit"
-            />
-            <span class="help-text">{{ $t('COMMON.PROFILE.PASSWORD_HELP_TEXT') }}</span>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
 
@@ -203,8 +128,82 @@ const resetForm = () => {
     state.passwordType = state.passwordTypeArr[0].name;
     emit('change-input', { password: '', passwordType: state.passwordType });
 })();
-
 </script>
+
+<template>
+    <div>
+        <p-field-group :label="userPageState.visibleUpdateModal ? $t('COMMON.PROFILE.PASSWORD') : ''"
+                       required
+                       class="password-form-wrapper"
+        >
+            <div class="password-form-view">
+                <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
+                    <p-radio v-for="(type, idx) in state.passwordTypeArr"
+                             :key="type.name"
+                             v-model="state.passwordStatus"
+                             :value="idx"
+                             :disabled="type.disabled"
+                             @change="handleClickRadio(idx)"
+                    >
+                        {{ type.label }}
+                    </p-radio>
+                </p-radio-group>
+                <p-divider />
+                <form class="form">
+                    <p-field-group
+                        :label="$t('COMMON.PROFILE.PASSWORD')"
+                        :required="true"
+                        :invalid="invalidState.password"
+                        :invalid-text="invalidTexts.password"
+                        class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="password"
+                                          type="password"
+                                          autocomplete="current-password"
+                                          appearance-type="masking"
+                                          class="text-input password"
+                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
+                                          :invalid="invalid"
+                                          @update:value="handleChangeInput('password', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                    <p-field-group
+                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                        :required="true"
+                        :invalid="invalidState.passwordCheck"
+                        :invalid-text="invalidTexts.passwordCheck"
+                        class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input :value="passwordCheck"
+                                          type="password"
+                                          class="text-input password-check"
+                                          autocomplete="new-password"
+                                          appearance-type="masking"
+                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
+                                          :invalid="invalid"
+                                          @update:value="handleChangeInput('passwordCheck', $event)"
+                            />
+                        </template>
+                    </p-field-group>
+                </form>
+            </div>
+        </p-field-group>
+        <div v-if="userPageState.visibleUpdateModal && !props.item.email_verified"
+             class="help-text-wrapper"
+        >
+            <p-i name="ic_info-circle"
+                 height="0.875rem"
+                 width="0.875rem"
+                 class="info-icon"
+                 color="inherit"
+            />
+            <span class="help-text">{{ $t('COMMON.PROFILE.PASSWORD_HELP_TEXT') }}</span>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .password-form-wrapper {

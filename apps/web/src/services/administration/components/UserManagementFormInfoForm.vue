@@ -25,7 +25,6 @@ import {
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
-
 interface Props {
     activeTab?: string;
     item?: User;

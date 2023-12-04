@@ -1,28 +1,3 @@
-<template>
-    <div class="admin-role-wrapper">
-        <p-field-title :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')">
-            <template #left>
-                <p-toggle-button
-                    :value="state.isToggled"
-                    class="toggle-button"
-                    @change-toggle="handleUpdateToggle"
-                />
-            </template>
-        </p-field-title>
-        <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
-        <p-select-dropdown v-if="state.isToggled"
-                           :key="`admin-role-${props.activeTab}`"
-                           :menu="formState.domainRoleList"
-                           :disabled="formState.domainRoleList.length < 2 || state.isSameId"
-                           use-fixed-menu-style
-                           :selected="state.selectedMenuIndex"
-                           class="dropdown"
-                           index-mode
-                           @select="handleSelectedMenuIndex"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import { reactive } from 'vue';
 
@@ -122,6 +97,31 @@ const getRoleList = async () => {
     }
 })();
 </script>
+
+<template>
+    <div class="admin-role-wrapper">
+        <p-field-title :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')">
+            <template #left>
+                <p-toggle-button
+                    :value="state.isToggled"
+                    class="toggle-button"
+                    @change-toggle="handleUpdateToggle"
+                />
+            </template>
+        </p-field-title>
+        <!-- CAUTION: Do not remove key binding at select dropdown. This is for initiating scroll parent to refresh fixed menu style. -->
+        <p-select-dropdown v-if="state.isToggled"
+                           :key="`admin-role-${props.activeTab}`"
+                           :menu="formState.domainRoleList"
+                           :disabled="formState.domainRoleList.length < 2 || state.isSameId"
+                           use-fixed-menu-style
+                           :selected="state.selectedMenuIndex"
+                           class="dropdown"
+                           index-mode
+                           @select="handleSelectedMenuIndex"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .admin-role-wrapper {

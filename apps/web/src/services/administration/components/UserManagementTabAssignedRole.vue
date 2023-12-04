@@ -1,58 +1,8 @@
-<template>
-    <div>
-        <p-heading heading-type="sub"
-                   :title="title"
-        />
-        <p-data-table
-            :items="items"
-            :loading="loading"
-            :fields="fields"
-            :striped="false"
-        >
-            <template #col-project_group_info.project_group_id-format="{value}">
-                <p-link v-if="value"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
-                        new-tab
-                        :href="getProjectLink(value, false)"
-                >
-                    {{ projectGroups[value] ? projectGroups[value].label : value }}
-                </p-link>
-                <p v-if="!value">
-                    -
-                </p>
-            </template>
-            <template #col-project_info.project_id-format="{value}">
-                <p-link v-if="value"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
-                        new-tab
-                        :href="getProjectLink(value, true)"
-                >
-                    {{ projects[value] ? projects[value].label : value }}
-                </p-link>
-                <p v-if="!value">
-                    -
-                </p>
-            </template>
-            <template #col-labels-format="{value}">
-                <p v-if="value.length === 0" />
-                <p-badge v-for="(label, idx) in value"
-                         :key="idx"
-                         badge-type="subtle"
-                         style-type="gray200"
-                         class="mr-2"
-                >
-                    {{ label }}
-                </p-badge>
-            </template>
-        </p-data-table>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PDataTable, PLink, PBadge,
@@ -74,9 +24,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
-
-
 interface UserRoleItem {
     labels?: string[]|string;
     project_group_info?: ProjectGroupReferenceItem|string;
@@ -87,89 +34,122 @@ interface UserRoleItem {
     role_info: any;
     tags?: Tags;
 }
+interface Props {
+    userId: string
+}
 
-export default {
-    name: 'UserManagementTabAssignedRole',
-    components: {
-        PDataTable,
-        PHeading,
-        PLink,
-        PBadge,
-    },
-    props: {
-        userId: {
-            type: String,
-            required: true,
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const baseState = reactive({
-            title: computed(() => i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES')),
-            loading: true,
-            fields: computed(() => [
-                { name: 'role_info.name', label: 'Role Name' },
-                { name: 'role_info.role_type', label: 'Role Type' },
-                { name: 'project_group_info.project_group_id', label: 'Project Group' },
-                { name: 'project_info.project_id', label: 'Project' },
-                { name: 'labels', label: 'Labels' },
-            ]),
-            items: [] as UserRoleItem[],
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            projects: computed(() => store.getters['reference/projectItems']),
+const props = withDefaults(defineProps<Props>(), {
+    userId: '',
+});
+
+const router = useRouter();
+
+const state = reactive({
+    title: computed(() => i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES')),
+    loading: true,
+    fields: computed(() => [
+        { name: 'role_info.name', label: 'Role Name' },
+        { name: 'role_info.role_type', label: 'Role Type' },
+        { name: 'project_group_info.project_group_id', label: 'Project Group' },
+        { name: 'project_info.project_id', label: 'Project' },
+        { name: 'labels', label: 'Labels' },
+    ]),
+    items: [] as UserRoleItem[],
+    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projects: computed(() => store.getters['reference/projectItems']),
+});
+
+const getProjectLink = (value, isProject: true) => {
+    if (isProject) {
+        const link = router.resolve(referenceRouter(value, {
+            resource_type: 'identity.Project',
+        }));
+        return link.href;
+    }
+    const link = router.resolve(referenceRouter(value, {
+        resource_type: 'identity.ProjectGroup',
+    }));
+    return link.href;
+};
+
+const getUserDetailData = async (userId) => {
+    state.loading = true;
+    try {
+        const res = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
+            user_id: userId,
         });
 
-        const getProjectLink = (value, isProject: true) => {
-            if (isProject) {
-                const link = vm.$router.resolve(referenceRouter(value, {
-                    resource_type: 'identity.Project',
-                }));
-                return link.href;
-            }
-            const link = vm.$router.resolve(referenceRouter(value, {
-                resource_type: 'identity.ProjectGroup',
-            }));
-            return link.href;
-        };
-
-        const getUserDetailData = async (userId) => {
-            baseState.loading = true;
-            try {
-                const res = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
-                    user_id: userId,
-                });
-
-                baseState.items = res.role_bindings.map((d) => ({
-                    ...d,
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                baseState.items = [];
-            } finally {
-                baseState.loading = false;
-            }
-        };
-
-        watch(() => props.userId, () => {
-            const userId = props.userId;
-            getUserDetailData(userId);
-        }, { immediate: true });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(baseState),
-            userStateFormatter,
-            referenceRouter,
-            getProjectLink,
-            ACTION_ICON,
-        };
-    },
+        state.items = res.role_bindings.map((d) => ({
+            ...d,
+        }));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.items = [];
+    } finally {
+        state.loading = false;
+    }
 };
+
+watch(() => props.userId, () => {
+    const userId = props.userId;
+    getUserDetailData(userId);
+}, { immediate: true });
+
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/projectGroup/load'),
+    ]);
+})();
 </script>
+
+<template>
+    <div>
+        <p-heading heading-type="sub"
+                   :title="state.title"
+        />
+        <p-data-table
+            :items="state.items"
+            :loading="state.loading"
+            :fields="state.fields"
+            :striped="false"
+        >
+            <template #col-project_group_info.project_group_id-format="{value}">
+                <p-link v-if="value"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :href="getProjectLink(value, false)"
+                >
+                    {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
+                </p-link>
+                <p v-if="!value">
+                    -
+                </p>
+            </template>
+            <template #col-project_info.project_id-format="{value}">
+                <p-link v-if="value"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :href="getProjectLink(value, true)"
+                >
+                    {{ state.projects[value] ? state.projects[value].label : value }}
+                </p-link>
+                <p v-if="!value">
+                    -
+                </p>
+            </template>
+            <template #col-labels-format="{value}">
+                <p v-if="value.length === 0" />
+                <p-badge v-for="(label, idx) in value"
+                         :key="idx"
+                         badge-type="subtle"
+                         style-type="gray200"
+                         class="mr-2"
+                >
+                    {{ label }}
+                </p-badge>
+            </template>
+        </p-data-table>
+    </div>
+</template>

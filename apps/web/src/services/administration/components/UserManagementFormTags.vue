@@ -1,24 +1,3 @@
-<template>
-    <div class="tags-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
-                       class="title"
-        >
-            <div class="tag-help-msg">
-                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
-                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
-            </div>
-        </p-field-group>
-
-        <tags-input-group :tags="formState.tags"
-                          show-validation
-                          :is-valid.sync="validationState.isTagsValid"
-                          is-administration
-                          class="utils-wrapper"
-                          @update-tags="handleUpdateTags"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import { reactive } from 'vue';
 
@@ -67,6 +46,26 @@ const handleUpdateTags = (tags: Tag) => {
 })();
 </script>
 
+<template>
+    <div class="tags-wrapper">
+        <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
+                       class="title"
+        >
+            <div class="tag-help-msg">
+                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
+                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
+            </div>
+        </p-field-group>
+
+        <tags-input-group :tags="formState.tags"
+                          show-validation
+                          :is-valid.sync="validationState.isTagsValid"
+                          is-administration
+                          class="utils-wrapper"
+                          @update-tags="handleUpdateTags"
+        />
+    </div>
+</template>
 <style lang="postcss" scoped>
 .tags-wrapper {
     .title {
