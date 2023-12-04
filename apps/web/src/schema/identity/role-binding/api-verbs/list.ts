@@ -1,5 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleType } from '@/schema/identity/role/type';
 
@@ -12,7 +13,4 @@ export interface RoleBindingListParameters {
     workspace_id?: string;
 }
 
-export interface RoleBindingListResponse {
-    results: RoleBindingModel[];
-    total_count: number;
-}
+export type RoleBindingListResponse = ListResponse<RoleBindingModel>;

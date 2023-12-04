@@ -87,12 +87,12 @@ const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(asy
         const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>({
             role_id: role.role_id,
         });
-        const roleBindingList: UnDeletableRole[] = results.map((roleBinding: RoleBindingModel) => ({
+        const roleBindingList: UnDeletableRole[] = results?.map((roleBinding: RoleBindingModel) => ({
             roleName: role.name,
             roleDescription: role.tags?.description,
             roleType: role.role_type,
             assignTo: { resource_id: roleBinding.user_id, resource_type: 'identity.User' },
-        }));
+        })) ?? [];
         state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
     } catch (e) {
         ErrorHandler.handleError(e);
