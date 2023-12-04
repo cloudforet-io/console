@@ -92,7 +92,7 @@ export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList
     return results;
 }, [] as LNBMenu[]);
 
-export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermissionTuple[], menuList: Menu[]): PagePermissionType|undefined => {
+export const getPermissionOfMenu = (menuId: MenuId, pagePermissions: PagePermissionTuple[], menuList: Menu[]): PagePermissionType|undefined => {
     let result: PagePermissionType|undefined;
     const filterdMenuListByRequiredPermission = filterMenuByPermission(menuList);
 
