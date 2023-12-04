@@ -2,6 +2,7 @@ import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
+// eslint-disable-next-line import/no-cycle
 import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
 interface AppContextStoreState {
