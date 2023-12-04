@@ -9,6 +9,8 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -20,6 +22,7 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type {
     ProjectTreeNodeData,
@@ -62,8 +65,9 @@ const state = reactive({
         },
     })),
     allProjectRoot: null as any,
-    allProjectNode: computed(() => ([i18n.t('PROJECT.LANDING.ALL_PROJECT')])),
+    allProjectNode: computed(() => ([i18n.t('PROJECT.LANDING.ALL_PROJECTS')])),
 });
+const projectTreeHelper = useProjectTree();
 
 const toggleOptions = {
     validator: (node) => node.data.has_child || node.children.length > 0,
@@ -120,13 +124,12 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
         }
 
         if (projectPageStore.treeEditMode) {
-            params.include_permission = true;
             if (projectOnly) params.exclude_type = 'PROJECT_GROUP';
         } else {
             params.exclude_type = 'PROJECT';
         }
 
-        const { items } = await SpaceConnector.client.identity.project.tree(params);
+        const items = await projectTreeHelper.getProjectTree(params);
 
         if (!node.data) {
             projectPageStore.hasProjectGroup = Array.isArray(items) ? !!items.length : false;
@@ -185,12 +188,11 @@ watch(() => projectPageStore.treeEditMode, async (treeEditMode) => {
 
 const onFinishEdit = async (node, editText: string) => {
     try {
-        const params = {
+        await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: node.data.id,
             name: editText,
-        };
-
-        await SpaceConnector.client.identity.projectGroup.update(params);
+        });
 
         dataSetter(editText, node);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
@@ -200,16 +202,12 @@ const onFinishEdit = async (node, editText: string) => {
 };
 
 const updateProjectGroup = async (node, oldParent, parent) => {
-    const params: any = {
-        project_group_id: node.data.id,
-    };
-    if (parent) {
-        params.parent_project_group_id = parent.data.id;
-    } else {
-        params.release_parent_project_group = true;
-    }
     try {
-        await SpaceConnector.client.identity.projectGroup.update(params);
+        await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            project_group_id: node.data.id,
+            parent_group_id: parent?.data?.id || undefined,
+        });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
@@ -218,16 +216,12 @@ const updateProjectGroup = async (node, oldParent, parent) => {
 };
 
 const updateProject = async (node, oldParent, parent) => {
-    const params: any = {
-        project_id: node.data.id,
-    };
-    if (parent) {
-        params.project_group_id = parent.data.id;
-    } else {
-        params.release_parent_project_group = true;
-    }
     try {
-        await SpaceConnector.client.identity.project.update(params);
+        await SpaceConnector.clientV2.identity.project.changeProjectGroup<ProjectChangeProjectGroupParameters>({
+            project_id: node.data.id,
+            project_group_id: parent?.data?.id || undefined,
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+        });
 
         // this is for refresh project list cards
         if (projectPageStore.groupId === oldParent?.data.id || projectPageStore.groupId === parent.data.id) {

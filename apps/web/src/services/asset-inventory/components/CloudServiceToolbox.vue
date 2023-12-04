@@ -13,15 +13,15 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter, ExportOption } from '@/schema/_common/api-verbs/export';
+import { QueryType } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import {
     dynamicFieldsToExcelDataFields,
-} from '@/lib/component-util/dynamic-layout';
+} from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
 
@@ -29,23 +29,28 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CloudServiceFilterModal from '@/services/asset-inventory/components/CloudServiceFilterModal.vue';
 import CloudServicePeriodFilter from '@/services/asset-inventory/components/CloudServicePeriodFilter.vue';
+import { getCloudServiceAnalyzeQuery } from '@/services/asset-inventory/helpers/cloud-service-analyze-query-helper';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
-
-
+import type { CloudServiceAnalyzeResult } from '@/services/asset-inventory/types/cloud-service-card-type';
+import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Handlers { keyItemSets?: KeyItemSet[]; valueHandlerMap?: ValueHandlerMap }
 
 interface Props {
-    totalCount: number;
+    hasNextPage: boolean;
     handlers: Handlers;
     queryTags?: QueryTag[];
+    period?: Period;
+    pageSize?: number;
 }
 
 
 const props = withDefaults(defineProps<Props>(), {
-    totalCount: 0,
+    hasNextPage: false,
     handlers: () => ({}),
     queryTags: () => [],
+    period: undefined,
+    pageSize: undefined,
 });
 
 const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): void;
@@ -88,60 +93,50 @@ const excelState = reactive({
 });
 
 /* excel */
-const cloudServiceResourcesApiQueryHelper = new ApiQueryHelper()
-    .setPageLimit(0).setPageStart(1)
-    .setMultiSort([
-        { key: 'provider', desc: false },
-        { key: 'cloud_service_group', desc: false },
-    ]);
-const getCloudServiceResources = async () => {
+interface CloudServiceResource {
+    provider?: string;
+    cloud_service_group?: string;
+    cloud_service_type?: string
+}
+
+const getCloudServiceResources = async (): Promise<CloudServiceResource[]> => {
     try {
-        cloudServiceResourcesApiQueryHelper.setFilters(state.cloudServiceFilters);
-        const { results } = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-            {
-                labels: cloudServicePageStore.selectedCategories,
-                query: cloudServiceResourcesApiQueryHelper.data,
-            },
-        );
-        return results;
+        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+            query: getCloudServiceAnalyzeQuery(
+                cloudServicePageStore.allFilters,
+                undefined,
+                props.period,
+            ),
+        });
+        return (results as CloudServiceAnalyzeResult[]).map((d) => d.resources?.map((r) => ({
+            ...r,
+            provider: d.provider,
+            cloud_service_group: d.cloud_service_group,
+        })) ?? []).flat();
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
     }
 };
 
-const getExcelFields = async (data): Promise<ExcelDataField[]> => {
+const getExcelFields = async (data: CloudServiceResource): Promise<ExcelDataField[]> => {
     let schema: DynamicLayout;
     let excelField;
-    if (data.resource_type === 'inventory.Server') {
-        try {
-            schema = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: 'inventory.Server',
-                schema: 'table',
-            });
-            if (schema.options) {
-                excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
+    try {
+        schema = await SpaceConnector.client.addOns.pageSchema.get({
+            resource_type: 'inventory.CloudService',
+            schema: 'table',
+            options: {
+                provider: data.provider,
+                cloud_service_group: data.cloud_service_group,
+                cloud_service_type: data.cloud_service_type,
+            },
+        });
+        if (schema.options) {
+            excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
         }
-    } else {
-        try {
-            schema = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: 'inventory.CloudService',
-                schema: 'table',
-                options: {
-                    provider: data.provider,
-                    cloud_service_group: data.cloud_service_group,
-                    cloud_service_type: data.cloud_service_type,
-                },
-            });
-            if (schema.options) {
-                excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
-            }
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
     }
     return excelField;
 };
@@ -160,24 +155,17 @@ const getExcelQuery = (data) => {
     return excelApiQueryHelper.data;
 };
 const getCloudServiceResourcesPayload = (): ExportOption => {
-    excelApiQueryHelper.setFilters(excelState.cloudServiceFilters).setMultiSortV2([
-        { key: 'provider', desc: true },
-        { key: 'cloud_service_group', desc: true },
-    ]);
-    return ({
+    const query = getCloudServiceAnalyzeQuery(excelState.cloudServiceFilters, undefined, props.period);
+    // analyze_query at export api does not support field_group
+    delete query.field_group;
+    delete query.page;
+
+    return {
         name: 'Summary',
         title: 'Summary',
         query_type: QueryType.ANALYZE,
-        analyze_query: {
-            ...excelApiQueryHelper.data,
-            group_by: ['provider', 'cloud_service_group', 'cloud_service_type'],
-            fields: {
-                total_count: {
-                    operator: 'count',
-                },
-            },
-        },
-    });
+        analyze_query: query,
+    };
 };
 const getExcelPayloadList = async (): Promise<ExportOption[]> => {
     const excelPayloadList: ExportOption[] = [];
@@ -197,7 +185,7 @@ const getExcelPayloadList = async (): Promise<ExportOption[]> => {
         let sheetName = `${excelItems[idx].cloud_service_group}.${excelItems[idx].cloud_service_type}`;
         sheetName = removeErrorString(sheetName);
 
-        const provider = excelItems[idx].provider;
+        const provider = excelItems[idx].provider ?? '';
         const providerName = state.providers[provider]?.label || provider;
 
         excelPayloadList.push({
@@ -220,7 +208,8 @@ const handleChange = (options: ToolboxOptions = {}) => {
         cloudServicePageStore.$patch((_state) => {
             _state.searchFilters = searchQueryHelper.filters;
         });
-    } else {
+    }
+    if (options.pageStart !== undefined || options.pageLimit !== undefined) {
         emit('update-pagination', options);
     }
 };
@@ -230,7 +219,7 @@ const handleClickSet = () => {
 const handleExport = () => {
     const excelExportFetcher = async () => {
         const excelPayloadList = await getExcelPayloadList();
-        const cloudServiceExcelExportParams:ExportParameter = {
+        const cloudServiceExcelExportParams: ExportParameter = {
             file_name: 'cloud_service_export',
             options: [
                 getCloudServiceResourcesPayload(),
@@ -270,17 +259,15 @@ const handleExport = () => {
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SET') }}
                 </p-button>
             </div>
-            <div class="total-result-wrapper">
-                <span class="total-result">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.TOTAL_RESULT') }}</span><span class="total-result-value">{{ props.totalCount }}</span>
-            </div>
         </div>
         <p-toolbox filters-visible
                    exportable
                    search-type="query"
-                   :total-count="props.totalCount"
+                   :has-next-page="props.hasNextPage"
                    :query-tags="state.queryTags"
                    :key-item-sets="state.keyItemSets"
                    :value-handler-map="props.handlers?.valueHandlerMap ?? {}"
+                   :page-size="props.pageSize"
                    @change="handleChange"
                    @refresh="handleChange()"
                    @export="handleExport"
@@ -316,18 +303,6 @@ const handleExport = () => {
     .filters-count {
         margin-right: 0.5rem;
         font-size: 0.875rem;
-    }
-}
-.total-result-wrapper {
-    @apply text-sm flex flex-wrap gap-2;
-    flex-shrink: 0;
-    line-height: 1.09375rem;
-    min-width: 5.875rem;
-    .total-result {
-        @apply text-gray-600;
-    }
-    .total-result-value {
-        @apply text-gray-800;
     }
 }
 </style>

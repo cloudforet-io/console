@@ -55,7 +55,8 @@ export default class ServiceAPI {
             if (!request.headers) request.headers = {} as AxiosRequestHeaders;
 
             // Set the access token
-            request.headers.Authorization = `Bearer ${this.tokenApi.getAccessToken()}`;
+            const auth = request.headers?.Authorization;
+            if (!auth) request.headers.Authorization = `Bearer ${this.tokenApi.getAccessToken()}`;
 
             return request;
         });

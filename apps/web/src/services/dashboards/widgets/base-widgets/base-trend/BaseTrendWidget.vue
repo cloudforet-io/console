@@ -11,10 +11,10 @@ import dayjs from 'dayjs';
 import { cloneDeep, sortBy, uniqBy } from 'lodash';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
-import { sortArrayInObjectArray } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { sortArrayInObjectArray } from '@cloudforet/utils';
 
 import { CHART_TYPE, COST_DATA_FIELD_MAP, WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type { DateRange } from '@/schema/dashboard/_types/dashboard-type';
@@ -129,7 +129,7 @@ const state = reactive({
         } else if (state.dataType === 'usage_quantity') {
             _textOptions = { type: 'usage', unitPath: 'usage_unit' };
         }
-        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions, 'value_sum');
+        const refinedFields = getWidgetTableDateFields(widgetState.granularity, widgetState.dateRange, _textOptions);
         const dataFieldLabel = Object.values(COST_DATA_FIELD_MAP).find((d) => d.name === widgetState.dataField)?.label ?? widgetState.parsedDataField;
 
         // set width of table fields

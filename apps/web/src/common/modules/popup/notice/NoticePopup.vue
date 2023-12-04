@@ -19,7 +19,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
+import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -36,7 +37,7 @@ export default {
         const state = reactive({
             isSessionExpired: computed<boolean>(() => store.state.user.isSessionExpired),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
-            popupList: [] as Array<NoticePostModel>,
+            popupList: [] as Array<PostModel>,
         });
 
         // helper
@@ -84,7 +85,7 @@ export default {
             try {
                 const noticeBoard = await getNoticeBoard();
                 if (!noticeBoard) return;
-                const { results } = await SpaceConnector.client.board.post.list({
+                const { results } = await SpaceConnector.client.board.post.list<PostListParameters, PostListResponse>({
                     domain_id: null,
                     board_id: noticeBoard,
                     query: apiQueryForPostList,

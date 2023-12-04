@@ -76,7 +76,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { SpaceRouter } from '@/router';
 import type { TimeStamp } from '@/schema/_common/model';
 import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -124,7 +124,7 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             boardId: undefined as undefined | string,
             noticeItemsRef: null as HTMLElement|null,
-            noticeData: [] as NoticePostModel[],
+            noticeData: [] as PostModel[],
             items: computed<NoticeItem[]>(() => {
                 const filteredData = state.noticeData.filter((d) => !d.options.is_pinned);
                 return convertNoticeItem(filteredData);
@@ -137,7 +137,7 @@ export default {
         });
 
         /* Util */
-        const convertNoticeItem = (rawData: NoticePostModel[]): NoticeItem[] => rawData.map((d) => ({
+        const convertNoticeItem = (rawData: PostModel[]): NoticeItem[] => rawData.map((d) => ({
             postId: d.post_id,
             createdAt: d.created_at,
             title: d.title,

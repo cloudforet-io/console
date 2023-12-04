@@ -119,13 +119,15 @@ import {
     PBadge, PButton, PDataLoader, PDivider, PI, PHeading, PPaneLayout,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
 import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
+import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
+import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -172,14 +174,14 @@ export default {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             loading: false,
-            noticePostData: {} as NoticePostModel,
+            noticePostData: {} as PostModel,
             postType: computed(() => state.noticePostData.post_type),
-            prevNoticePost: undefined as NoticePostModel | undefined,
+            prevNoticePost: undefined as PostModel | undefined,
             prevPostRoute: computed(() => ({
                 name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                 params: { boardId: props.boardId, postId: state.prevNoticePost?.post_id },
             })),
-            nextNoticePost: undefined as NoticePostModel | undefined,
+            nextNoticePost: undefined as PostModel | undefined,
             nextPostRoute: computed(() => ({
                 name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                 params: { boardId: props.boardId, postId: state.nextNoticePost?.post_id },
@@ -268,7 +270,7 @@ export default {
                 return;
             }
             try {
-                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: state.noticePostData.domain_id });
+                const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: state.noticePostData.domain_id });
                 state.postDomainName = name;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -286,20 +288,6 @@ export default {
         const handleBackToListButtonClick = () => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
         };
-        // TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외
-        // const handleSendEmailConfirm = async () => {
-        //     try {
-        //         await SpaceConnector.client.board.post.sendNotification({
-        //             post_id: props.postId,
-        //             board_id: props.boardId,
-        //         });
-        //         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_SEND_EMAIL'), '');
-        //     } catch (e) {
-        //         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_SEND_EMAIL'));
-        //     } finally {
-        //         modalState.sendEmailModalVisible = false;
-        //     }
-        // };
         const handleDeleteNoticeConfirm = async () => {
             try {
                 await SpaceConnector.client.board.post.delete({

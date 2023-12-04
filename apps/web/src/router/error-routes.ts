@@ -1,12 +1,10 @@
 import type { RouteConfig } from 'vue-router';
 
+import { ERROR_ROUTE } from '@/router/constant';
+
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 import ErrorPage from '@/common/pages/ErrorPage.vue';
-
-export const ERROR_ROUTE = Object.freeze({
-    _NAME: 'error',
-});
 
 export const errorRoutes: RouteConfig[] = [
     {

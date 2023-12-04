@@ -71,16 +71,15 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 
+import type { PluginModel } from '@/schema/repository/plugin/model';
+
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import { repositoryColorMap, repositoryIconMap, repositoryBackgroundColorMap } from '@/services/asset-inventory/constants/collector-constant';
 
-import type {
-    RepositoryPluginModel,
-} from '@/api-schema/inventory/collector/model';
 
 interface Props {
-    plugin?: RepositoryPluginModel|null;
+    plugin?: PluginModel|null;
     hideLabels?: boolean;
     emphasizeName?: boolean;
 }
@@ -95,8 +94,8 @@ const state = reactive({
     icon: computed<string>(() => assetUrlConverter(props.plugin?.tags?.icon ?? '')),
     name: computed<string>(() => props.plugin?.name ?? ''),
     description: computed<string>(() => props.plugin?.tags?.long_description ?? ''),
-    labels: computed<string[]>(() => (props.plugin as RepositoryPluginModel)?.labels ?? []), // it is empty with collector plugin
-    isBeta: computed<boolean>(() => !!(props.plugin as RepositoryPluginModel)?.tags?.beta ?? false), // it is empty with collector plugin
+    labels: computed<string[]>(() => (props.plugin as PluginModel)?.labels ?? []), // it is empty with collector plugin
+    isBeta: computed<boolean>(() => !!(props.plugin as PluginModel)?.tags?.beta ?? false), // it is empty with collector plugin
     pluginDetailLink: computed<string>(() => props.plugin?.tags?.link ?? ''),
     repositoryType: computed<string>(() => props.plugin?.repository_info?.repository_type ?? ''),
     repositoryName: computed<string>(() => props.plugin?.repository_info?.name ?? ''),

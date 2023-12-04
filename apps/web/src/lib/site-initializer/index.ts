@@ -6,7 +6,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
-import { ERROR_ROUTE, errorRoutes } from '@/router/error-routes';
+import { ERROR_ROUTE } from '@/router/constant';
+import { errorRoutes } from '@/router/error-routes';
 import { serviceRoutes } from '@/router/service-routes';
 
 import config from '@/lib/config';
@@ -20,6 +21,8 @@ import { initDomain } from '@/lib/site-initializer/domain';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
+import { initWorkspace } from '@/lib/site-initializer/workspace';
+
 
 const initConfig = async () => {
     await config.init();
@@ -53,6 +56,7 @@ const init = async () => {
     const domainName = await initDomain(store, config);
 
     if (domainName) {
+        await initWorkspace(store);
         prefetchResources();
         initI18n();
         initDayjs();

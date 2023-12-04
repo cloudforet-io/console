@@ -50,7 +50,8 @@ import {
     PPaneLayout, PHeading, PSelectCard, PI,
 } from '@spaceone/design-system';
 
-import type { AccountType } from '@/services/asset-inventory/types/service-account-page-type';
+
+import type { AccountType } from '@/schema/identity/service-account/type';
 
 export default defineComponent({
     name: 'ServiceAccountAccountType',

@@ -2,15 +2,34 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectModel } from '@/schema/identity/project/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ProjectReferenceMap, ProjectReferenceState } from '@/store/modules/reference/project/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
 let lastLoadedTime = 0;
 
-export const load: Action<ProjectReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
+const getProjectGroup = async (projectGroupId?: string, domainId?: string): Promise<ProjectGroupModel|undefined> => {
+    if (!projectGroupId) return undefined;
+    try {
+        return await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
+            domain_id: domainId, // TODO: remove domain_id after backend is ready
+            project_group_id: projectGroupId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return undefined;
+    }
+};
+export const load: Action<ProjectReferenceState, any> = async ({ state, commit, rootState }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -20,27 +39,30 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit }
     ) return;
 
     try {
-        const response = await SpaceConnector.client.identity.project.list({
+        const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
+            domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
-                only: ['project_id', 'name', 'project_group_info'],
+                only: ['project_id', 'name', 'project_group_id', 'workspace_id'],
             },
         }, { timeout: 3000 });
         const projects: ProjectReferenceMap = {};
 
-        response.results.forEach((projectInfo: any): void => {
-            const groupInfo = projectInfo.project_group_info;
+        // eslint-disable-next-line no-restricted-syntax
+        for await (const projectInfo of results || []) {
+            const projectGroup = await getProjectGroup(projectInfo.project_group_id, rootState.domain.domainId);
             projects[projectInfo.project_id] = {
                 key: projectInfo.project_id,
-                label: `${groupInfo.name} > ${projectInfo.name}`,
+                label: (projectGroup)
+                    ? `${projectGroup.name} > ${projectInfo.name}` : projectInfo.name,
                 name: projectInfo.name,
                 data: {
-                    groupInfo: {
-                        id: groupInfo.project_group_id,
-                        name: groupInfo.name,
-                    },
+                    groupInfo: (projectGroup) ? {
+                        id: projectGroup.project_group_id,
+                        name: projectGroup.name,
+                    } : undefined,
                 },
             };
-        });
+        }
 
         commit('setProjects', projects);
         lastLoadedTime = currentTime;
@@ -49,20 +71,20 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit }
     }
 };
 
-export const sync: Action<ProjectReferenceState, any> = ({ state, commit }, projectInfo): void => {
-    const groupInfo = projectInfo.project_group_info;
-
+export const sync: Action<ProjectReferenceState, any> = async ({ state, commit, rootState }, projectInfo): Promise<void> => {
+    const projectGroup = await getProjectGroup(projectInfo.project_group_id, rootState.domain.domainId);
     const projects: ProjectReferenceMap = {
         ...state.items,
         [projectInfo.project_id]: {
             key: projectInfo.project_id,
-            label: `${groupInfo.name} > ${projectInfo.name}`,
+            label: (projectGroup)
+                ? `${projectGroup.name} > ${projectInfo.name}` : projectInfo.name,
             name: projectInfo.name,
             icon: {
-                groupInfo: {
-                    id: groupInfo.project_group_id,
-                    name: groupInfo.name,
-                },
+                groupInfo: (projectGroup) ? {
+                    id: projectGroup.project_group_id,
+                    name: projectGroup.name,
+                } : undefined,
             },
         },
     };

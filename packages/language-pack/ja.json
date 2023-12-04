@@ -1738,7 +1738,7 @@
 				"TAG_DESC_1": "{name}のタグを設定します",
 				"TAG_DESC_2": "キーは、文字、数字、およびアンダースコアのみ使用できます。",
 				"TAG_LABEL": "タグ",
-				"TITLE": "サービスアカウントの追加",
+				"TITLE": "{type} 追加",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "TrustedAccountを選択した場合、選択したアカウントのリソースにアクセスすることができます"
 			},
 			"MAIN": {
@@ -1926,6 +1926,8 @@
 				"UPDATE": "編集",
 				"USER_ID": "ID",
 				"USER_MANAGEMENT": "ユーザー管理",
+				"WORKSPACE_ROLE": "",
+				"WORKSPACE_ROLE_TYPE": "",
 				"YESTERDAY": "昨日"
 			},
 			"NOTIFICATION": {
@@ -2126,7 +2128,6 @@
 				"SHOW_CHARTS": "チャートの表示",
 				"SHOW_MAJOR": "主なサービスを見る",
 				"TITLE": "{provider} クラウドサービス",
-				"TOTAL_RESULT": "検索結果",
 				"USAGE_OVERVIEW": "利用概要",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}の利用状況"
 			},
@@ -3186,7 +3187,7 @@
 			"ACTION_DELETE_THIS_GROUP": "選択したグループ削除",
 			"ACTION_EDIT_GROUP_NAME": "選択したグループ編集",
 			"ADD_SERVICE_ACCOUNT": "サービスアカウント追加",
-			"ALL_PROJECT": "すべてのプロジェクト",
+			"ALL_PROJECTS": "すべてのプロジェクト",
 			"ALT_E_CREATE_PROJECT": "プロジェクト作成に失敗",
 			"ALT_E_CREATE_PROJECT_GROUP": "プロジェクトグループ作成失敗",
 			"ALT_E_DELETE_PROJECT_GROUP": "プロジェクトグループの削除に失敗",
@@ -3222,9 +3223,12 @@
 				"TITLE": "プロジェクトグループ削除"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
+			"NO_PROJECT_GROUP_MSG": "",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",
+			"PROJECT": "プロジェクト",
+			"PROJECT_GROUP": "プロジェクトグループ",
 			"PROJECT_GROUPS": "プロジェクトグループ",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "作成",

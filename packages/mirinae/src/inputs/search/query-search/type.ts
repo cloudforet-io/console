@@ -40,6 +40,7 @@ export interface KeyItem {
     valueSet?: ValueSet;
     dataType?: KeyDataType;
     operators?: OperatorType[];
+    reference?: string;
 }
 
 export interface QueryItem {

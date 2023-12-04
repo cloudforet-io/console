@@ -21,7 +21,7 @@ const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
     meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: DashboardsContainer,
     children: [
         {
@@ -43,7 +43,16 @@ const dashboardsRoute: RouteConfig = {
                         translationId: 'DASHBOARDS.CREATE.TITLE',
                         accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
                         accessInfo: {
-                            referenceMenuIds: [MENU_ID.DASHBOARDS_PROJECT, MENU_ID.DASHBOARDS_WORKSPACE],
+                            /*
+                            * The 'referenceMenuIds' array is used to specify multiple menu IDs for access level checks.
+                            * Unlike typical routes which are associated with a single menu ID, this route requires
+                            * validation against multiple IDs, ensuring all necessary access levels are met.
+                            *
+                            * Future development note: If child routes are added under this unique route configuration,
+                            * it's important to consider inheritance of these access checks. Additional development may
+                            * be required to handle the complexities of multi-ID access verification in child routes.
+                            */
+                            referenceMenuIds: [MENU_ID.PROJECT_DASHBOARDS, MENU_ID.WORKSPACE_DASHBOARDS],
                         },
                     },
                     component: DashboardCreatePage,

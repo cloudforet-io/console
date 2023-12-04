@@ -1,7 +1,280 @@
+<script setup lang="ts">
+import {
+    computed, reactive, watch, onMounted,
+} from 'vue';
+
+import {
+    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+import { isEmpty } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import type { ProviderGetParameters } from '@/schema/identity/provider/api-verbs/get';
+import type { ProviderModel } from '@/schema/identity/provider/model';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import type {
+    ActiveDataType, CredentialForm, PageMode,
+} from '@/services/asset-inventory/types/service-account-page-type';
+
+interface Props {
+    editMode: PageMode;
+    serviceAccountType: AccountType;
+    provider?: string;
+    isValid: boolean;
+    originForm: Partial<CredentialForm>;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    editMode: 'CREATE',
+    serviceAccountType: 'GENERAL',
+    provider: undefined,
+    isValid: false,
+    originForm: () => ({}),
+});
+
+const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;
+    (e: 'change', formData: CredentialForm): void;
+}>();
+
+const storeState = reactive({
+    language: computed(() => store.state.user.language),
+});
+const state = reactive({
+    providerData: {} as ProviderModel,
+    showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
+    trustedAccounts: [] as ServiceAccountModel[],
+    trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
+        name: d.service_account_id,
+        label: d.name,
+    }))),
+    selectedTrustedAccountDataList: computed(() => {
+        const selectedTrustedAccount = state.trustedAccounts.find((d) => d.service_account_id === formState.attachedTrustedAccountId);
+        if (!selectedTrustedAccount) return [];
+        const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
+        let entries: Array<[string, JsonSchema]> = [];
+        if (baseInfoProperties) entries = Object.entries(baseInfoProperties);
+        return entries.map(([k, v]) => ({
+            key: v.title,
+            value: selectedTrustedAccount.data[k],
+        }));
+    }),
+    secretTypes: computed<string[]>(() => {
+        if (props.serviceAccountType === 'GENERAL') {
+            if (formState.attachTrustedAccount) {
+                return state.providerData?.capability?.general_service_account_schema ?? [];
+            }
+            return state.providerData?.capability?.supported_schema ?? [];
+        }
+        return state.providerData?.capability?.trusted_service_account_schema ?? [];
+    }),
+    credentialSchema: {} as JsonSchema,
+    trustedAccountInfoLink: computed<string>(() => {
+        const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
+        return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
+    }),
+    baseInformationSchema: computed<JsonSchema>(() => state.providerData.template?.service_account?.schema ?? null),
+    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
+});
+const formState = reactive({
+    hasCredentialKey: true,
+    selectedSecretType: '',
+    customSchemaForm: {},
+    credentialJson: '{}',
+    attachTrustedAccount: false,
+    attachedTrustedAccountId: undefined,
+    attachedTrustedSecretId: undefined,
+    formData: computed<CredentialForm>(() => ({
+        hasCredentialKey: formState.hasCredentialKey,
+        selectedSecretType: formState.selectedSecretType,
+        customSchemaForm: formState.customSchemaForm,
+        credentialJson: formState.credentialJson,
+        activeDataType: tabState.activeTab as ActiveDataType,
+        attachedTrustedAccountId: formState.attachedTrustedAccountId,
+        attachedTrustedSecretId: formState.attachedTrustedSecretId,
+    })),
+    isCustomSchemaFormValid: false,
+    isAllValid: computed<boolean>(() => {
+        if (!formState.hasCredentialKey) return true;
+        if (formState.attachTrustedAccount && !formState.attachedTrustedAccountId) return false;
+        if (state.secretTypes.length) {
+            if (tabState.activeTab === 'input') return formState.isCustomSchemaFormValid;
+            return checkJsonStringAvailable(formState.credentialJson);
+        }
+        return true;
+    }),
+});
+const tabState = reactive({
+    tabs: computed<TabItem[]>(() => [
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_INPUT'), name: 'input', keepAlive: true },
+        { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_JSON'), name: 'json', keepAlive: true },
+    ]),
+    activeTab: 'input',
+});
+
+/* Util */
+const initForm = () => {
+    formState.hasCredentialKey = true;
+    formState.attachTrustedAccount = false;
+    formState.selectedSecretType = state.secretTypes[0];
+    formState.customSchemaForm = {};
+    formState.credentialJson = '{}';
+    formState.attachedTrustedAccountId = undefined;
+    formState.isCustomSchemaFormValid = false;
+    tabState.activeTab = 'input';
+};
+const setOriginForm = (originForm: Partial<CredentialForm>) => {
+    formState.hasCredentialKey = originForm?.hasCredentialKey;
+    formState.attachTrustedAccount = !!originForm?.attachedTrustedAccountId;
+    formState.attachedTrustedAccountId = originForm?.attachedTrustedAccountId;
+};
+const checkJsonStringAvailable = (str: string): boolean => {
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
+/* Api */
+const getProviderData = async (provider: string) => {
+    try {
+        const result = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters>({
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+            provider,
+            workspace_id: undefined,
+        });
+        state.providerData = result;
+        const supportedSchema = result?.capability?.supported_schema;
+        formState.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.providerData = {};
+    }
+};
+const getCredentialSchema = async (selectedSecretType: string) => {
+    try {
+        const res = await SpaceConnector.client.repository.schema.get({
+            name: selectedSecretType,
+            only: ['schema'],
+        });
+        return res.schema;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return {};
+    }
+};
+const apiQueryHelper = new ApiQueryHelper();
+const listTrustAccounts = async () => {
+    try {
+        const getQuery = () => apiQueryHelper
+            .setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '=' }]);
+        const { results } = await SpaceConnector.client.identity.serviceAccount.list({ query: getQuery().data });
+        state.trustedAccounts = results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.trustedAccounts = [];
+    }
+};
+const getTrustedAccountCredentialData = async (serviceAccountId: string) => {
+    try {
+        const getQuery = () => apiQueryHelper
+            .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
+        const { results } = await SpaceConnector.client.secret.trustedSecret.list({ query: getQuery().data });
+        if (results.length) {
+            formState.attachedTrustedSecretId = results[0].trusted_secret_id;
+        } else {
+            formState.attachedTrustedSecretId = undefined;
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        formState.attachedTrustedSecretId = undefined;
+    }
+};
+
+/* Event */
+const handleCredentialValidate = (isValid) => {
+    formState.isCustomSchemaFormValid = isValid;
+};
+const handleChangeSecretType = (val: string) => {
+    if (formState.selectedSecretType !== val) {
+        initForm();
+        formState.selectedSecretType = val;
+    }
+};
+const handleSelectNoCredentials = (val: boolean) => {
+    if (formState.hasCredentialKey !== val) {
+        initForm();
+        formState.hasCredentialKey = val;
+    }
+};
+const handleChangeAttachTrustedAccount = (val: boolean) => {
+    if (formState.attachTrustedAccount !== val) {
+        initForm();
+        formState.attachTrustedAccount = val;
+        if (val) formState.attachedTrustedAccountId = state.trustedAccounts?.[0]?.service_account_id;
+    }
+};
+const handleChangeAttachedTrustedAccountId = (val?: string) => {
+    if (formState.attachedTrustedAccountId !== val) {
+        formState.attachedTrustedAccountId = val;
+    }
+};
+
+/* Init */
+(async () => {
+    await listTrustAccounts();
+})();
+
+/* Mounted */
+onMounted(async () => {
+    if (!isEmpty(props.originForm)) setOriginForm(props.originForm);
+});
+
+/* Watcher */
+watch(() => props.provider, (provider) => {
+    if (provider) getProviderData(provider);
+}, { immediate: true });
+watch(() => state.secretTypes, (secretTypes) => {
+    if (secretTypes.length) formState.selectedSecretType = secretTypes[0];
+});
+watch(() => formState.selectedSecretType, async (selectedSecretType) => {
+    if (selectedSecretType) {
+        state.credentialSchema = await getCredentialSchema(selectedSecretType);
+    }
+});
+watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
+    getTrustedAccountCredentialData(attachedTrustedAccountId);
+});
+watch(() => props.serviceAccountType, () => {
+    initForm();
+});
+watch(() => formState.formData, (formData) => {
+    emit('change', formData);
+});
+watch(() => formState.isAllValid, (isAllValid) => {
+    emit('update:isValid', isAllValid);
+});
+
+</script>
+
 <template>
     <div class="service-account-credentials-form">
-        <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
-                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: providerData.name })"
+        <p-field-group v-if="props.serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
+                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: state.providerData.name })"
                        required
         >
             <div class="flex">
@@ -20,7 +293,7 @@
             </div>
         </p-field-group>
         <template v-if="formState.hasCredentialKey">
-            <p-field-group v-if="serviceAccountType !== ACCOUNT_TYPE.TRUSTED && showTrustedAccount"
+            <p-field-group v-if="props.serviceAccountType !== ACCOUNT_TYPE.TRUSTED && state.showTrustedAccount"
                            :label="$t('INVENTORY.SERVICE_ACCOUNT.DETAIL.CREDENTIALS_LABEL')"
                            required
             >
@@ -29,7 +302,7 @@
                     <p-link class="see-more-text"
                             :text="$t('IDENTITY.SERVICE_ACCOUNT.ADD.SEE_MORE')"
                             :action-icon="ACTION_ICON.EXTERNAL_LINK"
-                            :href="trustedAccountInfoLink"
+                            :href="state.trustedAccountInfoLink"
                     />
                 </template>
                 <div class="radio-wrapper">
@@ -50,7 +323,7 @@
                          class="yes-dropdown"
                     >
                         <p-select-dropdown :selected="formState.attachedTrustedAccountId"
-                                           :menu="trustedAccountMenuItems"
+                                           :menu="state.trustedAccountMenuItems"
                                            :disabled="!formState.attachTrustedAccount"
                                            @select="handleChangeAttachedTrustedAccountId"
                         />
@@ -62,7 +335,7 @@
                                  height="0.875rem"
                             />
                             <div class="right-part">
-                                <div v-for="(data, idx) in selectedTrustedAccountDataList"
+                                <div v-for="(data, idx) in state.selectedTrustedAccountDataList"
                                      :key="`text-${data.key}-${idx}`"
                                 >
                                     <b>{{ data.key }} </b>
@@ -80,7 +353,7 @@
                            class="mb-8"
             >
                 <div class="flex">
-                    <p-radio v-for="(type, idx) in secretTypes"
+                    <p-radio v-for="(type, idx) in state.secretTypes"
                              :key="idx"
                              :selected="formState.selectedSecretType"
                              :value="type"
@@ -97,7 +370,7 @@
             >
                 <template #input>
                     <p-json-schema-form :form-data.sync="formState.customSchemaForm"
-                                        :schema="credentialSchema"
+                                        :schema="state.credentialSchema"
                                         :language="$store.state.user.language"
                                         class="custom-schema-box"
                                         @validate="handleCredentialValidate"
@@ -119,312 +392,6 @@
     </div>
 </template>
 
-<script lang="ts">
-import type { PropType } from 'vue';
-import {
-    computed, defineComponent, reactive, watch, toRefs, onMounted,
-} from 'vue';
-
-import {
-    PFieldGroup, PRadio, PTab, PJsonSchemaForm, PTextEditor, PSelectDropdown, PLink, PCopyButton, PI,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { isEmpty } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { ACCOUNT_TYPE } from '@/services/asset-inventory/constants/service-account-constant';
-import type {
-    ActiveDataType, CredentialForm, ProviderModel, PageMode, AccountType,
-    ServiceAccountModel,
-} from '@/services/asset-inventory/types/service-account-page-type';
-
-interface Props {
-    editMode: PageMode;
-    serviceAccountType: AccountType;
-    provider?: string;
-    isValid: boolean;
-    originForm: Partial<CredentialForm>;
-}
-
-export default defineComponent<Props>({
-    name: 'ServiceAccountCredentialsForm',
-    components: {
-        PLink,
-        PSelectDropdown,
-        PFieldGroup,
-        PRadio,
-        PTab,
-        PJsonSchemaForm,
-        PTextEditor,
-        PCopyButton,
-        PI,
-    },
-    props: {
-        editMode: {
-            type: String as PropType<PageMode>,
-            default: 'CREATE',
-        },
-        serviceAccountType: {
-            type: String as PropType<AccountType>,
-            default: 'GENERAL',
-        },
-        provider: {
-            type: String,
-            default: undefined,
-        },
-        isValid: {
-            type: Boolean,
-            default: false,
-        },
-        originForm: {
-            type: Object as PropType<Partial<CredentialForm>>,
-            default: () => ({}),
-        },
-    },
-    setup(props, { emit }) {
-        const storeState = reactive({
-            language: computed(() => store.state.user.language),
-        });
-        const state = reactive({
-            providerData: {} as ProviderModel,
-            showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
-            trustedAccounts: [] as ServiceAccountModel[],
-            trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
-                name: d.service_account_id,
-                label: d.name,
-            }))),
-            selectedTrustedAccountDataList: computed(() => {
-                const selectedTrustedAccount = state.trustedAccounts.find((d) => d.service_account_id === formState.attachedTrustedAccountId);
-                if (!selectedTrustedAccount) return [];
-                const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
-                let entries: Array<[string, JsonSchema]> = [];
-                if (baseInfoProperties) entries = Object.entries(baseInfoProperties);
-                return entries.map(([k, v]) => ({
-                    key: v.title,
-                    value: selectedTrustedAccount.data[k],
-                }));
-            }),
-            secretTypes: computed<string[]>(() => {
-                if (props.serviceAccountType === 'GENERAL') {
-                    if (formState.attachTrustedAccount) {
-                        return state.providerData?.capability?.general_service_account_schema ?? [];
-                    }
-                    return state.providerData?.capability?.supported_schema ?? [];
-                }
-                return state.providerData?.capability?.trusted_service_account_schema ?? [];
-            }),
-            credentialSchema: {} as JsonSchema,
-            trustedAccountInfoLink: computed<string>(() => {
-                const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
-                return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
-            }),
-            baseInformationSchema: computed<JsonSchema>(() => state.providerData.template?.service_account?.schema ?? null),
-        });
-        const formState = reactive({
-            hasCredentialKey: true,
-            selectedSecretType: '',
-            customSchemaForm: {},
-            credentialJson: '{}',
-            attachTrustedAccount: false,
-            attachedTrustedAccountId: undefined,
-            attachedTrustedSecretId: undefined,
-            formData: computed<CredentialForm>(() => ({
-                hasCredentialKey: formState.hasCredentialKey,
-                selectedSecretType: formState.selectedSecretType,
-                customSchemaForm: formState.customSchemaForm,
-                credentialJson: formState.credentialJson,
-                activeDataType: tabState.activeTab as ActiveDataType,
-                attachedTrustedAccountId: formState.attachedTrustedAccountId,
-                attachedTrustedSecretId: formState.attachedTrustedSecretId,
-            })),
-            isCustomSchemaFormValid: false,
-            isAllValid: computed<boolean>(() => {
-                if (!formState.hasCredentialKey) return true;
-                if (formState.attachTrustedAccount && !formState.attachedTrustedAccountId) return false;
-                if (state.secretTypes.length) {
-                    if (tabState.activeTab === 'input') return formState.isCustomSchemaFormValid;
-                    return checkJsonStringAvailable(formState.credentialJson);
-                }
-                return true;
-            }),
-        });
-        const tabState = reactive({
-            tabs: computed<TabItem[]>(() => [
-                { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_INPUT'), name: 'input', keepAlive: true },
-                { label: i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.TAB_JSON'), name: 'json', keepAlive: true },
-            ]),
-            activeTab: 'input',
-        });
-
-        /* Util */
-        const initForm = () => {
-            formState.hasCredentialKey = true;
-            formState.attachTrustedAccount = false;
-            formState.selectedSecretType = state.secretTypes[0];
-            formState.customSchemaForm = {};
-            formState.credentialJson = '{}';
-            formState.attachedTrustedAccountId = undefined;
-            formState.isCustomSchemaFormValid = false;
-            tabState.activeTab = 'input';
-        };
-        const setOriginForm = (originForm: Partial<CredentialForm>) => {
-            formState.hasCredentialKey = originForm?.hasCredentialKey;
-            formState.attachTrustedAccount = !!originForm?.attachedTrustedAccountId;
-            formState.attachedTrustedAccountId = originForm?.attachedTrustedAccountId;
-        };
-        const checkJsonStringAvailable = (str: string): boolean => {
-            try {
-                JSON.parse(str);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        };
-
-        /* Api */
-        const getProviderData = async (provider: string) => {
-            try {
-                const result = await SpaceConnector.client.identity.provider.get({
-                    provider,
-                });
-                state.providerData = result;
-                const supportedSchema = result?.capability?.supported_schema;
-                formState.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.providerData = {};
-            }
-        };
-        const getCredentialSchema = async (selectedSecretType: string) => {
-            try {
-                const res = await SpaceConnector.client.repository.schema.get({
-                    name: selectedSecretType,
-                    only: ['schema'],
-                });
-                return res.schema;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return {};
-            }
-        };
-        const apiQueryHelper = new ApiQueryHelper();
-        const listTrustAccounts = async () => {
-            try {
-                const getQuery = () => apiQueryHelper
-                    .setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '=' }]);
-                const { results } = await SpaceConnector.client.identity.serviceAccount.list({ query: getQuery().data });
-                state.trustedAccounts = results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.trustedAccounts = [];
-            }
-        };
-        const getTrustedAccountCredentialData = async (serviceAccountId: string) => {
-            try {
-                const getQuery = () => apiQueryHelper
-                    .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
-                const { results } = await SpaceConnector.client.secret.trustedSecret.list({ query: getQuery().data });
-                if (results.length) {
-                    formState.attachedTrustedSecretId = results[0].trusted_secret_id;
-                } else {
-                    formState.attachedTrustedSecretId = undefined;
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                formState.attachedTrustedSecretId = undefined;
-            }
-        };
-
-        /* Event */
-        const handleCredentialValidate = (isValid) => {
-            formState.isCustomSchemaFormValid = isValid;
-        };
-        const handleChangeSecretType = (val: string) => {
-            if (formState.selectedSecretType !== val) {
-                initForm();
-                formState.selectedSecretType = val;
-            }
-        };
-        const handleSelectNoCredentials = (val: boolean) => {
-            if (formState.hasCredentialKey !== val) {
-                initForm();
-                formState.hasCredentialKey = val;
-            }
-        };
-        const handleChangeAttachTrustedAccount = (val: boolean) => {
-            if (formState.attachTrustedAccount !== val) {
-                initForm();
-                formState.attachTrustedAccount = val;
-                if (val) formState.attachedTrustedAccountId = state.trustedAccounts?.[0]?.service_account_id;
-            }
-        };
-        const handleChangeAttachedTrustedAccountId = (val?: string) => {
-            if (formState.attachedTrustedAccountId !== val) {
-                formState.attachedTrustedAccountId = val;
-            }
-        };
-
-        /* Init */
-        (async () => {
-            await listTrustAccounts();
-        })();
-
-        /* Mounted */
-        onMounted(async () => {
-            if (!isEmpty(props.originForm)) setOriginForm(props.originForm);
-        });
-
-        /* Watcher */
-        watch(() => props.provider, (provider) => {
-            if (provider) getProviderData(provider);
-        }, { immediate: true });
-        watch(() => state.secretTypes, (secretTypes) => {
-            if (secretTypes.length) formState.selectedSecretType = secretTypes[0];
-        });
-        watch(() => formState.selectedSecretType, async (selectedSecretType) => {
-            if (selectedSecretType) {
-                state.credentialSchema = await getCredentialSchema(selectedSecretType);
-            }
-        });
-        watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
-            getTrustedAccountCredentialData(attachedTrustedAccountId);
-        });
-        watch(() => props.serviceAccountType, () => {
-            initForm();
-        });
-        watch(() => formState.formData, (formData) => {
-            emit('change', formData);
-        });
-        watch(() => formState.isAllValid, (isAllValid) => {
-            emit('update:isValid', isAllValid);
-        });
-
-        return {
-            ...toRefs(state),
-            formState,
-            tabState,
-            ACCOUNT_TYPE,
-            ACTION_ICON,
-            handleChangeSecretType,
-            handleCredentialValidate,
-            handleSelectNoCredentials,
-            handleChangeAttachTrustedAccount,
-            handleChangeAttachedTrustedAccountId,
-            checkJsonStringAvailable,
-        };
-    },
-});
-</script>
 <style lang="postcss" scoped>
 .service-account-credentials-form {
     .radio-text {

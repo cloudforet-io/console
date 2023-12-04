@@ -14,9 +14,9 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import dayjs from 'dayjs';
 import { orderBy, range } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { i18n } from '@/translations';
 
@@ -143,14 +143,14 @@ const tableState = reactive({
             // const timeUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
             // const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
             // const pastDate = dayjs.utc(d.date).subtract(1, timeUnit).format(dateFormat);
-            // const pastCost = results.find((bd) => bd.date === pastDate)?.cost_sum || 0;
+            // const pastCost = results.find((bd) => bd.date === pastDate)?.value_sum || 0;
             // costData[d.date] = {
             //     cost: currencyMoneyFormatter(d.value, { currency: state.currency }),
             // };
-            // if (pastCost && pastCost < d.cost_sum && (d.cost_sum - pastCost) / Math.abs(pastCost) > 0.5) {
+            // if (pastCost && pastCost < d.value_sum && (d.value_sum - pastCost) / Math.abs(pastCost) > 0.5) {
             //     costData[d.date].color = 'red';
             // }
-            d.cost_sum.forEach((cost) => {
+            d.value_sum.forEach((cost) => {
                 costData[cost.date] = currencyMoneyFormatter(cost.value, { currency: state.currency });
             });
 
@@ -276,7 +276,7 @@ const fetchTrendData = async (dataSourceId: string) => {
             query: {
                 granularity: state.selectedDateType,
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
@@ -315,12 +315,12 @@ const fetchTableData = async (dataSourceId: string) => {
                 granularity: state.selectedDateType,
                 group_by: [GROUP_BY.PRODUCT],
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_cost_sum', desc: true }],
+                sort: [{ key: '_total_value_sum', desc: true }],
                 field_group: ['date'],
                 filter: costAnalyzeQueryHelper.apiQuery.filter,
                 start,
@@ -348,8 +348,8 @@ const setCountData = (results) => {
         start = utcToday.subtract(2, 'day').format('YYYY-MM-DD');
         end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
     }
-    summaryState.pastCost = results.find((d) => d.date === start)?.cost_sum || 0;
-    summaryState.currentCost = results.find((d) => d.date === end)?.cost_sum || 0;
+    summaryState.pastCost = results.find((d) => d.date === start)?.value_sum || 0;
+    summaryState.currentCost = results.find((d) => d.date === end)?.value_sum || 0;
 };
 const getRefinedChartData = (results): ChartData[] => {
     const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
@@ -357,7 +357,7 @@ const getRefinedChartData = (results): ChartData[] => {
     if (results.length > 0) {
         data = results.map((d) => ({
             date: dayjs(d.date),
-            value: d.cost_sum,
+            value: d.value_sum,
         }));
     } else {
         data = [];

@@ -17,3 +17,13 @@ export const repositoryBackgroundColorMap = {
     managed: violet[100],
     remote: indigo[100],
 };
+export const COLLECT_DATA_TYPE = {
+    ENTIRE: 'entire',
+    SINGLE: 'secret',
+} as const;
+export const JOB_STATE = {
+    IN_PROGRESS: 'IN_PROGRESS',
+    FAILURE: 'FAILURE',
+    CANCELED: 'CANCELED',
+    SUCCESS: 'SUCCESS',
+} as const;

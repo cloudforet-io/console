@@ -9,6 +9,7 @@ import {
 import type { DynamicField } from '@spaceone/design-system/src/data-display/dynamic/dynamic-field/type/field-schema';
 import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
+import { isTableTypeInDynamicLayoutType } from '@cloudforet/core-lib/component-util/dynamic-layout';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -18,7 +19,7 @@ import type { ExportOption, ExportParameter } from '@/schema/_common/api-verbs/e
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { dynamicFieldsToExcelDataFields, isTableTypeInDynamicLayoutType } from '@/lib/component-util/dynamic-layout';
+import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -43,6 +44,7 @@ const props = defineProps<{
 const emits = defineEmits<{(event: 'update:visible', value: boolean): void;
 }>();
 const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
+const cloudServiceDetailPageStoreState = cloudServiceDetailPageStore.$state;
 
 
 const MAIN_TABLE = 'Main Table';
@@ -65,11 +67,11 @@ const state = reactive({
 const apiQuery = new ApiQueryHelper();
 const getCloudServiceListQuery = () => {
     apiQuery.setMultiSortV2([{ key: 'created_at', desc: true }])
-        .setFilters(props.hiddenFilters);
+        .setFilters(props.hiddenFilters.concat(cloudServiceDetailPageStoreState.searchFilters));
     return apiQuery.data;
 };
 
-const getSubDataExcelSearchQuery = () => {
+const getSubDataExcelSearchQuery = (): ExportOption[] => {
     const sort = [{ key: 'created_at', desc: true }];
     const options:ExportOption[] = [];
     state.selectedSubDataSchemas.forEach((schema:DynamicLayout) => {
@@ -106,7 +108,7 @@ const handleConfirm = async () => {
                 ...getCloudServiceListQuery(),
                 fields: dynamicFieldsToExcelDataFields(props.cloudServiceListFields),
             },
-        }) : undefined;
+        }) as ExportOption : undefined;
 
         const cloudServiceExcelExportParams: ExportParameter = {
             file_name: cloudServiceDetailPageStore.sheetNamePrefix,

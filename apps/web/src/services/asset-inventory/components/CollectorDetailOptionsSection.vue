@@ -68,6 +68,7 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -78,7 +79,6 @@ import SectionHeader from '@/services/asset-inventory/components/CollectorDetail
 import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
-import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/api-schema/inventory/collector/model';
 
 
 
@@ -98,7 +98,7 @@ const state = reactive({
         const order: string[] = state.collectorOptionsSchema?.order ?? [];
         return Object.entries<JsonSchema['properties']>(properties).map(([key, property]) => ({
             name: key,
-            label: property.title ?? key,
+            label: property?.title ?? key,
             disableCopy: !state.collectorOptions[key],
         })).sort((a, b) => {
             const aIndex = order.indexOf(a.name);

@@ -1738,7 +1738,7 @@
 				"TAG_DESC_1": "{name}의 태그를 설정합니다.",
 				"TAG_DESC_2": "키는 문자, 숫자 및 밑줄만 사용할 수 있습니다.",
 				"TAG_LABEL": "태그",
-				"TITLE": "서비스 어카운트 추가",
+				"TITLE": "{type} 추가",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "특정 Trusted Account를 선택하여 연결하게 될 경우, 해당 어카운트의 리소스에 접근할 수 있습니다. "
 			},
 			"MAIN": {
@@ -1926,6 +1926,8 @@
 				"UPDATE": "수정",
 				"USER_ID": "아이디",
 				"USER_MANAGEMENT": "사용자 관리 ",
+				"WORKSPACE_ROLE": "",
+				"WORKSPACE_ROLE_TYPE": "",
 				"YESTERDAY": "어제 "
 			},
 			"NOTIFICATION": {
@@ -2126,7 +2128,6 @@
 				"SHOW_CHARTS": "차트 보기",
 				"SHOW_MAJOR": "주요 서비스 보기 ",
 				"TITLE": "{provider} 클라우드 서비스 ",
-				"TOTAL_RESULT": "검색 결과",
 				"USAGE_OVERVIEW": "이용 현황",
 				"USAGE_OVERVIEW_OF_RESOURCE": "{resource}의 이용 현황"
 			},
@@ -3186,7 +3187,7 @@
 			"ACTION_DELETE_THIS_GROUP": "선택한 그룹 삭제 ",
 			"ACTION_EDIT_GROUP_NAME": "선택한 그룹 편집 ",
 			"ADD_SERVICE_ACCOUNT": "서비스 어카운트 추가 ",
-			"ALL_PROJECT": "모든 프로젝트 ",
+			"ALL_PROJECTS": "모든 프로젝트 ",
 			"ALT_E_CREATE_PROJECT": "프로젝트 생성 실패",
 			"ALT_E_CREATE_PROJECT_GROUP": "프로젝트 그룹 생성 실패",
 			"ALT_E_DELETE_PROJECT_GROUP": "프로젝트 그룹 삭제 실패",
@@ -3222,9 +3223,12 @@
 				"TITLE": "프로젝트 그룹 삭제 "
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
+			"NO_PROJECT_GROUP_MSG": "",
 			"PLACE_HOLDER_EXAMPLE": "예) 프로젝트/프로젝트 그룹",
 			"PLACE_HOLDER_PROJECT": "프로젝트 ",
 			"PLACE_HOLDER_SHOW_MORE": "더보기",
+			"PROJECT": "프로젝트",
+			"PROJECT_GROUP": "프로젝트 그룹 ",
 			"PROJECT_GROUPS": "프로젝트 그룹 ",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "생성",

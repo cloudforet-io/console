@@ -3,16 +3,17 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type {
+    CollectorModel, CollectorOptions,
+
+} from '@/schema/inventory/collector/model';
+import type { PluginModel } from '@/schema/repository/plugin/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type {
-    CollectorModel, CollectorOptions,
-    RepositoryPluginModel,
-} from '@/api-schema/inventory/collector/model';
 
 
 /**
@@ -35,7 +36,7 @@ export type ServiceAccountFilterOption = 'include'|'exclude';
 export const useCollectorFormStore = defineStore('collector-form', {
     state: () => ({
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
-        repositoryPlugin: null as RepositoryPluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
+        repositoryPlugin: null as PluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
         provider: null as string|null,
         tags: {} as Tag,
         name: '',
@@ -68,7 +69,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.originCollector = collector;
             await this.resetForm();
         },
-        setRepositoryPlugin(pluginInfo: RepositoryPluginModel|null) {
+        setRepositoryPlugin(pluginInfo: PluginModel|null) {
             this.repositoryPlugin = pluginInfo;
         },
         async resetForm() {

@@ -3,6 +3,7 @@ import type { RouteConfig } from 'vue-router';
 // Routes
 import { store } from '@/store';
 
+import { ROOT_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
 
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
@@ -18,10 +19,6 @@ import infoRoute from '@/services/info/routes/routes';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import myPageRoute from '@/services/my-page/routes/routes';
 import projectRoute from '@/services/project/routes/routes';
-
-export const ROOT_ROUTE = Object.freeze({
-    _NAME: 'root',
-});
 
 export const serviceRoutes: RouteConfig[] = [
     ...authRoutes,

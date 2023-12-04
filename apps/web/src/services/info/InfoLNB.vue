@@ -33,8 +33,8 @@ export default defineComponent({
                 const allLnbMenu: LNBMenu[] = [
                     {
                         type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.INFO_NOTICE].translationId),
-                        id: MENU_ID.INFO_NOTICE,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.NOTICE].translationId),
+                        id: MENU_ID.NOTICE,
                         to: { name: INFO_ROUTE.NOTICE._NAME },
                     },
                 ];

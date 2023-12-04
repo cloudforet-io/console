@@ -50,10 +50,10 @@ import {
     PButtonModal, PBadge, PDivider, PButton,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@cloudforet/core-lib';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 
 import type { FileInfo } from '@/lib/file-manager/type';
@@ -81,7 +81,7 @@ export default {
             default: undefined,
         },
         item: {
-            type: Object as PropType<NoticePostModel>,
+            type: Object as PropType<PostModel>,
             default: undefined,
         },
     },
@@ -93,7 +93,7 @@ export default {
         const files = computedAsync<FileInfo[]>(async () => {
             const notice = props.item;
             if (!notice) return [];
-            const result: NoticePostModel = await SpaceConnector.client.board.post.get({
+            const result: PostModel = await SpaceConnector.client.board.post.get({
                 board_id: notice.board_id,
                 post_id: notice.post_id,
             });

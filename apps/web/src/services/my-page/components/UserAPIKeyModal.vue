@@ -1,5 +1,96 @@
+<script setup lang="ts">
+import type { Ref, UnwrapRef } from 'vue';
+import { reactive, watch } from 'vue';
+
+import {
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import yaml from 'js-yaml';
+
+import type { ApiKeyModel } from '@/schema/identity/api-key/model';
+
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useEndpointStore } from '@/services/my-page/stores/endpoint-store';
+
+enum FileType {
+    JSON = 'json',
+    YAML = 'yaml'
+}
+
+const props = defineProps<{
+    visible: boolean;
+    apiKeyItem?: ApiKeyModel;
+}>();
+const emit = defineEmits<{(event: 'visible', visible: boolean): void;
+    (event: 'clickButton'): void;
+}>();
+const endpointStore = useEndpointStore();
+const endpointGetters = endpointStore.getters;
+interface State {
+    proxyVisible: Ref<boolean>;
+    isAPICollapsed: boolean;
+    isSpacectlCollapsed: boolean;
+    apiKeyItemCode: string;
+    yamlItem: string;
+    githubLink: string;
+}
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    isAPICollapsed: true,
+    isSpacectlCollapsed: true,
+    apiKeyItemCode: '',
+    yamlItem: '',
+    githubLink: 'https://github.com/cloudforet-io/spacectl',
+}) as UnwrapRef<State>;
+
+const onClickDownloadFile = (fileType: FileType) => {
+    let blob;
+    if (fileType === FileType.JSON) blob = new Blob([state.apiKeyItemCode], { type: 'application/json' });
+    if (fileType === FileType.YAML) blob = new Blob([state.yamlItem], { type: 'application/x-yaml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    if (fileType === FileType.JSON) a.download = 'api_key';
+    if (fileType === FileType.YAML) a.download = 'spacectl_config';
+    a.click();
+    a.remove();
+};
+
+const onClickConfirm = () => {
+    emit('clickButton');
+};
+
+const makeJsonItem = () => {
+    state.apiKeyItemCode = JSON.stringify(props.apiKeyItem, null, 4);
+};
+
+const makeYamlItem = () => {
+    const endpoints = endpointGetters.endpointLinks;
+    const yamlItem = {
+        api_key: props.apiKeyItem?.api_key,
+        endpoints,
+    };
+
+    state.yamlItem = yaml.dump(yamlItem, {
+        noArrayIndent: false,
+        lineWidth: -1,
+    });
+};
+
+watch(() => props.visible, async (visible) => {
+    if (!visible) return;
+    if (!props.apiKeyItem) return;
+    await endpointStore.listEndpoints();
+    makeJsonItem();
+    makeYamlItem();
+}, { immediate: true });
+
+</script>
+
 <template>
-    <p-icon-modal :visible.sync="proxyVisible"
+    <p-icon-modal :visible.sync="state.proxyVisible"
                   icon-name="ic_check-circle"
                   size="md"
                   :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
@@ -22,15 +113,15 @@
                     {{ $t('IDENTITY.USER.API_KEY.ID') }}
                 </span>
                 <p class="box-contents">
-                    {{ apiKeyItem.api_key_id }}
-                    <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed"
+                    {{ props.apiKeyItem?.api_key_id }}
+                    <p-collapsible-toggle :is-collapsed.sync="state.isAPICollapsed"
                                           class="collapsible-toggle"
                     >
-                        {{ isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
+                        {{ state.isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-text-editor v-if="!isAPICollapsed"
+                    <p-text-editor v-if="!state.isAPICollapsed"
                                    class="m-4"
-                                   :code="apiItem"
+                                   :code="state.apiKeyItemCode"
                                    folded
                                    read-only
                     />
@@ -56,7 +147,7 @@
                         />
                         <p>{{ $t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
                             <span class="text">
-                                <p-link :href="githubLink"
+                                <p-link :href="state.githubLink"
                                         :action-icon="ACTION_ICON.EXTERNAL_LINK"
                                 >
                                     {{ $t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
@@ -67,14 +158,14 @@
                 </span>
                 <p class="box-contents">
                     {{ $t('IDENTITY.USER.API_KEY.SPACECTL_CONFIG') }}
-                    <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed"
+                    <p-collapsible-toggle :is-collapsed.sync="state.isSpacectlCollapsed"
                                           class="collapsible-toggle"
                     >
-                        {{ isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
+                        {{ state.isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
-                    <p-text-editor v-if="!isSpacectlCollapsed"
+                    <p-text-editor v-if="!state.isSpacectlCollapsed"
                                    class="m-4"
-                                   :code="yamlItem"
+                                   :code="state.yamlItem"
                                    folded
                                    read-only
                     />
@@ -91,109 +182,6 @@
         </template>
     </p-icon-modal>
 </template>
-
-<script lang="ts">
-
-import { reactive, toRefs } from 'vue';
-
-import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PButton, PLink, PTextEditor,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import yaml from 'js-yaml';
-
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-enum FileType {
-    JSON = 'json',
-    YAML = 'yaml'
-}
-
-interface APIItem {
-    api_key: string;
-}
-
-export default {
-    name: 'UserAPIKeyModal',
-    components: {
-        PIconModal,
-        PI,
-        PPaneLayout,
-        PDivider,
-        PCollapsibleToggle,
-        PTextEditor,
-        PButton,
-        PLink,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        apiKeyItem: {
-            type: Object,
-            default: null,
-        },
-        endpoints: {
-            type: Object,
-            default: null,
-        },
-    },
-    setup(props, context) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, context.emit),
-            isAPICollapsed: true,
-            isSpacectlCollapsed: true,
-            apiItem: {} as APIItem,
-            yamlItem: '',
-            githubLink: 'https://github.com/cloudforet-io/spacectl',
-        });
-
-        const onClickDownloadFile = (fileType: FileType) => {
-            let blob;
-            if (fileType === FileType.JSON) blob = new Blob([JSON.stringify(state.apiItem)], { type: 'application/json' });
-            if (fileType === FileType.YAML) blob = new Blob([state.yamlItem], { type: 'application/x-yaml' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            if (fileType === FileType.JSON) a.download = 'api_key';
-            if (fileType === FileType.YAML) a.download = 'spacectl_config';
-            a.click();
-            a.remove();
-        };
-
-        const onClickConfirm = () => {
-            context.emit('clickButton');
-        };
-
-        const makeYamlItem = () => {
-            const apiItem = {
-                api_key: props.apiKeyItem.api_key,
-            };
-            const endpoint = props.endpoints;
-            const yamlItem = { ...apiItem, ...endpoint };
-
-            state.yamlItem = yaml.dump(yamlItem, {
-                noArrayIndent: false,
-                lineWidth: -1,
-            });
-        };
-
-        (async () => {
-            if (props.apiKeyItem) state.apiItem = props.apiKeyItem;
-            makeYamlItem();
-        })();
-
-        return {
-            FileType,
-            ...toRefs(state),
-            ACTION_ICON,
-            onClickDownloadFile,
-            onClickConfirm,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .alert-wrapper {

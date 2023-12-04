@@ -1738,7 +1738,7 @@
 				"TAG_DESC_1": "Set {name}'s tag.",
 				"TAG_DESC_2": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
 				"TAG_LABEL": "Tags",
-				"TITLE": "Add Service Account",
+				"TITLE": "Add {type}",
 				"TRUSTED_ACCOUNT_HELP_TEXT": "If you choose to attach a Trusted Account, It will have access to the resources from selected account."
 			},
 			"MAIN": {
@@ -1926,6 +1926,8 @@
 				"UPDATE": "Update",
 				"USER_ID": "ID",
 				"USER_MANAGEMENT": "User Management",
+				"WORKSPACE_ROLE": "Workspace Role",
+				"WORKSPACE_ROLE_TYPE": "Workspace Role Type",
 				"YESTERDAY": "Yesterday"
 			},
 			"NOTIFICATION": {
@@ -2126,7 +2128,6 @@
 				"SHOW_CHARTS": "Show Charts",
 				"SHOW_MAJOR": "Show Major Services ",
 				"TITLE": "{provider} Cloud Service",
-				"TOTAL_RESULT": "Total Result",
 				"USAGE_OVERVIEW": "Usage Overview",
 				"USAGE_OVERVIEW_OF_RESOURCE": "Usage Overview of {resource}"
 			},
@@ -3186,7 +3187,7 @@
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
 			"ACTION_EDIT_GROUP_NAME": "Edit group name",
 			"ADD_SERVICE_ACCOUNT": "Add service account",
-			"ALL_PROJECT": "All Project",
+			"ALL_PROJECTS": "All Projects",
 			"ALT_E_CREATE_PROJECT": "Failed to Create Project",
 			"ALT_E_CREATE_PROJECT_GROUP": "Failed to Create Project Group",
 			"ALT_E_DELETE_PROJECT_GROUP": "Failed to Delete Project Group",
@@ -3222,9 +3223,12 @@
 				"TITLE": "Delete Project Group "
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
+			"NO_PROJECT_GROUP_MSG": "Getting started with grouping your scattered resource and accounts with your own project.",
 			"PLACE_HOLDER_EXAMPLE": "e.g. project/project group",
 			"PLACE_HOLDER_PROJECT": "Project",
 			"PLACE_HOLDER_SHOW_MORE": "more",
+			"PROJECT": "Project",
+			"PROJECT_GROUP": "Project Group",
 			"PROJECT_GROUPS": "Project Groups",
 			"PROJECT_GROUP_TREE": {
 				"CREATE": "Create",

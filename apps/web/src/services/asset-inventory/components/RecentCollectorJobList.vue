@@ -12,9 +12,10 @@ import { i18n } from '@/translations';
 
 import CollectorJobStatusIcon
     from '@/services/asset-inventory/components/CollectorJobStatusIcon.vue';
+import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CollectorLink } from '@/services/asset-inventory/types/collector-main-page-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
+
 
 interface MinimalJobInfo {
     job_id: string;
@@ -22,7 +23,7 @@ interface MinimalJobInfo {
     finished_at: string;
 }
 interface Props {
-    recentJobs?: MinimalJobInfo[];
+    recentJobs?: MinimalJobInfo[]|null;
     historyLink?: CollectorLink;
     fullMode?: boolean;
 }

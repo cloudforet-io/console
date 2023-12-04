@@ -71,12 +71,12 @@ const fetchData = async (): Promise<AnalyzeRawData[]|null> => {
                 end: widgetState.dateRange.end,
                 group_by: [widgetState.dataField],
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: 'cost_sum', desc: true }],
+                sort: [{ key: 'value_sum', desc: true }],
                 page: { limit: LIMIT_DATA },
                 ...apiQueryHelper.data,
             },
@@ -94,7 +94,7 @@ const drawChart = (chartData: TreemapChartData[]) => {
     if (!chartData[0]) return;
 
     const seriesSettings = {
-        valueField: 'cost_sum',
+        valueField: 'value_sum',
         categoryField: 'value',
         nodePaddingInner: 4,
     };

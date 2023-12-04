@@ -14,8 +14,11 @@ import {
 
 import { PBadge } from '@spaceone/design-system';
 
-import { ACCOUNT_TYPE, ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
-import type { AccountType } from '@/services/asset-inventory/types/service-account-page-type';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/type';
+
+import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
+
 
 interface Props {
     accountType: AccountType;

@@ -6,22 +6,26 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
+import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
+import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
+import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import type {
     ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectGroupTreeItem, ProjectTreeRoot,
 } from '@/services/project/types/project-tree-type';
 
-interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
-interface ProjectInfo {
-    project_group_id: string;
-    name: string;
-}
 
 export interface ProjectPageState {
     isInitiated: boolean;
@@ -60,10 +64,10 @@ interface ProjectPageAction {
     openProjectGroupCreateForm: (target?: ProjectGroupTreeItem) => void;
     openProjectGroupUpdateForm: (target?: ProjectGroupTreeItem) => void;
     openProjectGroupDeleteCheckModal: (target?: ProjectGroupTreeItem) => void;
-    createProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
-    updateProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
+    createProjectGroup: (params: ProjectGroupCreateParameters) => Promise<void>;
+    updateProjectGroup: (params: Partial<ProjectGroupUpdateParameters>) => Promise<void>;
     deleteProjectGroup: () => Promise<void>;
-    createProject: (projectInfo: ProjectInfo) => Promise<ProjectModel|undefined>;
+    createProject: (params: ProjectCreateParameters) => Promise<ProjectModel|undefined>;
     refreshPermissionInfo: () => Promise<void>;
     addPermissionInfo: (permissionInfo: any) => void;
     openProjectCreateForm: (target?: ProjectGroupTreeItem) => void;
@@ -71,6 +75,7 @@ interface ProjectPageAction {
     getPermissionInfo: (ids:string[]) => Promise<Record<string, boolean>>;
 }
 
+const projectTreeHelper = useProjectTree();
 export const useProjectPageStore = defineStore<string, ProjectPageState, ProjectStoreGetters, ProjectPageAction>('project-page', {
     state: () => ({
         isInitiated: false,
@@ -129,7 +134,7 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             }
 
             try {
-                const res = await SpaceConnector.client.identity.project.tree.search({
+                const res = await projectTreeHelper.getProjectTreeSearchPath({
                     item_id: groupId,
                     item_type: 'PROJECT_GROUP',
                 });
@@ -163,17 +168,20 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             this.permissionInfo = { ...this.permissionInfo, ...permissionInfo };
         },
         async createProjectGroup(
-            projectGroupInfo: ProjectGroupInfo,
+            params: ProjectGroupCreateParameters,
         ) {
             try {
-                const params: ProjectGroupInfo = { ...projectGroupInfo };
+                const _params: ProjectGroupCreateParameters = {
+                    ...params,
+                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+                };
                 if (this.actionTargetNodeData) {
-                    params.parent_project_group_id = this.actionTargetNodeData.id;
+                    _params.parent_group_id = this.actionTargetNodeData.id;
                 }
-                const res = await SpaceConnector.client.identity.projectGroup.create(params);
+                const res: ProjectGroupModel = await SpaceConnector.clientV2.identity.projectGroup.create(_params);
 
                 const newData: ProjectTreeNodeData = {
-                    ...projectGroupInfo,
+                    ...params,
                     id: res.project_group_id,
                     item_type: 'PROJECT_GROUP',
                     has_child: false,
@@ -204,21 +212,20 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             }
         },
         async updateProjectGroup(
-            projectGroupInfo: Partial<ProjectGroupInfo>,
+            params: Partial<ProjectGroupUpdateParameters>,
         ) {
             if (!this.rootNode || !this.actionTargetNodeData) return;
 
             try {
-                const params = {
+                await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
+                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                     project_group_id: this.actionTargetNodeData.id,
-                    ...projectGroupInfo,
-                };
-
-                await SpaceConnector.client.identity.projectGroup.update(params);
+                    ...params,
+                });
 
                 this.rootNode.updateNodeByPath(
                     this.actionTargetNodePath,
-                    { ...this.actionTargetNodeData, ...projectGroupInfo },
+                    { ...this.actionTargetNodeData, ...params },
                 );
             } catch (e: any) {
                 ErrorHandler.handleError(e);
@@ -232,7 +239,8 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 throw new Error('No Target for deletion');
             }
 
-            await SpaceConnector.client.identity.projectGroup.delete({
+            await SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>({
+                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 project_group_id: this.actionTargetNodeData.id,
             });
 
@@ -252,12 +260,12 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 permissionApiQueryHelper.setOnly('project_group_id')
                     .setFilters([{ k: 'project_group_id', v: ids }]);
 
-                const { results } = await SpaceConnector.client.identity.projectGroup.list({
+                const { results } = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
+                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                     query: permissionApiQueryHelper.data,
-                    author_within: true,
                 });
 
-                results.forEach((d) => {
+                results?.forEach((d) => {
                     permissionInfo[d.project_group_id] = true;
                 });
             } catch (e) {
@@ -266,18 +274,19 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
             return permissionInfo;
         },
         async createProject(
-            projectInfo: ProjectInfo,
+            params: ProjectCreateParameters,
         ):Promise<ProjectModel|undefined> {
             try {
-                const res = await SpaceConnector.client.identity.project.create({
-                    ...projectInfo,
+                const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
+                    ...params,
+                    domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 });
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
                 this.shouldUpdateProjectList = true;
 
                 if (this.treeEditMode) {
                     const newData: ProjectTreeNodeData = {
-                        name: projectInfo.name,
+                        name: params.name,
                         id: res.project_id,
                         item_type: 'PROJECT',
                         has_child: false,

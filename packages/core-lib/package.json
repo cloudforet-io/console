@@ -1,7 +1,7 @@
 {
   "name": "@cloudforet/core-lib",
   "version": "1.12.0-dev11",
-  "description": "Cloudforet Console Core Library",
+  "description": "Cloudforet Console Front-end Core Library",
   "scripts": {
     "build": "tsc --project tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "dev": "rimraf dist && tsc-watch --project tsconfig.build.json --outDir ./dist --onSuccess \"tsc-alias -w -p tsconfig.build.json\"",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spaceone-dev/console-core-lib.git"
+    "url": "git+https://github.com/cloudforet-io/console.git"
   },
   "author": "Cloudforet",
   "license": "Apache-2.0",
@@ -25,6 +25,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
+    "@spaceone/design-system": "*",
     "@types/bytes": "^3.1.1",
     "@types/node": "^16.11.43",
     "concurrently": "^7.6.0",

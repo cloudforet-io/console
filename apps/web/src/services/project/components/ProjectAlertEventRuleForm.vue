@@ -15,8 +15,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import EventRuleActionForm from '@/services/project/components/ProjectAlertEventRuleActionForm.vue';
-import EventRuleConditionForm from '@/services/project/components/ProjectAlertEventRuleConditionForm.vue';
+import ProjectAlertEventRuleActionForm from '@/services/project/components/ProjectAlertEventRuleActionForm.vue';
+import ProjectAlertEventRuleConditionForm from '@/services/project/components/ProjectAlertEventRuleConditionForm.vue';
 
 
 const CONDITIONS_POLICY = Object.freeze({
@@ -163,12 +163,12 @@ watch(() => state.conditions, (conditions) => {
 
 <template>
     <div class="event-rule-form">
-        <event-rule-condition-form
+        <project-alert-event-rule-condition-form
             class="event-rule-condition-form"
             :conditions-policy.sync="state.conditionsPolicy"
             :conditions.sync="state.conditions"
         />
-        <event-rule-action-form
+        <project-alert-event-rule-action-form
             class="event-rule-action-form"
             :actions.sync="state.actions"
             :options.sync="state.options"

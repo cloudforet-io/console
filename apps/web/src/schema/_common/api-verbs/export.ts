@@ -38,18 +38,23 @@ interface AnalyzeQuery {
     keyword?: string;
     select?: any;
 }
-
-export interface ExportOption {
+interface SearchQueryExportOption {
     name: string; // name of the sheet
     title?: string;
-    query_type: QueryType;
+    query_type: typeof QueryType['SEARCH'];
     search_query?: SearchQuery;
+}
+interface AnalyzeQueryExportOption {
+    name: string; // name of the sheet
+    title?: string;
+    query_type: typeof QueryType['ANALYZE'];
     analyze_query?: AnalyzeQuery;
 }
+export type ExportOption = SearchQueryExportOption | AnalyzeQueryExportOption;
 
 export interface ExportParameter {
     file_name?: string;
-    options: ExportOption[]
+    options: ExportOption[];
     timezone?: string;
     file_format?: 'Excel' | 'CSV'; // default: Excel
 }

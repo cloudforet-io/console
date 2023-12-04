@@ -1,3 +1,103 @@
+<script setup lang="ts">
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import {
+    PDefinitionTable, PHeading, PI, PStatus,
+} from '@spaceone/design-system';
+import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
+import type { UserModel } from '@/schema/identity/user/model';
+import { i18n } from '@/translations';
+
+import config from '@/lib/config';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+
+import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
+
+interface Props {
+    userId: string
+    timezone: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    userId: '',
+    timezone: '',
+});
+
+const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
+
+const state = reactive({
+    loading: true,
+    smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    fields: computed<DefinitionField[]>(() => {
+        const additionalFields: DefinitionField[] = [];
+        if (state.smtpEnabled) {
+            additionalFields.push({
+                name: 'email',
+                label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
+                block: true,
+                disableCopy: state.data.user_type === 'API_USER',
+            });
+        }
+        return [
+            { name: 'user_id', label: i18n.t('IDENTITY.USER.MAIN.USER_ID') },
+            { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
+            { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
+            { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
+            ...additionalFields,
+            { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
+            { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
+            { name: 'role_type', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE_TYPE') },
+            { name: 'role_id', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE') },
+            { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
+            { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
+            { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
+        ];
+    }),
+    data: {} as UserModel,
+});
+
+/* API */
+const getUserDetailData = async (userId) => {
+    state.loading = true;
+    try {
+        const response = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
+            user_id: userId || props.userId,
+        });
+        state.data = {
+            ...response,
+            last_accessed_at: calculateTime(state.data.last_accessed_at, props.timezone as string) || 0,
+        };
+    } catch (e) {
+        state.data = {} as UserModel;
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* Watcher */
+watch(() => props.userId, (value) => {
+    getUserDetailData(value);
+}, { immediate: true });
+watch(() => userPageState.visibleUpdateModal, (value) => {
+    if (!value) {
+        getUserDetailData(props.userId);
+    }
+});
+</script>
+
 <template>
     <div>
         <p-heading heading-type="sub"
@@ -70,102 +170,6 @@
         </p-definition-table>
     </div>
 </template>
-
-<script setup lang="ts">
-import {
-    computed, reactive, watch,
-} from 'vue';
-
-import {
-    PDefinitionTable, PHeading, PI, PStatus,
-} from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
-
-import { iso8601Formatter } from '@cloudforet/core-lib';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import config from '@/lib/config';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
-
-import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
-import { useUserPageStore } from '@/services/administration/store/user-page-store';
-
-import type { UserModel } from '@/api-schema/identity/user/model';
-
-interface Props {
-    userId: string
-    timezone: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    userId: '',
-    timezone: '',
-});
-
-const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
-
-const state = reactive({
-    loading: true,
-    smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
-    fields: computed<DefinitionField[]>(() => {
-        const additionalFields: DefinitionField[] = [];
-        if (state.smtpEnabled) {
-            additionalFields.push({
-                name: 'email',
-                label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
-                block: true,
-                disableCopy: state.data.user_type === 'API_USER',
-            });
-        }
-        return [
-            { name: 'user_id', label: i18n.t('IDENTITY.USER.MAIN.USER_ID') },
-            { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
-            { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
-            { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
-            ...additionalFields,
-            { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
-            { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
-            { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
-            { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
-            { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
-        ];
-    }),
-    data: {} as UserModel,
-});
-
-/* API */
-const getUserDetailData = async (userId) => {
-    state.loading = true;
-    try {
-        const response = await SpaceConnector.client.identity.user.get({
-            user_id: userId || props.userId,
-        });
-        state.data = response;
-        state.data.last_accessed_at = calculateTime(state.data.last_accessed_at, props.timezone as string) || 0;
-        state.data.email = response.email;
-        state.data.email_verified = response.email_verified;
-        state.loading = false;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-/* Watcher */
-watch(() => props.userId, (value) => {
-    getUserDetailData(value);
-}, { immediate: true });
-watch(() => userPageState.visibleUpdateModal, (value) => {
-    if (!value) {
-        getUserDetailData(props.userId);
-    }
-});
-
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-definition */

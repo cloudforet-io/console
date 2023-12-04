@@ -19,7 +19,7 @@ import type {
 } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

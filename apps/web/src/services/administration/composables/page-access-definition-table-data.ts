@@ -4,9 +4,10 @@ import type { TranslateResult } from 'vue-i18n';
 
 import type { DefinitionField } from '@spaceone/design-system/types/data-display/tables/definition-table/type';
 
+
 import { i18n } from '@/translations';
 
-import type { PagePermissionMap, RawPagePermission, PagePermissionType } from '@/lib/access-control/config';
+import type { PagePermissionMap, PagePermissionType, PagePermission } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw, getPermissionRequiredMenuIds,
 } from '@/lib/access-control/page-permission-helper';
@@ -44,7 +45,7 @@ const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, s
     return result;
 };
 // eslint-disable-next-line max-len
-export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<RawPagePermission[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
+export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<PagePermission[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
     const pagePermissionMap = getPagePermissionMapFromRaw(pagePermissionData.value);
     const results: PageAccessDefinitionTableData[] = [];
     MENU_LIST.forEach((menu) => {

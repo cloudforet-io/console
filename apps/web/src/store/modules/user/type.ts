@@ -1,8 +1,9 @@
-import type { RawPagePermission } from '@/lib/access-control/config';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { AuthType, UserType } from '@/schema/identity/user/type';
 
-type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
-type UserBackend = 'LOCAL' | 'EXTERNAL';
-type RoleType = 'SYSTEM' | 'DOMAIN' | 'PROJECT';
+import type { PagePermission } from '@/lib/access-control/config';
+
+
 export type LanguageCode = 'ko' | 'en' | string;
 // export type Timezone = 'UTC' | 'Asia/Seoul' | string;
 
@@ -10,14 +11,15 @@ export interface UserRole {
     roleId?: string;
     name: string;
     roleType: RoleType;
-    pagePermissions: RawPagePermission[];
+    pagePermissions: PagePermission[];
 }
 
 export interface UserState {
     isSessionExpired?: boolean;
     userId?: string;
     userType?: UserType;
-    backend?: UserBackend;
+    authType?: AuthType;
+    roleType?: RoleType;
     name?: string;
     email?: string;
     language?: string;
@@ -29,12 +31,15 @@ export interface UserState {
 }
 
 export interface SignInRequest {
+    credentials: Record<string, any>;
+    authType: AuthType;
+    timeout?: number;
+    refresh_count?: number;
+    verify_code?: string;
     domainId: string;
-    userId?: string;
-    userType: UserType;
-    credentials: any;
 }
 
+// TODO: this will be replaced with UserModel
 export interface UpdateUserRequest {
     user_id?: string;
     name?: string;
@@ -47,3 +52,6 @@ export interface UpdateUserRequest {
     verify_code?: string
     email_verified?: boolean
 }
+
+
+export type PageAccessType = 'SYSTEM'|'BASIC';

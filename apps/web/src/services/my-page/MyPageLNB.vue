@@ -49,14 +49,12 @@ export default defineComponent({
         const state = reactive({
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
-            hasDomainRole: computed(() => store.getters['user/hasDomainRole']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
             icon: computed(() => {
                 if (state.isDomainOwner) return 'img_avatar_root-account';
-                if (state.hasDomainRole) return 'img_avatar_admin';
                 return 'img_avatar_user';
             }),
             memberType: computed(() => {
@@ -68,26 +66,26 @@ export default defineComponent({
                 const allLnbMenu: LNBMenu[] = [
                     {
                         type: 'title',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT].translationId),
-                        id: MENU_ID.MY_PAGE_ACCOUNT,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT].translationId),
+                        id: MENU_ID.ACCOUNT,
                         foldable: false,
                     },
                     {
                         type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT_PROFILE].translationId),
-                        id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId),
+                        id: MENU_ID.ACCOUNT_PROFILE,
+                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT_PROFILE._NAME },
                     },
                     {
                         type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_API_KEY].translationId),
-                        id: MENU_ID.MY_PAGE_API_KEY,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.API_KEY].translationId),
+                        id: MENU_ID.API_KEY,
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
                     },
                     {
                         type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].translationId),
-                        id: MENU_ID.MY_PAGE_NOTIFICATIONS,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.NOTIFICATIONS].translationId),
+                        id: MENU_ID.NOTIFICATIONS,
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
                         hightlightTag: 'beta',
                     },

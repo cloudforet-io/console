@@ -13,7 +13,7 @@ import {
 import dayjs from 'dayjs';
 import { get } from 'lodash';
 
-import { numberFormatter } from '@cloudforet/core-lib';
+import { numberFormatter } from '@cloudforet/utils';
 
 import config from '@/lib/config';
 

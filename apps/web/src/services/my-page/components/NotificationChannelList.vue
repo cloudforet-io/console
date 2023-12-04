@@ -107,7 +107,12 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
+// import type { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
+import type {
+    ChannelItem,
+    EnrichedProtocolItem,
+    ProtocolItem,
+} from '@/services/administration/types/user-notification-type';
 import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 import { PROTOCOL_TYPE } from '@/services/my-page/types/notification-item-type';

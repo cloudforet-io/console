@@ -59,7 +59,7 @@ export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<Cost
 
         const legends: Legend[] = [];
         rawData.results.forEach((d) => {
-            if (d.cost_sum) {
+            if (d.value_sum) {
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
                 let _color;
@@ -123,9 +123,9 @@ export const getXYChartData = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<
                 if (!groupByName) {
                     groupByName = `no_${_groupBy}`;
                 }
-                chartDataByDate[groupByName] = d.cost_sum?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate[groupByName] = d.value_sum?.find((c) => c.date === _date)?.value || 0;
             } else {
-                chartDataByDate.totalCost = d.cost_sum?.find((c) => c.date === _date)?.value || 0;
+                chartDataByDate.totalCost = d.value_sum?.find((c) => c.date === _date)?.value || 0;
             }
         });
         chartData.push(chartDataByDate);

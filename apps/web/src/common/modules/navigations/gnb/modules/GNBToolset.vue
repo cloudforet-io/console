@@ -1,14 +1,14 @@
 <template>
     <div class="gnb-toolset">
-        <g-n-b-search v-if="!isDomainOwner"
+        <g-n-b-search v-if="!isAdminMode"
                       :visible="openedMenu === 'search'"
                       @update:visible="updateOpenedMenu('search', $event)"
         />
-        <g-n-b-recent-favorite v-if="!isDomainOwner"
+        <g-n-b-recent-favorite v-if="!isAdminMode"
                                :visible="openedMenu === 'recentFavorite'"
                                @update:visible="updateOpenedMenu('recentFavorite', $event)"
         />
-        <g-n-b-noti v-if="!isDomainOwner"
+        <g-n-b-noti v-if="!isAdminMode"
                     :visible="openedMenu === 'notifications'"
                     @update:visible="updateOpenedMenu('notifications', $event)"
         />
@@ -26,12 +26,12 @@ import {
 
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import GNBNoti from '@/common/modules/navigations/gnb/modules/gnb-noti/GNBNoti.vue';
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
-
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 export default defineComponent({
     name: 'GNBToolset',
@@ -48,8 +48,9 @@ export default defineComponent({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const appContextStore = useAppContextStore();
         const state = reactive({
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             timezone: computed(() => store.state.user.timezone),
         });
 
@@ -66,7 +67,6 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
-            MY_PAGE_ROUTE,
             hideMenu,
             openMenu,
             updateOpenedMenu,

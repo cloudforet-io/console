@@ -1,6 +1,6 @@
 {
   "name": "cloudforet-console",
-  "version": "2.0.0-dev3",
+  "version": "2.0.0-dev10",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -10,6 +10,7 @@
     "start:web": "npm run build:packages && turbo run dev --filter=web",
     "build": "turbo run build",
     "build:packages": "turbo run build --filter=./packages/* --parallel",
+    "transpile": "turbo run transpile",
     "dev": "turbo run dev",
     "lint": "turbo run lint --parallel",
     "format": "turbo run format",
@@ -25,8 +26,8 @@
     "turbo": "^1.10.5"
   },
   "engines": {
-    "npm": ">=8.19.4",
-    "node": ">=16.20.0"
+    "npm": ">=10.2.3",
+    "node": ">=20.10.0"
   },
-  "packageManager": "npm@8.19.4"
+  "packageManager": "npm@10.2.3"
 }

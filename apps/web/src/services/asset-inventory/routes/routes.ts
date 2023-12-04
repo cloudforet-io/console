@@ -8,6 +8,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
+import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const AssetInventoryContainer = () => import('@/services/asset-inventory/AssetInventoryContainer.vue');
@@ -16,7 +17,6 @@ const CloudServiceDetailPage = () => import('@/services/asset-inventory/pages/Cl
 const CloudServiceSearch = () => import('@/services/asset-inventory/pages/CloudServiceSearchPage.vue');
 const CloudServiceTypeSearch = () => import('@/services/asset-inventory/pages/CloudServiceTypeSearchPage.vue');
 
-const ServerPage = () => import('@/services/asset-inventory/pages/ServerPage.vue');
 const CloudServicePage = () => import('@/services/asset-inventory/pages/CloudServicePage.vue');
 const NoResourcePage = () => import('@/common/pages/NoResourcePage.vue');
 
@@ -36,12 +36,12 @@ const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
     meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.ASSET_INVENTORY, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: AssetInventoryContainer,
     children: [
         {
             path: 'cloud-service',
-            meta: { menuId: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE },
+            meta: { menuId: MENU_ID.CLOUD_SERVICE },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -85,14 +85,8 @@ const assetInventoryRoute: RouteConfig = {
             ],
         },
         {
-            path: 'server',
-            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.ASSET_INVENTORY_SERVER },
-            component: ServerPage as any,
-        },
-        {
             path: 'collector',
-            meta: { menuId: MENU_ID.ASSET_INVENTORY_COLLECTOR },
+            meta: { menuId: MENU_ID.COLLECTOR },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -139,7 +133,7 @@ const assetInventoryRoute: RouteConfig = {
         },
         {
             path: 'service-account',
-            meta: { menuId: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT },
+            meta: { menuId: MENU_ID.SERVICE_ACCOUNT },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -163,9 +157,14 @@ const assetInventoryRoute: RouteConfig = {
                     component: ServiceAccountSearchPage,
                 },
                 {
-                    path: 'add/:provider',
+                    path: 'add/:provider/:serviceAccountType',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
-                    meta: { translationId: 'IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: {
+                        translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
+                            type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
+                        }]),
+                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
+                    },
                     props: true,
                     component: ServiceAccountAddPage as any,
                 },

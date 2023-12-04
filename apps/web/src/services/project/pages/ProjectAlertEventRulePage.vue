@@ -9,6 +9,9 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectModel } from '@/schema/identity/project/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -18,8 +21,9 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
-import EventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
-import EventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
+import ProjectAlertEventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
+import ProjectAlertEventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
+
 
 const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',
@@ -28,7 +32,7 @@ const EDIT_MODE = Object.freeze({
 type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
 interface Props {
-    projectId?: string;
+    projectId: string;
 }
 const props = defineProps<Props>();
 
@@ -68,7 +72,8 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
 /* api */
 const getProject = async () => {
     try {
-        state.project = await SpaceConnector.client.identity.project.get({
+        state.project = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: props.projectId,
         });
     } catch (e) {
@@ -174,7 +179,7 @@ const onClickFormCancel = () => {
 </script>
 
 <template>
-    <general-page-layout class="add-service-account-container">
+    <general-page-layout>
         <p-breadcrumbs class="flex-grow"
                        :routes="routeState.routes"
         />
@@ -257,15 +262,17 @@ const onClickFormCancel = () => {
                         </div>
                     </template>
                 </template>
-                <event-rule-form v-if="state.isEditMode && (state.selectedOrder === data.order)"
-                                 :project-id="props.projectId"
-                                 :event-rule-id="data.event_rule_id"
-                                 :mode="EDIT_MODE.UPDATE"
-                                 @confirm="onClickFormConfirm"
-                                 @cancel="onClickFormCancel"
+                <project-alert-event-rule-form
+                    v-if="state.isEditMode && (state.selectedOrder === data.order)"
+                    :project-id="props.projectId"
+                    :event-rule-id="data.event_rule_id"
+                    :mode="EDIT_MODE.UPDATE"
+                    @confirm="onClickFormConfirm"
+                    @cancel="onClickFormCancel"
                 />
-                <event-rule-content v-else
-                                    :data="data"
+                <project-alert-event-rule-content
+                    v-else
+                    :data="data"
                 />
             </p-card>
         </div>
@@ -273,10 +280,11 @@ const onClickFormCancel = () => {
                 style-type="indigo400"
                 :header="$t('PROJECT.EVENT_RULE.ADD_EVENT_RULE')"
         >
-            <event-rule-form :project-id="props.projectId"
-                             :mode="EDIT_MODE.CREATE"
-                             @confirm="onClickFormConfirm"
-                             @cancel="onClickFormCancel"
+            <project-alert-event-rule-form
+                :project-id="props.projectId"
+                :mode="EDIT_MODE.CREATE"
+                @confirm="onClickFormConfirm"
+                @cancel="onClickFormCancel"
             />
         </p-card>
         <p-button v-if="state.cardData.length"

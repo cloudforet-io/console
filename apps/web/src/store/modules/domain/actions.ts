@@ -4,6 +4,8 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { DomainGetAuthInfoParams, DomainGetAuthInfoResponse } from '@/schema/identity/domain/api-verbs/get-auth-info';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { DomainState, ExtendedAuthType } from './type';
@@ -27,15 +29,16 @@ const getAuthOptions = (pluginInfo): any => {
 };
 
 export const load = async ({ commit }, name: string): Promise<void|Error> => {
-    const response = await SpaceConnector.client.identity.domain.list({ name });
+    const response = await SpaceConnector.clientV2.identity.domain.getAuthInfo<DomainGetAuthInfoParams, DomainGetAuthInfoResponse>({ name });
 
-    if (response.total_count === 1) {
-        const domainResponse = response.results[0];
+    // TODO: refactor below logic with new response
+    if (response.domain_id) {
+        const authMetadata = response.metadata;
         commit('setDomain', {
-            domainId: domainResponse.domain_id,
-            name: domainResponse.name,
-            extendedAuthType: getExtendedAuthType(domainResponse.plugin_info?.options?.auth_type),
-            authOptions: getAuthOptions(domainResponse.plugin_info),
+            domainId: response.domain_id,
+            name: response.name,
+            extendedAuthType: getExtendedAuthType(authMetadata.auth_type),
+            authOptions: getAuthOptions(authMetadata.plugin_info),
         });
     } else {
         throw new Error(`Can not find '${name}' domain.`);

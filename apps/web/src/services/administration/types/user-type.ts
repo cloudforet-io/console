@@ -1,8 +1,4 @@
-
-import type { UserModel } from '@/api-schema/identity/user/model';
-
-
-
+import type { UserModel } from '@/schema/identity/user/model';
 
 export interface User extends UserModel {
 	api_key_count?: number;

@@ -7,6 +7,7 @@ import { PIconButton } from '@spaceone/design-system';
 
 import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
+import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -22,15 +23,14 @@ import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { ProjectDashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 
 
 const PRIVATE_ICON = 'ic_lock-filled';
 
 const state = reactive({
     loading: true,
-    projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
-    workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+    projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
+    workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
     hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
     showFavoriteOnly: false,
     header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
@@ -86,7 +86,7 @@ const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[])
             ? i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')
             : i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT'),
     } as LNBItem;
-    const routeName = scope === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.DASHBOARDS_WORKSPACE : MENU_ID.DASHBOARDS_PROJECT;
+    const routeName = scope === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;
     const pagePermission = store.getters['user/pagePermissionMap'];
 
     if (pagePermission[routeName]) return [topTitle, ...items];

@@ -16,7 +16,7 @@ export default class CostDefaultFieldVariableModel extends EnumVariableModel {
         { key: 'service_account_id', name: 'Service Account' },
         { key: 'project_group_id', name: 'Project Group' },
         { key: 'region_code', name: 'Region' },
-        { key: 'cost_usage_type', name: 'Usage Type' },
+        { key: 'usage_type', name: 'Usage Type' },
         { key: 'product', name: 'Product' },
     ];
 }

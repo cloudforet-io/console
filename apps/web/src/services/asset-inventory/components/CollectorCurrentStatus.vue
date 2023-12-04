@@ -55,12 +55,13 @@ import { computed, reactive } from 'vue';
 import { PI, PProgressBar } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { numberFormatter } from '@cloudforet/core-lib/index';
+import { numberFormatter } from '@cloudforet/utils';
 
 import { peacock } from '@/styles/colors';
 
+import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import type { JobAnalyzeStatus } from '@/services/asset-inventory/types/collector-main-page-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
+
 
 const PROGRESS_BAR_COLOR = peacock[500];
 

@@ -20,6 +20,7 @@ import { watch } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
+import type { CollectorModel, CollectorUpdateParameter } from '@/schema/inventory/collector/model';
 import { i18n as i18nTranslator } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -29,7 +30,6 @@ import CollectorScheduleForm
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 
-import type { CollectorModel, CollectorUpdateParameter } from '@/api-schema/inventory/collector/model';
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;

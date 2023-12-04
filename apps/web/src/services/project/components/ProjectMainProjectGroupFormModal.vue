@@ -9,6 +9,12 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
+import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
+import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
+import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -55,24 +61,24 @@ const state = reactive({
 
 const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
 const getProjectGroupNames = async () => {
-    const res = await SpaceConnector.client.identity.projectGroup.list({
+    const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: projectGroupNameApiQuery.data,
     });
-    state.projectGroupNames = res.results.map((d) => d.name);
+    state.projectGroupNames = res.results?.map((d) => d.name) ?? [];
 };
 
-const projectGroupApiQuery = new ApiQueryHelper().setOnly('project_group_id', 'name');
 const getProjectGroup = async () => {
-    const res = await SpaceConnector.client.identity.projectGroup.get({
+    const res = await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
+        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         project_group_id: state.currentGroupId,
-        query: projectGroupApiQuery.data,
     });
     state.projectGroupName = res.name;
 };
 
-const createProjectGroup = async (item) => {
+const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
     try {
-        await projectPageStore.createProjectGroup(item);
+        await projectPageStore.createProjectGroup(params);
         await store.dispatch('reference/projectGroup/load');
         projectPageStore.$patch({ shouldUpdateProjectList: true });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
@@ -81,9 +87,9 @@ const createProjectGroup = async (item) => {
     }
 };
 
-const updateProjectGroup = async (item) => {
+const updateProjectGroup = async (params: Partial<ProjectGroupUpdateParameters>) => {
     try {
-        await projectPageStore.updateProjectGroup(item);
+        await projectPageStore.updateProjectGroup(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
@@ -96,14 +102,14 @@ const confirm = async () => {
     if (!state.isValid) return;
 
     state.loading = true;
-    const item = {
+    const params: ProjectGroupCreateParameters | Partial<ProjectGroupUpdateParameters> = {
         name: state.projectGroupName,
     };
 
     state.showValidation = false;
 
-    if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(item);
-    else await updateProjectGroup(item);
+    if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
+    else await updateProjectGroup(params);
 
     state.loading = false;
     projectPageStore.$patch({ projectGroupFormVisible: false });

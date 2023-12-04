@@ -16,9 +16,9 @@ import {
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { iso8601Formatter, durationFormatter } from '@cloudforet/core-lib/index';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -34,6 +34,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import NoCollectorModal from '@/services/asset-inventory/components/CollectorHistoryNoCollectorModal.vue';
+import { JOB_STATE } from '@/services/asset-inventory/constants/collector-constant';
 import {
     statusClassFormatter,
     statusIconColorFormatter,
@@ -43,7 +44,7 @@ import {
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { JOB_SELECTED_STATUS } from '@/services/asset-inventory/types/collector-history-page-type';
-import { JOB_STATE } from '@/services/asset-inventory/types/collector-type';
+
 
 const fields: DataTableField[] = [
     { label: 'Job ID', name: 'job_id' },

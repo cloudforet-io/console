@@ -24,6 +24,7 @@ export interface ToolboxProps {
     thisPage?: number;
     pageSize?: number;
     totalCount?: number;
+    hasNextPage?: boolean;
     sortBy?: string;
     pageSizeOptions?: number[];
     sortByOptions?: MenuItem[];

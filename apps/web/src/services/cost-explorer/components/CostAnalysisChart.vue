@@ -34,11 +34,11 @@ import type {
 
 type CostAnalyzeRawData = {
     [groupBy: string]: string | any;
-    cost_sum?: Array<{
+    value_sum?: Array<{
         date: string;
         value: number
     }>;
-    _total_cost_sum?: number;
+    _total_value_sum?: number;
 };
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
@@ -67,12 +67,12 @@ const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<
                 start: dayjs.utc(period.start).format(dateFormat),
                 end: dayjs.utc(period.end).format(dateFormat),
                 fields: {
-                    cost_sum: {
+                    value_sum: {
                         key: 'cost',
                         operator: 'sum',
                     },
                 },
-                sort: [{ key: '_total_cost_sum', desc: true }],
+                sort: [{ key: '_total_value_sum', desc: true }],
                 field_group: ['date'],
                 ...analyzeApiQueryHelper.data,
             },

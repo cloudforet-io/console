@@ -65,6 +65,7 @@ import { i18n } from '@/translations';
 
 import getRandomId from '@/lib/random-id-generator';
 import type { VariableModelConfigType } from '@/lib/variable-models';
+import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -114,20 +115,22 @@ const {
 });
 
 // helper
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options'], target: ManageVariableFormOption[]): boolean => true;
-// TODO: update
-// let _subject;
-// if (Array.isArray(subject)) {
-//     _subject = subject.map((d) => ({ key: d, label: d }));
-// } else if (subject?.type === 'ENUM') {
-//     _subject = subject?.values;
-// } else _subject = [];
-// // TODO: refactor Search Data Source CASE
-// const targetExcludingEmpty = target.filter((d) => d.key !== '' && d.label !== '');
-// if (_subject.length !== targetExcludingEmpty.length) return false;
-// for (let idx = 0; idx < _subject.length; idx++) if (_subject[idx].key !== targetExcludingEmpty[idx].key || _subject[idx].key !== targetExcludingEmpty[idx].label) return false;
-// return true
+const checkOptionsChanged = (subject: DashboardVariableSchemaProperty['options'], target: ManageVariableFormOption[]): boolean => {
+    let values: {key: string; label: string;}[] = [];
+    if (Array.isArray(subject)) {
+        subject.forEach((d) => {
+            if (d.type === 'ENUM') {
+                values = values.concat(d.values.map((v) => ({ key: v.key, label: v.name })));
+            }
+        });
+    }
+    const targetExcludingEmpty = target.filter((d) => d.key !== '' && d.label !== '');
+    if (values.length !== targetExcludingEmpty.length) return false;
+    for (let idx = 0; idx < values.length; idx++) {
+        if (values[idx].key !== targetExcludingEmpty[idx].key || values[idx].key !== targetExcludingEmpty[idx].label) return false;
+    }
+    return true;
+};
 
 const state = reactive({
     proxyContentType: useProxyValue('contentType', props, emit),
@@ -176,29 +179,28 @@ const handleCancel = () => {
 };
 
 const handleSave = () => {
-    // TODO: update
-    // let options;
-    // if (state.optionsType === 'ENUM') {
-    //     options = {
-    //         type: 'ENUM',
-    //         values: state.options.map((d) => ({ key: d.key, label: d.label })).filter(({ key, label }) => key !== '' && label !== ''),
-    //     } as EnumModelOptions;
-    // } else {
-    //     options = {
-    //         type: 'SEARCH_RESOURCE',
-    //         reference_key: '',
-    //         resource_type: '',
-    //     } as ResourceValueModelOptions;
-    // }
-    // const variableToSave = {
-    //     variable_type: 'CUSTOM',
-    //     name: name.value,
-    //     use: true,
-    //     selection_type: state.selectionType,
-    //     description: description.value,
-    //     options,
-    // } as DashboardVariableSchemaProperty;
-    // emit('save-click', variableToSave);
+    let options;
+    if (state.optionsType === 'ENUM') {
+        options = {
+            type: 'ENUM',
+            values: state.options.map((d) => ({ key: d.key, name: d.label })).filter((v) => v.key !== '' && v.name !== ''),
+        } as EnumVariableModelConfig;
+    } else {
+        options = {
+            type: 'RESOURCE_VALUE',
+            reference_key: '',
+            resource_type: '',
+        } as ResourceValueVariableModelConfig;
+    }
+    const variableToSave = {
+        variable_type: 'CUSTOM',
+        name: name.value,
+        use: true,
+        selection_type: state.selectionType,
+        description: description.value,
+        options: [options],
+    } as DashboardVariableSchemaProperty;
+    emit('save-click', variableToSave);
 };
 
 onMounted(() => {
@@ -207,13 +209,17 @@ onMounted(() => {
         setForm('name', `${namePrefix}${props.selectedVariable?.name}` ?? '');
         setForm('description', props.selectedVariable?.description ?? '');
         state.selectionType = props.selectedVariable?.selection_type ?? 'MULTI';
-        // TODO: update
-        // if (Array.isArray(props.selectedVariable?.options)) {
-        //     state.options = (props.selectedVariable?.options ?? []).map((d) => ({ draggableItemId: getRandomId();, key: d, label: d })) ?? [{ draggableItemId: getRandomId();, key: '', label: '' }];
-        // } else if (props.selectedVariable?.options?.type === 'ENUM') {
-        // eslint-disable-next-line max-len
-        //     state.options = props.selectedVariable?.options.values.map((d) => ({ draggableItemId: getRandomId();, key: d.key, label: d.label })) ?? [{ draggableItemId: getRandomId();, key: '', label: '' }];
-        // }
+        if (Array.isArray(props.selectedVariable?.options)) {
+            props.selectedVariable?.options.forEach((option) => {
+                if (option.type === 'ENUM') {
+                    if (option.values.length) {
+                        state.options = option.values.map((v) => ({ draggableItemId: getRandomId(), key: v.key, label: v.name }));
+                    } else {
+                        state.options = [{ draggableItemId: getRandomId(), key: '', label: '' }];
+                    }
+                }
+            });
+        }
     }
 });
 

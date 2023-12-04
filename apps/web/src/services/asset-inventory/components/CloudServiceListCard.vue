@@ -5,14 +5,14 @@
         >
             <div class="card-title-wrapper">
                 <div class="provider-title-wrapper">
-                    <span class="provider">{{ providers[item.provider] ? providers[item.provider].label : item.provider }}</span>
+                    <span class="provider">{{ (item.provider && providers[item.provider]) ? providers[item.provider].label : item.provider }}</span>
                 </div>
                 <div class="service-group-wrapper">
                     <p-lazy-img width="1.25rem"
                                 height="1.25rem"
-                                :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                :src="getImageUrl(item)"
                                 error-icon="ic_cloud-filled"
-                                :alt="item.name"
+                                :alt="item.cloud_service_group"
                                 class="icon"
                     />
                     <span class="service-group">{{ item.cloud_service_group }}</span>
@@ -21,19 +21,24 @@
             <p-divider />
             <div class="service-type-list">
                 <template
-                    v-for="(cloudServiceType, idx) in slicedResources"
+                    v-for="(resource, idx) in slicedResources"
                 >
                     <router-link
-                        :key="`${cloudServiceType}-${idx}`"
-                        :to="getCloudServiceDetailLink({ ...item, cloudServiceTypeName: cloudServiceType.cloud_service_type })"
+                        :key="`${resource}-${idx}`"
+                        :to="getCloudServiceDetailLink(item, resource)"
                         class="service-type-item"
-                        :style="{ width: `${90 / slicedResources.length}%` }"
+                        :style="{flexBasis: `${100 / slicedResources.length}%`}"
                     >
-                        <span class="service-type-name">{{ cloudServiceType.cloud_service_type }}</span>
-                        <span class="service-type-count">{{ cloudServiceType.count }}</span>
+                        <p-tooltip ref="serviceTypeNameRef"
+                                   class="service-type-name"
+                                   :contents="getTextOverflowState(idx) ? resource.cloud_service_type || '' : ''"
+                        >
+                            {{ resource.cloud_service_type }}
+                        </p-tooltip>
+                        <span class="service-type-count">{{ resource.value }}</span>
                     </router-link>
                     <p-divider
-                        v-if="item.resources.length > 1 && idx === 0"
+                        v-if="slicedResources.length > 1 && idx === 0"
                         :key="idx"
                         class="service-type-divider"
                         :vertical="true"
@@ -45,42 +50,52 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+import type { PropType } from 'vue';
+import {
+    computed, defineComponent, reactive, ref, toRefs,
+} from 'vue';
 import type { Location } from 'vue-router';
 
-import { PLazyImg, PDivider } from '@spaceone/design-system';
+import { PLazyImg, PDivider, PTooltip } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import { store } from '@/store';
 
+import type { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceItem } from '@/store/modules/reference/cloud-service-type/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { objectToQueryString } from '@/lib/router-query-string';
 
+import { useTextOverflowState } from '@/common/composables/text-overflow-state';
+
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCloudServicePageStore } from '@/services/asset-inventory/stores/cloud-service-page-store';
 import type { Period } from '@/services/asset-inventory/types/type';
 
+import type { CloudServiceAnalyzeResult, CloudServiceAnalyzeResultResource } from '../types/cloud-service-card-type';
+
+
 interface Props {
-    item: any;
+    item: CloudServiceAnalyzeResult;
     searchFilters: ConsoleFilter[];
     selectedRegions: string[];
     period?: Period;
 }
 
-export default {
+export default defineComponent<Props>({
     name: 'CloudServiceListCard',
     components: {
         PLazyImg,
         PDivider,
+        PTooltip,
     },
     props: {
         item: {
-            type: Object,
-            default: () => {},
+            type: Object as PropType<CloudServiceAnalyzeResult>,
+            default: () => ({}),
         },
     },
     setup(props: Props) {
@@ -89,10 +104,27 @@ export default {
 
         const state = reactive({
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            slicedResources: computed(() => props.item?.resources.slice(0, 2)),
+            cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
+            cloudServiceTypeToItemMap: computed(() => {
+                const res: Record<string, CloudServiceTypeReferenceItem> = {};
+                Object.entries(state.cloudServiceTypes).forEach(([, item]) => {
+                    res[`${item.data.provider}:${item.data.group}:${item.name}`] = item;
+                });
+                return res;
+            }),
+            slicedResources: computed<CloudServiceAnalyzeResultResource[]>(() => {
+                const resources = props.item?.resources ?? [];
+                resources.sort((a, b) => a.cloud_service_type?.localeCompare(b.cloud_service_type ?? '') ?? 0);
+                return resources.slice(0, 2);
+            }),
         });
         const cloudServiceDetailQueryHelper = new QueryHelper();
-        const getCloudServiceDetailLink = (item) => {
+        const getCloudServiceDetailLink = (item: CloudServiceAnalyzeResult, resource?: CloudServiceAnalyzeResultResource): Location|undefined => {
+            const targetCloudServiceType = resource ?? item.resources?.[0];
+            if (!item.provider || !item.cloud_service_group || !targetCloudServiceType?.cloud_service_type) {
+                console.error(new Error(`Invalid cloud service item to generate link: ${item}`));
+                return undefined;
+            }
             cloudServiceDetailQueryHelper.setFilters(cloudServicePageState.searchFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
@@ -108,7 +140,7 @@ export default {
                 params: {
                     provider: item.provider,
                     group: item.cloud_service_group,
-                    name: item.cloudServiceTypeName ?? item.resources[0].cloud_service_type,
+                    name: targetCloudServiceType.cloud_service_type,
                 },
                 query: {
                     filters: cloudServiceDetailQueryHelper.rawQueryStrings,
@@ -118,18 +150,49 @@ export default {
             return res;
         };
 
+        const serviceTypeNameRef = ref<(HTMLElement|null)[]>([]);
+        const { getTextOverflowState } = useTextOverflowState({
+            targetRef: serviceTypeNameRef,
+            lineClamp: true,
+        });
+
+        const getImageUrl = (item: CloudServiceAnalyzeResult) => {
+            const cloudServiceType = item.resources?.[0]?.cloud_service_type;
+            const provider = item.provider;
+            const group = item.cloud_service_group;
+
+            if (cloudServiceType && provider && group) {
+                const key = `${provider}:${group}:${cloudServiceType}`;
+                const icon = state.cloudServiceTypeToItemMap[key]?.icon;
+                if (icon) return assetUrlConverter(icon);
+            }
+
+            if (provider) {
+                const icon = state.providers[provider]?.icon;
+                if (icon) return assetUrlConverter(icon);
+            }
+
+            return '';
+        };
+
         // LOAD REFERENCE STORE
         (async () => {
-            await store.dispatch('reference/provider/load');
+            await Promise.allSettled([
+                store.dispatch('reference/provider/load'),
+                store.dispatch('reference/cloudServiceType/load'),
+            ]);
         })();
 
         return {
             ...toRefs(state),
+            serviceTypeNameRef,
+            getTextOverflowState,
             assetUrlConverter,
             getCloudServiceDetailLink,
+            getImageUrl,
         };
     },
-};
+});
 </script>
 
 <style scoped lang="postcss">
@@ -137,12 +200,14 @@ export default {
     @apply bg-white border border-gray-200 rounded-lg;
     box-shadow: 0 0.02rem 0.04rem rgba(0, 0, 0, 0.06);
 
-    &:hover {
-        @apply border-l border-secondary border-gray-200 bg-blue-100;
-        cursor: pointer;
+    @media (hover: hover) {
+        &:hover {
+            @apply border-l border-secondary border-gray-200 bg-blue-100;
+            cursor: pointer;
 
-        .favorite-btn:not(.active) {
-            display: block;
+            .favorite-btn:not(.active) {
+                display: block;
+            }
         }
     }
 
@@ -181,41 +246,41 @@ export default {
 
         .service-type-list {
             @apply flex w-full items-center;
-            padding: 0.75rem 0.25rem;
+            padding: 0.75rem 1rem;
+            gap: 0.5rem;
 
             .service-type-item {
-                @apply flex items-center;
-                margin-left: 0.75rem;
+                @apply text-sm font-normal;
+                display: flex;
+                align-items: center;
                 white-space: break-spaces;
+                overflow: hidden;
+                gap: 0.5rem;
+                line-height: 1.25;
 
                 .service-type-name {
-                    @apply text-sm text-gray-600;
-                    max-width: 90%;
-                    font-weight: 400;
-                    line-height: 1.25;
+                    @apply text-gray-600;
                     display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
                     overflow: hidden;
                     text-overflow: ellipsis;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
                     white-space: normal;
-                    height: calc(100% + 0.5rem);
                 }
                 .service-type-count {
                     @apply text-gray-800;
-                    margin: 0 0.5rem;
-                    font-weight: 400;
-                    font-size: 0.875rem;
-                    line-height: 1.25;
+                    flex-shrink: 0;
                 }
 
-                &:hover {
-                    .service-type-name {
-                        @apply text-blue-600 underline;
-                        text-underline-position: under;
-                    }
-                    .service-type-count {
-                        @apply text-blue-600;
+                @media (hover: hover) {
+                    &:hover {
+                        .service-type-name {
+                            @apply text-blue-600 underline;
+                        }
+
+                        .service-type-count {
+                            @apply text-blue-600;
+                        }
                     }
                 }
             }

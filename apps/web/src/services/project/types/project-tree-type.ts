@@ -1,7 +1,7 @@
 import type { TreeItem, Tree } from '@spaceone/design-system/types/data-display/tree/type';
 
 
-export type ProjectTreeItemType = 'PROJECT_GROUP'|'PROJECT';
+export type ProjectTreeItemType = 'PROJECT_GROUP'|'PROJECT'|'ROOT';
 
 export interface ProjectTreeNodeData {
     id: string;

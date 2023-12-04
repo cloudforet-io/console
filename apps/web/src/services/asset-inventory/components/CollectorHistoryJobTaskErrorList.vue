@@ -66,12 +66,14 @@ import {
 
 import { PDataTable, PHeading, PCollapsibleToggle } from '@spaceone/design-system';
 
+import type { JobTaskModel } from '@/schema/inventory/job-task/model';
+
 import { resourceTypeLabels } from '@/lib/reference/type';
 
-import type { JobTaskData, JobTaskError } from '@/services/asset-inventory/types/collector-history-job-type';
+import type { JobTaskError } from '@/services/asset-inventory/types/collector-history-job-type';
 
 interface Props {
-    selectedItem: JobTaskData;
+    selectedItem: JobTaskModel;
 }
 
 const detailErrorLocationList = ['inventory.CloudService', 'inventory.Server'];
@@ -94,7 +96,7 @@ export default {
     },
     props: {
         selectedItem: {
-            type: Object as () => JobTaskData,
+            type: Object as () => JobTaskModel,
             default: () => ({}),
             required: true,
         },

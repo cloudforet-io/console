@@ -25,18 +25,18 @@ const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
     meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.COST_EXPLORER, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: CostExplorerContainer,
     children: [
         {
             path: 'landing',
-            meta: { menuId: MENU_ID.COST_EXPLORER_LANDING, centeredLayout: true },
+            meta: { centeredLayout: true },
             name: COST_EXPLORER_ROUTE.LANDING._NAME,
             component: CostExplorerHome as any,
         },
         {
             path: 'cost-analysis',
-            meta: { menuId: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
+            meta: { menuId: MENU_ID.COST_ANALYSIS },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -80,7 +80,7 @@ const costExplorerRoutes: RouteConfig = {
         },
         {
             path: 'budget',
-            meta: { menuId: MENU_ID.COST_EXPLORER_BUDGET },
+            meta: { menuId: MENU_ID.BUDGET },
             component: { template: '<router-view />' },
             beforeEnter: async (to, from, next) => {
                 try {

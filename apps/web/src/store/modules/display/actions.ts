@@ -154,3 +154,11 @@ export const startCheckNotification: Action<DisplayState, any> = ({ dispatch }):
 export const showMobileGuideModal: Action<DisplayState, any> = ({ commit }) => {
     commit('setVisibleMobileGuideModal', true);
 };
+
+export const switchToAdminMode: Action<DisplayState, any> = ({ commit }) => {
+    commit('setIsAdminMode', true);
+};
+
+export const switchToUserMode: Action<DisplayState, any> = ({ commit }) => {
+    commit('setIsAdminMode', false);
+};

@@ -1,14 +1,10 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PCheckbox, PI, PRadio, PSelectDropdown, PTree, PButton,
+    PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
@@ -19,8 +15,9 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import type { ProjectTreeNodeData, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/types/project-tree-type';
+import type { ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot } from '@/services/project/types/project-tree-type';
 
 interface Props {
     multiSelectable?: boolean;
@@ -82,11 +79,12 @@ const state = reactive({
     }),
     contextKey: Math.floor(Math.random() * Date.now()),
 });
+const projectTreeHelper = useProjectTree();
 
 const getSearchPath = async (id: string|undefined, type: string|undefined): Promise<string[]> => {
     if (!id) return [];
     try {
-        const res = await SpaceConnector.client.identity.project.tree.search({
+        const res = await projectTreeHelper.getProjectTreeSearchPath({
             item_id: id,
             item_type: type,
         });
@@ -136,8 +134,7 @@ const dataFetcher = async (node): Promise<ProjectTreeNodeData[]> => {
             params.item_type = node.data.item_type;
         }
 
-        const { items } = await SpaceConnector.client.identity.project.tree(params);
-        return items;
+        return await projectTreeHelper.getProjectTree(params);
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];

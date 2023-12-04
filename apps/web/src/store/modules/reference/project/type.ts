@@ -1,7 +1,7 @@
 import type { ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 
 export interface ProjectResourceItemData {
-    groupInfo: {
+    groupInfo?: {
         id: string;
         name: string;
     };

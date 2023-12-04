@@ -6,17 +6,12 @@ import {
     PFieldGroup, PTextInput, PButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import { debounce } from 'lodash';
-
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type {
@@ -25,17 +20,11 @@ import type {
 import {
     checkDuplicateID,
     checkEmailFormat, checkEmptyValue,
-    checkOauth,
     checkRequiredField,
 } from '@/services/administration/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
-interface ExternalMenuType {
-    name: string;
-    label: string;
-    disabled: boolean;
-}
 interface Props {
     activeTab?: string;
     item?: User;
@@ -73,32 +62,6 @@ const validationState = reactive({
 });
 
 /* Components */
-const setExternalMenuItems = (users) => {
-    const _externalItems: ExternalMenuType[] = [];
-    users.forEach((user) => {
-        const singleItem = {
-            name: user.userId,
-            label: user.name ? `${user.userId} (${user.name})` : user.userId,
-            disabled: false,
-        };
-        if (state.users[user.userId]) {
-            singleItem.label = `(${i18n.t('IDENTITY.USER.FORM.ALREADY_EXISTS')}) ${singleItem.label}`;
-            singleItem.disabled = true;
-        }
-        _externalItems.push(singleItem);
-    });
-    state.externalItems = _externalItems;
-};
-const handleDeleteSelectedExternalUser = () => {
-    formState.userId = '';
-    formState.name = '';
-    validationState.proxyIsUserIdValid = undefined;
-    validationState.userIdInvalidText = '';
-};
-const handleSelectExternalUser = async (userItem) => {
-    await getExternalUser(userItem.name);
-    await handleClickCheckId();
-};
 const handleChangeName = () => {
     emit('change-input', { ...formState, name: formState.name });
 };
@@ -113,51 +76,9 @@ const setForm = () => {
     formState.name = props.item.name || '';
 };
 
-/* API */
-const listExternalUser = debounce(async () => {
-    try {
-        state.loading = true;
-        const { results } = await SpaceConnector.client.identity.user.find({
-            search: {
-                keyword: state.searchText,
-            },
-        });
-        await setExternalMenuItems(results);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.externalItems = [];
-    } finally {
-        state.loading = false;
-    }
-}, 300);
-const getExternalUser = async (userId: string) => {
-    try {
-        const { results, total_count } = await SpaceConnector.client.identity.user.find({
-            search: {
-                userId,
-            },
-        });
-        if (total_count > 0) {
-            const selectedExternalUser = results[0];
-            formState.userId = selectedExternalUser.userId;
-
-            if (state.users[userId]) {
-                formState.name = '';
-            } else {
-                formState.name = selectedExternalUser.name;
-            }
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        formState.userId = userId;
-        formState.name = '';
-    }
-};
-
 const executeSpecificIDValidation = async () => {
     let res: Validation = { isValid: true, invalidText: '' };
     if (props.activeTab === 'local') res = checkEmailFormat(formState.userId);
-    else if (props.activeTab === 'external') res = await checkOauth(formState.userId);
     return res;
 };
 const handleClickCheckId = async () => {
@@ -195,13 +116,6 @@ watch(() => props.activeTab, (after) => {
         }
     }
 }, { immediate: true });
-watch(() => state.searchText, (searchText) => {
-    if (!searchText.trim().length) {
-        state.externalItems = [];
-    } else {
-        listExternalUser();
-    }
-});
 </script>
 
 <template>
@@ -236,8 +150,6 @@ watch(() => state.searchText, (searchText) => {
                         use-fixed-menu-style
                         is-filterable
                         show-delete-all-button
-                        @select="handleSelectExternalUser"
-                        @delete-tag="handleDeleteSelectedExternalUser"
                     />
                 </div>
                 <div v-else

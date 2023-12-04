@@ -2,11 +2,10 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { MENU_ID } from '@/lib/menu/config';
 
-
 export const ROLE_TYPE_BADGE_OPTION = {
-    [ROLE_TYPE.SYSTEM]: { label: 'System', styleType: 'secondary1' },
-    [ROLE_TYPE.DOMAIN]: { label: 'Admin', styleType: 'primary1' },
-    [ROLE_TYPE.PROJECT]: { label: 'Project', styleType: 'gray500' },
+    [ROLE_TYPE.DOMAIN_ADMIN]: { label: 'Admin', styleType: 'primary1' },
+    [ROLE_TYPE.WORKSPACE_OWNER]: { label: 'Workspace Owner', styleType: 'secondary1' },
+    [ROLE_TYPE.WORKSPACE_MEMBER]: { label: 'Workspace Member', styleType: 'gray500' },
 } as const;
 
 export const FORM_TYPE = {

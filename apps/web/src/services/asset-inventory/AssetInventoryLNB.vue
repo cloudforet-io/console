@@ -56,7 +56,7 @@ export default defineComponent({
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY].translationId)),
             backLink: computed<BackLink|undefined>(() => {
                 if (!state.isCloudServiceDetailPage) return undefined;
-                return { label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId), to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } };
+                return { label: i18n.t(MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId), to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME } };
             }),
             topTitle: computed<TopTitle|undefined>(() => {
                 if (!state.detailPageParams) return undefined;
@@ -82,8 +82,8 @@ export default defineComponent({
             menuSet: computed<LNBMenu[]>(() => {
                 const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
                     type: 'item',
-                    id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE,
-                    label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE].translationId),
+                    id: MENU_ID.CLOUD_SERVICE,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId),
                     to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
                 }]);
                 return [
@@ -91,20 +91,14 @@ export default defineComponent({
                     ...filterLNBMenuByPermission(menu.concat([
                         {
                             type: 'item',
-                            id: MENU_ID.ASSET_INVENTORY_SERVER,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVER].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
-                        },
-                        {
-                            type: 'item',
-                            id: MENU_ID.ASSET_INVENTORY_COLLECTOR,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_COLLECTOR].translationId),
+                            id: MENU_ID.COLLECTOR,
+                            label: i18n.t(MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId),
                             to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
                         },
                         {
                             type: 'item',
-                            id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT].translationId),
+                            id: MENU_ID.SERVICE_ACCOUNT,
+                            label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId),
                             to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
                         },
                     ]), store.getters['user/pagePermissionList']),

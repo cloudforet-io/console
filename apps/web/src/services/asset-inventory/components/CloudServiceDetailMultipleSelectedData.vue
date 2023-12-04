@@ -5,6 +5,7 @@ import {
 } from 'vue';
 
 import { PDynamicLayout, PButtonTab } from '@spaceone/design-system';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
     DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type';
@@ -12,7 +13,6 @@ import type { DynamicLayout } from '@spaceone/design-system/types/data-display/d
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
-import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -22,8 +22,7 @@ import type { ExportParameter } from '@/schema/_common/api-verbs/export';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
-import type { ConsoleDynamicField } from '@/lib/component-util/dynamic-layout/type';
+import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
 import { downloadExcelByExportFetcher } from '@/lib/helper/file-download-helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
@@ -186,7 +185,7 @@ const getData = async () => {
 const excelQuery = new ApiQueryHelper()
     .setMultiSortV2([{ key: 'created_at', desc: true }]);
 
-const unwindTableExcelDownload = async (fields:ConsoleDynamicField[]) => {
+const unwindTableExcelDownload = async (fields: DynamicField[]) => {
     excelQuery.setFilters([{ k: 'cloud_service_id', v: props.cloudServiceIdList, o: '=' }]);
     const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
     const isTagsEmpty = (options.queryTags ?? []).length === 0;
@@ -227,7 +226,7 @@ const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
         state.selectIndex = selectIndex;
     },
     export() {
-        const fields:ConsoleDynamicField[] = state.currentLayout?.options?.fields;
+        const fields: DynamicField[] = state.currentLayout?.options?.fields;
         unwindTableExcelDownload(fields);
     },
 };

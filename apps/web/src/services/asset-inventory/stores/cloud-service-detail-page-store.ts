@@ -1,13 +1,16 @@
 import { find } from 'lodash';
 import { defineStore } from 'pinia';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { CloudServiceTypeInfo } from '@/schema/inventory/cloud-service-type/model';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { CloudServiceTypeInfo, CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
+import type { CloudServiceDetailPageParams } from '@/services/asset-inventory/types/cloud-service-detail-page-type';
 
 
 const _cloudServiceTypeQuery = new ApiQueryHelper()
@@ -28,6 +31,7 @@ export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-
         name: undefined as undefined | string,
         cloudServiceTypeList: [] as CloudServiceTypeInfo[],
         selectedCloudServiceType: undefined as undefined | CloudServiceTypeInfo,
+        searchFilters: [] as ConsoleFilter[],
     }),
     getters: {
         sheetNamePrefix: (state) => (`${state.provider}_${state.group}_${state.name}`.replace(/\//g, '')).toLowerCase(),
