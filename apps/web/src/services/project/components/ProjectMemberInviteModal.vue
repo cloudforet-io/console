@@ -10,7 +10,7 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAddUsersParameters } from '@/schema/identity/project/api-verbs/add-users';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
