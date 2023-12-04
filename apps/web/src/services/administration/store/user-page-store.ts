@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
@@ -9,8 +8,6 @@ import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-
 
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
@@ -34,21 +31,11 @@ export const useUserPageStore = defineStore('user-page', {
         },
     },
     actions: {
-        async listUsers(apiQuery: Query) {
+        async listUsers(params: UserListParameters) {
             this.loading = true;
             try {
-                const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>({
-                    query: apiQuery,
-                });
+                const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
                 this.users = res.results || [];
-                // TODO: api_key_count, role_name
-                // this.users = res.results?.map((d) => ({
-                //     ...d,
-                //     // api_key_count: d.api_key_count || 0,
-                //     // user_type: getUserType(d.user_type),
-                //     // role_name: (_getArrayWithNotDuplicatedItem(d.role_bindings.map((data) => data.role_info.name))).join(', '),
-                //     // last_accessed_at: calculateTime(d.last_accessed_at, this.timezone),
-                // })) ?? [];
                 this.totalCount = res.total_count ?? 0;
                 this.selectedIndices = [];
             } catch (e) {
