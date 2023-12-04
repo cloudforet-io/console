@@ -2,26 +2,20 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
-import { PDataTable, PBadge, PLink } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import { PDataTable, PBadge } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/model';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectModel } from '@/schema/identity/project/model';
+import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -35,10 +29,6 @@ interface UnDeletableRole {
     roleDescription: string;
     roleType: string;
     assignTo: { resource_id: string; resource_type: string };
-    project?: {
-        project_info: ProjectModel | undefined;
-        project_group_info: ProjectGroupModel | undefined;
-    };
 }
 
 interface Props {
@@ -51,16 +41,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const rolePageStore = useRolePageStore();
 
-const router = useRouter();
-
 const emit = defineEmits<{(e: ':update:visible'): void,
     (e: 'refresh'): void,
 }>();
 
 const state = reactive({
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-    projects: computed(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
     fields: [
@@ -75,7 +61,6 @@ const state = reactive({
         { name: 'roleDescription', label: 'Role Description' },
         { name: 'roleType', label: 'Role Type' },
         { name: 'assignTo', label: 'Assigned To' },
-        { name: 'project', label: ' ' },
     ] as DataTableField[],
     isDeletable: computed(() => state.unDeletableRoles.length === 0),
     headerTitle: computed(() => (state.isDeletable ? i18n.t('IAM.ROLE.MODAL.DELETE_TITLE') : i18n.t('IAM.ROLE.MODAL.DELETE_TITLE_CANNOT'))),
@@ -97,49 +82,17 @@ const handleDelete = async () => {
     }
 };
 
-const projectFieldHandler = (value, projects) => {
-    if (value) {
-        const projectId = value.project_info?.project_id;
-        if (projectId) {
-            return projects[projectId] ? projects[projectId].label : projectId;
-        }
-        const projectGroupId = value.project_group_info?.project_group_id;
-        return state.projectGroups[projectGroupId] ? state.projectGroups[projectGroupId].label : projectGroupId;
-    }
-    return '--';
-};
-
-const getProjectLink = (value) => {
-    const projectId = value?.project_info?.project_id;
-    let link;
-    if (projectId) {
-        link = router.resolve(referenceRouter(projectId, {
-            resource_type: 'identity.Project',
-        }));
-    } else {
-        const projectGroupId = value?.project_group_info?.project_group_id;
-        link = router.resolve(referenceRouter(projectGroupId, {
-            resource_type: 'identity.ProjectGroup',
-        }));
-    }
-    return link.href;
-};
 const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
     try {
-        const { results }: ListResponse<RoleBindingModel> = await SpaceConnector.client.identity.roleBinding.list({ role_id: role.role_id });
-        const roleBindingList: UnDeletableRole[] = results.map((roleBinding) => {
-            const {
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                resource_id, resource_type, role_info, project_info, project_group_info,
-            } = roleBinding;
-            return {
-                roleName: role_info?.name,
-                roleDescription: role_info?.tags?.description,
-                roleType: role_info?.role_type,
-                assignTo: { resource_id, resource_type },
-                project: (project_info || project_group_info) ? { project_info, project_group_info } : undefined,
-            };
+        const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>({
+            role_id: role.role_id,
         });
+        const roleBindingList: UnDeletableRole[] = results.map((roleBinding: RoleBindingModel) => ({
+            roleName: role.name,
+            roleDescription: role.tags?.description,
+            roleType: role.role_type,
+            assignTo: { resource_id: roleBinding.user_id, resource_type: 'identity.User' },
+        }));
         state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -149,8 +102,6 @@ const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(asy
 
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
         store.dispatch('reference/user/load'),
     ]);
 })();
@@ -219,16 +170,6 @@ watch(() => state.proxyVisible, async (after) => {
                 </template>
                 <template #col-assignTo-format="{ value }">
                     {{ state.users[value.resource_id] ? state.users[value.resource_id].label : '--' }}
-                </template>
-                <template #col-project-format="{ value }">
-                    <p-link v-if="value"
-                            :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            new-tab
-                            highlight
-                            :href="getProjectLink(value)"
-                    >
-                        {{ projectFieldHandler(value, state.projects) }}
-                    </p-link>
                 </template>
             </p-data-table>
         </template>
