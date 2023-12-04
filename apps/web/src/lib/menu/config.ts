@@ -47,6 +47,7 @@ export interface Menu {
 
 export interface MenuInfo {
     menuId: MenuId;
+    routeName: string;
     translationId: string;
     icon?: string;
     highlightTag?: HighlightTagType;

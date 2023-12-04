@@ -6,6 +6,7 @@ import { ERROR_ROUTE } from '@/router/constant';
 import type { PagePermissionType } from '@/lib/access-control/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 type FlattenedMenuMap = Partial<Record<MenuId, MenuId[]>>;
 const getSubMenuIdsToMap = (menu: Menu, flattenedMenuMap: FlattenedMenuMap = {}): FlattenedMenuMap => {
@@ -45,7 +46,6 @@ export const getRedirectRouteByPagePermission = (route: Route, pagePermissionsMa
         return false;
     });
 
-    const frontRouteName = route.matched.reverse()[0].name;
-    if (redirectMenuId) return { name: `${frontRouteName}.${redirectMenuId}` };
+    if (redirectMenuId) return { name: MENU_INFO_MAP[redirectMenuId].routeName };
     return { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
 };
