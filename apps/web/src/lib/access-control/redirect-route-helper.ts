@@ -1,3 +1,4 @@
+import type { Route } from 'vue-router';
 import type { Location } from 'vue-router/types/router';
 
 import { ERROR_ROUTE } from '@/router/constant';
@@ -31,7 +32,9 @@ const getSubMenuListByMenuId = (menuId: MenuId): MenuId[] => {
     return [];
 };
 
-export const getRedirectRouteByPagePermission = (menuId: MenuId, pagePermissionsMap: Record<string, PagePermissionType>): Location => {
+export const getRedirectRouteByPagePermission = (route: Route, pagePermissionsMap: Record<string, PagePermissionType>): Location => {
+    const menuId = route.meta?.menuId;
+    if (!menuId) return { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
     const subMenuIdList = getSubMenuListByMenuId(menuId);
     let redirectMenuId: MenuId|undefined;
     subMenuIdList.some((subMenuId) => {
@@ -41,6 +44,8 @@ export const getRedirectRouteByPagePermission = (menuId: MenuId, pagePermissions
         }
         return false;
     });
-    if (redirectMenuId) return { name: redirectMenuId };
+
+    const frontRouteName = route.matched.reverse()[0].name;
+    if (redirectMenuId) return { name: `${frontRouteName}.${redirectMenuId}` };
     return { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
 };
