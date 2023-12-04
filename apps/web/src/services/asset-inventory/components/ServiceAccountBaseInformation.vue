@@ -16,7 +16,7 @@ import type { ServiceAccountGetParameters } from '@/schema/identity/service-acco
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType, ServiceAccountModelForBinding } from '@/schema/identity/service-account/type';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
 import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
@@ -31,7 +31,6 @@ import ServiceAccountBaseInformationDetail
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationDetail.vue';
 import ServiceAccountBaseInformationForm
     from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
-import { serviceAccountPreprocessor } from '@/services/asset-inventory/helpers/service-account-preprocesseor';
 import type {
     BaseInformationForm, PageMode,
 } from '@/services/asset-inventory/types/service-account-page-type';
@@ -61,7 +60,7 @@ const state = reactive({
     mode: 'READ' as PageMode,
     isFormValid: undefined,
     baseInformationSchema: {} as Partial<SchemaModel>,
-    serviceAccountData: undefined as ServiceAccountModelForBinding|undefined,
+    serviceAccountData: undefined as ServiceAccountModel|TrustedAccountModel|undefined,
     baseInformationForm: {} as BaseInformationForm,
     originBaseInformationForm: {} as BaseInformationForm,
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
@@ -97,7 +96,7 @@ const getServiceAccount = async (serviceAccountId:string) => {
             });
         }
 
-        state.serviceAccountData = serviceAccountPreprocessor(res);
+        state.serviceAccountData = res;
         state.baseInformationForm = {
             accountName: res.name,
             customSchemaForm: res.data,

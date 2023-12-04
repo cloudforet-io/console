@@ -28,7 +28,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
-import type { AccountType, ServiceAccountModelForBinding } from '@/schema/identity/service-account/type';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
@@ -50,7 +50,6 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
-import { serviceAccountPreprocessor } from '@/services/asset-inventory/helpers/service-account-preprocesseor';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
 const { width } = useWindowSize();
@@ -91,7 +90,7 @@ const typeOptionState = reactive({
 
 const tableState = reactive({
     hasManagePermission: useManagePermissionState(),
-    items: [] as ServiceAccountModelForBinding[],
+    items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: null as null|DynamicLayout,
     schemaOptions: computed<DynamicLayoutOptions>(() => {
         const option = tableState.schema?.options ?? {};
@@ -162,7 +161,7 @@ const listServiceAccountData = async () => {
         }
 
 
-        tableState.items = serviceAccountPreprocessor(res.results || []);
+        tableState.items = res.results || [];
         typeOptionState.totalCount = res.total_count ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -245,7 +244,7 @@ const getTableSchema = async () => {
             options: {
                 provider: state.selectedProvider,
             },
-        });
+        }, { mockPath: '?resource=serviceaccount' });
     } catch (e) {
         tableState.schema = null;
     }
