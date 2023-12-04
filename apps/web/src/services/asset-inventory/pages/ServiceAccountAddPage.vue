@@ -9,7 +9,6 @@ import { get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { ProviderGetParameters } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
@@ -31,9 +30,10 @@ import ServiceAccountCredentialsForm
     from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
 import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
-
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const props = defineProps<{
     provider?: string;
     serviceAccountType?: AccountType;
@@ -43,7 +43,7 @@ const state = reactive({
     providerLoading: true,
     providerData: {} as ProviderModel,
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    providerIcon: computed(() => state.providers[state.providerData?.provider]?.icon),
+    providerIcon: computed(() => (props.provider ? state.providers[props.provider]?.icon : '')),
     description: computed(() => get(state.providerData, 'metadata.view.layouts.help:service_account:create', undefined)),
     enableCredentialInput: computed<boolean>(() => {
         const secretTypes = state.providerData?.capability?.supported_schema ?? [];
@@ -68,20 +68,6 @@ const formState = reactive({
     }),
     formLoading: false,
 });
-
-/* Api */
-const getProvider = async () => {
-    try {
-        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            provider: props.provider ?? '',
-            workspace_id: undefined,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.providerData = {};
-    }
-};
 
 const deleteServiceAccount = async (serviceAccountId: string) => {
     await SpaceConnector.client.identity.serviceAccount.delete({
@@ -176,9 +162,9 @@ const handleChangeCredentialForm = (credentialForm) => {
 /* Init */
 (async () => {
     state.providerLoading = true;
+    await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
     await Promise.allSettled([
         store.dispatch('reference/provider/load'),
-        getProvider(),
     ]);
     state.providerLoading = false;
 })();
