@@ -11,6 +11,8 @@ export interface RoleBindingListParameters {
     role_id?: string;
     role_type?: RoleType;
     workspace_id?: string;
+    // TODO: will be removed after the backend is ready
+    domain_id: string;
 }
 
 export type RoleBindingListResponse = ListResponse<RoleBindingModel>;
