@@ -35,28 +35,18 @@ export default defineComponent({
             menuSet: computed<LNBMenu[]>(() => [
                 ...filterLNBMenuByPermission([
                     {
-                        type: 'title', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_IAM].translationId), id: MENU_ID.ADMINISTRATION_IAM, foldable: false,
+                        type: 'title', label: i18n.t(MENU_INFO_MAP[MENU_ID.IAM].translationId), id: MENU_ID.IAM, foldable: false,
                     },
                     {
-                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_USER].translationId), id: MENU_ID.ADMINISTRATION_USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
+                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.USER].translationId), id: MENU_ID.USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
                     },
                     {
-                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_ROLE].translationId), id: MENU_ID.ADMINISTRATION_ROLE, to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME },
+                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ROLE].translationId), id: MENU_ID.ROLE, to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME },
                     },
                     {
-                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].translationId), id: MENU_ID.ADMINISTRATION_POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
+                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.POLICY].translationId), id: MENU_ID.POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
                     },
                 ], store.getters['user/pagePermissionList']),
-                // TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
-                // { type: 'divider' },
-                // ...filterLNBMenuByPermission([
-                //     {
-                //         type: 'title', label: 'Additional Settings', id: MENU_ID.ADMINISTRATION_SETTINGS, foldable: false,
-                //     },
-                //     {
-                //         type: 'item', label: 'Provider', id: MENU_ID.ADMINISTRATION_PROVIDER, to: { name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME },
-                //     },
-                // ], store.getters['user/pagePermissionList']),
             ]),
         };
     },
