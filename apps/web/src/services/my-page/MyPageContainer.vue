@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <vertical-page-layout v-if="$route.meta.lnbVisible"
+        <vertical-page-layout v-if="$route.meta?.lnbVisible"
                               :breadcrumbs="breadcrumbs"
         >
             <template #sidebar>

@@ -68,8 +68,8 @@ const state = reactive({
         ...filterLNBMenuByPermission([
             {
                 type: 'item',
-                id: MENU_ID.COST_EXPLORER_BUDGET,
-                label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_BUDGET].translationId),
+                id: MENU_ID.BUDGET,
+                label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
                 to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
             },
         ], store.getters['user/pagePermissionList']),
@@ -78,7 +78,7 @@ const state = reactive({
         { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
-            label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
+            label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_ANALYSIS].translationId),
         },
         {
             type: MENU_ITEM_TYPE.SLOT,
@@ -212,7 +212,7 @@ const getCurrentCurrencySet = (dataSourceKey: string): string => {
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
     const pagePermission = store.getters['user/pagePermissionMap'];
-    const routeName = MENU_ID.COST_EXPLORER_COST_ANALYSIS;
+    const routeName = MENU_ID.COST_ANALYSIS;
 
     if (pagePermission[routeName]) return [...menuSet];
     return [];

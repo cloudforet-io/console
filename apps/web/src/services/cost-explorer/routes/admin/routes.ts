@@ -2,10 +2,8 @@ import type { RouteConfig } from 'vue-router';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -21,17 +19,16 @@ const BudgetMainPage = () => import('@/services/cost-explorer/pages/BudgetMainPa
 const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCreatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 
-const costExplorerRoutes: RouteConfig = {
+const adminCostExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
-    name: COST_EXPLORER_ROUTE._NAME,
-    meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    name: makeAdminRouteName(COST_EXPLORER_ROUTE._NAME),
+    meta: { menuId: MENU_ID.COST_EXPLORER },
     component: CostExplorerContainer,
     children: [
         {
             path: 'landing',
             meta: { centeredLayout: true },
-            name: COST_EXPLORER_ROUTE.LANDING._NAME,
+            name: makeAdminRouteName(COST_EXPLORER_ROUTE.LANDING._NAME),
             component: CostExplorerHome as any,
         },
         {
@@ -41,19 +38,19 @@ const costExplorerRoutes: RouteConfig = {
             children: [
                 {
                     path: '/',
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME,
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS._NAME),
                     meta: { lnbVisible: true },
                     beforeEnter: async (to, from, next) => {
                         try {
                             const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
                             const results = response?.results || [];
                             if (results.length === 0) { // none-data-source case
-                                next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                                next({ name: makeAdminRouteName(COST_EXPLORER_ROUTE.LANDING._NAME) });
                             } else if (to.params.dataSourceId && to.params.costQuerySetId) {
                                 next();
                             } else {
                                 next({
-                                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME),
                                     params: {
                                         dataSourceId: results[0].data_source_id,
                                         costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PROJECT,
@@ -67,7 +64,7 @@ const costExplorerRoutes: RouteConfig = {
                 },
                 {
                     path: ':dataSourceId/:costQuerySetId',
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME),
                     meta: {
                         lnbVisible: true,
                         label: ({ params }) => (params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS ? undefined : params.costQuerySetId),
@@ -80,14 +77,14 @@ const costExplorerRoutes: RouteConfig = {
         },
         {
             path: 'budget',
-            meta: { menuId: MENU_ID.BUDGET },
+            meta: { menuId: makeAdminRouteName(MENU_ID.BUDGET) },
             component: { template: '<router-view />' },
             beforeEnter: async (to, from, next) => {
                 try {
                     const response = await SpaceConnector.clientV2.costAnalysis.dataSource.list();
                     const results = response?.results || [];
                     if (results.length === 0) { // none-data-source case
-                        next({ name: COST_EXPLORER_ROUTE.LANDING._NAME });
+                        next({ name: makeAdminRouteName(COST_EXPLORER_ROUTE.LANDING._NAME) });
                     } else {
                         next();
                     }
@@ -98,19 +95,19 @@ const costExplorerRoutes: RouteConfig = {
             children: [
                 {
                     path: '/',
-                    name: COST_EXPLORER_ROUTE.BUDGET._NAME,
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET._NAME),
                     meta: { lnbVisible: true },
                     component: BudgetMainPage as any,
                 },
                 {
                     path: 'create',
-                    name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME),
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET' },
                     component: BudgetCreatePage as any,
                 },
                 {
                     path: ':budgetId',
-                    name: COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME,
+                    name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.DETAIL._NAME),
                     props: true,
                     meta: { lnbVisible: true, label: ({ params }) => params.budgetId, copiable: true },
                     component: BudgetDetailPage as any,
@@ -120,4 +117,4 @@ const costExplorerRoutes: RouteConfig = {
     ],
 };
 
-export default costExplorerRoutes;
+export default adminCostExplorerRoutes;

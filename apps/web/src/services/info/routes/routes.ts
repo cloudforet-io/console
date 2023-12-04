@@ -19,14 +19,14 @@ const infoRoute: RouteConfig = {
     path: 'info',
     name: INFO_ROUTE._NAME,
     meta: { menuId: MENU_ID.INFO },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.INFO, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: InfoContainer,
     children: [
         {
             path: 'notice',
             meta: {
                 lnbVisible: true,
-                menuId: MENU_ID.INFO_NOTICE,
+                menuId: MENU_ID.NOTICE,
             },
             component: { template: '<router-view />' },
             children: [

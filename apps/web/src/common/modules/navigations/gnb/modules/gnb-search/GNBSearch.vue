@@ -197,7 +197,7 @@ export default defineComponent<Props>({
                     },
                 ];
 
-                if (isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList'])) {
+                if (isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pagePermissionList'])) {
                     items.push({
                         itemType: SUGGESTION_TYPE.CLOUD_SERVICE,
                         totalCount: dataState._cloudServiceTotalCount,

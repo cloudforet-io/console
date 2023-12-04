@@ -8,42 +8,48 @@ export const MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.DASHBOARDS,
+        needPermissionByRole: true,
         subMenuList: [
-            { id: MENU_ID.DASHBOARDS_WORKSPACE },
-            { id: MENU_ID.DASHBOARDS_PROJECT },
+            { id: MENU_ID.WORKSPACE_DASHBOARDS, needPermissionByRole: true },
+            { id: MENU_ID.PROJECT_DASHBOARDS, needPermissionByRole: true },
         ],
     },
-    { id: MENU_ID.PROJECT },
+    { id: MENU_ID.PROJECT, needPermissionByRole: true },
     {
         id: MENU_ID.ASSET_INVENTORY,
+        needPermissionByRole: true,
         subMenuList: [
-            { id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE },
-            { id: MENU_ID.ASSET_INVENTORY_COLLECTOR },
-            { id: MENU_ID.ASSET_INVENTORY_SERVICE_ACCOUNT },
+            { id: MENU_ID.CLOUD_SERVICE, needPermissionByRole: true },
+            { id: MENU_ID.COLLECTOR, needPermissionByRole: true },
+            { id: MENU_ID.SERVICE_ACCOUNT, needPermissionByRole: true },
         ],
     },
     {
         id: MENU_ID.COST_EXPLORER,
+        needPermissionByRole: true,
         subMenuList: [
-            { id: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
-            { id: MENU_ID.COST_EXPLORER_BUDGET },
+            { id: MENU_ID.COST_ANALYSIS, needPermissionByRole: true },
+            { id: MENU_ID.BUDGET, needPermissionByRole: true },
         ],
     },
     {
         id: MENU_ID.ALERT_MANAGER,
+        needPermissionByRole: true,
         subMenuList: [
-            { id: MENU_ID.ALERT_MANAGER_DASHBOARD },
-            { id: MENU_ID.ALERT_MANAGER_ALERT },
-            { id: MENU_ID.ALERT_MANAGER_ESCALATION_POLICY },
+            { id: MENU_ID.ALERT_MANAGER_DASHBOARD, needPermissionByRole: true },
+            { id: MENU_ID.ALERT, needPermissionByRole: true },
+            { id: MENU_ID.ESCALATION_POLICY, needPermissionByRole: true },
         ],
     },
     {
         id: MENU_ID.ADMINISTRATION,
+        needPermissionByRole: true,
         subMenuList: [
             {
-                id: MENU_ID.ADMINISTRATION_IAM,
+                id: MENU_ID.IAM,
+                needPermissionByRole: true,
                 subMenuList: [
-                    { id: MENU_ID.ADMINISTRATION_USER },
+                    { id: MENU_ID.USER, needPermissionByRole: true },
                 ],
             },
         ],
@@ -54,11 +60,11 @@ export const MENU_LIST: Menu[] = [
         hideOnSiteMap: true,
         subMenuList: [
             {
-                id: MENU_ID.MY_PAGE_ACCOUNT,
+                id: MENU_ID.ACCOUNT,
                 subMenuList: [
-                    { id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE },
-                    { id: MENU_ID.MY_PAGE_API_KEY },
-                    { id: MENU_ID.MY_PAGE_NOTIFICATIONS },
+                    { id: MENU_ID.ACCOUNT_PROFILE },
+                    { id: MENU_ID.API_KEY },
+                    { id: MENU_ID.NOTIFICATIONS },
                 ],
             },
         ],
@@ -68,7 +74,7 @@ export const MENU_LIST: Menu[] = [
         hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
-            { id: MENU_ID.INFO_NOTICE },
+            { id: MENU_ID.NOTICE },
         ],
     },
 ];
@@ -81,40 +87,40 @@ export const ADMIN_MENU_LIST: Menu[] = [
     {
         id: MENU_ID.DASHBOARDS,
         subMenuList: [
-            { id: MENU_ID.DASHBOARDS_WORKSPACE },
-            { id: MENU_ID.DASHBOARDS_PROJECT },
+            { id: MENU_ID.WORKSPACE_DASHBOARDS },
+            { id: MENU_ID.PROJECT_DASHBOARDS },
         ],
     },
     {
         id: MENU_ID.ASSET_INVENTORY,
         subMenuList: [
-            { id: MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE },
-            { id: MENU_ID.ASSET_INVENTORY_COLLECTOR },
+            { id: MENU_ID.CLOUD_SERVICE },
+            { id: MENU_ID.COLLECTOR },
         ],
     },
     {
         id: MENU_ID.COST_EXPLORER,
         subMenuList: [
-            { id: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
-            { id: MENU_ID.COST_EXPLORER_BUDGET },
+            { id: MENU_ID.COST_ANALYSIS },
+            { id: MENU_ID.BUDGET },
         ],
     },
     {
         id: MENU_ID.ADMINISTRATION,
         subMenuList: [
             {
-                id: MENU_ID.ADMINISTRATION_IAM,
+                id: MENU_ID.IAM,
                 subMenuList: [
-                    { id: MENU_ID.ADMINISTRATION_USER },
-                    { id: MENU_ID.ADMINISTRATION_ROLE },
-                    { id: MENU_ID.ADMINISTRATION_POLICY },
+                    { id: MENU_ID.USER },
+                    { id: MENU_ID.ROLE },
+                    { id: MENU_ID.POLICY },
                 ],
             },
             {
-                id: MENU_ID.ADMINISTRAION_PREFERENCE,
+                id: MENU_ID.PREFERENCE,
                 subMenuList: [
-                    { id: MENU_ID.ADMINISTRATION_DOMAIN_SETTINGS },
-                    { id: MENU_ID.ADMINISTRATION_WORKSPACES },
+                    { id: MENU_ID.DOMAIN_SETTINGS },
+                    { id: MENU_ID.WORKSPACES },
                 ],
             },
         ],
@@ -124,7 +130,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
         hideOnGNB: true,
         hideOnSiteMap: true,
         subMenuList: [
-            { id: MENU_ID.INFO_NOTICE },
+            { id: MENU_ID.NOTICE },
         ],
     },
 ];

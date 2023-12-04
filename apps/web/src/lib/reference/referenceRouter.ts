@@ -16,19 +16,19 @@ interface LinkFormatter {
 
 const queryHelper = new QueryHelper();
 
-const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
-    const location = { name, query };
-    let filters: any[] = [];
-    if (data) {
-        queryHelper.setFilters([{ k: 'server_id', v: data, o: '=' }]);
-        filters.push(...queryHelper.rawQueryStrings);
-        if (query?.filters) {
-            filters = concat(queryHelper.rawQueryStrings, query?.filters);
-        }
-    }
-    location.query = { filters };
-    return location;
-};
+// const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
+//     const location = { name, query };
+//     let filters: any[] = [];
+//     if (data) {
+//         queryHelper.setFilters([{ k: 'server_id', v: data, o: '=' }]);
+//         filters.push(...queryHelper.rawQueryStrings);
+//         if (query?.filters) {
+//             filters = concat(queryHelper.rawQueryStrings, query?.filters);
+//         }
+//     }
+//     location.query = { filters };
+//     return location;
+// };
 
 const projectLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     if (data) {
@@ -98,11 +98,6 @@ const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, que
 type RouterMap = Record<ResourceType, { name: string; formatter: LinkFormatter}>;
 
 const routerMap: RouterMap = {
-    'inventory.Server':
-        {
-            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-            formatter: serverLinkFormatter,
-        },
     'identity.Project':
         {
             name: PROJECT_ROUTE.DETAIL._NAME,

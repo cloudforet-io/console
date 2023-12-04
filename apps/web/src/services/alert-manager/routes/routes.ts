@@ -19,7 +19,7 @@ const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
     meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: AlertManagerContainer,
     children: [
         {
@@ -30,7 +30,7 @@ const alertManagerRoutes: RouteConfig = {
         },
         {
             path: 'alert',
-            meta: { menuId: MENU_ID.ALERT_MANAGER_ALERT },
+            meta: { menuId: MENU_ID.ALERT },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -51,7 +51,7 @@ const alertManagerRoutes: RouteConfig = {
         {
             path: 'escalation-policy',
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.ALERT_MANAGER_ESCALATION_POLICY },
+            meta: { lnbVisible: true, menuId: MENU_ID.ESCALATION_POLICY },
             component: EscalationPolicyPage as any,
         },
     ],

@@ -27,7 +27,6 @@ import { store } from '@/store';
 
 import NoticeList from '@/services/info/components/NoticeList.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 
 export default {
     name: 'NoticePage',
@@ -47,7 +46,6 @@ export default {
 
         return {
             ...toRefs(state),
-            MY_PAGE_ROUTE,
             handleCreateNotice,
         };
     },

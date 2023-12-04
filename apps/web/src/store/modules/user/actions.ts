@@ -107,7 +107,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
     commit('setRoles', userRoles);
 
     const workspaceStore = useWorkspaceStore();
-    await workspaceStore.load();
+    await workspaceStore.load(userId);
 
     commit('setIsSessionExpired', false);
 };

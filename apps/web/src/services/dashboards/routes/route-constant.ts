@@ -6,21 +6,21 @@ export const DASHBOARDS_ROUTE = Object.freeze({
         _NAME: `${MENU_ID.DASHBOARDS}.all`,
     },
     PROJECT: {
-        _NAME: MENU_ID.DASHBOARDS_PROJECT,
+        _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.PROJECT_DASHBOARDS}`,
         DETAIL: {
-            _NAME: `${MENU_ID.DASHBOARDS_PROJECT}.detail`,
+            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.PROJECT_DASHBOARDS}.detail`,
         },
         CUSTOMIZE: {
-            _NAME: `${MENU_ID.DASHBOARDS_PROJECT}.customize`,
+            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.PROJECT_DASHBOARDS}.customize`,
         },
     },
     WORKSPACE: {
-        _NAME: MENU_ID.DASHBOARDS_WORKSPACE,
+        _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.WORKSPACE_DASHBOARDS}`,
         DETAIL: {
-            _NAME: `${MENU_ID.DASHBOARDS_WORKSPACE}.detail`,
+            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.WORKSPACE_DASHBOARDS}.detail`,
         },
         CUSTOMIZE: {
-            _NAME: `${MENU_ID.DASHBOARDS_WORKSPACE}.customize`,
+            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.WORKSPACE_DASHBOARDS}.customize`,
         },
     },
     CREATE: {
