@@ -239,7 +239,7 @@ const handleClickSignOut = async () => {
                     </router-link>
                 </div>
             </template>
-            <template v-if="state.hasPermission && !state.isDomainOwner">
+            <template v-if="state.hasPermission">
                 <p-divider />
                 <div class="sub-menu-wrapper">
                     <router-link class="sub-menu"

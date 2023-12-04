@@ -119,8 +119,8 @@ export default defineComponent({
                 });
                 return dashboardList;
             }),
-            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
-            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
+            projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
+            workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
             hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
         });
         const hideMenu = () => {
