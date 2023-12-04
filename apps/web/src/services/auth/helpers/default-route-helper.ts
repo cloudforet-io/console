@@ -4,6 +4,7 @@ import { MENU_ID } from '@/lib/menu/config';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
+// TODO: need to refactor with admin mode
 const GENERAL_DEFAULT_ROUTE = Object.freeze({
     name: HOME_DASHBOARD_ROUTE._NAME,
 });
