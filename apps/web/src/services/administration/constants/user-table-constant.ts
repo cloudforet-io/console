@@ -1,3 +1,5 @@
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
@@ -80,7 +82,7 @@ export const userSearchHandlers = {
             label: 'Tags',
             dataType: 'object',
         }],
-    }],
+    }] as KeyItemSet[],
     valueHandlerMap: {
         user_id: makeDistinctValueHandler('identity.User', 'user_id'),
         name: makeDistinctValueHandler('identity.User', 'name'),

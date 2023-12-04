@@ -14,11 +14,6 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
-import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -113,22 +108,18 @@ const userFormState = reactive({
 });
 
 /* Component */
-const saveRoleOfSelectedUser = (index) => {
-    const selectedUser = userPageState.users[index];
-    const roleBindingsData = selectedUser?.role_bindings?.find((data) => data.role_info?.role_type === 'DOMAIN');
-    if (roleBindingsData) userFormState.roleOfSelectedUser = roleBindingsData.role_info?.role_id;
-    else userFormState.roleOfSelectedUser = '';
-};
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
-    if (index.length === 1) saveRoleOfSelectedUser(index);
 };
 const handleChange = async (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
     }
-    await getUserList();
+    await userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
 };
 const handleSelectDropdown = (name) => {
     switch (name) {
@@ -145,10 +136,16 @@ const handleUserFormConfirm = async (item, roleId) => {
     } else {
         await addUser(item, roleId);
     }
-    await getUserList();
+    await userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
 };
 const handleUserStatusModalConfirm = () => {
-    getUserList();
+    userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
 };
 
 /* Modal */
@@ -188,12 +185,6 @@ const clickDisable = () => {
 
 /* API */
 let userListApiQuery = userListApiQueryHelper.data;
-const getUserList = () => {
-    userPageStore.listUsers({
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    });
-};
 const handleExport = async () => {
     await downloadExcel({
         url: '/identity/user/list',
@@ -206,23 +197,6 @@ const handleExport = async () => {
         timezone: state.timezone,
     });
 };
-const bindRole = async (userId, roleId) => {
-    await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters>({
-        user_id: userId,
-        role_id: roleId,
-    });
-};
-const unbindRole = async (userId) => {
-    const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
-        user_id: userId,
-    });
-    const roleBindingId = results?.[0].role_binding_id;
-    if (roleBindingId) {
-        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteParameters>({
-            role_binding_id: roleBindingId,
-        });
-    }
-};
 const addUser = async (item, roleId) => {
     userPageStore.$patch({
         modalLoading: true,
@@ -233,7 +207,13 @@ const addUser = async (item, roleId) => {
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
         if (roleId.length > 0 || roleId !== '') {
-            await bindRole(item.user_id, roleId);
+            await userPageStore.createRoleBinding({
+                user_id: item.user_id,
+                role_id: roleId,
+                // TODO: will be changed after permission group is implemented
+                permission_group: 'DOMAIN',
+                domain_id: state.domain_id,
+            });
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
@@ -254,11 +234,20 @@ const updateUser = async (item, roleId) => {
             ...item,
         });
         if (roleId && roleId !== userFormState.roleOfSelectedUser) {
-            await bindRole(item.user_id, roleId);
+            await userPageStore.createRoleBinding({
+                user_id: item.user_id,
+                role_id: roleId,
+                // TODO: will be changed after permission group is implemented
+                permission_group: 'DOMAIN',
+                domain_id: state.domain_id,
+            });
             userFormState.roleOfSelectedUser = roleId;
         }
         if (!roleId && userFormState.roleOfSelectedUser !== '') {
-            await unbindRole(item.user_id);
+            await userPageStore.listRoleBindings({
+                user_id: item.user_id,
+                domain_id: state.domain_id,
+            });
             userFormState.roleOfSelectedUser = roleId;
         }
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
@@ -271,7 +260,10 @@ const updateUser = async (item, roleId) => {
             ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
         }
     } finally {
-        await getUserList();
+        await userPageStore.listUsers({
+            query: userListApiQuery,
+            domain_id: state.domain_id,
+        });
         userPageStore.$patch({
             selectedIndices: [],
             visibleUpdateModal: false,
@@ -282,7 +274,10 @@ const updateUser = async (item, roleId) => {
 
 /* Init */
 (async () => {
-    await getUserList();
+    await userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
 })();
 </script>
 
