@@ -47,7 +47,7 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),

@@ -4,10 +4,9 @@ import { clone } from 'lodash';
 
 import type { AccessLevel, PagePermissionTuple, PagePermissionType } from '@/lib/access-control/config';
 import { ACCESS_LEVEL, PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
-import { getPermissionOfPage } from '@/lib/access-control/page-permission-helper';
+import { flattenMenu, getPermissionOfPage } from '@/lib/access-control/page-permission-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
-import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 const getAccessTypeFromPermission = (permission?: string | PagePermissionType): AccessLevel => {
     if (permission === PAGE_PERMISSION_TYPE.VIEW) return ACCESS_LEVEL.VIEW_PERMISSION;
@@ -35,12 +34,12 @@ const getPermissionByReferenceMenuIds = (referenceMenuIds: MenuId[], pagePermiss
 
 export const getUserAccessLevel = (
     route?: Route|null,
-    isDomainOwner?: boolean,
+    isDomainAdmin?: boolean,
     pagePermissions: PagePermissionTuple[] = [],
     isTokenAlive = true,
 ): AccessLevel => {
     if (!isTokenAlive) return ACCESS_LEVEL.EXCLUDE_AUTH;
-    if (isDomainOwner) return ACCESS_LEVEL.ADMIN_PERMISSION;
+    if (isDomainAdmin) return ACCESS_LEVEL.ADMIN_PERMISSION;
 
     let permission;
 
@@ -55,15 +54,19 @@ export const getUserAccessLevel = (
 
     return getAccessTypeFromPermission(permission);
 };
-const getMenuAccessLevel = (id: MenuId): AccessLevel => (MENU_INFO_MAP[id]?.needPermissionByRole ? ACCESS_LEVEL.VIEW_PERMISSION : ACCESS_LEVEL.AUTHENTICATED);
+const getMenuAccessLevel = (id: MenuId): AccessLevel => {
+    const flattenedMenuList = flattenMenu(MENU_LIST);
+    if (!flattenedMenuList.find((menu) => menu.id === id)) return ACCESS_LEVEL.VIEW_PERMISSION;
+    return ACCESS_LEVEL.AUTHENTICATED;
+};
 
 export const isUserAccessibleToMenu = (menuId: MenuId, pagePermissions: PagePermissionTuple[]): boolean => {
     const [, permission] = pagePermissions.find(([id]) => id === menuId) ?? [];
     if (!permission) return false;
     return getAccessTypeFromPermission(permission) >= getMenuAccessLevel(menuId);
 };
-export const isUserAccessibleToRoute = (route: Route, isDomainOwner: boolean, pagePermissions: PagePermissionTuple[]): boolean => {
+export const isUserAccessibleToRoute = (route: Route, isDomainAdmin: boolean, pagePermissions: PagePermissionTuple[]): boolean => {
     const routeAccessLevel = getRouteAccessLevel(route);
-    const userAccessLevel = getUserAccessLevel(route, isDomainOwner, pagePermissions);
+    const userAccessLevel = getUserAccessLevel(route, isDomainAdmin, pagePermissions);
     return userAccessLevel >= routeAccessLevel;
 };

@@ -138,7 +138,7 @@ export default {
                 }
 
                 const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-                const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainOwner'], store.getters['user/pagePermissionList']);
+                const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pagePermissionList']);
                 if (isAccessible) {
                     await vm.$router.push(resolvedRoute.location);
                 } else {

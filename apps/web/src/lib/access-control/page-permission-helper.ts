@@ -12,7 +12,7 @@ import {
     PAGE_PERMISSION_TYPE,
     SYSTEM_USER_DEFAULT_PERMISSIONS,
 } from '@/lib/access-control/config';
-import type { Menu } from '@/lib/menu/config';
+import type { Menu, MenuId } from '@/lib/menu/config';
 
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
@@ -30,7 +30,7 @@ export const getProperPermissionType = (permissionA: PagePermissionType = PAGE_P
     return PAGE_PERMISSION_TYPE.VIEW;
 };
 
-const flattenMenu = (menuList: Menu[]) => menuList.flatMap((menu) => [
+export const flattenMenu = (menuList: Menu[]) => menuList.flatMap((menu) => [
     { id: menu.id, needPermissionByRole: menu.needPermissionByRole },
     ...menu.subMenuList?.map((subMenu) => ({
         id: subMenu.id,
@@ -92,7 +92,7 @@ export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList
     return results;
 }, [] as LNBMenu[]);
 
-export const getPermissionOfPage = (menuId: string, pagePermissions: PagePermissionTuple[], menuList: Menu[]): PagePermissionType|undefined => {
+export const getPermissionOfPage = (menuId: MenuId, pagePermissions: PagePermissionTuple[], menuList: Menu[]): PagePermissionType|undefined => {
     let result: PagePermissionType|undefined;
     const filterdMenuListByRequiredPermission = filterMenuByPermission(menuList);
 

@@ -15,7 +15,7 @@ import type { UserState, PageAccessType } from './type';
 
 // TODO: temporary defence
 // export const isDomainOwner = (state: UserState): boolean => state.roleType === 'DOMAIN_ADMIN';
-export const isDomainOwner = (): boolean => true;
+export const isDomainAdmin = (): boolean => true;
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 export const roleNames = (state: UserState): Array<string> => {
     const systemRoleNames: Array<string> = [];
