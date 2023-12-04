@@ -3,35 +3,24 @@ import jwtDecode from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import type { RoleModel } from '@/schema/identity/role/model';
 import { setI18nLocale } from '@/translations';
 
+// eslint-disable-next-line import/no-cycle
 import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
 } from './type';
 
-// const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> => {
-//     const response = await SpaceConnector.client.identity.domainOwner.get({ owner_id: ownerId });
-//     return {
-//         userId: response.owner_id,
-//         userType: 'DOMAIN_OWNER',
-//         backend: 'LOCAL',
-//         name: response.name,
-//         email: response.email,
-//         language: languages[response.language] ? response.language : 'en',
-//         timezone: response.timezone,
-//         // email_verified : There is data only when the value is true.
-//         emailVerified: !!response.email_verified,
-//     };
-// };
 
 const getUserInfo = async (userId: string, domainId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.clientV2.identity.user.get({
         user_id: userId,
         domain_id: domainId,
     });
-    console.debug('user response', response);
     // TODO: refactor below code with new response
     return {
         userId: response.user_id,
@@ -73,10 +62,9 @@ const getUserInfoFromToken = (token: string): string[] => {
 const getUserRoles = async (domainId): Promise<Array<UserRole>> => {
     try {
         const userRoles: Record<string, UserRole> = {};
-        const { results } = await SpaceConnector.clientV2.identity.role.list({
+        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
             domain_id: domainId,
         });
-        console.debug('role list', results);
 
         if (!results) return [];
 
@@ -151,27 +139,6 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
         await setI18nLocale(userRequest.language);
     }
 };
-
-// export const setTimezone = async ({ commit, state }, timezone: string): Promise<void> => {
-//     await updateUser(state.userId, state.userType, { timezone });
-//     commit('setTimezone', timezone);
-// };
-//
-// export const setLanguage = async ({ commit, state }, language: string): Promise<void> => {
-//     await updateUser(state.userId, state.userType, { language });
-//     commit('setLanguage', language);
-//     await setI18nLocale(language);
-// };
-
-// export const getUser = async ({ commit, state }, userId): Promise<void> => {
-//     if (state.userType === 'DOMAIN_OWNER') {
-//         const userInfo = await getDomainOwnerInfo(userId);
-//         commit('setUser', userInfo);
-//     } else {
-//         const userInfo = await getUserInfo(userId);
-//         commit('setUser', userInfo);
-//     }
-// };
 
 export const startSignIn = ({ commit }) => {
     commit('setIsSignInLoading', true);

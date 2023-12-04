@@ -5,8 +5,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/model';
-import type { WorkspaceListRequestParameters } from '@/schema/identity/workspace/api-verbs/list';
+import type { GetWorkspacesParameters } from '@/schema/identity/user/api-verbs/get-workspaces';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+// eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
 
 interface WorkspaceStoreState {
     items: WorkspaceModel[];
@@ -27,7 +29,13 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
 
     const actions = {
         async load() {
-            const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListRequestParameters, ListResponse<WorkspaceModel>>();
+            const userId = store.state.user.userId;
+            // TODO: remove this
+            const domainId = store.state.domain.domainId;
+            const { results } = await SpaceConnector.clientV2.identity.user.getWorkspaces<GetWorkspacesParameters, ListResponse<WorkspaceModel>>({
+                user_id: userId,
+                domain_id: domainId,
+            });
             state.items = results || [];
         },
         setCurrentWorkspace(workspaceId?: string) {
