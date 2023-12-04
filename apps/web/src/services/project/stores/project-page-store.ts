@@ -6,7 +6,7 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
 import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';

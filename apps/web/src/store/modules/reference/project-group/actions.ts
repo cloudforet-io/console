@@ -2,7 +2,7 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';

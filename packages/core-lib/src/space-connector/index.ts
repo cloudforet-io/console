@@ -1,5 +1,6 @@
-import type { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
+import type { CustomAxiosRequestConfig } from 'axios-auth-refresh/dist/utils';
 import { camelCase } from 'lodash';
 
 import type {
@@ -14,7 +15,7 @@ const API_REFLECTION_URL_V2 = '/console-api/api/reflection';
 
 const CHECK_TOKEN_TIME = 1000 * 30;
 
-interface MockRequestConfig extends AxiosRequestConfig {
+interface MockRequestConfig extends CustomAxiosRequestConfig {
     mockMode?: boolean;
     mockPath?: string;
 }
@@ -28,7 +29,7 @@ type AfterCallApiMap = Record<string, AfterCallApi>;
 
 
 interface ApiHandler {
-    <Params = any, Response = any>(params?: Params, config?: AxiosRequestConfig): Promise<Response>;
+    <Params = any, Response = any>(params?: Params, config?: CustomAxiosRequestConfig): Promise<Response>;
     [key: string]: ApiHandler;
 }
 const DEFAULT_MOCK_CONFIG: MockRequestConfig = Object.freeze({ mockMode: false });
@@ -230,7 +231,7 @@ export class SpaceConnector {
                 return response.data;
             };
         }
-        return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
+        return async (params: object = {}, config?: CustomAxiosRequestConfig): Promise<any> => {
             const response: AxiosPostResponse = await serviceApi.instance.post(path, params, config);
 
             if (afterCall) afterCall(response.data);
