@@ -4,7 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
 
-import type { ListResponse } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PolicyModel } from '@/schema/identity/policy/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';

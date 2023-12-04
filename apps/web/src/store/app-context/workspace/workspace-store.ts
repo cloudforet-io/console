@@ -4,7 +4,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { GetWorkspacesParameters } from '@/schema/identity/user/api-verbs/get-workspaces';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 // eslint-disable-next-line import/no-cycle
