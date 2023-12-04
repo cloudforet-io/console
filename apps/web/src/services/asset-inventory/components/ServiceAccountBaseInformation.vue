@@ -10,9 +10,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProviderGetParameters } from '@/schema/identity/provider/api-verbs/get';
 import type { ProviderModel } from '@/schema/identity/provider/model';
+import type { SchemaGetParameters } from '@/schema/identity/schema/api-verbs/get';
+import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
+import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -33,6 +37,7 @@ interface Props {
     serviceAccountId?: string;
     editable: boolean;
     serviceAccountLoading: boolean;
+    serviceAccountType: AccountType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -40,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
     serviceAccountId: undefined,
     editable: false,
     serviceAccountLoading: false,
+    serviceAccountType: ACCOUNT_TYPE.GENERAL,
 });
 
 const emit = defineEmits<{(e: 'refresh'): void;
@@ -47,10 +53,10 @@ const emit = defineEmits<{(e: 'refresh'): void;
 
 const state = reactive({
     loading: true,
-    providerData: {} as ProviderModel,
+    providerData: {} as Partial<ProviderModel>,
     mode: 'READ' as PageMode,
     isFormValid: undefined,
-    baseInformationSchema: computed(() => state.providerData.template?.service_account?.schema ?? null),
+    baseInformationSchema: {} as Partial<SchemaModel>,
     serviceAccountData: undefined as ServiceAccountModel|undefined,
     baseInformationForm: {} as BaseInformationForm,
     originBaseInformationForm: {} as BaseInformationForm,
@@ -60,9 +66,10 @@ const state = reactive({
 /* Api */
 const getProvider = async () => {
     try {
-        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters>({
+        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>({
             domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             provider: props.provider ?? '',
+            workspace_id: undefined,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -105,7 +112,8 @@ const getServiceAccount = async (serviceAccountId) => {
 };
 const updateServiceAccount = async () => {
     try {
-        state.serviceAccountData = await SpaceConnector.client.identity.serviceAccount.update({
+        state.serviceAccountData = await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             service_account_id: props.serviceAccountId,
             name: state.baseInformationForm.accountName,
             data: state.baseInformationForm.customSchemaForm,
@@ -114,6 +122,19 @@ const updateServiceAccount = async () => {
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
+    }
+};
+
+const getBaseInformationSchema = async () => {
+    try {
+        state.baseInformationSchema = await SpaceConnector.clientV2.identity.schema.get<SchemaGetParameters, SchemaModel>({
+            schema_id: `${props.provider}-service-account`,
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+            workspace_id: undefined,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.baseInformationSchema = {};
     }
 };
 
@@ -136,8 +157,11 @@ const handleChangeForm = (form) => {
 };
 
 /* Watcher */
-watch(() => props.provider, (provider) => {
-    if (provider) getProvider();
+watch(() => props.provider, async (provider) => {
+    if (provider) {
+        await getProvider();
+        await getBaseInformationSchema();
+    }
 });
 watch(() => props.serviceAccountId, (serviceAccountId) => {
     if (serviceAccountId) getServiceAccount(serviceAccountId);
@@ -183,9 +207,10 @@ watch(() => props.serviceAccountId, (serviceAccountId) => {
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
                                                    edit-mode="UPDATE"
-                                                   :schema="state.baseInformationSchema"
+                                                   :schema="state.baseInformationSchema.schema"
                                                    :is-valid.sync="state.isFormValid"
                                                    :origin-form="state.originBaseInformationForm"
+                                                   :aacount-type="props.serviceAccountType"
                                                    @change="handleChangeForm"
             />
         </div>

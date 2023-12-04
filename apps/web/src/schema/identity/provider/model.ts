@@ -5,10 +5,11 @@ export interface ProviderModel {
     name: string;
     alias: string;
     color: string;
-    options: Record<string, any>;
+    icon: string;
     order: number;
+    options: Record<string, any>;
     tags: Tags;
     is_managed: boolean;
-    domain_id: string;
     created_at: TimeStamp;
+    updated_at: TimeStamp;
 }

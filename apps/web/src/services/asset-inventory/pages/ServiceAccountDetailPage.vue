@@ -44,7 +44,7 @@ const state = reactive({
     item: {} as ServiceAccountModel,
     serviceAccountType: computed(() => (state.item.trusted_account_id ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL)),
     attachedGeneralAccounts: [] as ServiceAccountModel[],
-    attachedTrustedAccountId: computed(() => state.item.trusted_service_account_id),
+    attachedTrustedAccountId: computed(() => state.item.trusted_account_id),
     providerData: {} as ProviderModel,
     providerId: computed(() => state.item?.provider),
     provider: computed(() => {
@@ -83,9 +83,10 @@ const getServiceAccount = async (serviceAccountId: string) => {
 };
 const getProviderData = async (provider:string) => {
     try {
-        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters>({
+        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>({
             domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             provider,
+            workspace_id: undefined,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -159,6 +160,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <service-account-base-information :provider="state.providerKey"
                                               :service-account-loading="state.loading"
                                               :service-account-id="props.serviceAccountId"
+                                              :service-account-type="state.serviceAccountType"
                                               :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
             />

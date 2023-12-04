@@ -7,4 +7,5 @@ export interface ProviderListParameters {
     name?: string;
     alias?: string;
     is_managed?: boolean;
+    workspace_id?: string;
 }

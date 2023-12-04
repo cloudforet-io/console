@@ -1,20 +1,5 @@
-<template>
-    <div class="service-account-base-information-detail">
-        <p-dynamic-layout :type="convertedDetailSchema.type"
-                          :options="convertedDetailSchema.options"
-                          :data="serviceAccountData"
-                          :type-options="{
-                              loading: !convertedDetailSchema.type || loading
-                          }"
-                          :field-handler="fieldHandler"
-        />
-    </div>
-</template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
+<script setup lang="ts">
+import { computed, reactive, watch } from 'vue';
 
 import { PDynamicLayout } from '@spaceone/design-system';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -27,75 +12,69 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const EXCLUDED_FIELD_KEYS = ['project_info.project_id', 'created_at', 'service_account_type'];
 
-export default {
-    name: 'ServiceAccountBaseInformationDetail',
-    components: {
-        PDynamicLayout,
-    },
-    props: {
-        provider: {
-            type: String,
-            default: undefined,
-        },
-        serviceAccountData: {
-            type: Object,
-            default: undefined,
-        },
-        loading: {
-            type: Boolean,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            detailSchema: {},
-            convertedDetailSchema: computed(() => {
-                const result = cloneDeep(state.detailSchema);
-                if (!isEmpty(result)) {
-                    result.options.fields = state.detailSchema?.options?.fields.filter((d) => !EXCLUDED_FIELD_KEYS.includes(d.key));
-                }
-                return result;
-            }),
-            fieldHandler: [],
-        });
+const props = defineProps<{
+    provider?: string;
+    serviceAccountData?: Record<string, any>;
+    loading?: boolean;
+}>();
 
-        /* Util */
-        const fieldHandler = (field) => {
-            if (field.extraData?.reference) {
-                return referenceFieldFormatter(field.extraData.reference, field.data);
-            }
-            return {};
-        };
 
-        /* Api */
-        const getDetailSchema = async (provider) => {
-            try {
-                const result = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: 'identity.ServiceAccount',
-                    schema: 'details',
-                    options: {
-                        provider,
-                    },
-                });
-                state.detailSchema = result.details[0];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.detailSchema = {};
-            }
-        };
+const state = reactive({
+    detailSchema: {},
+    convertedDetailSchema: computed(() => {
+        const result = cloneDeep(state.detailSchema);
+        if (!isEmpty(result)) {
+            result.options.fields = state.detailSchema?.options?.fields.filter((d) => !EXCLUDED_FIELD_KEYS.includes(d.key));
+        }
+        return result;
+    }),
+    fieldHandler: [],
+});
 
-        /* Watcher */
-        watch(() => props.provider, (provider) => {
-            if (provider) getDetailSchema(provider);
-        });
-
-        return {
-            ...toRefs(state),
-            fieldHandler,
-        };
-    },
+/* Util */
+const fieldHandler = (field) => {
+    if (field.extraData?.reference) {
+        return referenceFieldFormatter(field.extraData.reference, field.data);
+    }
+    return {};
 };
+
+/* Api */
+const getDetailSchema = async (provider) => {
+    try {
+        const result = await SpaceConnector.client.addOns.pageSchema.get({
+            resource_type: 'identity.ServiceAccount',
+            schema: 'details',
+            options: {
+                provider,
+            },
+        });
+        state.detailSchema = result.details[0];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.detailSchema = {};
+    }
+};
+
+/* Watcher */
+watch(() => props.provider, (provider) => {
+    if (provider) getDetailSchema(provider);
+});
 </script>
+
+<template>
+    <div class="service-account-base-information-detail">
+        <p-dynamic-layout :type="state.convertedDetailSchema.type"
+                          :options="state.convertedDetailSchema.options"
+                          :data="props.serviceAccountData"
+                          :type-options="{
+                              loading: !state.convertedDetailSchema.type || loading
+                          }"
+                          :field-handler="fieldHandler"
+        />
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .service-account-base-information-detail {
     /* custom design-system component - p-dynamic-layout */

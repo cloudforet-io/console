@@ -72,9 +72,10 @@ const formState = reactive({
 /* Api */
 const getProvider = async () => {
     try {
-        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters>({
+        state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>({
             domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             provider: props.provider ?? '',
+            workspace_id: undefined,
         });
     } catch (e) {
         ErrorHandler.handleError(e);

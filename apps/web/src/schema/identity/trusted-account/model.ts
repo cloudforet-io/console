@@ -8,7 +8,6 @@ export interface TrustedAccountModel {
     tags: { [key: string]: unknown; };
     permission_group: 'DOMAIN' | 'WORKSPACE';
     workspace_id?: string;
-    domain_id?: string;
     created_at?: string;
 }
 
