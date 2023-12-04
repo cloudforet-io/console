@@ -1,76 +1,3 @@
-<template>
-    <div>
-        <p-heading heading-type="sub"
-                   :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
-        />
-        <p-definition-table :fields="state.fields"
-                            :data="state.data"
-                            :loading="state.loading"
-                            :skeleton-rows="7"
-                            v-on="$listeners"
-        >
-            <template #data-state="{data}">
-                <p-status v-bind="userStateFormatter(data)"
-                          class="capitalize"
-                />
-            </template>
-            <template #data-user_type="{data}">
-                <span v-if="data === 'API_USER'">API Only</span>
-                <span v-else>Console, API</span>
-            </template>
-            <template #data-email="{data}">
-                <span v-if="state.data.user_type !== 'API_USER'">
-                    <span :class="state.data.email_verified && 'verified-text'">{{ data }}</span>
-                    <span v-if="state.data.email_verified">
-                        <p-i name="ic_verified"
-                             height="1rem"
-                             width="1rem"
-                             class="verified-icon"
-                             color="#60B731"
-                        />
-                    </span>
-                    <span v-else
-                          class="not-verified"
-                    >
-                        {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
-                    </span>
-                </span>
-                <span v-else>
-                    <span>N/A</span>
-                </span>
-            </template>
-            <template #data-last_accessed_at="{data}">
-                <span v-if="data === -1">
-                    No Activity
-                </span>
-                <span v-else-if="data === 0">
-                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
-                </span>
-                <span v-else-if="data === 1">
-                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
-                </span>
-                <span v-else>
-                    {{ data }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
-                </span>
-            </template>
-            <template #data-created_at="{data}">
-                {{ iso8601Formatter(data, timezone) }}
-            </template>
-            <template #extra="{label}">
-                <verify-button
-                    v-if="label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && state.data.user_type !== 'API_USER'"
-                    :email="state.data.email"
-                    :user-id="state.data.user_id"
-                    :domain-id="state.data.domain_id"
-                    :verified="state.data.email_verified"
-                    is-administration
-                    @refresh-user="getUserDetailData"
-                />
-            </template>
-        </p-definition-table>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive, watch,
@@ -169,8 +96,80 @@ watch(() => userPageState.visibleUpdateModal, (value) => {
         getUserDetailData(props.userId);
     }
 });
-
 </script>
+
+<template>
+    <div>
+        <p-heading heading-type="sub"
+                   :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
+        />
+        <p-definition-table :fields="state.fields"
+                            :data="state.data"
+                            :loading="state.loading"
+                            :skeleton-rows="7"
+                            v-on="$listeners"
+        >
+            <template #data-state="{data}">
+                <p-status v-bind="userStateFormatter(data)"
+                          class="capitalize"
+                />
+            </template>
+            <template #data-user_type="{data}">
+                <span v-if="data === 'API_USER'">API Only</span>
+                <span v-else>Console, API</span>
+            </template>
+            <template #data-email="{data}">
+                <span v-if="state.data.user_type !== 'API_USER'">
+                    <span :class="state.data.email_verified && 'verified-text'">{{ data }}</span>
+                    <span v-if="state.data.email_verified">
+                        <p-i name="ic_verified"
+                             height="1rem"
+                             width="1rem"
+                             class="verified-icon"
+                             color="#60B731"
+                        />
+                    </span>
+                    <span v-else
+                          class="not-verified"
+                    >
+                        {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
+                    </span>
+                </span>
+                <span v-else>
+                    <span>N/A</span>
+                </span>
+            </template>
+            <template #data-last_accessed_at="{data}">
+                <span v-if="data === -1">
+                    No Activity
+                </span>
+                <span v-else-if="data === 0">
+                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                </span>
+                <span v-else-if="data === 1">
+                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                </span>
+                <span v-else>
+                    {{ data }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                </span>
+            </template>
+            <template #data-created_at="{data}">
+                {{ iso8601Formatter(data, timezone) }}
+            </template>
+            <template #extra="{label}">
+                <verify-button
+                    v-if="label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && state.data.user_type !== 'API_USER'"
+                    :email="state.data.email"
+                    :user-id="state.data.user_id"
+                    :domain-id="state.data.domain_id"
+                    :verified="state.data.email_verified"
+                    is-administration
+                    @refresh-user="getUserDetailData"
+                />
+            </template>
+        </p-definition-table>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-definition */

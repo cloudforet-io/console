@@ -25,12 +25,10 @@ import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
-
 interface Props {
     headerTitle: string;
     item?: User;
 }
-
 interface UserManagementData {
     user_id: string;
     name: string;
@@ -57,13 +55,13 @@ const props = withDefaults(defineProps<Props>(), {
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
+const emit = defineEmits<{(e: 'confirm', data: UserManagementData, roleId: string|null): void; }>();
+
 const state = reactive({
     data: {} as User,
     selectedId: computed(() => props.item?.user_id),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
-
-const emit = defineEmits<{(e: 'confirm', data: UserManagementData, roleId: string|null): void; }>();
 
 const formState = reactive({
     tabs: [

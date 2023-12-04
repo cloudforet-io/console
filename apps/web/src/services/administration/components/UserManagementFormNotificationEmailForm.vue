@@ -1,79 +1,3 @@
-<template>
-    <div class="notification-email-form-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
-                       :invalid="invalidState.email"
-                       :invalid-text="invalidTexts.email"
-                       class="input-form-view"
-        >
-            <template #default="{invalid}">
-                <div class="input-form">
-                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
-                    <p-text-input :value="email"
-                                  :invalid="invalid"
-                                  placeholder="user@spaceone.io"
-                                  :disabled="userPageState.visibleUpdateModal && !state.isEdit"
-                                  class="text-input"
-                                  @update:value="handleChangeInput($event)"
-                    >
-                        <div v-if="userPageState.visibleUpdateModal && (!state.isEdit || !state.isFocused)"
-                             class="email-status-badge"
-                             @click="handleClickBadge"
-                        >
-                            <span>{{ email }}</span>
-                            <p-badge class="selected-text"
-                                     badge-type="subtle"
-                                     :style-type="isValidEmail ? 'green200' : 'yellow200'"
-                            >
-                                {{ isValidEmail
-                                    ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
-                                    : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED')
-                                }}
-                            </p-badge>
-                        </div>
-                    </p-text-input>
-                    <div v-if="userPageState.visibleUpdateModal">
-                        <p-button v-if="!state.isEdit"
-                                  style-type="tertiary"
-                                  @click="handleClickChange"
-                        >
-                            <p-i name="ic_edit"
-                                 height="1rem"
-                                 width="1rem"
-                                 class="edit-icon"
-                                 color="inherit transparent"
-                            />
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
-                        </p-button>
-                        <p-button v-else
-                                  style-type="tertiary"
-                                  class="send-mail-button"
-                                  :disabled="!email || invalidTexts.email !== ''"
-                                  :loading="state.loading"
-                                  @click="handleClickSend"
-                        >
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}</span>
-                        </p-button>
-                    </div>
-                </div>
-            </template>
-            <template #label-extra>
-                <p-tooltip
-                    position="bottom"
-                    :contents="$t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
-                    class="tooltip"
-                >
-                    <p-i name="ic_question-mark-circle-filled"
-                         height="0.875rem"
-                         width="0.875rem"
-                         color="inherit transparent"
-                         class="tooltip-icon"
-                    />
-                </p-tooltip>
-            </template>
-        </p-field-group>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive, watch,
@@ -190,6 +114,82 @@ watch(() => props.isValidEmail, (value) => {
     }
 })();
 </script>
+
+<template>
+    <div class="notification-email-form-wrapper">
+        <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
+                       :invalid="invalidState.email"
+                       :invalid-text="invalidTexts.email"
+                       class="input-form-view"
+        >
+            <template #default="{invalid}">
+                <div class="input-form">
+                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
+                    <p-text-input :value="email"
+                                  :invalid="invalid"
+                                  placeholder="user@spaceone.io"
+                                  :disabled="userPageState.visibleUpdateModal && !state.isEdit"
+                                  class="text-input"
+                                  @update:value="handleChangeInput($event)"
+                    >
+                        <div v-if="userPageState.visibleUpdateModal && (!state.isEdit || !state.isFocused)"
+                             class="email-status-badge"
+                             @click="handleClickBadge"
+                        >
+                            <span>{{ email }}</span>
+                            <p-badge class="selected-text"
+                                     badge-type="subtle"
+                                     :style-type="isValidEmail ? 'green200' : 'yellow200'"
+                            >
+                                {{ isValidEmail
+                                    ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
+                                    : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED')
+                                }}
+                            </p-badge>
+                        </div>
+                    </p-text-input>
+                    <div v-if="userPageState.visibleUpdateModal">
+                        <p-button v-if="!state.isEdit"
+                                  style-type="tertiary"
+                                  @click="handleClickChange"
+                        >
+                            <p-i name="ic_edit"
+                                 height="1rem"
+                                 width="1rem"
+                                 class="edit-icon"
+                                 color="inherit transparent"
+                            />
+                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
+                        </p-button>
+                        <p-button v-else
+                                  style-type="tertiary"
+                                  class="send-mail-button"
+                                  :disabled="!email || invalidTexts.email !== ''"
+                                  :loading="state.loading"
+                                  @click="handleClickSend"
+                        >
+                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}</span>
+                        </p-button>
+                    </div>
+                </div>
+            </template>
+            <template #label-extra>
+                <p-tooltip
+                    position="bottom"
+                    :contents="$t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
+                    class="tooltip"
+                >
+                    <p-i name="ic_question-mark-circle-filled"
+                         height="0.875rem"
+                         width="0.875rem"
+                         color="inherit transparent"
+                         class="tooltip-icon"
+                    />
+                </p-tooltip>
+            </template>
+        </p-field-group>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .notification-email-form-wrapper {
