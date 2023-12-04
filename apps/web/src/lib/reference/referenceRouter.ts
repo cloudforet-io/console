@@ -98,11 +98,6 @@ const cloudServiceTypeLinkFormatter: LinkFormatter = (name, data, reference, que
 type RouterMap = Record<ResourceType, { name: string; formatter: LinkFormatter}>;
 
 const routerMap: RouterMap = {
-    'inventory.Server':
-        {
-            name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
-            formatter: serverLinkFormatter,
-        },
     'identity.Project':
         {
             name: PROJECT_ROUTE.DETAIL._NAME,
