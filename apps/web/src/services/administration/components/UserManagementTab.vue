@@ -47,13 +47,11 @@ const state = reactive({
 });
 
 const singleItemTabState = reactive({
-    tabs: computed(() => ([
+    tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
+        { label: i18n.t('IDENTITY.USER.MAIN.PROJECTS'), name: 'projects', keepAlive: true },
         { label: i18n.t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
-        { label: i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
-        { label: i18n.t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
-        // { label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
-    ] as TabItem[])),
+    ])),
     activeTab: 'detail',
 });
 
