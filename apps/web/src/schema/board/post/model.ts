@@ -1,9 +1,6 @@
-import type { TimeStamp } from '@/schema/_common/model';
 import type { NoticePostType } from '@/schema/board/post/type';
 
 import type { FileInfo } from '@/lib/file-manager/type';
-
-
 
 export interface PostModel {
     board_id: string;
@@ -24,6 +21,6 @@ export interface PostModel {
     domain_id?: string;
     user_id: string;
     user_domain_id: string;
-    created_at: TimeStamp;
-    updated_at: TimeStamp;
+    created_at: string;
+    updated_at: string;
 }
