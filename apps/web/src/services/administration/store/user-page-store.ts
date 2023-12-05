@@ -3,6 +3,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
+import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
@@ -44,6 +48,35 @@ export const useUserPageStore = defineStore('user-page', {
                 this.totalCount = 0;
             } finally {
                 this.loading = false;
+            }
+        },
+        async createRoleBinding(params: RoleCreateParameters) {
+            try {
+                await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(params);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        async listRoleBindings(params: RoleBindingListParameters) {
+            const { domain_id } = params;
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>(params);
+                const roleBindingId = results?.[0].role_binding_id;
+                if (roleBindingId) {
+                    await this.deleteRoleBinding({
+                        role_binding_id: roleBindingId,
+                        domain_id,
+                    });
+                }
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        async deleteRoleBinding(params: RoleDeleteParameters) {
+            try {
+                await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteParameters>(params);
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
     },

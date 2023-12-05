@@ -14,11 +14,6 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
-import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
-import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -64,36 +59,38 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setFiltersAsRawQueryString(route.query.filters);
 
 const state = reactive({
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    // TODO: will be removed after the backend is ready
+    domain_id: computed(() => store.state.domain.domainId),
+    dropdownMenu: computed(() => ([
+        {
+            type: 'item',
+            name: 'update',
+            label: i18n.t('IDENTITY.USER.MAIN.UPDATE'),
+            disabled: userPageState.selectedIndices.length > 1 || !tableState.isSelected,
+        },
+        {
+            type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: !tableState.isSelected,
+        },
+        { type: 'divider' },
+        {
+            type: 'item', name: 'enable', label: i18n.t('IDENTITY.USER.MAIN.ENABLE'), disabled: !tableState.isSelected,
+        },
+        {
+            type: 'item', name: 'disable', label: i18n.t('IDENTITY.USER.MAIN.DISABLE'), disabled: !tableState.isSelected,
+        },
+    ] as MenuItem[])),
+});
+const tableState = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
         // api_key_count: d.api_key_count || 0,
         last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
-    dropdownMenu: computed(() => ([
-        {
-            type: 'item',
-            name: 'update',
-            label: i18n.t('IDENTITY.USER.MAIN.UPDATE'),
-            disabled: userPageState.selectedIndices.length > 1 || !state.isSelected,
-        },
-        {
-            type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: !state.isSelected,
-        },
-        { type: 'divider' },
-        {
-            type: 'item', name: 'enable', label: i18n.t('IDENTITY.USER.MAIN.ENABLE'), disabled: !state.isSelected,
-        },
-        {
-            type: 'item', name: 'disable', label: i18n.t('IDENTITY.USER.MAIN.DISABLE'), disabled: !state.isSelected,
-        },
-    ] as MenuItem[])),
     keyItemSets: userSearchHandlers.keyItemSets as KeyItemSet[],
     valueHandlerMap: userSearchHandlers.valueHandlerMap,
     tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets).queryTags,
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    // TODO: will be removed after the backend is ready
-    domain_id: computed(() => store.state.domain.domainId),
 });
 const modalState = reactive({
     mode: '',
@@ -110,49 +107,46 @@ const userFormState = reactive({
     roleOfSelectedUser: '',
 });
 
-/* API */
-let userListApiQuery = userListApiQueryHelper.data;
-
-const getUserList = () => {
-    userPageStore.listUsers({
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    });
-};
-
-const saveRoleOfSelectedUser = (index) => {
-    const selectedUser = userPageState.users[index];
-    const roleBindingsData = selectedUser?.role_bindings?.find((data) => data.role_info?.role_type === 'DOMAIN');
-    if (roleBindingsData) userFormState.roleOfSelectedUser = roleBindingsData.role_info?.role_id;
-    else userFormState.roleOfSelectedUser = '';
-};
-
+/* Component */
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
-    if (index.length === 1) saveRoleOfSelectedUser(index);
 };
-
 const handleChange = async (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
     }
-    await getUserList();
-};
-
-const handleExport = async () => {
-    await downloadExcel({
-        url: '/identity/user/list',
-        param: {
-            query: userListApiQuery,
-            include_role_binding: true,
-        },
-        fields: userExcelFields,
-        file_name_prefix: FILE_NAME_PREFIX.user,
-        timezone: state.timezone,
+    await userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
     });
 };
-
+const handleSelectDropdown = (name) => {
+    switch (name) {
+    case 'enable': clickEnable(); break;
+    case 'disable': clickDisable(); break;
+    case 'delete': clickDelete(); break;
+    case 'update': clickUpdate(); break;
+    default: break;
+    }
+};
+const handleUserFormConfirm = async (item, roleId) => {
+    if (userFormState.updateMode) {
+        await updateUser(item, roleId);
+    } else {
+        await addUser(item, roleId);
+    }
+    await userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
+};
+const handleUserStatusModalConfirm = () => {
+    userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
+};
 
 /* Modal */
 const clickAdd = () => {
@@ -189,32 +183,19 @@ const clickDisable = () => {
     userPageStore.$patch({ visibleStatusModal: true });
 };
 
-const handleSelectDropdown = (name) => {
-    switch (name) {
-    case 'enable': clickEnable(); break;
-    case 'disable': clickDisable(); break;
-    case 'delete': clickDelete(); break;
-    case 'update': clickUpdate(); break;
-    default: break;
-    }
-};
-
-const bindRole = async (userId, roleId) => {
-    await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters>({
-        user_id: userId,
-        role_id: roleId,
+/* API */
+let userListApiQuery = userListApiQueryHelper.data;
+const handleExport = async () => {
+    await downloadExcel({
+        url: '/identity/user/list',
+        param: {
+            query: userListApiQuery,
+            include_role_binding: true,
+        },
+        fields: userExcelFields,
+        file_name_prefix: FILE_NAME_PREFIX.user,
+        timezone: state.timezone,
     });
-};
-const unbindRole = async (userId) => {
-    const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
-        user_id: userId,
-    });
-    const roleBindingId = results?.[0].role_binding_id;
-    if (roleBindingId) {
-        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteParameters>({
-            role_binding_id: roleBindingId,
-        });
-    }
 };
 const addUser = async (item, roleId) => {
     userPageStore.$patch({
@@ -226,7 +207,13 @@ const addUser = async (item, roleId) => {
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
         if (roleId.length > 0 || roleId !== '') {
-            await bindRole(item.user_id, roleId);
+            await userPageStore.createRoleBinding({
+                user_id: item.user_id,
+                role_id: roleId,
+                // TODO: will be changed after permission group is implemented
+                permission_group: 'DOMAIN',
+                domain_id: state.domain_id,
+            });
         }
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
@@ -247,11 +234,20 @@ const updateUser = async (item, roleId) => {
             ...item,
         });
         if (roleId && roleId !== userFormState.roleOfSelectedUser) {
-            await bindRole(item.user_id, roleId);
+            await userPageStore.createRoleBinding({
+                user_id: item.user_id,
+                role_id: roleId,
+                // TODO: will be changed after permission group is implemented
+                permission_group: 'DOMAIN',
+                domain_id: state.domain_id,
+            });
             userFormState.roleOfSelectedUser = roleId;
         }
         if (!roleId && userFormState.roleOfSelectedUser !== '') {
-            await unbindRole(item.user_id);
+            await userPageStore.listRoleBindings({
+                user_id: item.user_id,
+                domain_id: state.domain_id,
+            });
             userFormState.roleOfSelectedUser = roleId;
         }
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
@@ -264,7 +260,10 @@ const updateUser = async (item, roleId) => {
             ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
         }
     } finally {
-        await getUserList();
+        await userPageStore.listUsers({
+            query: userListApiQuery,
+            domain_id: state.domain_id,
+        });
         userPageStore.$patch({
             selectedIndices: [],
             visibleUpdateModal: false,
@@ -273,21 +272,12 @@ const updateUser = async (item, roleId) => {
     }
 };
 
-const handleUserFormConfirm = async (item, roleId) => {
-    if (userFormState.updateMode) {
-        await updateUser(item, roleId);
-    } else {
-        await addUser(item, roleId);
-    }
-    await getUserList();
-};
-const handleUserStatusModalConfirm = () => {
-    getUserList();
-};
-
 /* Init */
 (async () => {
-    await getUserList();
+    await userPageStore.listUsers({
+        query: userListApiQuery,
+        domain_id: state.domain_id,
+    });
 })();
 </script>
 
@@ -299,15 +289,15 @@ const handleUserStatusModalConfirm = () => {
             selectable
             sortable
             :loading="userPageState.loading"
-            :items="state.refinedUserItems"
+            :items="tableState.refinedUserItems"
             :select-index="userPageState.selectedIndices"
             :fields="userTableFields"
             sort-by="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
-            :key-item-sets="state.keyItemSets"
-            :value-handler-map="state.valueHandlerMap"
-            :query-tags="state.tags"
+            :key-item-sets="tableState.keyItemSets"
+            :value-handler-map="tableState.valueHandlerMap"
+            :query-tags="tableState.tags"
             :style="{height: `${props.tableHeight}px`}"
             @select="handleSelect"
             @change="handleChange"
