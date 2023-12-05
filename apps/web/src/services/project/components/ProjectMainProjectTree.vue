@@ -6,6 +6,7 @@ import {
 import {
     PI, PIconButton, PTree, PButton, PDataLoader,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -36,21 +37,23 @@ interface Props {
 const props = defineProps<Props>();
 
 const projectPageStore = useProjectPageStore();
+const projectPageGetters = projectPageStore.getters;
+const projectPageState = projectPageStore.state;
 const state = reactive({
     hasRootProjectGroupManagePermission: computed(() => !props.manageDisabled && store.getters['user/hasDomainRole']),
-    hasCurrentProjectGroupManagePermission: computed(() => !props.manageDisabled && projectPageStore.permissionInfo[(projectPageStore.groupId) ?? '']),
+    hasCurrentProjectGroupManagePermission: computed(() => !props.manageDisabled && projectPageState.permissionInfo[(projectPageGetters.groupId) ?? '']),
     loading: false,
     editOptions: computed(() => ({
-        disabled: !projectPageStore.treeEditMode,
-        editStartValidator: (item) => (projectPageStore.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
+        disabled: !projectPageState.treeEditMode,
+        editStartValidator: (item) => (projectPageState.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
         validator: (text) => (text && text.length > 2 && text.length < 40),
         setDataAfterEdit: false,
     })),
     dragOptions: computed(() => ({
-        disabled: !projectPageStore.treeEditMode,
+        disabled: !projectPageState.treeEditMode,
         dragValidator(node, dragNodeParent) {
             if (!dragNodeParent) return !props.manageDisabled;
-            return !!(projectPageStore.permissionInfo[node.data.id] || node.data.has_permission);
+            return !!(projectPageState.permissionInfo[node.data.id] || node.data.has_permission);
         },
         dropValidator(node, oldParent, parent) {
             if (oldParent?.data.id === parent?.data.id) return true;
@@ -61,7 +64,7 @@ const state = reactive({
             }
             if (parent.data.item_type === 'PROJECT') return false;
             if (parent.children?.some((child) => child.data.name === node.data.name)) return false;
-            return !!(projectPageStore.permissionInfo[parent.data.id] || parent.data.has_permission);
+            return !!(projectPageState.permissionInfo[parent.data.id] || parent.data.has_permission);
         },
     })),
     allProjectRoot: null as any,
@@ -86,28 +89,12 @@ const dataSetter = (text, node) => {
 const dataGetter = (node) => node.data.name;
 
 const getClassNames = ({ data }) => ({
-    'no-permission': projectPageStore.treeEditMode ? !projectPageStore.permissionInfo[data.id] && !data.has_permission : false,
+    'no-permission': projectPageState.treeEditMode ? !projectPageState.permissionInfo[data.id] && !data.has_permission : false,
 });
 
-const openProjectGroupDeleteCheckModal = (item) => {
-    projectPageStore.openProjectGroupDeleteCheckModal(item);
-};
-
-const openProjectGroupCreateForm = (item = {}) => {
-    projectPageStore.openProjectGroupCreateForm(item);
-};
-
-const startTreeEdit = () => {
-    projectPageStore.$patch({ treeEditMode: true });
-};
-
-const finishTreeEdit = () => {
-    projectPageStore.$patch({ treeEditMode: false });
-};
-
 const getAllCurrentItems = (): {path: number[]; node: any}[] => {
-    if (!projectPageStore.rootNode) return [];
-    return projectPageStore.rootNode.getAllItems();
+    if (!projectPageState.rootNode) return [];
+    return projectPageState.rootNode.getAllItems();
 };
 
 const dataFetcher = async (node: any = {}, projectOnly = false): Promise<ProjectTreeNodeData[]> => {
@@ -123,7 +110,7 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
             params.item_type = node.data.item_type;
         }
 
-        if (projectPageStore.treeEditMode) {
+        if (projectPageState.treeEditMode) {
             if (projectOnly) params.exclude_type = 'PROJECT_GROUP';
         } else {
             params.exclude_type = 'PROJECT';
@@ -132,7 +119,7 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
         const items = await projectTreeHelper.getProjectTree(params);
 
         if (!node.data) {
-            projectPageStore.hasProjectGroup = Array.isArray(items) ? !!items.length : false;
+            projectPageState.hasProjectGroup = Array.isArray(items) ? !!items.length : false;
         }
 
         projectPageStore.addPermissionInfo(items.filter((d) => d.item_type === 'PROJECT_GROUP')
@@ -145,25 +132,25 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
 };
 
 const addProjectNodes = async (items) => {
-    if (!projectPageStore.rootNode) return;
+    if (!projectPageState.rootNode) return;
 
-    const permittedItems = items.filter(({ node }) => projectPageStore.permissionInfo[node.data.id]);
+    const permittedItems = items.filter(({ node }) => projectPageState.permissionInfo[node.data.id]);
 
     const newChildren: ProjectTreeNodeData[][] = await Promise.all(permittedItems.map(({ node }) => dataFetcher(node, true)));
 
     permittedItems.forEach(({ node, path }, i) => {
-        projectPageStore.rootNode?.updateNodeByPath(path, { ...node.data, has_child: node.data.has_child || newChildren[i].length > 0 });
-        if (!node.$folded) projectPageStore.rootNode?.addChildNodeByPath(path, newChildren[i], false);
+        projectPageState.rootNode?.updateNodeByPath(path, { ...node.data, has_child: node.data.has_child || newChildren[i].length > 0 });
+        if (!node.$folded) projectPageState.rootNode?.addChildNodeByPath(path, newChildren[i], false);
     });
 };
 
 const removeProjectNodes = async (items) => {
-    if (!projectPageStore.rootNode) return;
+    if (!projectPageState.rootNode) return;
 
     const projectItems = items.filter(({ node }) => node.data.item_type === 'PROJECT');
 
     projectItems.forEach(({ node }) => {
-        projectPageStore.rootNode?.deleteNode((d) => d.id === node.data.id);
+        projectPageState.rootNode?.deleteNode((d) => d.id === node.data.id);
     });
 
     const projectGroupItems = items.filter(({ node }) => node.data.item_type === 'PROJECT_GROUP' && node.data.has_child);
@@ -171,11 +158,11 @@ const removeProjectNodes = async (items) => {
     const newChildren: ProjectTreeNodeData[][] = await Promise.all(projectGroupItems.map(({ node }) => dataFetcher(node)));
 
     projectGroupItems.forEach(({ node, path }, i) => {
-        projectPageStore.rootNode?.updateNodeByPath(path, { ...node.data, has_child: newChildren[i].length > 0 });
+        projectPageState.rootNode?.updateNodeByPath(path, { ...node.data, has_child: newChildren[i].length > 0 });
     });
 };
 
-watch(() => projectPageStore.treeEditMode, async (treeEditMode) => {
+watch(() => projectPageState.treeEditMode, async (treeEditMode) => {
     const items = getAllCurrentItems();
     state.loading = true;
     if (treeEditMode) {
@@ -224,10 +211,8 @@ const updateProject = async (node, oldParent, parent) => {
         });
 
         // this is for refresh project list cards
-        if (projectPageStore.groupId === oldParent?.data.id || projectPageStore.groupId === parent.data.id) {
-            projectPageStore.$patch((_state) => {
-                _state.selectedItem = { ...projectPageStore?.selectedItem };
-            });
+        if (projectPageGetters.groupId === oldParent?.data.id || projectPageGetters.groupId === parent.data.id) {
+            projectPageStore.setSelectedItem(cloneDeep(projectPageState?.selectedItem));
         }
 
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '');
@@ -238,10 +223,10 @@ const updateProject = async (node, oldParent, parent) => {
 };
 
 const onDrop = async (node, oldParent, parent, rollback) => {
-    if (!projectPageStore.rootNode) return;
+    if (!projectPageState.rootNode) return;
     if (oldParent?.data.id === parent?.data.id) return;
     if (oldParent?.data.has_child && oldParent?.children.length === 1) {
-        projectPageStore.rootNode.updateNode((d) => d.id === oldParent.data.id, {
+        projectPageState.rootNode.updateNode((d) => d.id === oldParent.data.id, {
             ...oldParent.data,
             has_child: false,
         });
@@ -259,18 +244,16 @@ const onDrop = async (node, oldParent, parent, rollback) => {
 };
 
 const onChangeSelect = (selected) => {
-    projectPageStore.$patch((_state) => {
-        _state.selectedItem = selected[0] || {};
-    });
+    projectPageStore.setSelectedItem(selected[0] || {});
 };
 
 const onAllProjectChangeSelect = (selected) => {
-    if (selected.length > 0 && projectPageStore.groupId && projectPageStore.rootNode) {
-        projectPageStore.rootNode.resetSelect();
+    if (selected.length > 0 && projectPageGetters.groupId && projectPageState.rootNode) {
+        projectPageState.rootNode.resetSelect();
     }
 };
 
-watch(() => projectPageStore.groupId, (data) => {
+watch(() => projectPageGetters.groupId, (data) => {
     if (!state.allProjectRoot) return;
     if (data) {
         state.allProjectRoot.resetSelect();
@@ -281,16 +264,16 @@ watch(() => projectPageStore.groupId, (data) => {
 
 /* Init */
 const onTreeInit = (root) => {
-    projectPageStore.initRoot(root);
+    projectPageStore.setRootNode(root);
 };
 
 const onAllProjectTreeInit = (root) => {
     state.allProjectRoot = root;
 };
 
-watch([() => projectPageStore.rootNode, () => state.allProjectRoot], async ([rootNode, allProjectRoot]) => {
+watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([rootNode, allProjectRoot]) => {
     if (rootNode && allProjectRoot) {
-        if (projectPageStore.isInitiated) return;
+        if (projectPageState.isInitiated) return;
 
         state.loading = true;
         if (props.initGroupId) {
@@ -304,7 +287,7 @@ watch([() => projectPageStore.rootNode, () => state.allProjectRoot], async ([roo
             allProjectRoot.changeSelectState(state.allProjectNode, [0]);
             await rootNode.fetchData();
         }
-        projectPageStore.$patch({ isInitiated: true });
+        projectPageStore.setIsInitiated(true);
         state.loading = false;
     }
 }, { immediate: true });
@@ -315,10 +298,10 @@ watch([() => projectPageStore.rootNode, () => state.allProjectRoot], async ([roo
         <sidebar-title :title="$t('PROJECT.LANDING.PROJECT_GROUPS')">
             <template #extra>
                 <div class="action-btn-wrapper">
-                    <p-button v-if="projectPageStore.treeEditMode"
+                    <p-button v-if="projectPageState.treeEditMode"
                               size="sm"
                               style-type="highlight"
-                              @click="finishTreeEdit"
+                              @click="projectPageStore.setTreeEditMode(false)"
                     >
                         {{ $t('PROJECT.LANDING.PROJECT_GROUP_TREE.DONE') }}
                     </p-button>
@@ -328,7 +311,7 @@ watch([() => projectPageStore.rootNode, () => state.allProjectRoot], async ([roo
                                        style-type="transparent"
                                        size="sm"
                                        :disabled="props.manageDisabled"
-                                       @click="startTreeEdit"
+                                       @click="projectPageStore.setTreeEditMode(true)"
                         />
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"
                                        name="ic_plus_thin"
@@ -337,7 +320,7 @@ watch([() => projectPageStore.rootNode, () => state.allProjectRoot], async ([roo
                                        color="inherit"
                                        class="ml-1"
                                        :disabled="!(state.hasRootProjectGroupManagePermission || state.hasCurrentProjectGroupManagePermission)"
-                                       @click="openProjectGroupCreateForm()"
+                                       @click="projectPageStore.openProjectGroupFormModal()"
                         />
                     </template>
                 </div>
@@ -396,20 +379,20 @@ watch([() => projectPageStore.rootNode, () => state.allProjectRoot], async ([roo
                         />
                     </template>
                     <template #right-extra="{node, path}">
-                        <p-icon-button v-if="projectPageStore.treeEditMode && node.data.item_type !== 'PROJECT' && projectPageStore.permissionInfo[node.data.id]"
+                        <p-icon-button v-if="projectPageState.treeEditMode && node.data.item_type !== 'PROJECT' && projectPageState.permissionInfo[node.data.id]"
                                        name="ic_close"
                                        class="group-delete-btn"
                                        size="sm"
                                        color="inherit"
                                        :disabled="props.manageDisabled"
-                                       @click.stop="openProjectGroupDeleteCheckModal({node, path})"
+                                       @click.stop="projectPageStore.openProjectGroupDeleteCheckModal({node, path})"
                         />
-                        <p-icon-button v-if="!projectPageStore.treeEditMode && node.data.item_type !== 'PROJECT'"
+                        <p-icon-button v-if="!projectPageState.treeEditMode && node.data.item_type !== 'PROJECT'"
                                        name="ic_plus"
                                        class="group-add-btn"
                                        size="sm"
-                                       :disabled="props.manageDisabled || !projectPageStore.permissionInfo[node.data.id]"
-                                       @click.stop="openProjectGroupCreateForm({node, path})"
+                                       :disabled="props.manageDisabled || !projectPageState.permissionInfo[node.data.id]"
+                                       @click.stop="projectPageStore.openProjectGroupFormModal({node, path})"
                         />
                     </template>
                 </p-tree>

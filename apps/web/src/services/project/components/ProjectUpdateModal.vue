@@ -1,28 +1,27 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import VueI18n from 'vue-i18n';
 import { useRouter } from 'vue-router/composables';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
-import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useProjectStore } from '@/store/reference/project-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -30,24 +29,28 @@ import TranslateResult = VueI18n.TranslateResult;
 interface Props {
     visible?: boolean;
     projectGroupId?: string;
-    project?: ProjectModel;
+    projectId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    projectGroupId: '',
-    project: undefined,
+    projectGroupId: undefined,
+    projectId: undefined,
 });
-const emit = defineEmits<{(e: 'complete', projectInfo?: ProjectModel): void;
-    (e: 'update:visible'): void;
+const emit = defineEmits<{(e: 'confirm', project?: ProjectModel): void;
+    (e: 'update:visible', visible?: boolean): void;
 }>();
 const router = useRouter();
+const projectStore = useProjectStore();
 
-const projectPageStore = useProjectPageStore();
 const state = reactive({
-    updateMode: computed(() => !!props.project),
+    project: computed<ProjectModel>(() => projectStore.getters.projectItems?.[props.projectId] ?? {}),
     proxyVisible: useProxyValue('visible', props, emit),
-    projectNames: [] as string[],
-    projectName: props.project?.name as string|undefined,
+    projectNames: computed<string[]>(() => {
+        const projectItems: ProjectReferenceMap = projectStore.getters.projectItems;
+        if (isEmpty(projectItems)) return [];
+        return Object.values(projectItems).map((project: ProjectReferenceItem) => project.name);
+    }),
+    projectName: undefined as string|undefined,
     projectNameInvalidText: computed(() => {
         let invalidText = '' as TranslateResult;
         if (typeof state.projectName === 'string') {
@@ -71,35 +74,12 @@ const state = reactive({
     loading: false,
 });
 
-const getProjectNames = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
-            project_group_id: props.projectGroupId,
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
-        });
-        state.projectNames = results?.map((d) => d.name) ?? [];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-
-const createProject = async (): Promise<ProjectModel|undefined> => {
-    const params: ProjectCreateParameters = {
-        name: state.projectName.trim(),
-        project_type: 'PRIVATE', // TODO: project_type
-    };
-    if (props.projectGroupId) params.project_group_id = props.projectGroupId;
-    const projectInfo = await projectPageStore.createProject(params);
-    await store.dispatch('reference/project/load');
-    return projectInfo;
-};
-
 const updateProject = async (): Promise<ProjectModel|undefined> => {
     let updatedProject: ProjectModel|undefined;
     try {
         updatedProject = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
             name: state.projectName.trim(),
-            project_id: props.project?.project_id || router.currentRoute.params.id,
+            project_id: props.projectId || router.currentRoute.params.id,
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
@@ -118,13 +98,11 @@ const confirm = async () => {
     state.loading = true;
 
     try {
-        let projectInfo:ProjectModel|undefined;
-        if (state.updateMode) {
-            projectInfo = await updateProject();
-        } else {
-            projectInfo = await createProject();
+        const project: ProjectModel|undefined = await updateProject();
+        if (project) {
+            state.proxyVisible = false;
+            emit('confirm', project);
         }
-        emit('complete', projectInfo);
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -134,15 +112,15 @@ const confirm = async () => {
     }
 };
 
-/** Init */
-(async () => {
-    await getProjectNames();
-})();
+watch(() => state.project, async (project) => {
+    if (!isEmpty(project)) state.projectName = project?.name;
+    else state.projectName = undefined; // init form
+}, { immediate: true });
 </script>
 
 <template>
     <p-button-modal
-        :header-title="state.updateMode ? $t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE') : $t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
+        :header-title="$t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE')"
         centered
         size="sm"
         fade

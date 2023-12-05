@@ -33,7 +33,8 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant.js';
-import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
+import ProjectCreateModal from '@/services/project/components/ProjectMainProjectCreateModal.vue';
+import ProjectUpdateModal from '@/services/project/components/ProjectUpdateModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectGroupTreeNodeData } from '@/services/project/types/project-tree-type';
@@ -63,35 +64,30 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
+const projectPageGetters = projectPageStore.getters;
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 const state = reactive({
     items: [] as ProjectModel[],
-    totalCount: 0,
     loading: true,
     cardSummaryLoading: true,
     pageStart: 1,
     pageSize: 24,
     searchText: undefined as string|undefined,
-    allPage: computed(() => getAllPage(state.totalCount, (state.pageSize))),
+    allPage: computed(() => getAllPage(projectPageState.projectCount, (state.pageSize))),
     cardSummary: {} as CardSummary,
-    noProject: computed(() => state.totalCount === 0),
-    hoveredProjectId: '',
-    hoveredGroupId: '',
-    groupId: computed(() => projectPageStore.groupId),
-    noProjectGroup: computed(() => !projectPageStore.hasProjectGroup),
-    projectFormVisible: computed({
-        get() { return projectPageStore.projectFormVisible; },
-        set(val) { projectPageStore.$patch({ projectFormVisible: val }); },
-    }),
+    groupId: computed(() => projectPageGetters.groupId),
+    noProject: computed(() => projectPageState.projectCount === 0),
+    noProjectGroup: computed(() => !projectPageState.hasProjectGroup),
     projectSummaryList: computed(() => [
         { title: i18n.t('PROJECT.LANDING.SERVER'), summaryType: SUMMARY_TYPE.SERVER },
         { title: i18n.t('PROJECT.LANDING.DATABASE'), summaryType: SUMMARY_TYPE.DATABASE },
         { title: i18n.t('PROJECT.LANDING.STORAGE'), summaryType: SUMMARY_TYPE.STORAGE },
     ]),
-    shouldUpdateProjectList: computed<boolean>(() => projectPageStore.shouldUpdateProjectList),
+    shouldUpdateProjectList: computed<boolean>(() => projectPageState.shouldUpdateProjectList),
 });
 
 const getItemSummaryCount = (summaryType: SummaryType, projectId: string) => {
@@ -142,9 +138,7 @@ const getCardSummary = async () => {
 
 const listProjectFetcher = getCancellableFetcher<ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
 const listApiQueryHelper = new ApiQueryHelper();
-const fetchProjectList = async (projectGroupId?: string) => {
-    const _projectGroupId = projectGroupId || state.groupId;
-
+const fetchProjectList = async () => {
     listApiQueryHelper.setPageStart(state.pageStart).setPageLimit(state.pageSize);
     listApiQueryHelper.setFilters([]);
     if (state.searchText !== undefined) {
@@ -155,22 +149,20 @@ const fetchProjectList = async (projectGroupId?: string) => {
         state.loading = true;
         const params: ProjectListParameters = {
             query: listApiQueryHelper.data,
-            project_group_id: _projectGroupId,
+            project_group_id: state.groupId,
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         };
         const { status, response } = await listProjectFetcher(params);
         if (status === 'succeed') {
             state.items = response.results || [];
-            state.totalCount = response.total_count || 0;
-            projectPageStore.$patch({ projectCount: state.totalCount });
+            projectPageStore.setProjectCount(response.total_count);
             state.loading = false;
             await getCardSummary();
         }
     } catch (e: any) {
         state.items = [];
-        state.totalCount = 0;
         state.loading = false;
-        projectPageStore.$patch({ projectCount: 0 });
+        projectPageStore.setProjectCount(0);
         ErrorHandler.handleError(e);
     }
 };
@@ -187,14 +179,14 @@ const handleChange = async (options: any) => {
 };
 
 const resetAll = () => {
-    state.totalCount = 0;
+    projectPageStore.setProjectCount(0);
     state.pageStart = 1;
     state.pageSize = 24;
 };
 
-const listProjects = async (groupId?: string, reset = true) => {
-    if (reset) resetAll();
-    await fetchProjectList(groupId);
+const handleConfirmProjectForm = async () => {
+    resetAll();
+    await fetchProjectList();
 };
 
 const queryHelper = new QueryHelper();
@@ -211,13 +203,13 @@ const getLocation = (serviceType: SummaryType, name: string, projectId: string) 
 watch(() => state.shouldUpdateProjectList, async () => {
     if (state.shouldUpdateProjectList) {
         await fetchProjectList();
-        projectPageStore.$patch({ shouldUpdateProjectList: false });
+        projectPageStore.setShouldUpdateProjectList(false);
     }
 });
 
 /* Init */
-watch([() => projectPageStore.isInitiated, () => state.groupId], async ([isInitiated, groupId]) => {
-    if (isInitiated) await listProjects(groupId);
+watch([() => projectPageState.isInitiated, () => state.groupId], async ([isInitiated]) => {
+    if (isInitiated) await handleConfirmProjectForm();
 }, { immediate: true });
 
 // LOAD REFERENCE STORE
@@ -231,7 +223,7 @@ watch([() => projectPageStore.isInitiated, () => state.groupId], async ([isIniti
 <template>
     <div class="project-main-card-list">
         <p-toolbox :page-size="state.pageSize"
-                   :total-count="state.totalCount"
+                   :total-count="projectPageState.projectCount"
                    @change="handleChange"
                    @refresh="fetchProjectList()"
         />
@@ -338,11 +330,19 @@ watch([() => projectPageStore.isInitiated, () => state.groupId], async ([isIniti
             </template>
         </p-data-loader>
 
-        <project-form-modal
-            v-if="state.projectFormVisible"
-            :visible.sync="state.projectFormVisible"
+        <project-update-modal
+            v-if="projectPageState.projectUpdateModalVisible"
+            :visible="projectPageState.projectUpdateModalVisible"
             :project-group-id="state.groupId"
-            @complete="listProjects(state.groupId)"
+            @confirm="handleConfirmProjectForm()"
+            @update:visible="projectPageStore.setProjectUpdateModalVisible"
+        />
+        <project-create-modal
+            v-if="projectPageState.projectCreateModalVisible"
+            :visible="projectPageState.projectCreateModalVisible"
+            :project-group-id="state.groupId"
+            @confirm="handleConfirmProjectForm()"
+            @update:visible="projectPageStore.setProjectCreateModalVisible"
         />
     </div>
 </template>

@@ -41,9 +41,11 @@ import type {
 const route = useRoute();
 const router = useRouter();
 const projectPageStore = useProjectPageStore();
+const projectPageGetters = projectPageStore.getters;
+const projectPageState = projectPageStore.state;
 
 /* Query String */
-watch(() => projectPageStore.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
+watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
     router.replace({
         query: {
             select_pg: selectedItem.node?.data.id || null,
@@ -55,17 +57,17 @@ const menuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
 const storeState = reactive({
-    groupId: computed(() => projectPageStore.groupId),
-    groupName: computed(() => projectPageStore.groupName),
-    selectedItem: computed(() => projectPageStore.selectedItem),
-    selectedNodeData: computed(() => projectPageStore.selectedNodeData),
-    parentGroups: computed(() => projectPageStore.parentGroups),
-    projectCount: computed(() => projectPageStore.projectCount),
+    groupId: computed(() => projectPageGetters.groupId),
+    groupName: computed(() => projectPageGetters.groupName),
+    selectedItem: computed(() => projectPageState.selectedItem),
+    selectedNodeData: computed(() => projectPageGetters.selectedNodeData),
+    parentGroups: computed(() => projectPageGetters.parentGroups),
+    projectCount: computed(() => projectPageState.projectCount),
     projects: computed(() => store.getters['reference/projectItems']),
     favoriteProjects: computed(() => store.state.favorite.projectItems),
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-    projectGroupFormVisible: computed(() => projectPageStore.projectGroupFormVisible),
-    projectGroupDeleteCheckModalVisible: computed(() => projectPageStore.projectGroupDeleteCheckModalVisible),
+    projectGroupFormVisible: computed(() => projectPageState.projectGroupFormVisible),
+    projectGroupDeleteCheckModalVisible: computed(() => projectPageState.projectGroupDeleteCheckModalVisible),
     favoriteProjectGroups: computed(() => store.state.favorite.projectGroupItems),
 });
 
@@ -130,7 +132,7 @@ const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroupTre
 
 /* Event */
 const handleClickProjectGroupEditButton = () => {
-    projectPageStore.openProjectGroupUpdateForm(storeState.selectedItem);
+    projectPageStore.openProjectGroupFormModal(storeState.selectedItem, true);
 };
 const handleClickProjectGroupDeleteButton = () => {
     projectPageStore.openProjectGroupDeleteCheckModal(storeState.selectedItem);
@@ -142,13 +144,10 @@ const handleClickCreateButton = () => {
 };
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
-        projectPageStore.openProjectCreateForm(storeState.selectedItem);
+        projectPageStore.openProjectCreateModal(storeState.selectedItem);
     } else if (item.name === 'projectGroup') {
-        openProjectGroupCreateForm();
+        projectPageStore.openProjectGroupFormModal(storeState.selectedItem);
     }
-};
-const openProjectGroupCreateForm = () => {
-    projectPageStore.openProjectGroupCreateForm(storeState.selectedItem);
 };
 
 watch(() => route.query, async (after, before) => {
@@ -158,8 +157,7 @@ watch(() => route.query, async (after, before) => {
 });
 
 onUnmounted(() => {
-    projectPageStore.$reset();
-    projectPageStore.$dispose();
+    projectPageStore.reset();
 });
 
 /* Init */
@@ -261,7 +259,6 @@ onUnmounted(() => {
                         class="card-container"
                         :parent-groups="storeState.parentGroups"
                         :manage-disabled="!state.hasRootProjectGroupManagePermission"
-                        @create-project-group="openProjectGroupCreateForm"
                     />
 
                     <project-main-project-group-form-modal v-if="storeState.projectGroupFormVisible" />
