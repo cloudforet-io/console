@@ -29,7 +29,7 @@ import NoticeList from '@/services/info/components/NoticeList.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 export default {
-    name: 'NoticePage',
+    name: 'NoticeMainPage',
     components: {
         PHeading,
         PButton,
@@ -51,3 +51,9 @@ export default {
     },
 };
 </script>
+
+<style scoped lang="postcss">
+.button-group {
+    @apply flex gap-2;
+}
+</style>
