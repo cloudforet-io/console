@@ -131,7 +131,7 @@ const confirm = async () => {
     if (props.project) { // update project
         const updatedProject1 = await updateProject();
         const updatedProject2 = await updateProjectType();
-        if (updatedProject1 && updatedProject2 || updatedProject2) {
+        if ((updatedProject1 && updatedProject2) || updatedProject2) {
             await projectStore.sync(updatedProject2);
             emit('confirm', updatedProject2);
         } else if (updatedProject1) {
