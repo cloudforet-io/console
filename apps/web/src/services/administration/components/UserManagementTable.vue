@@ -5,7 +5,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PBadge, PButton, PSelectDropdown, PStatus, PToolboxTable,
+    PBadge, PButton, PSelectDropdown, PStatus, PToolboxTable, PLazyImg,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
@@ -34,7 +34,10 @@ import {
     userSearchHandlers,
     userTableFields,
 } from '@/services/administration/constants/user-table-constant';
-import { userMfaFormatter, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import {
+    userMfaFormatter, userRoleFormatter,
+    userStateFormatter,
+} from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
@@ -84,7 +87,6 @@ const state = reactive({
 const tableState = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
-        // api_key_count: d.api_key_count || 0,
         mfa: user.mfa && user.mfa.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
     }))),
@@ -330,6 +332,15 @@ const updateUser = async (item, roleId) => {
                           class="capitalize"
                 />
             </template>
+            <template #col-role_type-format="{value}">
+                <span class="role-type">
+                    <p-lazy-img :src="userRoleFormatter(value).image"
+                                width="1.5rem"
+                                height="1.5rem"
+                    />
+                    <span>{{ userRoleFormatter(value).name }}</span>
+                </span>
+            </template>
             <template #col-last_accessed_at-format="{ value }">
                 <span v-if="value === -1">
                     No Activity
@@ -382,5 +393,9 @@ const updateUser = async (item, roleId) => {
     &:last-child {
         flex-grow: 1;
     }
+}
+.role-type {
+    @apply flex items-center;
+    gap: 0.5rem;
 }
 </style>
