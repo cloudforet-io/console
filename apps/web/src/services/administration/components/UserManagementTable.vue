@@ -5,9 +5,8 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PBadge, PButton, PSelectDropdown, PStatus, PToolboxTable, PI,
+    PBadge, PStatus, PToolboxTable, PI,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -18,8 +17,6 @@ import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/crea
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
-import { downloadExcel } from '@/lib/helper/file-download-helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -30,7 +27,6 @@ import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
 import { calculateTime } from '@/services/administration/composables/refined-user-data';
 import {
-    userExcelFields,
     userSearchHandlers,
     userTableFields,
 } from '@/services/administration/constants/user-table-constant';
@@ -43,12 +39,10 @@ import type { User } from '@/services/administration/types/user-type';
 
 interface Props {
     tableHeight: number;
-    manageDisabled: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
-    manageDisabled: false,
 });
 
 const userPageStore = useUserPageStore();
@@ -65,24 +59,6 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     // TODO: will be removed after the backend is ready
     domain_id: computed(() => store.state.domain.domainId),
-    dropdownMenu: computed(() => ([
-        {
-            type: 'item',
-            name: 'update',
-            label: i18n.t('IDENTITY.USER.MAIN.UPDATE'),
-            disabled: userPageState.selectedIndices.length > 1 || !tableState.isSelected,
-        },
-        {
-            type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: !tableState.isSelected,
-        },
-        { type: 'divider' },
-        {
-            type: 'item', name: 'enable', label: i18n.t('IDENTITY.USER.MAIN.ENABLE'), disabled: !tableState.isSelected,
-        },
-        {
-            type: 'item', name: 'disable', label: i18n.t('IDENTITY.USER.MAIN.DISABLE'), disabled: !tableState.isSelected,
-        },
-    ] as MenuItem[])),
 });
 const tableState = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
@@ -124,15 +100,6 @@ const handleChange = async (options: any = {}) => {
         domain_id: state.domain_id,
     });
 };
-const handleSelectDropdown = (name) => {
-    switch (name) {
-    case 'enable': clickEnable(); break;
-    case 'disable': clickDisable(); break;
-    case 'delete': clickDelete(); break;
-    case 'update': clickUpdate(); break;
-    default: break;
-    }
-};
 const handleUserFormConfirm = async (item, roleId) => {
     if (userFormState.updateMode) {
         await updateUser(item, roleId);
@@ -151,55 +118,8 @@ const handleUserStatusModalConfirm = () => {
     });
 };
 
-/* Modal */
-const clickAdd = () => {
-    userFormState.updateMode = false;
-    userFormState.headerTitle = i18n.t('IDENTITY.USER.FORM.ADD_TITLE') as string;
-    userFormState.item = undefined;
-    userPageStore.$patch({ visibleCreateModal: true });
-};
-const clickUpdate = () => {
-    userFormState.updateMode = true;
-    userFormState.headerTitle = i18n.t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
-    userFormState.item = userPageState.users[userPageState.selectedIndices[0]];
-    userPageStore.$patch({ visibleUpdateModal: true });
-};
-const clickDelete = () => {
-    modalState.mode = 'delete';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
-    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
-    modalState.themeColor = 'alert';
-    userPageStore.$patch({ visibleStatusModal: true });
-};
-const clickEnable = () => {
-    modalState.mode = 'enable';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
-    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
-    modalState.themeColor = 'safe';
-    userPageStore.$patch({ visibleStatusModal: true });
-};
-const clickDisable = () => {
-    modalState.mode = 'disable';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
-    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
-    modalState.themeColor = 'alert';
-    userPageStore.$patch({ visibleStatusModal: true });
-};
-
 /* API */
 let userListApiQuery = userListApiQueryHelper.data;
-const handleExport = async () => {
-    await downloadExcel({
-        url: '/identity/user/list',
-        param: {
-            query: userListApiQuery,
-            include_role_binding: true,
-        },
-        fields: userExcelFields,
-        file_name_prefix: FILE_NAME_PREFIX.user,
-        timezone: state.timezone,
-    });
-};
 const addUser = async (item, roleId) => {
     userPageStore.$patch({
         modalLoading: true,
@@ -305,23 +225,7 @@ const updateUser = async (item, roleId) => {
             @select="handleSelect"
             @change="handleChange"
             @refresh="handleChange()"
-            @export="handleExport"
         >
-            <template #toolbox-left>
-                <p-button style-type="primary"
-                          icon-left="ic_plus_bold"
-                          :disabled="props.manageDisabled"
-                          @click="clickAdd"
-                >
-                    {{ $t('IDENTITY.USER.MAIN.ADD') }}
-                </p-button>
-                <p-select-dropdown class="left-toolbox-item"
-                                   :menu="state.dropdownMenu"
-                                   :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
-                                   :disabled="props.manageDisabled"
-                                   @select="handleSelectDropdown"
-                />
-            </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
                           class="capitalize"
