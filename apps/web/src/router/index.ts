@@ -7,9 +7,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
-// eslint-disable-next-line import/no-cycle
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
@@ -29,7 +26,6 @@ export class SpaceRouter {
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
 
         Vue.use(VueRouter);
-        const appContextStore = useAppContextStore();
 
         SpaceRouter.router = new VueRouter({
             mode: 'history',
@@ -37,6 +33,7 @@ export class SpaceRouter {
             routes,
         });
 
+        const appContextStore = SpaceRouter.router.app?.$pinia.state.value['app-context-store'];
         let nextPath: string;
 
         SpaceRouter.router.onError((error) => {

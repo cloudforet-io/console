@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
@@ -28,7 +27,7 @@ const initConfig = async () => {
     await config.init();
 };
 
-const initQueryHelper = () => {
+const initQueryHelper = (store) => {
     QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
@@ -40,7 +39,7 @@ const initRouter = (domainName?: string) => {
     }
 };
 
-const initI18n = () => {
+const initI18n = (store) => {
     setI18nLocale(store.state.user.language);
 };
 
@@ -49,7 +48,7 @@ const removeInitializer = () => {
     if (el?.parentElement) el.parentElement.removeChild(el);
 };
 
-const init = async () => {
+const init = async (store) => {
     /* Init SpaceONE Console */
     await initConfig();
     await initApiClient(store, config);
@@ -58,9 +57,9 @@ const init = async () => {
     if (domainName) {
         await initWorkspace(store);
         prefetchResources();
-        initI18n();
+        initI18n(store);
         initDayjs();
-        initQueryHelper();
+        initQueryHelper(store);
         initGtag(store, config);
         initGtm(config);
         initAmcharts(config);
@@ -76,7 +75,7 @@ const init = async () => {
 };
 
 const MIN_LOADING_TIME = 1000;
-export const siteInit = async () => {
+export const siteInit = async (store) => {
     store.dispatch('display/startInitializing');
 
     store.watch((state) => state.display.isInitialized, (isInitialized) => {
@@ -98,7 +97,7 @@ export const siteInit = async () => {
     }, MIN_LOADING_TIME);
 
     try {
-        await init();
+        await init(store);
     } catch (e) {
         console.error(e);
         store.dispatch('display/finishInitializing');
