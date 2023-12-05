@@ -5,16 +5,16 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 import type { Location } from 'vue-router';
 
-import {
-    XYChart, CategoryAxis, ValueAxis, ColumnSeries, LabelBullet, XYCursor,
-} from '@amcharts/amcharts4/charts';
-import { create, color, percent } from '@amcharts/amcharts4/core';
+import type { TimeUnit } from '@amcharts/amcharts5/.internal/core/util/Time';
+import type { XYChart } from '@amcharts/amcharts5/xy';
 import {
     PBalloonTab, PSelectButton, PDataLoader, PSkeleton, PSpinner,
 } from '@spaceone/design-system';
 import type { Unit } from 'bytes';
 import dayjs from 'dayjs';
-import { forEach, orderBy, range } from 'lodash';
+import {
+    cloneDeep, forEach, orderBy, range,
+} from 'lodash';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
@@ -27,16 +27,18 @@ import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
-import config from '@/lib/config';
-
+import { useAmcharts5 } from '@/common/composables/amcharts5';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { gray, primary1, primary2 } from '@/styles/colors';
+import {
+    primary,
+} from '@/styles/colors';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import ProjectSummaryAllSummaryWidgetRegionService from '@/services/project/components/ProjectSummaryAllSummaryWidgetRegionService.vue';
 import { SERVICE_CATEGORY } from '@/services/project/constants/project-summary-constant';
 import type { DateType, ServiceCategory } from '@/services/project/types/project-summary-type';
+
 
 interface ChartData {
     date: string;
@@ -60,6 +62,7 @@ const DAY_COUNT = 14;
 const MONTH_COUNT = 12;
 
 const chartContext = ref<HTMLElement|null>(null);
+const chartHelper = useAmcharts5(chartContext);
 const queryHelper = new QueryHelper();
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -67,7 +70,7 @@ const storeState = reactive({
 const state = reactive({
     loading: true,
     summaryLoading: true,
-    chart: null as XYChart | null,
+    chart: null as null | XYChart,
     skeletons: range(4),
     //
     selectedDateType: 'DAILY' as DateType,
@@ -100,72 +103,80 @@ const chartState = reactive({
 });
 
 /* Util */
-const disposeChart = (_chartContext) => {
-    if (chartState.registry[_chartContext]) {
-        chartState.registry[_chartContext].dispose();
-        delete chartState.registry[_chartContext];
+const drawChart = () => {
+    // refresh root for deleting previous chart
+    chartHelper.refreshRoot();
+
+    // set date formatter for tooltip text
+    if (state.selectedDateType === 'DAILY') {
+        chartHelper.root.value?.dateFormatter.setAll({
+            dateFormat: 'd MMM, yyyy',
+            dateFields: ['valueX'],
+        });
     }
-};
-const drawChart = (_chartContext) => {
-    const createChart = () => {
-        disposeChart(_chartContext);
-        chartState.registry[_chartContext] = create(_chartContext, XYChart);
-        return chartState.registry[_chartContext];
-    };
-    const chart = createChart();
+
+    let timeUnit: TimeUnit = 'day';
+    if (state.selectedDateType === 'MONTHLY') timeUnit = 'month';
+
+    const { chart, xAxis, yAxis } = chartHelper.createXYDateChart({
+        paddingLeft: -5,
+        paddingTop: 10,
+        paddingBottom: 0,
+    });
+
+    // set base interval of xAxis
+    xAxis.get('baseInterval').timeUnit = timeUnit;
+    yAxis.set('extraMax', 0.02);
+
+    // create column series
+    const columnSeries = chartHelper.createXYColumnSeries(chart, {
+        name: 'date',
+        valueYField: 'count',
+        stacked: true,
+    });
+    columnSeries.columns.template.setAll({
+        width: chartHelper.percent(25),
+        cornerRadiusTL: 3,
+        cornerRadiusTR: 3,
+    });
+
+    // set data processor
+    let dateFormat = 'yyyy-MM-dd';
+    if (state.selectedDateType === 'MONTHLY') dateFormat = 'yyyy-MM';
+    columnSeries.data.processor = chartHelper.createDataProcessor({
+        dateFormat,
+        dateFields: ['date'],
+    });
+
+    // create bullet
+    columnSeries.bullets.push(() => {
+        const label = chartHelper.createLabel({
+            text: '{bulletText}',
+            populateText: true,
+            fontSize: 14,
+            fill: chartHelper.color(primary),
+            textAlign: 'center',
+            centerX: chartHelper.percent(50),
+            centerY: chartHelper.percent(80),
+        });
+        return chartHelper.createBullet({
+            locationX: 0.5,
+            locationY: 1,
+            sprite: label,
+            dynamic: true,
+        });
+    });
+
+    // set series to chart and set data
+    columnSeries.data.setAll(cloneDeep(chartState.data));
+    chart.series.push(columnSeries);
+
+    // create tooltip
+    const tooltip = chartHelper.createTooltip();
+    chartHelper.setXYSingleTooltipText(chart, tooltip);
+    columnSeries.set('tooltip', tooltip);
+
     state.chart = chart;
-
-    if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-    chart.paddingLeft = -5;
-    chart.paddingBottom = 0;
-    chart.paddingTop = 10;
-    chart.data = chartState.data;
-
-    const dateAxis = chart.xAxes.push(new CategoryAxis());
-    dateAxis.dataFields.category = 'date';
-    dateAxis.renderer.minGridDistance = 40;
-    dateAxis.renderer.grid.template.disabled = true;
-    dateAxis.renderer.labels.template.fill = color(gray[600]);
-    dateAxis.tooltip.disabled = true;
-    dateAxis.fontSize = 11;
-
-    const valueAxis = chart.yAxes.push(new ValueAxis());
-    valueAxis.renderer.minGridDistance = 30;
-    valueAxis.renderer.grid.template.strokeOpacity = 1;
-    valueAxis.renderer.grid.template.stroke = color(gray[200]);
-    valueAxis.renderer.labels.template.fill = color(primary1);
-    valueAxis.tooltip.disabled = true;
-    valueAxis.fontSize = 11;
-    valueAxis.extraMax = 0.25;
-    valueAxis.min = 0;
-
-    const series = chart.series.push(new ColumnSeries());
-    series.dataFields.valueY = 'count';
-    series.dataFields.categoryX = 'date';
-    series.fill = color(primary2);
-    series.columns.template.width = percent(15);
-    series.strokeWidth = 0;
-    series.tooltipText = '{count}';
-    series.tooltip.pointerOrientation = 'down';
-    series.tooltip.fontSize = 14;
-    series.tooltip.strokeWidth = 0;
-    series.tooltip.dy = -5;
-    series.tooltip.getFillFromObject = false;
-    series.tooltip.label.fill = color(primary1);
-    series.tooltip.background.stroke = color(primary1);
-
-    const bullet = series.bullets.push(new LabelBullet());
-    bullet.label.text = '{bulletText}';
-    bullet.label.fontSize = 14;
-    bullet.label.truncate = false;
-    bullet.label.hideOversized = false;
-    bullet.label.fill = color(primary2);
-    bullet.label.dy = -10;
-
-    chart.cursor = new XYCursor();
-    chart.cursor.lineX.strokeOpacity = 0;
-    chart.cursor.lineY.strokeOpacity = 0;
-    chart.cursor.behavior = 'none';
 };
 const getLocation = (type: ServiceCategory) => {
     const query: Location['query'] = {};
@@ -212,10 +223,9 @@ const getCloudServiceSummary = async () => {
     }
 };
 const getTrend = async (type) => {
-    const utcToday = dayjs.utc();
     const dateRange = state.selectedDateType === 'MONTHLY' ? MONTH_COUNT : DAY_COUNT;
     const dateUnit = state.selectedDateType === 'MONTHLY' ? 'month' : 'day';
-    const dateFormat = state.selectedDateType === 'MONTHLY' ? 'MMM' : 'MM/DD';
+    const dateFormat = state.selectedDateType === 'MONTHLY' ? 'YYYY-DD' : 'YYYY-MM-DD';
 
     try {
         const param: any = {
@@ -238,30 +248,26 @@ const getTrend = async (type) => {
                 if (formattedSize) count = formattedSize.split(' ')[0];
             }
             return {
-                date: dayjs.utc(d.date),
+                date: d.date,
                 count,
             };
         });
+
         forEach(range(0, dateRange), (i) => {
-            const date = utcToday.subtract(i, dateUnit);
-            if (!(chartData.find((d) => d.date.isSame(date, 'day')))) {
-                chartData.push({ date, count: null });
+            const date = dayjs.utc().subtract(i, dateUnit);
+            if (chartData.find((d) => date.format(dateFormat) === d.date)) {
+                chartData.push(chartData.find((d) => date.format(dateFormat) === d.date));
+            } else {
+                chartData.push({ date: date.format(dateFormat), count: null });
             }
         });
 
         const orderedData = orderBy(chartData, ['date'], ['asc']);
         chartState.data = orderedData.map((d, idx) => {
-            let bulletText = '';
-            if (idx % 3 === 1) bulletText = d.count;
-            if (state.selectedDateType === 'MONTHLY' && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
-                return {
-                    date: d.date.format('MMM, YY'),
-                    count: d.count,
-                    bulletText,
-                };
-            }
+            let bulletText: string|undefined;
+            if (idx % 3 === 1) bulletText = numberFormatter(d.count);
             return {
-                date: d.date.format(dateFormat),
+                date: d.date,
                 count: d.count,
                 bulletText,
             };
@@ -345,12 +351,12 @@ const getSummaryInfo = async (type) => {
 /* Event */
 const handleChangeTab = async (type) => {
     await Promise.all([getSummaryInfo(type), getTrend(type)]);
-    drawChart(chartContext.value);
+    drawChart();
 };
-const handleChangeDateType = async (dateType) => {
+const handleChangeDateType = async (dateType: DateType) => {
     state.selectedDateType = dateType;
     await getTrend(state.activeTab);
-    drawChart(chartContext.value);
+    drawChart();
 };
 
 /* Init */
@@ -371,7 +377,7 @@ watch(() => storeState.providers, (providers) => {
 }, { immediate: true });
 watch([() => chartState.loading, () => chartContext.value], async ([loading, _chartContext]) => {
     if (!loading && _chartContext) {
-        drawChart(_chartContext);
+        drawChart();
     }
 }, { immediate: true });
 

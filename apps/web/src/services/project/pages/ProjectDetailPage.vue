@@ -8,6 +8,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import {
     PBadge, PBreadcrumbs, PButton, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab,
 } from '@spaceone/design-system';
+import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
@@ -66,15 +67,20 @@ const state = reactive({
     projectGroupId: computed<string>(() => state.item?.project_group_id || ''),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     // projectGroupNames: [],
-    pageNavigation: computed(() => [
-        { name: i18n.t('MENU.PROJECT'), path: '/project' },
-        { name: state.projectGroupInfo?.name || '', path: `/project?select_pg=${state.projectGroupId}` },
-        // ...state.projectGroupNames.map(d => ({
-        //     name: d.name,
-        //     path: `/project?select_pg=${d.project_group_id}`,
-        // })),
-        { name: state.item?.name || '' },
-    ]),
+    pageNavigation: computed<Route[]>(() => {
+        const results: Route[] = [
+            { name: i18n.t('MENU.PROJECT') as string, path: '/project' },
+            // ...state.projectGroupNames.map(d => ({
+            //     name: d.name,
+            //     path: `/project?select_pg=${d.project_group_id}`,
+            // })),
+        ];
+        if (state.projectGroupId?.length) {
+            results.push({ name: state.projectGroupInfo?.name || '', path: `/project?select_pg=${state.projectGroupId}` });
+        }
+        results.push({ name: state.item?.name || '' });
+        return results;
+    }),
     maintenanceWindowFormVisible: false,
     counts: computed(() => ({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,

@@ -226,10 +226,9 @@ const getChartData = (data): ChartData[] => {
 
     const orderedData = orderBy(chartData, ['date'], ['asc']);
     return orderedData.map((d, idx) => {
-        const tooltipText = d.count || '';
         let bulletText;
         if ((dateType === 'DAILY' && idx % 3 === 1) || (dateType === 'MONTHLY' && idx % 3 === 2)) {
-            bulletText = tooltipText;
+            bulletText = numberFormatter(d.count || 0);
         }
 
         const date = dayjs.utc(d.date).format(dateFormat);
@@ -238,7 +237,7 @@ const getChartData = (data): ChartData[] => {
             date,
             count: d.count,
             bulletText,
-            tooltipText,
+            tooltipText: d.count || '',
         };
     });
 };
