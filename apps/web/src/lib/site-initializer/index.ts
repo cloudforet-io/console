@@ -8,7 +8,7 @@ import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
-import { serviceRoutes } from '@/router/service-routes';
+import { integralRoutes } from '@/router/integral-routes';
 
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
@@ -36,7 +36,7 @@ const initRouter = (domainName?: string) => {
     if (!domainName) {
         SpaceRouter.init(errorRoutes);
     } else {
-        SpaceRouter.init(serviceRoutes);
+        SpaceRouter.init(integralRoutes);
     }
 };
 
