@@ -12,7 +12,7 @@ import SignInLeftContainer from '@/services/auth/components/SignInLeftContainer.
 const route = useRoute();
 
 const state = reactive({
-    isDomainOwner: false,
+    isDomainAdmin: false,
     images: computed(() => {
         const domainImage = config.get('DOMAIN_IMAGE');
         if (!isEmpty(domainImage)) {
@@ -27,7 +27,7 @@ const state = reactive({
 });
 
 watch(() => route.name, (name) => {
-    state.isDomainOwner = name === 'domainAdminSignIn';
+    state.isDomainAdmin = name === 'domainAdminSignIn';
 }, { immediate: true });
 </script>
 
@@ -52,7 +52,7 @@ watch(() => route.name, (name) => {
             </template>
         </div>
         <div class="contents-wrapper">
-            <sign-in-left-container :is-domain-owner="state.isDomainOwner" />
+            <sign-in-left-container :is-domain-admin="state.isDomainAdmin" />
             <router-view />
         </div>
     </div>
