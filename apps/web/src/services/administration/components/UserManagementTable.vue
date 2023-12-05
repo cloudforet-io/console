@@ -25,15 +25,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
 import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
-import { calculateTime } from '@/services/administration/composables/refined-user-data';
+import {
+    calculateTime, userStateFormatter, userMfaFormatter, userRoleFormatter,
+} from '@/services/administration/composables/refined-user-data';
 import {
     userSearchHandlers,
     userTableFields,
 } from '@/services/administration/constants/user-table-constant';
-import {
-    userMfaFormatter, userRoleFormatter,
-    userStateFormatter,
-} from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 

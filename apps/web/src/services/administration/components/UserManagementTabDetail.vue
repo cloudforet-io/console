@@ -23,8 +23,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 
-import { calculateTime } from '@/services/administration/composables/refined-user-data';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { calculateTime, userStateFormatter } from '@/services/administration/composables/refined-user-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 

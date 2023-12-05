@@ -40,7 +40,7 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
 import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
 import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
 

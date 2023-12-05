@@ -15,7 +15,7 @@ import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 import UserManagementTabAssignedRole from '@/services/administration/components/UserManagementTabAssignedRole.vue';
 import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import UserAPIKeyTable from '@/services/my-page/components/UserAPIKeyTable.vue';
 
