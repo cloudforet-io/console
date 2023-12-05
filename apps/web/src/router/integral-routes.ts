@@ -37,7 +37,7 @@ export const integralRoutes: RouteConfig[] = [
                 name: ROOT_ROUTE.ADMIN._NAME,
                 meta: { accessLevel: ACCESS_LEVEL.ADMIN_PERMISSION },
                 redirect: () => {
-                    if (!store.getters['user/hasDomainRole']) return { name: ROOT_ROUTE.WORKSPACE._NAME };
+                    if (!store.getters['user/isDomainAdmin']) return { name: ROOT_ROUTE.WORKSPACE._NAME };
                     return ({ name: makeAdminRouteName(HOME_DASHBOARD_ROUTE._NAME) });
                 },
                 component: { template: '<router-view />' },
