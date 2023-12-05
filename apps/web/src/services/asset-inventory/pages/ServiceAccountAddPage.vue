@@ -9,7 +9,7 @@ import { get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { ProviderModel } from '@/schema/identity/provider/model';
+import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
@@ -40,17 +40,16 @@ const props = defineProps<{
 }>();
 
 const state = reactive({
-    providerLoading: true,
-    providerData: {} as ProviderModel,
+    isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    providerSchemaLoading: true,
+    providerSchemaData: computed<Partial<SchemaModel|undefined>>(
+        () => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema),
+    ),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     providerIcon: computed(() => (props.provider ? state.providers[props.provider]?.icon : '')),
-    description: computed(() => get(state.providerData, 'metadata.view.layouts.help:service_account:create', undefined)),
-    enableCredentialInput: computed<boolean>(() => {
-        const secretTypes = state.providerData?.capability?.supported_schema ?? [];
-        return secretTypes.length > 0;
-    }),
-    baseInformationSchema: computed(() => state.providerData.template?.service_account?.schema),
-    showTrustedAccount: computed(() => state.providerData?.capability?.support_trusted_service_account ?? false),
+    description: computed(() => get(state.providerSchemaData, 'metadata.view.layouts.help:service_account:create', undefined)),
+    enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
+    baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
@@ -161,12 +160,12 @@ const handleChangeCredentialForm = (credentialForm) => {
 
 /* Init */
 (async () => {
-    state.providerLoading = true;
+    state.providerSchemaLoading = true;
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
     await Promise.allSettled([
         store.dispatch('reference/provider/load'),
     ]);
-    state.providerLoading = false;
+    state.providerSchemaLoading = false;
 })();
 
 </script>
@@ -182,7 +181,7 @@ const handleChangeCredentialForm = (credentialForm) => {
                 <p-lazy-img class="icon"
                             :src="state.providerIcon"
                             :alt="provider"
-                            :loading="state.providerLoading"
+                            :loading="state.providerSchemaLoading"
                             error-icon="ic_cloud-filled"
                 />
             </template>

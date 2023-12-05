@@ -19,20 +19,18 @@ import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
-import type { BaseInformationForm, PageMode, ProjectForm } from '@/services/asset-inventory/types/service-account-page-type';
+import type { BaseInformationForm, ProjectForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 
 
 interface Props {
-    editMode: PageMode;
     schema: any;
     isValid: boolean;
-    originForm: Partial<BaseInformationForm>;
+    originForm?: Partial<BaseInformationForm>;
     accountType?: AccountType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    editMode: 'CREATE',
     schema: () => ({}),
     isValid: false,
     originForm: () => ({}),
