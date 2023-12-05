@@ -118,7 +118,7 @@ const getNextPostData = async (createdAt: string) => {
             board_id: props.boardId,
             query: nextPostApiQueryHelper.data,
         });
-        state.nextNoticePost = results.length ? results[0] : undefined;
+        state.nextNoticePost = results?.length ? results[0] : undefined;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.nextNoticePost = undefined;
@@ -144,7 +144,7 @@ const getPrevPostData = async (createdAt: string) => {
             board_id: props.boardId,
             query: prevPostApiQueryHelper.data,
         });
-        state.prevNoticePost = results.length ? results[0] : undefined;
+        state.prevNoticePost = results?.length ? results[0] : undefined;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.prevNoticePost = undefined;

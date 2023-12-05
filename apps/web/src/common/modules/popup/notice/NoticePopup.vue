@@ -91,7 +91,7 @@ export default {
                     query: apiQueryForPostList,
                 });
                 const postIdList = await getUserConfigBoardPostIdList();
-                state.popupList = results.filter((d) => !postIdList.includes(d.post_id));
+                state.popupList = results?.filter((d) => !postIdList.includes(d.post_id)) ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.popupList = [];

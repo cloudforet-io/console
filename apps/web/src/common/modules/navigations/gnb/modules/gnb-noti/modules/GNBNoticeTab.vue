@@ -75,6 +75,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import type { TimeStamp } from '@/schema/_common/model';
+import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
 import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
@@ -160,13 +161,13 @@ export default {
         }
         const listNotice = async () => {
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.board.post.list({
+                const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
                     domain_id: null,
                 });
-                state.proxyCount = total_count;
-                state.noticeData = results;
+                state.proxyCount = total_count ?? 0;
+                state.noticeData = results ?? [];
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
                 state.proxyCount = 0;

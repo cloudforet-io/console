@@ -100,8 +100,8 @@ export const useNoticeStore = ({ userId }: {
                 query: noticeApiHelper.data,
                 domain_id: null,
             });
-            totalNoticeIdList.value = results.map((post) => post.post_id);
-            totalNoticeCount.value = total_count;
+            totalNoticeIdList.value = results?.map((post) => post.post_id) ?? [];
+            totalNoticeCount.value = total_count ?? 0;
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
         }

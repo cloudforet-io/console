@@ -1,5 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PostModel } from '@/schema/board/post/model';
 
 export interface PostListParameters {
@@ -15,7 +16,4 @@ export interface PostListParameters {
     query?: Query;
 }
 
-export interface PostListResponse {
-    results: PostModel[];
-    total_count: number;
-}
+export type PostListResponse = ListResponse<PostModel>;
