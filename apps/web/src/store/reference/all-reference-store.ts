@@ -189,11 +189,17 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             await Promise.allSettled([
                 store.dispatch('reference/loadAll', options),
                 costDataSourceReferenceStore.load(options),
+                cloudServiceQuerySetReferenceStore.load(options),
+                projectReferenceStore.load(options),
             ]);
         },
         async load(type: ReferenceType, options?: ReferenceLoadOptions) {
             if (type === 'costDataSource' || type === 'cost_data_source') {
                 await costDataSourceReferenceStore.load(options);
+            } else if (type === 'cloudServiceQuerySet' || type === 'cloud_service_query_set') {
+                await cloudServiceQuerySetReferenceStore.load(options);
+            } else if (type === 'project') {
+                await projectReferenceStore.load(options);
             } else {
                 await store.dispatch(`reference/${camelCase(type)}/load`, options);
             }
