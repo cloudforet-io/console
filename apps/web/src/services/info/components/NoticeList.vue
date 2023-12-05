@@ -1,80 +1,14 @@
-<template>
-    <div class="notice-list">
-        <div class="notice-header">
-            <p-toolbox :pagination-visible="false"
-                       :page-size-changeable="false"
-                       :refreshable="false"
-                       @change="handleToolboxChange"
-            >
-                <template #left-area>
-                    <p-select-dropdown v-if="domainName !== 'root'"
-                                       :menu="dropdownItems"
-                                       :selected="selectedPostType"
-                                       @update:selected="handleSearchPostTypeChange"
-                    />
-                </template>
-            </p-toolbox>
-        </div>
-        <p-divider />
-        <p-data-loader :data="noticeItems"
-                       :loading="loading"
-        >
-            <ul class="list-wrapper">
-                <list-item v-for="(item, index) in noticeItems"
-                           :key="`notice-${item.post_id}-${index}`"
-                           class="list-item"
-                           :post="item"
-                           :is-new="!isReadMap[item.post_id]"
-                           :input-text="searchText"
-                           @click.native="handleClickNotice(item.post_id)"
-                />
-            </ul>
-            <template #no-data>
-                <div v-if="!searchText || !searchText.length"
-                     class="no-data"
-                >
-                    <img src="@/assets/images/illust_satellite.svg"
-                         class="no-data-img"
-                    >
-                    <p class="no-data-text">
-                        {{ $t('INFO.NOTICE.NO_NOTICES') }}
-                    </p>
-                </div>
-                <div v-else
-                     class="no-data"
-                >
-                    <img src="@/assets/images/illust_ghost.svg"
-                         class="img-no-data-ghost"
-                    >
-                    <p class="no-data-text">
-                        <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
-                            <template #inputText>
-                                <em>{{ searchText }}</em>
-                            </template>
-                        </i18n>
-                    </p>
-                </div>
-            </template>
-        </p-data-loader>
-        <div class="pagination-wrapper">
-            <p-pagination :total-count="noticeItemTotalCount"
-                          :page-size="10"
-                          @change="handlePageChange"
-            />
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import {
     PDataLoader, PDivider,
     PPagination, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -100,149 +34,189 @@ import ListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 
-interface Props {
-    noticeItems: any[];
-    loading: boolean;
-}
 
 const NOTICE_ITEM_LIMIT = 10;
 
-export default defineComponent<Props>({
-    name: 'NoticeList',
-    components: {
-        PToolbox,
-        PSelectDropdown,
-        PPagination,
-        PDataLoader,
-        PDivider,
-        ListItem,
-    },
-    setup() {
-        const state = reactive({
-            domainName: computed<string|undefined>(() => store.state.domain.name),
-            dropdownItems: computed(() => [
-                {
-                    label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
-                    name: 'ALL',
-                },
-                {
-                    label: i18n.t('INFO.NOTICE.MAIN.LABEL_SYSTEM_NOTI'),
-                    name: NOTICE_POST_TYPE.SYSTEM,
-                },
-                {
-                    label: i18n.t('INFO.NOTICE.MAIN.LABEL_DOMAIN_NOTI'),
-                    name: NOTICE_POST_TYPE.INTERNAL,
-                },
-            ]),
-            selectedPostType: 'ALL' as NoticePostType | 'ALL',
-            loading: false,
-            noticeItems: [] as PostModel[],
-            noticeItemTotalCount: 0,
-            boardId: undefined as undefined | string,
-            searchText: undefined as undefined | string,
-        });
-
-        const {
-            isReadMap, fetchNoticeReadState,
-        } = useNoticeStore({
-            userId: computed(() => store.state.user.userId),
-        });
-
-        /* Api */
-        const initNoticeApiHelper = () => {
-            const initApiHelper = new ApiQueryHelper()
-                .setPage(1, NOTICE_ITEM_LIMIT)
-                .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
-            if (state.domainName === 'root') {
-                return initApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
-            }
-            return initApiHelper;
-        };
-        let noticeApiHelper = initNoticeApiHelper();
-        const listNotice = async () => {
-            state.loading = true;
-            try {
-                if (!state.boardId) throw new Error('boardId is undefined');
-                const { results, total_count } = await SpaceConnector.client.board.post.list<PostListParameters, PostListResponse>({
-                    board_id: state.boardId,
-                    query: noticeApiHelper.data,
-                    domain_id: null,
-                });
-                state.noticeItems = results;
-                state.noticeItemTotalCount = total_count;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.noticeItems = [];
-                state.noticeItemTotalCount = 0;
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        /* Util */
-        const getSearchFilter = () => {
-            const filterHelper = new ApiQueryHelper()
-                .setPage(1, NOTICE_ITEM_LIMIT)
-                .setSort('created_at', true);
-            const filter = [] as ConsoleFilter[];
-            if (state.selectedPostType !== 'ALL') filter.push({ k: 'post_type', v: state.selectedPostType, o: '=' });
-            if (state.searchText) filter.push({ k: 'title', v: state.searchText, o: '' });
-            filterHelper.setFilters(filter);
-            return filterHelper;
-        };
-        const loadSearchListSet = async () => {
-            if (!state.searchText) {
-                noticeApiHelper = initNoticeApiHelper();
-                if (state.selectedPostType !== 'ALL') noticeApiHelper.setFilters([{ k: 'post_type', v: state.selectedPostType, o: '=' }]);
-            } else {
-                noticeApiHelper = getSearchFilter();
-            }
-            if (state.boardId) await listNotice();
-        };
-
-        /* event */
-        const handleToolboxChange = (options: ToolboxOptions = {}) => {
-            state.searchText = options?.searchText;
-            loadSearchListSet();
-        };
-        const handleSearchPostTypeChange = (searchScope: NoticePostType|'ALL') => {
-            state.selectedPostType = searchScope;
-            loadSearchListSet();
-        };
-        const handleClickNotice = (postId: string) => {
-            SpaceRouter.router.push({
-                name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-                params: {
-                    boardId: state.boardId ?? '',
-                    postId,
-                },
-            });
-        };
-        const handlePageChange = (page: number) => {
-            noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
-            if (state.boardId) listNotice();
-        };
-
-        (async () => {
-            state.loading = true;
-            state.boardId = await getNoticeBoardId();
-            if (state.boardId) {
-                await Promise.allSettled([fetchNoticeReadState(), listNotice()]);
-            }
-            state.loading = false;
-        })();
-
-        return {
-            ...toRefs(state),
-            isReadMap,
-            handleToolboxChange,
-            handleClickNotice,
-            handlePageChange,
-            handleSearchPostTypeChange,
-        };
-    },
+const state = reactive({
+    domainName: computed<string|undefined>(() => store.state.domain.name),
+    dropdownItems: computed<SelectDropdownMenuItem[]>(() => [
+        {
+            label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
+            name: 'ALL',
+        },
+        {
+            label: i18n.t('INFO.NOTICE.MAIN.LABEL_SYSTEM_NOTI'),
+            name: NOTICE_POST_TYPE.SYSTEM,
+        },
+        {
+            label: i18n.t('INFO.NOTICE.MAIN.LABEL_DOMAIN_NOTI'),
+            name: NOTICE_POST_TYPE.INTERNAL,
+        },
+    ]),
+    selectedPostType: 'ALL' as NoticePostType | 'ALL',
+    loading: false,
+    noticeItems: [] as PostModel[],
+    noticeItemTotalCount: 0,
+    boardId: undefined as undefined | string,
+    searchText: undefined as undefined | string,
 });
+
+const noticeStore = useNoticeStore();
+const noticeGetters = noticeStore.getters;
+
+/* Api */
+const initNoticeApiHelper = () => {
+    const initApiHelper = new ApiQueryHelper()
+        .setPage(1, NOTICE_ITEM_LIMIT)
+        .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+    if (state.domainName === 'root') {
+        return initApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
+    }
+    return initApiHelper;
+};
+let noticeApiHelper = initNoticeApiHelper();
+const listNotice = async () => {
+    state.loading = true;
+    try {
+        if (!state.boardId) throw new Error('boardId is undefined');
+        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
+            board_id: state.boardId,
+            query: noticeApiHelper.data,
+            domain_id: null,
+        });
+        state.noticeItems = results ?? [];
+        state.noticeItemTotalCount = total_count ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.noticeItems = [];
+        state.noticeItemTotalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+
+/* Util */
+const getSearchFilter = () => {
+    const filterHelper = new ApiQueryHelper()
+        .setPage(1, NOTICE_ITEM_LIMIT)
+        .setSort('created_at', true);
+    const filter = [] as ConsoleFilter[];
+    if (state.selectedPostType !== 'ALL') filter.push({ k: 'post_type', v: state.selectedPostType, o: '=' });
+    if (state.searchText) filter.push({ k: 'title', v: state.searchText, o: '' });
+    filterHelper.setFilters(filter);
+    return filterHelper;
+};
+const loadSearchListSet = async () => {
+    if (!state.searchText) {
+        noticeApiHelper = initNoticeApiHelper();
+        if (state.selectedPostType !== 'ALL') noticeApiHelper.setFilters([{ k: 'post_type', v: state.selectedPostType, o: '=' }]);
+    } else {
+        noticeApiHelper = getSearchFilter();
+    }
+    if (state.boardId) await listNotice();
+};
+
+/* event */
+const handleToolboxChange = (options: ToolboxOptions = {}) => {
+    state.searchText = options?.searchText;
+    loadSearchListSet();
+};
+const handleSearchPostTypeChange = (searchScope: NoticePostType|'ALL') => {
+    state.selectedPostType = searchScope;
+    loadSearchListSet();
+};
+const handleClickNotice = (postId: string) => {
+    SpaceRouter.router.push({
+        name: INFO_ROUTE.NOTICE.DETAIL._NAME,
+        params: {
+            boardId: state.boardId ?? '',
+            postId,
+        },
+    });
+};
+const handlePageChange = (page: number) => {
+    noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
+    if (state.boardId) listNotice();
+};
+
+(async () => {
+    state.loading = true;
+    state.boardId = await getNoticeBoardId();
+    if (state.boardId) {
+        await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
+    }
+    state.loading = false;
+})();
+
 </script>
+
+<template>
+    <div class="notice-list">
+        <div class="notice-header">
+            <p-toolbox :pagination-visible="false"
+                       :page-size-changeable="false"
+                       :refreshable="false"
+                       @change="handleToolboxChange"
+            >
+                <template #left-area>
+                    <p-select-dropdown v-if="state.domainName !== 'root'"
+                                       :menu="state.dropdownItems"
+                                       :selected="state.selectedPostType"
+                                       @update:selected="handleSearchPostTypeChange"
+                    />
+                </template>
+            </p-toolbox>
+        </div>
+        <p-divider />
+        <p-data-loader :data="state.noticeItems"
+                       :loading="state.loading"
+        >
+            <ul class="list-wrapper">
+                <list-item v-for="(item, index) in state.noticeItems"
+                           :key="`notice-${item.post_id}-${index}`"
+                           class="list-item"
+                           :post="item"
+                           :is-new="!noticeGetters.isReadMap[item.post_id]"
+                           :input-text="state.searchText"
+                           @click.native="handleClickNotice(item.post_id)"
+                />
+            </ul>
+            <template #no-data>
+                <div v-if="!state.searchText || !state.searchText.length"
+                     class="no-data"
+                >
+                    <img src="@/assets/images/illust_satellite.svg"
+                         class="no-data-img"
+                    >
+                    <p class="no-data-text">
+                        {{ $t('INFO.NOTICE.NO_NOTICES') }}
+                    </p>
+                </div>
+                <div v-else
+                     class="no-data"
+                >
+                    <img src="@/assets/images/illust_ghost.svg"
+                         class="img-no-data-ghost"
+                    >
+                    <p class="no-data-text">
+                        <i18n path="COMMON.GNB.SEARCH.NO_RESULT_1">
+                            <template #inputText>
+                                <em>{{ state.searchText }}</em>
+                            </template>
+                        </i18n>
+                    </p>
+                </div>
+            </template>
+        </p-data-loader>
+        <div class="pagination-wrapper">
+            <p-pagination :total-count="state.noticeItemTotalCount"
+                          :page-size="10"
+                          @change="handlePageChange"
+            />
+        </div>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .notice-list {
     @apply border border-gray-200 bg-white rounded-lg;

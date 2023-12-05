@@ -108,7 +108,7 @@ const handleConfirm = () => {
 
 const handleCreateNotice = async () => {
     try {
-        await SpaceConnector.client.board.post.create({
+        await SpaceConnector.clientV2.board.post.create({
             ...formData.value,
             domain_id: state.isAllDomainSelected ? null : state.selectedDomain[0].name,
         });
@@ -120,7 +120,7 @@ const handleCreateNotice = async () => {
 };
 const handleEditNotice = async () => {
     try {
-        await SpaceConnector.client.board.post.update(
+        await SpaceConnector.clientV2.board.post.update(
             state.isAllDomainSelected
                 ? {
                     ...formData.value,
