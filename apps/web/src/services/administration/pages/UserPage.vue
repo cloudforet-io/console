@@ -36,9 +36,7 @@ onUnmounted(() => {
         />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
-                <user-management-table :table-height="height"
-                                       :manage-disabled="!state.hasManagePermission"
-                />
+                <user-management-table :table-height="height" />
             </template>
         </p-horizontal-layout>
         <user-management-tab :manage-disabled="!state.hasManagePermission" />
