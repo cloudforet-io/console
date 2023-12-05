@@ -209,7 +209,7 @@ const updateUser = async (item, roleId) => {
             searchable
             selectable
             sortable
-            :loading="userPageState.loading"
+            :loading="userPageState.loading.list"
             :items="tableState.refinedUserItems"
             :select-index="userPageState.selectedIndices"
             :fields="userTableFields"
