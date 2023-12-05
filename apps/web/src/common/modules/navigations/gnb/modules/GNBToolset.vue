@@ -15,11 +15,6 @@
         <g-n-b-profile :visible="openedMenu === 'profile'"
                        @update:visible="updateOpenedMenu('profile', $event)"
         />
-        <p-toggle-button v-if="isDomainAdmin"
-                         class="temporary-admin-mode-toggle"
-                         :value="checked"
-                         @change-toggle="toggleAdminMode"
-        />
     </div>
 </template>
 
@@ -28,13 +23,8 @@ import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
-
-import { PToggleButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
-
-import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -50,7 +40,6 @@ export default defineComponent({
         GNBRecentFavorite,
         GNBSearch,
         GNBNoti,
-        PToggleButton,
     },
     props: {
         openedMenu: {
@@ -59,16 +48,10 @@ export default defineComponent({
         },
     },
     setup(props, { emit }: SetupContext) {
-        const router = useRouter();
         const appContextStore = useAppContextStore();
         const state = reactive({
-            isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             timezone: computed(() => store.state.user.timezone),
-        });
-
-        const adminToggleState = reactive({
-            checked: computed(() => state.isAdminMode),
         });
 
         const hideMenu = () => {
@@ -82,33 +65,12 @@ export default defineComponent({
             else hideMenu();
         };
 
-        const toggleAdminMode = () => {
-            if (state.isAdminMode) {
-                appContextStore.switchToWorkspaceMode();
-                router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
-                return;
-            }
-            appContextStore.switchToAdminMode();
-            router.push({ name: ROOT_ROUTE.ADMIN._NAME });
-        };
-
         return {
             ...toRefs(state),
-            ...toRefs(adminToggleState),
             hideMenu,
             openMenu,
             updateOpenedMenu,
-            toggleAdminMode,
         };
     },
 });
 </script>
-
-
-<style lang="postcss" scoped>
-.gnb-toolset {
-    .temporary-admin-mode-toggle {
-        margin-left: 1rem;
-    }
-}
-</style>

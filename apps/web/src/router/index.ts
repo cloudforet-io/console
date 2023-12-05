@@ -5,10 +5,7 @@ import VueRouter from 'vue-router';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
-
-// eslint-disable-next-line import/no-cycle
-import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { ERROR_ROUTE } from '@/router/constant';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -29,7 +26,6 @@ export class SpaceRouter {
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
 
         Vue.use(VueRouter);
-        const appContextStore = useAppContextStore();
 
         SpaceRouter.router = new VueRouter({
             mode: 'history',
@@ -55,10 +51,6 @@ export class SpaceRouter {
 
         SpaceRouter.router.onReady(() => {
             LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, '');
-            const currentPathes = SpaceRouter.router.currentRoute?.path?.split('/');
-            if (currentPathes.includes(ROOT_ROUTE.ADMIN._NAME)) {
-                appContextStore.switchToAdminMode();
-            }
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {

@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'gnb': true, 'admin-gnb': isAdminMode}">
+    <div class="gnb">
         <div class="left-part">
             <div class="site-map-wrapper">
                 <site-map :menu-list="siteMapMenuList"
@@ -43,7 +43,6 @@ import { includes } from 'lodash';
 
 import { store } from '@/store';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { DisplayMenu as GNBMenuType } from '@/store/modules/display/type';
 import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
@@ -70,10 +69,8 @@ export default defineComponent({
     },
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
-        const appContextStore = useAppContextStore();
 
         const state = reactive({
-            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             openedMenu: '',
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
@@ -133,11 +130,6 @@ export default defineComponent({
     @apply bg-white items-center;
     display: flex !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-
-    &.admin-gnb {
-        @apply bg-indigo-400;
-    }
-
     .left-part {
         padding-left: 1.5rem;
 

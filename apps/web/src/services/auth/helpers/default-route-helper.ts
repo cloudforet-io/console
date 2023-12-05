@@ -1,21 +1,20 @@
 import type { Location } from 'vue-router/types/router';
 
-import { ROOT_ROUTE } from '@/router/constant';
+import { MENU_ID } from '@/lib/menu/config';
 
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 // TODO: need to refactor with admin mode
 const GENERAL_DEFAULT_ROUTE = Object.freeze({
-    name: ROOT_ROUTE.WORKSPACE._NAME,
+    name: HOME_DASHBOARD_ROUTE._NAME,
 });
 
 const NO_ROLE_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
+    name: MENU_ID.ACCOUNT,
 });
 
 const SYTEM_DEFAULT_ROUTE = Object.freeze({
-    name: ADMINISTRATION_ROUTE.IAM._NAME,
+    name: MENU_ID.USER,
 });
 
 export const getDefaultRouteAfterSignIn = (hasSystemRole: boolean, hasAnyPermissions: boolean): Location => {

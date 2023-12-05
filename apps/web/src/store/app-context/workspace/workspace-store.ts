@@ -81,11 +81,6 @@ const setDefaultParamsToSpaceConnector = (workspaceId: string) => {
 };
 
 const EXCLUDED_WORKSPACE_API_LIST = [
-    // identity
-    '/identity/token/issue',
-    '/identity/user/get',
-    '/identity/user/get-workspaces',
-    '/identity/role/list',
     // inventory
     '/inventory/cloud-service/analyze',
     '/inventory/cloud-service-query-set/list',
