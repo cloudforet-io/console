@@ -29,8 +29,7 @@ import {
     calculateTime, userStateFormatter, userMfaFormatter, userRoleFormatter,
 } from '@/services/administration/composables/refined-user-data';
 import {
-    userSearchHandlers,
-    userTableFields,
+    USER_SEARCH_HANDLERS, USER_TABLE_FIELDS,
 } from '@/services/administration/constants/user-table-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
@@ -65,9 +64,9 @@ const tableState = reactive({
         last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
-    keyItemSets: userSearchHandlers.keyItemSets as KeyItemSet[],
-    valueHandlerMap: userSearchHandlers.valueHandlerMap,
-    tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets).queryTags,
+    keyItemSets: USER_SEARCH_HANDLERS.keyItemSets as KeyItemSet[],
+    valueHandlerMap: USER_SEARCH_HANDLERS.valueHandlerMap,
+    tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
 const modalState = reactive({
     mode: '',
@@ -212,7 +211,7 @@ const updateUser = async (item, roleId) => {
             :loading="userPageState.loading.list"
             :items="tableState.refinedUserItems"
             :select-index="userPageState.selectedIndices"
-            :fields="userTableFields"
+            :fields="USER_TABLE_FIELDS"
             sort-by="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"

@@ -4,7 +4,7 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { RoleType } from '@/schema/identity/role/type';
 
-import { USER_MFA_COLOR, userStateColor } from '@/services/administration/constants/user-table-constant';
+import { USER_MFA_COLOR, USER_STATE_COLOR } from '@/services/administration/constants/user-table-constant';
 
 export const calculateTime = (lastAccessedDay, timezone) => {
     const today = dayjs().toISOString();
@@ -21,7 +21,7 @@ const colorBindFactory = (colorMapping, textFnc) => (value) => ({
     ...colorMapping[value],
 });
 
-export const userStateFormatter = colorBindFactory(userStateColor, (value) => value.toLowerCase());
+export const userStateFormatter = colorBindFactory(USER_STATE_COLOR, (value) => value.toLowerCase());
 export const userMfaFormatter = colorBindFactory(USER_MFA_COLOR, (value) => value.toLowerCase());
 export const userRoleFormatter = (value: RoleType) => {
     let image;
