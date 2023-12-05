@@ -33,8 +33,7 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant.js';
-import ProjectCreateModal from '@/services/project/components/ProjectMainProjectCreateModal.vue';
-import ProjectUpdateModal from '@/services/project/components/ProjectUpdateModal.vue';
+import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectGroupTreeNodeData } from '@/services/project/types/project-tree-type';
@@ -329,20 +328,12 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                 </p-empty>
             </template>
         </p-data-loader>
-
-        <project-update-modal
-            v-if="projectPageState.projectUpdateModalVisible"
-            :visible="projectPageState.projectUpdateModalVisible"
+        <project-form-modal
+            v-if="projectPageState.projectFormModalVisible"
+            :visible="projectPageState.projectFormModalVisible"
             :project-group-id="state.groupId"
             @confirm="handleConfirmProjectForm()"
-            @update:visible="projectPageStore.setProjectUpdateModalVisible"
-        />
-        <project-create-modal
-            v-if="projectPageState.projectCreateModalVisible"
-            :visible="projectPageState.projectCreateModalVisible"
-            :project-group-id="state.groupId"
-            @confirm="handleConfirmProjectForm()"
-            @update:visible="projectPageStore.setProjectCreateModalVisible"
+            @update:visible="projectPageStore.setProjectFormModalVisible"
         />
     </div>
 </template>

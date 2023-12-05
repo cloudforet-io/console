@@ -144,7 +144,7 @@ const handleClickCreateButton = () => {
 };
 const handleSelectCreateMenu = (item: SelectDropdownMenuItem) => {
     if (item.name === 'project') {
-        projectPageStore.openProjectCreateModal(storeState.selectedItem);
+        projectPageStore.openProjectFormModal(storeState.selectedItem);
     } else if (item.name === 'projectGroup') {
         projectPageStore.openProjectGroupFormModal(storeState.selectedItem);
     }
