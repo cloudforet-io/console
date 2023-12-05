@@ -27,8 +27,10 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import {
     useCostDataSourceReferenceStore,
 } from '@/store/reference/cost-data-source-reference-store';
+import { useProjectStore } from '@/store/reference/project-store';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
+
 
 export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cost_data_source'|'cloudServiceQuerySet'|'cloud_service_query_set';
 
@@ -43,6 +45,7 @@ export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
     const cloudServiceQuerySetReferenceStore = useCloudServiceQuerySetReferenceStore();
+    const projectReferenceStore = useProjectStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
@@ -55,10 +58,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 referenceMap: getters.projectGroup,
             },
             //
-            project: {
-                ...REFERENCE_TYPE_INFO.project,
-                referenceMap: getters.project,
-            },
+            project: projectReferenceStore.getters.projectTypeInfo,
             //
             protocol: {
                 ...REFERENCE_TYPE_INFO.protocol,
@@ -131,10 +131,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             await store.dispatch('reference/projectGroup/load');
             return store.getters['reference/projectGroupItems'];
         }, {}, { lazy: true }),
-        project: asyncComputed<ProjectReferenceMap>(async () => {
-            await store.dispatch('reference/project/load');
-            return store.getters['reference/projectItems'];
-        }, {}, { lazy: true }),
+        project: asyncComputed<ProjectReferenceMap>(async () => projectReferenceStore.getters.projectItems),
         protocol: asyncComputed<ProtocolReferenceMap>(async () => {
             await store.dispatch('reference/protocol/load');
             return store.getters['reference/protocolItems'];
@@ -192,11 +189,17 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             await Promise.allSettled([
                 store.dispatch('reference/loadAll', options),
                 costDataSourceReferenceStore.load(options),
+                cloudServiceQuerySetReferenceStore.load(options),
+                projectReferenceStore.load(options),
             ]);
         },
         async load(type: ReferenceType, options?: ReferenceLoadOptions) {
             if (type === 'costDataSource' || type === 'cost_data_source') {
                 await costDataSourceReferenceStore.load(options);
+            } else if (type === 'cloudServiceQuerySet' || type === 'cloud_service_query_set') {
+                await cloudServiceQuerySetReferenceStore.load(options);
+            } else if (type === 'project') {
+                await projectReferenceStore.load(options);
             } else {
                 await store.dispatch(`reference/${camelCase(type)}/load`, options);
             }
