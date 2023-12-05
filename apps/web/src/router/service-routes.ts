@@ -26,7 +26,7 @@ export const serviceRoutes: RouteConfig[] = [
         path: '/',
         name: ROOT_ROUTE._NAME,
         redirect: () => {
-            if (store.getters['user/isDomainOwner'] || store.getters['user/hasSystemRole']) return { name: ADMINISTRATION_ROUTE._NAME };
+            if (store.getters['user/isDomainAdmin'] || store.getters['user/hasSystemRole']) return { name: ADMINISTRATION_ROUTE._NAME };
             if (!store.getters['user/hasPermission']) return { name: MY_PAGE_ROUTE._NAME };
             return ({ name: HOME_DASHBOARD_ROUTE._NAME });
         },

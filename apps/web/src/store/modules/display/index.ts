@@ -1,6 +1,7 @@
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import * as actions from './actions';
+// eslint-disable-next-line import/no-cycle
 import * as getters from './getters';
 import * as mutations from './mutations';
 import type { DisplayState } from './type';

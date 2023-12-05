@@ -155,11 +155,11 @@ watch(() => props.originForm, (originForm) => {
                             :language="$store.state.user.language"
                             @validate="handleAccountValidate"
         />
-        <p-field-group :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
+        <p-field-group v-if="props.accountType === ACCOUNT_TYPE.GENERAL"
+                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
                        class="account-tags"
         >
-            <service-account-project-form v-if="props.accountType === ACCOUNT_TYPE.GENERAL"
-                                          :is-valid.sync="state.isProjectFormValid"
+            <service-account-project-form :is-valid.sync="state.isProjectFormValid"
                                           @change="handleChangeProjectForm"
             />
         </p-field-group>

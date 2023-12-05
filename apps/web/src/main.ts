@@ -42,7 +42,7 @@ Vue.config.productionTip = import.meta.env.DEV;
 
 /** ********** INITIALIZE ************** */
 (async () => {
-    await siteInit();
+    await siteInit(store);
 
     new Vue({
         el: '#app',

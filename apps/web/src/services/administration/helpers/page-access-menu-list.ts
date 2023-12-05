@@ -1,4 +1,3 @@
-import { getPermissionRequiredMenuIds } from '@/lib/access-control/page-permission-helper';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -9,8 +8,7 @@ const flattenSubMenuList = (subMenuList?: Menu[], translationIds?: string[]): Pa
     if (!subMenuList) return [];
     let results: PageAccessMenuItem[] = [];
     subMenuList.forEach((subMenu) => {
-        const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
-        if (!permissionRequiredMenuIdList.includes(subMenu.id)) return;
+        if (!subMenu.needPermissionByRole) return;
 
         const menuInfo = MENU_INFO_MAP[subMenu.id];
         if (subMenu.subMenuList?.length) {
@@ -29,10 +27,9 @@ const flattenSubMenuList = (subMenuList?: Menu[], translationIds?: string[]): Pa
 };
 
 export const getPageAccessMenuList = (defaultItems: PageAccessMenuItem[] = []): PageAccessMenuItem[] => {
-    const permissionRequiredMenuIdList = getPermissionRequiredMenuIds();
     const results: PageAccessMenuItem[] = [];
     MENU_LIST.forEach((menu) => {
-        if (permissionRequiredMenuIdList.includes(menu.id)) {
+        if (menu.needPermissionByRole) {
             const menuInfo = MENU_INFO_MAP[menu.id];
             results.push({
                 id: menu.id,

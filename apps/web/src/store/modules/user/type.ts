@@ -56,4 +56,4 @@ export interface UpdateUserRequest {
 }
 
 
-export type PageAccessType = 'SYSTEM'|'BASIC';
+export type PageAccessType = 'SYSTEM'|'USER';

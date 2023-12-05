@@ -27,7 +27,7 @@ import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel, ServiceAccountModelForBinding } from '@/schema/identity/service-account/model';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
@@ -90,7 +90,7 @@ const typeOptionState = reactive({
 
 const tableState = reactive({
     hasManagePermission: useManagePermissionState(),
-    items: [] as ServiceAccountModelForBinding[],
+    items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: null as null|DynamicLayout,
     schemaOptions: computed<DynamicLayoutOptions>(() => {
         const option = tableState.schema?.options ?? {};
@@ -109,6 +109,7 @@ const tableState = reactive({
     ]),
     selectedAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
     searchFilters: computed<ConsoleFilter[]>(() => queryHelper.setFiltersAsQueryTag(fetchOptionState.queryTags).filters),
+    isTrustedAccount: computed(() => tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED),
 });
 
 const searchFilter = new ApiQueryHelper();
@@ -142,22 +143,11 @@ const getQuery = (type: AccountType) => {
     return apiQuery.data;
 };
 
-// add TRUSTED MANAGED directly
-const serviceAccountPreprocessor = (serviceAccount: ServiceAccountModelForBinding[]): ServiceAccountModelForBinding[] => serviceAccount.map((sa) => {
-    if (sa.service_account_type === ACCOUNT_TYPE.TRUSTED && sa.tags?.is_managed === 'true') {
-        return {
-            ...sa,
-            service_account_type: 'TRUSTED-MANAGED',
-        };
-    }
-    return sa;
-});
-
 const listServiceAccountData = async () => {
     typeOptionState.loading = true;
     try {
-        let res;
-        if (tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED) {
+        let res: ListResponse<TrustedAccountModel> | ListResponse<ServiceAccountModel>;
+        if (tableState.isTrustedAccount) {
             res = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
                 domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 query: getQuery(tableState.selectedAccountType),
@@ -171,7 +161,7 @@ const listServiceAccountData = async () => {
         }
 
 
-        tableState.items = serviceAccountPreprocessor(res.results || []);
+        tableState.items = res.results || [];
         typeOptionState.totalCount = res.total_count ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -237,7 +227,7 @@ const handleClickRow = (index) => {
     const item = tableState.items[index];
     SpaceRouter.router.push({
         name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.DETAIL._NAME,
-        params: { serviceAccountId: item.service_account_id },
+        params: { serviceAccountId: tableState.isTrustedAccount ? item.trusted_account_id : item.service_account_id },
     });
 };
 const handleDynamicLayoutFetch = (changed) => {
@@ -254,7 +244,7 @@ const getTableSchema = async () => {
             options: {
                 provider: state.selectedProvider,
             },
-        });
+        }, { mockPath: '?resource=serviceaccount' });
     } catch (e) {
         tableState.schema = null;
     }
