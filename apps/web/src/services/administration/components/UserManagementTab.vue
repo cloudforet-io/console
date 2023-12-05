@@ -15,7 +15,8 @@ import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 import UserManagementTabAssignedRole from '@/services/administration/components/UserManagementTabAssignedRole.vue';
 import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
+import { userTabTableFields } from '@/services/administration/constants/user-tab-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import UserAPIKeyTable from '@/services/my-page/components/UserAPIKeyTable.vue';
 
@@ -33,27 +34,14 @@ const userPageState = userPageStore.$state;
 const state = reactive({
     loading: true,
     timezone: computed(() => store.state.user.timezone || 'UTC'),
-    fields: computed(() => ([
-        { name: 'user_id', label: 'User ID' },
-        { name: 'name', label: 'Name' },
-        { name: 'state', label: 'State' },
-        { name: 'user_type', label: 'Access Control' },
-        { name: 'api_key_count', label: 'API Key' },
-        { name: 'role_name', label: 'Role' },
-        { name: 'backend', label: 'Auth Type' },
-        { name: 'last_accessed_at', label: 'Last Activity' },
-        { name: 'timezone', label: 'Timezone' },
-    ])),
 });
 
 const singleItemTabState = reactive({
-    tabs: computed(() => ([
+    tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
+        { label: i18n.t('IDENTITY.USER.MAIN.PROJECTS'), name: 'projects', keepAlive: true },
         { label: i18n.t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
-        { label: i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
-        { label: i18n.t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
-        // { label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
-    ] as TabItem[])),
+    ])),
     activeTab: 'detail',
 });
 
@@ -109,7 +97,7 @@ const multiItemTabState = reactive({
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table :fields="state.fields"
+                <p-data-table :fields="userTabTableFields"
                               :sortable="false"
                               :selectable="false"
                               :items="userPageStore.selectedUsers"

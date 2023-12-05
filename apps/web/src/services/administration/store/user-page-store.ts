@@ -7,6 +7,7 @@ import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-ve
 import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
@@ -15,9 +16,13 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
-        loading: false,
+        loading: {
+            list: false,
+            detail: false,
+        },
         modalLoading: false,
         users: [] as UserModel[],
+        selectedUser: {} as UserModel,
         totalCount: 0,
         selectedIndices: [],
         visibleStatusModal: false,
@@ -36,7 +41,7 @@ export const useUserPageStore = defineStore('user-page', {
     },
     actions: {
         async listUsers(params: UserListParameters) {
-            this.loading = true;
+            this.loading.list = true;
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
                 this.users = res.results || [];
@@ -47,7 +52,19 @@ export const useUserPageStore = defineStore('user-page', {
                 this.users = [];
                 this.totalCount = 0;
             } finally {
-                this.loading = false;
+                this.loading.list = false;
+            }
+        },
+        async getUser(params: UserGetParameters) {
+            this.loading.detail = true;
+            try {
+                const res = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
+                this.selectedUser = res || {};
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.selectedUser = {} as UserModel;
+            } finally {
+                this.loading.detail = false;
             }
         },
         async createRoleBinding(params: RoleCreateParameters) {

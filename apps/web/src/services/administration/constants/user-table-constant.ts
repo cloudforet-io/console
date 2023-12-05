@@ -5,8 +5,6 @@ import {
     makeEnumValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
 
-import type { ExcelDataField } from '@/lib/helper/file-download-helper/type';
-
 import * as styles from '@/styles/colors';
 
 const USER_STATE = {
@@ -14,7 +12,7 @@ const USER_STATE = {
     DISABLE: 'DISABLED',
 } as const;
 
-export const userStateColor = {
+export const USER_STATE_COLOR = {
     ENABLED: {
         iconColor: styles.safe,
         textColor: styles.gray[900],
@@ -24,17 +22,6 @@ export const userStateColor = {
         textColor: styles.gray[900],
     },
     DISABLED: {
-        iconColor: styles.gray[400],
-        textColor: styles.gray[400],
-    },
-} as const;
-
-export const pluginStateColor = {
-    ACTIVE: {
-        iconColor: styles.safe,
-        textColor: styles.gray[900],
-    },
-    INACTIVE: {
         iconColor: styles.gray[400],
         textColor: styles.gray[400],
     },
@@ -50,7 +37,7 @@ export const USER_MFA_COLOR = {
     },
 } as const;
 
-export const userSearchHandlers = {
+export const USER_SEARCH_HANDLERS = {
     keyItemSets: [{
         title: 'Properties',
         items: [
@@ -105,25 +92,14 @@ export const userSearchHandlers = {
     },
 };
 
-export const userTableFields = [
+export const USER_TABLE_FIELDS = [
     { name: 'user_id', label: 'User ID', sortable: false },
     { name: 'name', label: 'Name', sortable: false },
     { name: 'state', label: 'State', sortable: false },
     { name: 'mfa', label: 'Multi-factor Auth', sortable: false },
-    { name: 'role_type', label: 'Role' },
+    { name: 'role_type', label: 'Role', sortable: false },
     { name: 'tags', label: 'Tags' },
     { name: 'auth_type', label: 'Auth Type', sortable: false },
     { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
     { name: 'timezone', label: 'Timezone', sortable: false },
-];
-
-export const userExcelFields:ExcelDataField[] = [
-    { key: 'user_id', name: 'User ID' },
-    { key: 'name', name: 'Name' },
-    { key: 'state', name: 'State' },
-    { key: 'mfa', name: 'Multi-factor Auth' },
-    { key: 'role_type', name: 'Role' },
-    { key: 'auth_type', name: 'Auth Type' },
-    { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },
-    { key: 'timezone', name: 'Timezone' },
 ];

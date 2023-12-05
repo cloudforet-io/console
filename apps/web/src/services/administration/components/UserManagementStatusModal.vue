@@ -19,7 +19,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {

@@ -25,15 +25,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
 import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
-import { calculateTime } from '@/services/administration/composables/refined-user-data';
 import {
-    userSearchHandlers,
-    userTableFields,
+    calculateTime, userStateFormatter, userMfaFormatter, userRoleFormatter,
+} from '@/services/administration/composables/refined-user-data';
+import {
+    USER_SEARCH_HANDLERS, USER_TABLE_FIELDS,
 } from '@/services/administration/constants/user-table-constant';
-import {
-    userMfaFormatter, userRoleFormatter,
-    userStateFormatter,
-} from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
@@ -67,9 +64,9 @@ const tableState = reactive({
         last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
-    keyItemSets: userSearchHandlers.keyItemSets as KeyItemSet[],
-    valueHandlerMap: userSearchHandlers.valueHandlerMap,
-    tags: userListApiQueryHelper.setKeyItemSets(userSearchHandlers.keyItemSets).queryTags,
+    keyItemSets: USER_SEARCH_HANDLERS.keyItemSets as KeyItemSet[],
+    valueHandlerMap: USER_SEARCH_HANDLERS.valueHandlerMap,
+    tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
 const modalState = reactive({
     mode: '',
@@ -211,10 +208,10 @@ const updateUser = async (item, roleId) => {
             searchable
             selectable
             sortable
-            :loading="userPageState.loading"
+            :loading="userPageState.loading.list"
             :items="tableState.refinedUserItems"
             :select-index="userPageState.selectedIndices"
-            :fields="userTableFields"
+            :fields="USER_TABLE_FIELDS"
             sort-by="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
