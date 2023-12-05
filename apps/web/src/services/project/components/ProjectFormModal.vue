@@ -77,7 +77,7 @@ const getProjectNames = async () => {
             project_group_id: props.projectGroupId,
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
-        state.projectNames = results?.map((d) => d.name);
+        state.projectNames = results?.map((d) => d.name) ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
     }

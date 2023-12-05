@@ -1,3 +1,101 @@
+<script lang="ts" setup>
+import {
+    computed, onActivated, reactive, watch,
+} from 'vue';
+
+import {
+    PBadge, PDivider, PI, PLink,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import { get } from 'lodash';
+
+import { QueryHelper } from '@cloudforet/core-lib/query';
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
+import { FINISH_CONDITION } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+
+
+interface Props {
+    projectId?: string;
+    escalationPolicy?: object;
+}
+const props = withDefaults(defineProps<Props>(), {
+    projectId: undefined,
+    escalationPolicy: () => ({}),
+});
+
+const queryHelper = new QueryHelper();
+const state = reactive({
+    finishConditions: computed(() => ([
+        {
+            name: FINISH_CONDITION.acknowledged,
+            label: i18n.t('PROJECT.DETAIL.ALERT.ACKNOWLEDGED'),
+        },
+        {
+            name: FINISH_CONDITION.resolved,
+            label: i18n.t('PROJECT.DETAIL.ALERT.RESOLVED'),
+        },
+    ])),
+    escalationPolicyName: computed(() => get(props.escalationPolicy, 'name')),
+    finishCondition: computed(() => {
+        const finishCondition = get(props.escalationPolicy, 'finish_condition');
+        if (finishCondition) return state.finishConditions.find((d) => d.name === finishCondition).label;
+        return '';
+    }),
+    escalationRules: computed(() => get(props.escalationPolicy, 'rules')),
+    repeatCount: computed(() => get(props.escalationPolicy, 'repeat_count')),
+    projectChannels: [],
+    escalationPolicyLink: computed(() => {
+        const filters: ConsoleFilter[] = [];
+        filters.push({ k: 'escalation_policy_id', o: '=', v: get(props.escalationPolicy, 'escalation_policy_id') });
+        return {
+            name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
+            query: {
+                filters: queryHelper.setFilters(filters).rawQueryStrings,
+            },
+        };
+    }),
+});
+
+/* util */
+const notificationLevelFormatter = (str) => str.replace('LV', '');
+
+/* api */
+const apiQuery = new ApiQueryHelper();
+const getQuery = () => {
+    apiQuery
+        .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+    return apiQuery.data;
+};
+const listProjectChannel = async () => {
+    try {
+        const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
+        state.projectChannels = results;
+    } catch (e) {
+        state.projectChannels = [];
+        ErrorHandler.handleError(e);
+    }
+};
+
+watch(() => props.projectId, async (projectId) => {
+    if (projectId) {
+        await listProjectChannel();
+    }
+}, { immediate: true });
+
+onActivated(async () => {
+    await listProjectChannel();
+});
+</script>
+
 <template>
     <div class="project-alert-settings-escalation-policy">
         <section>
@@ -5,21 +103,21 @@
             <p-link class="value"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
-                    :to="escalationPolicyLink"
+                    :to="state.escalationPolicyLink"
                     highlight
             >
-                {{ escalationPolicyName }}
+                {{ state.escalationPolicyName }}
             </p-link>
         </section>
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.FINISH_CONDITION_LABEL') }}</span>
-            <span>{{ finishCondition }}</span>
+            <span>{{ state.finishCondition }}</span>
         </section>
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.ESCALATION_RULES_LABEL') }}</span>
             <div class="escalation-rules-wrapper">
                 <div class="rule-wrapper">
-                    <div v-for="(rule, idx) in escalationRules"
+                    <div v-for="(rule, idx) in state.escalationRules"
                          :key="`rule-${idx}`"
                     >
                         <p-badge badge-type="solid-outline"
@@ -41,7 +139,7 @@
                                 </i18n>
                             </span>
                         </template>
-                        <project-channel-list :project-channels="projectChannels"
+                        <project-channel-list :project-channels="state.projectChannels"
                                               :notification-level="rule.notification_level"
                         />
                         <p-divider class="divider" />
@@ -53,7 +151,7 @@
                           class="ml-2"
                     >
                         <template #count>
-                            <strong>{{ repeatCount }}</strong>
+                            <strong>{{ state.repeatCount }}</strong>
                         </template>
                     </i18n>
                 </div>
@@ -61,125 +159,6 @@
         </section>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, onActivated, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PBadge, PDivider, PI, PLink,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import { get, filter } from 'lodash';
-
-import { QueryHelper } from '@cloudforet/core-lib/query';
-import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
-import { FINISH_CONDITION } from '@/services/alert-manager/constants/alert-constant';
-import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
-
-export default {
-    name: 'ProjectAlertSettingsEscalationPolicy',
-    components: {
-        ProjectChannelList,
-        PDivider,
-        PBadge,
-        PI,
-        PLink,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-        escalationPolicy: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const queryHelper = new QueryHelper();
-        const state = reactive({
-            finishConditions: computed(() => ([
-                {
-                    name: FINISH_CONDITION.acknowledged,
-                    label: i18n.t('PROJECT.DETAIL.ALERT.ACKNOWLEDGED'),
-                },
-                {
-                    name: FINISH_CONDITION.resolved,
-                    label: i18n.t('PROJECT.DETAIL.ALERT.RESOLVED'),
-                },
-            ])),
-            escalationPolicyName: computed(() => get(props.escalationPolicy, 'name')),
-            finishCondition: computed(() => {
-                const finishCondition = get(props.escalationPolicy, 'finish_condition');
-                if (finishCondition) return state.finishConditions.find((d) => d.name === finishCondition).label;
-                return '';
-            }),
-            escalationRules: computed(() => get(props.escalationPolicy, 'rules')),
-            repeatCount: computed(() => get(props.escalationPolicy, 'repeat_count')),
-            projectChannels: [],
-            escalationPolicyLink: computed(() => {
-                const filters: ConsoleFilter[] = [];
-                filters.push({ k: 'escalation_policy_id', o: '=', v: get(props.escalationPolicy, 'escalation_policy_id') });
-                return {
-                    name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-                    query: {
-                        filters: queryHelper.setFilters(filters).rawQueryStrings,
-                    },
-                };
-            }),
-        });
-
-        /* util */
-        const notificationLevelFormatter = (str) => str.replace('LV', '');
-        const channelFormatter = (level) => filter(state.projectChannels, { notification_level: level });
-
-        /* api */
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery
-                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
-            return apiQuery.data;
-        };
-        const listProjectChannel = async () => {
-            try {
-                const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
-                state.projectChannels = results;
-            } catch (e) {
-                state.projectChannels = [];
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        watch(() => props.projectId, async (projectId) => {
-            if (projectId) {
-                await listProjectChannel();
-            }
-        }, { immediate: true });
-
-        onActivated(async () => {
-            await listProjectChannel();
-        });
-
-        return {
-            ...toRefs(state),
-            ALERT_MANAGER_ROUTE,
-            ACTION_ICON,
-            notificationLevelFormatter,
-            channelFormatter,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .project-alert-settings-escalation-policy {
