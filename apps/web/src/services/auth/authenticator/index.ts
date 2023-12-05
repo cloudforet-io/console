@@ -9,11 +9,12 @@ import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store
 
 
 abstract class Authenticator {
-    static async signIn(credentials: Record<string, any>, authType: AuthType): Promise<void> {
+    static async signIn(credentials: Record<string, any>, authType: AuthType, verifyCode?: string): Promise<void> {
         await store.dispatch('user/signIn', {
             domainId: store.state.domain.domainId,
             credentials,
             authType,
+            verify_code: verifyCode,
         });
         const workspaceStore = useWorkspaceStore();
         await workspaceStore.load(store.state.user.userId);
