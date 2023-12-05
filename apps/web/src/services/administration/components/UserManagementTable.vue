@@ -34,7 +34,7 @@ import {
     userSearchHandlers,
     userTableFields,
 } from '@/services/administration/constants/user-table-constant';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { userMfaFormatter, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { User } from '@/services/administration/types/user-type';
 
@@ -85,6 +85,7 @@ const tableState = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
         // api_key_count: d.api_key_count || 0,
+        mfa: user.mfa && user.mfa.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
