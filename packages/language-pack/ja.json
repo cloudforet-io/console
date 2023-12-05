@@ -2979,6 +2979,7 @@
 	},
 	"PROJECT": {
 		"DETAIL": {
+			"ACCESS": "",
 			"ADD": "追加",
 			"ALERT": {
 				"ACKNOWLEDGED": "確認",
@@ -3265,6 +3266,7 @@
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "クラウドリソースを管理してみましょう！",
 			"EMPTY_PROJECT_MSG": "プロジェクトがありません",
 			"EMPTY_REQUEST_VALID_PERMISSION": "プロジェクト担当者もしくはドメインアドミンに問い合わせください。",
+			"EVERYONE_AT_THIS_WORKSPACE": "",
 			"FAVORITES": "お気に入り",
 			"MANAGE_PROJECT_GROUP_MEMBER": "プロジェクトグループのメンバ管理",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "名前",
@@ -3278,6 +3280,7 @@
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
 			"NO_PROJECT_GROUP_MSG": "",
+			"ONLY_PEOPLE_INVITED": "",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",
