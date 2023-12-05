@@ -49,7 +49,7 @@ const state = reactive({
         state.workSpaceUserList.forEach((user) => {
             const singleItem = {
                 name: user.user_id,
-                label: user.name,
+                label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
                 disabled: false,
             };
             if (state.projectUserIdList.includes(user.user_id)) {
@@ -112,7 +112,7 @@ const getProjectUserData = async () => {
             domain_id: store.state.domain.domainId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
-        state.projectUserIdList = res.users;
+        state.projectUserIdList = res.users ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.projectUserIdList = [];
@@ -138,18 +138,16 @@ const handleConfirm = async () => {
 <template>
     <p-button-modal
         class="project-member-invite-modal"
-        :header-title="$t('PROJECT.DETAIL.MEMBER.MODAL_INVITE_MEMBER_TITLE')"
+        :header-title="$t('PROJECT.DETAIL.MEMBER.INVITE_MEMBER')"
         :fade="true"
         :backdrop="true"
+        size="sm"
         :visible.sync="state.proxyVisible"
         :disabled="!isAllValid"
         @confirm="handleConfirm"
     >
         <template #body>
             <div class="form-wrapper">
-                <p class="title">
-                    {{ $t('PROJECT.DETAIL.MEMBER.MEMBER') }} ({{ selectedUserItems.length }})
-                </p>
                 <p-field-group :label="$t('PROJECT.DETAIL.MEMBER.MEMBER')"
                                required
                                :invalid="invalidState.selectedUserItems"
@@ -173,6 +171,12 @@ const handleConfirm = async () => {
                 </p-field-group>
             </div>
         </template>
+        <template #confirm-button>
+            <span>{{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}</span>
+            <span v-if="selectedUserItems.length"
+                  class="ml-1"
+            >{{ selectedUserItems.length }}</span>
+        </template>
     </p-button-modal>
 </template>
 
@@ -185,8 +189,6 @@ const handleConfirm = async () => {
         }
     }
     .form-wrapper {
-        height: 30rem;
-
         .title {
             @apply text-gray-900;
             font-size: 1.375rem;

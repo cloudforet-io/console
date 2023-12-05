@@ -4,11 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButton,
-    PHeading,
-    PSelectDropdown,
-    PTableCheckModal,
-    PToolboxTable,
+    PButton, PHeading, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -139,19 +135,13 @@ const handleChangeTable = async (options: ToolboxOptions = {}) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
+const handleClickRemoveMember = () => {
+    state.memberDeleteModalVisible = true;
+};
 const handleClickInviteMember = () => {
     state.memberInviteFormVisible = true;
 };
 
-const clickDeleteMember = () => {
-    state.memberDeleteModalVisible = true;
-};
-const handleSelectDropdown = (name) => {
-    switch (name) {
-    case 'delete': clickDeleteMember(); break;
-    default: break;
-    }
-};
 const handleConfirmDeleteMember = async (items) => {
     await deleteProjectUser(items);
 
@@ -196,22 +186,26 @@ watch(() => store.state.reference.project.items, (projects) => {
                            :title="$t('PROJECT.DETAIL.MEMBER_TITLE')"
                            use-total-count
                            :total-count="state.totalCount"
-                />
-            </template>
-            <template #toolbox-left>
-                <p-button style-type="primary"
-                          class="mr-4 add-btn"
-                          icon-left="ic_plus_bold"
-                          :disabled="props.manageDisabled"
-                          @click="handleClickInviteMember"
                 >
-                    {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
-                </p-button>
-                <p-select-dropdown :menu="state.dropdownMenu"
-                                   :disabled="props.manageDisabled"
-                                   :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
-                                   @select="handleSelectDropdown"
-                />
+                    <template #title-right-extra>
+                        <div class="action-button-wrapper">
+                            <p-button style-type="primary"
+                                      class="mr-4 add-btn"
+                                      :disabled="!state.selectedItems.length"
+                                      @click="handleClickRemoveMember"
+                            >
+                                {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
+                            </p-button>
+                            <p-button style-type="primary"
+                                      class="mr-4 add-btn"
+                                      :disabled="props.manageDisabled"
+                                      @click="handleClickInviteMember"
+                            >
+                                {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
+                            </p-button>
+                        </div>
+                    </template>
+                </p-heading>
             </template>
         </p-toolbox-table>
 
@@ -243,6 +237,11 @@ watch(() => store.state.reference.project.items, (projects) => {
             line-height: 1.6;
             margin-bottom: 0.5rem;
         }
+    }
+
+    .action-button-wrapper {
+        display: inline-flex;
+        float: right;
     }
 }
 </style>
