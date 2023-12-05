@@ -2980,6 +2980,7 @@
 	},
 	"PROJECT": {
 		"DETAIL": {
+			"ACCESS": "Access",
 			"ADD": "Add",
 			"ALERT": {
 				"ACKNOWLEDGED": "Acknowledged",
@@ -3266,6 +3267,7 @@
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "Let's begin to manage your resource!",
 			"EMPTY_PROJECT_MSG": "Looks like you don't have any Project.",
 			"EMPTY_REQUEST_VALID_PERMISSION": "Please, Request valid permission to project Admin/Domain Administrator.",
+			"EVERYONE_AT_THIS_WORKSPACE": "Everyone at this workspace",
 			"FAVORITES": "Favorites",
 			"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
@@ -3279,6 +3281,7 @@
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
 			"NO_PROJECT_GROUP_MSG": "Getting started with grouping your scattered resource and accounts with your own project.",
+			"ONLY_PEOPLE_INVITED": "Only people invited",
 			"PLACE_HOLDER_EXAMPLE": "e.g. project/project group",
 			"PLACE_HOLDER_PROJECT": "Project",
 			"PLACE_HOLDER_SHOW_MORE": "more",

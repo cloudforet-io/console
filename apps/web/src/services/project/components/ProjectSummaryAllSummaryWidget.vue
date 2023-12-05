@@ -265,7 +265,13 @@ const getTrend = async (type) => {
         const orderedData = orderBy(chartData, ['date'], ['asc']);
         chartState.data = orderedData.map((d, idx) => {
             let bulletText: string|undefined;
-            if (idx % 3 === 1) bulletText = numberFormatter(d.count);
+            if (idx % 3 === 1) {
+                if (type !== SERVICE_CATEGORY.STORAGE) {
+                    bulletText = numberFormatter(d.count, { notation: 'compact' });
+                } else {
+                    bulletText = d.count;
+                }
+            }
             return {
                 date: d.date,
                 count: d.count,
