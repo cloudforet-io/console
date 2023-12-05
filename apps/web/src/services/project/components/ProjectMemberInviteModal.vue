@@ -84,7 +84,6 @@ const fetchWorkspaceUsers = async () => {
         const response = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
             domain_id: store.state.domain.domainId,
         });
-        console.log(response);
         state.workSpaceUserList = response.results ?? [];
     } catch (e) {
         state.workSpaceUserList = [];
