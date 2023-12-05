@@ -160,7 +160,7 @@ export default {
         }
         const listNotice = async () => {
             try {
-                const { results, total_count } = await SpaceConnector.client.board.post.list({
+                const { results, total_count } = await SpaceConnector.clientV2.board.post.list({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
                     domain_id: null,

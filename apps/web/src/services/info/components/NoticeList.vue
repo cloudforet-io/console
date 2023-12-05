@@ -163,7 +163,7 @@ export default defineComponent<Props>({
             state.loading = true;
             try {
                 if (!state.boardId) throw new Error('boardId is undefined');
-                const { results, total_count } = await SpaceConnector.client.board.post.list<PostListParameters, PostListResponse>({
+                const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
                     board_id: state.boardId,
                     query: noticeApiHelper.data,
                     domain_id: null,

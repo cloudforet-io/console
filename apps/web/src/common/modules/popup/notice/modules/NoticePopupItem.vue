@@ -93,7 +93,7 @@ export default {
         const files = computedAsync<FileInfo[]>(async () => {
             const notice = props.item;
             if (!notice) return [];
-            const result: PostModel = await SpaceConnector.client.board.post.get({
+            const result: PostModel = await SpaceConnector.clientV2.board.post.get({
                 board_id: notice.board_id,
                 post_id: notice.post_id,
             });

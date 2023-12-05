@@ -51,7 +51,7 @@ export default {
         /* Api */
         const getNoticePostData = async () => {
             try {
-                state.noticePostData = await SpaceConnector.client.board.post.get({
+                state.noticePostData = await SpaceConnector.clientV2.board.post.get({
                     board_id: props.boardId,
                     post_id: props.postId,
                 });

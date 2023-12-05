@@ -1,6 +1,6 @@
 <template>
     <section class="notice-detail-page">
-        <p-heading :title="noticePostData.title"
+        <p-heading :title="noticePostData?.title"
                    show-back-button
                    @click-back-button="$router.go(-1)"
         >
@@ -14,10 +14,6 @@
                     >
                         {{ $t('INFO.NOTICE.FORM.EDIT') }}
                     </p-button>
-                    <!--        TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외-->
-                    <!--                    <p-button :outline="true" style-type="gray-border" icon="ic_paper-airplane">-->
-                    <!--                        {{ $t('Send Email') }}-->
-                    <!--                    </p-button>-->
                     <p-button style-type="negative-secondary"
                               @click="handleDeleteModalOpen"
                     >
@@ -30,7 +26,9 @@
             <p-data-loader :loading="loading"
                            :data="noticePostData"
             >
-                <div class="post-title">
+                <div v-if="noticePostData"
+                     class="post-title"
+                >
                     <p-badge badge-type="solid-outline"
                              :style-type="noticeTypeBadgeInfo.style"
                     >
@@ -57,7 +55,9 @@
                     >| {{ postDomainName }}</span>
                 </div>
                 <p-divider />
-                <div class="text-editor-wrapper">
+                <div v-if="noticePostData"
+                     class="text-editor-wrapper"
+                >
                     <text-editor-viewer :contents="noticePostData.contents"
                                         :attachments="attachments"
                     />
@@ -87,20 +87,6 @@
                 {{ $t('INFO.NOTICE.DETAIL.BACK_TO_LIST') }}
             </p-button>
         </section>
-        <!--        TODO: 이미지 URL 이슈로 인해 v1.10.1에서 제외-->
-        <!--        <p-button-modal :header-title="$t('INFO.NOTICE.FORM.SEND_EMAIL_MODAL_TITLE')"-->
-        <!--                        :visible.sync="sendEmailModalVisible"-->
-        <!--                        size="sm"-->
-        <!--                        @confirm="handleSendEmailConfirm"-->
-        <!--        >-->
-        <!--            <template #body>-->
-        <!--                <i18n path="INFO.NOTICE.FORM.SEND_EMAIL_MODAL_DESC" tag="p" class="desc">-->
-        <!--                    <template #domainText>-->
-        <!--                        <strong>{{ domainName }}</strong>-->
-        <!--                    </template>-->
-        <!--                </i18n>-->
-        <!--            </template>-->
-        <!--        </p-button-modal>-->
 
         <delete-modal :header-title="$t('INFO.NOTICE.FORM.DELETE_MODAL_TITLE')"
                       :visible.sync="deleteModalVisible"
@@ -124,8 +110,11 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
+import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
+import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
 import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
+import type { NoticePostType } from '@/schema/board/post/type';
 import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
 import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
@@ -133,6 +122,7 @@ import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice';
 
+import type { FileInfo } from '@/lib/file-manager/type';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
@@ -174,8 +164,8 @@ export default {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             loading: false,
-            noticePostData: {} as PostModel,
-            postType: computed(() => state.noticePostData.post_type),
+            noticePostData: undefined as PostModel | undefined,
+            postType: computed<NoticePostType>(() => state.noticePostData?.post_type ?? NOTICE_POST_TYPE.INTERNAL),
             prevNoticePost: undefined as PostModel | undefined,
             prevPostRoute: computed(() => ({
                 name: INFO_ROUTE.NOTICE.DETAIL._NAME,
@@ -201,19 +191,20 @@ export default {
             // TODO: send email open state
         });
 
-        const { attachments } = useFileAttachments(computed(() => state.noticePostData.files));
+        const files = computed<FileInfo[]>(() => state.noticePostData?.files ?? []);
+        const { attachments } = useFileAttachments(files);
 
         /* Api */
         const getNoticePostData = async () => {
             try {
-                const results = await SpaceConnector.client.board.post.get({
+                const result = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
                     board_id: props.boardId,
                     post_id: props.postId,
                 });
-                state.noticePostData = results;
+                state.noticePostData = result;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.noticePostData = {};
+                state.noticePostData = undefined;
             }
         };
         const getNextPostData = async (createdAt) => {
@@ -229,7 +220,7 @@ export default {
                         { k: 'created_at', v: createdAt, o: '>t' },
                     ]);
                 }
-                const { results } = await SpaceConnector.client.board.post.list({
+                const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
                     domain_id: null,
                     board_id: props.boardId,
                     query: nextPostApiQueryHelper.data,
@@ -253,7 +244,7 @@ export default {
                         { k: 'created_at', v: createdAt, o: '<t' },
                     ]);
                 }
-                const { results } = await SpaceConnector.client.board.post.list({
+                const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
                     domain_id: null,
                     board_id: props.boardId,
                     query: prevPostApiQueryHelper.data,
@@ -265,12 +256,13 @@ export default {
             }
         };
         const getPostDomainName = async () => {
-            if (!state.noticePostData?.domain_id) {
+            const domainId = state.noticePostData?.domain_id;
+            if (!domainId) {
                 state.postDomainName = 'All Domains';
                 return;
             }
             try {
-                const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: state.noticePostData.domain_id });
+                const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: domainId });
                 state.postDomainName = name;
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -290,7 +282,7 @@ export default {
         };
         const handleDeleteNoticeConfirm = async () => {
             try {
-                await SpaceConnector.client.board.post.delete({
+                await SpaceConnector.clientV2.board.post.delete({
                     post_id: props.postId,
                     board_id: props.boardId,
                 });
@@ -332,7 +324,7 @@ export default {
             state.loading = true;
             await getNoticePostData();
             if (state.hasSystemRoleUser) await getPostDomainName();
-            if (state.noticePostData.created_at) {
+            if (state.noticePostData?.created_at) {
                 await getNextPostData(state.noticePostData.created_at);
                 await getPrevPostData(state.noticePostData.created_at);
             }

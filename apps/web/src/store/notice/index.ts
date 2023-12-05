@@ -95,7 +95,7 @@ export const useNoticeStore = ({ userId }: {
                 boardId.value = await getNoticeBoardId();
                 if (!boardId.value) throw new Error('Notice board not found');
             }
-            const { results, total_count } = await SpaceConnector.client.board.post.list<PostListParameters, PostListResponse>({
+            const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
                 board_id: boardId.value,
                 query: noticeApiHelper.data,
                 domain_id: null,

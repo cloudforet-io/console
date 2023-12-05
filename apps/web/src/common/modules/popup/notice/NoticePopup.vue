@@ -85,7 +85,7 @@ export default {
             try {
                 const noticeBoard = await getNoticeBoard();
                 if (!noticeBoard) return;
-                const { results } = await SpaceConnector.client.board.post.list<PostListParameters, PostListResponse>({
+                const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
                     domain_id: null,
                     board_id: noticeBoard,
                     query: apiQueryForPostList,
