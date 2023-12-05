@@ -23,9 +23,10 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 const route = useRoute();
 const router = useRouter();
 
-const { password, userId, userType } = route.params;
+const { password, userId, authType } = route.params;
 
 const credentials = {
+    user_id: userId,
     password,
 };
 
@@ -58,7 +59,7 @@ const handleClickGoBackButton = () => {
 const handleClickResend = async () => {
     state.loading = true;
     try {
-        await loadAuth().signIn(credentials, userId, userType);
+        await loadAuth().signIn(credentials, authType);
         validationState.verificationCode = '';
     } catch (e: any) {
         if (e.message.includes('MFA')) {
@@ -74,11 +75,11 @@ const handleClickResend = async () => {
 const handleClickConfirmButton = async () => {
     state.confirmLoading = true;
     try {
-        await loadAuth().signIn(credentials, userId, userType, validationState.verificationCode);
+        await loadAuth().signIn(credentials, authType, validationState.verificationCode);
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
         } else {
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
             await router.push(defaultRoute);
         }
         validationState.verificationCode = '';

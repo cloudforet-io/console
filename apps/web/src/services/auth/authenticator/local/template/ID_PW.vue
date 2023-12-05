@@ -78,23 +78,24 @@ const signIn = async () => {
     }
     const credentials = {
         password: state.password.trim(),
+        user_id: state.userId?.trim(),
     };
     try {
-        await loadAuth().signIn(credentials, state.userId?.trim(), props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER');
+        await loadAuth().signIn(credentials, 'LOCAL');
         await store.dispatch('display/hideSignInErrorMessage');
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
         } else {
             emit('sign-in', state.userId);
         }
-    } catch (e:any) {
+    } catch (e: any) {
         if (e.message.includes('MFA')) {
             await router.push({
                 name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
                 params: {
                     password: credentials.password,
                     userId: state.userId?.trim() as string,
-                    userType: props.isDomainOwner ? 'DOMAIN_OWNER' : 'USER',
+                    authType: 'LOCAL',
                 },
             });
         } else {
