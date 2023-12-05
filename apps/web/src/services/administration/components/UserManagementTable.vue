@@ -5,7 +5,7 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PBadge, PButton, PSelectDropdown, PStatus, PToolboxTable, PLazyImg,
+    PBadge, PButton, PSelectDropdown, PStatus, PToolboxTable, PI,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
@@ -334,9 +334,10 @@ const updateUser = async (item, roleId) => {
             </template>
             <template #col-role_type-format="{value}">
                 <span class="role-type">
-                    <p-lazy-img :src="userRoleFormatter(value).image"
-                                width="1.5rem"
-                                height="1.5rem"
+                    <p-i :name="userRoleFormatter(value).image"
+                         width="1.5rem"
+                         height="1.5rem"
+                         class="role-type-icon"
                     />
                     <span>{{ userRoleFormatter(value).name }}</span>
                 </span>
@@ -397,5 +398,8 @@ const updateUser = async (item, roleId) => {
 .role-type {
     @apply flex items-center;
     gap: 0.5rem;
+    .role-type-icon {
+        @apply rounded-full;
+    }
 }
 </style>

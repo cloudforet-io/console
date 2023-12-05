@@ -18,9 +18,9 @@ export const userRoleFormatter = (value: RoleType) => {
     if (value === 'DOMAIN_ADMIN') {
         image = 'img_avatar_admin';
     } else if (value === 'WORKSPACE_OWNER') {
-        image = 'img_avatar_workspace-owner';
+        image = 'img_avatar_project-admin';
     } else {
-        image = 'img_avatar_workspace-member_no-role';
+        image = 'img_avatar_user';
     }
 
     return {
