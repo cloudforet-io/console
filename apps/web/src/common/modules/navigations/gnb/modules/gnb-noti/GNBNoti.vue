@@ -71,6 +71,11 @@ import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-no
 interface Props {
     visible: boolean
 }
+
+interface CountInfo {
+  notifications: number;
+  notice: number;
+}
 export default defineComponent<Props>({
     name: 'GNBNoti',
     components: {
@@ -91,7 +96,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || unreadNoticeCount.value > 0),
+            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || noticeGetters.unreadNoticeCount > 0),
             domainName: computed(() => store.state.domain.name),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             tabs: computed(() => ([
@@ -100,9 +105,9 @@ export default defineComponent<Props>({
             ] as TabItem[])),
             activeTab: 'notifications',
             notificationCount: 0,
-            count: computed(() => ({
+            count: computed<CountInfo>(() => ({
                 notifications: state.notificationCount,
-                notice: unreadNoticeCount.value,
+                notice: noticeGetters.unreadNoticeCount,
             })),
         });
 
@@ -128,11 +133,8 @@ export default defineComponent<Props>({
             noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
         }
 
-        const {
-            unreadNoticeCount, fetchNoticeCount, fetchNoticeReadState,
-        } = useNoticeStore({
-            userId: computed(() => store.state.user.userId),
-        });
+        const noticeStore = useNoticeStore();
+        const noticeGetters = noticeStore.getters;
 
         const documentVisibility = useDocumentVisibility();
         watch(documentVisibility, (visibility) => {
@@ -151,8 +153,8 @@ export default defineComponent<Props>({
 
         onMounted(() => {
             store.dispatch('display/startCheckNotification');
-            fetchNoticeReadState();
-            fetchNoticeCount();
+            noticeStore.fetchNoticeReadState();
+            noticeStore.fetchNoticeCount();
         });
         onUnmounted(() => {
             store.dispatch('display/stopCheckNotification');
@@ -169,7 +171,7 @@ export default defineComponent<Props>({
             hideNotiMenu,
             handleNotiButtonClick,
             numberFormatter,
-            unreadNoticeCount,
+            noticeGetters,
         };
     },
 });

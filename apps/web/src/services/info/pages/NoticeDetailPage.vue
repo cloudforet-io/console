@@ -165,11 +165,7 @@ const getPostDomainName = async () => {
     }
 };
 
-const {
-    updateNoticeReadState,
-} = useNoticeStore({
-    userId: computed(() => store.state.user.userId),
-});
+const noticeStore = useNoticeStore();
 
 /* Event */
 const handleBackToListButtonClick = () => {
@@ -225,7 +221,7 @@ const initPage = async (postId: string) => {
     }
     const isGetPostSuccess = !!state.noticePostData?.post_id;
     if (isGetPostSuccess) {
-        await updateNoticeReadState(postId);
+        await noticeStore.updateNoticeReadState(postId);
     }
     state.loading = false;
 };

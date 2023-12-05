@@ -61,11 +61,8 @@ const state = reactive({
     searchText: undefined as undefined | string,
 });
 
-const {
-    isReadMap, fetchNoticeReadState,
-} = useNoticeStore({
-    userId: computed(() => store.state.user.userId),
-});
+const noticeStore = useNoticeStore();
+const noticeGetters = noticeStore.getters;
 
 /* Api */
 const initNoticeApiHelper = () => {
@@ -87,8 +84,8 @@ const listNotice = async () => {
             query: noticeApiHelper.data,
             domain_id: null,
         });
-        state.noticeItems = results;
-        state.noticeItemTotalCount = total_count;
+        state.noticeItems = results ?? [];
+        state.noticeItemTotalCount = total_count ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.noticeItems = [];
@@ -146,7 +143,7 @@ const handlePageChange = (page: number) => {
     state.loading = true;
     state.boardId = await getNoticeBoardId();
     if (state.boardId) {
-        await Promise.allSettled([fetchNoticeReadState(), listNotice()]);
+        await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
     }
     state.loading = false;
 })();
@@ -179,7 +176,7 @@ const handlePageChange = (page: number) => {
                            :key="`notice-${item.post_id}-${index}`"
                            class="list-item"
                            :post="item"
-                           :is-new="!isReadMap[item.post_id]"
+                           :is-new="!noticeGetters.isReadMap[item.post_id]"
                            :input-text="state.searchText"
                            @click.native="handleClickNotice(item.post_id)"
                 />

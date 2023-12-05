@@ -20,7 +20,7 @@
                                      :key="`${item.postId}-${idx}`"
                                      :title="item.title"
                                      :created-at="item.createdAt"
-                                     :is-read="isReadMap[item.postId]"
+                                     :is-read="noticeGetters.isReadMap[item.postId]"
                                      :writer="item.writer"
                                      @select="handleSelectNotice(item.postId)"
                     />
@@ -30,7 +30,7 @@
                                  :key="`${item.postId}-${idx}`"
                                  :title="item.title"
                                  :created-at="item.createdAt"
-                                 :is-read="isReadMap[item.postId]"
+                                 :is-read="noticeGetters.isReadMap[item.postId]"
                                  :writer="item.writer"
                                  @select="handleSelectNotice(item.postId)"
                 />
@@ -146,11 +146,8 @@ export default {
             isPinned: d.options.is_pinned,
         }));
 
-        const {
-            isReadMap, fetchNoticeReadState,
-        } = useNoticeStore({
-            userId: computed(() => store.state.user.userId),
-        });
+        const noticeStore = useNoticeStore();
+        const noticeGetters = noticeStore.getters;
 
         /* Api */
         const noticeApiHelper = new ApiQueryHelper()
@@ -193,7 +190,7 @@ export default {
             state.loading = true;
             state.boardId = await getNoticeBoardId();
             if (state.boardId) {
-                await Promise.allSettled([fetchNoticeReadState(), listNotice()]);
+                await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
             }
             state.loading = false;
         };
@@ -203,7 +200,7 @@ export default {
 
         return {
             ...toRefs(state),
-            isReadMap,
+            noticeGetters,
             ADMINISTRATION_ROUTE,
             handleSelectNotice,
             handleClickViewAllNotice,

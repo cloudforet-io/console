@@ -1,7 +1,8 @@
-import type { ComputedRef } from 'vue';
 import {
-    computed, ref,
+    computed, reactive,
 } from 'vue';
+
+import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -25,19 +26,32 @@ interface NoticeConfigData {
 }
 type NoticeConfigMap = Record<string, NoticeConfigData>;
 
-const boardId = ref<string>();
-const noticeConfigMap = ref<NoticeConfigMap>({});
-const isReadMap = computed<{ [key: string]: boolean }>(() => {
-    const readMap = {};
-    Object.keys(noticeConfigMap.value).forEach((postId) => {
-        readMap[postId] = noticeConfigMap.value[postId].is_read;
+export const useNoticeStore = defineStore('notice', () => {
+    const state = reactive({
+        boardId: undefined as undefined|string,
+        noticeConfigMap: {} as NoticeConfigMap,
+        totalNoticeIdList: [] as string[],
+        totalNoticeCount: 0,
     });
-    return readMap;
-});
 
-export const useNoticeStore = ({ userId }: {
-    userId: ComputedRef<string>,
-}) => {
+    const getters = reactive({
+        userId: computed<string>(() => store.state.user.userId),
+        isReadMap: computed<{ [key: string]: boolean }>(() => {
+            const readMap = {};
+            Object.keys(state.noticeConfigMap).forEach((postId) => {
+                readMap[postId] = state.noticeConfigMap[postId].is_read;
+            });
+            return readMap;
+        }),
+        unreadNoticeCount: computed<number>(() => {
+            let unreadCount = 0;
+            state.totalNoticeIdList.forEach((postId) => {
+                if (!getters.isReadMap[postId]) unreadCount++;
+            });
+            return unreadCount;
+        }),
+    });
+
     const convertUserConfigToNoticeConfigMap = (userConfigs: UserConfig[]): NoticeConfigMap => {
         const configMap: NoticeConfigMap = {};
         userConfigs.forEach((config) => {
@@ -49,16 +63,16 @@ export const useNoticeStore = ({ userId }: {
     };
 
     const fetchNoticeReadState = async () => {
-        if (!boardId.value) boardId.value = await getNoticeBoardId();
+        if (!state.boardId) state.boardId = await getNoticeBoardId();
         const userConfigApiQuery = new ApiQueryHelper()
             .setFilters([{
                 k: 'user_id',
-                v: userId.value,
+                v: getters.userId,
                 o: '=',
             },
             {
                 k: 'name',
-                v: `console:board:${boardId.value}:`,
+                v: `console:board:${state.boardId}:`,
                 o: '',
             }])
             .setOnly('data', 'user_id');
@@ -66,62 +80,51 @@ export const useNoticeStore = ({ userId }: {
             const { results } = await SpaceConnector.client.config.userConfig.list({
                 query: userConfigApiQuery.data,
             });
-            noticeConfigMap.value = convertUserConfigToNoticeConfigMap(results);
+            state.noticeConfigMap = convertUserConfigToNoticeConfigMap(results);
         } catch (e) {
             ErrorHandler.handleError(e);
-            noticeConfigMap.value = {};
+            state.noticeConfigMap = {};
         }
     };
     const updateNoticeReadState = async (postId: string, showPopup?: boolean) => {
         try {
-            if (!boardId.value) boardId.value = await getNoticeBoardId();
+            if (!state.boardId) state.boardId = await getNoticeBoardId();
             const result = await SpaceConnector.client.config.userConfig.set({
                 user_id: store.state.user.userId,
-                name: `console:board:${boardId.value}:${postId}`,
+                name: `console:board:${state.boardId}:${postId}`,
                 data: { is_read: true, show_popup: showPopup },
             });
-            noticeConfigMap.value = { ...noticeConfigMap.value, [postId]: result.data };
+            state.noticeConfigMap = { ...state.noticeConfigMap, [postId]: result.data };
         } catch (e) {
             ErrorHandler.handleError(e);
         }
     };
 
-    const totalNoticeIdList = ref<string[]>([]);
-    const totalNoticeCount = ref(0);
     const noticeApiHelper = new ApiQueryHelper().setOnly('post_id');
     const fetchNoticeCount = async () => {
         try {
-            if (!boardId.value) {
-                boardId.value = await getNoticeBoardId();
-                if (!boardId.value) throw new Error('Notice board not found');
+            if (!state.boardId) {
+                state.boardId = await getNoticeBoardId();
+                if (!state.boardId) throw new Error('Notice board not found');
             }
             const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-                board_id: boardId.value,
+                board_id: state.boardId,
                 query: noticeApiHelper.data,
                 domain_id: null,
             });
-            totalNoticeIdList.value = results?.map((post) => post.post_id) ?? [];
-            totalNoticeCount.value = total_count ?? 0;
+            state.totalNoticeIdList = results?.map((post) => post.post_id) ?? [];
+            state.totalNoticeCount = total_count ?? 0;
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
         }
     };
 
-    const unreadNoticeCount = computed(() => {
-        let unreadCount = 0;
-        totalNoticeIdList.value.forEach((postId) => {
-            if (!isReadMap.value[postId]) unreadCount++;
-        });
-        return unreadCount;
-    });
 
     return {
-        boardId,
-        isReadMap,
+        state,
+        getters,
         fetchNoticeReadState,
         updateNoticeReadState,
-        totalNoticeCount,
-        unreadNoticeCount,
         fetchNoticeCount,
     };
-};
+});
