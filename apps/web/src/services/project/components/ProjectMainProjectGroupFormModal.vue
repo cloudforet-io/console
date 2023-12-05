@@ -28,12 +28,14 @@ import TranslateResult = VueI18n.TranslateResult;
 
 
 const projectPageStore = useProjectPageStore();
+const projectPageGetters = projectPageStore.getters;
+const projectPageState = projectPageStore.state;
 const state = reactive({
     proxyVisible: computed({
-        get() { return projectPageStore.projectGroupFormVisible; },
-        set(val) { projectPageStore.$patch({ projectGroupFormVisible: val }); },
+        get() { return projectPageState.projectGroupFormVisible; },
+        set(val) { projectPageStore.setProjectGroupFormVisible(val); },
     }),
-    currentGroupId: computed(() => projectPageStore.actionTargetNodeData?.id),
+    currentGroupId: computed(() => projectPageGetters.actionTargetNodeData?.id),
     projectGroupNames: [] as string[],
     projectGroupName: undefined as undefined | string,
     projectGroupNameInvalidText: computed(() => {
@@ -80,7 +82,7 @@ const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
     try {
         await projectPageStore.createProjectGroup(params);
         await store.dispatch('reference/projectGroup/load');
-        projectPageStore.$patch({ shouldUpdateProjectList: true });
+        projectPageStore.setShouldUpdateProjectList(true);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
@@ -108,15 +110,15 @@ const confirm = async () => {
 
     state.showValidation = false;
 
-    if (!projectPageStore.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
+    if (!projectPageState.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
     else await updateProjectGroup(params);
 
     state.loading = false;
-    projectPageStore.$patch({ projectGroupFormVisible: false });
+    projectPageStore.setProjectGroupFormVisible(false);
 };
 
 watch(() => state.currentGroupId, async (after) => {
-    if (after && projectPageStore.projectGroupFormUpdateMode) await getProjectGroup();
+    if (after && projectPageState.projectGroupFormUpdateMode) await getProjectGroup();
     else state.projectGroupName = undefined; // init form
 }, { immediate: true });
 
@@ -127,7 +129,7 @@ init();
 </script>
 
 <template>
-    <p-button-modal :header-title="projectPageStore.projectGroupFormUpdateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
+    <p-button-modal :header-title="projectPageState.projectGroupFormUpdateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
                     centered
                     size="sm"
                     fade

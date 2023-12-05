@@ -41,7 +41,7 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
 import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
-import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
+import ProjectUpdateModal from '@/services/project/components/ProjectUpdateModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
@@ -172,7 +172,7 @@ const openProjectEditForm = () => {
     formState.projectEditFormVisible = true;
 };
 
-const onProjectFormComplete = async (data) => {
+const handleConfirmProjectForm = (data) => {
     state.item = data || null;
 };
 
@@ -182,7 +182,7 @@ const onChangeTab = (activeTab) => {
 };
 
 const urlQueryHelper = new QueryHelper();
-const onCreateMaintenanceWindow = (maintenanceWindowId: string) => {
+const handleCreateMaintenanceWindow = (maintenanceWindowId: string) => {
     singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME;
     urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
     router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
@@ -310,16 +310,16 @@ onUnmounted(() => {
             </template>
         </p-button-modal>
 
-        <project-form-modal
+        <project-update-modal
             v-if="formState.projectEditFormVisible"
             :visible.sync="formState.projectEditFormVisible"
             :project-group-id="state.projectGroupId"
-            :project="state.item"
-            @complete="onProjectFormComplete"
+            :project-id="state.projectId"
+            @confirm="handleConfirmProjectForm"
         />
         <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
                                        :project-id="state.projectId"
-                                       @confirm="onCreateMaintenanceWindow"
+                                       @confirm="handleCreateMaintenanceWindow"
         />
     </general-page-layout>
 </template>

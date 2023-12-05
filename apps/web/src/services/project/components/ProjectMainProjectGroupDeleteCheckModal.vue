@@ -14,23 +14,24 @@ import { useProjectPageStore } from '@/services/project/stores/project-page-stor
 
 
 const projectPageStore = useProjectPageStore();
+const projectPageGetters = projectPageStore.getters;
+const projectPageState = projectPageStore.state;
 const state = reactive({
     proxyVisible: computed({
-        get() { return projectPageStore.projectGroupDeleteCheckModalVisible; },
-        set(val) { projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: val }); },
+        get() { return projectPageState.projectGroupDeleteCheckModalVisible; },
+        set(val) { projectPageStore.setProjectGroupDeleteCheckModalVisible(val); },
     }),
-    groupId: computed((() => projectPageStore.actionTargetNodeData?.id)),
+    groupId: computed((() => projectPageGetters.actionTargetNodeData?.id)),
 });
 
 const deleteProjectGroup = async () => {
     try {
         await projectPageStore.deleteProjectGroup();
-        // await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
     } finally {
-        projectPageStore.$patch({ projectGroupDeleteCheckModalVisible: false });
+        projectPageStore.setProjectGroupDeleteCheckModalVisible(false);
     }
 };
 </script>
