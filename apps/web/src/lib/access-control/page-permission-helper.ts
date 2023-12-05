@@ -32,16 +32,13 @@ export const getProperPermissionType = (permissionA: PagePermissionType = PAGE_P
 
 export const flattenMenu = (menuList: Menu[]) => menuList.flatMap((menu) => [
     { id: menu.id, needPermissionByRole: menu.needPermissionByRole },
-    ...menu.subMenuList?.map((subMenu) => ({
-        id: subMenu.id,
-        needPermissionByRole: subMenu.needPermissionByRole,
-    })) ?? [],
+    ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
 const filterMenuByPermission = (menuList: Menu[]): Menu[] => menuList.filter((menu) => menu.needPermissionByRole)
     .map((menu) => ({
         ...menu,
-        subMenulist: menu.subMenuList ? filterMenuByPermission(menu.subMenuList) : [],
+        subMenuList: menu.subMenuList ? filterMenuByPermission(menu.subMenuList) : [],
     }));
 
 
