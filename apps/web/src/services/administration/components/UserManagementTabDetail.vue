@@ -13,16 +13,20 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
+import { postValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 
-import { calculateTime, userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { calculateTime } from '@/services/administration/composables/refined-user-data';
+import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-
+import type { User } from '@/services/administration/types/user-type';
 
 interface Props {
     userId: string
@@ -56,6 +60,7 @@ const state = reactive({
             { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
             { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
             ...additionalFields,
+            { name: 'mfa', label: i18n.t('IDENTITY.USER.MAIN.MFA'), disableCopy: true },
             { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
             { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
             { name: 'role_type', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE_TYPE') },
@@ -65,7 +70,10 @@ const state = reactive({
             { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
         ];
     }),
-    data: {} as UserModel,
+    data: {} as User,
+    verifyEmailLoading: false,
+    isModalVisible: false,
+    modalType: '',
 });
 
 /* API */
@@ -84,6 +92,24 @@ const getUserDetailData = async (userId) => {
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
+    }
+};
+const handleClickVerifyButton = async (type: string) => {
+    state.verifyEmailLoading = true;
+    try {
+        if (state.data.email_verified) return;
+        await postValidationEmail({
+            user_id: state.data.user_id,
+            domain_id: state.data.domain_id,
+            email: state.data.email,
+        });
+        await store.dispatch('user/setUser', { email: state.data.email });
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.isModalVisible = true;
+        state.verifyEmailLoading = false;
+        state.modalType = type;
     }
 };
 
@@ -113,6 +139,9 @@ watch(() => userPageState.visibleUpdateModal, (value) => {
                 <p-status v-bind="userStateFormatter(data)"
                           class="capitalize"
                 />
+            </template>
+            <template #data-mfa="{data}">
+                {{ data?.state === 'ENABLED' ? 'On' : 'Off' }}
             </template>
             <template #data-user_type="{data}">
                 <span v-if="data === 'API_USER'">API Only</span>
@@ -159,13 +188,21 @@ watch(() => userPageState.visibleUpdateModal, (value) => {
             <template #extra="{label}">
                 <verify-button
                     v-if="label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && state.data.user_type !== 'API_USER'"
+                    :loading="state.verifyEmailLoading"
                     :email="state.data.email"
-                    :user-id="state.data.user_id"
-                    :domain-id="state.data.domain_id"
                     :verified="state.data.email_verified"
                     is-administration
-                    @refresh-user="getUserDetailData"
-                />
+                    @click-button="handleClickVerifyButton"
+                >
+                    <notification-email-modal
+                        :domain-id="state.data.domain_id"
+                        :user-id="state.data.user_id"
+                        :email="state.data.email"
+                        :modal-type="state.modalType"
+                        :visible.sync="state.isModalVisible"
+                        @refresh-user="getUserDetailData"
+                    />
+                </verify-button>
             </template>
         </p-definition-table>
     </div>

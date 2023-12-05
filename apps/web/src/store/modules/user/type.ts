@@ -28,6 +28,7 @@ export interface UserState {
     requiredActions?: string[];
     emailVerified?: boolean;
     isSignInLoading?: boolean;
+    mfa?: any
 }
 
 export interface SignInRequest {
@@ -51,6 +52,7 @@ export interface UpdateUserRequest {
     domain_id?: string
     verify_code?: string
     email_verified?: boolean
+    mfa?: any
 }
 
 

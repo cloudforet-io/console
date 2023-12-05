@@ -28,6 +28,26 @@
 		}
 	},
 	"AUTH": {
+		"COLLAPSED": {
+			"CLICK_HERE": "こちら",
+			"EXTENSION_CONTACT": "ドメイン管理者にお問い合わせください。",
+			"EXTENSION_DESC_1": "それでもメールが届かない場合は通知メールアドレスとユーザーIDが異なる場合があります。もし、通知メールアドレスがわからない場合は、",
+			"EXTENSION_REASON_1": "もうしばらくお待ちください。受信トレイに反映されるまで、10分以上かかる場合があります。",
+			"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
+			"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
+			"EXTENSION_TITLE_1": "メールが届かない場合は、",
+			"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？"
+		},
+		"MFA": {
+			"AUTHENTICATION_CODE": "",
+			"AUTHENTICATION_CODE_LOWER": "",
+			"CONFIRM": "確認",
+			"EMAIL_INFO": "",
+			"ENTER_CODE": "",
+			"GO_BACK": "",
+			"SUB_TITLE": "",
+			"TITLE": ""
+		},
 		"PASSWORD": {
 			"FIND": {
 				"BACK_TO_SIGN_IN": "ログインする",
@@ -56,17 +76,9 @@
 				"DONE": "パスワードのリセットが完了しました!",
 				"EMAIL": {
 					"DONE": {
-						"CLICK_HERE": "こちら",
 						"COLLAPSED": "メールが届かない場合は、",
 						"DESC_1": "メール送信完了",
 						"DESC_2": "送信されたガイドに従ってパスワードを変更してください。",
-						"EXTENSION_CONTACT": "ドメイン管理者にお問い合わせください。",
-						"EXTENSION_DESC_1": "それでもメールが届かない場合は通知メールアドレスとユーザーIDが異なる場合があります。もし、通知メールアドレスがわからない場合は、",
-						"EXTENSION_REASON_1": "もうしばらくお待ちください。受信トレイに反映されるまで、10分以上かかる場合があります。",
-						"EXTENSION_REASON_2": "迷惑メールボックスを含めてご確認下さい。",
-						"EXTENSION_REASON_3": "をクリックして、メールを再送信してください。",
-						"EXTENSION_TITLE_1": "メールが届かない場合は、",
-						"EXTENSION_TITLE_2": "まだメールを受け取っていないですか？",
 						"GO_BACK_TO_CONSOLE": "コンソールログイン",
 						"TITLE": "パスワードリセットメールを送信する"
 					},
@@ -962,6 +974,37 @@
 		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
+		},
+		"MFA_MODAL": {
+			"ALT": {
+				"DESC": "",
+				"DISABLED": "無効化",
+				"EMAIL_INFO": "入力されたメールに認証コードを送信してください。",
+				"TITLE": "",
+				"VERIFIED": "認証済みです"
+			},
+			"ALT_S_SENT_EMAIL": "認証コードがメールで送信されました。",
+			"CHANGE": {
+				"CANCEL": "キャンセル",
+				"CONFIRM_BTN": "",
+				"DESC": "",
+				"TITLE": "",
+				"TOOLTIP": ""
+			},
+			"COLLAPSE_DESC": "迷惑メールボックスを含めてご確認下さい。それでもメールが届かない場合は、",
+			"COLLAPSE_TITLE": "認証コードが届きませんか？",
+			"EDIT": {
+				"TITLE": ""
+			},
+			"EMAIL": "メールアドレス",
+			"INVALID_CODE": "無効なコードです。もう一度メールを確認してください。",
+			"SEND_CODE": "認証コードを送信",
+			"SEND_NEW_CODE": "再送信",
+			"SENT_DESC": "認証コードが入力したメールアドレスに送信されました:",
+			"SUCCESS": "確認コードが通知メールに送信されました。",
+			"TITLE": "",
+			"VERIFICATION_CODE": "認証コード",
+			"VERIFY": "認証"
 		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}に表示されます",
@@ -1907,6 +1950,8 @@
 				"GROUP": "グループ",
 				"LANGUAGE": "言語",
 				"LAST_ACTIVITY": "最終アクセス時間",
+				"MFA": "",
+				"MFA_DESC": "",
 				"MOBILE": "連絡先",
 				"MY_ACCOUNT": "マイアカウント",
 				"NAME": "名前",
@@ -2733,6 +2778,15 @@
 		}
 	},
 	"MY_PAGE": {
+		"MFA": {
+			"BTN_CHANGE": "変更",
+			"BTN_SEND_MAIL": "認証コード送信",
+			"ENABLE_MFA": "",
+			"STATE_NOT_VERIFIED": "認証されていません",
+			"STATE_VERIFIED": "認証済みです",
+			"TITLE": "",
+			"TYPE": ""
+		},
 		"NOTIFICATION": {
 			"ADD_CHANNEL": "通知チャンネル追加"
 		}

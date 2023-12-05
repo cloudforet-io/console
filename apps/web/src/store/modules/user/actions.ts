@@ -34,6 +34,7 @@ const getUserInfo = async (userId: string, domainId: string): Promise<Partial<Us
         requiredActions: response.required_actions,
         // email_verified : There is data only when the value is true.
         emailVerified: !!response.email_verified,
+        mfa: response.mfa,
     };
 };
 
@@ -94,6 +95,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
         domain_id: domainId,
         auth_type: signInRequest.authType,
         credentials: signInRequest.credentials,
+        verify_code: signInRequest.verify_code,
     }, { skipAuthRefresh: true });
 
     SpaceConnector.setToken(response.access_token, response.refresh_token);
@@ -130,6 +132,7 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
         language: userRequest.language || state.language,
         timezone: userRequest.timezone || state.timezone,
         emailVerified: userRequest.email_verified !== undefined ? userRequest.email_verified : state.emailVerified,
+        mfa: userRequest.mfa || state.mfa,
     });
 
     commit('setUser', { ...state, ...convertRequestType() });

@@ -2,6 +2,7 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { languages } from '@/store/modules/user/config';
 
+// eslint-disable-next-line import/no-cycle
 import * as actions from './actions';
 import * as getters from './getters';
 import * as mutations from './mutations';
@@ -31,6 +32,7 @@ const state: UserState = {
     requiredActions: storedUserState.requiredActions,
     emailVerified: storedUserState.emailVerified,
     isSignInLoading: false,
+    mfa: storedUserState.mfa,
 };
 
 export default {

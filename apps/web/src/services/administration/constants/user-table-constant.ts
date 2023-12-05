@@ -39,6 +39,16 @@ export const pluginStateColor = {
         textColor: styles.gray[400],
     },
 } as const;
+export const USER_MFA_COLOR = {
+    ON: {
+        iconColor: styles.safe,
+        textColor: styles.gray[900],
+    },
+    OFF: {
+        iconColor: styles.gray[400],
+        textColor: styles.gray[400],
+    },
+} as const;
 
 export const userSearchHandlers = {
     keyItemSets: [{

@@ -3,6 +3,7 @@
 </template>
 
 <script lang="ts">
+import type Vue from 'vue';
 import {
     defineComponent, getCurrentInstance, onMounted,
 } from 'vue';
@@ -17,7 +18,7 @@ import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-rout
 
 
 export default defineComponent({
-    name: 'KB_SSOPage',
+    name: 'KBSSOPage',
     components: {
     },
     props: {

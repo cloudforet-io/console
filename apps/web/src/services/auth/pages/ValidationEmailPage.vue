@@ -74,7 +74,10 @@
                     >
                         {{ $t('AUTH.PASSWORD.RESET.EMAIL.DONE.COLLAPSED') }}
                     </p-collapsible-toggle>
-                    <validation-email-collapsible-contents v-else />
+                    <collapsible-contents v-else
+                                          :loading="state.loading"
+                                          @click-resend="handleClickResend"
+                    />
                 </div>
             </div>
             <div v-else
@@ -95,26 +98,49 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, reactive, watch } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { computed, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PButton, PCollapsibleToggle, PI, PIconButton,
 } from '@spaceone/design-system';
 
-import ValidationEmailCollapsibleContents from '@/services/auth/components/ValidationEmailCollapsibleContents.vue';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { SpaceRouter } from '@/router';
+import { store } from '@/store';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import CollapsibleContents from '@/services/auth/components/CollapsibleContents.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
-const vm = getCurrentInstance()?.proxy as Vue;
-const { status, userId } = vm.$route.query;
+const route = useRoute();
+const { status, userId } = route.query;
 
 const state = reactive({
+    loading: false,
+    domainId: computed(() => store.state.domain.domainId),
     isCollapsed: true,
     status: status as string,
     userId: userId as string,
 });
 
-watch(() => vm.$route.query.status, (res) => {
+const handleClickResend = async () => {
+    state.loading = true;
+    try {
+        await SpaceConnector.clientV2.identity.user.resetPassword({ user_id: userId, domain_id: state.domainId });
+        await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'done' } }).catch(() => {});
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        await SpaceRouter.router.push({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'fail' } }).catch(() => {});
+        throw e;
+    } finally {
+        state.loading = false;
+    }
+};
+
+watch(() => route.query.status, (res) => {
     state.status = res as string;
 });
 </script>

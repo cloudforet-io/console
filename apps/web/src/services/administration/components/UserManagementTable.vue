@@ -324,6 +324,11 @@ const updateUser = async (item, roleId) => {
                           class="capitalize"
                 />
             </template>
+            <template #col-mfa-format="{value}">
+                <p-status v-bind="userMfaFormatter(value)"
+                          class="capitalize"
+                />
+            </template>
             <template #col-last_accessed_at-format="{ value }">
                 <span v-if="value === -1">
                     No Activity

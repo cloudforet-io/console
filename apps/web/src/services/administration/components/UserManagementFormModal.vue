@@ -12,11 +12,15 @@ import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
 
 import config from '@/lib/config';
+import { postDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserManagementFormAdminRole from '@/services/administration/components/UserManagementFormAdminRole.vue';
 import UserManagementFormInfoForm from '@/services/administration/components/UserManagementFormInfoForm.vue';
+import UserManagementFormMultiFactorAuth
+    from '@/services/administration/components/UserManagementFormMultiFactorAuth.vue';
 import UserManagementFormNotificationEmailForm
     from '@/services/administration/components/UserManagementFormNotificationEmailForm.vue';
 import UserManagementFormPasswordForm from '@/services/administration/components/UserManagementFormPasswordForm.vue';
@@ -61,6 +65,9 @@ const state = reactive({
     data: {} as User,
     selectedId: computed(() => props.item?.user_id),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    mfa: computed(() => store.state.user.mfa),
+    loginUserId: computed(() => store.state.user.userId),
+    isChangedToggle: false,
 });
 
 const formState = reactive({
@@ -83,6 +90,9 @@ const formState = reactive({
 const validationState = reactive({
     isUserIdValid: undefined as undefined | boolean,
 });
+
+/* Components */
+
 
 /* Components */
 const handleChangeInputs = (value) => {
@@ -151,6 +161,34 @@ const confirm = async () => {
     }
     if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
         data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
+    }
+
+    if (state.isChangedToggle) {
+        userPageStore.$patch({
+            modalLoading: true,
+        });
+        try {
+            await postDisableMfa({
+                user_id: state.data.user_id,
+                domain_id: state.data.domain_id,
+                force: true,
+            });
+            if (state.loginUserId === state.data.user_id) {
+                await store.dispatch('user/setUser', {
+                    mfa: {
+                        ...state.data?.mfa,
+                        state: 'DISABLED',
+                    },
+                });
+            }
+        } catch (e: any) {
+            showErrorMessage(e.message, e);
+            ErrorHandler.handleError(e);
+        } finally {
+            userPageStore.$patch({
+                modalLoading: false,
+            });
+        }
     }
 
     if (formState.domainRole !== undefined) {
@@ -246,6 +284,9 @@ const initAuthTypeList = async () => {
                         :item="state.data"
                         @change-input="handleChangeInputs"
                         @change-verify="handleChangeVerify"
+                    />
+                    <user-management-form-multi-factor-auth :state="state.data.mfa?.state"
+                                                            :is-changed-toggle.sync="state.isChangedToggle"
                     />
                     <user-management-form-password-form
                         v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL && state.data.user_type !== USER_TYPE.API_USER"

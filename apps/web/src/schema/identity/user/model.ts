@@ -2,7 +2,6 @@ import type { Tags, TimeStamp } from '@/schema/_common/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { AuthType, UserState, UserType } from '@/schema/identity/user/type';
 
-
 export interface UserModel {
     user_id: string;
     name: string;
