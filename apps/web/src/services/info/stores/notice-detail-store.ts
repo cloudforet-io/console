@@ -4,8 +4,10 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { PostCreateParameters } from '@/schema/board/post/api-verbs/create';
 import type { PostDeleteParameters } from '@/schema/board/post/api-verbs/delete';
 import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
+import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import type { PostModel } from '@/schema/board/post/model';
 
 import { getNoticeBoardId } from '@/lib/helper/notice-helper';
@@ -44,6 +46,13 @@ export const useNoticeDetailStore = defineStore('notice-detail', () => {
                 board_id: state.boardId,
             });
             state.post = undefined;
+        },
+        updateNoticePost: async (params: PostUpdateParameters) => {
+            const post = await SpaceConnector.clientV2.board.post.update<PostUpdateParameters, PostModel>(params);
+            state.post = post;
+        },
+        createNoticePost: async (params: PostCreateParameters) => {
+            await SpaceConnector.clientV2.board.post.create(params);
         },
         reset: () => {
             state.boardId = undefined;

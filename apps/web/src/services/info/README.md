@@ -2,6 +2,6 @@
 
 ## Components for admin mode
 
-| Name         | Admin only | Features (for admin)                                               |
-|--------------|------------|--------------------------------------------------------------------|
-| NoticeForm   | O          |                                                                    |
+| Name       | Admin only | Features (for admin)         |
+|------------|------------|------------------------------|
+| NoticeForm | O          | Create and update the notice |

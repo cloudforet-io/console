@@ -11,6 +11,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import type { PostModel } from '@/schema/board/post/model';
 import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
 import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
@@ -28,7 +29,7 @@ import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
-
+import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
 interface Props {
     boardId?: string;
@@ -47,6 +48,8 @@ const props = withDefaults(defineProps<Props>(), {
     type: 'CREATE',
     noticePostData: undefined,
 });
+
+const noticeDetailStore = useNoticeDetailStore();
 
 const state = reactive({
     hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
@@ -87,7 +90,7 @@ const {
     },
 });
 
-const formData:ComputedRef = computed(() => ({
+const formData:ComputedRef = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     board_id: state.boardIdState,
     title: noticeTitle.value,
     writer: writerName.value,
@@ -108,10 +111,11 @@ const handleConfirm = () => {
 
 const handleCreateNotice = async () => {
     try {
-        await SpaceConnector.clientV2.board.post.create({
+        const params = {
             ...formData.value,
             domain_id: state.isAllDomainSelected ? null : state.selectedDomain[0].name,
-        });
+        };
+        await noticeDetailStore.createNoticePost(params);
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
         await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
     } catch (e) {
@@ -120,18 +124,17 @@ const handleCreateNotice = async () => {
 };
 const handleEditNotice = async () => {
     try {
-        await SpaceConnector.clientV2.board.post.update(
-            state.isAllDomainSelected
-                ? {
-                    ...formData.value,
-                    post_id: state.postId,
-                }
-                : {
-                    ...formData.value,
-                    domain_id: state.selectedDomain[0].name,
-                    post_id: state.postId,
-                },
-        );
+        const params = state.isAllDomainSelected
+            ? {
+                ...formData.value,
+                post_id: state.postId,
+            }
+            : {
+                ...formData.value,
+                domain_id: state.selectedDomain[0].name,
+                post_id: state.postId,
+            };
+        await noticeDetailStore.updateNoticePost(params);
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
         await SpaceRouter.router.back();
     } catch (e) {
