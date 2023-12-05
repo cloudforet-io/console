@@ -1,47 +1,6 @@
-<template>
-    <div class="gnb-noti-item">
-        <p v-if="dateHeader"
-           class="date-header"
-        >
-            {{ dateHeader }}
-        </p>
-        <div class="item-wrapper"
-             @click="handleClickItem"
-        >
-            <span class="new-icon"
-                  :class="{ invisible: isRead }"
-            />
-            <div class="contents-wrapper">
-                <p class="title">
-                    <p-i v-if="icon"
-                         :name="icon"
-                         :color="iconColor"
-                         width="1rem"
-                         height="1rem"
-                         class="mr-1"
-                    />
-                    <span>{{ title }}</span>
-                </p>
-                <div class="additional-text">
-                    {{ occurred }} <span v-if="writer">· {{ writer }}</span>
-                </div>
-            </div>
-            <p-icon-button v-if="deletable"
-                           class="delete-button"
-                           name="ic_close"
-                           size="sm"
-                           @click="handleClickDeleteButton"
-            />
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
+<script setup lang="ts">
 import {
-    computed,
-    defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
@@ -63,83 +22,82 @@ interface Props {
     dateHeader?: TranslateResult | string;
     icon?: string;
     writer?: string;
-    deletable: boolean;
+    deletable?: boolean;
 }
 
-export default defineComponent<Props>({
-    name: 'GNBNotiItem',
-    components: {
-        PI,
-        PIconButton,
-    },
-    props: {
-        isRead: {
-            type: Boolean,
-            default: false,
-        },
-        title: {
-            type: String,
-            default: '',
-        },
-        createdAt: {
-            type: String,
-            default: '',
-        },
-        dateHeader: {
-            type: String,
-            default: undefined,
-        },
-        icon: {
-            type: String,
-            default: undefined,
-        },
-        writer: {
-            type: String,
-            default: undefined,
-        },
-        deletable: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            occurred: computed(() => {
-                if (!props.createdAt) return '';
-                return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');
-            }),
-            iconColor: computed(() => {
-                if (props.icon === NOTIFICATION_TYPE_ICONS.SUCCESS) {
-                    return green[500];
-                }
-                if (props.icon === NOTIFICATION_TYPE_ICONS.ERROR) {
-                    return red[400];
-                }
-                if (props.icon === NOTIFICATION_TYPE_ICONS.WARNING) {
-                    return yellow[500];
-                }
-                return undefined;
-            }),
-        });
+const props = defineProps<Props>();
+const emit = defineEmits<{(event: 'select'): void;
+    (event: 'delete'): void;
+}>();
 
-        /* Event */
-        const handleClickItem = () => {
-            emit('select');
-        };
-        const handleClickDeleteButton = (event) => {
-            event.stopPropagation();
-            emit('delete');
-        };
-
-        return {
-            ...toRefs(state),
-            handleClickItem,
-            handleClickDeleteButton,
-        };
-    },
+const state = reactive({
+    timezone: computed<string>(() => store.state.user.timezone),
+    occurred: computed<string>(() => {
+        if (!props.createdAt) return '';
+        return dayjs.tz(dayjs.utc(props.createdAt), state.timezone).format('YYYY-MM-DD HH:mm');
+    }),
+    iconColor: computed<string|undefined>(() => {
+        if (props.icon === NOTIFICATION_TYPE_ICONS.SUCCESS) {
+            return green[500];
+        }
+        if (props.icon === NOTIFICATION_TYPE_ICONS.ERROR) {
+            return red[400];
+        }
+        if (props.icon === NOTIFICATION_TYPE_ICONS.WARNING) {
+            return yellow[500];
+        }
+        return undefined;
+    }),
 });
+
+/* Event */
+const handleClickItem = () => {
+    emit('select');
+};
+const handleClickDeleteButton = (event) => {
+    event.stopPropagation();
+    emit('delete');
+};
+
 </script>
+
+<template>
+    <div class="gnb-noti-item">
+        <p v-if="props.dateHeader"
+           class="date-header"
+        >
+            {{ props.dateHeader }}
+        </p>
+        <div class="item-wrapper"
+             @click="handleClickItem"
+        >
+            <span class="new-icon"
+                  :class="{ invisible: props.isRead }"
+            />
+            <div class="contents-wrapper">
+                <p class="title">
+                    <p-i v-if="props.icon"
+                         :name="props.icon"
+                         :color="state.iconColor"
+                         width="1rem"
+                         height="1rem"
+                         class="mr-1"
+                    />
+                    <span>{{ props.title }}</span>
+                </p>
+                <div class="additional-text">
+                    {{ state.occurred }} <span v-if="props.writer">· {{ props.writer }}</span>
+                </div>
+            </div>
+            <p-icon-button v-if="props.deletable"
+                           class="delete-button"
+                           name="ic_close"
+                           size="sm"
+                           @click="handleClickDeleteButton"
+            />
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .gnb-noti-item {

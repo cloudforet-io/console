@@ -1,13 +1,134 @@
+<script setup lang="ts">
+import {
+    computed, reactive,
+} from 'vue';
+
+import {
+    PDataLoader, PI, PDivider, PEmpty,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import { SpaceRouter } from '@/router';
+import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
+import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
+import type { PostModel } from '@/schema/board/post/model';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { useNoticeStore } from '@/store/notice';
+
+import { getNoticeBoardId } from '@/lib/helper/notice-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
+
+import { INFO_ROUTE } from '@/services/info/routes/route-constant';
+
+interface NoticeItem {
+    postId: string;
+    createdAt: string;
+    title: string;
+    writer: string;
+    isPinned: boolean;
+}
+
+const NOTICE_ITEM_LIMIT = 15;
+
+const emit = defineEmits<{(event: 'close'): void;
+}>();
+
+const state = reactive({
+    loading: true,
+    timezone: computed<string>(() => store.state.user.timezone),
+    boardId: undefined as undefined | string,
+    noticeItemsRef: null as HTMLElement|null,
+    noticeData: [] as PostModel[],
+    items: computed<NoticeItem[]>(() => {
+        const filteredData = state.noticeData.filter((d) => !d.options.is_pinned);
+        return convertNoticeItem(filteredData);
+    }),
+    pinnedItems: computed<NoticeItem[]>(() => {
+        const filteredData = state.noticeData.filter((d) => d.options.is_pinned);
+        return convertNoticeItem(filteredData);
+    }),
+    domainName: computed<string>(() => store.state.domain.name),
+});
+
+/* Util */
+const convertNoticeItem = (rawData: PostModel[]): NoticeItem[] => rawData.map((d) => ({
+    postId: d.post_id,
+    createdAt: d.created_at,
+    title: d.title,
+    writer: d.writer,
+    isPinned: d.options.is_pinned,
+}));
+
+const noticeStore = useNoticeStore();
+const noticeGetters = noticeStore.getters;
+
+/* Api */
+const noticeApiHelper = new ApiQueryHelper()
+    .setPage(1, NOTICE_ITEM_LIMIT)
+    .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+if (state.domainName === 'root') {
+    noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
+}
+const listNotice = async () => {
+    try {
+        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
+            board_id: state.boardId,
+            query: noticeApiHelper.data,
+            domain_id: null,
+        });
+        state.proxyCount = total_count ?? 0;
+        state.noticeData = results ?? [];
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+        state.proxyCount = 0;
+        state.noticeData = [];
+    }
+};
+
+/* Event */
+const handleSelectNotice = (postId: string) => {
+    emit('close');
+    SpaceRouter.router.push({
+        name: INFO_ROUTE.NOTICE.DETAIL._NAME,
+        params: { boardId: state.boardId, postId },
+    }).catch(() => {});
+};
+const handleClickViewAllNotice = () => {
+    emit('close');
+    SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME }).catch(() => {});
+};
+
+/* Init */
+const init = async () => {
+    state.loading = true;
+    state.boardId = await getNoticeBoardId();
+    if (state.boardId) {
+        await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
+    }
+    state.loading = false;
+};
+(async () => {
+    await init();
+})();
+
+</script>
+
 <template>
     <div class="gnb-notice-tab">
-        <p-data-loader :data="items"
-                       :loading="loading"
-                       :class="{ loading: loading && !items.length }"
+        <p-data-loader :data="state.items"
+                       :loading="state.loading"
+                       :class="{ loading: state.loading && !state.items.length }"
         >
             <div ref="noticeItemsRef"
                  class="content-wrapper"
             >
-                <template v-if="!!pinnedItems.length">
+                <template v-if="!!state.pinnedItems.length">
                     <div class="pinned-header-wrapper">
                         <p-i name="ic_pin-filled"
                              width="1rem"
@@ -16,7 +137,7 @@
                         />
                         <span class="label">{{ $t('COMMON.GNB.NOTICE.PINNED_NOTICE') }}</span>
                     </div>
-                    <g-n-b-noti-item v-for="(item, idx) in pinnedItems"
+                    <g-n-b-noti-item v-for="(item, idx) in state.pinnedItems"
                                      :key="`${item.postId}-${idx}`"
                                      :title="item.title"
                                      :created-at="item.createdAt"
@@ -58,156 +179,6 @@
         </p-data-loader>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PDataLoader, PI, PDivider, PEmpty,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { SpaceRouter } from '@/router';
-import type { TimeStamp } from '@/schema/_common/model';
-import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
-import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
-import type { PostModel } from '@/schema/board/post/model';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { useNoticeStore } from '@/store/notice';
-
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
-
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import { INFO_ROUTE } from '@/services/info/routes/route-constant';
-
-
-
-
-interface NoticeItem {
-    postId: string;
-    createdAt: TimeStamp;
-    title: string;
-    writer: string;
-    isPinned: boolean;
-}
-
-const NOTICE_ITEM_LIMIT = 15;
-
-export default {
-    name: 'GNBNoticeTab',
-    components: {
-        GNBNotiItem,
-        PDataLoader,
-        PI,
-        PDivider,
-        PEmpty,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            loading: true,
-            timezone: computed(() => store.state.user.timezone),
-            boardId: undefined as undefined | string,
-            noticeItemsRef: null as HTMLElement|null,
-            noticeData: [] as PostModel[],
-            items: computed<NoticeItem[]>(() => {
-                const filteredData = state.noticeData.filter((d) => !d.options.is_pinned);
-                return convertNoticeItem(filteredData);
-            }),
-            pinnedItems: computed<NoticeItem[]>(() => {
-                const filteredData = state.noticeData.filter((d) => d.options.is_pinned);
-                return convertNoticeItem(filteredData);
-            }),
-            domainName: computed(() => store.state.domain.name),
-        });
-
-        /* Util */
-        const convertNoticeItem = (rawData: PostModel[]): NoticeItem[] => rawData.map((d) => ({
-            postId: d.post_id,
-            createdAt: d.created_at,
-            title: d.title,
-            writer: d.writer,
-            isPinned: d.options.is_pinned,
-        }));
-
-        const noticeStore = useNoticeStore();
-        const noticeGetters = noticeStore.getters;
-
-        /* Api */
-        const noticeApiHelper = new ApiQueryHelper()
-            .setPage(1, NOTICE_ITEM_LIMIT)
-            .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
-        if (state.domainName === 'root') {
-            noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
-        }
-        const listNotice = async () => {
-            try {
-                const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-                    board_id: state.boardId,
-                    query: noticeApiHelper.data,
-                    domain_id: null,
-                });
-                state.proxyCount = total_count ?? 0;
-                state.noticeData = results ?? [];
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-                state.proxyCount = 0;
-                state.noticeData = [];
-            }
-        };
-
-        /* Event */
-        const handleSelectNotice = (postId: string) => {
-            emit('close');
-            SpaceRouter.router.push({
-                name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-                params: { boardId: state.boardId, postId },
-            }).catch(() => {});
-        };
-        const handleClickViewAllNotice = () => {
-            emit('close');
-            SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME }).catch(() => {});
-        };
-
-        /* Init */
-        const init = async () => {
-            state.loading = true;
-            state.boardId = await getNoticeBoardId();
-            if (state.boardId) {
-                await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
-            }
-            state.loading = false;
-        };
-        (async () => {
-            await init();
-        })();
-
-        return {
-            ...toRefs(state),
-            noticeGetters,
-            ADMINISTRATION_ROUTE,
-            handleSelectNotice,
-            handleClickViewAllNotice,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .gnb-notice-tab {
