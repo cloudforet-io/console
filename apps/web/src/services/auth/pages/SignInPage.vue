@@ -23,6 +23,8 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -39,6 +41,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     nextPath: undefined,
 });
+const appContextStore = useAppContextStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -71,8 +74,10 @@ const onSignIn = async (userId:string) => {
         }
 
         const resolvedRoute = router.resolve(props.nextPath);
+        const isAdminRoute = resolvedRoute.route.matched.some((route) => route.path === '/admin');
         const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pagePermissionList']);
         if (isAccessible) {
+            if (isAdminRoute) appContextStore.switchToAdminMode();
             await router.push(resolvedRoute.location);
         } else {
             await router.push(defaultRoute);

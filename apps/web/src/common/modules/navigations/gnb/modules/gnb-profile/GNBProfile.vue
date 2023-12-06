@@ -15,6 +15,7 @@ import ejs from 'ejs';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';
@@ -33,6 +34,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
+const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
@@ -64,6 +66,7 @@ const state = reactive({
     languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
         label: v, name: k,
     }))),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const profileMenuRef = ref<HTMLElement|null>(null);
@@ -121,6 +124,7 @@ const handleClickSignOut = async () => {
         query: { nextPath: route.fullPath },
     };
     await router.push(res);
+    if (state.isAdminMode) appContextStore.switchToWorkspaceMode();
 };
 </script>
 
