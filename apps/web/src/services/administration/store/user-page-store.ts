@@ -28,11 +28,17 @@ export const useUserPageStore = defineStore('user-page', {
         selectedUser: {} as UserModel | WorkspaceUserModel,
         totalCount: 0,
         selectedIndices: [],
+        // TODO: plan to organize it after completing the modal.
         modalVisible: {
+            form: false,
+            //
             status: false,
             create: false,
+            //
             update: false,
-            remove: false,
+            delete: false,
+            enable: false,
+            disable: false,
         },
     }),
     getters: {

@@ -10,21 +10,15 @@ import {
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
 import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
@@ -35,7 +29,6 @@ import {
     USER_SEARCH_HANDLERS, USER_TABLE_FIELDS,
 } from '@/services/administration/constants/user-table-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
 
 interface Props {
     tableHeight: number;
@@ -80,13 +73,8 @@ const modalState = reactive({
     themeColor: undefined as string | undefined,
     visible: computed(() => userPageState.modalVisible.status),
 });
-const userFormState = reactive({
-    visible: computed(() => userPageState.modalVisible.create || userPageState.modalVisible.update),
-    updateMode: false,
-    headerTitle: '',
-    item: undefined as undefined | User,
-    roleOfSelectedUser: '',
-});
+
+let userListApiQuery = userListApiQueryHelper.data;
 
 /* Component */
 const handleSelect = async (index) => {
@@ -102,99 +90,11 @@ const handleChange = async (options: any = {}) => {
         domain_id: state.domain_id,
     });
 };
-const handleUserFormConfirm = async (item, roleId) => {
-    if (userFormState.updateMode) {
-        await updateUser(item, roleId);
-    } else {
-        await addUser(item, roleId);
-    }
-    await userPageStore.listUsers({
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    });
-};
 const handleUserStatusModalConfirm = () => {
     userPageStore.listUsers({
         query: userListApiQuery,
         domain_id: state.domain_id,
     });
-};
-
-/* API */
-let userListApiQuery = userListApiQueryHelper.data;
-const addUser = async (item, roleId) => {
-    userPageStore.$patch({
-        modalLoading: true,
-    });
-    try {
-        await SpaceConnector.clientV2.identity.user.create<UserCreateParameters>({
-            ...item,
-        });
-        showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '');
-        if (roleId.length > 0 || roleId !== '') {
-            await userPageStore.createRoleBinding({
-                user_id: item.user_id,
-                role_id: roleId,
-                // TODO: will be changed after permission group is implemented
-                permission_group: 'DOMAIN',
-                domain_id: state.domain_id,
-            });
-        }
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
-    } finally {
-        userPageStore.$patch((_state) => {
-            _state.selectedIndices = [];
-            _state.modalVisible.create = false;
-            _state.modalLoading = false;
-        });
-    }
-};
-const updateUser = async (item, roleId) => {
-    userPageStore.$patch({
-        modalLoading: true,
-    });
-    try {
-        await SpaceConnector.clientV2.identity.user.update({
-            ...item,
-        });
-        if (roleId && roleId !== userFormState.roleOfSelectedUser) {
-            await userPageStore.createRoleBinding({
-                user_id: item.user_id,
-                role_id: roleId,
-                // TODO: will be changed after permission group is implemented
-                permission_group: 'DOMAIN',
-                domain_id: state.domain_id,
-            });
-            userFormState.roleOfSelectedUser = roleId;
-        }
-        if (!roleId && userFormState.roleOfSelectedUser !== '') {
-            await userPageStore.listRoleBindings({
-                user_id: item.user_id,
-                domain_id: state.domain_id,
-            });
-            userFormState.roleOfSelectedUser = roleId;
-        }
-        showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '');
-    } catch (e: any) {
-        if (e.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH') {
-            showErrorMessage(e.message, '');
-        } else if (e.code === 'ERROR_PASSWORD_NOT_CHANGED') {
-            ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_SAME_PASSWORD'));
-        } else {
-            ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'));
-        }
-    } finally {
-        await userPageStore.listUsers({
-            query: userListApiQuery,
-            domain_id: state.domain_id,
-        });
-        userPageStore.$patch((_state) => {
-            _state.selectedIndices = [];
-            _state.modalVisible.update = false;
-            _state.modalLoading = false;
-        });
-    }
 };
 
 /* Watcher */
@@ -293,11 +193,6 @@ watch(() => state.isAdminMode, async (isAdminMode) => {
                                       :theme-color="modalState.themeColor"
                                       :mode="modalState.mode"
                                       @confirm="handleUserStatusModalConfirm()"
-        />
-        <user-management-form-modal v-if="userPageState.modalVisible.create || userPageState.modalVisible.update"
-                                    :header-title="userFormState.headerTitle"
-                                    :item="userFormState.item"
-                                    @confirm="handleUserFormConfirm"
         />
     </section>
 </template>
