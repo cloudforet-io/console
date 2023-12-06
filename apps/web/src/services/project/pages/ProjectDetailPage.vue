@@ -235,18 +235,20 @@ onUnmounted(() => {
                                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
                             </span>
-                            <p-icon-button name="ic_settings"
-                                           class="edit-btn"
-                                           size="md"
-                                           :disabled="!state.hasManagePermission"
-                                           @click="projectPageStore.openProjectFormModal()"
-                            />
-                            <p-icon-button name="ic_delete"
-                                           class="delete-btn"
-                                           size="md"
-                                           :disabled="!state.hasManagePermission"
-                                           @click="openProjectDeleteForm"
-                            />
+                            <template v-if="projectPageState.hasManagePermission">
+                                <p-icon-button name="ic_settings"
+                                               class="edit-btn"
+                                               size="md"
+                                               :disabled="!state.hasManagePermission"
+                                               @click="projectPageStore.openProjectFormModal()"
+                                />
+                                <p-icon-button name="ic_delete"
+                                               class="delete-btn"
+                                               size="md"
+                                               :disabled="!state.hasManagePermission"
+                                               @click="openProjectDeleteForm"
+                                />
+                            </template>
                         </div>
                         <div class="top-right-group">
                             <p class="copy-project-id">
@@ -256,7 +258,7 @@ onUnmounted(() => {
                                                :value="state.projectId"
                                 />
                             </p>
-                            <p-button v-if="state.hasAlertPermission"
+                            <p-button v-if="state.hasAlertPermission && singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME"
                                       style-type="tertiary"
                                       icon-left="ic_spanner-filled"
                                       class="ml-3"
