@@ -221,7 +221,6 @@ watch(() => props.serviceAccountId, (serviceAccountId) => {
                                                      :loading="props.serviceAccountLoading || state.loading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
-                                                   edit-mode="UPDATE"
                                                    :schema="state.baseInformationSchema.schema"
                                                    :is-valid.sync="state.isFormValid"
                                                    :origin-form="state.originBaseInformationForm"
