@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PPaneLayout,
@@ -15,6 +15,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -36,6 +37,7 @@ const state = reactive({
     items: [] as any,
     sortBy: 'name',
     sortDesc: true,
+    domainId: computed(() => store.state.domain.domainId), // TODO: remove this after backend is ready
 });
 const fields = [
     { name: 'name', label: 'Name', sortable: true },
@@ -47,8 +49,9 @@ const getAttachedGeneralAccountList = async () => {
     state.loading = true;
     try {
         const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-            trusted_account_id: props.serviceAccountId,
-            query: apiQueryHelper.setSort(state.sortBy, state.sortDesc).data,
+            query: apiQueryHelper.setSort(state.sortBy, state.sortDesc).setFilters([
+                { k: 'trusted_account_id', v: props.serviceAccountId, o: '=' }]).data,
+            domain_id: state.domainId,
         });
         state.items = results;
         if (results) emit('update:attached-general-accounts', results);
