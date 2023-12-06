@@ -15,8 +15,9 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ProviderGetParameters } from '@/schema/identity/provider/api-verbs/get';
-import type { ProviderModel } from '@/schema/identity/provider/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
+import type { SchemaModel } from '@/schema/identity/schema/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
@@ -25,20 +26,17 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type {
-    ActiveDataType, CredentialForm, PageMode,
-} from '@/services/asset-inventory/types/service-account-page-type';
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+import type { ActiveDataType, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
 
 interface Props {
-    editMode: PageMode;
     serviceAccountType: AccountType;
     provider?: string;
     isValid: boolean;
-    originForm: Partial<CredentialForm>;
+    originForm?: Partial<CredentialForm>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    editMode: 'CREATE',
     serviceAccountType: 'GENERAL',
     provider: undefined,
     isValid: false,
@@ -49,12 +47,19 @@ const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;
     (e: 'change', formData: CredentialForm): void;
 }>();
 
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+
 const storeState = reactive({
     language: computed(() => store.state.user.language),
+    currentProviderSchemaList: computed<SchemaModel[]>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList),
+    trustingSecretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustingSecretSchema),
+    trustedAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.trustedAccountSchema),
+    generalAccountSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.generalAccountSchema),
+    secretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.secretSchema),
+    providerName: computed(() => serviceAccountSchemaStore.getters.currentProviderData?.name ?? ''),
 });
 const state = reactive({
-    providerData: {} as ProviderModel,
-    showTrustedAccount: computed<boolean>(() => state.providerData?.capability?.support_trusted_service_account ?? false),
+    showTrustedAccount: computed<boolean>(() => !!storeState.trustingSecretSchema),
     trustedAccounts: [] as ServiceAccountModel[],
     trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
         name: d.service_account_id,
@@ -71,26 +76,18 @@ const state = reactive({
             value: selectedTrustedAccount.data[k],
         }));
     }),
-    secretTypes: computed<string[]>(() => {
-        if (props.serviceAccountType === 'GENERAL') {
-            if (formState.attachTrustedAccount) {
-                return state.providerData?.capability?.general_service_account_schema ?? [];
-            }
-            return state.providerData?.capability?.supported_schema ?? [];
-        }
-        return state.providerData?.capability?.trusted_service_account_schema ?? [];
-    }),
-    credentialSchema: {} as JsonSchema,
+    secretTypes: [] as SchemaModel[],
+    credentialSchema: computed<JsonSchema>(() => formState.selectedSecretType?.schema ?? null),
     trustedAccountInfoLink: computed<string>(() => {
         const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
         return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
     }),
-    baseInformationSchema: computed<JsonSchema>(() => state.providerData.template?.service_account?.schema ?? null),
+    baseInformationSchema: computed<JsonSchema>(() => storeState.generalAccountSchema?.schema ?? null),
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 const formState = reactive({
     hasCredentialKey: true,
-    selectedSecretType: '',
+    selectedSecretType: {} as SchemaModel,
     customSchemaForm: {},
     credentialJson: '{}',
     attachTrustedAccount: false,
@@ -150,33 +147,6 @@ const checkJsonStringAvailable = (str: string): boolean => {
 };
 
 /* Api */
-const getProviderData = async (provider: string) => {
-    try {
-        const result = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-            provider,
-            workspace_id: undefined,
-        });
-        state.providerData = result;
-        const supportedSchema = result?.capability?.supported_schema;
-        formState.selectedSecretType = supportedSchema ? supportedSchema[0] : '';
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.providerData = {};
-    }
-};
-const getCredentialSchema = async (selectedSecretType: string) => {
-    try {
-        const res = await SpaceConnector.client.repository.schema.get({
-            name: selectedSecretType,
-            only: ['schema'],
-        });
-        return res.schema;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return {};
-    }
-};
 const apiQueryHelper = new ApiQueryHelper();
 const listTrustAccounts = async () => {
     try {
@@ -245,17 +215,9 @@ onMounted(async () => {
 });
 
 /* Watcher */
-watch(() => props.provider, (provider) => {
-    if (provider) getProviderData(provider);
-}, { immediate: true });
 watch(() => state.secretTypes, (secretTypes) => {
     if (secretTypes.length) formState.selectedSecretType = secretTypes[0];
-});
-watch(() => formState.selectedSecretType, async (selectedSecretType) => {
-    if (selectedSecretType) {
-        state.credentialSchema = await getCredentialSchema(selectedSecretType);
-    }
-});
+}, { immediate: true });
 watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
     getTrustedAccountCredentialData(attachedTrustedAccountId);
 });
@@ -268,13 +230,39 @@ watch(() => formState.formData, (formData) => {
 watch(() => formState.isAllValid, (isAllValid) => {
     emit('update:isValid', isAllValid);
 });
+const schemaApiQueryHelper = new ApiQueryHelper();
+const getSecretSchema = async (isTrustingSchema:boolean) => {
+    const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
+    const trustedAccountRelatedSchemas = storeState.trustedAccountSchema?.related_schemas ?? [];
+    const generalAccountRelatedSchemas = storeState.generalAccountSchema?.related_schemas ?? [];
+    schemaApiQueryHelper.setFilters([
+        { k: 'schema_type', v: isTrustingSchema ? 'TRUSTING_SECRET' : 'SECRET', o: '=' },
+        { k: 'schema_id', v: isTrustedAccount ? trustedAccountRelatedSchemas : generalAccountRelatedSchemas, o: '=' },
+    ]);
+    try {
+        const result = await SpaceConnector.clientV2.identity.schema.list<SchemaListParameters, ListResponse<SchemaModel>>({
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+            query: schemaApiQueryHelper.data,
+            workspace_id: undefined,
+        });
+        state.secretTypes = result.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.secretTypes = [];
+    }
+};
+
+watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
+    getSecretSchema(attachTrustedAccount);
+}, { immediate: true });
+
 
 </script>
 
 <template>
     <div class="service-account-credentials-form">
         <p-field-group v-if="props.serviceAccountType !== ACCOUNT_TYPE.TRUSTED"
-                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: state.providerData.name })"
+                       :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIAL_HELP_TEXT', { provider: storeState.providerName })"
                        required
         >
             <div class="flex">
@@ -360,7 +348,7 @@ watch(() => formState.isAllValid, (isAllValid) => {
                              class="radio-text"
                              @change="handleChangeSecretType"
                     >
-                        {{ type }}
+                        {{ type.name }}
                     </p-radio>
                 </div>
             </p-field-group>
