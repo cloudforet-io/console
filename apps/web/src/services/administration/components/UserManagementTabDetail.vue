@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PDefinitionTable, PHeading, PI, PStatus,
@@ -12,6 +13,8 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import config from '@/lib/config';
 
@@ -32,10 +35,14 @@ const props = withDefaults(defineProps<Props>(), {
     timezone: '',
 });
 
+const route = useRoute();
+
+const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     // TODO: will be removed after the backend is ready
     domain_id: computed(() => store.state.domain.domainId),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
@@ -74,10 +81,18 @@ const tableState = reactive({
 
 /* API */
 const getUserDetailData = async (userId) => {
-    await userPageStore.getUser({
-        user_id: userId || props.userId,
-        domain_id: state.domain_id,
-    });
+    if (state.isAdminMode) {
+        await userPageStore.getUser({
+            user_id: userId || props.userId,
+            domain_id: state.domain_id,
+        });
+    } else {
+        await userPageStore.getWorkspaceUser({
+            user_id: userId || props.userId,
+            workspace_id: route.params?.workspaceId || '',
+            domain_id: state.domain_id,
+        });
+    }
 };
 
 /* Watcher */

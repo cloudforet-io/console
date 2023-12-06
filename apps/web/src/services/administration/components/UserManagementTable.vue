@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -197,13 +197,18 @@ const updateUser = async (item, roleId) => {
     }
 };
 
-/* Init */
-(async () => {
-    await userPageStore.listUsers({
+/* Watcher */
+watch(() => state.isAdminMode, async (isAdminMode) => {
+    const params = {
         query: userListApiQuery,
         domain_id: state.domain_id,
-    });
-})();
+    };
+    if (isAdminMode) {
+        await userPageStore.listUsers(params);
+    } else {
+        await userPageStore.workspaceListUsers(params);
+    }
+}, { immediate: true });
 </script>
 
 <template>
