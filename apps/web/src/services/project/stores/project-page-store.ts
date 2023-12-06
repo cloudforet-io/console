@@ -6,12 +6,9 @@ import { reverse } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
 import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
-import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
@@ -41,7 +38,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         rootNode: null as ProjectTreeRoot|null,
         selectedItem: {} as ProjectGroupTreeItem,
         treeEditMode: false as boolean,
-        permissionInfo: {} as Record<string, boolean>,
         hasProjectGroup: undefined as boolean|undefined,
         projectCount: undefined as number|undefined,
         actionTargetItem: {} as ProjectGroupTreeItem,
@@ -56,9 +52,9 @@ export const useProjectPageStore = defineStore('project-page', () => {
             const _workspaceUser = await getWorkspaceUser(store.state.user.userId);
             return _workspaceUser;
         }),
-        hasManagePermission: computed<boolean>(() => {
+        isWorkspaceOwner: computed<boolean>(() => {
             if (!state.workspaceUser) return false;
-            return state.workspaceUser.role_type === 'DOMAIN_ADMIN' || state.workspaceUser.role_type === 'WORKSPACE_OWNER';
+            return state.workspaceUser.role_type === 'WORKSPACE_OWNER';
         }),
     });
 
@@ -159,76 +155,12 @@ export const useProjectPageStore = defineStore('project-page', () => {
         state.actionTargetItem = target;
         state.projectFormModalVisible = true;
     };
-    const getPermissionInfo = async (ids: string[]): Promise<Record<string, boolean>> => {
-        const permissionApiQueryHelper = new ApiQueryHelper();
-
-        const permissionInfo = {};
-
-        try {
-            permissionApiQueryHelper.setOnly('project_group_id')
-                .setFilters([{ k: 'project_group_id', v: ids }]);
-
-            const { results } = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
-                query: permissionApiQueryHelper.data,
-            });
-
-            results?.forEach((d) => {
-                permissionInfo[d.project_group_id] = true;
-            });
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-        return permissionInfo;
-    };
-    const refreshPermissionInfo = async (ids?: string[]): Promise<void> => {
-        let refreshPermissionInfoLoading;
-        if (refreshPermissionInfoLoading) return;
-
-        const projectGroupIds = ids || Object.keys(state.permissionInfo);
-        if (!projectGroupIds.length) return;
-
-        refreshPermissionInfoLoading = true;
-
-        try {
-            const permissionInfo = await getPermissionInfo(projectGroupIds);
-
-            if (ids) pushPermissionInfo(permissionInfo);
-            else state.permissionInfo = permissionInfo;
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        } finally {
-            refreshPermissionInfoLoading = false;
-        }
-    };
-    const addPermissionInfo = async (ids: string[]): Promise<void> => {
-        let addPermissionInfoLoading;
-        if (addPermissionInfoLoading) return;
-
-        const projectGroupIds = ids.filter((id) => state.permissionInfo[id] === undefined);
-        if (!projectGroupIds.length) return;
-
-        addPermissionInfoLoading = true;
-
-        try {
-            const permissionInfo = await getPermissionInfo(projectGroupIds);
-            pushPermissionInfo(permissionInfo);
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        } finally {
-            addPermissionInfoLoading = false;
-        }
-    };
-    const pushPermissionInfo = (permissionInfo: Record<string, boolean>) => {
-        state.permissionInfo = { ...state.permissionInfo, ...permissionInfo };
-    };
     const reset = () => {
         state.isInitiated = false;
         state.searchText = undefined;
         state.rootNode = null;
         state.selectedItem = {};
         state.treeEditMode = false;
-        state.permissionInfo = {};
         state.hasProjectGroup = undefined;
         state.projectCount = undefined;
         state.actionTargetItem = {};
@@ -272,8 +204,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
                     state.rootNode.addNode(newData);
                 }
             }
-            state.permissionInfo = { ...state.permissionInfo, [res.project_group_id]: true };
-            pushPermissionInfo({ [res.project_group_id]: true });
             state.hasProjectGroup = true;
         } catch (e: any) {
             ErrorHandler.handleError(e);
@@ -343,8 +273,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
                         state.rootNode.addChildNodeByPath(getters.selectedNodePath, newData);
                     }
                 }
-
-                pushPermissionInfo({ [res.project_id]: true });
             }
             return res;
         } catch (e: any) {
@@ -401,11 +329,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         createProject,
         updateProject,
         updateProjectType,
-        refreshPermissionInfo,
-        addPermissionInfo,
         openProjectFormModal,
-        pushPermissionInfo,
-        getPermissionInfo,
     };
 
     return {

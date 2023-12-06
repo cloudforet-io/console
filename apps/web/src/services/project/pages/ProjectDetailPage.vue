@@ -26,14 +26,11 @@ import { i18n } from '@/translations';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 
-import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { MENU_ID } from '@/lib/menu/config';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
@@ -62,8 +59,6 @@ const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
 });
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-    hasAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
     loading: true,
     item: null as null|ProjectModel,
     projectId: computed(() => projectDetailPageState.projectId),
@@ -118,10 +113,10 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
         },
-        ...(state.hasAlertPermission) ? [{
+        {
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-        }] : [],
+        },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
@@ -235,17 +230,15 @@ onUnmounted(() => {
                                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
                             </span>
-                            <template v-if="projectPageState.hasManagePermission">
+                            <template v-if="projectPageState.isWorkspaceOwner">
                                 <p-icon-button name="ic_settings"
                                                class="edit-btn"
                                                size="md"
-                                               :disabled="!state.hasManagePermission"
                                                @click="projectPageStore.openProjectFormModal()"
                                 />
                                 <p-icon-button name="ic_delete"
                                                class="delete-btn"
                                                size="md"
-                                               :disabled="!state.hasManagePermission"
                                                @click="openProjectDeleteForm"
                                 />
                             </template>
@@ -258,11 +251,10 @@ onUnmounted(() => {
                                                :value="state.projectId"
                                 />
                             </p>
-                            <p-button v-if="state.hasAlertPermission && singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME"
+                            <p-button v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME"
                                       style-type="tertiary"
                                       icon-left="ic_spanner-filled"
                                       class="ml-3"
-                                      :disabled="!state.hasManagePermission"
                                       @click="state.maintenanceWindowFormVisible = true"
                             >
                                 {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}

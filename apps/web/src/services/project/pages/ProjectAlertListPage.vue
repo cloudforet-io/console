@@ -8,8 +8,6 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
 import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/types/alert-type';
@@ -30,7 +28,6 @@ const state = reactive({
     urgency: route.query.urgency ?? ALERT_URGENCY.ALL,
     assigned: route.query.assigned ?? ASSIGNED_STATE.ALL,
     filters: tagQueryHelper.filters,
-    hasManagePermission: useManagePermissionState(),
 });
 
 /* util */
@@ -83,7 +80,6 @@ onActivated(() => {
             :urgency="state.urgency"
             :assigned="state.assigned"
             :filters="state.filters"
-            :manage-disabled="!state.hasManagePermission"
             keep-alive
             @update="onUpdateTable"
             @change-list="onChangeList"

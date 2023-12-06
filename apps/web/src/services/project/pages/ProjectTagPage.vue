@@ -1,18 +1,20 @@
 <script lang="ts" setup>
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import TagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
+
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
 interface Props {
     id?: string;
 }
 const props = defineProps<Props>();
-const hasManagePermission = useManagePermissionState();
+const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
 </script>
 
 <template>
     <tags-panel :resource-id="props.id"
-                :disabled="!hasManagePermission"
+                :disabled="!projectPageState.isWorkspaceOwner"
                 resource-key="project_id"
                 resource-type="identity.Project"
                 class="tab-bg"

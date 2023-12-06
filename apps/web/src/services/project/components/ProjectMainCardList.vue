@@ -55,11 +55,9 @@ type SummaryType = typeof SUMMARY_TYPE[keyof typeof SUMMARY_TYPE];
 
 interface Props {
     parentGroups: ProjectGroupTreeNodeData[];
-    manageDisabled: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     parentGroups: () => [],
-    manageDisabled: false,
 });
 
 const projectPageStore = useProjectPageStore();

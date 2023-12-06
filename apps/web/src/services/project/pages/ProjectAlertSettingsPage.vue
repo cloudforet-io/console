@@ -14,7 +14,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { red } from '@/styles/colors';
 
@@ -47,7 +46,6 @@ const props = defineProps<Props>();
 const router = useRouter();
 
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     notificationUrgencyList: computed(() => ([
         {
             name: NOTIFICATION_URGENCY.ALL,
@@ -152,7 +150,6 @@ onActivated(() => {
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}</span>
                 <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
                                @click="onClickUpdateNotificationPolicy"
                 />
             </div>
@@ -168,7 +165,6 @@ onActivated(() => {
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}</span>
                 <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
                                @click="onClickUpdateAutoRecovery"
                 />
             </div>
@@ -183,7 +179,6 @@ onActivated(() => {
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}</span>
                 <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
                                @click="onClickEditEventRule"
                 />
             </div>
@@ -198,7 +193,7 @@ onActivated(() => {
                     <p-button class="text-button"
                               style-type="tertiary"
                               size="sm"
-                              :disabled="!state.hasManagePermission || (state.escalationPolicy.scope === SCOPE.DOMAIN)"
+                              :disabled="state.escalationPolicy.scope === SCOPE.DOMAIN"
                               @click="onClickUpdateEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
@@ -206,7 +201,6 @@ onActivated(() => {
                     <p-button class="text-button"
                               style-type="tertiary"
                               size="sm"
-                              :disabled="!state.hasManagePermission"
                               @click="onClickChangeEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}
