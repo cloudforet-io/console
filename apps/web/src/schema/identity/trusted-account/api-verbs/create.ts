@@ -4,8 +4,7 @@ export interface TrustedAccountCreateParameters {
     name: string;
     data: any;
     provider: string;
-    tags?: Tags;
     permission_group: 'DOMAIN' | 'WORKSPACE';
+    tags?: Tags;
     workspace_id?: string;
-    domain_id?: string;
 }

@@ -8,7 +8,13 @@ export interface SchemaModel {
     schema: any,
     provider: string,
     related_schemas: string[],
-    options: any,
+    options: {
+        help: {
+            en: string,
+            ko: string
+        },
+        external_link: string,
+    },
     tags: Tags,
     is_managed: boolean,
     created_at: TimeStamp,

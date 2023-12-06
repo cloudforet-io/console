@@ -18,7 +18,6 @@ export interface CredentialForm {
     credentialJson: string;
     activeDataType: ActiveDataType;
     attachedTrustedAccountId?: string;
-    attachedTrustedSecretId?: string;
 }
 
 export interface ProjectForm {

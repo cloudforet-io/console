@@ -154,6 +154,7 @@ watch(() => props.originForm, (originForm) => {
                             @validate="handleAccountValidate"
         />
         <p-field-group v-if="props.accountType === ACCOUNT_TYPE.GENERAL"
+                       required
                        :label="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
                        class="account-tags"
         >

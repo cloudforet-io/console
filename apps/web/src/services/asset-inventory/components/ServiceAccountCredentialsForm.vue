@@ -96,7 +96,6 @@ const formState = reactive({
     credentialJson: '{}',
     attachTrustedAccount: false,
     attachedTrustedAccountId: undefined,
-    attachedTrustedSecretId: undefined,
     formData: computed<CredentialForm>(() => ({
         hasCredentialKey: formState.hasCredentialKey,
         selectedSecretType: formState.selectedSecretType,
@@ -104,7 +103,6 @@ const formState = reactive({
         credentialJson: formState.credentialJson,
         activeDataType: tabState.activeTab as ActiveDataType,
         attachedTrustedAccountId: formState.attachedTrustedAccountId,
-        attachedTrustedSecretId: formState.attachedTrustedSecretId,
     })),
     isCustomSchemaFormValid: false,
     isAllValid: computed<boolean>(() => {
@@ -170,7 +168,6 @@ const listTrustAccounts = async () => {
 const getTrustedAccountCredentialData = (trustedAccountId: string) => {
     const trustedAccount:TrustedAccountModel|undefined = state.trustedAccounts.find((d:TrustedAccountModel) => d.trusted_account_id === trustedAccountId);
     if (!trustedAccount) return;
-    formState.attachedTrustedSecretId = trustedAccount.trusted_account_id;
     formState.credentialJson = JSON.stringify(trustedAccount.data, null, 2);
 };
 
