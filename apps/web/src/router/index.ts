@@ -5,7 +5,7 @@ import VueRouter from 'vue-router';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { ERROR_ROUTE } from '@/router/constant';
+import { ERROR_ROUTE, ROOT_ROUTE } from '@/router/constant';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -33,6 +33,7 @@ export class SpaceRouter {
             routes,
         });
 
+        const appContextStore = SpaceRouter.router.app?.$pinia.state.value['app-context-store'];
         let nextPath: string;
 
         SpaceRouter.router.onError((error) => {
@@ -51,6 +52,10 @@ export class SpaceRouter {
 
         SpaceRouter.router.onReady(() => {
             LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, '');
+            const currentPathes = SpaceRouter.router.currentRoute?.path?.split('/');
+            if (currentPathes.includes(ROOT_ROUTE.ADMIN._NAME)) {
+                appContextStore.switchToAdminMode();
+            }
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
