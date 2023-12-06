@@ -28,9 +28,12 @@ export const useUserPageStore = defineStore('user-page', {
         selectedUser: {} as UserModel | WorkspaceUserModel,
         totalCount: 0,
         selectedIndices: [],
-        visibleStatusModal: false,
-        visibleCreateModal: false,
-        visibleUpdateModal: false,
+        visibleModal: {
+            status: false,
+            create: false,
+            update: false,
+            remove: false,
+        },
     }),
     getters: {
         timezone: () => store.state.user.timezone || 'UTC',

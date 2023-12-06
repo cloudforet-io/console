@@ -115,7 +115,12 @@ const handleChangeInputs = (value) => {
     }
 };
 const handleClose = () => {
-    userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
+    userPageStore.$patch({
+        visibleModal: {
+            create: false,
+            update: false,
+        },
+    });
 };
 const setForm = () => {
     formState.userId = state.data.user_id;
@@ -149,7 +154,7 @@ const confirm = async () => {
         tags: formState.tags || {},
         password: formState.password || '',
     };
-    if (userPageState.visibleCreateModal) {
+    if (userPageState.visibleModal.create) {
         if (formState.activeTab === 'local') {
             data.backend = USER_BACKEND_TYPE.LOCAL;
         } else if (formState.activeTab === 'apiOnly') {
@@ -159,7 +164,7 @@ const confirm = async () => {
             data.backend = USER_BACKEND_TYPE.EXTERNAL;
         }
     }
-    if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
+    if (formState.activeTab === 'local' || userPageState.visibleModal.update) {
         data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
     }
 
@@ -217,7 +222,7 @@ const initAuthTypeList = async () => {
         // LOAD REFERENCE STORE
         store.dispatch('reference/user/load'),
     ]);
-    if (userPageState.visibleUpdateModal) {
+    if (userPageState.visibleModal.update) {
         await setForm();
     }
 })();
@@ -229,17 +234,17 @@ const initAuthTypeList = async () => {
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
+                    :visible="userPageState.visibleModal.update || userPageState.visibleModal.create"
                     :disabled="formState.userId === ''
                         || (formState.passwordManual && formState.password === '')
-                        || (userPageState.visibleCreateModal && !validationState.isUserIdValid)"
+                        || (userPageState.visibleModal.create && !validationState.isUserIdValid)"
                     :loading="userPageState.modalLoading"
                     @confirm="confirm"
                     @cancel="handleClose"
                     @close="handleClose"
     >
         <template #body>
-            <p-box-tab v-if="userPageState.visibleCreateModal"
+            <p-box-tab v-if="userPageState.visibleModal.create"
                        v-model="formState.activeTab"
                        :tabs="formState.tabs"
                        style-type="gray"

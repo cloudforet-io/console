@@ -45,10 +45,10 @@ const state = reactive({
             additionalItems.push({
                 name: PASSWORD_TYPE.RESET,
                 label: i18n.t('COMMON.PROFILE.SEND_LINK'),
-                disabled: userPageState.visibleUpdateModal ? !props.isValidEmail : false,
+                disabled: userPageState.visibleModal.update ? !props.isValidEmail : false,
             });
         }
-        if (userPageState.visibleUpdateModal) {
+        if (userPageState.visibleModal.update) {
             return [
                 {
                     name: PASSWORD_TYPE.KEEP,
@@ -132,12 +132,12 @@ const resetForm = () => {
 
 <template>
     <div>
-        <p-field-group :label="userPageState.visibleUpdateModal ? $t('COMMON.PROFILE.PASSWORD') : ''"
+        <p-field-group :label="userPageState.visibleModal.update ? $t('COMMON.PROFILE.PASSWORD') : ''"
                        required
                        class="password-form-wrapper"
         >
             <div class="password-form-view">
-                <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
+                <p-radio-group :direction="userPageState.visibleModal.update ? 'vertical' : 'horizontal'">
                     <p-radio v-for="(type, idx) in state.passwordTypeArr"
                              :key="type.name"
                              v-model="state.passwordStatus"
@@ -191,7 +191,7 @@ const resetForm = () => {
                 </form>
             </div>
         </p-field-group>
-        <div v-if="userPageState.visibleUpdateModal && !props.item.email_verified"
+        <div v-if="userPageState.visibleModal.update && !props.item.email_verified"
              class="help-text-wrapper"
         >
             <p-i name="ic_info-circle"

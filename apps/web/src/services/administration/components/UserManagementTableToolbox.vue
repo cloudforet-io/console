@@ -40,7 +40,7 @@ const modalState = reactive({
     title: '',
     subTitle: '',
     themeColor: undefined as string | undefined,
-    visible: computed(() => userPageState.visibleStatusModal),
+    visible: computed(() => userPageState.visibleModal.status),
 });
 
 /* Component */
@@ -54,28 +54,44 @@ const handleSelectDropdown = (name) => {
     }
 };
 const clickUpdate = () => {
-    userPageStore.$patch({ visibleUpdateModal: true });
+    userPageStore.$patch({
+        visibleModal: {
+            update: true,
+        },
+    });
 };
 const clickDelete = () => {
     modalState.mode = 'delete';
     modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
     modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'alert';
-    userPageStore.$patch({ visibleStatusModal: true });
+    userPageStore.$patch({
+        visibleModal: {
+            status: true,
+        },
+    });
 };
 const clickEnable = () => {
     modalState.mode = 'enable';
     modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
     modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'safe';
-    userPageStore.$patch({ visibleStatusModal: true });
+    userPageStore.$patch({
+        visibleModal: {
+            status: true,
+        },
+    });
 };
 const clickDisable = () => {
     modalState.mode = 'disable';
     modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
     modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'alert';
-    userPageStore.$patch({ visibleStatusModal: true });
+    userPageStore.$patch({
+        visibleModal: {
+            status: true,
+        },
+    });
 };
 
 </script>

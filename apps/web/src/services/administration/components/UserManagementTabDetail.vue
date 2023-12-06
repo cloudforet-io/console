@@ -99,7 +99,7 @@ const getUserDetailData = async (userId) => {
 watch(() => props.userId, (value) => {
     getUserDetailData(value);
 }, { immediate: true });
-watch(() => userPageState.visibleUpdateModal, (value) => {
+watch(() => userPageState.visibleModal.update, (value) => {
     if (!value) {
         getUserDetailData(props.userId);
     }

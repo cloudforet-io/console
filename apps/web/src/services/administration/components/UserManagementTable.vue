@@ -78,10 +78,10 @@ const modalState = reactive({
     title: '',
     subTitle: '',
     themeColor: undefined as string | undefined,
-    visible: computed(() => userPageState.visibleStatusModal),
+    visible: computed(() => userPageState.visibleModal.status),
 });
 const userFormState = reactive({
-    visible: computed(() => userPageState.visibleCreateModal || userPageState.visibleUpdateModal),
+    visible: computed(() => userPageState.visibleModal.create || userPageState.visibleModal.update),
     updateMode: false,
     headerTitle: '',
     item: undefined as undefined | User,
@@ -145,7 +145,9 @@ const addUser = async (item, roleId) => {
     } finally {
         userPageStore.$patch({
             selectedIndices: [],
-            visibleCreateModal: false,
+            visibleModal: {
+                create: false,
+            },
             modalLoading: false,
         });
     }
@@ -191,7 +193,9 @@ const updateUser = async (item, roleId) => {
         });
         userPageStore.$patch({
             selectedIndices: [],
-            visibleUpdateModal: false,
+            visibleModal: {
+                update: false,
+            },
             modalLoading: false,
         });
     }
@@ -294,7 +298,7 @@ watch(() => state.isAdminMode, async (isAdminMode) => {
                                       :mode="modalState.mode"
                                       @confirm="handleUserStatusModalConfirm()"
         />
-        <user-management-form-modal v-if="userPageState.visibleCreateModal || userPageState.visibleUpdateModal"
+        <user-management-form-modal v-if="userPageState.visibleModal.create || userPageState.visibleModal.update"
                                     :header-title="userFormState.headerTitle"
                                     :item="userFormState.item"
                                     @confirm="handleUserFormConfirm"

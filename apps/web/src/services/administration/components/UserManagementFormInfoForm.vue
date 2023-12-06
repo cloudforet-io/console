@@ -100,7 +100,7 @@ const handleClickCheckId = async () => {
 
 /* Init */
 (async () => {
-    if (userPageState.visibleUpdateModal) {
+    if (userPageState.visibleModal.update) {
         await setForm();
     }
 })();
@@ -108,7 +108,7 @@ const handleClickCheckId = async () => {
 watch(() => props.activeTab, (after) => {
     if (after) {
         state.selectedItems = [];
-        if (userPageState.visibleCreateModal) {
+        if (userPageState.visibleModal.create) {
             formState.userId = '';
             formState.name = '';
             validationState.proxyIsUserIdValid = undefined;
@@ -161,10 +161,10 @@ watch(() => props.activeTab, (after) => {
                                   placeholder="user@spaceone.io"
                                   :invalid="invalid"
                                   :valid="validationState.proxyIsUserIdValid"
-                                  :disabled="userPageState.visibleUpdateModal"
+                                  :disabled="userPageState.visibleModal.update"
                                   @update:value="handleChangeUserId"
                     />
-                    <p-button v-if="!userPageState.visibleUpdateModal"
+                    <p-button v-if="!userPageState.visibleModal.update"
                               style-type="secondary"
                               class="user-id-check-button"
                               @click="handleClickCheckId"

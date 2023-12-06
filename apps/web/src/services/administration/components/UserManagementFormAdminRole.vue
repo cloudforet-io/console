@@ -92,7 +92,7 @@ const getRoleList = async () => {
         // LOAD REFERENCE STORE
         store.dispatch('reference/user/load'),
     ]);
-    if (userPageState.visibleUpdateModal) {
+    if (userPageState.visibleModal.update) {
         await setForm();
     }
 })();
