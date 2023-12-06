@@ -23,7 +23,6 @@ import {
 } from '@/lib/helper/config-data-helper';
 
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -72,8 +71,6 @@ const storeState = reactive({
 });
 
 const state = reactive({
-    hasRootProjectGroupManagePermission: computed(() => state.hasManagePermission && store.getters['user/hasDomainRole']),
-    hasManagePermission: useManagePermissionState(),
     initGroupId: route.query.select_pg as string,
     favoriteItems: computed<FavoriteItem[]>(() => [
         ...convertProjectGroupConfigToReferenceData(storeState.favoriteProjectGroups, storeState.projectGroups),
@@ -199,7 +196,6 @@ onUnmounted(() => {
                     <div class="sidebar-item-wrapper">
                         <project-main-project-tree
                             :init-group-id="state.initGroupId"
-                            :manage-disabled="!state.hasManagePermission"
                         />
                     </div>
                 </div>
@@ -225,40 +221,39 @@ onUnmounted(() => {
                                                  :item-id="storeState.groupId"
                                                  :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
                                 />
-                                <p-icon-button name="ic_edit-text"
-                                               style-type="transparent"
-                                               @click="handleClickProjectGroupEditButton"
-                                />
-                                <p-icon-button name="ic_delete"
-                                               style-type="transparent"
-                                               @click="handleClickProjectGroupDeleteButton"
-                                />
-                            </div>
-                            <div class="top-button-box">
-                                <div>
-                                    <p-button v-if="state.hasRootProjectGroupManagePermission"
-                                              ref="targetRef"
-                                              icon-left="ic_plus_bold"
-                                              :disabled="!state.hasManagePermission"
-                                              @click="handleClickCreateButton"
-                                    >
-                                        {{ $t('PROJECT.LANDING.CREATE') }}
-                                    </p-button>
-                                    <p-context-menu v-show="visibleMenu"
-                                                    ref="menuRef"
-                                                    class="create-context-menu"
-                                                    :style="contextMenuStyle"
-                                                    :menu="state.createDropdownMenuItems"
-                                                    @select="handleSelectCreateMenu"
+                                <template v-if="projectPageState.hasManagePermission">
+                                    <p-icon-button name="ic_edit-text"
+                                                   style-type="transparent"
+                                                   @click="handleClickProjectGroupEditButton"
                                     />
-                                </div>
+                                    <p-icon-button name="ic_delete"
+                                                   style-type="transparent"
+                                                   @click="handleClickProjectGroupDeleteButton"
+                                    />
+                                </template>
+                            </div>
+                            <div v-if="projectPageState.hasManagePermission"
+                                 class="top-button-box"
+                            >
+                                <p-button ref="targetRef"
+                                          icon-left="ic_plus_bold"
+                                          @click="handleClickCreateButton"
+                                >
+                                    {{ $t('PROJECT.LANDING.CREATE') }}
+                                </p-button>
+                                <p-context-menu v-show="visibleMenu"
+                                                ref="menuRef"
+                                                class="create-context-menu"
+                                                :style="contextMenuStyle"
+                                                :menu="state.createDropdownMenuItems"
+                                                @select="handleSelectCreateMenu"
+                                />
                             </div>
                         </template>
                     </p-heading>
                     <project-main-card-list
                         class="card-container"
                         :parent-groups="storeState.parentGroups"
-                        :manage-disabled="!state.hasRootProjectGroupManagePermission"
                     />
 
                     <project-main-project-group-form-modal v-if="storeState.projectGroupFormVisible" />

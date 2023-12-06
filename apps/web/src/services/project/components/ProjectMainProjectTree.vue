@@ -10,6 +10,7 @@ import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectGroupChangeParentGroupParameters } from '@/schema/identity/project-group/api-verbs/change-parent-group';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
 import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';
 import { store } from '@/store';
@@ -32,7 +33,6 @@ import type {
 
 interface Props {
     initGroupId?: string;
-    manageDisabled?: boolean;
 }
 const props = defineProps<Props>();
 
@@ -40,31 +40,25 @@ const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
 const state = reactive({
-    hasRootProjectGroupManagePermission: computed(() => !props.manageDisabled && store.getters['user/hasDomainRole']),
-    hasCurrentProjectGroupManagePermission: computed(() => !props.manageDisabled && projectPageState.permissionInfo[(projectPageGetters.groupId) ?? '']),
     loading: false,
     editOptions: computed(() => ({
         disabled: !projectPageState.treeEditMode,
-        editStartValidator: (item) => (projectPageState.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
+        editStartValidator: (item) => item.data.item_type !== 'PROJECT',
         validator: (text) => (text && text.length > 2 && text.length < 40),
         setDataAfterEdit: false,
     })),
     dragOptions: computed(() => ({
         disabled: !projectPageState.treeEditMode,
-        dragValidator(node, dragNodeParent) {
-            if (!dragNodeParent) return !props.manageDisabled;
-            return !!(projectPageState.permissionInfo[node.data.id] || node.data.has_permission);
-        },
         dropValidator(node, oldParent, parent) {
             if (oldParent?.data.id === parent?.data.id) return true;
 
             if (!parent) {
                 if (node.data.item_type === 'PROJECT') return false;
-                return !props.manageDisabled;
+                return true;
             }
             if (parent.data.item_type === 'PROJECT') return false;
             if (parent.children?.some((child) => child.data.name === node.data.name)) return false;
-            return !!(projectPageState.permissionInfo[parent.data.id] || parent.data.has_permission);
+            return true;
         },
     })),
     allProjectRoot: null as any,
@@ -87,10 +81,6 @@ const dataSetter = (text, node) => {
     node.data.name = text;
 };
 const dataGetter = (node) => node.data.name;
-
-const getClassNames = ({ data }) => ({
-    'no-permission': projectPageState.treeEditMode ? !projectPageState.permissionInfo[data.id] && !data.has_permission : false,
-});
 
 const getAllCurrentItems = (): {path: number[]; node: any}[] => {
     if (!projectPageState.rootNode) return [];
@@ -121,9 +111,6 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
         if (!node.data) {
             projectPageState.hasProjectGroup = Array.isArray(items) ? !!items.length : false;
         }
-
-        projectPageStore.addPermissionInfo(items.filter((d) => d.item_type === 'PROJECT_GROUP')
-            .map((d) => d.id));
         return items;
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -134,11 +121,9 @@ const dataFetcher = async (node: any = {}, projectOnly = false): Promise<Project
 const addProjectNodes = async (items) => {
     if (!projectPageState.rootNode) return;
 
-    const permittedItems = items.filter(({ node }) => projectPageState.permissionInfo[node.data.id]);
+    const newChildren: ProjectTreeNodeData[][] = await Promise.all(items.map(({ node }) => dataFetcher(node, true)));
 
-    const newChildren: ProjectTreeNodeData[][] = await Promise.all(permittedItems.map(({ node }) => dataFetcher(node, true)));
-
-    permittedItems.forEach(({ node, path }, i) => {
+    items.forEach(({ node, path }, i) => {
         projectPageState.rootNode?.updateNodeByPath(path, { ...node.data, has_child: node.data.has_child || newChildren[i].length > 0 });
         if (!node.$folded) projectPageState.rootNode?.addChildNodeByPath(path, newChildren[i], false);
     });
@@ -173,7 +158,7 @@ watch(() => projectPageState.treeEditMode, async (treeEditMode) => {
     state.loading = false;
 });
 
-const onFinishEdit = async (node, editText: string) => {
+const handleFinishEdit = async (node, editText: string) => {
     try {
         await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
@@ -190,7 +175,7 @@ const onFinishEdit = async (node, editText: string) => {
 
 const updateProjectGroup = async (node, oldParent, parent) => {
     try {
-        await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
+        await SpaceConnector.clientV2.identity.projectGroup.changeParentGroup<ProjectGroupChangeParentGroupParameters>({
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: node.data.id,
             parent_group_id: parent?.data?.id || undefined,
@@ -222,7 +207,7 @@ const updateProject = async (node, oldParent, parent) => {
     }
 };
 
-const onDrop = async (node, oldParent, parent, rollback) => {
+const handleDrop = async (node, oldParent, parent, rollback) => {
     if (!projectPageState.rootNode) return;
     if (oldParent?.data.id === parent?.data.id) return;
     if (oldParent?.data.has_child && oldParent?.children.length === 1) {
@@ -243,11 +228,11 @@ const onDrop = async (node, oldParent, parent, rollback) => {
     }
 };
 
-const onChangeSelect = (selected) => {
+const handleChangeSelect = (selected) => {
     projectPageStore.setSelectedItem(selected[0] || {});
 };
 
-const onAllProjectChangeSelect = (selected) => {
+const handleAllProjectChangeSelect = (selected) => {
     if (selected.length > 0 && projectPageGetters.groupId && projectPageState.rootNode) {
         projectPageState.rootNode.resetSelect();
     }
@@ -263,11 +248,11 @@ watch(() => projectPageGetters.groupId, (data) => {
 });
 
 /* Init */
-const onTreeInit = (root) => {
+const handleTreeInit = (root) => {
     projectPageStore.setRootNode(root);
 };
 
-const onAllProjectTreeInit = (root) => {
+const handleAllProjectTreeInit = (root) => {
     state.allProjectRoot = root;
 };
 
@@ -297,7 +282,9 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
     <fragment>
         <sidebar-title :title="$t('PROJECT.LANDING.PROJECT_GROUPS')">
             <template #extra>
-                <div class="action-btn-wrapper">
+                <div v-if="projectPageState.hasManagePermission"
+                     class="action-btn-wrapper"
+                >
                     <p-button v-if="projectPageState.treeEditMode"
                               size="sm"
                               style-type="highlight"
@@ -310,7 +297,6 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                                        name="ic_edit-text"
                                        style-type="transparent"
                                        size="sm"
-                                       :disabled="props.manageDisabled"
                                        @click="projectPageStore.setTreeEditMode(true)"
                         />
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"
@@ -319,7 +305,6 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                                        size="sm"
                                        color="inherit"
                                        class="ml-1"
-                                       :disabled="!(state.hasRootProjectGroupManagePermission || state.hasCurrentProjectGroupManagePermission)"
                                        @click="projectPageStore.openProjectGroupFormModal()"
                         />
                     </template>
@@ -334,8 +319,8 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                         :edit-options="{disabled: true}"
                         :drag-options="{disabled: true}"
                         fetch-on-init
-                        @init="onAllProjectTreeInit"
-                        @change-select="onAllProjectChangeSelect"
+                        @init="handleAllProjectTreeInit"
+                        @change-select="handleAllProjectChangeSelect"
                 >
                     <template #left-extra>
                         <p-i name="ic_dots-4-square"
@@ -354,11 +339,10 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                         :data-setter="dataSetter"
                         :data-getter="dataGetter"
                         :data-fetcher="dataFetcher"
-                        :get-class-names="getClassNames"
-                        @init="onTreeInit"
-                        @finish-edit="onFinishEdit"
-                        @drop="onDrop"
-                        @change-select="onChangeSelect"
+                        @init="handleTreeInit"
+                        @finish-edit="handleFinishEdit"
+                        @drop="handleDrop"
+                        @change-select="handleChangeSelect"
                 >
                     <template #data="{node}">
                         {{ node.data.name }}
@@ -378,20 +362,20 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                                          class="mr-1"
                         />
                     </template>
-                    <template #right-extra="{node, path}">
-                        <p-icon-button v-if="projectPageState.treeEditMode && node.data.item_type !== 'PROJECT' && projectPageState.permissionInfo[node.data.id]"
+                    <template v-if="projectPageState.hasManagePermission"
+                              #right-extra="{node, path}"
+                    >
+                        <p-icon-button v-if="projectPageState.treeEditMode && node.data.item_type !== 'PROJECT'"
                                        name="ic_close"
                                        class="group-delete-btn"
                                        size="sm"
                                        color="inherit"
-                                       :disabled="props.manageDisabled"
                                        @click.stop="projectPageStore.openProjectGroupDeleteCheckModal({node, path})"
                         />
                         <p-icon-button v-if="!projectPageState.treeEditMode && node.data.item_type !== 'PROJECT'"
                                        name="ic_plus"
                                        class="group-add-btn"
                                        size="sm"
-                                       :disabled="props.manageDisabled || !projectPageState.permissionInfo[node.data.id]"
                                        @click.stop="projectPageStore.openProjectGroupFormModal({node, path})"
                         />
                     </template>
@@ -434,12 +418,6 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
         }
         .data {
             max-width: 80%;
-        }
-        .node.no-permission {
-            > .data, > .icon {
-                @apply text-gray-400;
-                cursor: not-allowed;
-            }
         }
     }
 }
