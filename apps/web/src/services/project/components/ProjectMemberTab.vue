@@ -7,7 +7,6 @@ import {
     PButton, PHeading, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -80,14 +79,6 @@ const state = reactive({
     pageLimit: 15,
     pageStart: 1,
     selectedItems: computed(() => state.selectIndex.map((i) => state.refinedItems[i])),
-    dropdownMenu: computed(() => ([
-        {
-            type: 'item',
-            name: 'delete',
-            label: i18n.t('IDENTITY.USER.MAIN.DELETE'),
-            disabled: !state.selectedItems.length || !!state.selectedItems.find((d) => !!d.project_group_info),
-        },
-    ] as MenuItem[])),
     memberInviteFormVisible: false,
     memberDeleteModalVisible: false,
 });
