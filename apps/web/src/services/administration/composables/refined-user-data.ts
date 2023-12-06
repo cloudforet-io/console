@@ -25,16 +25,20 @@ export const userStateFormatter = colorBindFactory(USER_STATE_COLOR, (value) => 
 export const userMfaFormatter = colorBindFactory(USER_MFA_COLOR, (value) => value.toLowerCase());
 export const userRoleFormatter = (value: RoleType) => {
     let image;
+    let name = value.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
     if (value === 'DOMAIN_ADMIN') {
         image = 'img_avatar_admin';
     } else if (value === 'WORKSPACE_OWNER') {
         image = 'img_avatar_project-admin';
+    } else if (value === 'USER') {
+        image = 'img_avatar_user';
+        name = '--';
     } else {
         image = 'img_avatar_user';
     }
 
     return {
         image,
-        name: value.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase()),
+        name,
     };
 };

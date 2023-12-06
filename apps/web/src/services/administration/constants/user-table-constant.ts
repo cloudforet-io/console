@@ -97,6 +97,7 @@ export const USER_TABLE_FIELDS = [
     { name: 'name', label: 'Name', sortable: false },
     { name: 'state', label: 'State', sortable: false },
     { name: 'mfa', label: 'Multi-factor Auth', sortable: false },
+    { name: 'api_key_count', label: 'API Key' },
     { name: 'role_type', label: 'Role', sortable: false },
     { name: 'tags', label: 'Tags' },
     { name: 'auth_type', label: 'Auth Type', sortable: false },
