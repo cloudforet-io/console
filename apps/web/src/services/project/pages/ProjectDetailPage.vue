@@ -235,7 +235,7 @@ onUnmounted(() => {
                                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
                             </span>
-                            <template v-if="projectPageState.hasManagePermission">
+                            <template v-if="projectPageState.isWorkspaceOwner">
                                 <p-icon-button name="ic_settings"
                                                class="edit-btn"
                                                size="md"

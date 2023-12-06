@@ -282,7 +282,7 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
     <fragment>
         <sidebar-title :title="$t('PROJECT.LANDING.PROJECT_GROUPS')">
             <template #extra>
-                <div v-if="projectPageState.hasManagePermission"
+                <div v-if="projectPageState.isWorkspaceOwner"
                      class="action-btn-wrapper"
                 >
                     <p-button v-if="projectPageState.treeEditMode"
@@ -362,7 +362,7 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                                          class="mr-1"
                         />
                     </template>
-                    <template v-if="projectPageState.hasManagePermission"
+                    <template v-if="projectPageState.isWorkspaceOwner"
                               #right-extra="{node, path}"
                     >
                         <p-icon-button v-if="projectPageState.treeEditMode && node.data.item_type !== 'PROJECT'"

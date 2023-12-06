@@ -52,7 +52,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
             const _workspaceUser = await getWorkspaceUser(store.state.user.userId);
             return _workspaceUser;
         }),
-        hasManagePermission: computed<boolean>(() => {
+        isWorkspaceOwner: computed<boolean>(() => {
             if (!state.workspaceUser) return false;
             return state.workspaceUser.role_type === 'WORKSPACE_OWNER';
         }),

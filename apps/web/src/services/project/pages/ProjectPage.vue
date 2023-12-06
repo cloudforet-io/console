@@ -221,7 +221,7 @@ onUnmounted(() => {
                                                  :item-id="storeState.groupId"
                                                  :favorite-type="FAVORITE_TYPE.PROJECT_GROUP"
                                 />
-                                <template v-if="projectPageState.hasManagePermission">
+                                <template v-if="projectPageState.isWorkspaceOwner">
                                     <p-icon-button name="ic_edit-text"
                                                    style-type="transparent"
                                                    @click="handleClickProjectGroupEditButton"
@@ -232,7 +232,7 @@ onUnmounted(() => {
                                     />
                                 </template>
                             </div>
-                            <div v-if="projectPageState.hasManagePermission"
+                            <div v-if="projectPageState.isWorkspaceOwner"
                                  class="top-button-box"
                             >
                                 <p-button ref="targetRef"
