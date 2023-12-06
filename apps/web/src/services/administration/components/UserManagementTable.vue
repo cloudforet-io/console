@@ -210,7 +210,7 @@ watch(() => state.isAdminMode, async (isAdminMode) => {
     if (isAdminMode) {
         await userPageStore.listUsers(params);
     } else {
-        await userPageStore.workspaceListUsers(params);
+        await userPageStore.listWorkspaceUsers(params);
     }
 }, { immediate: true });
 </script>

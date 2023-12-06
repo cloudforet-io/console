@@ -75,7 +75,7 @@ export const useUserPageStore = defineStore('user-page', {
             }
         },
         // Workspace mode
-        async workspaceListUsers(params: WorkspaceUserListParameters) {
+        async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             this.loading.list = true;
             try {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
