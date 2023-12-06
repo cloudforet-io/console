@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -78,10 +78,10 @@ const modalState = reactive({
     title: '',
     subTitle: '',
     themeColor: undefined as string | undefined,
-    visible: computed(() => userPageState.visibleStatusModal),
+    visible: computed(() => userPageState.modalVisible.status),
 });
 const userFormState = reactive({
-    visible: computed(() => userPageState.visibleCreateModal || userPageState.visibleUpdateModal),
+    visible: computed(() => userPageState.modalVisible.create || userPageState.modalVisible.update),
     updateMode: false,
     headerTitle: '',
     item: undefined as undefined | User,
@@ -143,10 +143,10 @@ const addUser = async (item, roleId) => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
     } finally {
-        userPageStore.$patch({
-            selectedIndices: [],
-            visibleCreateModal: false,
-            modalLoading: false,
+        userPageStore.$patch((_state) => {
+            _state.selectedIndices = [];
+            _state.modalVisible.create = false;
+            _state.modalLoading = false;
         });
     }
 };
@@ -189,21 +189,26 @@ const updateUser = async (item, roleId) => {
             query: userListApiQuery,
             domain_id: state.domain_id,
         });
-        userPageStore.$patch({
-            selectedIndices: [],
-            visibleUpdateModal: false,
-            modalLoading: false,
+        userPageStore.$patch((_state) => {
+            _state.selectedIndices = [];
+            _state.modalVisible.update = false;
+            _state.modalLoading = false;
         });
     }
 };
 
-/* Init */
-(async () => {
-    await userPageStore.listUsers({
+/* Watcher */
+watch(() => state.isAdminMode, async (isAdminMode) => {
+    const params = {
         query: userListApiQuery,
         domain_id: state.domain_id,
-    });
-})();
+    };
+    if (isAdminMode) {
+        await userPageStore.listUsers(params);
+    } else {
+        await userPageStore.listWorkspaceUsers(params);
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -289,7 +294,7 @@ const updateUser = async (item, roleId) => {
                                       :mode="modalState.mode"
                                       @confirm="handleUserStatusModalConfirm()"
         />
-        <user-management-form-modal v-if="userPageState.visibleCreateModal || userPageState.visibleUpdateModal"
+        <user-management-form-modal v-if="userPageState.modalVisible.create || userPageState.modalVisible.update"
                                     :header-title="userFormState.headerTitle"
                                     :item="userFormState.item"
                                     @confirm="handleUserFormConfirm"

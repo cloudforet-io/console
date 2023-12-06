@@ -19,4 +19,5 @@ export interface WorkspaceUserModel {
     domain_id: string;
     created_at: TimeStamp;
     last_accessed_at: TimeStamp;
+    api_key_count: number;
 }
