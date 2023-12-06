@@ -112,18 +112,14 @@ const checkModalConfirm = async (items) => {
         ErrorHandler.handleRequestError(new Error(''), vm.$tc(languageCode, failCount));
     }
     emit('confirm');
-    userPageStore.$patch({
-        visibleModal: {
-            status: false,
-        },
+    userPageStore.$patch((_state) => {
+        _state.modalVisible.status = false;
     });
 };
 
 const handleClose = () => {
-    userPageStore.$patch({
-        visibleModal: {
-            status: false,
-        },
+    userPageStore.$patch((_state) => {
+        _state.modalVisible.status = false;
     });
 };
 </script>
@@ -131,7 +127,7 @@ const handleClose = () => {
 <template>
     <p-table-check-modal
         v-if="!!props.mode"
-        :visible="userPageState.visibleModal.status"
+        :visible="userPageState.modalVisible.status"
         :header-title="props.headerTitle"
         :sub-title="props.subTitle"
         :theme-color="props.themeColor"

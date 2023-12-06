@@ -28,7 +28,7 @@ export const useUserPageStore = defineStore('user-page', {
         selectedUser: {} as UserModel | WorkspaceUserModel,
         totalCount: 0,
         selectedIndices: [],
-        visibleModal: {
+        modalVisible: {
             status: false,
             create: false,
             update: false,

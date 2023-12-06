@@ -40,7 +40,7 @@ const modalState = reactive({
     title: '',
     subTitle: '',
     themeColor: undefined as string | undefined,
-    visible: computed(() => userPageState.visibleModal.status),
+    visible: computed(() => userPageState.modalVisible.status),
 });
 
 /* Component */
@@ -54,10 +54,8 @@ const handleSelectDropdown = (name) => {
     }
 };
 const clickUpdate = () => {
-    userPageStore.$patch({
-        visibleModal: {
-            update: true,
-        },
+    userPageStore.$patch((_state) => {
+        _state.modalVisible.update = true;
     });
 };
 const clickDelete = () => {
@@ -65,10 +63,8 @@ const clickDelete = () => {
     modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
     modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'alert';
-    userPageStore.$patch({
-        visibleModal: {
-            status: true,
-        },
+    userPageStore.$patch((_state) => {
+        _state.modalVisible.status = true;
     });
 };
 const clickEnable = () => {
@@ -76,10 +72,8 @@ const clickEnable = () => {
     modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
     modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'safe';
-    userPageStore.$patch({
-        visibleModal: {
-            status: true,
-        },
+    userPageStore.$patch((_state) => {
+        _state.modalVisible.status = true;
     });
 };
 const clickDisable = () => {
@@ -87,10 +81,8 @@ const clickDisable = () => {
     modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
     modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'alert';
-    userPageStore.$patch({
-        visibleModal: {
-            status: true,
-        },
+    userPageStore.$patch((_state) => {
+        _state.modalVisible.status = true;
     });
 };
 

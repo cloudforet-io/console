@@ -40,7 +40,7 @@ const handleUpdateTags = (tags: Tag) => {
 
 /* Init */
 (async () => {
-    if (userPageState.visibleModal.update) {
+    if (userPageState.modalVisible.update) {
         await setForm();
     }
 })();

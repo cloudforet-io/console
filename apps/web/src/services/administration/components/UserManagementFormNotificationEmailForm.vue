@@ -109,7 +109,7 @@ watch(() => props.isValidEmail, (value) => {
 
 /* Init */
 (async () => {
-    if (userPageState.visibleModal.update) {
+    if (userPageState.modalVisible.update) {
         await initForm();
     }
 })();
@@ -128,11 +128,11 @@ watch(() => props.isValidEmail, (value) => {
                     <p-text-input :value="email"
                                   :invalid="invalid"
                                   placeholder="user@spaceone.io"
-                                  :disabled="userPageState.visibleModal.update && !state.isEdit"
+                                  :disabled="userPageState.modalVisible.update && !state.isEdit"
                                   class="text-input"
                                   @update:value="handleChangeInput($event)"
                     >
-                        <div v-if="userPageState.visibleModal.update && (!state.isEdit || !state.isFocused)"
+                        <div v-if="userPageState.modalVisible.update && (!state.isEdit || !state.isFocused)"
                              class="email-status-badge"
                              @click="handleClickBadge"
                         >
@@ -148,7 +148,7 @@ watch(() => props.isValidEmail, (value) => {
                             </p-badge>
                         </div>
                     </p-text-input>
-                    <div v-if="userPageState.visibleModal.update">
+                    <div v-if="userPageState.modalVisible.update">
                         <p-button v-if="!state.isEdit"
                                   style-type="tertiary"
                                   @click="handleClickChange"

@@ -78,10 +78,10 @@ const modalState = reactive({
     title: '',
     subTitle: '',
     themeColor: undefined as string | undefined,
-    visible: computed(() => userPageState.visibleModal.status),
+    visible: computed(() => userPageState.modalVisible.status),
 });
 const userFormState = reactive({
-    visible: computed(() => userPageState.visibleModal.create || userPageState.visibleModal.update),
+    visible: computed(() => userPageState.modalVisible.create || userPageState.modalVisible.update),
     updateMode: false,
     headerTitle: '',
     item: undefined as undefined | User,
@@ -143,12 +143,10 @@ const addUser = async (item, roleId) => {
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'));
     } finally {
-        userPageStore.$patch({
-            selectedIndices: [],
-            visibleModal: {
-                create: false,
-            },
-            modalLoading: false,
+        userPageStore.$patch((_state) => {
+            _state.selectedIndices = [];
+            _state.modalVisible.create = false;
+            _state.modalLoading = false;
         });
     }
 };
@@ -191,12 +189,10 @@ const updateUser = async (item, roleId) => {
             query: userListApiQuery,
             domain_id: state.domain_id,
         });
-        userPageStore.$patch({
-            selectedIndices: [],
-            visibleModal: {
-                update: false,
-            },
-            modalLoading: false,
+        userPageStore.$patch((_state) => {
+            _state.selectedIndices = [];
+            _state.modalVisible.update = false;
+            _state.modalLoading = false;
         });
     }
 };
@@ -298,7 +294,7 @@ watch(() => state.isAdminMode, async (isAdminMode) => {
                                       :mode="modalState.mode"
                                       @confirm="handleUserStatusModalConfirm()"
         />
-        <user-management-form-modal v-if="userPageState.visibleModal.create || userPageState.visibleModal.update"
+        <user-management-form-modal v-if="userPageState.modalVisible.create || userPageState.modalVisible.update"
                                     :header-title="userFormState.headerTitle"
                                     :item="userFormState.item"
                                     @confirm="handleUserFormConfirm"
