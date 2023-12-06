@@ -14,6 +14,8 @@ import type { ProjectGroupListParameters } from '@/schema/identity/project-group
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
+import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
+import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -24,7 +26,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import type {
-    ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectGroupTreeItem, ProjectTreeRoot,
+    ProjectGroupTreeItem, ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectTreeRoot,
 } from '@/services/project/types/project-tree-type';
 
 
@@ -44,8 +46,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         projectGroupFormVisible: false as boolean,
         projectGroupFormUpdateMode: false as boolean,
         projectGroupDeleteCheckModalVisible: false as boolean,
-        projectCreateModalVisible: false as boolean,
-        projectUpdateModalVisible: false as boolean,
+        projectFormModalVisible: false as boolean,
         shouldUpdateProjectList: false as boolean,
     });
 
@@ -82,11 +83,8 @@ export const useProjectPageStore = defineStore('project-page', () => {
     const setShouldUpdateProjectList = (val?: boolean) => {
         state.shouldUpdateProjectList = !!val;
     };
-    const setProjectCreateModalVisible = (val?: boolean) => {
-        state.projectCreateModalVisible = !!val;
-    };
-    const setProjectUpdateModalVisible = (val?: boolean) => {
-        state.projectUpdateModalVisible = !!val;
+    const setProjectFormModalVisible = (val?: boolean) => {
+        state.projectFormModalVisible = !!val;
     };
     const setProjectGroupDeleteCheckModalVisible = (val?: boolean) => {
         state.projectGroupDeleteCheckModalVisible = !!val;
@@ -145,9 +143,9 @@ export const useProjectPageStore = defineStore('project-page', () => {
         state.actionTargetItem = target;
         state.projectGroupDeleteCheckModalVisible = true;
     };
-    const openProjectCreateModal = (target: ProjectGroupTreeItem = {}) => {
+    const openProjectFormModal = (target: ProjectGroupTreeItem = {}) => {
         state.actionTargetItem = target;
-        state.projectCreateModalVisible = true;
+        state.projectFormModalVisible = true;
     };
     const getPermissionInfo = async (ids: string[]): Promise<Record<string, boolean>> => {
         const permissionApiQueryHelper = new ApiQueryHelper();
@@ -225,8 +223,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         state.projectGroupFormVisible = false;
         state.projectGroupFormUpdateMode = false;
         state.projectGroupDeleteCheckModalVisible = false;
-        state.projectCreateModalVisible = false;
-        state.projectUpdateModalVisible = false;
+        state.projectFormModalVisible = false;
         state.shouldUpdateProjectList = false;
     };
 
@@ -343,11 +340,36 @@ export const useProjectPageStore = defineStore('project-page', () => {
             throw new Error(e);
         }
     };
+    const updateProject = async (params: ProjectUpdateParameters): Promise<ProjectModel> => {
+        try {
+            const res = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
+                ...params,
+                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            });
+            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
+            return res;
+        } catch (e: any) {
+            ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
+            throw new Error(e);
+        }
+    };
+    const updateProjectType = async (params: ProjectUpdateProjectTypeParameters): Promise<ProjectModel> => {
+        try {
+            const res = await SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>({
+                ...params,
+                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            });
+            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
+            return res;
+        } catch (e: any) {
+            ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT_TYPE'));
+            throw new Error(e);
+        }
+    };
 
     const mutations = {
         setShouldUpdateProjectList,
-        setProjectCreateModalVisible,
-        setProjectUpdateModalVisible,
+        setProjectFormModalVisible,
         setProjectGroupDeleteCheckModalVisible,
         setProjectGroupFormVisible,
         setTreeEditMode,
@@ -365,9 +387,11 @@ export const useProjectPageStore = defineStore('project-page', () => {
         updateProjectGroup,
         deleteProjectGroup,
         createProject,
+        updateProject,
+        updateProjectType,
         refreshPermissionInfo,
         addPermissionInfo,
-        openProjectCreateModal,
+        openProjectFormModal,
         pushPermissionInfo,
         getPermissionInfo,
     };

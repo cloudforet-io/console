@@ -41,9 +41,10 @@ import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
 import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
-import ProjectUpdateModal from '@/services/project/components/ProjectUpdateModal.vue';
+import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
 interface Props {
@@ -53,6 +54,8 @@ const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
 
+const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.$state;
 const storeState = reactive({
@@ -168,11 +171,7 @@ const projectDeleteFormConfirm = async () => {
     }
 };
 
-const openProjectEditForm = () => {
-    formState.projectEditFormVisible = true;
-};
-
-const handleConfirmProjectForm = (data) => {
+const handleConfirmProjectForm = (data: ProjectModel) => {
     state.item = data || null;
 };
 
@@ -236,15 +235,17 @@ onUnmounted(() => {
                                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
                             </span>
+                            <p-icon-button name="ic_settings"
+                                           class="edit-btn"
+                                           size="md"
+                                           :disabled="!state.hasManagePermission"
+                                           @click="projectPageStore.openProjectFormModal()"
+                            />
                             <p-icon-button name="ic_delete"
                                            class="delete-btn"
+                                           size="md"
                                            :disabled="!state.hasManagePermission"
                                            @click="openProjectDeleteForm"
-                            />
-                            <p-icon-button name="ic_edit-text"
-                                           class="edit-btn"
-                                           :disabled="!state.hasManagePermission"
-                                           @click="openProjectEditForm"
                             />
                         </div>
                         <div class="top-right-group">
@@ -310,12 +311,13 @@ onUnmounted(() => {
             </template>
         </p-button-modal>
 
-        <project-update-modal
-            v-if="formState.projectEditFormVisible"
-            :visible.sync="formState.projectEditFormVisible"
+        <project-form-modal
+            v-if="projectPageState.projectFormModalVisible"
+            :visible="projectPageState.projectFormModalVisible"
             :project-group-id="state.projectGroupId"
-            :project-id="state.projectId"
+            :project="state.item"
             @confirm="handleConfirmProjectForm"
+            @update:visible="projectPageStore.setProjectFormModalVisible"
         />
         <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
                                        :project-id="state.projectId"
@@ -365,8 +367,8 @@ onUnmounted(() => {
     @apply rounded-lg;
 }
 
-.delete-btn {
-    @apply ml-3 cursor-pointer;
+.edit-btn {
+    @apply ml-3;
 }
 
 .maintenance-happening-list {
