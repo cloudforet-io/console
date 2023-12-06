@@ -21,7 +21,7 @@ const adminAdministrationRoutes: RouteConfig = {
     name: makeAdminRouteName(ADMINISTRATION_ROUTE._NAME),
     meta: { menuId: MENU_ID.ADMINISTRATION },
     redirect: () => ({
-        name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.USER._NAME),
+        name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM._NAME),
     }),
     component: AdministrationContainer,
     children: [
@@ -29,6 +29,9 @@ const adminAdministrationRoutes: RouteConfig = {
             path: 'iam',
             name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM._NAME),
             meta: { menuId: MENU_ID.IAM },
+            redirect: () => ({
+                name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.USER._NAME),
+            }),
             component: { template: '<router-view />' },
             children: [
                 {
