@@ -24,7 +24,6 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
@@ -75,7 +74,6 @@ const maintenanceWindowApiQueryHelper = new ApiQueryHelper()
     .setSort('state', true);
 
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     totalCount: 0,
     loading: false,
     items: [] as any[],
@@ -182,13 +180,13 @@ const closeMaintenanceWindow = async () => {
             <template #toolbox-left>
                 <p-button style-type="secondary"
                           class="mr-4"
-                          :disabled="!state.hasManagePermission || (state.selectedItems.length !== 1) || (state.selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED)"
+                          :disabled="(state.selectedItems.length !== 1) || (state.selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED)"
                           @click="state.visibleUpdateModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.UPDATE') }}
                 </p-button>
                 <p-button style-type="secondary"
-                          :disabled="!state.hasManagePermission || !state.selectedItems.length || (state.selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED)"
+                          :disabled="!state.selectedItems.length || (state.selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED)"
                           @click="state.visibleCloseCheckModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE') }}

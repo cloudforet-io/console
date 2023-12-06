@@ -38,7 +38,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
 import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
@@ -80,7 +79,6 @@ const webhookListApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
     .setFiltersAsRawQueryString(route.query.filters);
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     loading: true,
     timezone: computed(() => store.state.user.timezone),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
@@ -315,14 +313,13 @@ onActivated(() => {
                 <p-button class="mr-4 add-btn"
                           style-type="primary"
                           icon-left="ic_plus_bold"
-                          :disabled="!state.hasManagePermission"
                           @click="onClickAdd"
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-button>
                 <p-select-dropdown
                     :menu="state.dropdown"
-                    :disabled="!state.hasManagePermission || !state.isSelectedItem"
+                    :disabled="!state.isSelectedItem"
                     :placeholder="$t('PROJECT.DETAIL.WEBHOOK_ACTION')"
                     @select="onSelectDropdown"
                 />

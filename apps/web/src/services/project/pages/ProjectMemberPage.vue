@@ -8,8 +8,6 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
 import ProjectMemberTab from '@/services/project/components/ProjectMemberTab.vue';
 
 
@@ -22,7 +20,6 @@ const route = useRoute();
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(route.query.filters);
 const state = reactive({
     filters: queryHelper.filters,
-    hasManagePermission: useManagePermissionState(),
 });
 
 const onUpdateFilters = (filters) => {
@@ -40,7 +37,6 @@ onActivated(() => {
     <div>
         <project-member-tab :project-id="props.id"
                             :filters="state.filters"
-                            :manage-disabled="!state.hasManagePermission"
                             @update-filters="onUpdateFilters"
         />
     </div>

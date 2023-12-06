@@ -14,7 +14,6 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -29,7 +28,6 @@ const router = useRouter();
 const state = reactive({
     loading: true,
     isActivated: false,
-    hasManagePermission: useManagePermissionState(),
 });
 const tabState = reactive({
     tabs: computed(() => ([
@@ -98,7 +96,6 @@ watch(() => props.id, (projectId) => {
             <strong>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_1') }}</strong>
             <p>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_2') }}</p>
             <p-button style-type="positive"
-                      :disabled="!state.hasManagePermission"
                       @click="onActivateAlert"
             >
                 {{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATE') }}

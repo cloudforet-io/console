@@ -39,12 +39,10 @@ interface UserItem {
 interface Props {
     projectId?: string;
     filters?: { k: string; v: string }[];
-    manageDisabled?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     projectId: '',
     filters: () => ([]),
-    manageDisabled: false,
 });
 const emit = defineEmits<{(e: 'update-filters', filters: any): void;
 }>();
@@ -189,7 +187,6 @@ watch(() => store.state.reference.project.items, (projects) => {
                             </p-button>
                             <p-button style-type="primary"
                                       class="mr-4 add-btn"
-                                      :disabled="props.manageDisabled"
                                       @click="handleClickInviteMember"
                             >
                                 {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
