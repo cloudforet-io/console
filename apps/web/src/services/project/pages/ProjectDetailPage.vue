@@ -17,7 +17,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
 import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
-import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
@@ -29,7 +28,6 @@ import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/stor
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
-import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -54,14 +52,12 @@ const router = useRouter();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
-const projectDetailPageState = projectDetailPageStore.$state;
+const projectDetailPageState = projectDetailPageStore.state;
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
 });
 const state = reactive({
-    loading: true,
-    item: null as null|ProjectModel,
-    projectId: computed(() => projectDetailPageState.projectId),
+    item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
     projectGroupId: computed<string>(() => state.item?.project_group_id || ''),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     // projectGroupNames: [],
@@ -84,22 +80,6 @@ const state = reactive({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
     })),
 });
-
-/* api */
-const getProject = async (projectId: string) => {
-    try {
-        state.loading = true;
-        state.item = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
-            project_id: projectId,
-        });
-    } catch (e) {
-        state.item = null;
-        ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
-    } finally {
-        state.loading = false;
-    }
-};
 
 /** Tabs */
 const singleItemTabState = reactive({
@@ -153,7 +133,7 @@ const projectDeleteFormConfirm = async () => {
     try {
         await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
-            project_id: state.projectId,
+            project_id: projectDetailPageState.projectId,
         });
         // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
@@ -167,7 +147,7 @@ const projectDeleteFormConfirm = async () => {
 };
 
 const handleConfirmProjectForm = (data: ProjectModel) => {
-    state.item = data || null;
+    projectDetailPageStore.setProject(data);
 };
 
 const onChangeTab = (activeTab) => {
@@ -183,11 +163,11 @@ const handleCreateMaintenanceWindow = (maintenanceWindowId: string) => {
 };
 
 /* Watchers */
-watch(() => state.projectId, async (projectId) => {
+watch(() => projectDetailPageState.projectId, async (projectId) => {
     if (projectId) {
         await Promise.allSettled([
-            getProject(projectId),
-            projectDetailPageStore.getAlertCounts(),
+            projectDetailPageStore.getProject(projectId),
+            projectDetailPageStore.getAlertCounts(projectId),
         ]);
     }
 }, { immediate: true });
@@ -199,20 +179,19 @@ watch(() => route.name, () => {
 
 watch(() => props.id, (after, before) => {
     if (after !== before) {
-        projectDetailPageStore.$patch({ projectId: after });
+        projectDetailPageStore.setProjectId(after);
     }
 }, { immediate: true });
 
 onUnmounted(() => {
-    projectDetailPageStore.$reset();
-    projectDetailPageStore.$dispose();
+    projectDetailPageStore.reset();
 });
 </script>
 
 <template>
     <general-page-layout overflow="scroll">
         <p-data-loader class="page-inner"
-                       :loading="state.loading"
+                       :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
             <p-breadcrumbs :routes="state.pageNavigation" />
@@ -226,7 +205,7 @@ onUnmounted(() => {
                     <template #title-right-extra>
                         <div class="button-wrapper">
                             <span class="favorite-button-wrapper">
-                                <favorite-button :item-id="state.projectId"
+                                <favorite-button :item-id="projectDetailPageState.projectId"
                                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
                             </span>
@@ -246,9 +225,9 @@ onUnmounted(() => {
                         <div class="top-right-group">
                             <p class="copy-project-id">
                                 <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                                {{ state.projectId }}
+                                {{ projectDetailPageState.projectId }}
                                 <p-copy-button class="icon"
-                                               :value="state.projectId"
+                                               :value="projectDetailPageState.projectId"
                                 />
                             </p>
                             <p-button v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME"
@@ -265,7 +244,7 @@ onUnmounted(() => {
             </div>
 
             <maintenance-happening-list class="maintenance-happening-list"
-                                        :project-id="state.projectId"
+                                        :project-id="projectDetailPageState.projectId"
             />
 
             <p-tab v-if="state.item"
@@ -314,7 +293,7 @@ onUnmounted(() => {
             @update:visible="projectPageStore.setProjectFormModalVisible"
         />
         <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
-                                       :project-id="state.projectId"
+                                       :project-id="projectDetailPageState.projectId"
                                        @confirm="handleCreateMaintenanceWindow"
         />
     </general-page-layout>

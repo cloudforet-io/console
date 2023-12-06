@@ -13,7 +13,7 @@ import type { MaintenanceHappening } from '@/services/project/stores/project-det
 const TIME_FORMAT = 'YYYY-MM-DD HH:mm';
 
 const projectDetailPageStore = useProjectDetailPageStore();
-const projectDetailPageState = projectDetailPageStore.$state;
+const projectDetailPageState = projectDetailPageStore.state;
 const state = reactive({
     loading: false,
     maintenanceHappenings: computed<MaintenanceHappening[]>(() => projectDetailPageState.maintenanceHappenings),
