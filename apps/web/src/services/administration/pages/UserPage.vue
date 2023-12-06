@@ -3,18 +3,16 @@ import {
     onUnmounted, reactive,
 } from 'vue';
 
-import {
-    PHorizontalLayout, PHeading,
-} from '@spaceone/design-system';
+import { PHorizontalLayout } from '@spaceone/design-system';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
+import UserManagementHeader from '@/services/administration/components/UserManagementHeader.vue';
 import UserManagementTab from '@/services/administration/components/UserManagementTab.vue';
 import UserManagementTable from '@/services/administration/components/UserManagementTable.vue';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
@@ -28,12 +26,7 @@ onUnmounted(() => {
 
 <template>
     <section class="user-page">
-        <p-heading :title="$t('IDENTITY.USER.MAIN.TITLE')"
-                   use-selected-count
-                   use-total-count
-                   :total-count="userPageState.totalCount"
-                   :selected-count="userPageState.selectedIndices.length"
-        />
+        <user-management-header />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
                 <user-management-table :table-height="height" />
