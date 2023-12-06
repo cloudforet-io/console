@@ -4,8 +4,8 @@ import type { UserState, UserRole } from './type';
 
 export const setUser = (state: UserState, userInfo: UserState): void => {
     state.userId = userInfo.userId;
-    state.userType = userInfo.userType;
     state.authType = userInfo.authType;
+    state.roleType = userInfo.roleType;
     state.name = userInfo.name;
     state.email = userInfo.email;
     state.language = userInfo.language;
