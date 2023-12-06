@@ -52,8 +52,8 @@ export class SpaceRouter {
 
         SpaceRouter.router.onReady(() => {
             LocalStorageAccessor.setItem(CHUNK_LOAD_REFRESH_STORAGE_KEY, '');
-            const currentPathes = SpaceRouter.router.currentRoute?.path?.split('/');
-            if (currentPathes.includes(ROOT_ROUTE.ADMIN._NAME)) {
+            const currentPaths = SpaceRouter.router.currentRoute?.path?.split('/');
+            if (currentPaths.includes(ROOT_ROUTE.ADMIN._NAME)) {
                 appContextStore.switchToAdminMode();
             }
         });

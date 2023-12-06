@@ -21,7 +21,6 @@ const getUserInfo = async (userId: string, domainId: string): Promise<Partial<Us
     // TODO: refactor below code with new response
     return {
         userId: response.user_id,
-        userType: response.user_type,
         roleType: response.role_type,
         authType: response.auth_type,
         name: response.name,
