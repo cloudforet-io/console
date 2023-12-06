@@ -15,7 +15,7 @@ import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
 import { i18n } from '@/translations';
 
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
 import { useProjectStore } from '@/store/reference/project-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -44,12 +44,7 @@ const projectStore = useProjectStore();
 const projectPageStore = useProjectPageStore();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    projectNames: computed<string[]>(() => {
-        const projectItems: ProjectReferenceMap|null = projectStore.state.items;
-        if (isEmpty(projectItems)) return [];
-        const names = Object.values(projectItems).map((project: ProjectReferenceItem) => project.name);
-        return names.filter((name) => name !== props.project.name);
-    }),
+    projectNames: [] as string[],
     accessMenuItems: computed<SelectDropdownMenuItem[]>(() => ([
         {
             name: 'PRIVATE',
@@ -66,15 +61,15 @@ const state = reactive({
     loading: false,
 });
 const {
-    forms: { name },
+    forms: { projectName },
     invalidState,
     invalidTexts,
     setForm, isAllValid,
     initForm,
 } = useFormValidator({
-    name: undefined as string|undefined,
+    projectName: undefined as string|undefined,
 }, {
-    name: (val: string) => {
+    projectName: (val: string) => {
         if (!val?.length) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
         if (val.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
         if (state.projectNames.includes(val)) return i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
@@ -87,7 +82,7 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
     state.loading = true;
     try {
         const params: ProjectCreateParameters = {
-            name: name.value?.trim() as string,
+            name: projectName.value?.trim() as string,
             project_type: state.selectedAccess,
         };
         if (props.projectGroupId) params.project_group_id = props.projectGroupId;
@@ -103,7 +98,7 @@ const updateProject = async (): Promise<ProjectModel|undefined> => {
     try {
         const params: ProjectUpdateParameters = {
             project_id: props.project.project_id || router.currentRoute.params.id,
-            name: name.value?.trim() as string,
+            name: projectName.value?.trim() as string,
         };
         return await projectPageStore.updateProject(params);
     } catch (e) {
@@ -150,12 +145,16 @@ const handleSelectAccess = (selectedAccess: ProjectType) => {
     state.selectedAccess = selectedAccess;
 };
 
-watch(() => props.visible, (val) => {
-    if (val) initForm();
-});
 watch(() => props.project, async (project) => {
-    setForm('name', project?.name);
-    state.selectedAccess = project?.project_type ?? 'PRIVATE';
+    if (project) {
+        setForm('projectName', project?.name);
+        state.selectedAccess = project?.project_type ?? 'PRIVATE';
+    } else initForm();
+}, { immediate: true });
+watch(() => projectStore.state.items, (items) => {
+    if (isEmpty(items)) return;
+    const names = Object.values(items).map((project: ProjectReferenceItem) => project.name);
+    state.projectNames = names.filter((name) => name !== props.project?.name);
 }, { immediate: true });
 </script>
 
@@ -173,16 +172,16 @@ watch(() => props.project, async (project) => {
     >
         <template #body>
             <p-field-group :label="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_LABEL')"
-                           :invalid-text="invalidTexts.name"
-                           :invalid="invalidState.name"
+                           :invalid-text="invalidTexts.projectName"
+                           :invalid="invalidState.projectName"
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input :value="name"
+                    <p-text-input :value="projectName"
                                   class="block w-full"
                                   :invalid="invalid"
                                   :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_PLACEHOLDER')"
-                                  @update:value="setForm('name', $event)"
+                                  @update:value="setForm('projectName', $event)"
                     />
                 </template>
             </p-field-group>
