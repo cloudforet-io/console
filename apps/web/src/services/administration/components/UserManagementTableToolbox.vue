@@ -60,8 +60,8 @@ const clickUpdate = () => {
 };
 const clickDelete = () => {
     modalState.mode = 'delete';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
-    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', userPageState.selectedIndices.length);
+    modalState.title = i18n.t('IDENTITY.USER.MAIN.MODAL.DELETE_TITLE') as string;
+    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.MODAL.DELETE_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'alert';
     userPageStore.$patch((_state) => {
         _state.modalVisible.status = true;
@@ -69,8 +69,8 @@ const clickDelete = () => {
 };
 const clickEnable = () => {
     modalState.mode = 'enable';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
-    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', userPageState.selectedIndices.length);
+    modalState.title = i18n.t('IDENTITY.USER.MAIN.MODAL.ENABLE_TITLE') as string;
+    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.MODAL.ENABLE_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'safe';
     userPageStore.$patch((_state) => {
         _state.modalVisible.status = true;
@@ -78,8 +78,8 @@ const clickEnable = () => {
 };
 const clickDisable = () => {
     modalState.mode = 'disable';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
-    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', userPageState.selectedIndices.length);
+    modalState.title = i18n.t('IDENTITY.USER.MAIN.MODAL.DISABLE_TITLE') as string;
+    modalState.subTitle = i18n.tc('IDENTITY.USER.MAIN.MODAL.DISABLE_DESC', userPageState.selectedIndices.length);
     modalState.themeColor = 'alert';
     userPageStore.$patch((_state) => {
         _state.modalVisible.status = true;
