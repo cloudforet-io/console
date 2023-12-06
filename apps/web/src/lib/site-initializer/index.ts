@@ -18,6 +18,7 @@ import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
+import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
@@ -55,6 +56,7 @@ const init = async (store) => {
     const domainName = await initDomain(store, config);
 
     if (domainName) {
+        initModeSetting();
         await initWorkspace(store);
         prefetchResources();
         initI18n(store);

@@ -100,7 +100,8 @@ const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean): DisplayMen
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
     const appContextStore = useAppContextStore();
-    const isAdminMode = appContextStore.getters.isAdminMode;
+    const appContextState = appContextStore.$state;
+    const isAdminMode = appContextState.getters.isAdminMode;
     const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
     let _allGnbMenuList: DisplayMenu[];
 
