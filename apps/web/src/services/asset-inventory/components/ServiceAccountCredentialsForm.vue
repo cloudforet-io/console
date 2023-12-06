@@ -19,10 +19,13 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { SchemaListParameters } from '@/schema/identity/schema/api-verbs/list';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountListParameters } from '@/schema/identity/trusted-account/api-verbs/list';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -48,6 +51,7 @@ const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;
 }>();
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const workspaceStore = useWorkspaceStore();
 
 const storeState = reactive({
     language: computed(() => store.state.user.language),
@@ -60,13 +64,13 @@ const storeState = reactive({
 });
 const state = reactive({
     showTrustedAccount: computed<boolean>(() => !!storeState.trustingSecretSchema),
-    trustedAccounts: [] as ServiceAccountModel[],
+    trustedAccounts: [] as TrustedAccountModel[],
     trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
-        name: d.service_account_id,
+        name: d.trusted_account_id,
         label: d.name,
     }))),
     selectedTrustedAccountDataList: computed(() => {
-        const selectedTrustedAccount = state.trustedAccounts.find((d) => d.service_account_id === formState.attachedTrustedAccountId);
+        const selectedTrustedAccount = state.trustedAccounts.find((d) => d.trusted_account_id === formState.attachedTrustedAccountId);
         if (!selectedTrustedAccount) return [];
         const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
         let entries: Array<[string, JsonSchema]> = [];
@@ -151,28 +155,23 @@ const apiQueryHelper = new ApiQueryHelper();
 const listTrustAccounts = async () => {
     try {
         const getQuery = () => apiQueryHelper
-            .setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '=' }]);
-        const { results } = await SpaceConnector.client.identity.serviceAccount.list({ query: getQuery().data });
+            .setFilters([{ k: 'workspace_id', v: [workspaceStore.getters.currentWorkspaceId ?? '', null], o: '=' }]);
+        const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+            query: getQuery().data,
+            workspace_id: undefined,
+        });
         state.trustedAccounts = results;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.trustedAccounts = [];
     }
 };
-const getTrustedAccountCredentialData = async (serviceAccountId: string) => {
-    try {
-        const getQuery = () => apiQueryHelper
-            .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
-        const { results } = await SpaceConnector.client.secret.trustedSecret.list({ query: getQuery().data });
-        if (results.length) {
-            formState.attachedTrustedSecretId = results[0].trusted_secret_id;
-        } else {
-            formState.attachedTrustedSecretId = undefined;
-        }
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        formState.attachedTrustedSecretId = undefined;
-    }
+const getTrustedAccountCredentialData = (trustedAccountId: string) => {
+    const trustedAccount:TrustedAccountModel|undefined = state.trustedAccounts.find((d:TrustedAccountModel) => d.trusted_account_id === trustedAccountId);
+    if (!trustedAccount) return;
+    formState.attachedTrustedSecretId = trustedAccount.trusted_account_id;
+    formState.credentialJson = JSON.stringify(trustedAccount.data, null, 2);
 };
 
 /* Event */
@@ -195,7 +194,7 @@ const handleChangeAttachTrustedAccount = (val: boolean) => {
     if (formState.attachTrustedAccount !== val) {
         initForm();
         formState.attachTrustedAccount = val;
-        if (val) formState.attachedTrustedAccountId = state.trustedAccounts?.[0]?.service_account_id;
+        if (val) formState.attachedTrustedAccountId = state.trustedAccounts?.[0]?.trusted_account_id;
     }
 };
 const handleChangeAttachedTrustedAccountId = (val?: string) => {
@@ -325,9 +324,12 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
                             <div class="right-part">
                                 <div v-for="(data, idx) in state.selectedTrustedAccountDataList"
                                      :key="`text-${data.key}-${idx}`"
+                                     class="content-wrapper"
                                 >
                                     <b>{{ data.key }} </b>
-                                    <p-copy-button size="sm">
+                                    <p-copy-button size="sm"
+                                                   class="copy-button-wrap"
+                                    >
                                         {{ data.value }}
                                     </p-copy-button>
                                 </div>
@@ -400,6 +402,7 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
             }
             .copy-text-wrapper {
                 display: flex;
+                align-items: center;
                 padding-top: 0.75rem;
                 .right-part {
                     @apply text-gray-700;
@@ -407,6 +410,15 @@ watch(() => formState.attachTrustedAccount, (attachTrustedAccount) => {
                     gap: 0.25rem;
                     font-size: 0.75rem;
                     margin-left: 0.375rem;
+
+                    .content-wrapper {
+                        @apply flex items-center gap-1;
+
+                        .copy-button-wrap {
+                            display: inline-block;
+                            height: 1.125rem;
+                        }
+                    }
                 }
             }
         }
