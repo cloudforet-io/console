@@ -17,6 +17,8 @@ import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/crea
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -25,6 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
 import UserManagementStatusModal
     from '@/services/administration/components/UserManagementStatusModal.vue';
+import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
     calculateTime, userStateFormatter, userMfaFormatter, userRoleFormatter,
 } from '@/services/administration/composables/refined-user-data';
@@ -42,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
 });
 
+const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
@@ -53,6 +57,7 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setFiltersAsRawQueryString(route.query.filters);
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
     // TODO: will be removed after the backend is ready
     domain_id: computed(() => store.state.domain.domainId),
@@ -223,6 +228,9 @@ const updateUser = async (item, roleId) => {
             @change="handleChange"
             @refresh="handleChange()"
         >
+            <template #toolbox-left>
+                <user-management-table-toolbox v-if="state.isAdminMode" />
+            </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
                           class="capitalize"
@@ -262,6 +270,7 @@ const updateUser = async (item, roleId) => {
                     <p-badge v-for="([key, val], idx) in Object.entries(value)"
                              :key="`${key}-${val}-${idx}`"
                              badge-type="subtle"
+                             shape="square"
                              style-type="gray200"
                              class="mr-2"
                     >
