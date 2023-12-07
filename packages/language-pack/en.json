@@ -1867,6 +1867,8 @@
 				"NOT_SELECT_ROLE": "Not select role",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
+				"NO_USER": "No User",
+				"NO_USER_DESC": "Add an user or more",
 				"ONE_LOWER_CASE_INVALID": "Contains at least one lowercase character.",
 				"ONE_NUMBER_INVALID": "Contains at least one number.",
 				"ONE_UPPER_CASE_INVALID": "Contains at least one Upper character.",

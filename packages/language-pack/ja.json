@@ -1867,6 +1867,8 @@
 				"NOT_SELECT_ROLE": "ロールが選択されていません",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
+				"NO_USER": "",
+				"NO_USER_DESC": "",
 				"ONE_LOWER_CASE_INVALID": "少なくとも１つ以上の小文字を含めなければいけまん",
 				"ONE_NUMBER_INVALID": "少なくとも１つ以上の数字を含めなければいけません",
 				"ONE_UPPER_CASE_INVALID": "少なくとも１つ以上の大文字を含めなければいけません",
