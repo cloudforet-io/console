@@ -83,7 +83,7 @@ const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[])
     const topTitle = {
         type: 'top-title',
         label: scope === DASHBOARD_SCOPE.DOMAIN
-            ? i18n.t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')
+            ? i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')
             : i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT'),
     } as LNBItem;
     const routeName = scope === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;

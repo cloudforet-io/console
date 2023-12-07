@@ -109,7 +109,7 @@ const dashboardsRoute: RouteConfig = {
                 {
                     path: 'workspace',
                     name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
-                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE' },
+                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.WORKSPACE' },
                     redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
                     props: true,
                     component: { template: '<router-view/>' },

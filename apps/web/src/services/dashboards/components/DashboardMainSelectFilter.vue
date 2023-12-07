@@ -73,7 +73,7 @@ export default defineComponent({
             ]),
             scopeFilterList: computed(() => [
                 { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: DASHBOARD_SCOPE_TYPE.ALL },
-                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ENTIRE_WORKSPACE'), name: DASHBOARD_SCOPE_TYPE.DOMAIN },
+                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: DASHBOARD_SCOPE_TYPE.DOMAIN },
                 { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: DASHBOARD_SCOPE_TYPE.PROJECT },
             ]),
             viewersStatus: computed(() => store.state.dashboard.viewers),
