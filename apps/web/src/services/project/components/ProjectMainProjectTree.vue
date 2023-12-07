@@ -293,12 +293,12 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                         {{ $t('PROJECT.LANDING.PROJECT_GROUP_TREE.DONE') }}
                     </p-button>
                     <template v-else>
-                        <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.EDIT')"
-                                       name="ic_edit-text"
-                                       style-type="transparent"
-                                       size="sm"
-                                       @click="projectPageStore.setTreeEditMode(true)"
-                        />
+                        <!--                        <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.EDIT')"-->
+                        <!--                                       name="ic_edit-text"-->
+                        <!--                                       style-type="transparent"-->
+                        <!--                                       size="sm"-->
+                        <!--                                       @click="projectPageStore.setTreeEditMode(true)"-->
+                        <!--                        />-->
                         <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"
                                        name="ic_plus_thin"
                                        style-type="transparent"
