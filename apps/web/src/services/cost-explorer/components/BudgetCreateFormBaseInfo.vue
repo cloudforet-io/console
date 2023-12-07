@@ -22,7 +22,7 @@ type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_group_
 
 type ProviderFilter = BudgetModel['provider_filter'];
 
-const emit = defineEmits<{(e: 'update', budgetInfo:BudgetBaseInfo, isAllvalid: boolean): void; }>();
+const emit = defineEmits<{(e: 'update', budgetInfo:BudgetBaseInfo, isAllValid: boolean): void; }>();
 
 const {
     forms: {

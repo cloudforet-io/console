@@ -239,7 +239,6 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                            disable-handler
                            appearance-type="stack"
                            is-filterable
-                           show-delete-all-button
                            @update:visible-menu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
