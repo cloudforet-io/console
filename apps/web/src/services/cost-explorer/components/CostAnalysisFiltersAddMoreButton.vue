@@ -104,14 +104,6 @@ const handleSelectAddMoreMenuItem = (item: MenuItem, _, isSelected: boolean) => 
         );
         emit('disable-filter', item.name as string);
     }
-    // costAnalysisPageStore.$patch((_state) => {
-    //     if (isSelected) {
-    //         _state.enabledFiltersProperties = [...(_state.enabledFiltersProperties ?? []), item.name as string];
-    //     } else {
-    //         _state.enabledFiltersProperties = _state.enabledFiltersProperties?.filter((d) => d !== item.name);
-    //         emit('disable-filter', item.name as string);
-    //     }
-    // });
 };
 const handleClearAddMoreMenuItems = () => {
     costAnalysisPageStore.setEnabledFiltersProperties([]);
