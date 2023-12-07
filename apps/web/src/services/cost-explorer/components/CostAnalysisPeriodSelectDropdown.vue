@@ -40,7 +40,8 @@ const props = defineProps<{
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const { i18nDayjs } = useI18nDayjs();
 const state = reactive({
@@ -126,7 +127,7 @@ const state = reactive({
     }),
     selectedPeriod: 'last6Month',
     customRangeModalVisible: false,
-    isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
+    isPeriodInvalid: computed<boolean>(() => costAnalysisPageGetters.isPeriodInvalid),
 });
 
 /* Util */
@@ -134,10 +135,8 @@ const getPeriodItemNameByRelativePeriod = (relativePeriod?: RelativePeriod) => s
 
 const setSelectedItemByGranularity = (granularity:Granularity) => {
     const [defaultPeriod, defaultRelativePeriod] = initiatePeriodByGranularity(granularity);
-    costAnalysisPageStore.$patch((_state) => {
-        _state.period = defaultPeriod;
-        _state.relativePeriod = defaultRelativePeriod;
-    });
+    costAnalysisPageStore.setPeriod(defaultPeriod);
+    costAnalysisPageStore.setRelativePeriod(defaultRelativePeriod);
     state.selectedPeriod = getPeriodItemNameByRelativePeriod(defaultRelativePeriod);
 };
 const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:{
@@ -157,10 +156,9 @@ const setSelectedItemByQuerySet = ({ relativePeriod, period, granularity }:{
 const setPeriodMenuItemWithPeriod = (period?: Period) => {
     const start = dayjs.utc(period?.start).format('YYYY-MM');
     const end = dayjs.utc(period?.end).format('YYYY-MM');
-    costAnalysisPageStore.$patch((_state) => {
-        _state.period = { start, end };
-        _state.relativePeriod = undefined;
-    });
+
+    costAnalysisPageStore.setPeriod({ start, end });
+    costAnalysisPageStore.setRelativePeriod(undefined);
     state.selectedPeriod = 'custom';
 };
 
@@ -174,10 +172,8 @@ const handleSelectPeriod = (periodMenuName) => {
             relativePeriod: selectedPeriodItem.relativePeriod,
             granularity: costAnalysisPageState.granularity,
         }) : selectedPeriodItem.period;
-        costAnalysisPageStore.$patch((_state) => {
-            _state.period = state.period;
-            _state.relativePeriod = selectedPeriodItem.relativePeriod;
-        });
+        costAnalysisPageStore.setPeriod(state.period);
+        costAnalysisPageStore.setRelativePeriod(selectedPeriodItem.relativePeriod);
     }
 };
 const handleCustomRangeModalConfirm = (period: Period) => {

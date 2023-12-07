@@ -23,7 +23,8 @@ import type { CostQuerySetOption, Granularity } from '@/services/cost-explorer/t
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const route = useRoute();
 
@@ -46,7 +47,7 @@ const state = reactive({
         },
     ])),
     granularity: undefined as Granularity|undefined,
-    showPeriodBadge: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
+    showPeriodBadge: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
     periodBadgeText: computed<string>(() => {
         if (!costAnalysisPageState.period) return '';
         let startDateFormat = 'MMM D';
@@ -64,13 +65,13 @@ const state = reactive({
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    costAnalysisPageStore.$patch({ granularity });
+    costAnalysisPageStore.setGranularity(granularity);
     state.granularity = granularity;
 };
 
 
 /* NOTE: Case for changing query set(LNB, Dynamic Link) */
-watch(() => costAnalysisPageStore.selectedQueryId, (after, before) => {
+watch(() => costAnalysisPageGetters.selectedQueryId, (after, before) => {
     if (!after) return;
     if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
         state.optionForInitialPeriod = {
@@ -78,7 +79,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (after, before) => {
             period: costAnalysisPageState.period,
         };
     } else if (after !== before) {
-        state.optionForInitialPeriod = costAnalysisPageStore.selectedQuerySet?.options;
+        state.optionForInitialPeriod = costAnalysisPageGetters.selectedQuerySet?.options;
     }
 }, { immediate: true });
 </script>

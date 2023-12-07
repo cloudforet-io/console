@@ -35,7 +35,8 @@ import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-q
 const CostAnalysisQueryFormModal = () => import('@/services/cost-explorer/components/CostAnalysisQueryFormModal.vue');
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const filtersPopperRef = ref<any|null>(null);
 const rightPartRef = ref<HTMLElement|null>(null);
@@ -55,12 +56,12 @@ const state = reactive({
             label: `${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_AS')}...`,
         },
     ])),
-    selectedQuerySetId: computed(() => costAnalysisPageStore.selectedQueryId),
-    isManagedQuerySet: computed(() => costAnalysisPageStore.managedCostQuerySetList.map((d) => d.cost_query_set_id).includes(state.selectedQuerySetId)),
-    isDynamicQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
+    selectedQuerySetId: computed(() => costAnalysisPageGetters.selectedQueryId),
+    isManagedQuerySet: computed(() => costAnalysisPageGetters.managedCostQuerySetList.map((d) => d.cost_query_set_id).includes(state.selectedQuerySetId)),
+    isDynamicQuerySet: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS),
     filtersPopoverVisible: false,
     granularity: undefined as Granularity|undefined,
-    isPeriodInvalid: computed<boolean>(() => costAnalysisPageStore.isPeriodInvalid),
+    isPeriodInvalid: computed<boolean>(() => costAnalysisPageGetters.isPeriodInvalid),
     invalidPeriodMessage: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.INVALID_PERIOD_TEXT')),
     selectedFiltersCount: computed(() => {
         let count = 0;
@@ -88,13 +89,13 @@ onClickOutside(rightPartRef, hideContextMenu);
 const handleSaveQuerySet = async () => {
     try {
         await SpaceConnector.client.costAnalysis.costQuerySet.update({
-            cost_query_set_id: costAnalysisPageStore.selectedQueryId,
+            cost_query_set_id: costAnalysisPageGetters.selectedQueryId,
             options: {
                 granularity: costAnalysisPageState.granularity,
                 period: costAnalysisPageState.period,
                 relative_period: costAnalysisPageState.relativePeriod,
                 group_by: costAnalysisPageState.groupBy,
-                filters: costAnalysisPageStore.consoleFilters,
+                filters: costAnalysisPageGetters.consoleFilters,
                 metadata: { filters_schema: { enabled_properties: costAnalysisPageState.enabledFiltersProperties ?? [] } },
             },
         });
@@ -116,7 +117,7 @@ const handleUpdateQuery = async (updatedQueryId: string) => {
     await SpaceRouter.router.push({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
-            dataSourceId: costAnalysisPageStore.selectedDataSourceId as string,
+            dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
             costQuerySetId: updatedQueryId,
         },
     });
@@ -125,7 +126,7 @@ const handleClickFilter = () => {
     state.filtersPopoverVisible = !state.filtersPopoverVisible;
 };
 
-watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
+watch(() => costAnalysisPageGetters.selectedQueryId, (updatedQueryId) => {
     if (updatedQueryId !== '') {
         state.filtersPopoverVisible = false;
     }
@@ -214,7 +215,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (updatedQueryId) => {
         <cost-analysis-query-form-modal :visible.sync="state.queryFormModalVisible"
                                         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_TO_COST_ANALYSIS_LIBRARY')"
                                         request-type="SAVE"
-                                        :selected-query-set-id="costAnalysisPageStore.selectedQueryId"
+                                        :selected-query-set-id="costAnalysisPageGetters.selectedQueryId"
                                         @update-query="handleUpdateQuery"
         />
     </div>

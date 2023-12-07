@@ -14,10 +14,11 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplorerContainer.vue');
 
-const CostAnalysisPage = () => import('@/services/cost-explorer/pages/CostAnalysisPage.vue');
 const BudgetMainPage = () => import('@/services/cost-explorer/pages/BudgetMainPage.vue');
 const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCreatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
+
+const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
 
 const adminCostExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
@@ -71,7 +72,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                         copiable: ({ params }) => ![DYNAMIC_COST_QUERY_SET_PARAMS].includes(params.costQuerySetId),
                     },
                     props: true,
-                    component: CostAnalysisPage as any,
+                    component: AdminCostAnalysisPage as any,
                 },
             ],
         },
