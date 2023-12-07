@@ -1280,9 +1280,7 @@
 			"CREATE": "Create",
 			"CREAT_NEW_DASHBOARD": "Create New Dashboard",
 			"DASHBOARDS_TITLE": "Dashboards",
-			"ENTIRE_WORKSPACE": "Entire Workspace",
 			"FILTER_ALL": "All",
-			"FILTER_ENTIRE_WORKSPACE": "Entire Workspace",
 			"FILTER_PRIVATE": "Private",
 			"FILTER_PUBLIC": "Pubilc",
 			"FILTER_SINGLE_PROJECT": "Single Project",
@@ -1296,7 +1294,8 @@
 			"TOOLTIP_CLONE": "Clone",
 			"TOOLTIP_DELETE": "Delete",
 			"TOOLTIP_EDIT": "Edit",
-			"VIEW_ALL": "View All Dashboards"
+			"VIEW_ALL": "View All Dashboards",
+			"WORKSPACE": "Workspace"
 		},
 		"CREATE": {
 			"BLANK_DESC": "Build your own dashboard from scratch.",
@@ -1304,7 +1303,6 @@
 			"CONTINUE": "Continue",
 			"CREATE": "Create",
 			"CREATE_NEW_DASHBOARD": "Create New Dashboard",
-			"ENTIRE_WORKSPACES": "Entire Workspace",
 			"GO_BACK": "Go back",
 			"LABEL_DEFAULT_TEMPLATE": "Default Template",
 			"LABEL_EXISTING_DASHBOARD": "Existing Dashboard",
@@ -1324,7 +1322,8 @@
 			"TITLE": "Create New Dashboard",
 			"VALIDATION_PROJECT": "Please Select Project",
 			"VALIDATION_TEMPLATE": "Please Select Template.",
-			"VIEW": "View"
+			"VIEW": "View",
+			"WORKSPACE": "Workspace"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "Click + button to add dashboard's label.",
