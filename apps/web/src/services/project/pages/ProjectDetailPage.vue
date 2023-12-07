@@ -6,7 +6,7 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PBreadcrumbs, PButton, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab,
+    PBadge, PBreadcrumbs, PButton, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
@@ -53,6 +53,7 @@ const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
+const projectDetailPageGetters = projectDetailPageStore.getters;
 const storeState = reactive({
     projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
 });
@@ -221,6 +222,19 @@ onUnmounted(() => {
                                                @click="openProjectDeleteForm"
                                 />
                             </template>
+                            <p-badge v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
+                                     style-type="gray200"
+                                     badge-type="subtle"
+                            >
+                                <div class="badge-content-wrapper">
+                                    <p-i name="ic_lock-filled"
+                                         width="0.75rem"
+                                         height="0.75rem"
+                                         color="inherit"
+                                    />
+                                    <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
+                                </div>
+                            </p-badge>
                         </div>
                         <div class="top-right-group">
                             <p class="copy-project-id">
@@ -315,8 +329,11 @@ onUnmounted(() => {
         .favorite-button-wrapper {
             @apply inline-flex ml-2;
         }
-        .p-icon-text-button {
-            @apply flex-shrink-0 ml-4;
+        .badge-content-wrapper {
+            @apply text-gray-900;
+            display: flex;
+            align-content: center;
+            gap: 0.25rem;
         }
     }
     .top-right-group {

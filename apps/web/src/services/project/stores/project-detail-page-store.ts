@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -7,6 +7,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ProjectType } from '@/schema/identity/project/type';
 import type { AlertState } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 
@@ -35,6 +36,7 @@ export const useProjectDetailPageStore = defineStore('project-detail-page', () =
         maintenanceHappenings: [] as MaintenanceHappening[],
     });
     const getters = reactive({
+        projectType: computed<ProjectType|undefined>(() => state.currentProject?.project_type),
     });
 
     /* mutations */
