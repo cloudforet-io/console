@@ -7,12 +7,13 @@ import { defineStore } from 'pinia';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { GRANULARITY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
+import { GRANULARITY, GROUP_BY, GROUP_BY_ITEM_MAP } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { convertRelativePeriodToPeriod } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import { useCostQuerySetStore } from '@/services/cost-explorer/stores/cost-query-set-store';
 import type {
@@ -29,6 +30,7 @@ interface GroupByItem {
 const allReferenceStore = useAllReferenceStore();
 const costQuerySetStore = () => useCostQuerySetStore();
 const costQuerySetState = () => costQuerySetStore().$state;
+const appContextStore = useAppContextStore();
 
 const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, string[]> => {
     if (!consoleFilters || isEmpty(consoleFilters)) return {};
@@ -40,6 +42,15 @@ const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, str
 };
 
 export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => {
+    const _state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+        managedGroupByItems: computed<GroupByItem[]>(() => {
+            if (_state.isAdminMode) {
+                return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.PROJECT);
+            }
+            return Object.values(GROUP_BY_ITEM_MAP).filter((d) => d.name !== GROUP_BY.WORKSPACE);
+        }),
+    });
     const state = reactive({
         granularity: GRANULARITY.MONTHLY as Granularity,
         groupBy: [] as Array<GroupBy|string>,
@@ -49,7 +60,6 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         filters: {} as Record<string, string[]>,
         enabledFiltersProperties: undefined as string[]|undefined,
     });
-
     const getters = reactive({
         selectedQueryId: computed(() => costQuerySetState().selectedQuerySetId),
         costQueryList: computed(() => costQuerySetState().costQuerySetList),
@@ -75,7 +85,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
                     }));
                 }
             }
-            return [...Object.values(GROUP_BY_ITEM_MAP), ...sortBy(additionalInfoGroupBy, 'label')];
+            return [..._state.managedGroupByItems, ...sortBy(additionalInfoGroupBy, 'label')];
         }),
         consoleFilters: computed<ConsoleFilter[]>(() => {
             const results: ConsoleFilter[] = [];
@@ -167,7 +177,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         if (options.metadata?.filters_schema?.enabled_properties?.length) {
             state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
         } else {
-            state.enabledFiltersProperties = Object.keys(GROUP_BY_ITEM_MAP);
+            state.enabledFiltersProperties = _state.managedGroupByItems.map((d) => d.name);
         }
     };
     const saveQuery = async (name: string): Promise<CostQuerySetModel|undefined> => {
