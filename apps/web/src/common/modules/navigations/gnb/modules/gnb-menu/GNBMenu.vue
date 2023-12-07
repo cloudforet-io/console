@@ -8,6 +8,7 @@
              :class="[{
                  opened: isMenuWithAdditionalMenu && isOpened,
                  selected: isSelected,
+                 'is-admin': isAdminMode,
              }]"
         >
             <span class="button-label"
@@ -122,6 +123,10 @@ export default defineComponent<Props>({
         clickOutside: vOnClickOutside as DirectiveFunction,
     },
     props: {
+        isAdminMode: {
+            type: Boolean,
+            default: false,
+        },
         show: {
             type: Boolean,
             default: true,
@@ -207,6 +212,10 @@ export default defineComponent<Props>({
         cursor: pointer;
         text-decoration: none;
         text-transform: capitalize;
+
+        &.is-admin {
+            @apply text-violet-100;
+        }
 
         .button-label {
             @apply inline-block flex items-center;

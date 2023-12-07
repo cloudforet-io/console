@@ -8,22 +8,30 @@
                 />
             </div>
 
-            <g-n-b-logo :to="logoLink" />
-
-            <g-n-b-menu v-for="(menu, idx) in gnbMenuList"
-                        :key="`gnb-menu-${idx}`"
-                        :show="menu.show"
-                        :menu-id="menu.id"
-                        :label="menu.label"
-                        :to="menu.to"
-                        :sub-menu-list="menu.subMenuList"
-                        :has-permission="hasPermission"
-                        :is-opened="openedMenu === menu.id"
-                        :is-selected="selectedMenu === menu.id"
-                        :highlight-tag="menu.highlightTag"
-                        @open-menu="handleOpenMenu"
-                        @hide-menu="hideMenu"
+            <g-n-b-admin-logo v-if="isAdminMode"
+                              :to="adminModeLogoLink"
             />
+            <g-n-b-workspace-navigation v-else
+                                        :to="userModeLogoLink"
+            />
+
+            <div class="gnb-menu-warpper">
+                <g-n-b-menu v-for="(menu, idx) in gnbMenuList"
+                            :key="`gnb-menu-${idx}`"
+                            :is-admin-mode="isAdminMode"
+                            :show="menu.show"
+                            :menu-id="menu.id"
+                            :label="menu.label"
+                            :to="menu.to"
+                            :sub-menu-list="menu.subMenuList"
+                            :has-permission="hasPermission"
+                            :is-opened="openedMenu === menu.id"
+                            :is-selected="selectedMenu === menu.id"
+                            :highlight-tag="menu.highlightTag"
+                            @open-menu="handleOpenMenu"
+                            @hide-menu="hideMenu"
+                />
+            </div>
         </div>
         <g-n-b-toolset class="right-part"
                        :opened-menu="openedMenu"
@@ -43,6 +51,8 @@ import { includes } from 'lodash';
 
 import { store } from '@/store';
 
+import { ROOT_ROUTE } from '@/router/constant';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { DisplayMenu as GNBMenuType } from '@/store/modules/display/type';
 import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
@@ -51,19 +61,19 @@ import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import GNBAdminLogo from '@/common/modules/navigations/gnb/modules/gnb-left-part/GNBAdminLogo.vue';
+import GNBWorkspaceNavigation from '@/common/modules/navigations/gnb/modules/gnb-left-part/GNBWorkspaceNavigation.vue';
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
-import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
-
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 
 export default defineComponent({
     name: 'GNB',
     components: {
-        GNBLogo,
+        GNBWorkspaceNavigation,
+        GNBAdminLogo,
         GNBMenu,
         SiteMap,
         GNBToolset,
@@ -77,7 +87,8 @@ export default defineComponent({
             openedMenu: '',
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
-            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: HOME_DASHBOARD_ROUTE._NAME } : null)),
+            userModeLogoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: ROOT_ROUTE.WORKSPACE._NAME } : null)),
+            adminModeLogoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: ROOT_ROUTE.ADMIN._NAME } : null)),
             gnbMenuList: computed<GNBMenuType[]>(() => {
                 let result = [...store.getters['display/GNBMenuList']];
                 if (state.integrationMenu) result = [...result, state.integrationMenu];
@@ -135,11 +146,13 @@ export default defineComponent({
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
     &.admin-gnb {
-        @apply bg-indigo-400;
+        @apply bg-violet-900;
+        background: linear-gradient(90deg, #2c0f66 14.69%, #7d5dd2 100%);
+        box-shadow: 0 0.125rem 0.25rem 0 rgba(0, 0, 0, 0.12);
     }
 
     .left-part {
-        padding-left: 1.5rem;
+        @apply h-full w-full flex;
 
         @screen tablet {
             padding-left: 0;
@@ -159,6 +172,10 @@ export default defineComponent({
             @screen mobile {
                 display: inline-block;
             }
+        }
+
+        .gnb-menu-warpper {
+            @apply inline-flex;
         }
     }
     .right-part {
