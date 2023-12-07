@@ -1280,9 +1280,7 @@
 			"CREATE": "作成",
 			"CREAT_NEW_DASHBOARD": "新規ダッシュボード作成",
 			"DASHBOARDS_TITLE": "ダッシュボード",
-			"ENTIRE_WORKSPACE": "ワークスペース全体",
 			"FILTER_ALL": "すべて",
-			"FILTER_ENTIRE_WORKSPACE": "ワークスペース全体",
 			"FILTER_PRIVATE": "非公開",
 			"FILTER_PUBLIC": "公開",
 			"FILTER_SINGLE_PROJECT": "個別プロジェクト",
@@ -1296,7 +1294,8 @@
 			"TOOLTIP_CLONE": "複製",
 			"TOOLTIP_DELETE": "削除",
 			"TOOLTIP_EDIT": "編集",
-			"VIEW_ALL": "すべてのダッシュボードを表示"
+			"VIEW_ALL": "すべてのダッシュボードを表示",
+			"WORKSPACE": "ワークスペース"
 		},
 		"CREATE": {
 			"BLANK_DESC": "空のダッシュボードを利用して、最初から作成",
@@ -1304,7 +1303,6 @@
 			"CONTINUE": "次へ",
 			"CREATE": "作成",
 			"CREATE_NEW_DASHBOARD": "新規ダッシュボード作成",
-			"ENTIRE_WORKSPACES": "ワークスペース全体",
 			"GO_BACK": "戻る",
 			"LABEL_DEFAULT_TEMPLATE": "デフォルトテンプレートから選択",
 			"LABEL_EXISTING_DASHBOARD": "既存のダッシュボードから選択",
@@ -1324,7 +1322,8 @@
 			"TITLE": "新規ダッシュボード作成",
 			"VALIDATION_PROJECT": "プロジェクトを選択してください。",
 			"VALIDATION_TEMPLATE": "テンプレートを選択してください",
-			"VIEW": "ビュー"
+			"VIEW": "ビュー",
+			"WORKSPACE": "ワークスペース"
 		},
 		"CUSTOMIZE": {
 			"ADD_LABEL": "[+] ボタンをクリックして、ラベルを追加してください",

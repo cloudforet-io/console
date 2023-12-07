@@ -105,7 +105,7 @@ const adminDashboardsRoute: RouteConfig = {
                 {
                     path: 'workspace',
                     name: makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE._NAME),
-                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE' },
+                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.WORKSPACE' },
                     redirect: () => ({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) }),
                     props: true,
                     component: { template: '<router-view/>' },

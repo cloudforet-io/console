@@ -9,7 +9,7 @@
                          :disabled="!workspaceManagePermission"
                          @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
                 >
-                    {{ $t('DASHBOARDS.CREATE.ENTIRE_WORKSPACES') }}
+                    {{ $t('DASHBOARDS.CREATE.WORKSPACE') }}
                 </p-radio>
                 <p-radio :selected="!isDomainScope"
                          :disabled="!projectManagePermission"

@@ -55,7 +55,7 @@
                                        :scope-type="DASHBOARD_SCOPE.DOMAIN"
                                        class="dashboard-list"
                                        :class="{'full-mode': scopeStatus === SCOPE_TYPE.DOMAIN}"
-                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')"
+                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
                                        :dashboard-list="workspaceDashboardList"
             />
             <dashboard-main-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN && projectDashboardList.length"
