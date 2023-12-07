@@ -16,7 +16,7 @@
                            style-type="transparent"
                            @update:selected="handleChangeViewers"
         />
-        <template v-if="pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] && pagePermission[MENU_ID.DASHBOARDS_PROJECT]">
+        <template v-if="pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] && pagePermission[MENU_ID.PROJECT_DASHBOARDS]">
             <p-divider class="divider"
                        vertical
             />
