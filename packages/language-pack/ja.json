@@ -1878,6 +1878,8 @@
 				"PASSWORD_HELP_TEXT": "パスワードは、5〜12文字で入力してください。",
 				"PASSWORD_INVALID": "8文字以上で入力してください。",
 				"REQUIRED_FIELD": "該当する情報を入力してください。",
+				"ROLE_PLACEHOLDER": "",
+				"ROLE_TITLE": "",
 				"TAGS": "タグ",
 				"TAGS_HELP_TEXT1": "タグを追加してリソースを管理してください",
 				"TAGS_HELP_TEXT2": "Keyは下線、文字、数字のみ使用可能です",

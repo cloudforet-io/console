@@ -1878,6 +1878,8 @@
 				"PASSWORD_HELP_TEXT": "비밀번호는 5 ~ 12 자로 입력해주세요",
 				"PASSWORD_INVALID": "8자 이상 입력해주세요.",
 				"REQUIRED_FIELD": "해당 정보를 입력해주세요.",
+				"ROLE_PLACEHOLDER": "",
+				"ROLE_TITLE": "",
 				"TAGS": "태그",
 				"TAGS_HELP_TEXT1": "태그를 추가하여 리소스를 관리하세요.",
 				"TAGS_HELP_TEXT2": "키는 문자, 숫자 및 밑줄만 포함할 수 있습니다.",

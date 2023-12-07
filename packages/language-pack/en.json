@@ -1878,6 +1878,8 @@
 				"PASSWORD_HELP_TEXT": "your Password must be 5 ~ 12 characters long",
 				"PASSWORD_INVALID": "Password needs to at least 8 characters.",
 				"REQUIRED_FIELD": "Required field",
+				"ROLE_PLACEHOLDER": "Select a workspace role",
+				"ROLE_TITLE": "Invite with a role:",
 				"TAGS": "Tags",
 				"TAGS_HELP_TEXT1": "Add associated tags.",
 				"TAGS_HELP_TEXT2": "The Key - Value pair is a required field. Only underscores (_), characters, and numbers are allowed. International characters are allowed.",
