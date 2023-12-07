@@ -1,19 +1,20 @@
 <script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PButton, PHeading, PTableCheckModal, PToolboxTable, PI,
+    PButton, PHeading, PI, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
@@ -64,6 +65,7 @@ const state = reactive({
         { label: 'User ID', name: 'user_id' },
         { label: 'User Name', name: 'user_name' },
     ] as DataTableField[],
+    workspaceUserIdList: [] as string[],
     projectUserIdList: [] as string[],
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
@@ -87,17 +89,42 @@ const state = reactive({
     memberDeleteModalVisible: false,
 });
 
+/* Util */
+const fetchUserList = () => {
+    if (projectDetailPageGetters.projectType === 'PUBLIC') {
+        fetchWorkspaceUserList();
+    } else {
+        fetchProjectUsers();
+    }
+};
+
 /* Api */
-const getProjectUserData = async () => {
+const fetchProjectUsers = async () => {
     state.loading = true;
     state.selectIndex = [];
     try {
-        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+        const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.projectId,
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
         state.projectUserIdList = res.users ?? [];
         state.totalCount = res.users?.length ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.projectUserIdList = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+const fetchWorkspaceUserList = async () => {
+    state.loading = true;
+    try {
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
+            domain_id: store.state.domain.domainId,
+        });
+        state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
+        state.totalCount = res.total_count ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.projectUserIdList = [];
@@ -141,10 +168,10 @@ const handleConfirmDeleteMember = async (items) => {
     await deleteProjectUser(items);
 
     state.memberDeleteModalVisible = false;
-    await getProjectUserData();
+    fetchUserList();
 };
 const handleConfirmInvite = () => {
-    getProjectUserData();
+    fetchUserList();
 };
 
 /* Init */
@@ -158,21 +185,21 @@ const handleConfirmInvite = () => {
 
 /* Watcher */
 watch(() => store.state.reference.project.items, (projects) => {
-    if (projects) getProjectUserData();
+    if (projects) fetchUserList();
 }, { immediate: true });
 </script>
 
 <template>
     <div class="project-member-tab">
         <p-toolbox-table :excel-visible="false"
-                         selectable
+                         :selectable="projectDetailPageGetters.projectType === 'PRIVATE'"
                          sortable
                          :fields="state.fields"
                          :items="state.refinedItems"
                          :select-index.sync="state.selectIndex"
                          :loading="state.loading"
                          :total-count="state.totalCount"
-                         :search-text="state.searchText"
+                         :search-text.sync="state.searchText"
                          @change="handleChangeTable"
                          @refresh="handleChangeTable()"
         >
@@ -182,7 +209,9 @@ watch(() => store.state.reference.project.items, (projects) => {
                            use-total-count
                            :total-count="state.totalCount"
                 >
-                    <template #title-right-extra>
+                    <template v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
+                              #title-right-extra
+                    >
                         <div class="action-button-wrapper">
                             <p-button style-type="primary"
                                       class="mr-4 add-btn"
