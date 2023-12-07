@@ -3,6 +3,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import type { RoleModel } from '@/schema/identity/role/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 
@@ -15,6 +17,7 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
         title: '',
         themeColor: 'primary',
         users: [] as UserModel[],
+        roles: [] as RoleModel[],
         visible: {
             additional: false,
             form: false,
@@ -32,6 +35,18 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
                 ErrorHandler.handleError(e);
                 this.users = [];
                 throw e;
+            }
+        },
+        async listRoles(params: RoleListParameters) {
+            this.loading = true;
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                this.roles = results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.roles = [];
+            } finally {
+                this.loading = false;
             }
         },
     },

@@ -3,6 +3,7 @@ import { reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
+import UserManagementAdditionalRole from '@/services/administration/components/UserManagementAdditionalRole.vue';
 import UserManagementAdditionalUser from '@/services/administration/components/UserManagementAdditionalUser.vue';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 
@@ -42,6 +43,7 @@ const handleConfirm = () => {
         <template #body>
             <div class="modal-contents">
                 <user-management-additional-user />
+                <user-management-additional-role />
             </div>
         </template>
     </p-button-modal>
@@ -51,9 +53,10 @@ const handleConfirm = () => {
 .user-management-additional-modal {
     display: initial;
     .modal-contents {
-        @apply bg-primary-4 rounded-md;
+        @apply flex flex-col bg-primary-4 rounded-md;
         margin-bottom: 9rem;
         padding: 1rem;
+        gap: 1rem;
     }
 }
 </style>
