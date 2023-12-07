@@ -34,11 +34,10 @@ const state = reactive({
     ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
     workspaceList: computed(() => workspaceStoreState.getters.workspaceList),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed(() => [...state.workspaceList.map((_workspace) => ({
+    workspaceMenuList: computed(() => state.workspaceList.map((_workspace) => ({
         name: _workspace.workspace_id,
         label: _workspace.name,
-    })),
-    ]),
+    }))),
     searchText: '',
 });
 
