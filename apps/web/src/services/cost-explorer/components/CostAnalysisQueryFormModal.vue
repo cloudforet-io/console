@@ -35,6 +35,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
 const formState = reactive({
     queryName: undefined as undefined | string,
@@ -58,7 +59,7 @@ const state = reactive({
     showValidation: false,
     isAllValid: computed(() => state.showValidation && state.isQueryNameValid),
     managedCostQuerySetIdList: [...MANAGED_COST_QUERY_SET_ID_LIST],
-    existingCostQuerySetNameList: computed(() => costAnalysisPageStore.costQueryList.map((query) => query.name)),
+    existingCostQuerySetNameList: computed(() => costAnalysisPageGetters.costQueryList.map((query) => query.name)),
     mergedCostQuerySetNameList: computed(() => [...state.managedCostQuerySetIdList, ...state.existingCostQuerySetNameList]),
 });
 
@@ -102,7 +103,7 @@ const handleFirstQueryNameInput = () => {
 watch(() => state.proxyVisible, (visible) => {
     if (visible) {
         if (props.requestType === 'EDIT') {
-            const selectedQuerySet = costAnalysisPageStore.costQueryList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
+            const selectedQuerySet = costAnalysisPageGetters.costQueryList.find((query) => query.cost_query_set_id === props.selectedQuerySetId);
             formState.queryName = selectedQuerySet?.name;
         }
         state.showValidation = true;

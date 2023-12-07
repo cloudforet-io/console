@@ -47,7 +47,8 @@ const emit = defineEmits<{(e: 'update:chart', value): void;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const chartContext = ref<HTMLElement | null>(null);
 const chartHelper = useAmcharts5(chartContext);
@@ -151,7 +152,7 @@ const drawChart = () => {
             if (dataContext) {
                 const date = dayjs.utc(dataContext.date).format(_tooltipDateFormat);
                 let value = dataContext[legend.name];
-                value = currencyMoneyFormatter(value, { currency: costAnalysisPageStore.currency, style: 'decimal' });
+                value = currencyMoneyFormatter(value, { currency: costAnalysisPageGetters.currency, style: 'decimal' });
                 return `${date}\n[${seriesColor}; fontSize: 10px]●[/] {name}: [bold]${value}[/]`;
             }
             return text;

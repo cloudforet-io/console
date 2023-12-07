@@ -27,6 +27,7 @@ const route = useRoute();
 const router = useRouter();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
 /* util */
 const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQuerySetModel['options'] => ({
@@ -37,19 +38,18 @@ const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): CostQu
 });
 
 onUnmounted(() => {
-    costAnalysisPageStore.$dispose();
-    costAnalysisPageStore.$reset();
+    costAnalysisPageStore.reset();
 });
 
-watch(() => costAnalysisPageStore.selectedQuerySet, async (selectedQuerySet) => {
+watch(() => costAnalysisPageGetters.selectedQuerySet, async (selectedQuerySet) => {
     if (selectedQuerySet) {
-        await costAnalysisPageStore.setQueryOptions(selectedQuerySet.options);
+        costAnalysisPageStore.setQueryOptions(selectedQuerySet.options);
     } else if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
         const currentQuery = router.currentRoute.query;
         const costQuerySetOptions = getQueryOptionsFromUrlQuery(currentQuery);
-        await costAnalysisPageStore.setQueryOptions(costQuerySetOptions);
+        costAnalysisPageStore.setQueryOptions(costQuerySetOptions);
     } else {
-        await costAnalysisPageStore.setQueryOptions();
+        costAnalysisPageStore.setQueryOptions();
     }
 }, { immediate: true });
 </script>

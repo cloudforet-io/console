@@ -62,7 +62,7 @@ type CostAnalyzeRawData = {
 };
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
     component: computed(() => PToolboxTable),
