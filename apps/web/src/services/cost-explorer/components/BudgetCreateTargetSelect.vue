@@ -1,15 +1,14 @@
 <template>
     <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_TARGET')"
-                   :invalid="!disableValidation && invalidState.selectedTargets"
+                   :invalid="invalidState.selectedTargets"
                    :invalid-text="invalidTexts.selectedTargets"
                    required
                    class="budget-create-target-select"
     >
         <project-select-dropdown :selected-project-ids="selectedTargets"
-                                 :invalid="!disableValidation && invalidState.selectedTargets"
+                                 :invalid="invalidState.selectedTargets"
                                  project-selectable
-                                 project-group-selectable
-                                 :multi-selectable="multiSelectable"
+                                 :project-group-selectable="false"
                                  @update:selected-project-ids="setForm('selectedTargets', $event)"
                                  @close="validate('selectedTargets')"
         />
@@ -28,15 +27,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 
-interface Props {
-    targets: string[];
-    multiSelectable?: boolean;
-    disableValidation?: boolean;
-}
-const props = withDefaults(defineProps<Props>(), {
-    targets: () => [],
-});
-const emit = defineEmits<{(e: 'update', target: string|string[], isValid: boolean): void; }>();
+const emit = defineEmits<{(e: 'update', target: string, isValid: boolean): void; }>();
 const {
     forms: {
         selectedTargets,
@@ -53,7 +44,7 @@ const {
 });
 
 watch([() => selectedTargets.value, () => isAllValid.value], debounce(([targets, isValid]) => {
-    const target: string[]|string = props.multiSelectable ? targets : targets[0];
+    const target: string = targets[0];
     emit('update', target, isValid);
 }, 300) as any, { immediate: true });
 </script>
