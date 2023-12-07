@@ -3095,6 +3095,7 @@
 			"ALT_S_UPDATE_WEBHOOK": "ウェプフク編集成功",
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
+			"INVITE_ONLY": "",
 			"MEMBER": {
 				"ADD": "追加",
 				"ADD_FROM": "{user_type}から追加する",
@@ -3119,6 +3120,9 @@
 				"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 				"NO_RESULTS_FOUND": "検索結果が見つかりません",
 				"NO_RESULTS_FOUND_HELP_TEXT": "検索キーワードに一致する項目が見つかりません",
+				"PRIVATE_MEMBER_DESC": "",
+				"PROJECT_SETTINGS": "",
+				"PUBLIC_MEMBER_DESC": "",
 				"REMOVE": "",
 				"ROLE": "ロール",
 				"ROLE_HELP_TEXT": "選択したメンバーにロールを割り当ててください。",

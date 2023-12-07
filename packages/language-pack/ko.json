@@ -3095,6 +3095,7 @@
 			"ALT_S_UPDATE_WEBHOOK": "웹훅 업데이트 완료",
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
+			"INVITE_ONLY": "",
 			"MEMBER": {
 				"ADD": "추가",
 				"ADD_FROM": "{user_type} 사용자 추가",
@@ -3119,6 +3120,9 @@
 				"MODAL_VALIDATION_REQUIRED": "필수 입력 항목입니다.",
 				"NO_RESULTS_FOUND": "검색결과가 없습니다.",
 				"NO_RESULTS_FOUND_HELP_TEXT": "검색결과가 없습니다.",
+				"PRIVATE_MEMBER_DESC": "",
+				"PROJECT_SETTINGS": "",
+				"PUBLIC_MEMBER_DESC": "",
 				"REMOVE": "",
 				"ROLE": "역할(Role)",
 				"ROLE_HELP_TEXT": "선택한 멤버에 역할(Role)을 할당 해주세요",

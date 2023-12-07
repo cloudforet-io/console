@@ -3095,6 +3095,7 @@
 			"ALT_S_UPDATE_WEBHOOK": "Webhook successfully updated ",
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
+			"INVITE_ONLY": "Invite only",
 			"MEMBER": {
 				"ADD": "Add",
 				"ADD_FROM": "Add from {user_type}",
@@ -3119,6 +3120,9 @@
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
+				"PRIVATE_MEMBER_DESC": "Only people invited can be access to this project based on {settings}",
+				"PROJECT_SETTINGS": "project settings",
+				"PUBLIC_MEMBER_DESC": "Everyone in this workspace is considered a member of this project based on {settings}",
 				"REMOVE": "Remove",
 				"ROLE": "Role",
 				"ROLE_HELP_TEXT": "Set a role for selected member",

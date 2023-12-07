@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PButton, PHeading, PTableCheckModal, PToolboxTable,
+    PButton, PHeading, PTableCheckModal, PToolboxTable, PI,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -15,7 +15,7 @@ import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/g
 import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
-import { i18n } from '@/translations';
+import { i18n as _i18n } from '@/translations';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
@@ -25,6 +25,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectMemberInviteModal from '@/services/project/components/ProjectMemberInviteModal.vue';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type { ProjectMemberItem } from '@/services/project/types/project-member-type';
 
 
@@ -47,6 +49,10 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update-filters', filters: any): void;
 }>();
 
+const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
+const projectDetailPageStore = useProjectDetailPageStore();
+const projectDetailPageGetters = projectDetailPageStore.getters;
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
@@ -107,9 +113,9 @@ const deleteProjectUser = async (items) => {
             users: items.map((it) => it.user_id),
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
+        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
+        ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
     }
 };
 
@@ -194,6 +200,32 @@ watch(() => store.state.reference.project.items, (projects) => {
                         </div>
                     </template>
                 </p-heading>
+                <div class="description-wrapper"
+                     :class="[projectDetailPageGetters.projectType === 'PRIVATE' ? 'private' : 'public']"
+                >
+                    <span class="icon">
+                        <p-i :name="projectDetailPageGetters.projectType === 'PRIVATE' ? 'ic_lock-filled' : 'ic_globe-filled'"
+                             color="inherit"
+                             width="1rem"
+                             height="1rem"
+                        />
+                    </span>
+                    <span class="text">
+                        <i18n :path="projectDetailPageGetters.projectType === 'PRIVATE' ? 'PROJECT.DETAIL.MEMBER.PRIVATE_MEMBER_DESC' : 'PROJECT.DETAIL.MEMBER.PUBLIC_MEMBER_DESC'">
+                            <template #settings>
+                                <span v-if="projectPageState.isWorkspaceOwner"
+                                      class="link-text"
+                                      @click="projectPageStore.openProjectFormModal()"
+                                >
+                                    {{ $t('PROJECT.DETAIL.MEMBER.PROJECT_SETTINGS') }}
+                                </span>
+                                <span v-else>
+                                    {{ $t('PROJECT.DETAIL.MEMBER.PROJECT_SETTINGS') }}
+                                </span>
+                            </template>
+                        </i18n>
+                    </span>
+                </div>
             </template>
         </p-toolbox-table>
 
@@ -227,6 +259,39 @@ watch(() => store.state.reference.project.items, (projects) => {
         }
     }
 
+    .description-wrapper {
+        @apply rounded-md text-gray-900;
+        display: flex;
+        align-content: center;
+        padding: 0.75rem 1rem;
+        margin: 1rem 1rem 0 1rem;
+        &.public {
+            @apply bg-indigo-100;
+            .icon {
+                @apply text-indigo-600;
+            }
+        }
+        &.private {
+            @apply bg-gray-100;
+            .icon {
+                @apply text-gray-900;
+            }
+        }
+        .text {
+            @apply text-label-md;
+            padding-left: 0.25rem;
+            .link-text {
+                @apply text-blue-700;
+                cursor: pointer;
+                &:hover {
+                    @apply text-secondary;
+                    .text {
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
     .action-button-wrapper {
         display: inline-flex;
         float: right;
