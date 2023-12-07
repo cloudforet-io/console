@@ -9,21 +9,18 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import UserManagementButtonModal from '@/services/administration/components/UserManagementButtonModal.vue';
+import UserManagementAdditionalModal from '@/services/administration/components/UserManagementAdditionalModal.vue';
+import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const appContextStore = useAppContextStore();
+const modalSettingStore = useUserModalSettingStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     isWorkspaceOwner: computed(() => store.state.user.roleType === ROLE_TYPE.WORKSPACE_OWNER),
-});
-const modalState = reactive({
-    mode: '',
-    title: '',
-    themeColor: 'primary',
 });
 
 /* Component */
@@ -38,25 +35,27 @@ const handleClickButton = (type: string) => {
 
 /* Modal Handler */
 const clickRemove = () => {
-    modalState.mode = 'remove';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.MODAL.REMOVE_TITLE') as string;
-    modalState.themeColor = 'alert';
-    userPageStore.$patch((_state) => {
-        _state.modalVisible.status = true;
+    modalSettingStore.$patch((_state) => {
+        _state.mode = 'remove';
+        _state.title = i18n.t('IDENTITY.USER.MAIN.MODAL.REMOVE_TITLE') as string;
+        _state.themeColor = 'alert';
+        _state.visible.status = true;
     });
 };
 const clickInvite = () => {
-    modalState.mode = 'invite';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.MODAL.INVITE_TITLE') as string;
-    userPageStore.$patch((_state) => {
-        _state.modalVisible.form = true;
+    modalSettingStore.$patch((_state) => {
+        _state.mode = 'invite';
+        _state.title = i18n.t('IDENTITY.USER.MAIN.MODAL.INVITE_TITLE') as string;
+        _state.themeColor = 'primary';
+        _state.visible.additional = true;
     });
 };
 const clickAdd = () => {
-    modalState.mode = 'create';
-    modalState.title = i18n.t('IDENTITY.USER.MAIN.MODAL.CREATE_TITLE') as string;
-    userPageStore.$patch((_state) => {
-        _state.modalVisible.form = true;
+    modalSettingStore.$patch((_state) => {
+        _state.mode = 'create';
+        _state.title = i18n.t('IDENTITY.USER.MAIN.MODAL.CREATE_TITLE') as string;
+        _state.themeColor = 'primary';
+        _state.visible.additional = true;
     });
 };
 </script>
@@ -98,10 +97,7 @@ const clickAdd = () => {
                 </div>
             </template>
         </p-heading>
-        <user-management-button-modal :header-title="modalState.title"
-                                      :mode="modalState.mode"
-                                      :theme-color="modalState.themeColor"
-        />
+        <user-management-additional-modal />
     </div>
 </template>
 
