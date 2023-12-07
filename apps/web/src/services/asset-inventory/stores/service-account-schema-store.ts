@@ -21,9 +21,11 @@ import type { UserState } from '@/store/modules/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+import { getDetailSchema, getTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 
 interface Getters {
+    generalAccountDetailSchema: ComputedRef<{ details: Partial<DynamicLayout>[] }>;
+    trustedAccountDetailSchema: ComputedRef<{ details: Partial<DynamicLayout>[] }>;
     currentProviderSchemaList: ComputedRef<SchemaModel[]>;
     currentProviderData: ComputedRef<ProviderModel|ReferenceItem<undefined>>;
     generalAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
@@ -46,6 +48,8 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
     });
 
     const getters = reactive<Getters>({
+        generalAccountDetailSchema: computed(() => getDetailSchema({ accountSchema: getters.generlaAccountSchema, isTrustedAccount: false })),
+        trustedAccountDetailSchema: computed(() => getDetailSchema({ accountSchema: getters.generlaAccountSchema, isTrustedAccount: true })),
         currentProviderSchemaList: computed(() => _providerSchemaMap.value[state.currentProvider ?? ''] ?? []),
         currentProviderData: computed(() => _providerItemMap.value[state.currentProvider ?? '']),
         generalAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT')),

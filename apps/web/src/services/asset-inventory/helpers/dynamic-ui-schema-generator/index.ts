@@ -1,11 +1,12 @@
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
+import { getDefaultDetailSchema, getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
 import type { GetSchemaParams } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
 
@@ -26,12 +27,14 @@ const getCustomSchema = async ({ userType, userId }, provider, schemaType) => {
 };
 
 
+const getAccountFields = (accountSchema) => Object.entries<JsonSchema>(accountSchema?.schema?.properties ?? {}).map(([key, value]) => ({
+    key: `data.${key}`,
+    name: value?.title ?? key,
+    type: 'text',
+}));
+
 export const getTableSchema = async ({ accountSchema, isTrustedAccount, userConfig }: GetSchemaParams) => {
-    const fields:DynamicField[] = Object.entries<JsonSchema>(accountSchema?.schema?.properties ?? {}).map(([key, value]) => ({
-        key: `data.${key}`,
-        name: value?.title ?? key,
-        type: 'text',
-    }));
+    const fields:DynamicField[] = getAccountFields(accountSchema);
     let schemaData = getDefaultTableSchema(fields, isTrustedAccount);
 
     const customSchemaData = await getCustomSchema(userConfig, accountSchema?.provider, accountSchema?.schema_type);
@@ -46,3 +49,7 @@ export const getTableSchema = async ({ accountSchema, isTrustedAccount, userConf
     return schemaData;
 };
 
+export const getDetailSchema = ({ accountSchema, isTrustedAccount }: Partial<GetSchemaParams>): { details: Partial<DynamicLayout>[] } => {
+    const fields:DynamicField[] = getAccountFields(accountSchema);
+    return getDefaultDetailSchema(fields, isTrustedAccount);
+};

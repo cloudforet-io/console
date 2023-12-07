@@ -3,7 +3,7 @@ import type { DynamicLayout } from '@spaceone/design-system/types/data-display/d
 
 import type { DynamicField } from '@cloudforet/core-lib/component-util/dynamic-layout/field-schema';
 
-export const getDetailsSchema = (fields: DynamicField[], isTrustedAccount: boolean) => ({
+export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount: boolean): { details: Partial<DynamicLayout>[] } => ({
     details: [
         {
             name: 'Base Information',
@@ -14,6 +14,7 @@ export const getDetailsSchema = (fields: DynamicField[], isTrustedAccount: boole
                     {
                         key: isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
                         name: 'ID',
+                        type: 'text',
                         options: {
                             translation_id: 'PAGE_SCHEMA.ID',
                         },
@@ -21,6 +22,7 @@ export const getDetailsSchema = (fields: DynamicField[], isTrustedAccount: boole
                     {
                         key: 'name',
                         name: 'Name',
+                        type: 'text',
                         options: {
                             translation_id: 'PAGE_SCHEMA.NAME',
                         },
@@ -58,14 +60,16 @@ export const getDetailsSchema = (fields: DynamicField[], isTrustedAccount: boole
                                 },
                             },
                         },
-                    }]) || []),
+                    }]) || []) as DynamicField[],
                     ...fields.map((field) => ({
                         key: field.key,
                         name: field.name,
+                        type: 'text',
                     })),
-                    {
-                        key: 'project_info.project_id',
+                    ...((!isTrustedAccount && [{
+                        key: 'project_id',
                         name: 'Project',
+                        type: 'text',
                         options: {
                             translation_id: 'PAGE_SCHEMA.PROJECT',
                         },
@@ -73,7 +77,7 @@ export const getDetailsSchema = (fields: DynamicField[], isTrustedAccount: boole
                             resource_type: 'identity.Project',
                             reference_key: 'project_id',
                         },
-                    },
+                    }]) || []),
                     {
                         key: 'created_at',
                         name: 'Created',

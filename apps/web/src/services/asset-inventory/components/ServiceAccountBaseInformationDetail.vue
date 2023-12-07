@@ -1,33 +1,27 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { PDynamicLayout } from '@spaceone/design-system';
-import { cloneDeep, isEmpty } from 'lodash';
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { AccountType } from '@/schema/identity/service-account/type';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-const EXCLUDED_FIELD_KEYS = ['project_info.project_id', 'created_at', 'service_account_type'];
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 const props = defineProps<{
     provider?: string;
     serviceAccountData?: Record<string, any>;
+    serviceAccountType: AccountType;
     loading?: boolean;
 }>();
 
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 
 const state = reactive({
-    detailSchema: {},
-    convertedDetailSchema: computed(() => {
-        const result = cloneDeep(state.detailSchema);
-        if (!isEmpty(result)) {
-            result.options.fields = state.detailSchema?.options?.fields.filter((d) => !EXCLUDED_FIELD_KEYS.includes(d.key));
-        }
-        return result;
-    }),
+    detailSchema: {} as {details: Partial<DynamicLayout>[]},
     fieldHandler: [],
 });
 
@@ -39,36 +33,21 @@ const fieldHandler = (field) => {
     return {};
 };
 
-/* Api */
-const getDetailSchema = async (provider) => {
-    try {
-        const result = await SpaceConnector.client.addOns.pageSchema.get({
-            resource_type: 'identity.ServiceAccount',
-            schema: 'details',
-            options: {
-                provider,
-            },
-        });
-        state.detailSchema = result.details[0];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.detailSchema = {};
-    }
-};
-
-/* Watcher */
 watch(() => props.provider, (provider) => {
-    if (provider) getDetailSchema(provider);
+    if (provider) serviceAccountSchemaStore.setProviderSchema(provider);
+    const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
+    const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountDetailSchema : serviceAccountSchemaStore.getters.generalAccountDetailSchema;
+    state.detailSchema = detailSchema?.details[0];
 });
 </script>
 
 <template>
     <div class="service-account-base-information-detail">
-        <p-dynamic-layout :type="state.convertedDetailSchema.type"
-                          :options="state.convertedDetailSchema.options"
+        <p-dynamic-layout :type="state.detailSchema?.type"
+                          :options="state.detailSchema?.options"
                           :data="props.serviceAccountData"
                           :type-options="{
-                              loading: !state.convertedDetailSchema.type || loading
+                              loading: !state.detailSchema?.type || loading
                           }"
                           :field-handler="fieldHandler"
         />
