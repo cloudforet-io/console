@@ -299,14 +299,14 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                         <!--                                       size="sm"-->
                         <!--                                       @click="projectPageStore.setTreeEditMode(true)"-->
                         <!--                        />-->
-                        <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"
-                                       name="ic_plus_thin"
-                                       style-type="transparent"
-                                       size="sm"
-                                       color="inherit"
-                                       class="ml-1"
-                                       @click="projectPageStore.openProjectGroupFormModal()"
-                        />
+                        <!--                        <p-icon-button v-tooltip.bottom="$t('PROJECT.LANDING.PROJECT_GROUP_TREE.CREATE')"-->
+                        <!--                                       name="ic_plus_thin"-->
+                        <!--                                       style-type="transparent"-->
+                        <!--                                       size="sm"-->
+                        <!--                                       color="inherit"-->
+                        <!--                                       class="ml-1"-->
+                        <!--                                       @click="projectPageStore.openProjectGroupFormModal()"-->
+                        <!--                        />-->
                     </template>
                 </div>
             </template>
@@ -372,12 +372,12 @@ watch([() => projectPageState.rootNode, () => state.allProjectRoot], async ([roo
                                        color="inherit"
                                        @click.stop="projectPageStore.openProjectGroupDeleteCheckModal({node, path})"
                         />
-                        <p-icon-button v-if="!projectPageState.treeEditMode && node.data.item_type !== 'PROJECT'"
-                                       name="ic_plus"
-                                       class="group-add-btn"
-                                       size="sm"
-                                       @click.stop="projectPageStore.openProjectGroupFormModal({node, path})"
-                        />
+                        <!--                        <p-icon-button v-if="!projectPageState.treeEditMode && node.data.item_type !== 'PROJECT'"-->
+                        <!--                                       name="ic_plus"-->
+                        <!--                                       class="group-add-btn"-->
+                        <!--                                       size="sm"-->
+                        <!--                                       @click.stop="projectPageStore.openProjectGroupFormModal({node, path})"-->
+                        <!--                        />-->
                     </template>
                 </p-tree>
             </div>
