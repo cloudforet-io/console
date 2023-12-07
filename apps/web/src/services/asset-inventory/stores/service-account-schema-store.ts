@@ -1,6 +1,9 @@
 import type { ComputedRef } from 'vue';
-import { computed, reactive, ref } from 'vue';
+import {
+    computed, reactive, ref, watch,
+} from 'vue';
 
+import type { DynamicLayout } from '@spaceone/design-system/types/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { defineStore } from 'pinia';
 
 
@@ -14,11 +17,13 @@ import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ReferenceItem } from '@/store/modules/reference/type';
+import type { UserState } from '@/store/modules/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { getTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+
 interface Getters {
-    tableSchema?: any;
     currentProviderSchemaList: ComputedRef<SchemaModel[]>;
     currentProviderData: ComputedRef<ProviderModel|ReferenceItem<undefined>>;
     generalAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
@@ -32,13 +37,15 @@ interface Getters {
 export const useServiceAccountSchemaStore = defineStore('service-account-schema', () => {
     const _providerSchemaMap = ref<Record<string, SchemaModel[]>>({});
     const _providerItemMap = computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']);
+    const _userConfigMap = computed<UserState>(() => store.state.user);
 
     const state = reactive({
         currentProvider: undefined as string|undefined,
+        generalAccountTableSchema: undefined as DynamicLayout|undefined,
+        trustedAccountTableSchema: undefined as DynamicLayout|undefined,
     });
 
     const getters = reactive<Getters>({
-        // tableSchema: computed(() => ({})), // need converting
         currentProviderSchemaList: computed(() => _providerSchemaMap.value[state.currentProvider ?? ''] ?? []),
         currentProviderData: computed(() => _providerItemMap.value[state.currentProvider ?? '']),
         generalAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT')),
@@ -65,8 +72,28 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         },
     };
 
+    watch(() => state.currentProvider, async (provider) => {
+        if (provider) {
+            state.generalAccountTableSchema = await getTableSchema({
+                accountSchema: getters.generalAccountSchema,
+                isTrustedAccount: false,
+                userConfig: {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+            });
+            state.trustedAccountTableSchema = await getTableSchema({
+                accountSchema: getters.trustedAccountSchema,
+                isTrustedAccount: true,
+                userConfig: {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+            });
+        }
+    });
+
     return {
-        _providerSchemaMap,
         state,
         getters,
         ...actions,
