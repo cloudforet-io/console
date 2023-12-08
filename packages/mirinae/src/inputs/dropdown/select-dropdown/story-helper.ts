@@ -483,9 +483,18 @@ const extraArgTypes: ArgTypes = {
             type: { summary: null },
         },
     },
-    inputLeftArea: {
-        name: 'input-left-area',
-        description: 'This is a slot for the left area of the input.',
+    dropdownLeftArea: {
+        name: 'dropdown-left-area',
+        description: 'This is a slot for the left area of the dropdown button.',
+        defaultValue: { summary: null },
+        table: {
+            category: 'slots',
+            type: { summary: null },
+        },
+    },
+    noDataArea: {
+        name: 'no-data-area',
+        description: 'This is a slot for the left area of the dropdown button.',
         defaultValue: { summary: null },
         table: {
             category: 'slots',

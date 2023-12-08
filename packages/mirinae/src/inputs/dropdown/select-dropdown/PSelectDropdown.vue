@@ -320,6 +320,9 @@ defineExpose({ reloadMenu });
                       v-bind="scope[0]"
                 />
             </template>
+            <template #input-left-area>
+                <slot name="dropdown-left-area" />
+            </template>
         </dropdown-button>
         <p-context-menu v-show="state.proxyVisibleMenu"
                         ref="menuRef"
@@ -354,6 +357,9 @@ defineExpose({ reloadMenu });
         >
             <template #header>
                 <slot name="context-menu-header" />
+            </template>
+            <template #no-data-format>
+                <slot name="no-data-area" />
             </template>
             <template v-for="(_, slot) of state.menuSlots"
                       #[slot]="scope"
