@@ -218,6 +218,7 @@ watch(() => props.serviceAccountId, (serviceAccountId) => {
             <service-account-base-information-detail v-show="state.mode === 'READ'"
                                                      :provider="props.provider"
                                                      :service-account-data="state.serviceAccountData"
+                                                     :service-account-type="props.serviceAccountType"
                                                      :loading="props.serviceAccountLoading || state.loading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"
