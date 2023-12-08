@@ -159,7 +159,7 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
                 },
                 ...analyzeCloudServiceApiQueryHelper.data,
             },
-        }, { mockPath: '?projectPage=true' });
+        });
         state.cloudServiceDataMap[summaryType] = res.results || [];
     } catch (e: any) {
         ErrorHandler.handleError(e);
