@@ -19,7 +19,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -62,6 +61,7 @@ type CostAnalyzeRawData = {
 };
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
@@ -73,14 +73,12 @@ const state = reactive({
         return 'YYYY-MM-DD';
     }),
     //
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
     projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     //
     groupByStoreMap: computed(() => ({
-        [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
         [GROUP_BY.PROJECT]: state.projects,
         [GROUP_BY.PROVIDER]: state.providers,
         [GROUP_BY.REGION]: state.regions,
@@ -131,7 +129,6 @@ const tableState = reactive({
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
             if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
-            if (d.name === GROUP_BY.PROJECT_GROUP) field.reference = { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' };
             if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
             if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
             if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
@@ -299,10 +296,10 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
     try {
         tableState.loading = true;
         analyzeApiQueryHelper
-            .setFilters(costAnalysisPageStore.consoleFilters)
+            .setFilters(costAnalysisPageGetters.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
         const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 ...analyzeApiQueryHelper.data,
@@ -328,9 +325,9 @@ const handleChange = async (options: any = {}) => {
 const costAnalyzeExportQueryHelper = new QueryHelper();
 const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
     try {
-        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 filter: costAnalyzeExportQueryHelper.apiQuery.filter,
@@ -371,8 +368,8 @@ const handleUpdateThisPage = async () => {
 watch(
     [
         () => costAnalysisPageState,
-        () => costAnalysisPageStore.selectedDataSourceId,
-        () => costAnalysisPageStore.selectedQueryId,
+        () => costAnalysisPageGetters.selectedDataSourceId,
+        () => costAnalysisPageGetters.selectedQueryId,
         () => state.selectedDisplayDataType,
     ],
     async ([, selectedDataSourceId]) => {
@@ -388,14 +385,13 @@ watch(
     { immediate: true, deep: true },
 );
 
-const handleUpdateselectedDisplayDataType = (selected: DisplayDataType) => {
+const handleUpdateSelectedDisplayDataType = (selected: DisplayDataType) => {
     state.selectedDisplayDataType = selected;
 };
 
 // LOAD REFERENCE STORE
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/projectGroup/load'),
         store.dispatch('reference/project/load'),
         store.dispatch('reference/provider/load'),
         store.dispatch('reference/region/load'),
@@ -426,7 +422,7 @@ const handleUpdateselectedDisplayDataType = (selected: DisplayDataType) => {
                 />
             </template>
             <template #toolbox-left>
-                <cost-analysis-data-table-data-type-dropdown @update-display-data-type="handleUpdateselectedDisplayDataType" />
+                <cost-analysis-data-table-data-type-dropdown @update-display-data-type="handleUpdateSelectedDisplayDataType" />
                 <div class="toggle-wrapper">
                     <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
                     <p-collapsible-toggle :toggle-type="'switch'"
@@ -443,9 +439,6 @@ const handleUpdateselectedDisplayDataType = (selected: DisplayDataType) => {
                 <span v-if="tableState.loading" />
                 <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
                     Unknown
-                </span>
-                <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
-                    {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT">
                     {{ state.projects[value] ? state.projects[value].label : value }}
