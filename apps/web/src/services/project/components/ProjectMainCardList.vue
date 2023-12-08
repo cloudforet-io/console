@@ -8,22 +8,21 @@ import {
 } from '@spaceone/design-system';
 import { uniq } from 'lodash';
 
-import { getAllPage } from '@cloudforet/core-lib/component-util/pagination';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { byteFormatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { ProviderReferenceMap, ProviderReferenceItem } from '@/store/modules/reference/provider/type';
 
 import { arrayToQueryString } from '@/lib/router-query-string';
 
@@ -39,13 +38,6 @@ import { useProjectPageStore } from '@/services/project/stores/project-page-stor
 import type { ProjectGroupTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
-interface CardSummary {
-    [projectId: string]: {
-        Server: number;
-        Database: number;
-        Storage: number;
-    };
-}
 const SUMMARY_TYPE = {
     SERVER: 'Server',
     DATABASE: 'Database',
@@ -70,12 +62,16 @@ const storeState = reactive({
 const state = reactive({
     items: [] as ProjectModel[],
     loading: true,
-    cardSummaryLoading: true,
+    cardSummaryLoading: {
+        Server: true,
+        Database: true,
+        Storage: true,
+    } as Record<SummaryType, boolean>,
     pageStart: 1,
     pageSize: 24,
     searchText: undefined as string|undefined,
-    allPage: computed(() => getAllPage(projectPageState.projectCount, (state.pageSize))),
-    cardSummary: {} as CardSummary,
+    cloudServiceDataMap: {} as Record<SummaryType, any>,
+    serviceAccountList: [] as ServiceAccountModel[],
     groupId: computed(() => projectPageGetters.groupId),
     noProject: computed(() => projectPageState.projectCount === 0),
     noProjectGroup: computed(() => !projectPageState.hasProjectGroup),
@@ -87,16 +83,13 @@ const state = reactive({
     shouldUpdateProjectList: computed<boolean>(() => projectPageState.shouldUpdateProjectList),
 });
 
-const getItemSummaryCount = (summaryType: SummaryType, projectId: string) => {
-    if (state.cardSummary) {
-        let summaryCount = state.cardSummary[projectId][summaryType];
-        if (summaryType === SUMMARY_TYPE.STORAGE) summaryCount = summaryCount ? byteFormatter(summaryCount) : 0;
-        return summaryCount;
-    }
-    return {};
+/* Util */
+const getProvider = (name: string): ProviderReferenceItem => storeState.providers[name] || {};
+const getDistinctProviders = (projectId: string): string[] => uniq(state.serviceAccountList.filter((d) => d.project_id === projectId).map((d) => d.provider));
+const getCloudServiceCount = (summaryType: SummaryType, projectId: string) => {
+    const cloudServiceData = state.cloudServiceDataMap[summaryType].find((d) => d.project_id === projectId);
+    return cloudServiceData?.total_count || 0;
 };
-const getProvider = (name: string) => storeState.providers[name] || {};
-const getDistinctProviders = (items: string[]) => uniq(items);
 const getProjectGroupName = (projectItem: ProjectModel, parentGroups?: ProjectGroupTreeNodeData[]) => {
     let result = '';
     if (parentGroups?.length) {
@@ -105,47 +98,29 @@ const getProjectGroupName = (projectItem: ProjectModel, parentGroups?: ProjectGr
     result += storeState.projectGroups[projectItem.project_group_id]?.name || '';
     return result;
 };
-
-const getCardSummary = async () => {
-    if (state.items.length === 0) return;
-
-    const cardSummary: CardSummary = {};
-    state.cardSummaryLoading = true;
-    try {
-        // HACK: get cloud service summary
-        // const ids = state.items?.map((item) => item.project_id);
-        // const res = await SpaceConnector.client.statistics.topic.projectPage({
-        //     projects: ids,
-        // });
-        // res.results.forEach((d) => {
-        //     cardSummary[d.project_id] = {
-        //         Server: d.server_count || 0,
-        //         Database: d.database_count || 0,
-        //         Storage: d.storage_size || 0,
-        //     };
-        // });
-        // state.cardSummary = cardSummary;
-    } catch (e: any) {
-        state.cardSummary = cardSummary;
-        ErrorHandler.handleError(e);
-    } finally {
-        state.cardSummaryLoading = false;
-    }
+const fetchAll = async () => {
+    await fetchProjectList();
+    const projectIdList = state.items.map((item) => item.project_id);
+    await Promise.allSettled([
+        Object.values(SUMMARY_TYPE).map((summaryType) => analyzeCloudService(summaryType, projectIdList)),
+        fetchServiceAccountList(projectIdList),
+    ]);
 };
 
+/* Api */
 const listProjectFetcher = getCancellableFetcher<ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
-const listApiQueryHelper = new ApiQueryHelper();
+const listProjectApiQueryHelper = new ApiQueryHelper();
 const fetchProjectList = async () => {
-    listApiQueryHelper.setPageStart(state.pageStart).setPageLimit(state.pageSize);
-    listApiQueryHelper.setFilters([]);
+    listProjectApiQueryHelper.setPageStart(state.pageStart).setPageLimit(state.pageSize);
+    listProjectApiQueryHelper.setFilters([]);
     if (state.searchText !== undefined) {
-        listApiQueryHelper.setFilters([{ v: state.searchText }]);
+        listProjectApiQueryHelper.setFilters([{ v: state.searchText }]);
     }
 
     try {
         state.loading = true;
         const params: ProjectListParameters = {
-            query: listApiQueryHelper.data,
+            query: listProjectApiQueryHelper.data,
             project_group_id: state.groupId,
             domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         };
@@ -154,7 +129,6 @@ const fetchProjectList = async () => {
             state.items = response.results || [];
             projectPageStore.setProjectCount(response.total_count);
             state.loading = false;
-            await getCardSummary();
         }
     } catch (e: any) {
         state.items = [];
@@ -163,8 +137,58 @@ const fetchProjectList = async () => {
         ErrorHandler.handleError(e);
     }
 };
+const analyzeCloudServiceApiQueryHelper = new ApiQueryHelper();
+const analyzeCloudService = async (summaryType: SummaryType, projectIdList: string[]) => {
+    analyzeCloudServiceApiQueryHelper.setFilters([
+        { k: 'ref_cloud_service_type.labels', v: summaryType, o: '=' },
+        { k: 'ref_cloud_service_type.is_major', v: true, o: '=' },
+        { k: 'project_id', v: projectIdList, o: '' },
+    ]);
+    try {
+        const res = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+            query: {
+                group_by: ['project_id'],
+                fields: {
+                    total_count: {
+                        operator: 'count',
+                    },
+                    total_size: {
+                        key: 'instance_size',
+                        operator: 'sum',
+                    },
+                },
+                ...analyzeCloudServiceApiQueryHelper.data,
+            },
+        }, { mockPath: '?projectPage=true' });
+        state.cloudServiceDataMap[summaryType] = res.results || [];
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        state.cloudServiceDataMap[summaryType] = [];
+    } finally {
+        state.cardSummaryLoading[summaryType] = false;
+    }
+};
+const listServiceAccountApiQueryHelper = new ApiQueryHelper();
+const fetchServiceAccountList = async (projectIdList: string[]) => {
+    listServiceAccountApiQueryHelper
+        .setFilters([{ k: 'project_id', v: projectIdList, o: '' }])
+        .setOnly('provider', 'project_id', 'service_account_id');
+    try {
+        const res = await SpaceConnector.clientV2.identity.serviceAccount.list({
+            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
+            query: {
+                ...listServiceAccountApiQueryHelper.data,
+            },
+        });
+        state.serviceAccountList = res.results || [];
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+        state.serviceAccountList = [];
+    }
+};
 
-const handleChange = async (options: any) => {
+/* Event */
+const handleChange = async (options?: any) => {
     state.searchText = options.searchText;
     if (options.pageLimit !== undefined) {
         state.pageSize = options.pageLimit;
@@ -172,18 +196,14 @@ const handleChange = async (options: any) => {
     if (options.pageStart !== undefined) {
         state.pageStart = options.pageStart;
     }
-    await fetchProjectList();
-};
-
-const resetAll = () => {
-    projectPageStore.setProjectCount(0);
-    state.pageStart = 1;
-    state.pageSize = 24;
+    await fetchAll();
 };
 
 const handleConfirmProjectForm = async () => {
-    resetAll();
-    await fetchProjectList();
+    projectPageStore.setProjectCount(0);
+    state.pageStart = 1;
+    state.pageSize = 24;
+    await fetchAll();
 };
 
 const queryHelper = new QueryHelper();
@@ -199,7 +219,7 @@ const getLocation = (serviceType: SummaryType, name: string, projectId: string) 
 // When ProjectGroupTreeNodeData has been updated | project has been created
 watch(() => state.shouldUpdateProjectList, async () => {
     if (state.shouldUpdateProjectList) {
-        await fetchProjectList();
+        await fetchAll();
         projectPageStore.setShouldUpdateProjectList(false);
     }
 });
@@ -222,7 +242,7 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
         <p-toolbox :page-size="state.pageSize"
                    :total-count="projectPageState.projectCount"
                    @change="handleChange"
-                   @refresh="fetchProjectList()"
+                   @refresh="handleChange()"
         />
         <p-data-loader class="flex-grow"
                        :data="state.items"
@@ -256,7 +276,7 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                             <div class="accounts">
                                 <div class="provider-icon-wrapper">
                                     <div class="provider">
-                                        <router-link v-for="(provider, index) in getDistinctProviders(item.providers)"
+                                        <router-link v-for="(provider, index) in getDistinctProviders(item.project_id)"
                                                      :key="index"
                                                      :to="{
                                                          name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
@@ -268,7 +288,7 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                                      }"
                                         />
                                     </div>
-                                    <router-link v-if="getDistinctProviders(item.providers).length !== 0"
+                                    <router-link v-if="getDistinctProviders(item.project_id).length !== 0"
                                                  class="icon-wrapper"
                                                  :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
                                     >
@@ -278,7 +298,7 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                         />
                                     </router-link>
                                 </div>
-                                <div v-if="getDistinctProviders(item.providers).length === 0"
+                                <div v-if="getDistinctProviders(item.project_id).length === 0"
                                      class="account-add"
                                 >
                                     <router-link :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }">
@@ -302,12 +322,12 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
                                     <div class="summary-item-text">
                                         {{ title }}
                                     </div>
-                                    <p-skeleton v-if="state.cardSummaryLoading" />
-                                    <router-link v-else-if="state.cardSummary[item.project_id]"
+                                    <p-skeleton v-if="state.cardSummaryLoading[summaryType]" />
+                                    <router-link v-else-if="getCloudServiceCount(summaryType, item.project_id) !== 0"
                                                  class="summary-item-num"
                                                  :to="getLocation(summaryType, ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME, item.project_id)"
                                     >
-                                        {{ getItemSummaryCount(summaryType, item.project_id) }}
+                                        {{ getCloudServiceCount(summaryType, item.project_id) }}
                                     </router-link>
                                     <span v-else
                                           class="summary-item-num none"
