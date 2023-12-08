@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, reactive } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldGroup, PEmpty, PSelectDropdown,
@@ -25,16 +24,16 @@ interface SelectMenu {
 
 const modalSettingStore = useUserModalSettingStore();
 
-const route = useRoute();
-
 const state = reactive({
     loading: false,
-    searchText: '',
-    selectedItems: [] as SelectMenu[],
-    menuItems: [] as SelectMenu[],
     menuVisible: false,
+    menuItems: [] as SelectMenu[],
+    selectedItems: [] as SelectMenu[],
     // TODO: will be removed after the backend is ready
     domain_id: computed(() => store.state.domain.domainId),
+});
+const formState = reactive({
+    searchText: '',
 });
 
 /* Component */
@@ -55,36 +54,28 @@ const menuHandler: AutocompleteHandler = async (inputText: string) => {
 /* API */
 const roleListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
-    .setSort('name', true)
-    .setFiltersAsRawQueryString(route.query?.filters);
+    .setSort('name', true);
 
 const fetchListRoles = async (inputText: string) => {
     state.loading = true;
+    roleListApiQueryHelper.setFilters([{
+        k: 'role_type',
+        v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
+        o: '=',
+    }]);
+    if (inputText) {
+        roleListApiQueryHelper.addFilter({
+            k: 'name',
+            v: inputText,
+            o: '',
+        });
+    }
+
     try {
-        roleListApiQueryHelper.setOrFilters([
-            {
-                k: 'role_type',
-                v: ROLE_TYPE.WORKSPACE_OWNER,
-                o: '=',
-            },
-            {
-                k: 'role_type',
-                v: ROLE_TYPE.WORKSPACE_MEMBER,
-                o: '=',
-            }]);
-        if (inputText) {
-            roleListApiQueryHelper.setFilters([{
-                k: 'name',
-                v: inputText,
-                o: '',
-            }]);
-        }
-        const params = {
+        const response = await modalSettingStore.listRoles({
             query: roleListApiQueryHelper.data,
             domain_id: state.domain_id,
-        };
-
-        const response = await modalSettingStore.listRoles(params);
+        });
         state.menuItems = response.map((role) => ({
             label: role.name,
             name: role.role_id,
@@ -105,10 +96,10 @@ const fetchListRoles = async (inputText: string) => {
                                :placeholder="$t('IDENTITY.USER.FORM.ROLE_PLACEHOLDER')"
                                :visible-menu.sync="state.menuVisible"
                                :loading="state.loading"
-                               :search-text.sync="state.searchText"
+                               :search-text.sync="formState.searchText"
                                :selected.sync="state.selectedItems"
                                :handler="menuHandler"
-                               :is-filterable="state.menuItems.length > 0"
+                               is-filterable
                                show-delete-all-button
                                class="role-select-dropdown"
             >
