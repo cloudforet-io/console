@@ -27,12 +27,6 @@ interface GroupByItem {
     label: string;
 }
 
-const allReferenceStore = useAllReferenceStore();
-const costQuerySetStore = useCostQuerySetStore();
-const costQuerySetGetters = costQuerySetStore.getters;
-const costQuerySetState = costQuerySetStore.state;
-const appContextStore = useAppContextStore();
-
 const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, string[]> => {
     if (!consoleFilters || isEmpty(consoleFilters)) return {};
     const result: Record<string, string[]> = {};
@@ -43,6 +37,12 @@ const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, str
 };
 
 export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => {
+    const allReferenceStore = useAllReferenceStore();
+    const costQuerySetStore = useCostQuerySetStore();
+    const costQuerySetGetters = costQuerySetStore.getters;
+    const costQuerySetState = costQuerySetStore.state;
+    const appContextStore = useAppContextStore();
+
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
         managedGroupByItems: computed<GroupByItem[]>(() => {
@@ -175,8 +175,14 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
             state.period = { start: options.period.start, end: options.period.end };
         }
         state.filters = getRefinedFilters(options.filters);
+
+        // check admin mode
         if (options.metadata?.filters_schema?.enabled_properties?.length) {
-            state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties;
+            if (_state.isAdminMode) {
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.PROJECT);
+            } else {
+                state.enabledFiltersProperties = options.metadata.filters_schema.enabled_properties.filter((d) => d !== GROUP_BY.WORKSPACE);
+            }
         } else {
             state.enabledFiltersProperties = _state.managedGroupByItems.map((d) => d.name);
         }

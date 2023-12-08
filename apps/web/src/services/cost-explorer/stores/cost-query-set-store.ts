@@ -7,13 +7,20 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { ManagedCostQuerySets } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
+import { ADMIN_MANAGED_COST_QUERY_SET_LIST, MANAGED_COST_QUERY_SET_LIST } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
 export const useCostQuerySetStore = defineStore('cost-query-set', () => {
+    const appContextStore = useAppContextStore();
+
+    const _state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
     const state = reactive({
         costQuerySetList: [] as CostQuerySetModel[],
         selectedQuerySetId: undefined as string|undefined,
@@ -27,7 +34,9 @@ export const useCostQuerySetStore = defineStore('cost-query-set', () => {
         }),
         managedCostQuerySets: computed<CostQuerySetModel[]>(() => {
             if (!state.selectedDataSourceId) return [];
-            return ManagedCostQuerySets.map((item) => ({
+            let _managedCostQuerySetList = MANAGED_COST_QUERY_SET_LIST;
+            if (_state.isAdminMode) _managedCostQuerySetList = ADMIN_MANAGED_COST_QUERY_SET_LIST;
+            return _managedCostQuerySetList.map((item) => ({
                 ...item,
                 data_source_id: state.selectedDataSourceId,
             })) as CostQuerySetModel[];
