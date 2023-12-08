@@ -51,8 +51,9 @@ const validationState = reactive({
 });
 
 /* Component */
-const hideMenu = () => {
+const hideMenu = (userIds?: string) => {
     state.menuVisible = false;
+    formState.userIds = userIds || '';
 };
 const handleClickUserIdInput = async () => {
     state.menuVisible = true;
@@ -124,22 +125,20 @@ const fetchListWorkspaceUsers = async (item: UserMenuItem) => {
     if (!response) {
         state.validItems.push(item);
     } else {
-        hideMenu();
-        formState.userIds = item.user_id;
+        hideMenu(item.user_id);
         validationState.userIdInvalid = true;
         validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId: item.user_id });
     }
 };
 
 /* Context Menu */
-onClickOutside(containerRef, hideMenu);
+onClickOutside(containerRef, () => hideMenu());
 
 watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
         formState.searchText = '';
         await fetchListUsers();
     } else {
-        formState.userIds = '';
         state.isFocus = false;
         state.selectedItems = [];
         state.menuItems = [];
