@@ -49,7 +49,7 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
 
     const getters = reactive<Getters>({
         generalAccountDetailSchema: computed(() => getDetailSchema({ accountSchema: getters.generlaAccountSchema, isTrustedAccount: false })),
-        trustedAccountDetailSchema: computed(() => getDetailSchema({ accountSchema: getters.generlaAccountSchema, isTrustedAccount: true })),
+        trustedAccountDetailSchema: computed(() => getDetailSchema({ accountSchema: getters.trustedAccountSchema, isTrustedAccount: true })),
         currentProviderSchemaList: computed(() => _providerSchemaMap.value[state.currentProvider ?? ''] ?? []),
         currentProviderData: computed(() => _providerItemMap.value[state.currentProvider ?? '']),
         generalAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT')),

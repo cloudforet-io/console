@@ -16,7 +16,6 @@ const getCustomSchema = async ({ userType, userId }, provider, schemaType) => {
     try {
         userConfig = await SpaceConnector.client.config.userConfig.get({
             name: userConfigName,
-            domain_id: 'domain-286776a1516a',
             workspace_id: undefined,
         });
     } catch (e) {
@@ -49,7 +48,7 @@ export const getTableSchema = async ({ accountSchema, isTrustedAccount, userConf
     return schemaData;
 };
 
-export const getDetailSchema = ({ accountSchema, isTrustedAccount }: Partial<GetSchemaParams>): { details: Partial<DynamicLayout>[] } => {
+export const getDetailSchema = ({ accountSchema, isTrustedAccount }: Pick<GetSchemaParams, 'accountSchema'|'isTrustedAccount' >): { details: Partial<DynamicLayout>[] } => {
     const fields:DynamicField[] = getAccountFields(accountSchema);
     return getDefaultDetailSchema(fields, isTrustedAccount);
 };
