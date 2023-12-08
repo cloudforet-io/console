@@ -53,7 +53,8 @@ const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
 const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
-const costQuerySetState = costQuerySetStore.$state;
+const costQuerySetGetters = costQuerySetStore.getters;
+const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const allReferenceStore = useAllReferenceStore();
@@ -220,12 +221,12 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
 
 const handleSelectDataSource = (selected: string) => {
     if (!selected) return;
-    costQuerySetStore.$patch({ selectedDataSourceId: selected });
+    costQuerySetStore.setSelectedDataSourceId(selected);
     router.push({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
-            costQuerySetId: costQuerySetStore.managedCostQuerySets[0].cost_query_set_id,
+            costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
         },
     }).catch(() => {});
 };
