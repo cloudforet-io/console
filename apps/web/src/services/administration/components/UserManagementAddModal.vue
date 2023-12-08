@@ -3,8 +3,8 @@ import { reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
-import UserManagementAdditionalRole from '@/services/administration/components/UserManagementAdditionalRole.vue';
-import UserManagementAdditionalUser from '@/services/administration/components/UserManagementAdditionalUser.vue';
+import UserManagementAddRole from '@/services/administration/components/UserManagementAddRole.vue';
+import UserManagementAddUser from '@/services/administration/components/UserManagementAddUser.vue';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 
 const modalSettingStore = useUserModalSettingStore();
@@ -42,8 +42,8 @@ const handleConfirm = () => {
     >
         <template #body>
             <div class="modal-contents">
-                <user-management-additional-user />
-                <user-management-additional-role />
+                <user-management-add-user />
+                <user-management-add-role />
             </div>
         </template>
     </p-button-modal>

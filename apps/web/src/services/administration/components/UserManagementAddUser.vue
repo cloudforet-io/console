@@ -33,12 +33,17 @@ const state = reactive({
         name: user.user_id,
     }))),
     selectedItems: [] as MenuItem[],
-    searchText: '',
     // TODO: will be removed after the backend is ready
     domain_id: computed(() => store.state.domain.domainId),
 });
 const formState = reactive({
-    userId: '',
+    userIds: computed(() => {
+        if (state.selectedItems.length === 0) {
+            return '';
+        }
+        return state.selectedItems.map((item) => item.name).join(', ');
+    }),
+    searchText: '',
 });
 const validationState = reactive({
     userIdValid: undefined as undefined | boolean,
@@ -57,31 +62,31 @@ const {
     contextMenuRef,
     useMenuFiltering: true,
     useReorderBySelection: true,
-    searchText: toRef(state, 'searchText'),
+    searchText: toRef(formState, 'searchText'),
     selected: toRef(state, 'selectedItems'),
     menu: toRef(state, 'dropdownMenuItems'),
 });
 
 /* Component */
 const handleClickUserIdInput = async () => {
+    await reloadMenu();
     if (!contextMenuVisible.value) {
-        await fetchListWorkspaceUsers();
         await showContextMenu();
     } else {
-        state.searchText = '';
+        formState.searchText = '';
         await hideContextMenu();
-        await reloadMenu();
     }
 };
 const handleSelectMenuItem = (item: MenuItem) => {
     state.selectedItems.push(item);
 };
-const handleUpdateSearchText = debounce((text: string) => {
+const handleUpdateSearchText = debounce(async (text: string) => {
     if (text !== '') {
         showContextMenu();
     }
-    state.searchText = text;
-    fetchListWorkspaceUsers();
+    formState.searchText = text;
+    await fetchListWorkspaceUsers();
+    await reloadMenu();
 }, 200);
 
 /* API */
@@ -90,6 +95,7 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true)
     .setFiltersAsRawQueryString(route.query.filters);
 const userListApiQuery = userListApiQueryHelper.data;
+
 const fetchListWorkspaceUsers = () => {
     const params: UserListParameters = {
         query: userListApiQuery,
@@ -100,13 +106,12 @@ const fetchListWorkspaceUsers = () => {
         modalSettingStore.listUsers(params);
     } finally {
         state.loading = false;
-        reloadMenu();
     }
 };
 
 /* Init */
-(() => {
-    fetchListWorkspaceUsers();
+(async () => {
+    await fetchListWorkspaceUsers();
 })();
 </script>
 
@@ -120,7 +125,7 @@ const fetchListWorkspaceUsers = () => {
             <template #default="{invalid}">
                 <div class="input-form-wrapper">
                     <p-text-input ref="targetRef"
-                                  :value="formState.userId"
+                                  :value="contextMenuVisible ? formState.searchText : formState.userIds"
                                   :invalid="invalid"
                                   class="user-id-input"
                                   @click="handleClickUserIdInput"

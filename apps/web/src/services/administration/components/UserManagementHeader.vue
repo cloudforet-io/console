@@ -9,7 +9,7 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import UserManagementAdditionalModal from '@/services/administration/components/UserManagementAdditionalModal.vue';
+import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -97,7 +97,7 @@ const clickAdd = () => {
                 </div>
             </template>
         </p-heading>
-        <user-management-additional-modal />
+        <user-management-add-modal />
     </div>
 </template>
 
