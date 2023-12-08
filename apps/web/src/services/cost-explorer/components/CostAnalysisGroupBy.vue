@@ -99,10 +99,8 @@ const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelecte
             state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
             return;
         }
-        costAnalysisPageStore.$patch((_state) => {
-            costAnalysisPageStore.setGroupBy([selectedItem.name, ..._state.groupBy]);
-            costAnalysisPageStore.setChartGroupBy(selectedItem.name);
-        });
+        costAnalysisPageStore.setGroupBy([selectedItem.name, ...costAnalysisPageState.groupBy]);
+        costAnalysisPageStore.setChartGroupBy(selectedItem.name);
     } else {
         costAnalysisPageStore.setGroupBy(costAnalysisPageState.groupBy.filter((d) => d !== selectedItem.name));
     }
