@@ -3,11 +3,16 @@ import { computed, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PFieldGroup, PSelectDropdown,
+    PFieldGroup, PEmpty, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
+import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleType } from '@/schema/identity/role/type';
 import { store } from '@/store';
 
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
@@ -15,11 +20,10 @@ import { useUserModalSettingStore } from '@/services/administration/store/user-m
 interface SelectMenu {
     label: string;
     name: string;
-    role_type: string;
+    role_type: RoleType;
 }
 
 const modalSettingStore = useUserModalSettingStore();
-const modalSettingState = modalSettingStore.$state;
 
 const route = useRoute();
 
@@ -33,21 +37,55 @@ const state = reactive({
     domain_id: computed(() => store.state.domain.domainId),
 });
 
+/* Component */
+const roleTypeIconFormatter = (type: RoleType) => {
+    switch (type) {
+    case ROLE_TYPE.WORKSPACE_OWNER: return WorkspaceOwnerImage;
+    case ROLE_TYPE.WORKSPACE_MEMBER: return WorkspaceMemberImage;
+    default: return '';
+    }
+};
+const menuHandler: AutocompleteHandler = async (inputText: string) => {
+    await fetchListRoles(inputText);
+    return {
+        results: state.menuItems,
+    };
+};
+
 /* API */
 const roleListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('name', true)
     .setFiltersAsRawQueryString(route.query?.filters);
-const roleListApiQuery = roleListApiQueryHelper.data;
 
-const fetchListRoles = async () => {
+const fetchListRoles = async (inputText: string) => {
     state.loading = true;
     try {
-        await modalSettingStore.listRoles({
-            query: roleListApiQuery,
+        roleListApiQueryHelper.setOrFilters([
+            {
+                k: 'role_type',
+                v: ROLE_TYPE.WORKSPACE_OWNER,
+                o: '=',
+            },
+            {
+                k: 'role_type',
+                v: ROLE_TYPE.WORKSPACE_MEMBER,
+                o: '=',
+            }]);
+        if (inputText) {
+            roleListApiQueryHelper.setFilters([{
+                k: 'name',
+                v: inputText,
+                o: '',
+            }]);
+        }
+        const params = {
+            query: roleListApiQueryHelper.data,
             domain_id: state.domain_id,
-        });
-        state.menuItems = modalSettingState.roles.map((role) => ({
+        };
+
+        const response = await modalSettingStore.listRoles(params);
+        state.menuItems = response.map((role) => ({
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
@@ -56,11 +94,6 @@ const fetchListRoles = async () => {
         state.loading = false;
     }
 };
-
-/* Init */
-(async () => {
-    await fetchListRoles();
-})();
 </script>
 
 <template>
@@ -73,11 +106,44 @@ const fetchListRoles = async () => {
                                :visible-menu.sync="state.menuVisible"
                                :loading="state.loading"
                                :search-text.sync="state.searchText"
-                               :menu="state.menuItems"
                                :selected.sync="state.selectedItems"
-                               is-filterable
+                               :handler="menuHandler"
+                               :is-filterable="state.menuItems.length > 0"
+                               show-delete-all-button
                                class="role-select-dropdown"
-            />
+            >
+                <template #dropdown-left-area>
+                    <img v-if="state.selectedItems.length > 0"
+                         :src="roleTypeIconFormatter(state.selectedItems[0]?.role_type)"
+                         alt="role-type-icon"
+                         class="role-type-icon"
+                    >
+                </template>
+                <template #menu-item--format="{item}">
+                    <div class="role-menu-item">
+                        <img :src="roleTypeIconFormatter(item.role_type)"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span>{{ item.label }}</span>
+                        <span class="role-type">({{ item.role_type }})</span>
+                    </div>
+                </template>
+                <template #no-data-area>
+                    <p-empty v-if="state.menuItems.length === 0"
+                             image-size="md"
+                             show-image
+                             class="no-data-wrapper"
+                    >
+                        <template #image>
+                            <img src="@/assets/images/illust_microscope.svg"
+                                 alt="empty-options"
+                            >
+                        </template>
+                        {{ $t('INVENTORY.COLLECTOR.NO_DATA') }}
+                    </p-empty>
+                </template>
+            </p-select-dropdown>
         </p-field-group>
     </div>
 </template>
@@ -89,6 +155,32 @@ const fetchListRoles = async () => {
     padding: 0.75rem;
     .role-select-dropdown {
         width: 100%;
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1rem;
+            height: 1rem;
+        }
+        .role-menu-item {
+            @apply flex items-center;
+            gap: 0.25rem;
+            .role-type {
+                @apply text-gray-500;
+            }
+        }
+        .no-data-wrapper {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+    }
+}
+
+/* TODO: will be deleted after p-select-dropdown update */
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .selection-display-container {
+        @apply flex items-center;
+        gap: 0.25rem;
     }
 }
 </style>

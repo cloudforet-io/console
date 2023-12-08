@@ -223,7 +223,7 @@ watch(() => collectorFormState.attachedServiceAccount, (value) => {
                                        show-delete-all-button
                                        @update:selected="handleSelectAttachedServiceAccount"
                     >
-                        <template #input-left-area>
+                        <template #dropdown-left-area>
                             <p-i v-if="collectorFormState.selectedServiceAccountFilterOption === 'exclude'"
                                  name="ic_minus_circle"
                                  class="ml-2"

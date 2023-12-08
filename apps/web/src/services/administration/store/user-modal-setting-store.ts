@@ -17,7 +17,6 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
         title: '',
         themeColor: 'primary',
         users: [] as UserModel[],
-        roles: [] as RoleModel[],
         visible: {
             additional: false,
             form: false,
@@ -41,10 +40,10 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
             this.loading = true;
             try {
                 const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
-                this.roles = results || [];
+                return results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.roles = [];
+                return [];
             } finally {
                 this.loading = false;
             }
