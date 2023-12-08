@@ -58,7 +58,7 @@ export default {
         const { breadcrumbs } = useBreadcrumbs();
         const userId = computed(() => store.state.user.userId);
         const costQuerySetStore = useCostQuerySetStore();
-        const costQuerySetState = costQuerySetStore.$state;
+        const costQuerySetState = costQuerySetStore.state;
         const costExplorerSettingsStore = useCostExplorerSettingsStore();
         costExplorerSettingsStore.initState();
         costExplorerSettingsStore.$onAction((action) => {
@@ -73,8 +73,7 @@ export default {
         const route = useRoute();
 
         onUnmounted(() => {
-            costQuerySetStore.$dispose();
-            costQuerySetStore.$reset();
+            costQuerySetStore.reset();
             costExplorerSettingsStore.$dispose();
             costExplorerSettingsStore.$reset();
         });
@@ -91,9 +90,7 @@ export default {
                     });
                     if (status === 'succeed') {
                         const dataSourceId = response.results[0].data_source_id;
-                        costQuerySetStore.$patch({
-                            selectedDataSourceId: dataSourceId,
-                        });
+                        costQuerySetStore.setSelectedDataSourceId(dataSourceId);
                     }
                 } catch (e) {
                     ErrorHandler.handleError(e);
@@ -104,10 +101,8 @@ export default {
             * Both parameters are set in the route. (beforeEnter navigation guard in routes.ts)
             * */
             if (params.dataSourceId && params.costQuerySetId) {
-                costQuerySetStore.$patch({
-                    selectedDataSourceId: params.dataSourceId,
-                    selectedQuerySetId: params.costQuerySetId,
-                });
+                costQuerySetStore.setSelectedDataSourceId(params.dataSourceId);
+                costQuerySetStore.setSelectedQuerySetId(params.costQuerySetId);
             }
             await costQuerySetStore.listCostQuerySets();
         }, { immediate: true });

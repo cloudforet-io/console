@@ -28,8 +28,9 @@ interface GroupByItem {
 }
 
 const allReferenceStore = useAllReferenceStore();
-const costQuerySetStore = () => useCostQuerySetStore();
-const costQuerySetState = () => costQuerySetStore().$state;
+const costQuerySetStore = useCostQuerySetStore();
+const costQuerySetGetters = costQuerySetStore.getters;
+const costQuerySetState = costQuerySetStore.state;
 const appContextStore = useAppContextStore();
 
 const getRefinedFilters = (consoleFilters?: ConsoleFilter[]): Record<string, string[]> => {
@@ -61,22 +62,22 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         enabledFiltersProperties: undefined as string[]|undefined,
     });
     const getters = reactive({
-        selectedQueryId: computed(() => costQuerySetState().selectedQuerySetId),
-        costQueryList: computed(() => costQuerySetState().costQuerySetList),
-        selectedQuerySet: computed(() => costQuerySetStore().selectedQuerySet),
-        selectedDataSourceId: computed(() => costQuerySetState().selectedDataSourceId),
-        managedCostQuerySetList: computed(() => costQuerySetStore().managedCostQuerySets),
+        selectedQueryId: computed(() => costQuerySetState.selectedQuerySetId),
+        costQueryList: computed(() => costQuerySetState.costQuerySetList),
+        selectedQuerySet: computed(() => costQuerySetGetters.selectedQuerySet),
+        selectedDataSourceId: computed(() => costQuerySetState.selectedDataSourceId),
+        managedCostQuerySetList: computed(() => costQuerySetGetters.managedCostQuerySets),
         currency: computed<Currency>(() => {
-            if (costQuerySetState().selectedDataSourceId) {
-                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState().selectedDataSourceId ?? ''];
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
                 return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
             }
             return 'USD';
         }),
         defaultGroupByItems: computed(() => {
             let additionalInfoGroupBy: GroupByItem[] = [];
-            if (costQuerySetState().selectedDataSourceId) {
-                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState().selectedDataSourceId ?? ''];
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
                 const additionalInfoKeys = targetDataSource?.data?.cost_additional_info_keys;
                 if (targetDataSource && additionalInfoKeys?.length) {
                     additionalInfoGroupBy = additionalInfoKeys.map((d) => ({
@@ -101,8 +102,8 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
             return results;
         }),
         dataSourceImageUrl: computed<string>(() => {
-            if (costQuerySetState().selectedDataSourceId) {
-                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState().selectedDataSourceId ?? ''];
+            if (costQuerySetState.selectedDataSourceId) {
+                const targetDataSource = allReferenceStore.getters.costDataSource[costQuerySetState.selectedDataSourceId ?? ''];
                 return allReferenceStore.getters.plugin[targetDataSource?.data?.plugin_info?.plugin_id]?.icon;
             }
             return '';
@@ -193,7 +194,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         try {
             createdData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
                 name,
-                data_source_id: costQuerySetState().selectedDataSourceId,
+                data_source_id: costQuerySetState.selectedDataSourceId,
                 options,
             });
             selectQueryId(createdData.cost_query_set_id);
@@ -203,11 +204,11 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         return createdData;
     };
     const selectQueryId = (querySetId: string|undefined) => {
-        costQuerySetStore().$patch({ selectedQuerySetId: querySetId });
+        costQuerySetStore.setSelectedQuerySetId(querySetId);
     };
     const editQuery = async (querySetId: string, name: string): Promise<CostQuerySetModel> => {
         let updatedQueryData;
-        if (costQuerySetStore().selectedQuerySet?.name !== name) {
+        if (costQuerySetGetters.selectedQuerySet?.name !== name) {
             try {
                 updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: querySetId,
@@ -220,7 +221,7 @@ export const useCostAnalysisPageStore = defineStore('cost-analysis-page', () => 
         return updatedQueryData;
     };
     const getCostQueryList = async () => {
-        await costQuerySetStore().listCostQuerySets();
+        await costQuerySetStore.listCostQuerySets();
     };
 
     const actions = {
