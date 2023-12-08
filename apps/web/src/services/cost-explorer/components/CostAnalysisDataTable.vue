@@ -259,7 +259,6 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
     }
     return '';
 };
-
 const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
     const timeUnit = getTimeUnitByGranularity(granularity);
     let dateFormat = 'YYYY-MM-DD';
@@ -314,14 +313,6 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         tableState.loading = false;
     }
 };
-
-/* event */
-const handleChange = async (options: any = {}) => {
-    setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
-    const { results, more } = await listCostAnalysisTableData();
-    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
-    tableState.more = more ?? false;
-};
 const costAnalyzeExportQueryHelper = new QueryHelper();
 const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
     try {
@@ -339,6 +330,14 @@ const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
         ErrorHandler.handleError(e);
         return [];
     }
+};
+
+/* event */
+const handleChange = async (options: any = {}) => {
+    setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
+    const { results, more } = await listCostAnalysisTableData();
+    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    tableState.more = more ?? false;
 };
 const handleExcelDownload = async () => {
     try {
@@ -364,6 +363,9 @@ const handleUpdateThisPage = async () => {
     tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     tableState.more = more ?? false;
 };
+const handleUpdateSelectedDisplayDataType = (selected: DisplayDataType) => {
+    state.selectedDisplayDataType = selected;
+};
 
 watch(
     [
@@ -384,10 +386,6 @@ watch(
     },
     { immediate: true, deep: true },
 );
-
-const handleUpdateSelectedDisplayDataType = (selected: DisplayDataType) => {
-    state.selectedDisplayDataType = selected;
-};
 
 // LOAD REFERENCE STORE
 (async () => {
