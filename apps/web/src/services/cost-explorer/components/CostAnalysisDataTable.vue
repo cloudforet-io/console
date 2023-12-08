@@ -265,15 +265,21 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
     if (timeUnit === 'month') dateFormat = 'YYYY-MM';
     else if (timeUnit === 'year') dateFormat = 'YYYY';
 
+    // HACK: will be removed after refactoring period
+    const _period = cloneDeep(period);
+    if (granularity === GRANULARITY.DAILY) {
+        _period.start = dayjs.utc(period.start).format('YYYY-MM-01');
+        _period.end = dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD');
+    }
+
     const _results: CostAnalyzeRawData[] = cloneDeep(results);
     const refinedTableData: CostAnalyzeRawData[] = [];
     const today = dayjs.utc();
     _results.forEach((d) => {
         let target = cloneDeep(d.value_sum);
-        let now = dayjs.utc(period.start).clone();
-        while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
-            if (now.isAfter(today, timeUnit)) break;
-            if (!find(target, { date: now.format(dateFormat) })) {
+        let now = dayjs.utc(_period.start).clone();
+        while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
+            if (!now.isAfter(today, timeUnit) && !find(target, { date: now.format(dateFormat) })) {
                 target?.push({ date: now.format(dateFormat), value: 0 });
             }
             now = now.add(1, timeUnit);
