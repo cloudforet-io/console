@@ -1889,6 +1889,7 @@
 				"USER_ID": "User ID",
 				"USER_ID_DUPLICATED": "Already being used.",
 				"USER_ID_INVALID": "Same ID exists.",
+				"USER_ID_INVALID_WORKSPACE": "{userId} is already in this workspace",
 				"USER_ID_NOT_EXIST": "ID does not exists."
 			},
 			"HANDBOOK": {

@@ -1889,6 +1889,7 @@
 				"USER_ID": "User ID",
 				"USER_ID_DUPLICATED": "すでに存在しています",
 				"USER_ID_INVALID": "同じIDが存在します。",
+				"USER_ID_INVALID_WORKSPACE": "",
 				"USER_ID_NOT_EXIST": "IDがありません"
 			},
 			"HANDBOOK": {
