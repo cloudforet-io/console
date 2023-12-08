@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PPaneLayout, PHeading, PButton,
@@ -7,13 +7,12 @@ import {
 import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
-import type { CredentialModel } from '@/schema/secret/secret/model';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -33,6 +32,7 @@ interface Props {
     serviceAccountId?: string;
     serviceAccountType: AccountType;
     serviceAccountName?: string;
+    serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
     projectId?: string;
     attachedTrustedAccountId?: string;
     editable: boolean;
@@ -44,47 +44,26 @@ const props = withDefaults(defineProps<Props>(), {
     serviceAccountId: undefined,
     serviceAccountType: ACCOUNT_TYPE.GENERAL,
     serviceAccountName: undefined,
+    serviceAccountData: undefined,
     projectId: undefined,
     attachedTrustedAccountId: undefined,
     editable: false,
     hasManagePermission: undefined,
 });
 
-const emit = defineEmits<{(e: 'refresh'): void;
-}>();
+const emit = defineEmits<{(e: 'refresh'): void; }>();
 
 const state = reactive({
     loading: true,
     mode: 'READ' as PageMode,
     isFormValid: undefined,
-    credentialData: {} as CredentialModel,
+    credentialData: {},
     credentialForm: {} as CredentialForm,
-    originCredentialForm: {} as Partial<CredentialForm>,
+    originCredentialForm: computed(() => (props.serviceAccountData?.data)),
+    originAttachedTrustedAccountId: computed(() => (props.attachedTrustedAccountId)),
 });
 
 /* Api */
-const apiQueryHelper = new ApiQueryHelper();
-const getCredentialData = async (serviceAccountId: string) => {
-    try {
-        state.loading = true;
-
-        const getQuery = () => apiQueryHelper
-            .setFilters([{ k: 'service_account_id', v: serviceAccountId, o: '=' }]);
-        let listApi = SpaceConnector.client.secret.secret.list;
-        if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
-            listApi = SpaceConnector.client.secret.trustedSecret.list;
-        }
-        const { results } = await listApi({ query: getQuery().data });
-        if (results.length) state.credentialData = results[0];
-        else state.credentialData = {};
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.credentialData = {};
-    } finally {
-        state.originCredentialForm.hasCredentialKey = !isEmpty(state.credentialData);
-        state.loading = false;
-    }
-};
 const deleteGeneralSecret = async (): Promise<boolean> => {
     try {
         await SpaceConnector.client.secret.secret.delete({
@@ -191,21 +170,12 @@ const handleClickSaveButton = async () => {
         }
         if (isValid) await updateDataTrustedSecret();
     }
-    await getCredentialData(props.serviceAccountId as string);
     state.mode = 'READ';
     emit('refresh');
 };
 const handleChangeCredentialForm = (credentialForm) => {
     state.credentialForm = credentialForm;
 };
-
-/* Watcher */
-watch([() => props.serviceAccountId, () => props.serviceAccountType], ([serviceAccountId]) => {
-    if (serviceAccountId) getCredentialData(serviceAccountId);
-}, { immediate: true });
-watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
-    state.originCredentialForm.attachedTrustedAccountId = attachedTrustedAccountId;
-}, { immediate: true });
 
 </script>
 

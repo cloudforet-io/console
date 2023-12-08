@@ -45,7 +45,7 @@ const state = reactive({
     item: {} as ServiceAccountModel,
     serviceAccountType: ACCOUNT_TYPE.GENERAL as AccountType,
     attachedGeneralAccounts: [] as ServiceAccountModel[],
-    attachedTrustedAccountId: computed(() => state.item.trusted_account_id),
+    attachedTrustedAccountId: computed(() => state.item?.trusted_account_id),
     providerId: computed(() => state.item?.provider),
     provider: computed(() => {
         if (!storeState.providerLoading && !state.loading) {
@@ -156,6 +156,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                               :service-account-loading="state.loading"
                                               :service-account-id="props.serviceAccountId"
                                               :service-account-type="state.serviceAccountType"
+                                              :service-account-data="state.item"
                                               :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
                                               @refresh="handleRefresh"
             />
@@ -167,6 +168,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
                                          :service-account-id="props.serviceAccountId"
                                          :service-account-type="state.serviceAccountType"
                                          :service-account-name="state.item.name"
+                                         :service-account-data="state.item"
                                          :project-id="state.projectId"
                                          :attached-trusted-account-id="state.attachedTrustedAccountId"
                                          :editable="state.hasManagePermission && !state.isManagedTrustedAccount"
