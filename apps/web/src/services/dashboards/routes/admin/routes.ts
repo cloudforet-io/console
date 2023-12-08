@@ -20,6 +20,7 @@ const adminDashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: makeAdminRouteName(DASHBOARDS_ROUTE._NAME),
     meta: { menuId: MENU_ID.DASHBOARDS },
+    redirect: () => ({ name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) }),
     component: DashboardsContainer,
     children: [
         {
