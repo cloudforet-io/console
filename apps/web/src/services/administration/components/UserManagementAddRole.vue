@@ -9,6 +9,8 @@ import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/d
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
+import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { store } from '@/store';
@@ -38,8 +40,8 @@ const state = reactive({
 /* Component */
 const roleTypeIconFormatter = (type: RoleType) => {
     switch (type) {
-    case ROLE_TYPE.WORKSPACE_OWNER: return '/images/img_avatar_workspace-owner.png';
-    case ROLE_TYPE.WORKSPACE_MEMBER: return '/images/img_avatar_workspace-member.png';
+    case ROLE_TYPE.WORKSPACE_OWNER: return WorkspaceOwnerImage;
+    case ROLE_TYPE.WORKSPACE_MEMBER: return WorkspaceMemberImage;
     default: return '';
     }
 };
