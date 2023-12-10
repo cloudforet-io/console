@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PDataLoader, PDynamicLayout, PButton,
@@ -7,24 +7,23 @@ import {
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { CredentialModel } from '@/schema/secret/secret/model';
+import type { SecretModel } from '@/schema/secret/secret/model';
+import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { store } from '@/store';
 
-import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 
 interface Props {
     loading: boolean;
-    credentialData: CredentialModel;
+    credentialData: Partial<SecretModel|TrustedSecretModel>;
     attachedTrustedAccountId?: string;
     hasManagePermission: boolean;
 }
@@ -39,32 +38,34 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'edit'): void;
 }>();
 const storeState = reactive({
-    serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
+    trustedAccounts: computed<TrustedAccountReferenceMap>(() => store.getters['reference/trustedAccountItems']),
 });
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+
 const state = reactive({
     attachedTrustedAccount: computed(() => {
-        if (props.attachedTrustedAccountId) return storeState.serviceAccounts[props.attachedTrustedAccountId];
+        if (props.attachedTrustedAccountId) return storeState.trustedAccounts[props.attachedTrustedAccountId];
         return undefined;
     }),
-    credentialJsonSchema: {} as JsonSchema,
+    credentialJsonSchema: computed<JsonSchema>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList.find((schema) => (schema.schema_id === props.credentialData.schema_id))),
     convertedCredentialData: computed(() => {
         const convertedData = { ...props.credentialData };
         Object.keys(state.credentialJsonSchema?.properties ?? {}).forEach((k) => {
             convertedData[k] = '••••••••••••••••••••';
         });
-        if (props.attachedTrustedAccountId) {
-            convertedData.trusted_service_account_id = state.attachedTrustedAccount?.label ?? props.attachedTrustedAccountId;
+        if (props.attachedTrustedAccountId && 'trusted_account_id' in convertedData) {
+            convertedData.trusted_account_id = state.attachedTrustedAccount?.label ?? props.attachedTrustedAccountId;
         }
         return convertedData;
     }),
     detailSchema: computed(() => {
         const fields: DynamicField[] = [{
-            key: 'schema', name: 'Secret Type', type: 'text', options: { disable_copy: true },
+            key: 'schema_id', name: 'Secret Schema', type: 'text', options: { disable_copy: true },
         }];
         if (props.attachedTrustedAccountId) {
             const link = SpaceRouter.router.resolve(referenceRouter(props.attachedTrustedAccountId, { resource_type: 'identity.ServiceAccount' })).href;
             fields.push({
-                key: 'trusted_service_account_id',
+                key: 'trusted_account_id',
                 name: 'Trusted Account',
                 type: 'text',
                 options: { link, disable_copy: true },
@@ -97,19 +98,6 @@ const fieldHandler = (field) => {
     return {};
 };
 
-/* Api */
-const getCredentialSchema = async (selectedSecretType) => {
-    try {
-        const res = await SpaceConnector.client.repository.schema.get({
-            name: selectedSecretType,
-            only: ['schema'],
-        });
-        state.credentialJsonSchema = res.schema;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.credentialJsonSchema = {};
-    }
-};
 
 /* Event */
 const handleClickAddButton = () => {
@@ -118,17 +106,9 @@ const handleClickAddButton = () => {
 
 /* Init */
 (async () => {
-    await store.dispatch('reference/serviceAccount/load');
+    await store.dispatch('reference/trustedAccount/load');
 })();
 
-/* Watcher */
-watch(() => props.credentialData, (credentialData) => {
-    if (credentialData?.schema) {
-        getCredentialSchema(credentialData.schema);
-    } else {
-        state.credentialJsonSchema = {};
-    }
-});
 
 </script>
 
@@ -138,7 +118,8 @@ watch(() => props.credentialData, (credentialData) => {
                    :loading="props.loading"
     >
         <p-dynamic-layout v-if="state.detailSchema"
-                          v-bind="state.detailSchema"
+                          :type="state.detailSchema.type"
+                          :options="state.detailSchema.options"
                           :data="state.convertedCredentialData"
                           :field-handler="fieldHandler"
         />
@@ -161,6 +142,7 @@ watch(() => props.credentialData, (credentialData) => {
 
 <style lang="postcss" scoped>
 .service-account-credentials-detail {
+    min-height: 11.25rem;
     height: 100%;
 
     /* custom design-system component - p-heading */

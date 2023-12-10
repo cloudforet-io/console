@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PPaneLayout, PHeading, PButton,
@@ -8,11 +8,20 @@ import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import type { SecretCreateParameters } from '@/schema/secret/secret/api-verbs/create';
+import type { SecretDeleteParameters } from '@/schema/secret/secret/api-verbs/delete';
+import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
+import type { SecretModel } from '@/schema/secret/secret/model';
+import type { TrustedSecretGetParameters } from '@/schema/secret/trusted-secret/api-verbs/get';
+import type { TrustedSecretListParameters } from '@/schema/secret/trusted-secret/api-verbs/list';
+import type { TrustedSecretUpdateDataParameters } from '@/schema/secret/trusted-secret/api-verbs/update_data';
+import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -31,7 +40,6 @@ interface Props {
     provider?: string;
     serviceAccountId?: string;
     serviceAccountType: AccountType;
-    serviceAccountName?: string;
     serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
     projectId?: string;
     attachedTrustedAccountId?: string;
@@ -43,7 +51,6 @@ const props = withDefaults(defineProps<Props>(), {
     provider: undefined,
     serviceAccountId: undefined,
     serviceAccountType: ACCOUNT_TYPE.GENERAL,
-    serviceAccountName: undefined,
     serviceAccountData: undefined,
     projectId: undefined,
     attachedTrustedAccountId: undefined,
@@ -57,17 +64,20 @@ const state = reactive({
     loading: true,
     mode: 'READ' as PageMode,
     isFormValid: undefined,
-    credentialData: {},
+    credentialData: undefined as SecretModel|TrustedSecretModel|undefined,
     credentialForm: {} as CredentialForm,
-    originCredentialForm: computed(() => (props.serviceAccountData?.data)),
+    originCredentialForm: {} as Partial<CredentialForm>,
     originAttachedTrustedAccountId: computed(() => (props.attachedTrustedAccountId)),
+    hasTrustedSecret: computed(() => (!!props.serviceAccountData?.trusted_account_id)),
+    isTrustedAccount: computed(() => (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED)),
 });
 
 /* Api */
 const deleteGeneralSecret = async (): Promise<boolean> => {
+    if (state.credentialData && !('secret_id' in state.credentialData)) return false;
     try {
-        await SpaceConnector.client.secret.secret.delete({
-            secret_id: state.credentialData.secret_id,
+        await SpaceConnector.client.secret.secret.delete<SecretDeleteParameters>({
+            secret_id: state.credentialData?.secret_id ?? '',
         });
         return true;
     } catch (e) {
@@ -75,6 +85,19 @@ const deleteGeneralSecret = async (): Promise<boolean> => {
         return false;
     }
 };
+
+const getTrustedSecretId = async (trustedAccountId: string): Promise<string|undefined> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.secret.trustedSecret.list<TrustedSecretListParameters, ListResponse<TrustedSecretModel>>({
+            trusted_account_id: trustedAccountId,
+        });
+        return results ? results[0].trusted_secret_id : undefined;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+        return undefined;
+    }
+};
+
 const createGeneralSecret = async () => {
     try {
         let data;
@@ -84,14 +107,14 @@ const createGeneralSecret = async () => {
             data = state.credentialForm.customSchemaForm;
         }
 
-        await SpaceConnector.client.secret.secret.create({
-            name: (props.serviceAccountName ?? '') + props.serviceAccountId,
+        await SpaceConnector.client.secret.secret.create<SecretCreateParameters, SecretModel>({
+            name: (props.serviceAccountData?.name ?? '') + props.serviceAccountId,
             data,
-            schema: state.credentialForm.selectedSecretType,
-            secret_type: 'CREDENTIALS',
+            schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             service_account_id: props.serviceAccountId,
-            project_id: props.projectId || null,
-            trusted_secret_id: state.credentialForm.attachedTrustedSecretId,
+            trusted_secret_id: state.credentialForm.attachedTrustedAccountId ? await getTrustedSecretId(state.credentialForm.attachedTrustedAccountId) : undefined,
+            permission_group: 'PROJECT',
+            project_id: props.projectId,
         });
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');
     } catch (e) {
@@ -101,8 +124,8 @@ const createGeneralSecret = async () => {
 const updateTrustedSecret = async (): Promise<boolean> => {
     try {
         await SpaceConnector.client.secret.trustedSecret.update({
-            trusted_secret_id: state.credentialData.trusted_secret_id,
-            schema: state.credentialForm.selectedSecretType,
+            trusted_secret_id: state.credentialData?.trusted_secret_id,
+            schema: state.credentialForm.selectedSecretSchema.schema_id,
         });
         return true;
     } catch (e) {
@@ -111,6 +134,7 @@ const updateTrustedSecret = async (): Promise<boolean> => {
     }
 };
 const updateDataTrustedSecret = async () => {
+    if (!state.credentialData?.trusted_secret_id) return;
     try {
         let data;
         if (state.credentialForm.activeDataType === 'json') {
@@ -119,8 +143,9 @@ const updateDataTrustedSecret = async () => {
             data = state.credentialForm.customSchemaForm;
         }
 
-        await SpaceConnector.client.secret.trustedSecret.updateData({
+        await SpaceConnector.client.secret.trustedSecret.updateData<TrustedSecretUpdateDataParameters, TrustedSecretModel>({
             trusted_secret_id: state.credentialData.trusted_secret_id,
+            schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             data,
         });
 
@@ -165,7 +190,7 @@ const handleClickSaveButton = async () => {
         }
     } else {
         let isValid = true;
-        if (state.credentialForm.selectedSecretType !== state.credentialData.schema) {
+        if (state.credentialForm.selectedSecretSchema.schema_id !== state.credentialData?.schema_id) {
             isValid = await updateTrustedSecret();
         }
         if (isValid) await updateDataTrustedSecret();
@@ -177,6 +202,52 @@ const handleChangeCredentialForm = (credentialForm) => {
     state.credentialForm = credentialForm;
 };
 
+const getSecretSchema = async () => {
+    try {
+        if (state.credentialData?.trusted_secret_id) {
+            state.credentialForm.customSchemaForm = await SpaceConnector.client.secret.trustedSecret.get<TrustedSecretGetParameters, TrustedSecretModel>({
+                trusted_secret_id: state.credentialData.trusted_secret_id,
+            });
+        } else if (state.credentialData && 'secret_id' in state.credentialData) {
+            state.credentialForm.customSchemaForm = await SpaceConnector.client.secret.secret.get<SecretListParameters, SecretModel>({
+                secret_id: state.credentialData.secret_id,
+            });
+        }
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const getSecretData = async () => {
+    try {
+        let response;
+        if (state.isTrustedAccount || state.hasTrustedSecret) {
+            response = await SpaceConnector.client.secret.trustedSecret.list<TrustedSecretListParameters, ListResponse<TrustedSecretModel>>({
+                trusted_account_id: props.serviceAccountData?.trusted_account_id,
+            });
+        } else if ('service_account_id' in props.serviceAccountData) {
+            response = await SpaceConnector.client.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
+                secret_id: props.serviceAccountData.service_account_id,
+            });
+        }
+        state.credentialData = response.results ? response.results[0] : {};
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.originCredentialForm.hasCredentialKey = !isEmpty(state.credentialData);
+        state.loading = false;
+    }
+};
+
+watch(() => props.serviceAccountData, async (serviceAccountData) => {
+    if (serviceAccountData) {
+        await getSecretData();
+        if (state.credentialData) await getSecretSchema();
+    }
+}, { immediate: true });
+watch(() => props.attachedTrustedAccountId, (attachedTrustedAccountId) => {
+    state.originCredentialForm.attachedTrustedAccountId = attachedTrustedAccountId;
+}, { immediate: true });
 </script>
 
 <template>
@@ -185,7 +256,7 @@ const handleChangeCredentialForm = (credentialForm) => {
                    :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
         >
             <template #extra>
-                <p-button v-if="state.mode === 'READ' && props.editable && !isEmpty(state.credentialData)"
+                <p-button v-if="state.mode === 'READ' && props.editable && state.credentialData"
                           icon-left="ic_edit"
                           style-type="transparent"
                           @click="handleClickEditButton"

@@ -167,7 +167,6 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             <service-account-credentials :provider="state.providerKey"
                                          :service-account-id="props.serviceAccountId"
                                          :service-account-type="state.serviceAccountType"
-                                         :service-account-name="state.item.name"
                                          :service-account-data="state.item"
                                          :project-id="state.projectId"
                                          :attached-trusted-account-id="state.attachedTrustedAccountId"
