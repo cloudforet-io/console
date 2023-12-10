@@ -117,6 +117,7 @@ const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSea
 
 const apiQuery = new ApiQueryHelper();
 const getQuery = (type: AccountType) => {
+    const isTrustedAccount = type === ACCOUNT_TYPE.TRUSTED;
     apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
@@ -127,8 +128,11 @@ const getQuery = (type: AccountType) => {
     const fields = tableState.schema?.options?.fields;
     if (fields) {
         apiQuery.setOnly(
-            ...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.') && !(d === 'project_id')),
-            type === ACCOUNT_TYPE.TRUSTED ? 'trusted_account_id' : 'service_account_id',
+            ...fields.map((d) => d.key).filter((d) => {
+                if (isTrustedAccount && !(d === 'project_id')) return false;
+                return !d.startsWith('tags.');
+            }),
+            isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
             'tags',
         );
     }

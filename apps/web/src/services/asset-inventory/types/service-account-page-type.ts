@@ -21,5 +21,5 @@ export interface CredentialForm {
 }
 
 export interface ProjectForm {
-    selectedProjectId: string | null;
+    selectedProjectId: string;
 }
