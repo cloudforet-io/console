@@ -16,6 +16,7 @@ import type { ProviderReferenceMap } from '@/store/modules/reference/provider/ty
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
 import type {
     ReferenceMap,
     VuexStoreReferenceType,
@@ -103,6 +104,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 ...REFERENCE_TYPE_INFO.service_account,
                 referenceMap: getters.serviceAccount,
             },
+            trustedAccount: {
+                ...REFERENCE_TYPE_INFO.trusted_account,
+                referenceMap: getters.trustedAccount,
+            },
             service_account: {
                 ...REFERENCE_TYPE_INFO.service_account,
                 referenceMap: getters.serviceAccount,
@@ -170,6 +175,10 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
         serviceAccount: asyncComputed<ServiceAccountReferenceMap>(async () => {
             await store.dispatch('reference/serviceAccount/load');
             return store.getters['reference/serviceAccountItems'];
+        }, {}, { lazy: true }),
+        trustedAccount: asyncComputed<TrustedAccountReferenceMap>(async () => {
+            await store.dispatch('reference/trustedAccount/load');
+            return store.getters['reference/trustedAccountItems'];
         }, {}, { lazy: true }),
         service_account: asyncComputed<ServiceAccountReferenceMap>(async () => {
             await store.dispatch('reference/serviceAccount/load');
