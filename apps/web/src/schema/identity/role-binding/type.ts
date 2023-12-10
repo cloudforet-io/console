@@ -1,1 +1,1 @@
-export type PermissionGroup = 'WORKSPACE' | 'DOMAIN';
+export type PermissionGroup = 'WORKSPACE' | 'DOMAIN' | 'PROJECT';
