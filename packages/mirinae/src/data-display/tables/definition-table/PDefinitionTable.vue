@@ -165,6 +165,7 @@ export default defineComponent<DefinitionTableProps>({
         td {
             line-height: 1.8;
             word-break: break-word;
+            overflow-x: auto;
         }
     }
     .def-row {
