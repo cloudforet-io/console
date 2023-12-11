@@ -89,6 +89,7 @@ const getUserRoles = async (domainId): Promise<Array<UserRole>> => {
     }
 };
 
+// TODO: need to implementation with default permissino of managed role
 const generatePagePermissionsForManagedRole = (roleId: string): PagePermission[] => {
     if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.DOMAIN_ADMIN]) {
         return [{ page: '*', permission: 'MANAGE' }];
