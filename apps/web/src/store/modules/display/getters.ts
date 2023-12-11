@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import type { RawLocation } from 'vue-router';
 import type VueRouter from 'vue-router';
 import type { Getter } from 'vuex';
 
@@ -10,6 +11,8 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 // eslint-disable-next-line import/no-cycle
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+// eslint-disable-next-line import/no-cycle
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type {
     DisplayState, DisplayMenu, SidebarProps,
@@ -54,6 +57,8 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
 };
 
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
+    const workspaceStore = useWorkspaceStore();
+    const tagetWorkspaceId = workspaceStore.getters.currentWorkspaceId;
     const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
@@ -63,7 +68,11 @@ const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayM
         }
     }
 
-    const link = router.resolve(menu.to);
+    const to: RawLocation = {
+        name: menu.to.name,
+        params: tagetWorkspaceId ? { workspaceId: tagetWorkspaceId } : {},
+    };
+    const link = router.resolve(to);
     if (link?.href !== '/') results.push(menu);
 
     return results;
@@ -108,6 +117,7 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+
     return _allGnbMenuList;
 };
 

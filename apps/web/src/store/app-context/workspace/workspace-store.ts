@@ -42,19 +42,20 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
             state.items = results || [];
         },
         setCurrentWorkspace(workspaceId?: string) {
-            if (!workspaceId) {
-                state.currentItem = undefined;
-                return;
-            }
-
             const found = state.items.find((workspace) => workspace.workspace_id === workspaceId);
+            let currentItem: WorkspaceModel|undefined;
             if (found) {
-                state.currentItem = found;
+                currentItem = found;
+            } else if (state.items.length) {
+                currentItem = state.items[0];
             } else {
-                state.currentItem = state.items[0];
+                currentItem = undefined;
             }
 
-            setDefaultParamsToSpaceConnector(state.currentItem?.workspace_id);
+            if (currentItem) {
+                setDefaultParamsToSpaceConnector(currentItem.workspace_id);
+            }
+            state.currentItem = currentItem;
         },
     };
 
