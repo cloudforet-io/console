@@ -51,6 +51,7 @@ import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/C
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
 import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 const { width } = useWindowSize();
 
@@ -60,6 +61,7 @@ const { query } = SpaceRouter.router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
 const workspaceStore = useWorkspaceStore();
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 
 const state = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -92,16 +94,7 @@ const tableState = reactive({
     hasManagePermission: useManagePermissionState(),
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: null as null|DynamicLayout,
-    schemaOptions: computed<DynamicLayoutOptions>(() => {
-        const option = tableState.schema?.options ?? {};
-        if (tableState.selectedAccountType === ACCOUNT_TYPE.TRUSTED) {
-            return {
-                ...option,
-                fields: option.fields?.filter((d) => d.key !== 'project_id') ?? [],
-            };
-        }
-        return option;
-    }),
+    schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
     visibleCustomFieldModal: false,
     accountTypeList: computed(() => [
         { name: ACCOUNT_TYPE.GENERAL, label: ACCOUNT_TYPE_BADGE_OPTION[ACCOUNT_TYPE.GENERAL].label },
@@ -129,14 +122,17 @@ const getQuery = (type: AccountType) => {
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
             { k: 'provider', v: state.selectedProvider, o: '=' },
-            ...(isTrustedAccount ? [{ k: 'workspace_id', v: [workspaceStore.getters.currentWorkspaceId, null], o: '=' }] : []),
+            ...(tableState.isTrustedAccount ? [{ k: 'workspace_id', v: [workspaceStore.getters.currentWorkspaceId, null], o: '=' }] : []),
             ...tableState.searchFilters,
         ]);
     const fields = tableState.schema?.options?.fields;
     if (fields) {
         apiQuery.setOnly(
-            ...fields.map((d) => d.key).filter((d) => !d.startsWith('tags.') && !(d === 'project_id')),
-            type === ACCOUNT_TYPE.TRUSTED ? 'trusted_account_id' : 'service_account_id',
+            ...fields.map((d) => d.key).filter((d) => {
+                if (isTrustedAccount && !(d === 'project_id')) return false;
+                return !d.startsWith('tags.');
+            }),
+            isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
             'tags',
         );
     }
@@ -150,13 +146,13 @@ const listServiceAccountData = async () => {
         if (tableState.isTrustedAccount) {
             res = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
                 domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-                query: getQuery(tableState.selectedAccountType),
+                query: getQuery(ACCOUNT_TYPE.TRUSTED),
                 workspace_id: undefined,
             });
         } else {
             res = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
                 domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-                query: getQuery(tableState.selectedAccountType),
+                query: getQuery(ACCOUNT_TYPE.GENERAL),
             });
         }
 
@@ -235,34 +231,15 @@ const handleDynamicLayoutFetch = (changed) => {
     fetchTableData(changed);
 };
 /** ******* Page Init ******* */
-const getTableSchema = async () => {
-    try {
-        tableState.schema = await SpaceConnector.client.addOns.pageSchema.get({
-            // eslint-disable-next-line camelcase
-            resource_type: 'identity.ServiceAccount',
-            schema: 'table',
-            options: {
-                provider: state.selectedProvider,
-            },
-        }, { mockPath: '?resource=serviceaccount' });
-    } catch (e) {
-        tableState.schema = null;
-    }
+const setTableSchema = (type: AccountType) => {
+    tableState.schema = type === 'TRUSTED' ? serviceAccountSchemaStore.state.trustedAccountTableSchema : serviceAccountSchemaStore.state.generalAccountTableSchema;
 };
 
 const reloadTable = async () => {
-    await getTableSchema();
+    setTableSchema(tableState.isTrustedAccount ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
     await listServiceAccountData();
 };
 
-const init = async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/provider/load'),
-    ]);
-};
-init();
-/** ************************* */
 const replaceQueryHelper = new QueryHelper();
 watch(() => store.state.reference.provider.items, (providers) => {
     if (providers) {
@@ -270,10 +247,14 @@ watch(() => store.state.reference.provider.items, (providers) => {
         state.selectedProvider = providerFilter || Object.keys(providers)?.[0];
     }
 }, { immediate: true });
+watch(() => state.selectedProvider, (provier) => {
+    if (provier) {
+        serviceAccountSchemaStore.setProviderSchema(provier);
+    }
+});
 watch(() => state.selectedProvider, async (after, before) => {
     if (after && after !== before) {
         await replaceUrlQuery('provider', after);
-        await getTableSchema();
         await listServiceAccountData();
     }
 }, { immediate: true });
@@ -285,8 +266,19 @@ watch(() => tableState.searchFilters, (searchFilters) => {
     }
 });
 watch(() => tableState.selectedAccountType, () => {
+    setTableSchema(tableState.isTrustedAccount ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
     listServiceAccountData();
-});
+}, { immediate: true });
+
+(async () => {
+    const actionList = [
+        store.dispatch('reference/project/load'),
+        store.dispatch('reference/provider/load'),
+    ];
+    if (state.selectedProvider) actionList.push(serviceAccountSchemaStore.setProviderSchema(state.selectedProvider));
+    await Promise.allSettled(actionList);
+    setTableSchema(tableState.isTrustedAccount ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
+})();
 </script>
 
 <template>

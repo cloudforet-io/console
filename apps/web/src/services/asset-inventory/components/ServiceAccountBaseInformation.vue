@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PPaneLayout, PHeading,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -12,12 +12,10 @@ import type { ProviderGetParameters } from '@/schema/identity/provider/api-verbs
 import type { ProviderModel } from '@/schema/identity/provider/model';
 import type { SchemaGetParameters } from '@/schema/identity/schema/api-verbs/get';
 import type { SchemaModel } from '@/schema/identity/schema/model';
-import type { ServiceAccountGetParameters } from '@/schema/identity/service-account/api-verbs/get';
 import type { ServiceAccountUpdateParameters } from '@/schema/identity/service-account/api-verbs/update';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
-import type { TrustedAccountGetParameters } from '@/schema/identity/trusted-account/api-verbs/get';
 import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
@@ -41,6 +39,7 @@ interface Props {
     editable: boolean;
     serviceAccountLoading: boolean;
     serviceAccountType: AccountType;
+    serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -49,20 +48,38 @@ const props = withDefaults(defineProps<Props>(), {
     editable: false,
     serviceAccountLoading: false,
     serviceAccountType: ACCOUNT_TYPE.GENERAL,
+    serviceAccountData: undefined,
 });
 
-const emit = defineEmits<{(e: 'refresh'): void;
-}>();
+const emit = defineEmits<{(e: 'refresh'): void; }>();
 
-const state = reactive({
-    loading: true,
-    providerData: {} as Partial<ProviderModel>,
-    mode: 'READ' as PageMode,
+interface State {
+    loading: boolean;
+    isTrustedAccount: ComputedRef<boolean>;
+    providerData: Partial<ProviderModel>;
+    mode: PageMode;
+    isFormValid: boolean|undefined;
+    baseInformationSchema: Partial<SchemaModel>;
+    baseInformationForm: Partial<BaseInformationForm>;
+    originBaseInformationForm: ComputedRef<Partial<BaseInformationForm>>;
+    domainId: string; // TODO: remove domain_id after backend is ready
+}
+const state = reactive<State>({
+    loading: false,
+    isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    providerData: {},
+    mode: 'READ',
     isFormValid: undefined,
-    baseInformationSchema: {} as Partial<SchemaModel>,
-    serviceAccountData: undefined as ServiceAccountModel|TrustedAccountModel|undefined,
-    baseInformationForm: {} as BaseInformationForm,
-    originBaseInformationForm: {} as BaseInformationForm,
+    baseInformationSchema: {},
+    baseInformationForm: {},
+    originBaseInformationForm: computed(() => ({
+        accountName: props.serviceAccountData?.name,
+        customSchemaForm: props.serviceAccountData?.data,
+        tags: props.serviceAccountData?.tags,
+        ...((state.isTrustedAccount && ('project_id' in props.serviceAccountData)) && {
+            selectedProjectId: props.serviceAccountData?.project_id ?? '',
+        }),
+    })),
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
@@ -79,45 +96,11 @@ const getProvider = async () => {
         state.providerData = {};
     }
 };
-const getServiceAccount = async (serviceAccountId:string) => {
-    try {
-        state.loading = true;
-        let res;
-        if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
-            res = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-                trusted_account_id: serviceAccountId,
-                workspace_id: undefined,
-            });
-        } else {
-            res = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
-                service_account_id: serviceAccountId,
-            });
-        }
-
-        state.serviceAccountData = res;
-        state.baseInformationForm = {
-            accountName: res.name,
-            customSchemaForm: res.data,
-            tags: res.tags,
-            projectForm: res.project_info ?? {
-                project_id: '',
-                project_name: '',
-            },
-        };
-        state.originBaseInformationForm = cloneDeep(state.baseInformationForm);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.serviceAccountData = undefined;
-    } finally {
-        state.loading = false;
-    }
-};
 const updateServiceAccount = async () => {
     try {
-        if (props.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
-            state.serviceAccountData = await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
+        state.loading = true;
+        if (state.isTrustedAccount) {
+            await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
                 domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 trusted_account_id: props.serviceAccountId,
                 name: state.baseInformationForm.accountName,
@@ -125,7 +108,7 @@ const updateServiceAccount = async () => {
                 tags: state.baseInformationForm.tags,
             });
         } else {
-            state.serviceAccountData = await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
+            await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
                 domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 service_account_id: props.serviceAccountId,
                 name: state.baseInformationForm.accountName,
@@ -133,10 +116,11 @@ const updateServiceAccount = async () => {
                 tags: state.baseInformationForm.tags,
             });
         }
-
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_E_UPDATE_BASE_INFO'));
+    } finally {
+        state.loading = false;
     }
 };
 
@@ -163,7 +147,6 @@ const handleClickCancelButton = () => {
 const handleClickSaveButton = async () => {
     if (!state.isFormValid) return;
     await updateServiceAccount();
-    await getServiceAccount(props.serviceAccountId);
     state.mode = 'READ';
     emit('refresh');
 };
@@ -178,9 +161,6 @@ watch(() => props.provider, async (provider) => {
         await getBaseInformationSchema();
     }
 });
-watch(() => props.serviceAccountId, (serviceAccountId) => {
-    if (serviceAccountId) getServiceAccount(serviceAccountId);
-}, { immediate: true });
 
 </script>
 
@@ -217,7 +197,8 @@ watch(() => props.serviceAccountId, (serviceAccountId) => {
         <div class="content-wrapper">
             <service-account-base-information-detail v-show="state.mode === 'READ'"
                                                      :provider="props.provider"
-                                                     :service-account-data="state.serviceAccountData"
+                                                     :service-account-data="props.serviceAccountData"
+                                                     :service-account-type="props.serviceAccountType"
                                                      :loading="props.serviceAccountLoading || state.loading"
             />
             <service-account-base-information-form v-if="state.mode === 'UPDATE'"

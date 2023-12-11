@@ -13,6 +13,7 @@ import provider from './provider';
 import region from './region';
 import secret from './secret';
 import serviceAccount from './service-account';
+import trustedAccount from './trusted-account';
 import user from './user';
 import webhook from './webhook';
 
@@ -31,6 +32,7 @@ export default {
         project,
         projectGroup,
         serviceAccount,
+        trustedAccount,
         cloudServiceType,
         secret,
         collector,

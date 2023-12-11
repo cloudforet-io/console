@@ -2,10 +2,11 @@
     <div class="service-account-project-form">
         <project-select-dropdown
             class="project-select-dropdown"
-            project-selectable
             :selected-project-ids="selectedProjects"
             :use-fixed-menu-style="false"
             :invalid="proxyIsValid === false"
+            project-selectable
+            :project-group-selectable="false"
             @update:selected-project-ids="handleSelectedProject"
         />
     </div>

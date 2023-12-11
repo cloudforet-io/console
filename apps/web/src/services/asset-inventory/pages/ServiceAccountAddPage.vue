@@ -4,20 +4,30 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout,
 } from '@spaceone/design-system';
-import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
+import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountCreateParameters } from '@/schema/identity/trusted-account/api-verbs/create';
+import type { TrustedAccountDeleteParameters } from '@/schema/identity/trusted-account/api-verbs/detele';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import type { SecretCreateParameters } from '@/schema/secret/secret/api-verbs/create';
+import type { SecretModel } from '@/schema/secret/secret/model';
+import type { TrustedSecretCreateParameters } from '@/schema/secret/trusted-secret/api-verbs/create';
+import type { TrustedSecretListParameters } from '@/schema/secret/trusted-secret/api-verbs/list';
+import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -39,15 +49,19 @@ const props = defineProps<{
     serviceAccountType?: AccountType;
 }>();
 
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    trustedAccounts: computed<TrustedAccountReferenceMap>(() => store.getters['reference/trustedAccountItems']),
+});
+
 const state = reactive({
     isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
     providerSchemaLoading: true,
     providerSchemaData: computed<Partial<SchemaModel|undefined>>(
         () => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema),
     ),
-    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-    providerIcon: computed(() => (props.provider ? state.providers[props.provider]?.icon : '')),
-    description: computed(() => get(state.providerSchemaData, 'metadata.view.layouts.help:service_account:create', undefined)),
+    providerIcon: computed(() => (props.provider ? storeState.providers[props.provider]?.icon : '')),
+    description: computed(() => state.providerSchemaData?.options?.help),
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
@@ -62,70 +76,91 @@ const formState = reactive({
     isValid: computed(() => {
         if (!formState.isBaseInformationFormValid) return false;
         if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
-        if (formState.accountType === ACCOUNT_TYPE.TRUSTED) return true;
+        if (state.isTrustedAccount) return true;
         return true;
     }),
     formLoading: false,
 });
 
-const deleteServiceAccount = async (serviceAccountId: string) => {
-    await SpaceConnector.client.identity.serviceAccount.delete({
-        service_account_id: serviceAccountId,
-    });
-};
-const createServiceAccount = async (): Promise<string|undefined> => {
-    try {
-        formState.formLoading = true;
-        if (!(props.provider && formState.baseInformationForm.projectForm.selectedProjectId)) throw new Error('Invalid parameter');
-        const res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
+const createAccount = async (): Promise<string|undefined> => {
+    if (!props.provider) throw new Error('Invalid parameter');
+    const data = formState.baseInformationForm.customSchemaForm;
+
+    let res: TrustedAccountModel|ServiceAccountModel;
+    if (state.isTrustedAccount) {
+        res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
+            provider: props.provider,
+            name: formState.baseInformationForm.accountName,
+            data,
+            permission_group: 'WORKSPACE',
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
+        });
+    } else {
+        res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
             provider: props.provider,
             name: formState.baseInformationForm.accountName.trim(),
-            data: formState.baseInformationForm.customSchemaForm,
+            data,
             tags: formState.baseInformationForm.tags,
             trusted_account_id: formState.credentialForm.attachedTrustedAccountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,
+            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
         });
-        return res.service_account_id;
+    }
+
+    return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
+};
+
+const deleteServiceAccount = async (serviceAccountId: string) => {
+    if (state.isTrustedAccount) {
+        await SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>({
+            trusted_account_id: serviceAccountId,
+        });
+    } else {
+        await SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>({
+            service_account_id: serviceAccountId,
+        });
+    }
+};
+
+const getTrustedSecretId = async (trustedAccountId: string): Promise<string|undefined> => {
+    try {
+        const { results } = await SpaceConnector.clientV2.secret.trustedSecret.list<TrustedSecretListParameters, ListResponse<TrustedSecretModel>>({
+            trusted_account_id: trustedAccountId,
+        });
+        return results ? results[0].trusted_secret_id : undefined;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         return undefined;
-    } finally {
-        formState.formLoading = false;
     }
 };
-const createSecret = async (serviceAccountId: string): Promise<boolean> => {
-    let isSucceed: boolean;
-    try {
-        let data;
-        if (formState.credentialForm.activeDataType === 'json') {
-            data = JSON.parse(formState.credentialForm.credentialJson);
-        } else if (formState.credentialForm.activeDataType === 'input') {
-            data = formState.credentialForm.customSchemaForm;
-        }
 
-        let createApi = SpaceConnector.client.secret.secret.create;
-        if (formState.accountType === ACCOUNT_TYPE.TRUSTED) {
-            createApi = SpaceConnector.client.secret.trustedSecret.create;
-        }
-        await createApi({
-            name: formState.baseInformationForm.accountName + serviceAccountId,
-            data,
-            schema: formState.credentialForm.selectedSecretType,
-            secret_type: 'CREDENTIALS',
-            service_account_id: serviceAccountId,
-            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
-            trusted_secret_id: formState.credentialForm.attachedTrustedSecretId,
-        });
-
-        showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
-        isSucceed = true;
-    } catch (e) {
-        isSucceed = false;
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-        await deleteServiceAccount(serviceAccountId);
+const createSecret = async (accountId: string): Promise<void> => {
+    let data;
+    if (formState.credentialForm.activeDataType === 'json') {
+        data = JSON.parse(formState.credentialForm.credentialJson);
+    } else if (formState.credentialForm.activeDataType === 'input') {
+        data = formState.credentialForm.customSchemaForm;
     }
 
-    return isSucceed;
+    const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
+    if (state.isTrustedAccount) {
+        await SpaceConnector.client.secret.trustedSecret.create<TrustedSecretCreateParameters, TrustedSecretModel>({
+            name: formState.baseInformationForm.accountName + accountId,
+            data,
+            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
+            permission_group: 'WORKSPACE',
+            trusted_account_id: attachedTrustedAccountId,
+        });
+    } else {
+        await SpaceConnector.client.secret.secret.create<SecretCreateParameters, SecretModel>({
+            name: formState.baseInformationForm.accountName + accountId,
+            data,
+            permission_group: 'PROJECT',
+            service_account_id: accountId,
+            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
+            trusted_secret_id: attachedTrustedAccountId ? await getTrustedSecretId(attachedTrustedAccountId) : undefined,
+        });
+    }
 };
 
 /* Event */
@@ -134,17 +169,25 @@ const handleSave = async () => {
         ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
         return;
     }
-
-    const serviceAccountId = await createServiceAccount();
-    if (serviceAccountId && formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
+    let accountId:string|undefined;
+    try {
+        formState.formLoading = true;
+        accountId = await createAccount();
+        if (accountId && formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
         // preprocessing for Google Cloud form
-        if (formState.credentialForm.customSchemaForm?.private_key) {
-            formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
+            if (formState.credentialForm.customSchemaForm?.private_key) {
+                formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
+            }
+            await createSecret(accountId);
         }
-        const isSecretCreationSuccess = await createSecret(serviceAccountId);
-        if (!isSecretCreationSuccess) return;
+        showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
+        SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+        if (accountId) await deleteServiceAccount(accountId);
+    } finally {
+        formState.formLoading = false;
     }
-    SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
 };
 const handleGoBack = () => {
     const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;
@@ -164,6 +207,7 @@ const handleChangeCredentialForm = (credentialForm) => {
     await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
     await Promise.allSettled([
         store.dispatch('reference/provider/load'),
+        store.dispatch('reference/trustedAccount/load'),
     ]);
     state.providerSchemaLoading = false;
 })();
@@ -191,8 +235,8 @@ const handleChangeCredentialForm = (credentialForm) => {
                              class="info-button"
                 >
                     <template #contents>
-                        <p-markdown :markdown="state.description.options.markdown"
-                                    :data="state.description.options.markdown"
+                        <p-markdown :markdown="state.description"
+                                    :data="state.description"
                                     :language="$store.state.user.language"
                                     class="!p-0"
                         />
