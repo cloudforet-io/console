@@ -9,6 +9,9 @@ export const ASSET_INVENTORY_ROUTE = Object.freeze({
         NO_RESOURCE: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.no_resource` },
         DETAIL: { _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}.detail` },
     },
+    SERVER: {
+        _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
+    },
     COLLECTOR: {
         _NAME: `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.COLLECTOR}`,
         CREATE: {
