@@ -9,6 +9,7 @@ export const MENU_ID = Object.freeze({
     PROJECT: 'project',
     ASSET_INVENTORY: 'asset_inventory',
     CLOUD_SERVICE: 'cloud_service',
+    SERVER: 'server',
     COLLECTOR: 'collector',
     SERVICE_ACCOUNT: 'service_account',
     COST_EXPLORER: 'cost_explorer',
