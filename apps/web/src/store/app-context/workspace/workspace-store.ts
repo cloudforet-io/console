@@ -64,17 +64,30 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
     };
 });
 
+// TODO: remove this after identity v2 is ready
+const EXCLUDED_DOMAIN_ID_API_LIST = ['/identity/endpoint/list'];
 
 const setDefaultParamsToSpaceConnector = (workspaceId: string) => {
     SpaceConnector.setRequestInterceptor((request) => {
         if (!request.url) return request;
+
+        // TODO: remove this after identity v2 is ready
+        if (request.data && !EXCLUDED_DOMAIN_ID_API_LIST.includes(request.url)) {
+            request.data = {
+                domain_id: store.state.domain.domainId,
+                ...request.data,
+            };
+        }
 
         if (excludedWorkspaceApiMap.has(request.url)) {
             return request;
         }
 
         if (request.data) {
-            request.data = { workspace_id: workspaceId, ...request.data };
+            request.data = {
+                workspace_id: workspaceId,
+                ...request.data,
+            };
         }
         return request;
     });
@@ -86,6 +99,15 @@ const EXCLUDED_WORKSPACE_API_LIST = [
     '/identity/user/get',
     '/identity/user/get-workspaces',
     '/identity/role/list',
+    '/identity/api-key/create',
+    '/identity/api-key/update',
+    '/identity/api-key/enable',
+    '/identity/api-key/disable',
+    '/identity/api-key/delete',
+    '/identity/api-key/get',
+    '/identity/api-key/list',
+    '/identity/api-key/stat',
+    '/identity/endpoint/list',
     // inventory
     '/inventory/cloud-service/analyze',
     '/inventory/cloud-service-query-set/list',
