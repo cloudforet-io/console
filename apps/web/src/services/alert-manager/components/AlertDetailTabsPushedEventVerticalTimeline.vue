@@ -62,7 +62,7 @@ export default {
 .timeline-wrapper {
     .timeline-list {
         padding: 0;
-        display: inline-block;
+        display: flex;
     }
     .timeline-item {
         @apply border-l border-gray-200;
@@ -71,6 +71,7 @@ export default {
         padding-left: 1rem;
         padding-bottom: 1.5rem;
         min-height: 3.25rem;
+        width: calc(100% - 7.5rem);
         &::before {
             @mixin circle-style;
 

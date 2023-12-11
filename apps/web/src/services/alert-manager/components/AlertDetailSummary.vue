@@ -210,6 +210,7 @@ export default {
 <style lang="postcss" scoped>
 .alert-detail-summary {
     display: flex;
+    gap: 1rem;
     padding-left: 1rem;
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
@@ -231,7 +232,6 @@ export default {
     }
 }
 .content-wrapper {
-    width: 40%;
     display: flex;
     flex-direction: column;
 
