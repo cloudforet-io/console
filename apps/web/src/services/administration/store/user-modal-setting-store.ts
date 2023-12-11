@@ -7,16 +7,16 @@ import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useUserModalSettingStore = defineStore('user-modal-setting', {
     state: () => ({
-        loading: false,
         mode: '',
         title: '',
         themeColor: 'primary',
-        users: [] as UserModel[],
         visible: {
             additional: false,
             form: false,
@@ -29,23 +29,28 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
         async listUsers(params: UserListParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
-                this.users = res.results || [];
+                return res.results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.users = [];
-                throw e;
+                return [];
             }
         },
         async listRoles(params: RoleListParameters) {
-            this.loading = true;
             try {
                 const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
                 return results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
-            } finally {
-                this.loading = false;
+            }
+        },
+        async getWorkspaceUser(params: WorkspaceUserListParameters) {
+            try {
+                const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserListParameters, WorkspaceUserModel>(params);
+                return !!res;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return false;
             }
         },
     },

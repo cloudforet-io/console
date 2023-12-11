@@ -1,141 +1,176 @@
 <script setup lang="ts">
+import { onClickOutside } from '@vueuse/core';
 import {
-    computed, reactive, ref, toRef,
+    computed, reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/composables';
 
 import {
-    PContextMenu, PEmpty, PFieldGroup, PTextInput, useContextMenuController,
+    PContextMenu, PEmpty, PFieldGroup, PIconButton, PTextInput,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
+import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 
+interface UserMenuItem extends UserModel {
+    label: string;
+}
+
 const modalSettingStore = useUserModalSettingStore();
-const modalSettingState = modalSettingStore.$state;
+const workspaceStore = useWorkspaceStore();
 
-const route = useRoute();
-
+const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
 const state = reactive({
     loading: false,
-    dropdownMenuItems: computed<MenuItem[]>(() => modalSettingState.users.map((user) => ({
-        label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
-        name: user.user_id,
-    }))),
-    selectedItems: [] as MenuItem[],
+    isFocus: false,
+    menuVisible: false,
+    menuItems: [] as UserMenuItem[],
+    selectedItems: [] as UserMenuItem[],
+    validItems: [] as UserMenuItem[],
     // TODO: will be removed after the backend is ready
     domain_id: computed(() => store.state.domain.domainId),
 });
 const formState = reactive({
-    userIds: computed(() => {
-        if (state.selectedItems.length === 0) {
-            return '';
-        }
-        return state.selectedItems.map((item) => item.name).join(', ');
-    }),
     searchText: '',
+    userIds: '',
 });
 const validationState = reactive({
-    userIdValid: undefined as undefined | boolean,
-    userIdValidText: '' as TranslateResult,
-});
-
-const {
-    visibleMenu: contextMenuVisible,
-    refinedMenu,
-    showContextMenu,
-    hideContextMenu,
-    reloadMenu,
-} = useContextMenuController({
-    useFixedStyle: false,
-    targetRef,
-    contextMenuRef,
-    useMenuFiltering: true,
-    useReorderBySelection: true,
-    searchText: toRef(formState, 'searchText'),
-    selected: toRef(state, 'selectedItems'),
-    menu: toRef(state, 'dropdownMenuItems'),
+    userIdInvalid: undefined as undefined | boolean,
+    userIdInvalidText: '' as TranslateResult,
 });
 
 /* Component */
+const hideMenu = (userIds?: string) => {
+    state.menuVisible = false;
+    formState.userIds = userIds || '';
+};
 const handleClickUserIdInput = async () => {
-    await reloadMenu();
-    if (!contextMenuVisible.value) {
-        await showContextMenu();
-    } else {
-        formState.searchText = '';
-        await hideContextMenu();
-    }
+    state.menuVisible = true;
+    validationState.userIdInvalid = false;
+    validationState.userIdInvalidText = '';
 };
-const handleSelectMenuItem = (item: MenuItem) => {
-    state.selectedItems.push(item);
+const handleClickDeleteButton = (idx: number) => {
+    state.validItems.splice(idx, 1);
 };
-const handleUpdateSearchText = debounce(async (text: string) => {
-    if (text !== '') {
-        showContextMenu();
-    }
-    formState.searchText = text;
-    await fetchListWorkspaceUsers();
-    await reloadMenu();
+const handleSelectMenuItem = async (menuItem: UserMenuItem) => {
+    state.isFocus = false;
+    state.selectedItems.push(menuItem);
+    formState.userIds = state.selectedItems.map((item) => item.user_id).join(', ');
+    await fetchListWorkspaceUsers(menuItem);
+};
+const handleChangeUserIdInput = debounce(async (searchText: string) => {
+    if (!state.isFocus) return;
+    formState.searchText = searchText;
+    validationState.userIdInvalid = false;
+    validationState.userIdInvalidText = '';
+    await fetchListUsers();
 }, 200);
 
-/* API */
-const userListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('name', true)
-    .setFiltersAsRawQueryString(route.query.filters);
-const userListApiQuery = userListApiQueryHelper.data;
+const handleClickEnter = async () => {
+    if (!state.isFocus) return;
+    const selectedItem = state.menuItems.filter((item) => item.user_id === formState.searchText);
+    await fetchListWorkspaceUsers(selectedItem[0]);
+    formState.searchText = '';
+    hideMenu();
+};
 
-const fetchListWorkspaceUsers = () => {
-    const params: UserListParameters = {
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    };
+/* API */
+
+const fetchListUsers = async () => {
     state.loading = true;
+
+    const userListApiQueryHelper = new ApiQueryHelper()
+        .setPageStart(1).setPageLimit(15)
+        .setSort('name', true);
+    if (formState.searchText) {
+        userListApiQueryHelper.setFilters([{
+            k: 'user_id',
+            v: formState.searchText,
+            o: '',
+        }]);
+    }
+
     try {
-        modalSettingStore.listUsers(params);
+        const response = await modalSettingStore.listUsers({
+            query: userListApiQueryHelper.data,
+            domain_id: state.domain_id,
+        });
+        state.menuItems = response.map((user) => ({
+            ...user,
+            label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
+            name: user.user_id,
+        }));
     } finally {
         state.loading = false;
     }
 };
+const fetchListWorkspaceUsers = async (item: UserMenuItem) => {
+    const params = {
+        user_id: item.user_id,
+        workspace_id: workspaceStore.getters.currentWorkspaceId,
+        domain_id: state.domain_id,
+    };
+    const response = await modalSettingStore.getWorkspaceUser(params);
+    if (!response) {
+        state.validItems.push(item);
+    } else {
+        hideMenu(item.user_id);
+        validationState.userIdInvalid = true;
+        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId: item.user_id });
+    }
+};
 
-/* Init */
-(async () => {
-    await fetchListWorkspaceUsers();
-})();
+/* Context Menu */
+onClickOutside(containerRef, () => hideMenu());
+
+watch(() => state.menuVisible, async (menuVisible) => {
+    if (menuVisible) {
+        formState.searchText = '';
+        await fetchListUsers();
+    } else {
+        state.isFocus = false;
+        state.selectedItems = [];
+        state.menuItems = [];
+    }
+});
 </script>
 
 <template>
     <div class="user-info-wrapper">
         <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
                        required
-                       :invalid="validationState.userIdValid"
-                       :invalid-text="validationState.userIdValidText"
+                       :invalid="validationState.userIdInvalid"
+                       :invalid-text="validationState.userIdInvalidText"
         >
             <template #default="{invalid}">
-                <div class="input-form-wrapper">
+                <div ref="containerRef"
+                     class="input-form-wrapper"
+                >
                     <p-text-input ref="targetRef"
-                                  :value="contextMenuVisible ? formState.searchText : formState.userIds"
+                                  :value="state.isFocus ? formState.searchText : formState.userIds"
                                   :invalid="invalid"
                                   class="user-id-input"
+                                  @focusin="state.isFocus = true"
                                   @click="handleClickUserIdInput"
-                                  @update:value="handleUpdateSearchText"
+                                  @keyup.enter="handleClickEnter"
+                                  @update:value="handleChangeUserIdInput"
                     />
-                    <p-context-menu v-show="contextMenuVisible"
+                    <p-context-menu v-if="state.menuVisible"
                                     ref="contextMenuRef"
                                     :loading="state.loading"
-                                    :menu="refinedMenu"
-                                    :selected="state.selectedItems"
+                                    :menu="state.menuItems"
+                                    :selected="state.validItems"
                                     multi-selectable
                                     class="user-context-menu"
                                     @select="handleSelectMenuItem"
@@ -143,12 +178,34 @@ const fetchListWorkspaceUsers = () => {
                 </div>
             </template>
         </p-field-group>
-        <p-empty show-image
+        <p-empty v-if="state.validItems.length === 0"
+                 show-image
                  :title="$t('IDENTITY.USER.FORM.NO_USER')"
                  class="empty-wrapper"
         >
             {{ $t('IDENTITY.USER.FORM.NO_USER_DESC') }}
         </p-empty>
+        <div v-else
+             class="selected-user-list"
+        >
+            <div v-for="(item, idx) in state.validItems"
+                 :key="`selected-user-list-item-${idx}`"
+                 class="selected-user-list-item"
+            >
+                <div class="selected-user-label-wrapper">
+                    <span class="label">{{ item.name }}</span>
+                    <span class="new">new</span>
+                </div>
+                <div>
+                    <p-icon-button name="ic_delete"
+                                   class="delete-btn"
+                                   width="1.5rem"
+                                   height="1.5rem"
+                                   @click="handleClickDeleteButton(idx)"
+                    />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -171,6 +228,27 @@ const fetchListWorkspaceUsers = () => {
     }
     .empty-wrapper {
         margin: auto;
+    }
+    .selected-user-list {
+        @apply overflow-y-scroll;
+        height: 12.5rem;
+        .selected-user-list-item {
+            @apply flex items-center justify-between;
+            height: 2.25rem;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+            .selected-user-label-wrapper {
+                @apply flex items-start;
+                gap: 0.125rem;
+                .label {
+                    @apply text-label-md;
+                }
+                .new {
+                    @apply text-label-sm text-coral-500;
+                    margin-top: -0.125rem;
+                }
+            }
+        }
     }
 }
 </style>

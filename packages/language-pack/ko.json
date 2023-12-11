@@ -1889,6 +1889,7 @@
 				"USER_ID": "유저 아이디",
 				"USER_ID_DUPLICATED": "이미 사용중입니다.",
 				"USER_ID_INVALID": "같은 아이디가 존재합니다.",
+				"USER_ID_INVALID_WORKSPACE": "",
 				"USER_ID_NOT_EXIST": "아이디가 없습니다."
 			},
 			"HANDBOOK": {
