@@ -239,6 +239,7 @@ export default {
         .sub-contents {
             display: flex;
             flex-direction: column;
+            gap: 1rem;
         }
     }
 
