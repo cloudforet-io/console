@@ -65,7 +65,10 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
 });
 
 // TODO: remove this after identity v2 is ready
-const EXCLUDED_DOMAIN_ID_API_LIST = ['/identity/endpoint/list'];
+const EXCLUDED_DOMAIN_ID_API_LIST = [
+    '/identity/domain/get-auth-info',
+    '/identity/endpoint/list',
+];
 
 const setDefaultParamsToSpaceConnector = (workspaceId: string) => {
     SpaceConnector.setRequestInterceptor((request) => {
