@@ -11,6 +11,9 @@ import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 
@@ -26,8 +29,10 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
 const PRIVATE_ICON = 'ic_lock-filled';
+const appContextStore = useAppContextStore();
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: true,
     projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
     workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
@@ -49,7 +54,7 @@ const state = reactive({
         id: d.domain_dashboard_id,
         label: d.name,
         to: {
-            name: DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
+            name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME) : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
             params: {
                 dashboardId: d.domain_dashboard_id,
             },
@@ -69,7 +74,9 @@ const state = reactive({
             label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
             id: MENU_ID.DASHBOARDS,
             foldable: false,
-            to: { name: DASHBOARDS_ROUTE.ALL._NAME },
+            to: {
+                name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME,
+            },
             hideFavorite: true,
         },
         { type: 'divider' },
@@ -123,7 +130,7 @@ const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMen
                 id: board.project_dashboard_id,
                 label: board.name,
                 to: {
-                    name: DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
+                    name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME) : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
                     params: {
                         dashboardId: board.project_dashboard_id,
                     },

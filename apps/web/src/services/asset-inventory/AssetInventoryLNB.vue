@@ -21,6 +21,9 @@ import { get } from 'lodash';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
@@ -43,11 +46,13 @@ export default defineComponent({
     name: 'AssetInventoryLNB',
     components: { LNB },
     setup() {
+        const appContextStore = useAppContextStore();
         const cloudServiceDetailPageStore = useCloudServiceDetailPageStore();
         const cloudServiceDetailPageState = cloudServiceDetailPageStore.$state;
 
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
+            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             isCloudServiceDetailPage: computed(() => vm.$route.name === ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME),
             detailPageParams: computed<CloudServiceDetailPageParams|undefined>(() => {
                 if (state.isCloudServiceDetailPage) return vm.$route.params as unknown as CloudServiceDetailPageParams;
@@ -65,11 +70,12 @@ export default defineComponent({
             cloudServiceDetailMenuSet: computed<LNBItem[]>(() => {
                 const results: LNBItem[] = [];
                 cloudServiceDetailPageState.cloudServiceTypeList.forEach((d) => {
+                    const routeName = state.isAdminMode ? makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME) : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME;
                     results.push({
                         type: 'item',
                         label: d.name,
                         id: d.cloud_service_type_key,
-                        to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME, params: { ...state.detailPageParams, name: d.name } },
+                        to: { name: routeName, params: { ...state.detailPageParams, name: d.name } },
                         favoriteOptions: {
                             type: FAVORITE_TYPE.CLOUD_SERVICE,
                             id: d.cloud_service_type_key,
@@ -79,36 +85,67 @@ export default defineComponent({
                 results.push({ type: 'divider' });
                 return results;
             }),
+            userModeMenuSet: computed<LNBMenu[]>(() => [
+                {
+                    type: 'item',
+                    id: MENU_ID.SERVER,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVER].translationId),
+                    to: {
+                        name: ASSET_INVENTORY_ROUTE.SERVER._NAME,
+                    },
+                },
+                {
+                    type: 'item',
+                    id: MENU_ID.COLLECTOR,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId),
+                    to: {
+                        name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
+                    },
+                },
+                {
+                    type: 'item',
+                    id: MENU_ID.SERVICE_ACCOUNT,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId),
+                    to: {
+                        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+                    },
+                },
+            ]),
+            adminModeMenuSet: computed<LNBMenu[]>(() => [
+                {
+                    type: 'item',
+                    id: MENU_ID.SERVER,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVER].translationId),
+                    to: {
+                        name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.SERVER._NAME),
+                    },
+                },
+                {
+                    type: 'item',
+                    id: MENU_ID.COLLECTOR,
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId),
+                    to: {
+                        name: makeAdminRouteName(ASSET_INVENTORY_ROUTE.COLLECTOR._NAME),
+                    },
+                },
+
+            ]),
             menuSet: computed<LNBMenu[]>(() => {
                 const menu: LNBMenu[] = (state.isCloudServiceDetailPage ? [] : [{
                     type: 'item',
                     id: MENU_ID.CLOUD_SERVICE,
                     label: i18n.t(MENU_INFO_MAP[MENU_ID.CLOUD_SERVICE].translationId),
-                    to: { name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME },
+                    to: {
+                        name: state.isAdminMode ? makeAdminRouteName(ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME) : ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+                    },
                 }]);
-                return [
+                const result = [
                     (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
-                    ...filterLNBMenuByPermission(menu.concat([
-                        {
-                            type: 'item',
-                            id: MENU_ID.SERVER,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVER].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
-                        },
-                        {
-                            type: 'item',
-                            id: MENU_ID.COLLECTOR,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },
-                        },
-                        {
-                            type: 'item',
-                            id: MENU_ID.SERVICE_ACCOUNT,
-                            label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVICE_ACCOUNT].translationId),
-                            to: { name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME },
-                        },
-                    ]), store.getters['user/pagePermissionList']),
+                    ...filterLNBMenuByPermission(menu.concat(
+                        state.isAdminMode ? state.adminModeMenuSet : state.userModeMenuSet,
+                    ), store.getters['user/pagePermissionList']),
                 ];
+                return result;
             }),
         });
 
