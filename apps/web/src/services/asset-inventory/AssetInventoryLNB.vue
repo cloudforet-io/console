@@ -91,6 +91,12 @@ export default defineComponent({
                     ...filterLNBMenuByPermission(menu.concat([
                         {
                             type: 'item',
+                            id: MENU_ID.SERVER,
+                            label: i18n.t(MENU_INFO_MAP[MENU_ID.SERVER].translationId),
+                            to: { name: ASSET_INVENTORY_ROUTE.SERVER._NAME },
+                        },
+                        {
+                            type: 'item',
                             id: MENU_ID.COLLECTOR,
                             label: i18n.t(MENU_INFO_MAP[MENU_ID.COLLECTOR].translationId),
                             to: { name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME },

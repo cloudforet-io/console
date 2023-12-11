@@ -54,6 +54,11 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
         translationId: 'MENU.ASSET_INVENTORY_CLOUD_SERVICE',
     },
+    [MENU_ID.SERVER]: {
+        menuId: MENU_ID.SERVER,
+        routeName: ASSET_INVENTORY_ROUTE.SERVER._NAME,
+        translationId: 'MENU.ASSET_INVENTORY_SERVER',
+    },
     [MENU_ID.COLLECTOR]: {
         menuId: MENU_ID.COLLECTOR,
         routeName: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
