@@ -3,6 +3,7 @@ import { reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
+import UserManagementAddPassword from '@/services/administration/components/UserManagementAddPassword.vue';
 import UserManagementAddRole from '@/services/administration/components/UserManagementAddRole.vue';
 import UserManagementAddUser from '@/services/administration/components/UserManagementAddUser.vue';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
@@ -35,7 +36,6 @@ const handleConfirm = () => {
                     :backdrop="true"
                     :visible="modalSettingState.visible.additional"
                     :disabled="state.disabled"
-                    :loading="modalSettingState.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
@@ -43,6 +43,7 @@ const handleConfirm = () => {
         <template #body>
             <div class="modal-contents">
                 <user-management-add-user />
+                <user-management-add-password />
                 <user-management-add-role />
             </div>
         </template>
