@@ -6,8 +6,6 @@ export const ROLE_TYPE = {
     USER: 'USER',
 } as const;
 
-export type MANGED_ROLE_TYPE = 'managed-system-admin'|'manged-domain-admin' | 'manged-workspace-owner' | 'manged-workspace-member';
-
 export const MANAGED_ROLE_TYPE = {
     SYSTEM_ADMIN: 'managed-system-admin',
     DOMAIN_ADMIN: 'managed-domain-admin',
