@@ -3302,6 +3302,11 @@
 				"DESC": "{deleteAllSubProjects}後にプロジェクトグループを削除してください。",
 				"TITLE": "プロジェクトグループ削除"
 			},
+			"MODAL_MOVE_PROJECT_GROUP": {
+				"MODAL_MOVE_PROJECT_TITLE": "",
+				"NO_PROJECT_GROUP": "",
+				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": ""
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
 			"NO_PROJECT_GROUP_MSG": "",
 			"ONLY_PEOPLE_INVITED": "",

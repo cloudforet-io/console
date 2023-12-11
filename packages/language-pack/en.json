@@ -3302,6 +3302,11 @@
 				"DESC": "Please {deleteAllSubProjects}, if you want to delete project group.",
 				"TITLE": "Delete Project Group "
 			},
+			"MODAL_MOVE_PROJECT_GROUP": {
+				"MODAL_MOVE_PROJECT_TITLE": "Move \"{name}\"",
+				"NO_PROJECT_GROUP": "No Project Group",
+				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": "Select a project group to move to"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
 			"NO_PROJECT_GROUP_MSG": "Getting started with grouping your scattered resource and accounts with your own project.",
 			"ONLY_PEOPLE_INVITED": "Only people invited",

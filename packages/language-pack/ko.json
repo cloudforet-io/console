@@ -3302,6 +3302,11 @@
 				"DESC": "{deleteAllSubProjects}해야 프로젝트 그룹을 삭제할 수 있습니다.",
 				"TITLE": "프로젝트 그룹 삭제 "
 			},
+			"MODAL_MOVE_PROJECT_GROUP": {
+				"MODAL_MOVE_PROJECT_TITLE": "",
+				"NO_PROJECT_GROUP": "",
+				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": ""
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 수정",
 			"NO_PROJECT_GROUP_MSG": "",
 			"ONLY_PEOPLE_INVITED": "",
