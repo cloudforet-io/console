@@ -6,6 +6,7 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { ERROR_ROUTE } from '@/router/constant';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -63,8 +64,32 @@ export class SpaceRouter {
             const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
 
 
+            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store'].getters.isAdminMode;
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
+
+            /* Redirect Logic for Workspace and Admin Modes
+            * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent
+            * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
+             */
+            if (isAdminMode && to.name && !to.name?.startsWith('admin.')) {
+                const adminRouteName = makeAdminRouteName(to.name);
+                const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
+                const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
+                const adminUserAccessLevel = getUserAccessLevel(resolved.route, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+
+                if (adminRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
+                    nextLocation = {
+                        ...to,
+                        name: makeAdminRouteName(to.name),
+                    };
+                } else {
+                    nextLocation = {
+                        name: ERROR_ROUTE._NAME,
+                        params: { statusCode: '404' },
+                    };
+                }
+            }
 
             // When a user is authenticated
             if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
@@ -91,6 +116,7 @@ export class SpaceRouter {
             if (SpaceRouter.router.app?.$store.state.error.visibleAuthorizationError) {
                 SpaceRouter.router.app?.$store.commit('error/setVisibleAuthorizationError', false);
             }
+
             next(nextLocation);
         });
 

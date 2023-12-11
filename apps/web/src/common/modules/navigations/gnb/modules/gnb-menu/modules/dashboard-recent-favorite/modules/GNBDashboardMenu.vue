@@ -52,8 +52,6 @@ import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -98,12 +96,12 @@ export default defineComponent({
             subMenuList: computed(() => [
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
-                    to: { name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME },
+                    to: { name: DASHBOARDS_ROUTE.ALL._NAME },
                     show: true,
                 },
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
-                    to: { name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME) : DASHBOARDS_ROUTE.CREATE._NAME },
+                    to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
                     show: !state.hasOnlyViewPermission,
                 },
             ] as DisplayMenu[]),
