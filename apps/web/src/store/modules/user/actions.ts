@@ -9,6 +9,9 @@ import { MANAGED_ROLE_TYPE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { setI18nLocale } from '@/translations';
 
+// eslint-disable-next-line import/no-cycle
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+
 import type { PagePermission } from '@/lib/access-control/config';
 
 import type {
@@ -112,6 +115,8 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
     SpaceConnector.setToken(response.access_token, response.refresh_token);
 
     const [, userId] = getUserInfoFromToken(response.access_token);
+    const workspaceStore = useWorkspaceStore();
+    await workspaceStore.load(userId);
 
     const userInfo = await getUserInfo(userId, domainId);
     commit('setUser', userInfo);

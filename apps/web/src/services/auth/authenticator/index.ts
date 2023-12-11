@@ -5,8 +5,6 @@ import type { AuthType } from '@/schema/identity/user/type';
 import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
-
 
 abstract class Authenticator {
     static async signIn(credentials: Record<string, any>, authType: AuthType, verifyCode?: string): Promise<void> {
@@ -16,8 +14,7 @@ abstract class Authenticator {
             authType,
             verify_code: verifyCode,
         });
-        const workspaceStore = useWorkspaceStore();
-        await workspaceStore.load(store.state.user.userId);
+
         await Promise.allSettled([
             // INIT REFERENCE STORE
             store.dispatch('reference/loadAll', { force: true }),
