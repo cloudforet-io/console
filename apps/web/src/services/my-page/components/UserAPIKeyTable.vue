@@ -132,7 +132,7 @@ const listAPIKey = async (userId) => {
         const res = await SpaceConnector.clientV2.identity.apiKey.list<ApiKeyListParameters, ApiKeyListResponse>({
             query: apiQueryHelper.data,
         });
-        state.items = res.results;
+        state.items = res.results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.items = [];
