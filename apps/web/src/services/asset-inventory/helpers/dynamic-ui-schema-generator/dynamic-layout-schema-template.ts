@@ -143,7 +143,7 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                 name: field.name,
                 type: 'text',
             })),
-            ...((isTrustedAccount && [{
+            ...((!isTrustedAccount && [{
                 key: 'project_id',
                 name: 'Project',
                 type: 'text',

@@ -86,7 +86,7 @@ const state = reactive({
         const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
         return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
     }),
-    baseInformationSchema: computed<JsonSchema>(() => storeState.generalAccountSchema?.schema ?? null),
+    baseInformationSchema: computed<JsonSchema|undefined>(() => storeState.generalAccountSchema?.schema),
     domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 const formState = reactive({
@@ -98,7 +98,7 @@ const formState = reactive({
     attachedTrustedAccountId: undefined,
     formData: computed<CredentialForm>(() => ({
         hasCredentialKey: formState.hasCredentialKey,
-        selectedSecretType: formState.selectedSecretType,
+        selectedSecretSchema: formState.selectedSecretType,
         customSchemaForm: formState.customSchemaForm,
         credentialJson: formState.credentialJson,
         activeDataType: tabState.activeTab as ActiveDataType,
@@ -216,9 +216,6 @@ watch(() => state.secretTypes, (secretTypes) => {
 }, { immediate: true });
 watch(() => formState.attachedTrustedAccountId, (attachedTrustedAccountId) => {
     getTrustedAccountCredentialData(attachedTrustedAccountId);
-});
-watch(() => props.serviceAccountType, () => {
-    initForm();
 });
 watch(() => formState.formData, (formData) => {
     emit('change', formData);

@@ -49,6 +49,11 @@ export const REFERENCE_TYPE_INFO = {
         key: 'service_account_id',
         name: 'Service Account',
     },
+    trusted_account: {
+        type: 'trustedAccount',
+        key: 'trusted_account_id',
+        name: 'Trusted Account',
+    },
     user: {
         type: 'user',
         key: 'user_id',

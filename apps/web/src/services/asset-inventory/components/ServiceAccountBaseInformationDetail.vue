@@ -21,7 +21,7 @@ const props = defineProps<{
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 
 const state = reactive({
-    detailSchema: {} as {details: Partial<DynamicLayout>[]},
+    detailSchema: {} as Partial<DynamicLayout>,
     fieldHandler: [],
 });
 
