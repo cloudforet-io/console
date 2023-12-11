@@ -5,6 +5,7 @@ export interface ApiKeyModel {
     api_key?: string;
     name: string;
     state: ApiKeyState;
+    owner_type: string;
     user_id: string;
     domain_id: string;
     created_at: string;

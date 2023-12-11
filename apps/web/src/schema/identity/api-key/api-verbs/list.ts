@@ -1,5 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ApiKeyState } from '@/schema/identity/api-key/_types/api-key-type';
 import type { ApiKeyModel } from '@/schema/identity/api-key/model';
 
@@ -10,7 +11,4 @@ export interface ApiKeyListParameters {
     query?: Query;
 }
 
-export interface ApiKeyListResponse {
-    results: ApiKeyModel[];
-    total_count: number;
-}
+export type ApiKeyListResponse = ListResponse<ApiKeyModel>;
