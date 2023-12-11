@@ -5,8 +5,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { MANAGED_ROLE_TYPE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { setI18nLocale } from '@/translations';
+
+import type { PagePermission } from '@/lib/access-control/config';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, UserRole,
@@ -68,12 +71,13 @@ const getUserRoles = async (domainId): Promise<Array<UserRole>> => {
         // TODO: refactor below logic with new response
         results.forEach((role) => {
             const roleId = role.role_id;
+            const isManagedRole = roleId.startsWith('managed-');
             if (!userRoles[roleId]) {
                 userRoles[roleId] = {
                     roleId,
                     name: role.name,
                     roleType: role.role_type,
-                    pagePermissions: role.page_permissions,
+                    pagePermissions: isManagedRole ? generatePagePermissionsForManagedRole(roleId) : role.page_permissions,
                 };
             }
         });
@@ -83,6 +87,17 @@ const getUserRoles = async (domainId): Promise<Array<UserRole>> => {
         console.error(`RoleBinding Load Error: ${e}`);
         return [];
     }
+};
+
+// TODO: need to implementation with default permissino of managed role
+const generatePagePermissionsForManagedRole = (roleId: string): PagePermission[] => {
+    if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.DOMAIN_ADMIN]) {
+        return [{ page: '*', permission: 'MANAGE' }];
+    } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_OWNER]) {
+        return [{ page: '*', permission: 'MANAGE' }];
+    } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_MEMBER]) {
+        return [{ page: '*', permission: 'VIEW' }];
+    } return [];
 };
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
