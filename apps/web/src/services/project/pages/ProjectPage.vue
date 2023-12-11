@@ -21,6 +21,7 @@ import {
     convertProjectConfigToReferenceData,
     convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
+import getRandomId from '@/lib/random-id-generator';
 
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
@@ -30,6 +31,7 @@ import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayou
 import ProjectMainCardList from '@/services/project/components/ProjectMainCardList.vue';
 import ProjectMainProjectGroupDeleteCheckModal from '@/services/project/components/ProjectMainProjectGroupDeleteCheckModal.vue';
 import ProjectMainProjectGroupFormModal from '@/services/project/components/ProjectMainProjectGroupFormModal.vue';
+import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import ProjectMainProjectTree from '@/services/project/components/ProjectMainProjectTree.vue';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 import type {
@@ -93,6 +95,8 @@ const state = reactive({
             label: i18n.t('PROJECT.LANDING.PROJECT_GROUP') as string,
         },
     ])),
+    projectGroupModalVisible: false,
+    projectTreeKey: getRandomId(),
 });
 
 const {
@@ -109,7 +113,7 @@ const {
 onClickOutside(menuRef, hideContextMenu);
 
 /* Favorite */
-const onFavoriteDelete = (item: FavoriteItem) => {
+const handleDeleteFavorite = (item: FavoriteItem) => {
     store.dispatch('favorite/removeItem', item);
 };
 
@@ -133,6 +137,12 @@ const handleClickProjectGroupEditButton = () => {
 };
 const handleClickProjectGroupDeleteButton = () => {
     projectPageStore.openProjectGroupDeleteCheckModal(storeState.selectedItem);
+};
+const handleOpenProjectGroupMoveModal = () => {
+    state.projectGroupModalVisible = true;
+};
+const handleConfirmProjectGroupMoveModal = () => {
+    state.projectTreeKey = getRandomId();
 };
 
 /* Handling Forms */
@@ -181,7 +191,7 @@ onUnmounted(() => {
                         </sidebar-title>
                         <favorite-list :items="state.favoriteItems"
                                        :before-route="beforeFavoriteRoute"
-                                       @delete="onFavoriteDelete"
+                                       @delete="handleDeleteFavorite"
                         >
                             <template #icon="{item}">
                                 <p-i :name="item.itemType === FAVORITE_TYPE.PROJECT ? 'ic_document-filled' : 'ic_folder-filled'"
@@ -195,6 +205,7 @@ onUnmounted(() => {
 
                     <div class="sidebar-item-wrapper">
                         <project-main-project-tree
+                            :key="state.projectTreeKey"
                             :init-group-id="state.initGroupId"
                         />
                     </div>
@@ -225,6 +236,10 @@ onUnmounted(() => {
                                     <p-icon-button name="ic_edit-text"
                                                    style-type="transparent"
                                                    @click="handleClickProjectGroupEditButton"
+                                    />
+                                    <p-icon-button name="ic_move"
+                                                   style-type="transparent"
+                                                   @click="handleOpenProjectGroupMoveModal"
                                     />
                                     <p-icon-button name="ic_delete"
                                                    style-type="transparent"
@@ -257,8 +272,13 @@ onUnmounted(() => {
                     />
 
                     <project-main-project-group-form-modal v-if="storeState.projectGroupFormVisible" />
-
                     <project-main-project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
+                    <project-main-project-group-move-modal v-if="state.projectGroupModalVisible"
+                                                           :visible.sync="state.projectGroupModalVisible"
+                                                           :is-project="false"
+                                                           :target-id="storeState.groupId"
+                                                           @confirm="handleConfirmProjectGroupMoveModal"
+                    />
                 </div>
             </template>
         </p-vertical-page-layout>
