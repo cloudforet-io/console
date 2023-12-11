@@ -85,8 +85,7 @@ export default {
 
         const checkEmptyValue = (data: Record<string, any>) => Object.values(data).every((el) => el.length === 0);
         const additionalState = reactive({
-            fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k }))),
-            // eslint-disable-next-line camelcase
+            fields: computed(() => map(additionalState.data, (d, k) => ({ name: k, label: k })).sort((a, b) => a.label.localeCompare(b.label))),
             data: computed(() => alertPageState.alertData?.additional_info) || {},
             loading: true,
             isEmptyValue: computed(() => checkEmptyValue(additionalState.data)),

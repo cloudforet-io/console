@@ -2,9 +2,11 @@
     <p v-if="!isEditMode"
        class="content-wrapper"
     >
-        <p-text-beautifier class="description"
-                           :value="alertData.description"
-        />&zwnj;
+        <p-collapsible-panel :line-clamp="10">
+            <p-text-beautifier class="description"
+                               :value="alertData.description"
+            />&zwnj;
+        </p-collapsible-panel>
         <button class="edit-btn"
                 :class="{'disabled': manageDisabled}"
                 @click="startEdit(alertData.description)"
@@ -41,7 +43,9 @@
 <script lang="ts">
 import { toRefs } from 'vue';
 
-import { PTextarea, PButton, PTextBeautifier } from '@spaceone/design-system';
+import {
+    PTextarea, PButton, PTextBeautifier, PCollapsiblePanel,
+} from '@spaceone/design-system';
 
 import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
 import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
@@ -52,6 +56,7 @@ export default {
         PTextarea,
         PButton,
         PTextBeautifier,
+        PCollapsiblePanel,
     },
     props: {
         id: {
