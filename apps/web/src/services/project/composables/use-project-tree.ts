@@ -8,7 +8,6 @@ import type { ProjectGroupListParameters } from '@/schema/identity/project-group
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 
 import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
@@ -16,7 +15,7 @@ import type { ProjectTreeItemType, ProjectTreeNodeData } from '@/services/projec
 type ProjectGroupListResponse = ListResponse<ProjectGroupModel>;
 type ProjectListResponse = ListResponse<ProjectModel>;
 type ListRequestParams = ProjectGroupListParameters | ProjectListParameters;
-interface ProjectTreeOptions {
+export interface ProjectTreeOptions {
     item_type: ProjectTreeItemType;
     item_id?: string;
     check_child?: boolean;
@@ -39,7 +38,6 @@ const fetchProjectGroupChildMap = async (groups: ProjectGroupModel[]): Promise<R
     const res = {};
 
     const { results: allChildren } = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ProjectGroupListResponse>({
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['parent_group_id'],
             filter: [{
@@ -62,7 +60,6 @@ const fetchProjectChildMap = async (groups: ProjectGroupModel[]): Promise<Record
     const res: Record<string, boolean> = {};
 
     const { results: allChildren } = await SpaceConnector.clientV2.identity.project.list<ListRequestParams, ProjectListResponse>({
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['project_group_id'],
             filter: [{
@@ -93,16 +90,18 @@ const getChildMap = async (groups: ProjectGroupModel[], excludeType: ProjectTree
 };
 const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
     const requestParams: ProjectGroupListParameters = {
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query ?? {},
     };
 
     if (params.item_type === 'ROOT') {
-        (requestParams as Required<ListRequestParams>).query.filter = [{
-            k: 'parent_group_id',
-            v: null,
-            o: 'eq',
-        }];
+        (requestParams as Required<ListRequestParams>).query.filter = [
+            ...requestParams.query?.filter ?? [],
+            {
+                k: 'parent_group_id',
+                v: null,
+                o: 'eq',
+            },
+        ];
     } else {
         requestParams.parent_group_id = params.item_id;
     }
@@ -136,7 +135,6 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
     }
 
     const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ProjectListResponse>({
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: params.query,
         project_group_id: params.item_id || null,
     });
@@ -159,7 +157,6 @@ const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
 const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, openItems: string[] = []): Promise<string[]> => {
     if (itemType === 'PROJECT') {
         const response = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ProjectListResponse>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: itemId,
         });
 
@@ -172,7 +169,6 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
         }
     } else {
         const response = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ProjectGroupListResponse>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: itemId,
         });
 

@@ -2,7 +2,7 @@
 import { computed, reactive, watch } from 'vue';
 
 import {
-    PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree,
+    PButton, PCheckbox, PI, PRadio, PSelectDropdown, PTree, PBadge,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
@@ -15,10 +15,20 @@ import type { ReferenceMap } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { ProjectTreeOptions } from '@/services/project/composables/use-project-tree';
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-import type { ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot } from '@/services/project/types/project-tree-type';
+import type {
+    ProjectTreeItem, ProjectTreeNodeData, ProjectTreeRoot, ProjectTreeItemType,
+    ProjectTreeNode,
+} from '@/services/project/types/project-tree-type';
 
+
+interface ProjectGroupSelectOptions {
+    id: string;
+    currentProjectGroupId?: string;
+    type: 'PROJECT' | 'PROJECT_GROUP';
+}
 interface Props {
     multiSelectable?: boolean;
     projectSelectable?: boolean;
@@ -28,6 +38,7 @@ interface Props {
     disabled?: boolean;
     readonly?: boolean;
     useFixedMenuStyle?: boolean;
+    projectGroupSelectOptions?: ProjectGroupSelectOptions;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -39,6 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
     disabled: false,
     readonly: false,
     useFixedMenuStyle: true,
+    projectGroupSelectOptions: undefined,
 });
 
 const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
@@ -81,7 +93,7 @@ const state = reactive({
 });
 const projectTreeHelper = useProjectTree();
 
-const getSearchPath = async (id: string|undefined, type: string|undefined): Promise<string[]> => {
+const getSearchPath = async (id: string|undefined, type?: ProjectTreeItemType): Promise<string[]> => {
     if (!id) return [];
     try {
         const res = await projectTreeHelper.getProjectTreeSearchPath({
@@ -104,24 +116,32 @@ const findNodes = async () => {
 };
 
 /* Tree props */
-const predicate = (current, data) => current?.id === data.id;
+const predicate = (current: ProjectTreeNodeData, data: ProjectTreeNodeData): boolean => current?.id === data.id;
 const toggleOptions = {
-    validator: (node) => node.data.item_type === 'PROJECT_GROUP' && (node.data.has_child || node.children.length > 0),
+    validator: (node: ProjectTreeNode) => {
+        if (props.projectGroupSelectOptions?.type === 'PROJECT_GROUP' && props.projectGroupSelectOptions?.id === node.data.id) {
+            return false;
+        }
+        return node.data.item_type === 'PROJECT_GROUP' && (node.data.has_child || node.children.length > 0);
+    },
     toggleOnNodeClick: true,
 };
 const selectOptions = computed(() => ({
     multiSelectable: props.multiSelectable,
     validator({ data }) {
+        if (props.projectGroupSelectOptions?.type === 'PROJECT_GROUP' && props.projectGroupSelectOptions?.id === data.id) {
+            return false;
+        }
         return props.projectGroupSelectable ? true : data.item_type === 'PROJECT';
     },
 }));
-const dataSetter = (text, node) => {
+const dataSetter = (text: string, node: ProjectTreeNode) => {
     node.data.name = text;
 };
-const dataGetter = (node) => node.data.name;
-const dataFetcher = async (node): Promise<ProjectTreeNodeData[]> => {
+const dataGetter = (node: ProjectTreeNode): string => node.data.name;
+const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]> => {
     try {
-        const params: any = {
+        const params: ProjectTreeOptions = {
             sort: { key: 'name', desc: false },
             item_type: 'ROOT',
             check_child: true,
@@ -134,6 +154,16 @@ const dataFetcher = async (node): Promise<ProjectTreeNodeData[]> => {
             params.item_type = node.data.item_type;
         }
 
+        if (props.projectGroupSelectOptions?.type === 'PROJECT_GROUP' && (props.projectGroupSelectOptions?.currentProjectGroupId === node.data?.id)) {
+            params.query = {
+                filter: [{
+                    k: 'project_group_id',
+                    v: props.projectGroupSelectOptions.id,
+                    o: 'not',
+                }],
+            };
+        }
+
         return await projectTreeHelper.getProjectTree(params);
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -142,7 +172,7 @@ const dataFetcher = async (node): Promise<ProjectTreeNodeData[]> => {
 };
 
 /* Handlers */
-const handleTreeInit = async (root) => {
+const handleTreeInit = async (root: ProjectTreeRoot) => {
     state.root = root;
 
     state.loading = true;
@@ -167,7 +197,7 @@ const handleTreeChangeSelect = (selected: ProjectTreeItem[]) => {
     emit('select', state.selectedProjects);
 };
 
-const handleChangeSelectState = (node, path, selected, value) => {
+const handleChangeSelectState = (node: ProjectTreeNode, path: number[], _, value: boolean) => {
     if (state.root) state.root.changeSelectState(node, path, value);
 };
 
@@ -178,7 +208,7 @@ const handleDeleteTag = (_, index: number) => {
     }
 };
 
-const handleUpdateVisibleMenu = (value) => {
+const handleUpdateVisibleMenu = (value: boolean) => {
     state.visibleMenu = value;
     if (!value) emit('close');
 };
@@ -197,7 +227,7 @@ const handleClickCreateButton = () => {
 /* Watchers */
 watch(() => props.selectedProjectIds, async (after, before) => {
     if (after !== state._selectedProjectIds) {
-        findNodes();
+        await findNodes();
 
         /* when findNodes() has node delete function, this will be deprecated */
         if (after.length < before.length) {
@@ -281,6 +311,13 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
                                        @change="handleChangeSelectState(node, path, ...arguments)"
                             />
                             <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_folder-filled' : 'ic_document-filled'" />
+                            <p-badge v-if="props.projectGroupSelectOptions && node.data.id === props.projectGroupSelectOptions.currentProjectGroupId"
+                                     badge-type="subtle"
+                                     style-type="gray200"
+                                     class="ml-1"
+                            >
+                                {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CURRENT') }}
+                            </p-badge>
                         </span>
                     </template>
                 </p-tree>
