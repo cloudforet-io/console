@@ -85,9 +85,9 @@ const filterMenuByPermission = (menuList: DisplayMenu[], pagePermissionList: Pag
     return results;
 }, [] as DisplayMenu[]);
 
-const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d) => {
+const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
-    const routeName = MENU_INFO_MAP[d.id].routeName;
+    const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
     return {
         ...d,
         id: d.id,
@@ -95,7 +95,7 @@ const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d)
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
         to: { name: routeName },
-        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList) : [],
+        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode) : [],
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
@@ -105,7 +105,7 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
     let _allGnbMenuList: DisplayMenu[];
 
-    _allGnbMenuList = getDisplayMenuList(menuList);
+    _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     return _allGnbMenuList;

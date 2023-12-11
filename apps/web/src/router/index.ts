@@ -73,16 +73,22 @@ export class SpaceRouter {
             * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
              */
             if (isAdminMode && to.name && !to.name?.startsWith('admin.')) {
-                const adminfiedTo = { ...to, name: makeAdminRouteName(to.name) };
-                const adminfiedRouteAccessLevel = getRouteAccessLevel(adminfiedTo);
-                const adminfiedUserAccessLevel = getUserAccessLevel(adminfiedTo, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+                const adminRouteName = makeAdminRouteName(to.name);
+                const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
+                const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
+                const adminUserAccessLevel = getUserAccessLevel(resolved.route, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
 
-                if (adminfiedRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminfiedUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
+                if (adminRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
                     nextLocation = {
                         ...to,
                         name: makeAdminRouteName(to.name),
                     };
-                } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '404' } };
+                } else {
+                    nextLocation = {
+                        name: ERROR_ROUTE._NAME,
+                        params: { statusCode: '404' },
+                    };
+                }
             }
 
             // When a user is authenticated
