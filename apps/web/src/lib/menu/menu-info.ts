@@ -23,7 +23,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: DASHBOARDS_ROUTE._NAME,
         translationId: 'MENU.DASHBOARDS',
         icon: 'ic_service_dashboard',
-        highlightTag: 'new',
     },
     [MENU_ID.PROJECT_DASHBOARDS]: {
         menuId: MENU_ID.PROJECT_DASHBOARDS,
