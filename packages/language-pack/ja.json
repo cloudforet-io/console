@@ -1064,6 +1064,7 @@
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "プロジェクト作成",
+			"CURRENT": "",
 			"PLACEHOLDER": "プロジェクト選択",
 			"RELOAD_PROJECT": "プロジェクト読み込む"
 		},

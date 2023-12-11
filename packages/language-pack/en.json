@@ -1064,6 +1064,7 @@
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "Create Project",
+			"CURRENT": "Current",
 			"PLACEHOLDER": "Select Project",
 			"RELOAD_PROJECT": "Reload Projects"
 		},
