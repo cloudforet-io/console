@@ -1,3 +1,4 @@
+import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -44,10 +45,10 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
                 return [];
             }
         },
-        async getWorkspaceUser(params: WorkspaceUserListParameters) {
+        async checkInvalidWorkspaceUser(params: WorkspaceUserListParameters): Promise<boolean> {
             try {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserListParameters, WorkspaceUserModel>(params);
-                return !!res;
+                return !isEmpty(res);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return false;

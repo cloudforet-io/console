@@ -121,7 +121,7 @@ const fetchListWorkspaceUsers = async (item: UserMenuItem) => {
         workspace_id: workspaceStore.getters.currentWorkspaceId,
         domain_id: state.domain_id,
     };
-    const response = await modalSettingStore.getWorkspaceUser(params);
+    const response = await modalSettingStore.checkInvalidWorkspaceUser(params);
     if (!response) {
         state.validItems.push(item);
     } else {
