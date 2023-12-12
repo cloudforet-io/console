@@ -53,6 +53,7 @@ const getMockConfig = (config): MockConfig => ({
 });
 
 const getAuthConfig = (config): AuthConfig => ({
+    enabled: config.get('DEV.AUTH.ENABLED'),
     skipTokenCheck: config.get('DEV.AUTH.SKIP_TOKEN_CHECK'),
     apiKey: config.get('DEV.AUTH.API_KEY'),
 });

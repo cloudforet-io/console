@@ -93,6 +93,7 @@ export interface MockConfig {
     apiList?: string[][]; // [[v1_api_1, v1_api_2], [v2_api_1, v2_api_2, v2_api_3]]
 }
 export interface AuthConfig {
+    enabled?: boolean;
     skipTokenCheck?: boolean;
     apiKey?: string;
 }
