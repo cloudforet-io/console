@@ -8,10 +8,12 @@ import {
 
 import { generatePassword } from '@/services/administration/helpers/generate-helper';
 
-const emit = defineEmits<{(e: 'change-input', formState): void}>();
+const emit = defineEmits<{(e: 'change-input', password: string): void,
+    (e: 'change-toggle', value: boolean): void
+}>();
 
 const state = reactive({
-    passwordStatus: false,
+    passwordStatus: true,
     isGenerate: false,
     copyButtonVisible: true,
 });
@@ -26,12 +28,11 @@ const validationState = reactive({
 /* Components */
 const handleChangeToggleButton = () => {
     state.passwordStatus = !state.passwordStatus;
+    emit('change-toggle', state.passwordStatus);
 };
 const handleChangeInput = (value) => {
     formState.password = value;
-    emit('change-input', {
-        password: formState.password,
-    });
+    emit('change-input', formState.password);
 };
 const handleClickGenerate = () => {
     formState.password = generatePassword();
@@ -46,7 +47,7 @@ const handleClickGenerate = () => {
                              @change-toggle="handleChangeToggleButton"
             />
         </div>
-        <div v-if="state.passwordStatus"
+        <div v-if="!state.passwordStatus"
              class="password-form-view"
         >
             <p-divider />
