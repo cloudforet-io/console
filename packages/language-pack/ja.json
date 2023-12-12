@@ -1064,6 +1064,7 @@
 		},
 		"PROJECT_SELECT_DROPDOWN": {
 			"CREAT_PROJECT": "プロジェクト作成",
+			"CURRENT": "",
 			"PLACEHOLDER": "プロジェクト選択",
 			"RELOAD_PROJECT": "プロジェクト読み込む"
 		},
@@ -3301,6 +3302,11 @@
 				"DELETE_ALL_SUB_PROJECT": "前の下位プロジェクト削除",
 				"DESC": "{deleteAllSubProjects}後にプロジェクトグループを削除してください。",
 				"TITLE": "プロジェクトグループ削除"
+			},
+			"MODAL_MOVE_PROJECT_GROUP": {
+				"MODAL_MOVE_PROJECT_TITLE": "",
+				"NO_PROJECT_GROUP": "",
+				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": ""
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
 			"NO_PROJECT_GROUP_MSG": "",
