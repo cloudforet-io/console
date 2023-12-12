@@ -79,15 +79,6 @@ watch(() => costTypeRef.value, (costType) => {
         state.isTextTruncate = costTypeWrapperWidth <= (costTypeWidth + 60);
     }
 });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        allReferenceStore.load('project'),
-        allReferenceStore.load('projectGroup'),
-        allReferenceStore.load('plugin'),
-    ]);
-})();
 </script>
 
 <template>

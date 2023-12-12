@@ -83,7 +83,7 @@ const state = reactive({
     }))),
     selectedDataSourceId: undefined as undefined|string,
     currency: computed<Currency>(() => {
-        const targetDataSource = allReferenceStore.getters.costDataSource[state.selectedDataSourceId ?? ''];
+        const targetDataSource = storeState.dataSourceMap[state.selectedDataSourceId ?? ''];
         if (!targetDataSource) return CURRENCY.USD;
         const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
         return currentCurrency ?? CURRENCY.USD;

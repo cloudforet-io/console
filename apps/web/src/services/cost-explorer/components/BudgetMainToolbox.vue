@@ -26,6 +26,7 @@ import { i18n } from '@/translations';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 
@@ -56,9 +57,10 @@ const emit = defineEmits<{(e: 'update-filters', filters:ConsoleFilter[]): void;
 
 const pageSizeOptions = [12, 24, 36];
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
 });
 
@@ -165,8 +167,6 @@ watch(() => state.sort, (sort) => { emit('update-sort', sort); });
 (async () => {
     // LOAD REFERENCE STORE
     await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
         store.dispatch('reference/serviceAccount/load'),
     ]);
 })();

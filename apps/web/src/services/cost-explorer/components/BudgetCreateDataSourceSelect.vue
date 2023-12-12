@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PFieldGroup, PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
@@ -27,6 +27,10 @@ const {
     selectedDataSource(value: string|null) { return !!value; },
 });
 
+const storeState = reactive({
+    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
 const state = reactive({
     dataSourceItems: [] as MenuItem[],
 });
@@ -36,20 +40,17 @@ watch([() => selectedDataSource.value, () => isAllValid.value], ([dataSource, is
 }, { immediate: true });
 
 const getCurrencyFromDataSource = (dataSourceId: string) => {
-    const dataSourceItem:DataSourceItems = allReferenceStore.getters.costDataSource[dataSourceId];
+    const dataSourceItem:DataSourceItems = storeState.costDataSource[dataSourceId];
     const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
     return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
 };
 
 const fetchDataSource = async () => {
     try {
-        const dataSourceMap:CostDataSourceReferenceMap = await allReferenceStore.getters.costDataSource;
-        const pluginList:PluginReferenceMap = await allReferenceStore.getters.plugin;
-
-        const dataSourceItems: MenuItem[] = Object.entries(dataSourceMap).map(([key, dataSource]) => ({
+        const dataSourceItems: MenuItem[] = Object.entries(storeState.costDataSource).map(([key, dataSource]) => ({
             name: key,
             label: dataSource.label,
-            imageUrl: pluginList[dataSource.data.plugin_info.plugin_id]?.icon ? pluginList[dataSource.data.plugin_info.plugin_id]?.icon : 'error',
+            imageUrl: storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon ? storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon : 'error',
         }));
 
         state.dataSourceItems = dataSourceItems;
@@ -61,10 +62,6 @@ const fetchDataSource = async () => {
 };
 
 (async () => {
-    await Promise.allSettled([
-        allReferenceStore.load('plugin'),
-        allReferenceStore.load('costDataSource'),
-    ]);
     await fetchDataSource();
     if (state.dataSourceItems.length) setForm('selectedDataSource', state.dataSourceItems[0]?.name);
 })();

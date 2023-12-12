@@ -63,6 +63,9 @@ const recentBudgetApiQueryHelper = new ApiQueryHelper().setPage(1, 3);
 
 const { i18nDayjs } = useI18nDayjs();
 
+const storeState = reactive({
+    costDataSource: computed(() => allReferenceStore.getters.costDataSource),
+});
 const state = reactive({
     last3MonthsBudgets: [] as BudgetModel[],
     months: computed(() => {
@@ -112,7 +115,7 @@ const state = reactive({
     }),
     currency: computed<Currency>(() => {
         if (props.dataSourceId) {
-            const targetDataSource = allReferenceStore.getters.costDataSource[props.dataSourceId];
+            const targetDataSource = storeState.costDataSource[props.dataSourceId];
             return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
         }
         return 'USD';
@@ -145,11 +148,6 @@ const getRecentBudgets = async () => {
 watch([() => props.projectId, () => props.dataSourceId, () => props.projectGroupId], () => {
     if (state.showList) getRecentBudgets();
 }, { immediate: true });
-
-(async () => {
-    await allReferenceStore.load('costDataSource');
-})();
-
 </script>
 
 <template>

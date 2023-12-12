@@ -36,8 +36,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    costDataSource: computed(() => allReferenceStore.getters.costDataSource),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
@@ -55,7 +56,7 @@ const state = reactive({
         if (state.isProject) {
             const projectId = props.budgetUsage.project_id as string;
             const project: ProjectReferenceItem|undefined = storeState.projects[projectId];
-            if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
+            if (project?.data?.groupInfo?.name) projects.push(project.data.groupInfo.name);
             projects.push(project?.name ?? projectId);
         } else {
             const projectGroupId = props.budgetUsage.project_group_id as string;
@@ -69,7 +70,7 @@ const state = reactive({
     limit: computed<number>(() => props.budgetUsage.total_budget ?? 0),
     percentage: computed<number>(() => props.budgetUsage.budget_usage ?? 0),
     currency: computed<Currency>(() => {
-        const targetDataSource = allReferenceStore.getters.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        const targetDataSource = storeState.costDataSource[props.budgetUsage.data_source_id ?? ''];
         if (!targetDataSource) return CURRENCY.USD;
         const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
         return currentCurrency ?? CURRENCY.USD;
@@ -81,7 +82,7 @@ const state = reactive({
         return 'common';
     }),
     dataSourceText: computed<string>(() => {
-        const targetDataSource = allReferenceStore.getters.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        const targetDataSource = storeState.costDataSource[props.budgetUsage.data_source_id ?? ''];
         return targetDataSource?.label ?? '';
     }),
     providerText: computed<string>(() => {
@@ -106,8 +107,6 @@ const state = reactive({
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/serviceAccount/load'),
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
         store.dispatch('reference/region/load'),
         store.dispatch('reference/provider/load'),
     ]);
