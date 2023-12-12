@@ -9,8 +9,6 @@ import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
-import UserManagementStatusModal from '@/services/administration/components/UserManagementStatusModal.vue';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -18,8 +16,6 @@ const appContextStore = useAppContextStore();
 const modalSettingStore = useUserModalSettingStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
-
-const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -34,9 +30,6 @@ const handleClickButton = (type: string) => {
     case 'add': clickAdd(); break;
     default: break;
     }
-};
-const handleConfirm = () => {
-    emit('confirm');
 };
 
 /* Modal Handler */
@@ -104,8 +97,6 @@ const clickAdd = () => {
                 </div>
             </template>
         </p-heading>
-        <user-management-add-modal @confirm="handleConfirm" />
-        <user-management-status-modal @confirm="handleConfirm" />
     </div>
 </template>
 

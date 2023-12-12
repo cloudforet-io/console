@@ -150,7 +150,6 @@ watch([() => state.selectedItems, () => state.role], ([validItems, role]) => {
 
 <style lang="postcss">
 .user-management-additional-modal {
-    display: initial;
     .modal-contents {
         @apply flex flex-col bg-primary-4 rounded-md;
         margin-bottom: 9rem;
