@@ -9,6 +9,7 @@ import type { Tags } from '@/schema/_common/model';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import { USER_TYPE } from '@/schema/identity/user/constant';
 import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 
 import config from '@/lib/config';
@@ -27,11 +28,10 @@ import UserManagementFormPasswordForm from '@/services/administration/components
 import UserManagementFormTags from '@/services/administration/components/UserManagementFormTags.vue';
 import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
 
 interface Props {
     headerTitle: string;
-    item?: User;
+    item?: Partial<WorkspaceUserModel|UserModel>;
 }
 interface UserManagementData {
     user_id: string;
@@ -62,7 +62,7 @@ const userPageState = userPageStore.$state;
 const emit = defineEmits<{(e: 'confirm', data: UserManagementData, roleId: string|null): void; }>();
 
 const state = reactive({
-    data: {} as User,
+    data: {} as Partial<WorkspaceUserModel|UserModel>,
     selectedId: computed(() => props.item?.user_id),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     mfa: computed(() => store.state.user.mfa),

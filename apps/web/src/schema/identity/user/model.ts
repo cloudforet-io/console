@@ -20,7 +20,7 @@ export interface UserModel {
     domain_id: string;
     last_accessed_at: TimeStamp;
     created_at: TimeStamp;
-    api_key_count: number;
+    api_key_count?: number;
 }
 
 export interface UserMfa {

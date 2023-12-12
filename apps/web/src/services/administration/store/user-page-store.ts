@@ -24,8 +24,8 @@ export const useUserPageStore = defineStore('user-page', {
             detail: false,
         },
         modalLoading: false,
-        users: [] as UserModel[] | WorkspaceUserModel[],
-        selectedUser: {} as UserModel | WorkspaceUserModel,
+        users: [] as Partial<WorkspaceUserModel|UserModel>[],
+        selectedUser: {} as Partial<WorkspaceUserModel|UserModel>,
         totalCount: 0,
         selectedIndices: [],
         // TODO: plan to organize it after completing the modal.
@@ -43,9 +43,9 @@ export const useUserPageStore = defineStore('user-page', {
     }),
     getters: {
         timezone: () => store.state.user.timezone || 'UTC',
-        selectedUsers: (state): UserModel[]| WorkspaceUserModel[] => {
-            const users = [];
-            state.selectedIndices.forEach((d) => {
+        selectedUsers: (state) => {
+            const users: Partial<WorkspaceUserModel|UserModel>[] = [];
+            state.selectedIndices.forEach((d:number) => {
                 users.push(state.users[d]);
             });
             return users ?? [];
@@ -117,15 +117,11 @@ export const useUserPageStore = defineStore('user-page', {
             }
         },
         async listRoleBindings(params: RoleBindingListParameters) {
-            const { domain_id } = params;
             try {
                 const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>(params);
                 const roleBindingId = results?.[0].role_binding_id;
                 if (roleBindingId) {
-                    await this.deleteRoleBinding({
-                        role_binding_id: roleBindingId,
-                        domain_id,
-                    });
+                    await this.deleteRoleBinding({ role_binding_id: roleBindingId });
                 }
             } catch (e) {
                 ErrorHandler.handleError(e);

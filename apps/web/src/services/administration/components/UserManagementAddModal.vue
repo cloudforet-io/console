@@ -33,6 +33,8 @@ const workspaceStore = useWorkspaceStore();
 const modalSettingStore = useUserModalSettingStore();
 const modalSettingState = modalSettingStore.$state;
 
+const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const state = reactive({
     loading: false,
     disabled: true,
@@ -71,14 +73,16 @@ const handleChangeToggle = (value: boolean) => {
     state.isResetPassword = value;
 };
 const handleConfirm = async () => {
+    state.loading = true;
     try {
         await Promise.all(state.selectedItems.map(fetchCreateUser));
         showSuccessMessage(i18n.t('IDENTITY.USER.FORM.ALT_S_SEND_INVITATION_EMAIL'), '');
-        handleClose();
+        emit('confirm');
     } catch (e: any) {
         ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
+        handleClose();
     }
 };
 

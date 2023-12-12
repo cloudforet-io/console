@@ -13,11 +13,10 @@ export interface WorkspaceUserModel {
     role_type: RoleType;
     language: string;
     timezone: string;
-    api_key_count: number;
+    api_key_count?: number;
     tags: Tags;
     role_binding_info: RoleBindingModel;
     domain_id: string;
     created_at: TimeStamp;
     last_accessed_at: TimeStamp;
-    api_key_count: number;
 }

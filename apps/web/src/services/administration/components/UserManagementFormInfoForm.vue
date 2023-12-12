@@ -7,6 +7,8 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -23,11 +25,10 @@ import {
     checkRequiredField,
 } from '@/services/administration/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
 
 interface Props {
     activeTab?: string;
-    item?: User;
+    item?: Partial<WorkspaceUserModel|UserModel>;
     isUserIdValid?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
