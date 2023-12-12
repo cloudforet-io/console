@@ -4,9 +4,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type {
-    CollectorModel, CollectorOptions,
+    CollectorModel,
 
 } from '@/schema/inventory/collector/model';
+import type { CollectorOptions } from '@/schema/inventory/collector/type';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';

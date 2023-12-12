@@ -45,7 +45,8 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorUpdateParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -70,7 +71,7 @@ const state = reactive({
 
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         schedule: {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',

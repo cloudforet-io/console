@@ -1,9 +1,10 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type {
-    CollectorPluginModel, Schedule,
+    CollectorPluginModel,
 
 } from '@/schema/inventory/collector/model';
+import type { Schedule } from '@/schema/inventory/collector/type';
 import type { JobStatus } from '@/schema/inventory/job/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';

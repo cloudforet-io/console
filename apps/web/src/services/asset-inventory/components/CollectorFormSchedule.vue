@@ -49,7 +49,8 @@ import { range, size } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorUpdateParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { store } from '@/store';
 import { i18n as i18nTranslator } from '@/translations';
 
@@ -98,7 +99,7 @@ const updateSelectedHours = () => {
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is not defined');
     const schedule = collectorFormState.originCollector?.schedule ?? {};
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         schedule: {
             ...schedule,

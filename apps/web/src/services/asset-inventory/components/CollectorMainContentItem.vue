@@ -5,7 +5,7 @@ import {
     PButton, PCard, PLazyImg,
 } from '@spaceone/design-system';
 
-import type { CollectorUpdateParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
@@ -51,7 +51,7 @@ const state = reactive({
 const handleChangeToggle = async () => {
     try {
         state.isScheduleActivated = !state.isScheduleActivated;
-        const params: CollectorUpdateParameter = {
+        const params: CollectorUpdateParameters = {
             collector_id: props.item.collectorId,
             schedule: {
                 ...props.item.schedule,

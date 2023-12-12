@@ -20,7 +20,8 @@ import { watch } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
-import type { CollectorModel, CollectorUpdateParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n as i18nTranslator } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -58,7 +59,7 @@ const handleConfirm = async () => {
 /* API */
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is not defined');
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         schedule: {
             hours: collectorFormState.scheduleHours || [],

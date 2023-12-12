@@ -52,9 +52,10 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type {
     CollectorModel,
-    CollectorUpdateParameter,
+
 } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
@@ -88,7 +89,7 @@ const state = reactive({
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
     const originSecretFilter = collectorFormState.originCollector?.secret_filter ?? {};
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         secret_filter: {
             ...originSecretFilter,

@@ -68,7 +68,9 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorOptions } from '@/schema/inventory/collector/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -116,7 +118,7 @@ const state = reactive({
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdatePluginParameter = {
+    const params: CollectorUpdatePluginParameters = {
         collector_id: collectorFormStore.collectorId,
         options: collectorFormState.options,
     };
