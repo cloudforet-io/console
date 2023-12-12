@@ -90,7 +90,7 @@ const handleSelectedProvider = (providerName: string) => {
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
 const fetchCollectorCount = async () => {
     try {
-        const { total_count } = await SpaceConnector.client.inventory.collector.list({
+        const { total_count } = await SpaceConnector.clientV2.inventory.collector.list({
             query: collectorCountApiQueryHelper.data,
         });
         state.hasCollectorList = total_count > 0;

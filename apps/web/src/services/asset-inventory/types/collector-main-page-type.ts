@@ -47,6 +47,7 @@ interface CollectorDetailLinkQuery {
 
 export interface CollectorItemInfo {
     collectorId: string;
+    workspaceId: string;
     name: string;
     plugin: CollectorPlugin;
     historyLink: CollectorLink,

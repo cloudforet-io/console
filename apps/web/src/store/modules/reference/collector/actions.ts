@@ -22,7 +22,7 @@ export const load: Action<CollectorReferenceState, any> = async ({ state, commit
     ) return;
 
     try {
-        const response = await SpaceConnector.client.inventory.collector.list({
+        const response = await SpaceConnector.clientV2.inventory.collector.list({
             query: {
                 only: ['collector_id', 'name', 'tags'],
             },

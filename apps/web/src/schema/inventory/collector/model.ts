@@ -1,6 +1,7 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
 import type { Tags } from '@/schema/_common/model';
+import type { PermissionGroup } from '@/schema/identity/role-binding/type';
 import type { Capability } from '@/schema/repository/plugin/model';
 
 
@@ -65,6 +66,8 @@ export interface CollectorModel {
     schedule?: Schedule;
     secret_filter: SecretFilter;
     plugin_info: CollectorPluginModel;
+    workspace_id: string;
+    permission_group: PermissionGroup;
     created_at: string;
     last_collected_at: string;
     tags: Tags;

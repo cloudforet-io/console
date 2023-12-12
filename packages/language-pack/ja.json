@@ -2359,6 +2359,7 @@
 				"JOB_NONE": "収集記録なし",
 				"JOB_PROGRESS": "進捗率: 進行中",
 				"JOB_SUCCESS": "完了：{date}",
+				"MANAGED_ITEM_LABEL": "",
 				"NO_DATA": "作成されたコレクターはありません。",
 				"NO_JOB": "近のジョブはありません",
 				"NO_SCHEDULE": "スケジュールが設定されていません",

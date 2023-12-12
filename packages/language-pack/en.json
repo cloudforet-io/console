@@ -2359,6 +2359,7 @@
 				"JOB_NONE": "No collector job",
 				"JOB_PROGRESS": "Status: In-Progress",
 				"JOB_SUCCESS": "Completed: {date}",
+				"MANAGED_ITEM_LABEL": "Managed by admins",
 				"NO_DATA": "There’s no collector created yet.",
 				"NO_JOB": "No recent jobs",
 				"NO_SCHEDULE": "No scheduled",

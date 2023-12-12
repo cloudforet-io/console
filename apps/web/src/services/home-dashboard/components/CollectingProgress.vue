@@ -172,7 +172,7 @@ export default {
         const fetchCollectors = async (collectorIds: string[]) => {
             try {
                 collectorApiQuery.setFilters([{ k: 'collector_id', v: collectorIds, o: '=' }]);
-                const res = await SpaceConnector.client.inventory.collector.list({
+                const res = await SpaceConnector.clientV2.inventory.collector.list({
                     query: collectorApiQuery.data,
                 });
                 state.collectors = res.results;
@@ -188,7 +188,7 @@ export default {
                 jobApiQuery.setSort('created_at')
                     .setPage(1, 5)
                     .setFilters([{ k: 'status', v: STATUS_FILTER, o: '=' }]);
-                const res = await SpaceConnector.client.inventory.job.list({
+                const res = await SpaceConnector.clientV2.inventory.collector.list({
                     ...props.extraParams,
                     query: jobApiQuery.data,
                 });
