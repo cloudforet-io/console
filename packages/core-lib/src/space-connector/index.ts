@@ -124,7 +124,7 @@ export class SpaceConnector {
     }
 
     static get isTokenAlive(): boolean {
-        if (SpaceConnector.isDevMode && SpaceConnector.authConfig.skipTokenCheck) return true;
+        if (SpaceConnector.isDevMode && SpaceConnector.authConfig.enabled && SpaceConnector.authConfig.skipTokenCheck) return true;
         return TokenAPI.checkToken();
     }
 
@@ -192,7 +192,7 @@ export class SpaceConnector {
                 const axiosConfig = { ...config };
 
                 // set api key
-                if (SpaceConnector.authConfig.apiKey) {
+                if (SpaceConnector.authConfig.enabled && SpaceConnector.authConfig.apiKey) {
                     axiosConfig.headers = Object.assign(
                         axiosConfig.headers ?? {},
                         { Authorization: `Bearer ${SpaceConnector.authConfig.apiKey}` },
