@@ -82,15 +82,11 @@ const tableState = reactive({
 /* API */
 const getUserDetailData = async (userId) => {
     if (state.isAdminMode) {
-        await userPageStore.getUser({
-            user_id: userId || props.userId,
-            domain_id: state.domain_id,
-        });
+        await userPageStore.getUser({ user_id: userId || props.userId });
     } else {
         await userPageStore.getWorkspaceUser({
             user_id: userId || props.userId,
             workspace_id: route.params?.workspaceId || '',
-            domain_id: state.domain_id,
         });
     }
 };

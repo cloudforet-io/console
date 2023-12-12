@@ -11,6 +11,4 @@ export interface UserListParameters {
     email?: string;
     auth_type?: AuthType;
     workspace_id?: string;
-    // TODO: will be removed after the backend is ready
-    domain_id: string;
 }
