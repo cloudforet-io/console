@@ -18,6 +18,8 @@ import { i18n } from '@/translations';
 import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
 import { useProjectStore } from '@/store/reference/project-store';
 
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -86,9 +88,11 @@ const createProject = async (): Promise<ProjectModel|undefined> => {
             project_type: state.selectedAccess,
         };
         if (props.projectGroupId) params.project_group_id = props.projectGroupId;
-        return await projectPageStore.createProject(params);
+        const createdProject: ProjectModel = await projectPageStore.createProject(params);
+        showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
+        return createdProject;
     } catch (e) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
         return undefined;
     } finally {
         state.loading = false;
@@ -100,8 +104,11 @@ const updateProject = async (): Promise<ProjectModel|undefined> => {
             project_id: props.project.project_id || router.currentRoute.params.id,
             name: projectName.value?.trim() as string,
         };
-        return await projectPageStore.updateProject(params);
+        const updatedProject = await projectPageStore.updateProject(params);
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
+        return updatedProject;
     } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
         return undefined;
     }
 };
@@ -111,9 +118,11 @@ const updateProjectType = async (): Promise<ProjectModel|undefined> => {
             project_id: props.project.project_id || router.currentRoute.params.id,
             project_type: state.selectedAccess,
         };
-        return await projectPageStore.updateProjectType(params);
+        const updatedProject = await projectPageStore.updateProjectType(params);
+        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
+        return updatedProject;
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
+        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT_TYPE'));
         return undefined;
     }
 };

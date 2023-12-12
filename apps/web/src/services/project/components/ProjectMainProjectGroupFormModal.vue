@@ -15,6 +15,8 @@ import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-gro
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import { i18n } from '@/translations';
 
+import { useProjectGroupStore } from '@/store/reference/project-group-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -23,6 +25,7 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
+const projectGroupStore = useProjectGroupStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
@@ -69,6 +72,7 @@ const getProjectGroupNames = async () => {
 const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
     try {
         await projectPageStore.createProjectGroup(params);
+        await projectGroupStore.load({ force: true });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
@@ -77,6 +81,7 @@ const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
 const updateProjectGroup = async (params: Partial<ProjectGroupUpdateParameters>) => {
     try {
         await projectPageStore.updateProjectGroup(params);
+        await projectGroupStore.load({ force: true });
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));

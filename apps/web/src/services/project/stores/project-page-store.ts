@@ -17,9 +17,6 @@ import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/proje
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -239,66 +236,47 @@ export const useProjectPageStore = defineStore('project-page', () => {
         await SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>({
             project_group_id: getters.actionTargetNodeData.id,
         });
-
         state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
         // fetch data to update has child info
-        const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
-        await state.rootNode.fetchData(targetNode);
-
+        // HACK: disable below code because it causes error when getNodeByPath
+        // const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
+        // await state.rootNode.fetchData(targetNode);
         state.actionTargetItem = {};
     };
 
     /* Project */
-    const createProject = async (params: ProjectCreateParameters): Promise<ProjectModel|undefined> => {
-        try {
-            const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
-                ...params,
-            });
-            showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
-            state.shouldUpdateProjectList = true;
+    const createProject = async (params: ProjectCreateParameters): Promise<ProjectModel> => {
+        const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
+            ...params,
+        });
+        state.shouldUpdateProjectList = true;
 
-            if (state.treeEditMode) {
-                const newData: ProjectTreeNodeData = {
-                    name: params.name,
-                    id: res.project_id,
-                    item_type: 'PROJECT',
-                    has_child: false,
-                };
-                if (state.rootNode) {
-                    if (getters.selectedNodeData) {
-                        state.rootNode.addChildNodeByPath(getters.selectedNodePath, newData);
-                    }
+        if (state.treeEditMode) {
+            const newData: ProjectTreeNodeData = {
+                name: params.name,
+                id: res.project_id,
+                item_type: 'PROJECT',
+                has_child: false,
+            };
+            if (state.rootNode) {
+                if (getters.selectedNodeData) {
+                    state.rootNode.addChildNodeByPath(getters.selectedNodePath, newData);
                 }
             }
-            return res;
-        } catch (e: any) {
-            ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
-            throw new Error(e);
         }
+        return res;
     };
     const updateProject = async (params: ProjectUpdateParameters): Promise<ProjectModel> => {
-        try {
-            const res = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
-                ...params,
-            });
-            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
-            return res;
-        } catch (e: any) {
-            ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'));
-            throw new Error(e);
-        }
+        const res = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
+            ...params,
+        });
+        return res;
     };
     const updateProjectType = async (params: ProjectUpdateProjectTypeParameters): Promise<ProjectModel> => {
-        try {
-            const res = await SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>({
-                ...params,
-            });
-            showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
-            return res;
-        } catch (e: any) {
-            ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT_TYPE'));
-            throw new Error(e);
-        }
+        const res = await SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>({
+            ...params,
+        });
+        return res;
     };
 
     const mutations = {

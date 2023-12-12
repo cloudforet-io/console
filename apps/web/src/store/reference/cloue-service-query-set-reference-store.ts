@@ -52,7 +52,7 @@ export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-
 
     const getters = reactive({
         cloudServiceQuerySetItems: asyncComputed<CloudServiceQuerySetReferenceMap>(async () => {
-            await actions.load();
+            if (state.items === null) await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         cloudServiceQuerySetTypeInfo: computed<ReferenceTypeInfo>(() => ({
