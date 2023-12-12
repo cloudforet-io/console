@@ -14,8 +14,8 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 
 const CostExplorerContainer = () => import('@/services/cost-explorer/CostExplorerContainer.vue');
 
-const BudgetMainPage = () => import('@/services/cost-explorer/pages/BudgetMainPage.vue');
-const BudgetCreatePage = () => import('@/services/cost-explorer/pages/BudgetCreatePage.vue');
+const AdminBudgetMainPage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetMainPage.vue');
+const AdminBudgetCreatePage = () => import('@/services/cost-explorer/pages/admin/AdminBudgetCreatePage.vue');
 const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDetailPage.vue');
 
 const AdminCostAnalysisPage = () => import('@/services/cost-explorer/pages/admin/AdminCostAnalysisPage.vue');
@@ -98,13 +98,13 @@ const adminCostExplorerRoutes: RouteConfig = {
                     path: '/',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET._NAME),
                     meta: { lnbVisible: true },
-                    component: BudgetMainPage as any,
+                    component: AdminBudgetMainPage as any,
                 },
                 {
                     path: 'create',
                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME),
                     meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET' },
-                    component: BudgetCreatePage as any,
+                    component: AdminBudgetCreatePage as any,
                 },
                 {
                     path: ':budgetId',
