@@ -3,14 +3,16 @@ import { reactive } from 'vue';
 
 import { PFieldGroup } from '@spaceone/design-system';
 
+import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
 
 interface Props {
-    item?: User;
+    item?: Partial<WorkspaceUserModel|UserModel>;
 }
 
 const props = withDefaults(defineProps<Props>(), {

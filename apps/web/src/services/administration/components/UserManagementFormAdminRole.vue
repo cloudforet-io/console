@@ -5,16 +5,17 @@ import { PToggleButton, PSelectDropdown, PFieldTitle } from '@spaceone/design-sy
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
 
 interface Props {
     activeTab?: string
-    item?: User;
+    item?: Partial<WorkspaceUserModel|UserModel>;
 }
 const props = withDefaults(defineProps<Props>(), {
     activeTab: '',
