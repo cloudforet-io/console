@@ -15,8 +15,8 @@
             <p-i class="sitemap-icon"
                  :name="visible ? 'ic_close' : 'ic_gnb_menu'"
                  color="inherit"
-                 width="2rem"
-                 height="2rem"
+                 width="2.5rem"
+                 height="2.5rem"
             />
         </div>
         <ul v-if="visible"
@@ -144,7 +144,7 @@ export default {
 
 <style lang="postcss" scoped>
 .sitemap-container {
-    @apply relative;
+    @apply relative inline-flex items-center;
 
     .sitemap-button {
         @apply text-gray-900;
