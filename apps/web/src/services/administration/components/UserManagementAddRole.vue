@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import {
     PFieldGroup, PEmpty, PSelectDropdown,
@@ -9,7 +9,6 @@ import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/d
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 
 import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { userRoleFormatter } from '@/services/administration/composables/refined-user-data';
@@ -24,8 +23,6 @@ const state = reactive({
     menuVisible: false,
     menuItems: [] as AddModalMenuItem[],
     selectedItems: [] as AddModalMenuItem[],
-    // TODO: will be removed after the backend is ready
-    domain_id: computed(() => store.state.domain.domainId),
 });
 const formState = reactive({
     searchText: '',
@@ -62,7 +59,6 @@ const fetchListRoles = async (inputText: string) => {
     try {
         const response = await modalSettingStore.listRoles({
             query: roleListApiQueryHelper.data,
-            domain_id: state.domain_id,
         });
         state.menuItems = response.map((role) => ({
             label: role.name,
