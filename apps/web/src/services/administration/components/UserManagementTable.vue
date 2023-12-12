@@ -1,26 +1,29 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PBadge, PStatus, PToolboxTable, PI,
+    PBadge, PStatus, PToolboxTable, PButton,
 } from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import UserManagementStatusModal
-    from '@/services/administration/components/UserManagementStatusModal.vue';
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
     calculateTime, userStateFormatter, userMfaFormatter, userRoleFormatter,
@@ -44,59 +47,67 @@ const userPageState = userPageStore.$state;
 
 const route = useRoute();
 
+const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('name', true)
     .setFiltersAsRawQueryString(route.query.filters);
 
-const state = reactive({
+const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    userRoleType: computed(() => store.state.user.roleType),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
-const tableState = reactive({
+const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
+        api_key_count: user.api_key_count ?? 0,
         mfa: user.mfa && user.mfa.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_at: calculateTime(user.last_accessed_at, state.timezone),
+        last_accessed_at: calculateTime(user.last_accessed_at, storeState.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
-    keyItemSets: USER_SEARCH_HANDLERS.keyItemSets as KeyItemSet[],
-    valueHandlerMap: USER_SEARCH_HANDLERS.valueHandlerMap,
     tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
-const modalState = reactive({
-    mode: '',
-    title: '',
-    subTitle: '',
-    themeColor: undefined as string | undefined,
-    visible: computed(() => userPageState.modalVisible.status),
+const tableState = reactive({
+    userTableFields: computed(() => (!storeState.isAdminMode && storeState.userRoleType === ROLE_TYPE.WORKSPACE_OWNER
+        ? [
+            ...USER_TABLE_FIELDS,
+            { name: 'role_binding_info', label: ' ', sortable: false },
+        ]
+        : USER_TABLE_FIELDS
+    )),
 });
-
-let userListApiQuery = userListApiQueryHelper.data;
 
 /* Component */
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
 };
+const handleClickButton = async (value: RoleBindingModel) => {
+    try {
+        await SpaceConnector.clientV2.identity.roleBinding.delete({
+            role_binding_id: value.role_binding_id,
+        });
+        showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
+        emit('confirm');
+    } catch (e) {
+        showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
+        ErrorHandler.handleError(e);
+    }
+};
+/* API */
+let userListApiQuery = userListApiQueryHelper.data;
 const handleChange = async (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
     }
-    await userPageStore.listUsers({ query: userListApiQuery });
-};
-const handleUserStatusModalConfirm = () => {
-    userPageStore.listUsers({ query: userListApiQuery });
-};
-
-/* Watcher */
-watch(() => state.isAdminMode, async (isAdminMode) => {
-    if (isAdminMode) {
+    if (storeState.isAdminMode) {
         await userPageStore.listUsers({ query: userListApiQuery });
     } else {
         await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
     }
-}, { immediate: true });
+};
 </script>
 
 <template>
@@ -107,22 +118,22 @@ watch(() => state.isAdminMode, async (isAdminMode) => {
             selectable
             sortable
             :loading="userPageState.loading.list"
-            :items="tableState.refinedUserItems"
+            :items="state.refinedUserItems"
             :select-index="userPageState.selectedIndices"
-            :fields="USER_TABLE_FIELDS"
+            :fields="tableState.userTableFields"
             sort-by="name"
             :sort-desc="true"
             :total-count="userPageState.totalCount"
-            :key-item-sets="tableState.keyItemSets"
-            :value-handler-map="tableState.valueHandlerMap"
-            :query-tags="tableState.tags"
+            :key-item-sets="USER_SEARCH_HANDLERS.keyItemSets"
+            :value-handler-map="USER_SEARCH_HANDLERS.valueHandlerMap"
+            :query-tags="state.tags"
             :style="{height: `${props.tableHeight}px`}"
             @select="handleSelect"
             @change="handleChange"
             @refresh="handleChange()"
         >
             <template #toolbox-left>
-                <user-management-table-toolbox v-if="state.isAdminMode" />
+                <user-management-table-toolbox v-if="storeState.isAdminMode" />
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
@@ -136,12 +147,11 @@ watch(() => state.isAdminMode, async (isAdminMode) => {
             </template>
             <template #col-role_type-format="{value}">
                 <span class="role-type">
-                    <p-i :name="userRoleFormatter(value).image"
-                         width="1.5rem"
-                         height="1.5rem"
+                    <img :src="userRoleFormatter(value).image"
+                         alt="role-type-icon"
                          class="role-type-icon"
-                    />
-                    <span>{{ userRoleFormatter(value).name }}</span>
+                    >
+                    <span>{{ userRoleFormatter(value, true).name }}</span>
                 </span>
             </template>
             <template #col-last_accessed_at-format="{ value }">
@@ -174,30 +184,29 @@ watch(() => state.isAdminMode, async (isAdminMode) => {
                     <span />
                 </template>
             </template>
+            <template #col-role_binding_info-format="{value}">
+                <p-button style-type="tertiary"
+                          size="sm"
+                          class="remove-button"
+                          @click="handleClickButton(value)"
+                >
+                    {{ $t('IDENTITY.USER.MAIN.REMOVE') }}
+                </p-button>
+            </template>
         </p-toolbox-table>
-        <user-management-status-modal v-if="modalState.visible"
-                                      :header-title="modalState.title"
-                                      :sub-title="modalState.subTitle"
-                                      :theme-color="modalState.themeColor"
-                                      :mode="modalState.mode"
-                                      @confirm="handleUserStatusModalConfirm()"
-        />
     </section>
 </template>
 
 <style lang="postcss" scoped>
-.left-toolbox-item {
-    min-width: 6.5rem;
-    margin-left: 1rem;
-    &:last-child {
-        flex-grow: 1;
-    }
-}
-.role-type {
-    @apply flex items-center;
-    gap: 0.5rem;
-    .role-type-icon {
-        @apply rounded-full;
+.user-management-table {
+    .role-type {
+        @apply flex items-center;
+        gap: 0.5rem;
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
     }
 }
 </style>

@@ -33,10 +33,19 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('name', true);
 const refreshUserList = () => {
-    if (storeState.isAdminMode) {
-        userPageStore.listUsers({ query: userListApiQueryHelper.data });
-    } else {
-        userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
+    userPageStore.$patch((_state) => {
+        _state.loading.list = true;
+    });
+    try {
+        if (storeState.isAdminMode) {
+            userPageStore.listUsers({ query: userListApiQueryHelper.data });
+        } else {
+            userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
+        }
+    } finally {
+        userPageStore.$patch((_state) => {
+            _state.loading.list = false;
+        });
     }
 };
 
@@ -56,7 +65,9 @@ watch(() => storeState.isAdminMode, async () => {
         <user-management-header />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
-                <user-management-table :table-height="height" />
+                <user-management-table :table-height="height"
+                                       @confirm="refreshUserList"
+                />
             </template>
         </p-horizontal-layout>
         <user-management-tab :manage-disabled="!state.hasManagePermission" />

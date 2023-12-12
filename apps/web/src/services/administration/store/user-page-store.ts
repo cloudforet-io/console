@@ -54,7 +54,6 @@ export const useUserPageStore = defineStore('user-page', {
     actions: {
         // Admin mode
         async listUsers(params: UserListParameters) {
-            this.loading.list = true;
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
                 this.users = res.results || [];
@@ -64,8 +63,7 @@ export const useUserPageStore = defineStore('user-page', {
                 ErrorHandler.handleError(e);
                 this.users = [];
                 this.totalCount = 0;
-            } finally {
-                this.loading.list = false;
+                throw e;
             }
         },
         async getUser(params: UserGetParameters) {
@@ -82,18 +80,19 @@ export const useUserPageStore = defineStore('user-page', {
         },
         // Workspace mode
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
-            this.loading.list = true;
             try {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
-                this.users = res.results || [];
+                this.users = res.results?.map((item) => ({
+                    ...item,
+                    role_type: item.role_binding_info.role_type,
+                })) || [];
                 this.totalCount = res.total_count ?? 0;
                 this.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.users = [];
                 this.totalCount = 0;
-            } finally {
-                this.loading.list = false;
+                throw e;
             }
         },
         async getWorkspaceUser(params: WorkspaceUserGetParameters) {
