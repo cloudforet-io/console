@@ -8,11 +8,9 @@
                 />
             </div>
 
-            <g-n-b-admin-logo v-if="isAdminMode"
-                              :to="adminModeLogoLink"
-            />
-            <g-n-b-workspace-navigation v-else
-                                        :to="userModeLogoLink"
+            <g-n-b-header ref="gnbHeaderRef"
+                          :to="logoLink"
+                          :is-admin-mode="isAdminMode"
             />
 
             <div class="gnb-menu-warpper">
@@ -61,9 +59,8 @@ import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
-import GNBAdminLogo from '@/common/modules/navigations/gnb/modules/gnb-left-part/GNBAdminLogo.vue';
-import GNBWorkspaceNavigation from '@/common/modules/navigations/gnb/modules/gnb-left-part/GNBWorkspaceNavigation.vue';
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
+import GNBHeader from '@/common/modules/navigations/gnb/modules/GNBHeader.vue';
 import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
@@ -72,8 +69,7 @@ const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 export default defineComponent({
     name: 'GNB',
     components: {
-        GNBWorkspaceNavigation,
-        GNBAdminLogo,
+        GNBHeader,
         GNBMenu,
         SiteMap,
         GNBToolset,
@@ -87,8 +83,7 @@ export default defineComponent({
             openedMenu: '',
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
-            userModeLogoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: ROOT_ROUTE.WORKSPACE._NAME } : null)),
-            adminModeLogoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: ROOT_ROUTE.ADMIN._NAME } : null)),
+            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: ROOT_ROUTE._NAME } : null)),
             gnbMenuList: computed<GNBMenuType[]>(() => {
                 let result = [...store.getters['display/GNBMenuList']];
                 if (state.integrationMenu) result = [...result, state.integrationMenu];
