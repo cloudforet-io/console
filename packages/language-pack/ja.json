@@ -3308,6 +3308,11 @@
 				"NO_PROJECT_GROUP": "",
 				"SELECT_A_PROJECT_GROUP_TO_MOVE_TO": ""
 			},
+			"MODAL_PROJECT_CREATE": {
+				"MODAL_VALIDATION_DUPLICATED": "名前が重複しています",
+				"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
+				"MODAL_VALIDATION_REQUIRED": "名前を入力してください"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
 			"NO_PROJECT_GROUP_MSG": "",
 			"ONLY_PEOPLE_INVITED": "",
