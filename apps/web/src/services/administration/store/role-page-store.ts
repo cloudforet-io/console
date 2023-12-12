@@ -34,12 +34,9 @@ export const useRolePageStore = defineStore('role-page', {
     },
     actions: {
         async listRoles(params: RoleListParameters) {
-            const { query } = params;
             this.loading = true;
             try {
-                const { results, total_count } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-                    query,
-                });
+                const { results, total_count } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
                 this.roles = results || [];
                 this.totalCount = total_count || 0;
                 this.selectedIndices = [];

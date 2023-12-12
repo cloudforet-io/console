@@ -17,6 +17,8 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { UserListItemType } from '@/services/administration/types/user-type';
+
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
         loading: {
@@ -24,8 +26,7 @@ export const useUserPageStore = defineStore('user-page', {
             detail: false,
         },
         modalLoading: false,
-        users: [] as Partial<WorkspaceUserModel|UserModel>[],
-        selectedUser: {} as Partial<WorkspaceUserModel|UserModel>,
+        users: [] as UserListItemType[],
         totalCount: 0,
         selectedIndices: [],
         // TODO: plan to organize it after completing the modal.
@@ -44,7 +45,7 @@ export const useUserPageStore = defineStore('user-page', {
     getters: {
         timezone: () => store.state.user.timezone || 'UTC',
         selectedUsers: (state) => {
-            const users: Partial<WorkspaceUserModel|UserModel>[] = [];
+            const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
                 users.push(state.users[d]);
             });
@@ -69,11 +70,9 @@ export const useUserPageStore = defineStore('user-page', {
         async getUser(params: UserGetParameters) {
             this.loading.detail = true;
             try {
-                const res = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
-                this.selectedUser = res || {};
+                await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.selectedUser = {} as UserModel;
             } finally {
                 this.loading.detail = false;
             }
@@ -98,11 +97,9 @@ export const useUserPageStore = defineStore('user-page', {
         async getWorkspaceUser(params: WorkspaceUserGetParameters) {
             this.loading.detail = true;
             try {
-                const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
-                this.selectedUser = res || {};
+                await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
-                this.selectedUser = {} as WorkspaceUserModel;
             } finally {
                 this.loading.detail = false;
             }

@@ -4,13 +4,13 @@ import {
 } from 'vue';
 
 import {
-    PEmpty, PStatus, PTab, PDataTable, PHeading,
+    PEmpty, PStatus, PTab, PDataTable,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
 
 import UserManagementTabAssignedRole from '@/services/administration/components/UserManagementTabAssignedRole.vue';
@@ -18,24 +18,13 @@ import UserManagementTabDetail from '@/services/administration/components/UserMa
 import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
 import { userTabTableFields } from '@/services/administration/constants/user-tab-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import UserAPIKeyTable from '@/services/my-page/components/UserAPIKeyTable.vue';
-
-interface Props {
-    manageDisabled?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    manageDisabled: false,
-});
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const state = reactive({
-    loading: true,
-    timezone: computed(() => store.state.user.timezone || 'UTC'),
+    hasManagePermission: useManagePermissionState(),
 });
-
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
@@ -44,11 +33,10 @@ const singleItemTabState = reactive({
     ])),
     activeTab: 'detail',
 });
-
 const multiItemTabState = reactive({
-    tabs: computed(() => ([
+    tabs: computed<TabItem[]>(() => ([
         { name: 'data', label: i18n.t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), keepAlive: true },
-    ] as TabItem[])),
+    ])),
     activeTab: 'data',
 });
 </script>
@@ -60,37 +48,20 @@ const multiItemTabState = reactive({
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <user-management-tab-detail ref="userDetail"
-                                            :user-id="userPageStore.selectedUsers[0].user_id"
-                                            :timezone="state.timezone"
+                <user-management-tab-detail ref="userDetail" />
+            </template>
+            <template #project>
+                <user-management-tab-assigned-role
+                    :user-id="userPageStore.selectedUsers[0].user_id"
                 />
             </template>
             <template #tag>
                 <p-tags-panel :resource-id="userPageStore.selectedUsers[0].user_id"
                               resource-type="identity.User"
                               resource-key="user_id"
-                              :disabled="props.manageDisabled"
+                              :disabled="state.manageDisabled"
                 />
             </template>
-            <template #assigned_role>
-                <user-management-tab-assigned-role
-                    :user-id="userPageStore.selectedUsers[0].user_id"
-                />
-            </template>
-            <template #api_key>
-                <section>
-                    <p-heading heading-type="sub"
-                               :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                    />
-                    <user-a-p-i-key-table class="api-key-table"
-                                          :user-id="userPageStore.selectedUsers[0].user_id"
-                                          :disabled="props.manageDisabled"
-                    />
-                </section>
-            </template>
-            <!--            <template #notifications>-->
-            <!--                <user-notifications :user-id="selectedUsers[0].user_id" />-->
-            <!--            </template>-->
         </p-tab>
         <p-tab v-else-if="userPageState.selectedIndices.length > 1"
                :tabs="multiItemTabState.tabs"
@@ -143,13 +114,5 @@ const multiItemTabState = reactive({
 }
 .selected-data-tab {
     @apply mt-8;
-}
-
-/* custom user-a-p-i-key-table */
-:deep(.api-key-table) {
-    /* custom design-system component - p-pane-layout */
-    .main-table-wrapper {
-        border: 0;
-    }
 }
 </style>

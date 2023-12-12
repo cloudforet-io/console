@@ -59,12 +59,10 @@ const getUserInfoFromToken = (token: string): string[] => {
     return [decodedToken.user_type, decodedToken.aud as string];
 };
 
-const getUserRoles = async (domainId): Promise<Array<UserRole>> => {
+const getUserRoles = async (): Promise<Array<UserRole>> => {
     try {
         const userRoles: Record<string, UserRole> = {};
-        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-            domain_id: domainId,
-        });
+        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>();
 
         if (!results) return [];
 
@@ -116,7 +114,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
     const userInfo = await getUserInfo(userId, domainId);
     commit('setUser', userInfo);
 
-    const userRoles = await getUserRoles(domainId);
+    const userRoles = await getUserRoles();
     commit('setRoles', userRoles);
 
     commit('setIsSessionExpired', false);
