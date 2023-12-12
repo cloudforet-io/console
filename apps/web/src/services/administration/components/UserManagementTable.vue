@@ -52,8 +52,6 @@ const userListApiQueryHelper = new ApiQueryHelper()
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-    // TODO: will be removed after the backend is ready
-    domain_id: computed(() => store.state.domain.domainId),
 });
 const tableState = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
@@ -85,28 +83,18 @@ const handleChange = async (options: any = {}) => {
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
     }
-    await userPageStore.listUsers({
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    });
+    await userPageStore.listUsers({ query: userListApiQuery });
 };
 const handleUserStatusModalConfirm = () => {
-    userPageStore.listUsers({
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    });
+    userPageStore.listUsers({ query: userListApiQuery });
 };
 
 /* Watcher */
 watch(() => state.isAdminMode, async (isAdminMode) => {
-    const params = {
-        query: userListApiQuery,
-        domain_id: state.domain_id,
-    };
     if (isAdminMode) {
-        await userPageStore.listUsers(params);
+        await userPageStore.listUsers({ query: userListApiQuery });
     } else {
-        await userPageStore.listWorkspaceUsers(params);
+        await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
     }
 }, { immediate: true });
 </script>

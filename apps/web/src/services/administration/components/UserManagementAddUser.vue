@@ -6,54 +6,72 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PContextMenu, PEmpty, PFieldGroup, PIconButton, PTextInput,
+    PContextMenu, PEmpty, PFieldGroup, PIconButton, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
-import { debounce } from 'lodash';
+import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
+import { debounce, isEmpty } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { UserModel } from '@/schema/identity/user/model';
+import type { AuthType } from '@/schema/identity/user/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
+import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
+import { checkEmailFormat } from '@/services/administration/helpers/user-management-form-validations';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
-
-interface UserMenuItem extends UserModel {
-    label: string;
-}
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const modalSettingStore = useUserModalSettingStore();
+const userPageStore = useUserPageStore();
 const workspaceStore = useWorkspaceStore();
 
 const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
+const emit = defineEmits<{(e: 'change-list', selectedItems: MenuItem[]): void}>();
+
+const storeState = reactive({
+    userAuthType: computed(() => store.state.user.authType),
+});
 const state = reactive({
     loading: false,
-    isFocus: false,
     menuVisible: false,
-    menuItems: [] as UserMenuItem[],
-    selectedItems: [] as UserMenuItem[],
-    validItems: [] as UserMenuItem[],
-    // TODO: will be removed after the backend is ready
-    domain_id: computed(() => store.state.domain.domainId),
+    menuItems: [] as AddModalMenuItem[],
+    selectedItems: [] as AddModalMenuItem[],
+    selectedAuthType: '' as AuthType,
+    // TODO: will be changed
+    authTypeMenuItems: computed<MenuItem[]>(() => {
+        if (storeState.userAuthType === 'LOCAL') {
+            return [{ label: 'local', name: 'LOCAL' }];
+        }
+        return [
+            { label: 'local', name: 'LOCAL' },
+            { label: 'external', name: 'EXTERNAL' },
+        ];
+    }),
 });
 const formState = reactive({
     searchText: '',
-    userIds: '',
 });
 const validationState = reactive({
     userIdInvalid: undefined as undefined | boolean,
     userIdInvalidText: '' as TranslateResult,
 });
 
+const userListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(15)
+    .setSort('name', true);
+
 /* Component */
-const hideMenu = (userIds?: string) => {
+const hideMenu = async () => {
+    emit('change-list', state.selectedItems);
     state.menuVisible = false;
-    formState.userIds = userIds || '';
+    state.menuItems = [];
+    await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
 };
 const handleClickUserIdInput = async () => {
     state.menuVisible = true;
@@ -61,16 +79,13 @@ const handleClickUserIdInput = async () => {
     validationState.userIdInvalidText = '';
 };
 const handleClickDeleteButton = (idx: number) => {
-    state.validItems.splice(idx, 1);
+    state.selectedItems.splice(idx, 1);
 };
-const handleSelectMenuItem = async (menuItem: UserMenuItem) => {
-    state.isFocus = false;
+const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     state.selectedItems.push(menuItem);
-    formState.userIds = state.selectedItems.map((item) => item.user_id).join(', ');
-    await fetchListWorkspaceUsers(menuItem);
+    await hideMenu();
 };
 const handleChangeUserIdInput = debounce(async (searchText: string) => {
-    if (!state.isFocus) return;
     formState.searchText = searchText;
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
@@ -78,70 +93,69 @@ const handleChangeUserIdInput = debounce(async (searchText: string) => {
 }, 200);
 
 const handleClickEnter = async () => {
-    if (!state.isFocus) return;
-    const selectedItem = state.menuItems.filter((item) => item.user_id === formState.searchText);
-    await fetchListWorkspaceUsers(selectedItem[0]);
-    formState.searchText = '';
-    hideMenu();
+    if (formState.searchText === '') return;
+    const { isValid, invalidText } = checkEmailFormat(formState.searchText);
+    if (!isValid) {
+        validationState.userIdInvalid = true;
+        validationState.userIdInvalidText = invalidText;
+        await hideMenu();
+    } else {
+        await fetchListWorkspaceUsers(formState.searchText);
+    }
+};
+const handleSelectAuthTypeItem = (idx: number) => {
+    state.selectedItems[idx].auth_type = state.selectedAuthType;
 };
 
 /* API */
-
 const fetchListUsers = async () => {
     state.loading = true;
 
-    const userListApiQueryHelper = new ApiQueryHelper()
-        .setPageStart(1).setPageLimit(15)
-        .setSort('name', true);
-    if (formState.searchText) {
-        userListApiQueryHelper.setFilters([{
-            k: 'user_id',
-            v: formState.searchText,
-            o: '',
-        }]);
-    }
-
     try {
         const response = await modalSettingStore.listUsers({
-            query: userListApiQueryHelper.data,
-            domain_id: state.domain_id,
+            keyword: formState.searchText || '@',
+            exclude_workspace_id: workspaceStore.getters.currentWorkspaceId,
         });
         state.menuItems = response.map((user) => ({
-            ...user,
+            user_id: user.user_id,
             label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
             name: user.user_id,
+            auth_type: user.auth_type,
         }));
     } finally {
         state.loading = false;
     }
 };
-const fetchListWorkspaceUsers = async (item: UserMenuItem) => {
+const fetchListWorkspaceUsers = async (userId: string) => {
     const params = {
-        user_id: item.user_id,
+        user_id: userId,
         workspace_id: workspaceStore.getters.currentWorkspaceId,
-        domain_id: state.domain_id,
     };
-    const response = await modalSettingStore.checkInvalidWorkspaceUser(params);
-    if (!response) {
-        state.validItems.push(item);
+    const response = await modalSettingStore.getWorkspaceUser(params);
+    if (isEmpty(response)) {
+        state.selectedItems.push({
+            user_id: userId,
+            label: userId,
+            name: userId,
+            isNew: true,
+            auth_type: state.authTypeMenuItems[0].name as AuthType,
+        });
+        formState.searchText = '';
     } else {
-        hideMenu(item.user_id);
         validationState.userIdInvalid = true;
-        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId: item.user_id });
+        validationState.userIdInvalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId });
     }
+    await hideMenu();
 };
 
 /* Context Menu */
-onClickOutside(containerRef, () => hideMenu());
+onClickOutside(containerRef, hideMenu);
 
 watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
         formState.searchText = '';
+        state.selectedAuthType = state.authTypeMenuItems[0].name as AuthType;
         await fetchListUsers();
-    } else {
-        state.isFocus = false;
-        state.selectedItems = [];
-        state.menuItems = [];
     }
 });
 </script>
@@ -158,19 +172,18 @@ watch(() => state.menuVisible, async (menuVisible) => {
                      class="input-form-wrapper"
                 >
                     <p-text-input ref="targetRef"
-                                  :value="state.isFocus ? formState.searchText : formState.userIds"
+                                  :value="formState.searchText"
                                   :invalid="invalid"
                                   class="user-id-input"
-                                  @focusin="state.isFocus = true"
                                   @click="handleClickUserIdInput"
                                   @keyup.enter="handleClickEnter"
                                   @update:value="handleChangeUserIdInput"
                     />
-                    <p-context-menu v-if="state.menuVisible"
+                    <p-context-menu v-if="state.menuVisible && state.menuItems.length > 0"
                                     ref="contextMenuRef"
                                     :loading="state.loading"
                                     :menu="state.menuItems"
-                                    :selected="state.validItems"
+                                    :selected="state.selectedItems"
                                     multi-selectable
                                     class="user-context-menu"
                                     @select="handleSelectMenuItem"
@@ -178,7 +191,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
                 </div>
             </template>
         </p-field-group>
-        <p-empty v-if="state.validItems.length === 0"
+        <p-empty v-if="state.selectedItems.length === 0"
                  show-image
                  :title="$t('IDENTITY.USER.FORM.NO_USER')"
                  class="empty-wrapper"
@@ -188,15 +201,24 @@ watch(() => state.menuVisible, async (menuVisible) => {
         <div v-else
              class="selected-user-list"
         >
-            <div v-for="(item, idx) in state.validItems"
+            <div v-for="(item, idx) in state.selectedItems"
                  :key="`selected-user-list-item-${idx}`"
                  class="selected-user-list-item"
             >
                 <div class="selected-user-label-wrapper">
                     <span class="label">{{ item.name }}</span>
-                    <span class="new">new</span>
+                    <span v-if="item.isNew"
+                          class="new"
+                    >new</span>
                 </div>
-                <div>
+                <div class="selected-toolbox">
+                    <p-select-dropdown v-if="item.isNew"
+                                       :selected.sync="state.selectedAuthType"
+                                       :menu="state.authTypeMenuItems"
+                                       class="auth-type-dropdown"
+                                       style-type="transparent"
+                                       @select="handleSelectAuthTypeItem(idx)"
+                    />
                     <p-icon-button name="ic_delete"
                                    class="delete-btn"
                                    width="1.5rem"
@@ -224,6 +246,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
             top: 2rem;
             left: 0;
             max-height: 13.5rem;
+            z-index: 10;
         }
     }
     .empty-wrapper {
@@ -247,6 +270,9 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     @apply text-label-sm text-coral-500;
                     margin-top: -0.125rem;
                 }
+            }
+            .selected-toolbox {
+                @apply flex items-center;
             }
         }
     }

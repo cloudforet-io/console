@@ -1,13 +1,15 @@
-import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
-import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
+import type { FindUserParameters } from '@/schema/identity/user/api-verbs/find';
 import type { UserModel } from '@/schema/identity/user/model';
+import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 
@@ -27,9 +29,9 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
     getters: {
     },
     actions: {
-        async listUsers(params: UserListParameters) {
+        async listUsers(params: FindUserParameters) {
             try {
-                const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
+                const res = await SpaceConnector.clientV2.identity.user.find<FindUserParameters, ListResponse<UserModel>>(params);
                 return res.results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -45,13 +47,27 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
                 return [];
             }
         },
-        async checkInvalidWorkspaceUser(params: WorkspaceUserListParameters): Promise<boolean> {
+        async getWorkspaceUser(params: WorkspaceUserListParameters) {
             try {
-                const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserListParameters, WorkspaceUserModel>(params);
-                return !isEmpty(res);
+                return await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserListParameters, WorkspaceUserModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return false;
+                return {};
+            }
+        },
+        async createWorkspaceUser(params: WorkspaceUserCreateParameters) {
+            try {
+                await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>(params);
+            } catch (e: any) {
+                ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
+        async createRoleBinding(params: RoleCreateParameters) {
+            try {
+                await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(params);
+            } catch (e) {
+                ErrorHandler.handleError(e);
             }
         },
     },

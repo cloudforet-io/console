@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PFieldGroup, PEmpty, PSelectDropdown,
@@ -14,21 +14,18 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { store } from '@/store';
 
+import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 
-interface SelectMenu {
-    label: string;
-    name: string;
-    role_type: RoleType;
-}
-
 const modalSettingStore = useUserModalSettingStore();
+
+const emit = defineEmits<{(e: 'change-role', role: AddModalMenuItem): void}>();
 
 const state = reactive({
     loading: false,
     menuVisible: false,
-    menuItems: [] as SelectMenu[],
-    selectedItems: [] as SelectMenu[],
+    menuItems: [] as AddModalMenuItem[],
+    selectedItems: [] as AddModalMenuItem[],
     // TODO: will be removed after the backend is ready
     domain_id: computed(() => store.state.domain.domainId),
 });
@@ -85,6 +82,11 @@ const fetchListRoles = async (inputText: string) => {
         state.loading = false;
     }
 };
+
+/* Watcher */
+watch(() => state.selectedItems, (selectedItems) => {
+    emit('change-role', selectedItems[0]);
+});
 </script>
 
 <template>

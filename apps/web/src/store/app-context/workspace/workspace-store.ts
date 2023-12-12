@@ -102,6 +102,7 @@ const EXCLUDED_WORKSPACE_API_LIST = [
     '/identity/token/issue',
     '/identity/user/get',
     '/identity/user/get-workspaces',
+    '/identity/user/find',
     '/identity/role/list',
     '/identity/api-key/create',
     '/identity/api-key/update',
