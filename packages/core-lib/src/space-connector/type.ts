@@ -94,6 +94,7 @@ export interface MockConfig {
     apiKey?: string;
 }
 export interface AuthConfig {
+    enabled?: boolean;
     skipTokenCheck?: boolean;
     apiKey?: string;
 }
