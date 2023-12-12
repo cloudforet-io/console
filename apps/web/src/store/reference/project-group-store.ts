@@ -104,7 +104,7 @@ export const useProjectGroupStore = defineStore('project-group', () => {
 
     const getters = reactive({
         projectGroupItems: asyncComputed<ProjectGroupReferenceMap>(async () => {
-            await load();
+            if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectGroupTypeInfo: computed<ReferenceTypeInfo>(() => ({

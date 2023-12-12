@@ -11,7 +11,6 @@ import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
@@ -33,7 +32,7 @@ export const useProjectStore = defineStore('project', () => {
 
     const getters = reactive({
         projectItems: asyncComputed<ProjectReferenceMap>(async () => {
-            await load();
+            if (state.items === null) await load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         projectTypeInfo: computed<ReferenceTypeInfo>(() => ({
@@ -46,7 +45,6 @@ export const useProjectStore = defineStore('project', () => {
         if (!projectGroupId) return undefined;
         try {
             return await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 project_group_id: projectGroupId,
             });
         } catch (e) {
@@ -64,7 +62,6 @@ export const useProjectStore = defineStore('project', () => {
         ) return;
 
         const params: ProjectListParameters = {
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['project_id', 'name', 'project_group_id', 'workspace_id'],
             },
