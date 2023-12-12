@@ -8,13 +8,11 @@ import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/d
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import WorkspaceMemberImage from '@/assets/images/role/img_avatar_workspace-member.png';
-import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner.png';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleType } from '@/schema/identity/role/type';
 import { store } from '@/store';
 
 import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
+import { userRoleFormatter } from '@/services/administration/composables/refined-user-data';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 
 const modalSettingStore = useUserModalSettingStore();
@@ -34,13 +32,6 @@ const formState = reactive({
 });
 
 /* Component */
-const roleTypeIconFormatter = (type: RoleType) => {
-    switch (type) {
-    case ROLE_TYPE.WORKSPACE_OWNER: return WorkspaceOwnerImage;
-    case ROLE_TYPE.WORKSPACE_MEMBER: return WorkspaceMemberImage;
-    default: return '';
-    }
-};
 const menuHandler: AutocompleteHandler = async (inputText: string) => {
     await fetchListRoles(inputText);
     return {
@@ -107,14 +98,14 @@ watch(() => state.selectedItems, (selectedItems) => {
             >
                 <template #dropdown-left-area>
                     <img v-if="state.selectedItems.length > 0"
-                         :src="roleTypeIconFormatter(state.selectedItems[0]?.role_type)"
+                         :src="userRoleFormatter(state.selectedItems[0]?.role_type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
                 </template>
                 <template #menu-item--format="{item}">
                     <div class="role-menu-item">
-                        <img :src="roleTypeIconFormatter(item.role_type)"
+                        <img :src="userRoleFormatter(item.role_type).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >
