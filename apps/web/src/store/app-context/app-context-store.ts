@@ -26,6 +26,7 @@ export const useAppContextStore = defineStore('app-context-store', () => {
             state.isAdminMode = true;
         },
         switchToWorkspaceMode() {
+            workspaceStore.setCurrentWorkspace();
             state.isAdminMode = false;
         },
     };
