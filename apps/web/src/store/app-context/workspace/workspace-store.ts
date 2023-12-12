@@ -1,4 +1,6 @@
-import { computed, reactive } from 'vue';
+import type { ComputedRef, ToRefs } from 'vue';
+import { computed, reactive, toRefs } from 'vue';
+import type { UnwrapNestedRefs } from 'vue/types/v3-generated';
 
 import { defineStore } from 'pinia';
 
@@ -15,19 +17,36 @@ interface WorkspaceStoreState {
     currentItem?: WorkspaceModel;
 }
 
-export const useWorkspaceStore = defineStore('workspace-store', () => {
+interface Getters {
+    workspaceList: ComputedRef<WorkspaceModel[]>;
+    currentWorkspace?: ComputedRef<WorkspaceModel|undefined>;
+    currentWorkspaceId?: ComputedRef<string|undefined>;
+}
+
+interface Actions {
+    load(userId?: string): Promise<void>;
+    setCurrentWorkspace(workspaceId?: string): void;
+}
+
+type SetupStoreTypeGenerator<S, G, A> = UnwrapNestedRefs<G> & Omit<ToRefs<S>, keyof G> & A;
+
+type SetupStoreInterface = SetupStoreTypeGenerator<WorkspaceStoreState, {
+    getters: Getters;
+}, Actions>;
+
+export const useWorkspaceStore = defineStore<string, SetupStoreInterface>('workspace-store', () => {
     const state = reactive<WorkspaceStoreState>({
         items: [],
         currentItem: undefined,
     });
 
-    const getters = reactive({
-        workspaceList: computed<WorkspaceModel[]>(() => state.items || []),
-        currentWorkspace: computed<WorkspaceModel|undefined>(() => state.currentItem),
-        currentWorkspaceId: computed<string|undefined>(() => state.currentItem?.workspace_id),
+    const getters = reactive<Getters>({
+        workspaceList: computed(() => state.items || []),
+        currentWorkspace: computed(() => state.currentItem),
+        currentWorkspaceId: computed(() => state.currentItem?.workspace_id),
     });
 
-    const actions = {
+    const actions:Actions = {
         async load(userId?: string) {
             // TODO: remove this
             const domainId = store.state.domain.domainId;
@@ -60,6 +79,7 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
     };
 
     return {
+        ...toRefs(state),
         getters,
         ...actions,
     };
