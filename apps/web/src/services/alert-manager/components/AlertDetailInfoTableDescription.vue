@@ -92,7 +92,7 @@ export default {
 <style lang="postcss" scoped>
 @import './styles/alertInfoItem.pcss';
 .description {
-    white-space: pre-wrap;
+    white-space: pre-line;
 }
 .textarea {
     min-height: 15rem;
