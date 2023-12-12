@@ -14,7 +14,7 @@
         />
 
         <span v-else
-              class="menu-button"
+              :class="{'menu-button': true, 'opened': visible}"
               tabindex="0"
               role="button"
               @click.stop="handleSearchButtonClick"
@@ -22,8 +22,8 @@
               @keydown.enter="showSearchMenu"
         >
             <p-i name="ic_gnb_search"
-                 height="1.5rem"
-                 width="1.5rem"
+                 height="1.375rem"
+                 width="1.375rem"
                  color="inherit"
             />
         </span>
@@ -426,18 +426,18 @@ export default defineComponent<Props>({
 .gnb-search {
     @apply relative;
     .menu-button {
-        @apply text-gray-500;
+        @apply inline-flex items-center justify-center text-gray-500 rounded-full;
+        width: 2rem;
+        height: 2rem;
         line-height: $gnb-height;
         cursor: pointer;
 
-        &.opened {
-            @apply text-violet-400;
+        &:hover {
+            @apply text-blue-600 bg-blue-100;
         }
 
-        @media (hover: hover) {
-            &:hover {
-                @apply text-violet-400;
-            }
+        &.opened {
+            @apply text-blue-600 bg-blue-200;
         }
     }
 }

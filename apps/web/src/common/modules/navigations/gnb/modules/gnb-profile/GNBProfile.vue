@@ -134,7 +134,7 @@ const handleClickSignOut = async () => {
          class="gnb-profile"
          @keydown.esc="hideProfileMenu"
     >
-        <span class="menu-button"
+        <span :class="{'menu-button': true, 'opened': visible}"
               role="button"
               tabindex="0"
               @click.stop="handleProfileButtonClick"
@@ -142,6 +142,8 @@ const handleClickSignOut = async () => {
         >
             <p-i :name="state.userIcon"
                  class="menu-icon"
+                 width="1.75rem"
+                 height="1.75rem"
             />
         </span>
         <div v-if="visible"
@@ -287,7 +289,7 @@ const handleClickSignOut = async () => {
 <style lang="postcss" scoped>
 .gnb-profile {
     position: relative;
-    margin-left: 1.5rem;
+    margin-left: 0.25rem;
     outline: none;
 
     &:first-of-type {
@@ -295,22 +297,22 @@ const handleClickSignOut = async () => {
     }
 
     .menu-button {
-        @apply text-gray-500;
+        @apply inline-flex items-center justify-center text-gray-500 rounded-full;
+        width: 2rem;
+        height: 2rem;
         cursor: pointer;
         line-height: $gnb-height;
 
+        &:hover {
+            @apply text-blue-600 bg-blue-100;
+        }
+
         &.opened {
-            @apply text-violet-400;
+            @apply text-blue-600 bg-blue-200;
         }
 
         .menu-icon {
-            @apply rounded-xl;
-        }
-
-        @media (hover: hover) {
-            &:hover {
-                @apply text-violet-400;
-            }
+            @apply rounded-full;
         }
     }
 
@@ -422,10 +424,6 @@ const handleClickSignOut = async () => {
                 }
             }
         }
-    }
-
-    @screen laptop {
-        margin-left: 1.25rem;
     }
 
     @screen tablet {
