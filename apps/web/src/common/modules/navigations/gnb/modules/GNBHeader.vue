@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router/composables';
 import {
     PDivider, PSelectDropdown,
 } from '@spaceone/design-system';
+import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
@@ -32,9 +33,9 @@ const router = useRouter();
 
 const state = reactive({
     ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
-    workspaceList: computed(() => [...workspaceStoreState.getters.workspaceList]),
+    workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
-    workspaceMenuList: computed(() => state.workspaceList.map((_workspace) => {
+    workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => state.workspaceList.map((_workspace) => {
         if (state.selectedWorkspace.workspace_id === _workspace.workspace_id) {
             return {
                 name: _workspace.workspace_id,
@@ -51,7 +52,7 @@ const state = reactive({
     searchText: '',
 });
 
-const selectWorkspace = (workspaceId) => {
+const selectWorkspace = (workspaceId: string): void => {
     if (workspaceId) {
         if (workspaceId === state.selectedWorkspace?.workspace_id) return;
         workspaceStore.setCurrentWorkspace(workspaceId);
