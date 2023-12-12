@@ -156,8 +156,8 @@ const state = reactive({
 });
 
 const dataSourceState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
@@ -242,8 +242,6 @@ const handleDismissRelocateNotification = () => {
     });
     relocateNotificationState.isBannerVisible = false;
 };
-
-
 
 onMounted(() => {
     // Relocate dashboard notification

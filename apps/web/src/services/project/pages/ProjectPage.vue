@@ -16,6 +16,8 @@ import { i18n } from '@/translations';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import {
     convertProjectConfigToReferenceData,
@@ -41,6 +43,7 @@ import type {
 
 const route = useRoute();
 const router = useRouter();
+const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
@@ -64,9 +67,9 @@ const storeState = reactive({
     selectedNodeData: computed(() => projectPageGetters.selectedNodeData),
     parentGroups: computed(() => projectPageGetters.parentGroups),
     projectCount: computed(() => projectPageState.projectCount),
-    projects: computed(() => store.getters['reference/projectItems']),
     favoriteProjects: computed(() => store.state.favorite.projectItems),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     projectGroupFormVisible: computed(() => projectPageState.projectGroupFormVisible),
     projectGroupDeleteCheckModalVisible: computed(() => projectPageState.projectGroupDeleteCheckModalVisible),
     favoriteProjectGroups: computed(() => store.state.favorite.projectGroupItems),
@@ -172,8 +175,6 @@ onUnmounted(() => {
     await Promise.allSettled([
         store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
         store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
     ]);
 })();
 </script>

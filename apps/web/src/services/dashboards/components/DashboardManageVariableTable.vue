@@ -70,9 +70,6 @@ import {
 
 import { i18n } from '@/translations';
 
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type {
@@ -94,8 +91,6 @@ const emit = defineEmits<EmitFn>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
-
-const allReferenceStore = useAllReferenceStore();
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
@@ -121,7 +116,6 @@ const state = reactive({
         MANAGED: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_MANAGED'),
         CUSTOM: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_CUSTOM'),
     })),
-    allReferenceTypeInfo: computed(() => allReferenceStore.getters.allReferenceTypeInfo),
 });
 
 /* EVENT */

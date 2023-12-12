@@ -13,7 +13,6 @@ import type { ProjectGroupCreateParameters } from '@/schema/identity/project-gro
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -69,8 +68,7 @@ const getProjectGroupNames = async () => {
 
 const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
     try {
-        const createdProjectGroup = await projectPageStore.createProjectGroup(params);
-        await store.dispatch('reference/projectGroup/sync', createdProjectGroup);
+        await projectPageStore.createProjectGroup(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
@@ -78,8 +76,7 @@ const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
 };
 const updateProjectGroup = async (params: Partial<ProjectGroupUpdateParameters>) => {
     try {
-        const updatedProjectGroup = await projectPageStore.updateProjectGroup(params);
-        await store.dispatch('reference/projectGroup/sync', updatedProjectGroup);
+        await projectPageStore.updateProjectGroup(params);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));

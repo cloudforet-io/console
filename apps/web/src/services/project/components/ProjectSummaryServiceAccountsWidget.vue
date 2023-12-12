@@ -15,7 +15,6 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { arrayToQueryString, primitiveToQueryString } from '@/lib/router-query-string';
 
@@ -53,10 +52,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const queryHelper = new QueryHelper();
-const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     items: [] as Item[],
     fields: computed(() => [
         { name: 'provider', label: i18n.t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.PROVIDER') },

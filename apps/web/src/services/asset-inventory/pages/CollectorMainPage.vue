@@ -4,7 +4,6 @@ import {
     computed, reactive, onMounted,
 } from 'vue';
 
-
 import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -13,9 +12,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
@@ -31,12 +30,12 @@ import type {
     CollectorMainPageQueryValue,
 } from '@/services/asset-inventory/types/collector-main-page-type';
 
+
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 const state = reactive({
     initLoading: true,

@@ -120,14 +120,6 @@ watch(() => state.originParentGroupId, (_id?: string) => {
     if (_id) state.selectedProjectGroupIdList = [_id];
     else state.selectProjectGroup = false;
 }, { immediate: true });
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        allReferenceStore.load('project'),
-        allReferenceStore.load('projectGroup'),
-    ]);
-})();
 </script>
 
 <template>
