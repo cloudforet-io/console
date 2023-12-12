@@ -81,7 +81,7 @@ const selectWorkspace = (workspaceId) => {
                 >
                 <img v-else
                      class="logo-character"
-                     src="../../../../../assets/images/brand/spaceone-default-logo.svg"
+                     src="@/assets/images/brand/spaceone-default-logo.svg"
                 >
             </div>
         </component>
