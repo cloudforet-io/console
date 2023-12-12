@@ -13,9 +13,8 @@ import type { ProjectGroupCreateParameters } from '@/schema/identity/project-gro
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -25,7 +24,6 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
-const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
@@ -71,8 +69,8 @@ const getProjectGroupNames = async () => {
 
 const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
     try {
-        await projectPageStore.createProjectGroup(params);
-        await allReferenceStore.load('projectGroup', { force: true });
+        const createdProjectGroup = await projectPageStore.createProjectGroup(params);
+        await store.dispatch('reference/projectGroup/sync', createdProjectGroup);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
@@ -80,7 +78,8 @@ const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
 };
 const updateProjectGroup = async (params: Partial<ProjectGroupUpdateParameters>) => {
     try {
-        await projectPageStore.updateProjectGroup(params);
+        const updatedProjectGroup = await projectPageStore.updateProjectGroup(params);
+        await store.dispatch('reference/projectGroup/sync', updatedProjectGroup);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));

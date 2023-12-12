@@ -3,6 +3,7 @@ import {
     computed, reactive,
 } from 'vue';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -27,6 +28,7 @@ const state = reactive({
 const deleteProjectGroup = async () => {
     try {
         await projectPageStore.deleteProjectGroup();
+        await store.dispatch('reference/projectGroup/load');
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: i18n.t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }));
