@@ -54,7 +54,7 @@ const state = reactive({
     }),
     selectedProjectGroupIdList: [] as string[],
     selectProjectGroup: true as boolean,
-    isValid: computed<boolean>(() => getIsValid(state.selectProjectGroup, state.selectedProjectGroupIdList, state.originParentGroupId)),
+    isValid: computed<boolean>(() => getIsValid(props.isProject, state.selectProjectGroup, state.selectedProjectGroupIdList, state.originParentGroupId)),
     targetName: computed<string>(() => {
         if (!props.targetId) return '';
         if (props.isProject) return storeState.projects[props.targetId]?.name;
@@ -68,7 +68,8 @@ const state = reactive({
 });
 
 /* Util */
-const getIsValid = (selectProjectGroup: boolean, selectedProjectGroupIdList: string[], originParentGroupId?: string) => {
+const getIsValid = (isProject: boolean, selectProjectGroup: boolean, selectedProjectGroupIdList: string[], originParentGroupId?: string) => {
+    if (isProject) return true;
     if (!selectProjectGroup) { // no project group
         if (!originParentGroupId) return false;
     } else {
