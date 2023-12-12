@@ -176,7 +176,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         try {
             const _params: ProjectGroupCreateParameters = {
                 ...params,
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             };
             if (getters.actionTargetNodeData) {
                 _params.parent_group_id = getters.actionTargetNodeData.id;
@@ -217,7 +216,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
 
         try {
             await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 project_group_id: getters.actionTargetNodeData.id,
                 ...params,
             });
@@ -239,7 +237,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         }
 
         await SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: getters.actionTargetNodeData.id,
         });
 
@@ -256,7 +253,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         try {
             const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
                 ...params,
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
             showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
             state.shouldUpdateProjectList = true;
@@ -284,7 +280,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         try {
             const res = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
                 ...params,
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
             showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '');
             return res;
@@ -297,7 +292,6 @@ export const useProjectPageStore = defineStore('project-page', () => {
         try {
             const res = await SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>({
                 ...params,
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             });
             showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT_TYPE'), '');
             return res;
