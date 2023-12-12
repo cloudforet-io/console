@@ -16,7 +16,7 @@ export interface UserModel {
     required_actions: string[];
     language: string;
     timezone: string;
-    tags: Tags;
+    tags: Tags[];
     domain_id: string;
     last_accessed_at: TimeStamp;
     created_at: TimeStamp;

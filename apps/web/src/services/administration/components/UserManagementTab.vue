@@ -10,34 +10,28 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 
 import { i18n } from '@/translations';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
-
-import UserManagementTabAssignedRole from '@/services/administration/components/UserManagementTabAssignedRole.vue';
 import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
+import UserManagementTabPanels from '@/services/administration/components/UserManagementTabPanels.vue';
 import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
-import { userTabTableFields } from '@/services/administration/constants/user-tab-constant';
+import { USER_TAB_TABLE_FIELDS, USER_TABS } from '@/services/administration/constants/user-tab-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-});
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
-        { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
-        { label: i18n.t('IDENTITY.USER.MAIN.PROJECTS'), name: 'projects', keepAlive: true },
-        { label: i18n.t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
+        { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: USER_TABS.DETAIL },
+        { label: i18n.t('IDENTITY.USER.MAIN.PROJECTS'), name: USER_TABS.PROJECTS },
+        { label: i18n.t('IDENTITY.USER.MAIN.TAG'), name: USER_TABS.TAG },
     ])),
-    activeTab: 'detail',
+    activeTab: USER_TABS.DETAIL,
 });
 const multiItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
-        { name: 'data', label: i18n.t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), keepAlive: true },
+        { label: i18n.t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), name: USER_TABS.DATA },
     ])),
-    activeTab: 'data',
+    activeTab: USER_TABS.DATA,
 });
 </script>
 
@@ -48,18 +42,16 @@ const multiItemTabState = reactive({
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <user-management-tab-detail ref="userDetail" />
+                <user-management-tab-detail />
             </template>
-            <template #project>
-                <user-management-tab-assigned-role
-                    :user-id="userPageStore.selectedUsers[0].user_id"
+            <template #projects>
+                <user-management-tab-panels :type="USER_TABS.PROJECTS"
+                                            :active-tab="singleItemTabState.activeTab"
                 />
             </template>
             <template #tag>
-                <p-tags-panel :resource-id="userPageStore.selectedUsers[0].user_id"
-                              resource-type="identity.User"
-                              resource-key="user_id"
-                              :disabled="state.manageDisabled"
+                <user-management-tab-panels :type="USER_TABS.TAG"
+                                            :active-tab="singleItemTabState.activeTab"
                 />
             </template>
         </p-tab>
@@ -68,7 +60,7 @@ const multiItemTabState = reactive({
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table :fields="userTabTableFields"
+                <p-data-table :fields="USER_TAB_TABLE_FIELDS"
                               :sortable="false"
                               :selectable="false"
                               :items="userPageStore.selectedUsers"
