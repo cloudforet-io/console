@@ -28,6 +28,7 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import {
     useCostDataSourceReferenceStore,
 } from '@/store/reference/cost-data-source-reference-store';
+import { useProjectGroupStore } from '@/store/reference/project-group-store';
 import { useProjectStore } from '@/store/reference/project-store';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
@@ -47,17 +48,12 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
     const cloudServiceQuerySetReferenceStore = useCloudServiceQuerySetReferenceStore();
     const projectReferenceStore = useProjectStore();
+    const projectGroupReferenceStore = useProjectGroupStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
-            projectGroup: {
-                ...REFERENCE_TYPE_INFO.project_group,
-                referenceMap: getters.projectGroup,
-            },
-            project_group: {
-                ...REFERENCE_TYPE_INFO.project_group,
-                referenceMap: getters.projectGroup,
-            },
+            projectGroup: projectGroupReferenceStore.getters.projectGroupTypeInfo,
+            project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
             //
             project: projectReferenceStore.getters.projectTypeInfo,
             //
@@ -128,14 +124,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             cloud_service_query_set: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
             cloudServiceQuerySet: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
         })),
-        projectGroup: asyncComputed<ProjectGroupReferenceMap>(async () => {
-            await store.dispatch('reference/projectGroup/load');
-            return store.getters['reference/projectGroupItems'];
-        }, {}, { lazy: true }),
-        project_group: asyncComputed<ProjectGroupReferenceMap>(async () => {
-            await store.dispatch('reference/projectGroup/load');
-            return store.getters['reference/projectGroupItems'];
-        }, {}, { lazy: true }),
+        projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
+        project_group: asyncComputed<ProjectGroupReferenceMap>(async () => projectGroupReferenceStore.getters.projectGroupItems),
         project: asyncComputed<ProjectReferenceMap>(async () => projectReferenceStore.getters.projectItems),
         protocol: asyncComputed<ProtocolReferenceMap>(async () => {
             await store.dispatch('reference/protocol/load');
@@ -200,6 +190,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 costDataSourceReferenceStore.load(options),
                 cloudServiceQuerySetReferenceStore.load(options),
                 projectReferenceStore.load(options),
+                projectGroupReferenceStore.load(options),
             ]);
         },
         async load(type: ReferenceType, options?: ReferenceLoadOptions) {
@@ -209,6 +200,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 await cloudServiceQuerySetReferenceStore.load(options);
             } else if (type === 'project') {
                 await projectReferenceStore.load(options);
+            } else if (type === 'projectGroup' || type === 'project_group') {
+                await projectGroupReferenceStore.load(options);
             } else {
                 await store.dispatch(`reference/${camelCase(type)}/load`, options);
             }

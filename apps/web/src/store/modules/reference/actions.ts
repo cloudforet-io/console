@@ -8,7 +8,6 @@ export const loadAll: Action<ReferenceRootState, any> = async ({ dispatch, commi
         dispatch('cloudServiceType/load', options),
         dispatch('collector/load', options),
         dispatch('plugin/load', options),
-        dispatch('projectGroup/load', options),
         dispatch('protocol/load', options),
         dispatch('provider/load', options),
         dispatch('region/load', options),
