@@ -7,21 +7,25 @@
                 <div class="timestamp">
                     {{ item.created_at ? iso8601Formatter(item.created_at, timezone) : '' }}
                 </div>
-                <div class="item-detail">
+                <p-collapsible-panel class="item-detail"
+                                     :line-clamp="8"
+                >
                     <slot name="timeline-detail" />
-                </div>
+                </p-collapsible-panel>
             </li>
         </ul>
     </div>
 </template>
 
 <script lang="ts">
+import { PCollapsiblePanel } from '@spaceone/design-system';
+
 import { iso8601Formatter } from '@cloudforet/utils';
 
 export default {
     name: 'AlertDetailTabsPushedEventVerticalTimeline',
     components: {
-
+        PCollapsiblePanel,
     },
     props: {
         item: {
@@ -62,7 +66,7 @@ export default {
 .timeline-wrapper {
     .timeline-list {
         padding: 0;
-        display: inline-block;
+        display: flex;
     }
     .timeline-item {
         @apply border-l border-gray-200;
@@ -71,6 +75,7 @@ export default {
         padding-left: 1rem;
         padding-bottom: 1.5rem;
         min-height: 3.25rem;
+        width: calc(100% - 7.5rem);
         &::before {
             @mixin circle-style;
 
@@ -113,5 +118,6 @@ export default {
 .item-detail {
     font-size: 0.875rem;
     line-height: 150%;
+    padding: 0;
 }
 </style>

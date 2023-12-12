@@ -23,42 +23,46 @@
             </template>
         </p-heading>
         <section class="detail-contents-wrapper">
-            <div class="left-wrapper">
-                <alert-detail-summary
-                    :id="id"
-                    class="header"
-                    :manage-disabled="!hasManagePermission"
-                />
+            <div class="main-contents-wrapper">
+                <div class="main-contents">
+                    <alert-detail-summary
+                        :id="id"
+                        class="header"
+                        :manage-disabled="!hasManagePermission"
+                    />
 
-                <alert-detail-info-table
-                    :id="id"
-                    class="info"
-                    :manage-disabled="!hasManagePermission"
-                />
-                <alert-detail-status-update
-                    :id="id"
-                    :manage-disabled="!hasManagePermission"
-                    class="status-update"
-                />
-                <alert-detail-tabs
-                    :id="id"
-                    class="timeline-and-event"
-                />
+                    <alert-detail-info-table
+                        :id="id"
+                        class="info"
+                        :manage-disabled="!hasManagePermission"
+                    />
+                    <alert-detail-status-update
+                        :id="id"
+                        :manage-disabled="!hasManagePermission"
+                        class="status-update"
+                    />
+                    <alert-detail-tabs
+                        :id="id"
+                        class="timeline-and-event"
+                    />
+                </div>
             </div>
-            <div class="right-wrapper">
-                <alert-responder :id="id"
-                                 class="responder"
-                                 :alert-data="alertPageState.alertData"
-                                 :manage-disabled="!hasManagePermission"
-                />
-                <alert-detail-note
-                    :id="id"
-                    :manage-disabled="!hasManagePermission"
-                    class="note"
-                />
-                <alert-detail-project-dependency :id="id"
-                                                 class="project-dependency"
-                />
+            <div class="sub-contents-wrapper">
+                <div class="sub-contents">
+                    <alert-responder :id="id"
+                                     class="responder"
+                                     :alert-data="alertPageState.alertData"
+                                     :manage-disabled="!hasManagePermission"
+                    />
+                    <alert-detail-note
+                        :id="id"
+                        :manage-disabled="!hasManagePermission"
+                        class="note"
+                    />
+                    <alert-detail-project-dependency :id="id"
+                                                     class="project-dependency"
+                    />
+                </div>
             </div>
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
@@ -222,63 +226,38 @@ export default {
     grid-auto-rows: max-content;
     justify-content: center;
 
-    .left-wrapper {
-        @apply grid col-span-8 gap-4;
-        grid-auto-rows: max-content;
+    .main-contents-wrapper {
+        @apply col-span-8;
+        .main-contents {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
     }
-    .right-wrapper {
-        @apply grid col-span-4 gap-4;
-        grid-auto-rows: max-content;
+    .sub-contents-wrapper {
+        @apply col-span-4;
+        .sub-contents {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
     }
 
     @screen tablet {
         margin-top: 0;
-        .left-wrapper {
+        .main-contents-wrapper {
             @apply row-start-1 row-end-1 col-span-12;
-            .header {
-                @apply col-span-12 row-start-1 row-end-1;
-                max-height: none;
-            }
-            .info {
-                @apply col-span-12 row-start-2 row-end-2;
-            }
-            .status-update {
-                @apply col-span-12 row-start-3 row-end-3;
-                overflow-x: auto;
-            }
-            .timeline-and-event {
-                @apply col-span-12 row-start-4 row-end-4;
-                max-height: none;
-            }
         }
 
-        .right-wrapper {
+        .sub-contents-wrapper {
             @apply row-start-2 row-end-2 col-span-12;
-            .responder {
-                @apply col-span-6 row-start-5 row-end-5;
-            }
-            .note {
-                @apply col-span-6 row-start-5 row-end-5;
-            }
-            .project-dependency {
-                @apply col-span-6 row-start-6 row-end-6;
-            }
         }
     }
 
     @screen mobile {
-        .right-wrapper {
+        .sub-contents-wrapper {
             @apply col-span-12;
             margin-top: -4rem;
-            .responder {
-                @apply row-start-5 row-end-5;
-            }
-            .note {
-                @apply row-start-6 row-end-6 col-start-1;
-            }
-            .project-dependency {
-                @apply row-start-7 row-end-7 col-start-1;
-            }
         }
     }
 }
