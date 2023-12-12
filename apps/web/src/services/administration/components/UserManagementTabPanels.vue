@@ -26,7 +26,7 @@ const state = reactive({
     title: computed(() => (props.type === USER_TABS.PROJECTS
         ? i18n.t('IDENTITY.USER.MAIN.ASSOCIATED_PROJECTS')
         : i18n.t('IDENTITY.USER.MAIN.TAG'))),
-    items: {},
+    items: [],
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
@@ -50,7 +50,7 @@ const getProjectItems = async () => {
         });
         state.items = response.map((k) => ({ project_id: k.project_id, name: k.name, date: k.created_at }));
     } catch (e) {
-        state.items = {};
+        state.items = [];
     } finally {
         state.loading = false;
     }
