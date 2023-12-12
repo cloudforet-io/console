@@ -11,6 +11,7 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -25,40 +26,39 @@ import {
 } from '@/services/administration/composables/refined-user-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
-interface Props {
-    userId: string
-    timezone: string
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    userId: '',
-    timezone: '',
-});
-
 const route = useRoute();
 
 const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
-const state = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    // TODO: will be removed after the backend is ready
-    domain_id: computed(() => store.state.domain.domainId),
+const storeState = reactive({
+    userInfo: computed(() => store.state.user),
+    timezone: computed(() => storeState.userInfo.timezone || 'UTC'),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+const state = reactive({
+    selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
     refinedUserItems: computed(() => ({
-        ...userPageStore.selectedUser,
-        last_accessed_at: calculateTime(userPageStore.selectedUser.last_accessed_at, userPageStore.selectedUser.timezone),
+        ...state.selectedUser,
+        last_accessed_at: calculateTime(state.selectedUser.last_accessed_at, state.selectedUser.timezone),
     })),
     fields: computed<DefinitionField[]>(() => {
         const additionalFields: DefinitionField[] = [];
-        if (state.smtpEnabled) {
+        const additionalRoleFields: DefinitionField[] = [];
+        if (storeState.smtpEnabled) {
             additionalFields.push({
                 name: 'email',
                 label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
-                disableCopy: tableState.refinedUserItems.user_type === 'API_USER',
+            });
+        }
+        if (storeState.userInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER) {
+            additionalRoleFields.push({
+                name: 'role_binding_info',
+                label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE'),
             });
         }
         return [
@@ -69,9 +69,8 @@ const tableState = reactive({
             { name: 'mfa', label: i18n.t('IDENTITY.USER.MAIN.MFA'), disableCopy: true },
             { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
             { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
-            { name: 'role_type', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE_TYPE') },
-            // TODO: will be check after the role function is ready
-            { name: 'role_id', label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE') },
+            { name: 'role_type', label: i18n.t('IDENTITY.USER.MAIN.ROLE') },
+            ...additionalRoleFields,
             { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
             { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
             { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
@@ -81,25 +80,20 @@ const tableState = reactive({
 
 /* API */
 const getUserDetailData = async (userId) => {
-    if (state.isAdminMode) {
-        await userPageStore.getUser({ user_id: userId || props.userId });
+    if (storeState.isAdminMode) {
+        await userPageStore.getUser({ user_id: userId || state.selectedUser.user_id });
     } else {
         await userPageStore.getWorkspaceUser({
-            user_id: userId || props.userId,
+            user_id: userId || state.selectedUser.user_id,
             workspace_id: route.params?.workspaceId || '',
         });
     }
 };
 
 /* Watcher */
-watch(() => props.userId, (value) => {
+watch(() => state.selectedUser.user_id, (value) => {
     getUserDetailData(value);
 }, { immediate: true });
-watch(() => userPageState.modalVisible.update, (value) => {
-    if (!value) {
-        getUserDetailData(props.userId);
-    }
-});
 </script>
 
 <template>
@@ -124,28 +118,23 @@ watch(() => userPageState.modalVisible.update, (value) => {
             </template>
             <template #data-role_type="{value}">
                 <span class="role-type">
-                    <p-i :name="userRoleFormatter(value).image"
-                         width="1rem"
-                         height="1rem"
+                    <img :src="userRoleFormatter(value).image"
+                         alt="role-type-icon"
                          class="role-type-icon"
-                    />
+                    >
                     <span>{{ userRoleFormatter(value).name }}</span>
                 </span>
             </template>
+            <template #data-role_binding_info="{value}">
+                {{ value.role_type }}
+            </template>
             <template #data-email="{data}">
-                <span v-if="tableState.refinedUserItems.user_type !== 'API_USER'"
-                      class="notification-email-wrapper"
-                >
-                    <span v-if="!data" />
-                    <span v-else
-                          class="notification-email"
+                <span class="notification-email-wrapper">
+                    <span class="notification-email"
                           :class="tableState.refinedUserItems.email_verified && 'verified-text'"
                     >
                         {{ data }}
                     </span>
-                </span>
-                <span v-else>
-                    <span>N/A</span>
                 </span>
             </template>
             <template #data-last_accessed_at="{data}">
@@ -163,10 +152,10 @@ watch(() => userPageState.modalVisible.update, (value) => {
                 </span>
             </template>
             <template #data-created_at="{data}">
-                {{ iso8601Formatter(data, timezone) }}
+                {{ iso8601Formatter(data, storeState.timezone) }}
             </template>
             <template #extra="{label}">
-                <span v-if="tableState.refinedUserItems.email && label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL') && tableState.refinedUserItems.user_type !== 'API_USER'">
+                <span v-if="storeState.isAdminMode && tableState.refinedUserItems.email && label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL')">
                     <span v-if="tableState.refinedUserItems.email_verified">
                         <p-i name="ic_verified"
                              height="1rem"
@@ -224,6 +213,8 @@ watch(() => userPageState.modalVisible.update, (value) => {
         gap: 0.5rem;
         .role-type-icon {
             @apply rounded-full;
+            width: 1rem;
+            height: 1rem;
         }
     }
 }

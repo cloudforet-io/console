@@ -9,8 +9,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import UserManagementHeader from '@/services/administration/components/UserManagementHeader.vue';
 import UserManagementStatusModal from '@/services/administration/components/UserManagementStatusModal.vue';
@@ -23,9 +21,6 @@ const userPageStore = useUserPageStore();
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-});
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
 });
 
 /* API */
@@ -70,7 +65,7 @@ watch(() => storeState.isAdminMode, async () => {
                 />
             </template>
         </p-horizontal-layout>
-        <user-management-tab :manage-disabled="!state.hasManagePermission" />
+        <user-management-tab />
         <user-management-add-modal @confirm="refreshUserList" />
         <user-management-status-modal @confirm="refreshUserList" />
     </section>
