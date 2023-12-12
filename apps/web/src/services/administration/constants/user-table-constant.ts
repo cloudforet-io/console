@@ -104,3 +104,10 @@ export const USER_TABLE_FIELDS = [
     { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
     { name: 'timezone', label: 'Timezone', sortable: false },
 ];
+
+export const USER_STATUS_TABLE_FIELDS = [
+    { name: 'user_id', label: 'User ID' },
+    { name: 'name', label: 'Name' },
+    { name: 'state', label: 'State' },
+    { name: 'role_type', label: 'Workspace Role Type' },
+];

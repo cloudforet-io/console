@@ -4,6 +4,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
@@ -47,6 +48,7 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
                 return [];
             }
         },
+        //
         async getWorkspaceUser(params: WorkspaceUserListParameters) {
             try {
                 return await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserListParameters, WorkspaceUserModel>(params);
@@ -63,11 +65,21 @@ export const useUserModalSettingStore = defineStore('user-modal-setting', {
                 throw e;
             }
         },
+        //
         async createRoleBinding(params: RoleCreateParameters) {
             try {
                 await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
+                throw e;
+            }
+        },
+        async deleteRoleBinding(params: RoleDeleteParameters) {
+            try {
+                await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteParameters>(params);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
             }
         },
     },
