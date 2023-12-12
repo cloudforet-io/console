@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-
 import {
     PHeading, PDivider, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
 import BudgetMainList from '@/services/cost-explorer/components/BudgetMainList.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
-
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-});
 
 const handleCreateBudgetSelect = () => {
     SpaceRouter.router.push({ name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME });
@@ -28,7 +20,6 @@ const handleCreateBudgetSelect = () => {
             <template #extra>
                 <p-button style-type="primary"
                           icon-left="ic_plus_bold"
-                          :disabled="!state.hasManagePermission"
                           @click="handleCreateBudgetSelect"
                 >
                     {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE') }}
