@@ -18,6 +18,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -63,7 +64,7 @@ const props = defineProps<Props>();
 const allReferenceStore = useAllReferenceStore();
 const chartContext = ref<HTMLElement | null>(null);
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource ?? {}),
 });
 const state = reactive({

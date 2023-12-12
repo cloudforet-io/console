@@ -156,7 +156,7 @@ const state = reactive({
 });
 
 const dataSourceState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;

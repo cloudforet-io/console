@@ -10,6 +10,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import { store } from '@/store';
 
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
@@ -22,7 +23,6 @@ import { gray } from '@/styles/colors';
 
 import BudgetDetailInfoAmountPlanningTypePopover from '@/services/cost-explorer/components/BudgetDetailInfoAmountPlanningTypePopover.vue';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
-
 
 
 const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => state.providers[provider]?.label ?? '').join(', ') || 'All';
@@ -38,7 +38,7 @@ const costTypeRef = ref<HTMLElement|null>(null);
 const state = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
     processedProviderValue: computed<string>(() => {
         if (!budgetPageState.budgetData) return '';

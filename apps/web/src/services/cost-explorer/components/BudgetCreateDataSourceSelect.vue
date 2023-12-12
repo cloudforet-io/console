@@ -4,6 +4,8 @@ import { computed, reactive, watch } from 'vue';
 import { PFieldGroup, PSelectDropdown, PLazyImg } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
+import { store } from '@/store';
+
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -28,7 +30,7 @@ const {
 });
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({

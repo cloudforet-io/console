@@ -17,7 +17,6 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -40,9 +39,7 @@ import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/types/col
  *   @name makePluginReferenceValueHandler
  *   @param distinct
  */
-const makePluginReferenceValueHandler = (distinct: string): ValueHandler|undefined => {
-    const allReferenceStore = useAllReferenceStore();
-
+const makePluginReferenceValueHandler = (distinct: string, plugins: PluginReferenceMap): ValueHandler|undefined => {
     const param: any = {
         resource_type: 'inventory.Collector',
         options: { limit: 10 },
@@ -53,13 +50,9 @@ const makePluginReferenceValueHandler = (distinct: string): ValueHandler|undefin
         try {
             const { results } = await SpaceConnector.client.addOns.autocomplete.distinct(param);
 
-            const storeState = reactive({
-                plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-            });
-
             return {
                 results: results.slice(0, 10).reduce((r, d) => {
-                    if (d.name !== '' && d.name !== undefined && d.name !== null) r.push({ label: storeState.plugins[d.key].label, name: d.key });
+                    if (d.name !== '' && d.name !== undefined && d.name !== null) r.push({ label: plugins[d.key].label, name: d.key });
                     return r;
                 }, []),
                 totalCount: results.length,
@@ -75,10 +68,9 @@ const makePluginReferenceValueHandler = (distinct: string): ValueHandler|undefin
 
 const collectorPageStore = useCollectorPageStore();
 const collectorPageState = collectorPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
 
 const storeState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 
@@ -99,7 +91,7 @@ const collectorSearchHandler = reactive({
         collector_id: makeDistinctValueHandler('inventory.Collector', 'collector_id'),
         name: makeDistinctValueHandler('inventory.Collector', 'name'),
         'schedule.state': makeDistinctValueHandler('inventory.Collector', 'schedule.state'),
-        'plugin_info.plugin_id': makePluginReferenceValueHandler('plugin_info.plugin_id'),
+        'plugin_info.plugin_id': makePluginReferenceValueHandler('plugin_info.plugin_id', storeState.plugins),
         'plugin_info.version': makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
         created_at: makeDistinctValueHandler('inventory.Collector', 'created_at'),
         last_collected_at: makeDistinctValueHandler('inventory.Collector', 'last_collected_at'),
