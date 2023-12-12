@@ -9,7 +9,8 @@ import {
 import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -24,7 +25,6 @@ import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/Budg
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
 
 
-
 interface Props {
     budgetUsage: BudgetUsageAnalyzeResult;
     more?: boolean;
@@ -35,7 +35,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     costDataSource: computed(() => allReferenceStore.getters.costDataSource),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
@@ -50,21 +52,18 @@ const state = reactive({
             budgetId: props.budgetUsage.budget_id,
         },
     })),
-    isProject: computed<boolean>(() => !!props.budgetUsage.project_id),
-    projects: computed(() => {
-        const projects: string[] = [];
-        if (state.isProject) {
-            const projectId = props.budgetUsage.project_id as string;
-            const project: ProjectReferenceItem|undefined = storeState.projects[projectId];
-            if (project?.data?.groupInfo?.name) projects.push(project.data.groupInfo.name);
-            projects.push(project?.name ?? projectId);
-        } else {
-            const projectGroupId = props.budgetUsage.project_group_id as string;
-            const projectGroup: ProjectGroupReferenceItem|undefined = storeState.projectGroups[projectGroupId];
-            if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
-            projects.push(projectGroup?.name ?? projectGroupId);
+    targetList: computed<string[]>(() => {
+        // admin mode
+        if (storeState.isAdminMode) {
+            return ['Workspace Name']; // TODO: temporary
         }
-        return projects;
+        // user mode
+        const projectNameList: string[] = [];
+        const targetProjectId = props.budgetUsage.project_id as string;
+        const targetProject: ProjectReferenceItem|undefined = storeState.projects[targetProjectId];
+        if (targetProject?.data?.groupInfo?.name) projectNameList.push(targetProject.data.groupInfo.name);
+        projectNameList.push(targetProject?.name ?? targetProjectId);
+        return projectNameList;
     }),
     cost: computed<number>(() => props.budgetUsage.total_spent ?? 0),
     limit: computed<number>(() => props.budgetUsage.total_budget ?? 0),
@@ -120,20 +119,20 @@ const state = reactive({
     >
         <div class="card-header">
             <div class="flex items-center mb-1">
-                <span v-for="(name, index) in state.projects"
-                      :key="name"
-                      class="project-info"
-                      :class="{target: index === state.projects.length - 1}"
+                <span v-for="(targetName, index) in state.targetList"
+                      :key="`${targetName}-${index}`"
+                      class="target-info"
+                      :class="{target: index === state.targetList.length - 1}"
                 >
-                    <p-i v-if="index === state.projects.length - 1"
-                         :name="state.isProject ? 'ic_document-filled' : 'ic_folder-filled'"
+                    <p-i v-if="!storeState.isAdminMode && index === state.targetList.length - 1"
+                         name="ic_document-filled"
                          color="inherit"
                          width="1em"
                          height="1em"
                          class="mr-1"
                     />
-                    {{ name }}
-                    <p-i v-if="index < state.projects.length - 1"
+                    {{ targetName }}
+                    <p-i v-if="index < state.targetList.length - 1"
                          name="ic_chevron-right-thin"
                          width="1em"
                          height="1em"
@@ -201,7 +200,7 @@ const state = reactive({
         .budget-name {
             @apply text-gray-900 font-bold;
         }
-        .project-info {
+        .target-info {
             @apply text-gray-400;
             display: inline-flex;
             flex-wrap: wrap;
