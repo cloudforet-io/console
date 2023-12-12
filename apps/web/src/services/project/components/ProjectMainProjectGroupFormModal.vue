@@ -2,7 +2,6 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import VueI18n from 'vue-i18n';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
@@ -11,7 +10,6 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
-import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/api-verbs/get';
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
@@ -21,10 +19,9 @@ import { i18n } from '@/translations';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
-
-import TranslateResult = VueI18n.TranslateResult;
 
 
 const projectPageStore = useProjectPageStore();
@@ -37,78 +34,67 @@ const state = reactive({
     }),
     currentGroupId: computed(() => projectPageGetters.actionTargetNodeData?.id),
     projectGroupNames: [] as string[],
-    projectGroupName: undefined as undefined | string,
-    projectGroupNameInvalidText: computed(() => {
-        let invalidText = '' as TranslateResult;
-        if (typeof state.projectGroupName === 'string') {
-            if (state.projectGroupName.length === 0) {
-                invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
-            } else if (state.projectGroupName.length > 40) {
-                invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
-            } else if (state.projectGroupNames.includes(state.projectGroupName)) {
-                invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
-            }
-        }
-        return invalidText;
-    }),
-    isValid: computed(() => {
-        if (state.projectGroupName) {
-            return !(state.projectGroupName.length === 0 || state.projectGroupName.length > 40 || state.projectGroupNames.includes(state.projectGroupName));
-        }
-        return false;
-    }),
-    showValidation: false,
     loading: false,
 });
+const {
+    forms: { projectGroupName },
+    invalidState,
+    invalidTexts,
+    setForm, isAllValid,
+    initForm,
+} = useFormValidator({
+    projectGroupName: undefined as string|undefined,
+}, {
+    projectGroupName: (val?: string) => {
+        if (!val?.length) return i18n.t('PROJECT.LANDING.MODAL_PROJECT_CREATE.MODAL_VALIDATION_REQUIRED');
+        if (val.length > 40) return i18n.t('PROJECT.LANDING.MODAL_PROJECT_CREATE.MODAL_VALIDATION_LENGTH');
+        if (state.projectGroupNames.includes(val)) return i18n.t('PROJECT.LANDING.MODAL_PROJECT_CREATE.MODAL_VALIDATION_DUPLICATED');
+        return true;
+    },
+});
 
+/* Api */
 const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
 const getProjectGroupNames = async () => {
     const res = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         query: projectGroupNameApiQuery.data,
     });
-    state.projectGroupNames = res.results?.map((d) => d.name) ?? [];
-};
-
-const getProjectGroup = async () => {
-    const res = await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
-        domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
-        project_group_id: state.currentGroupId,
-    });
-    state.projectGroupName = res.name;
+    const names = res.results?.map((d) => d.name) ?? [];
+    if (projectPageState.projectGroupFormUpdateMode) {
+        state.projectGroupNames = names.filter((name) => name !== projectPageGetters.groupName);
+    } else {
+        state.projectGroupNames = names;
+    }
 };
 
 const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
     try {
-        await projectPageStore.createProjectGroup(params);
-        await store.dispatch('reference/projectGroup/load');
-        projectPageStore.setShouldUpdateProjectList(true);
+        const createdProjectGroup = await projectPageStore.createProjectGroup(params);
+        await store.dispatch('reference/projectGroup/sync', createdProjectGroup);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'));
     }
 };
-
 const updateProjectGroup = async (params: Partial<ProjectGroupUpdateParameters>) => {
     try {
-        await projectPageStore.updateProjectGroup(params);
+        const updatedProjectGroup = await projectPageStore.updateProjectGroup(params);
+        await store.dispatch('reference/projectGroup/sync', updatedProjectGroup);
         showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'));
     }
 };
 
+/* Event */
 const confirm = async () => {
     if (state.loading) return;
-    if (!state.showValidation) state.showValidation = true;
-    if (!state.isValid) return;
+    if (!isAllValid.value) return;
 
     state.loading = true;
     const params: ProjectGroupCreateParameters | Partial<ProjectGroupUpdateParameters> = {
-        name: state.projectGroupName,
+        name: projectGroupName.value,
     };
-
-    state.showValidation = false;
 
     if (!projectPageState.projectGroupFormUpdateMode) await createProjectGroup(params as ProjectGroupCreateParameters);
     else await updateProjectGroup(params);
@@ -118,14 +104,18 @@ const confirm = async () => {
 };
 
 watch(() => state.currentGroupId, async (after) => {
-    if (after && projectPageState.projectGroupFormUpdateMode) await getProjectGroup();
-    else state.projectGroupName = undefined; // init form
+    if (after && projectPageState.projectGroupFormUpdateMode) {
+        setForm('projectGroupName', projectPageGetters.groupName);
+    } else {
+        initForm();
+    }
 }, { immediate: true });
 
-const init = async () => {
+
+/* Init */
+(async () => {
     await getProjectGroupNames();
-};
-init();
+})();
 </script>
 
 <template>
@@ -135,21 +125,22 @@ init();
                     fade
                     backdrop
                     :visible.sync="state.proxyVisible"
-                    :disabled="state.loading || (state.showValidation && !state.isValid)"
+                    :disabled="state.loading || !isAllValid"
                     @confirm="confirm"
     >
         <template #body>
             <p-field-group :label="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_LABEL')"
-                           :invalid-text="state.projectGroupNameInvalidText"
-                           :invalid="state.showValidation && !state.isValid"
+                           :invalid-text="invalidTexts.projectGroupName"
+                           :invalid="invalidState.projectGroupName"
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="state.projectGroupName"
+                    <p-text-input :value="projectGroupName"
                                   class="block w-full"
-                                  :invalid="state.showValidation && invalid"
+                                  :invalid="invalid"
                                   :placeholder="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER')"
                                   @keydown.enter="confirm"
+                                  @update:value="setForm('projectGroupName', $event)"
                     />
                 </template>
             </p-field-group>

@@ -1,5 +1,5 @@
 <template>
-    <div class="all-dashboards-select-filter">
+    <div class="dashboard-main-select-filter">
         <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_VIWERS') }}</span>
         <p-select-status v-for="(view, idx) in viewerFilterList"
                          :key="`view-${idx}`"
@@ -101,7 +101,7 @@ export default defineComponent({
 </script>
 
 <style lang="postcss" scoped>
-.all-dashboards-select-filter {
+.dashboard-main-select-filter {
     @apply flex items-center;
     height: 2rem;
     margin: 1.125rem 0 0.625rem 0;

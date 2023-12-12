@@ -100,11 +100,11 @@ export default defineComponent({
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             domainDashboardItems: computed<DomainDashboardModel[]>(() => {
-                const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_WORKSPACE, store.getters['user/pagePermissionList']);
+                const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.WORKSPACE_DASHBOARDS, store.getters['user/pagePermissionList']);
                 return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
             }),
             projectDashboardItems: computed<ProjectDashboardModel[]>(() => {
-                const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_PROJECT, store.getters['user/pagePermissionList']);
+                const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.PROJECT_DASHBOARDS, store.getters['user/pagePermissionList']);
                 return isUserAccessibleToProjectDashboards ? store.getters['dashboard/getProjectItems'] : [];
             }),
             dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
@@ -126,7 +126,7 @@ export default defineComponent({
                 storeState.menuItems,
             )),
             recentCloudServiceItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pagePermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.CLOUD_SERVICE),
                     storeState.cloudServiceTypes,
@@ -162,7 +162,7 @@ export default defineComponent({
                 return [...domainDashboardReferenceData, ...projectDashboardReferenceData];
             }),
             recentCostAnalysisItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_COST_ANALYSIS, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pagePermissionList']);
                 return isUserAccessible
                     ? convertCostAnalysisConfigToReferenceData(
                         storeState.recents.filter((d) => d.itemType === RECENT_TYPE.COST_ANALYSIS),
