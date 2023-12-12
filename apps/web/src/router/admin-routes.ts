@@ -5,6 +5,7 @@ import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/r
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import adminDashboardsRoutes from '@/services/dashboards/routes/admin/routes';
 import adminHomeDashboardRoutes from '@/services/home-dashboard/routes/admin/routes';
+import adminInfoRoute from '@/services/info/routes/admin/routes';
 
 export const adminRoutes: RouteConfig[] = [
     {
@@ -16,4 +17,5 @@ export const adminRoutes: RouteConfig[] = [
     adminCostExplorerRoutes,
     adminAssetInventoryRoutes,
     adminAdministrationRoute,
+    adminInfoRoute,
 ];
