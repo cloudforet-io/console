@@ -17,6 +17,8 @@ import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { UserListItemType } from '@/services/administration/types/user-type';
+
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
         loading: {
@@ -24,8 +26,8 @@ export const useUserPageStore = defineStore('user-page', {
             detail: false,
         },
         modalLoading: false,
-        users: [] as Partial<WorkspaceUserModel|UserModel>[],
-        selectedUser: {} as Partial<WorkspaceUserModel|UserModel>,
+        users: [] as UserListItemType[],
+        selectedUser: {} as UserListItemType,
         totalCount: 0,
         selectedIndices: [],
         // TODO: plan to organize it after completing the modal.
@@ -44,7 +46,7 @@ export const useUserPageStore = defineStore('user-page', {
     getters: {
         timezone: () => store.state.user.timezone || 'UTC',
         selectedUsers: (state) => {
-            const users: Partial<WorkspaceUserModel|UserModel>[] = [];
+            const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
                 users.push(state.users[d]);
             });

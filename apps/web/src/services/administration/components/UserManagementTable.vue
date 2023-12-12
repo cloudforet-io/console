@@ -62,9 +62,9 @@ const storeState = reactive({
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
-        api_key_count: user.api_key_count ?? 0,
-        mfa: user.mfa && user.mfa.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_at: calculateTime(user.last_accessed_at, storeState.timezone),
+        api_key_count: user?.api_key_count ?? 0,
+        mfa: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
+        last_accessed_at: calculateTime(user?.last_accessed_at, storeState.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
     tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,

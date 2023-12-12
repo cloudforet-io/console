@@ -5,8 +5,6 @@ import {
     PTextInput, PFieldGroup, PRadio, PDivider, PRadioGroup, PI,
 } from '@spaceone/design-system';
 
-import type { UserModel } from '@/schema/identity/user/model';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
@@ -21,9 +19,10 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import type { UserListItemType } from '@/services/administration/types/user-type';
 
 interface Props {
-    item?: Partial<WorkspaceUserModel|UserModel>;
+    item?: UserListItemType;
     isValidEmail?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
