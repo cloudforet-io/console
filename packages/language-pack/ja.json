@@ -12,6 +12,7 @@
 		"MAIN": {
 			"CLOSE": "閉じる",
 			"NO": "いいえ",
+			"OK": "",
 			"YES": "はい"
 		},
 		"MODAL": {
@@ -2377,7 +2378,9 @@
 				"SET_SCHEDULE": "設定",
 				"TIMEZONE": "タイムゾーン",
 				"TITLE": "コレクタ",
-				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する"
+				"VIEW_HISTORY_DETAIL": "履歴の詳細を表示する",
+				"VIEW_SCHEDULE": "",
+				"VIEW_SCHEDULE_MODAL_TITLE": ""
 			},
 			"NO_DATA": "データがありません",
 			"NO_JOB": "近のジョブはありません",

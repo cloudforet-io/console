@@ -12,6 +12,7 @@
 		"MAIN": {
 			"CLOSE": "닫기",
 			"NO": "아니요",
+			"OK": "",
 			"YES": "네"
 		},
 		"MODAL": {
@@ -2377,7 +2378,9 @@
 				"SET_SCHEDULE": "설정",
 				"TIMEZONE": "타임존",
 				"TITLE": "컬렉터",
-				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기"
+				"VIEW_HISTORY_DETAIL": "컬렉터 히스토리 전체보기",
+				"VIEW_SCHEDULE": "",
+				"VIEW_SCHEDULE_MODAL_TITLE": ""
 			},
 			"NO_DATA": "데이터가 없습니다.",
 			"NO_JOB": "최근 작업내역 없음",
