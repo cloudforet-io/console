@@ -3,11 +3,19 @@ import { computed, reactive, watch } from 'vue';
 
 import { PDataTable, PHeading } from '@spaceone/design-system';
 
+import type { TimeStamp } from '@/schema/_common/model';
 import { i18n } from '@/translations';
 
 import { USER_TABS } from '@/services/administration/constants/user-tab-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
+interface TableItem {
+    project_id?: string;
+    name?: string;
+    date?: TimeStamp;
+    key?: string;
+    value?: string;
+}
 interface Props {
     type: string;
     activeTab: string;
@@ -26,7 +34,7 @@ const state = reactive({
     title: computed(() => (props.type === USER_TABS.PROJECTS
         ? i18n.t('IDENTITY.USER.MAIN.ASSOCIATED_PROJECTS')
         : i18n.t('IDENTITY.USER.MAIN.TAG'))),
-    items: [],
+    items: [] as TableItem[],
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
@@ -48,7 +56,11 @@ const getProjectItems = async () => {
         const response = await userPageStore.listProjects({
             user_id: state.selectedUser.user_id,
         });
-        state.items = response.map((k) => ({ project_id: k.project_id, name: k.name, date: k.created_at }));
+        state.items = response.map((k) => ({
+            project_id: k.project_id,
+            name: k.name,
+            date: k.created_at,
+        }));
     } catch (e) {
         state.items = [];
     } finally {
@@ -62,7 +74,10 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         await getProjectItems();
     } else {
         // TODO: will be changed to array
-        state.items = Object.entries(state.selectedUser.tags || {}).map(([k, v]) => ({ key: k, value: v }));
+        state.items = Object.entries(state.selectedUser.tags || {}).map(([k, v]) => ({
+            key: k,
+            value: v,
+        }));
     }
 }, { immediate: true });
 </script>
