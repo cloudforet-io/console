@@ -62,7 +62,6 @@ const state = reactive({
     projectId: computed(() => state.item.project_info?.project_id),
     deleteModalVisible: false,
     isManagedTrustedAccount: computed(() => state.item.tags?.is_managed === 'true'),
-    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
 /* Api */
@@ -71,13 +70,11 @@ const getAccount = async (serviceAccountId: string) => {
     try {
         if (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
             state.item = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 trusted_account_id: serviceAccountId,
                 workspace_id: undefined,
             });
         } else {
             state.item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 service_account_id: serviceAccountId,
             });
         }

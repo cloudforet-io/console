@@ -16,11 +16,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 let lastLoadedTime = 0;
 
-const getProjectGroup = async (projectGroupId?: string, domainId?: string): Promise<ProjectGroupModel|undefined> => {
+const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupModel|undefined> => {
     if (!projectGroupId) return undefined;
     try {
         return await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
-            domain_id: domainId, // TODO: remove domain_id after backend is ready
             project_group_id: projectGroupId,
         });
     } catch (e) {
@@ -28,7 +27,7 @@ const getProjectGroup = async (projectGroupId?: string, domainId?: string): Prom
         return undefined;
     }
 };
-export const load: Action<ProjectGroupReferenceState, any> = async ({ state, commit, rootState }, options: ReferenceLoadOptions): Promise<void|Error> => {
+export const load: Action<ProjectGroupReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -39,7 +38,6 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
 
     try {
         const response = await SpaceConnector.clientV2.identity.projectGroup.list<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>({
-            domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['project_group_id', 'name', 'parent_group_id', 'workspace_id'],
             },
@@ -47,8 +45,8 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
         const projectGroups: ProjectGroupReferenceMap = {};
 
         // eslint-disable-next-line no-restricted-syntax
-        for await (const projectGroupInfo of response.results) {
-            const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id, rootState.domain.domainId);
+        for await (const projectGroupInfo of response?.results ?? []) {
+            const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id);
             projectGroups[projectGroupInfo.project_group_id] = {
                 key: projectGroupInfo.project_group_id,
                 label: (parentGroup)
@@ -70,8 +68,8 @@ export const load: Action<ProjectGroupReferenceState, any> = async ({ state, com
     }
 };
 
-export const sync: Action<ProjectGroupReferenceState, any> = async ({ state, commit, rootState }, projectGroupInfo: ProjectGroupModel): void => {
-    const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id, rootState.domain.domainId);
+export const sync: Action<ProjectGroupReferenceState, any> = async ({ state, commit }, projectGroupInfo: ProjectGroupModel): void => {
+    const parentGroup = await getProjectGroup(projectGroupInfo.parent_group_id);
     const projectGroups: ProjectGroupReferenceMap = {
         ...state.items,
         [projectGroupInfo.project_group_id]: {

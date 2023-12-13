@@ -63,7 +63,6 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
             if (!_providerSchemaMap.value[provider]) {
                 try {
                     const res = await SpaceConnector.clientV2.identity.schema.list<SchemaListParameters, ListResponse<SchemaModel>>({
-                        domainId: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                         provider,
                         workspace_id: undefined,
                     });

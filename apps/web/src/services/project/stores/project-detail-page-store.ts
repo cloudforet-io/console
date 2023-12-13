@@ -9,7 +9,6 @@ import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/g
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
 import type { AlertState } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
 
 import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -52,7 +51,6 @@ export const useProjectDetailPageStore = defineStore('project-detail-page', () =
         try {
             state.loading = true;
             state.currentProject = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-                domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
                 project_id: projectId || state.projectId,
             });
         } catch (e) {

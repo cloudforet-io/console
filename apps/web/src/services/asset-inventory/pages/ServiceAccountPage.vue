@@ -69,7 +69,6 @@ const state = reactive({
     selectedProvider: undefined,
     selectedProviderName: computed(() => state.providers[state.selectedProvider]?.label),
     timezone: computed(() => store.state.user.timezone || 'UTC'),
-    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
 /** States for Dynamic Layout(search table type) * */
@@ -145,13 +144,11 @@ const listServiceAccountData = async () => {
         let res: ListResponse<TrustedAccountModel> | ListResponse<ServiceAccountModel>;
         if (tableState.isTrustedAccount) {
             res = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 query: getQuery(ACCOUNT_TYPE.TRUSTED),
                 workspace_id: undefined,
             });
         } else {
             res = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 query: getQuery(ACCOUNT_TYPE.GENERAL),
             });
         }

@@ -133,8 +133,7 @@ const projectDeleteFormConfirm = async () => {
     formState.modalLoading = true;
     try {
         await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
-            project_id: projectDetailPageState.projectId,
+            project_id: projectDetailPageState.projectId as string,
         });
         // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');

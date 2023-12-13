@@ -17,11 +17,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 let lastLoadedTime = 0;
 
-const getProjectGroup = async (projectGroupId?: string, domainId?: string): Promise<ProjectGroupModel|undefined> => {
+const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupModel|undefined> => {
     if (!projectGroupId) return undefined;
     try {
         return await SpaceConnector.clientV2.identity.projectGroup.get<ProjectGroupGetParameters, ProjectGroupModel>({
-            domain_id: domainId, // TODO: remove domain_id after backend is ready
             project_group_id: projectGroupId,
         });
     } catch (e) {
@@ -29,7 +28,7 @@ const getProjectGroup = async (projectGroupId?: string, domainId?: string): Prom
         return undefined;
     }
 };
-export const load: Action<ProjectReferenceState, any> = async ({ state, commit, rootState }, options: ReferenceLoadOptions): Promise<void|Error> => {
+export const load: Action<ProjectReferenceState, any> = async ({ state, commit }, options: ReferenceLoadOptions): Promise<void|Error> => {
     const currentTime = new Date().getTime();
 
     if (
@@ -40,7 +39,6 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit, 
 
     try {
         const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
-            domain_id: rootState.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 only: ['project_id', 'name', 'project_group_id', 'workspace_id'],
             },
@@ -49,7 +47,7 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit, 
 
         // eslint-disable-next-line no-restricted-syntax
         for await (const projectInfo of results || []) {
-            const projectGroup = await getProjectGroup(projectInfo.project_group_id, rootState.domain.domainId);
+            const projectGroup = await getProjectGroup(projectInfo.project_group_id);
             projects[projectInfo.project_id] = {
                 key: projectInfo.project_id,
                 label: (projectGroup)
@@ -71,8 +69,8 @@ export const load: Action<ProjectReferenceState, any> = async ({ state, commit, 
     }
 };
 
-export const sync: Action<ProjectReferenceState, any> = async ({ state, commit, rootState }, projectInfo): Promise<void> => {
-    const projectGroup = await getProjectGroup(projectInfo.project_group_id, rootState.domain.domainId);
+export const sync: Action<ProjectReferenceState, any> = async ({ state, commit }, projectInfo): Promise<void> => {
+    const projectGroup = await getProjectGroup(projectInfo.project_group_id);
     const projects: ProjectReferenceMap = {
         ...state.items,
         [projectInfo.project_id]: {

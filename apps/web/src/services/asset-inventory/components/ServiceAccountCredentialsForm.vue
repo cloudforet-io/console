@@ -87,7 +87,6 @@ const state = reactive({
         return `https://cloudforet.io/${lang}docs/guides/asset-inventory/service-account/`;
     }),
     baseInformationSchema: computed<JsonSchema|undefined>(() => storeState.generalAccountSchema?.schema),
-    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 const formState = reactive({
     hasCredentialKey: true,
@@ -155,7 +154,6 @@ const listTrustAccounts = async () => {
         const getQuery = () => apiQueryHelper
             .setFilters([{ k: 'workspace_id', v: [workspaceStore.getters.currentWorkspaceId ?? '', null], o: '=' }]);
         const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             query: getQuery().data,
             workspace_id: undefined,
         });
@@ -234,7 +232,6 @@ const getSecretSchema = async (isTrustingSchema:boolean) => {
     ]);
     try {
         const result = await SpaceConnector.clientV2.identity.schema.list<SchemaListParameters, ListResponse<SchemaModel>>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             query: schemaApiQueryHelper.data,
             workspace_id: undefined,
         });

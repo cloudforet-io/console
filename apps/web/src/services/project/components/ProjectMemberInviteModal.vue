@@ -16,7 +16,6 @@ import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/g
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -81,9 +80,7 @@ const {
 /* Util */
 const fetchWorkspaceUsers = async () => {
     try {
-        const response = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-            domain_id: store.state.domain.domainId,
-        });
+        const response = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
         state.workSpaceUserList = response.results ?? [];
     } catch (e) {
         state.workSpaceUserList = [];
@@ -97,7 +94,6 @@ const addMember = async () => {
         const params: ProjectAddUsersParameters = {
             project_id: props.projectId,
             users: selectedUserItems.value.map((d) => d.name),
-            domain_id: store.state.domain.domainId,
         };
         await SpaceConnector.clientV2.identity.project.addUsers(params);
         showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '');
@@ -109,7 +105,6 @@ const getProjectUserData = async () => {
     try {
         const params: ProjectGetParameters = {
             project_id: props.projectId,
-            domain_id: store.state.domain.domainId,
         };
         const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get(params);
         state.projectUserIdList = res.users ?? [];

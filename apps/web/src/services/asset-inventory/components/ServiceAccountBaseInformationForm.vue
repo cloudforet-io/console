@@ -11,7 +11,6 @@ import type { ServiceAccountListParameters } from '@/schema/identity/service-acc
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
 import type { AccountType } from '@/schema/identity/service-account/type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
@@ -77,7 +76,6 @@ const state = reactive({
         && ((props.accountType === ACCOUNT_TYPE.TRUSTED) ? true : state.isProjectFormValid)
         && state.isTagsValid
         && (isEmpty(props.schema) ? true : state.isCustomSchemaFormValid))),
-    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
 /* Util */
@@ -92,7 +90,6 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
 /* Api */
 const listServiceAccounts = async () => {
     const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-        domain_id: state.domainId, // TODO: remove domain_id after backend is ready
         query: {
             only: ['name'],
         },

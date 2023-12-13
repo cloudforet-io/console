@@ -11,7 +11,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -73,7 +72,6 @@ const changeOrder = (targetData, clickedData, tempOrder) => {
 const getProject = async () => {
     try {
         state.project = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_id: props.projectId,
         });
     } catch (e) {
