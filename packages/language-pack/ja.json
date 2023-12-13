@@ -1692,6 +1692,7 @@
 			},
 			"EDIT": "編集",
 			"FORM": {
+				"ACCESS": "",
 				"ALL": "全体",
 				"ALT_E_CREATE_ROLE": "ロール作成失敗",
 				"ALT_E_UPDATE_ROLE": "ロール変更失敗",
@@ -1700,6 +1701,9 @@
 				"CANCEL": "キャンセル",
 				"CREATE": "作成",
 				"CREATE_TITLE": "ロール作成",
+				"DESC_ADMIN": "",
+				"DESC_WORKSPACE_MEMBER": "",
+				"DESC_WORKSPACE_OWNER": "",
 				"EDIT_TITLE": "ロール修正",
 				"MANAGE": "Manage",
 				"MENU": "メニュー",
