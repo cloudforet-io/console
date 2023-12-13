@@ -38,7 +38,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         visible: {
             scheduleModal: false,
         },
-
+        scheduleModalMode: 'view',
     }),
     getters: {
         allFilters: (state): ConsoleFilter[] => {

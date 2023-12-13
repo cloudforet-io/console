@@ -8,6 +8,8 @@ import {
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -35,6 +37,8 @@ const collectorPageState = collectorPageStore.$state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorFormStore = useCollectorFormStore();
 
+const appContextStore = useAppContextStore();
+
 const state = reactive({
     plugin: computed<{name?: string; version: string}|null>(() => {
         const plugin = props.item.plugin;
@@ -46,6 +50,12 @@ const state = reactive({
         return props.item.recentJobAnalyze?.filter((rj) => rj.job_id === collectorPageStore.recentJobForAllAccounts?.job_id)[0];
     }),
     isScheduleActivated: false,
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isScheduleEditable: computed(() => {
+        if (state.isAdminMode) return true;
+        if (props.item.workspaceId === '*') return false;
+        return true;
+    }),
 });
 
 const handleChangeToggle = async () => {
@@ -93,7 +103,7 @@ watch(() => props.item.schedule, (schedule) => {
             <div class="collector-item-wrapper">
                 <div class="collector-title-wrapper">
                     <span class="collector-item-name">{{ props.item.name }}</span>
-                    <div v-if="props.item.workspaceId === '*'"
+                    <div v-if="props.item.workspaceId === '*' && !state.isAdminMode"
                          class="managed-item-label"
                     >
                         {{ $t('INVENTORY.COLLECTOR.MAIN.MANAGED_ITEM_LABEL') }}
@@ -125,6 +135,7 @@ watch(() => props.item.schedule, (schedule) => {
                     </div>
                     <collector-item-schedule :collector-id="props.item.collectorId"
                                              :is-schedule-activated="state.isScheduleActivated"
+                                             :mode="state.isScheduleEditable ? 'edit' : 'view'"
                                              @change-toggle="handleChangeToggle"
                     />
                 </div>

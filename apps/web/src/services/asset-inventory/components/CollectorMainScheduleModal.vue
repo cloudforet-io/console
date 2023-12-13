@@ -1,22 +1,28 @@
 <template>
     <p-button-modal class="collector-schedule-modal"
-                    :header-title="$t('INVENTORY.COLLECTOR.MAIN.COLLECTOR_SCHEDULE')"
+                    :header-title="state.isViewMode ? $t('INVENTORY.COLLECTOR.MAIN.VIEW_SCHEDULE_MODAL_TITLE') : $t('INVENTORY.COLLECTOR.MAIN.COLLECTOR_SCHEDULE')"
                     size="md"
                     fade
                     backdrop
                     :visible="collectorPageState.visible.scheduleModal"
+                    :hide-footer-close-button="state.isViewMode"
                     @close="handleCloseModal"
                     @cancel="handleCloseModal"
                     @confirm="handleConfirm"
     >
         <template #body>
-            <collector-schedule-form />
+            <collector-schedule-form :readonly="state.isViewMode" />
+        </template>
+        <template v-if="state.isViewMode"
+                  #confirm-button
+        >
+            {{ $t('APP.MAIN.OK') }}
         </template>
     </p-button-modal>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
@@ -39,13 +45,26 @@ const collectorFormState = collectorFormStore.$state;
 
 const emit = defineEmits<{(e: 'refresh-collector-list'): void}>();
 
+const state = reactive({
+    isViewMode: computed(() => collectorPageState.scheduleModalMode === 'view'),
+});
+
 /* Components */
-const handleCloseModal = () => {
+
+const closeScheduleModal = () => {
     collectorPageStore.$patch((_state) => {
         _state.visible.scheduleModal = false;
     });
 };
+
+const handleCloseModal = () => {
+    closeScheduleModal();
+};
 const handleConfirm = async () => {
+    if (state.isViewMode) {
+        closeScheduleModal();
+        return;
+    }
     try {
         await fetchCollectorUpdate();
         handleCloseModal();

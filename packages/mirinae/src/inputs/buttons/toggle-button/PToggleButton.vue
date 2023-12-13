@@ -1,8 +1,9 @@
 <template>
     <label class="p-toggle-button"
-           :class="[props.position, props.spacing, {'disabled': props.disabled, 'is-active': state.proxyValue}]"
+           :class="[props.position, props.spacing, {'disabled': props.disabled, 'read-only': props.readOnly, 'is-active': state.proxyValue}]"
     >
-        <input role="switch"
+        <input v-if="!props.readOnly"
+               role="switch"
                type="checkbox"
                class="slider"
                :disabled="props.disabled"
@@ -12,7 +13,7 @@
         <span v-if="props.showStateText"
               class="state-text"
         >
-            {{ state.proxyValue ? 'ON' : 'OFF' }}
+            {{ state.proxyValue ? props.trueStateText : props.falseStateText }}
         </span>
 
     </label>
@@ -27,6 +28,9 @@ interface ToggleButtonProps {
     value: boolean,
     disabled?: boolean,
     showStateText?: boolean,
+    trueStateText?: string,
+    falseStateText?: string,
+    readOnly?: boolean,
     spacing?: 'sm' | 'md' | 'space-between',
     position?: 'left' | 'right',
 }
@@ -34,6 +38,9 @@ const props = withDefaults(defineProps<ToggleButtonProps>(), {
     value: false,
     disabled: false,
     showStateText: false,
+    trueStateText: 'ON',
+    falseStateText: 'OFF',
+    readOnly: false,
     position: 'right',
     spacing: 'sm',
 });
@@ -133,6 +140,13 @@ const handleChangeToggle = () => {
 
         .state-text {
             @apply opacity-50;
+        }
+    }
+
+    &.read-only {
+        cursor: default;
+        .slider {
+            @apply bg-gray-200 cursor-not-allowed;
         }
     }
 }

@@ -12,6 +12,7 @@
 		"MAIN": {
 			"CLOSE": "Close",
 			"NO": "No",
+			"OK": "OK",
 			"YES": "Yes"
 		},
 		"MODAL": {
@@ -2377,7 +2378,9 @@
 				"SET_SCHEDULE": "Set",
 				"TIMEZONE": "Time Zone",
 				"TITLE": "Collector",
-				"VIEW_HISTORY_DETAIL": "View history details"
+				"VIEW_HISTORY_DETAIL": "View history details",
+				"VIEW_SCHEDULE": "View",
+				"VIEW_SCHEDULE_MODAL_TITLE": "View Schedule"
 			},
 			"NO_DATA": "No Data",
 			"NO_JOB": "No recent jobs",

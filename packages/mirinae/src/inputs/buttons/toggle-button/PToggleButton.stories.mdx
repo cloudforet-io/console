@@ -24,6 +24,9 @@ export const Template = (args, { argTypes }) => ({
                 :style-type="styleType"
                 :disabled="disabled"
                 :show-state-text="showStateText"
+                :true-state-text="trueStateText"
+                :false-state-text="falseStateText"
+                :read-only="readOnly"
                 :spacing="spacing"
                 :position="position"
             />
@@ -159,6 +162,33 @@ export const Template = (args, { argTypes }) => ({
                             show-state-text
                             :value="true"
                             :disabled="true"
+                        />
+                    </div>
+                </div>
+            `
+        }}
+    </Story>
+</Canvas>
+
+## Read Only
+<Canvas>
+    <Story name="toggle button read only">
+        {{
+            components: { PToggleButton },
+            template: `
+                <div class="flex flex-col items-center gap-6">
+                    <div class="flex">
+                        <p-toggle-button
+                            show-state-text
+                            :value="false"
+                            read-only
+                        />
+                    </div>
+                    <div class="flex">
+                        <p-toggle-button
+                            show-state-text
+                            :value="true"
+                            read-only
                         />
                     </div>
                 </div>
