@@ -16,6 +16,8 @@ const PolicyPage = () => import('@/services/administration/pages/PolicyPage.vue'
 const PolicyCreatePage = () => import('@/services/administration/pages/PolicyCreatePage.vue');
 const PolicyDetailPage = () => import('@/services/administration/pages/PolicyDetailPage.vue');
 
+const DomainSettingsPage = () => import('@/services/administration/pages/admin/AdminDomainSettingsPage.vue');
+
 const adminAdministrationRoutes: RouteConfig = {
     path: 'administration',
     name: makeAdminRouteName(ADMINISTRATION_ROUTE._NAME),
@@ -101,13 +103,16 @@ const adminAdministrationRoutes: RouteConfig = {
             path: 'preference',
             name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE._NAME),
             meta: { menuId: MENU_ID.PREFERENCE },
+            redirect: () => ({
+                name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME),
+            }),
             component: { template: '<router-view />' },
             children: [
                 {
                     path: 'domain-settings',
                     name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME),
                     meta: { lnbVisible: true, menuId: MENU_ID.DOMAIN_SETTINGS },
-                    component: { template: '<router-view />' },
+                    component: DomainSettingsPage,
                 },
                 {
                     path: 'workspaces',
