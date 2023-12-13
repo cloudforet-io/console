@@ -1,8 +1,7 @@
-import type { PermissionGroup } from '@/schema/identity/role-binding/type';
+import type { ResourceGroupType } from '@/schema/_common/type';
 
 export interface RoleCreateParameters {
     user_id: string;
     role_id: string;
-    permission_group: PermissionGroup;
-    workspace_id?: string;
+    resource_group: ResourceGroupType;
 }

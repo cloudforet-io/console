@@ -6,7 +6,7 @@ import type { PagePermission } from '@/lib/access-control/config';
 export interface RoleCreateParameters {
     name: string;
     role_type: RoleType;
-    api_permissions?: string[];
-    page_permissions?: PagePermission[];
+    permission_scopes?: string[];
+    page_access?: PagePermission[];
     tags?: Tags;
 }

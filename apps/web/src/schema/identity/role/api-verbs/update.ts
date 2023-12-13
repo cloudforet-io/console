@@ -5,7 +5,7 @@ import type { PagePermission } from '@/lib/access-control/config';
 export interface RoleUpdateParameters {
     role_id: string;
     name?: string;
-    api_permissions?: string[];
-    page_permissions?: PagePermission[];
+    permission_scopes?: string[];
+    page_access?: PagePermission[];
     tags?: Tags;
 }
