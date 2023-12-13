@@ -21,7 +21,6 @@ interface MockRequestConfig extends CustomAxiosRequestConfig {
 }
 
 interface AfterCallApi {
-    // eslint-disable-next-line no-unused-vars
     (data?: any): Promise<void>|void
 }
 
@@ -224,19 +223,19 @@ export class SpaceConnector {
                     }
                 }
 
-                const response: AxiosPostResponse = await serviceApi.instance.post(url, params, axiosConfig);
+                const response: AxiosPostResponse|undefined = await serviceApi.instance.post(url, params, axiosConfig);
 
-                if (afterCall) afterCall(response.data);
+                if (afterCall) afterCall(response?.data ?? {});
 
-                return response.data;
+                return response?.data ?? {};
             };
         }
         return async (params: object = {}, config?: CustomAxiosRequestConfig): Promise<any> => {
-            const response: AxiosPostResponse = await serviceApi.instance.post(path, params, config);
+            const response: AxiosPostResponse|undefined = await serviceApi.instance.post(path, params, config);
 
-            if (afterCall) afterCall(response.data);
+            if (afterCall) afterCall(response?.data ?? {});
 
-            return response.data;
+            return response?.data ?? {};
         };
     }
 }

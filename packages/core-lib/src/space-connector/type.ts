@@ -44,11 +44,6 @@ interface PostResponse {
 
 export type AxiosPostResponse = AxiosResponse<PostResponse>;
 
-export interface ServerListResponse<T> {
-    results: T[];
-    total_count: number;
-}
-
 export type ApiFilterOperator =
     | 'lt' | 'lte' | 'gt' | 'gte' | 'exists' | 'regex'
     | 'eq' | 'contain' | 'not' | 'not_contain'

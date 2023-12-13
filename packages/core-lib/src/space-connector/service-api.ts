@@ -27,7 +27,7 @@ export default class ServiceAPI {
         this.setAxiosInterceptors();
     }
 
-    private handleRequestError = async (error: AxiosError): Promise<void> => {
+    private handleResponseError = async (error: AxiosError): Promise<void> => {
         switch (error.response?.status) {
         case 400: {
             throw new BadRequestError(error);
@@ -64,7 +64,7 @@ export default class ServiceAPI {
         // Axios's response interceptor with error handling
         this.instance.interceptors.response.use(
             (response: AxiosResponse) => response,
-            this.handleRequestError,
+            this.handleResponseError,
         );
     }
 }
