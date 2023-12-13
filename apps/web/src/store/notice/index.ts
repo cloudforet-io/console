@@ -33,27 +33,34 @@ export const useNoticeStore = defineStore('notice', () => {
         totalNoticeCount: 0,
     });
 
-    const boardId = ref<string|undefined>();
-    const evaluatingBoardId = ref(false);
-    const fetchNoticeBoardId = async () => {
+    const _boardId = ref<string|undefined>();
+    let _boardLoading = false;
+    let _boardErrorCount = 0;
+    const _fetchNoticeBoardId = async () => {
         try {
-            if (boardId.value) return;
-            if (evaluatingBoardId.value) return;
+            if (_boardId.value) return;
+            if (_boardLoading) return;
+            _boardLoading = true;
             const { results } = await SpaceConnector.clientV2.board.board.list<BoardListParameters, BoardListResponse>({
                 name: 'Notice',
             });
-            boardId.value = results?.[0]?.board_id;
+            _boardId.value = results?.[0]?.board_id;
+            _boardErrorCount = 0;
         } catch (e) {
             ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+            _boardErrorCount++;
+        } finally {
+            _boardLoading = false;
         }
     };
-
     const getters = reactive({
         userId: computed<string>(() => store.state.user.userId),
         boardId: asyncComputed<string|undefined>(async () => {
-            await fetchNoticeBoardId();
-            return boardId.value;
-        }, undefined, { evaluating: evaluatingBoardId }),
+            if (_boardLoading) return undefined;
+            if (_boardErrorCount > 5) return undefined;
+            if (!_boardId.value) await _fetchNoticeBoardId();
+            return _boardId.value;
+        }, undefined, { lazy: true }),
         isReadMap: computed<{ [key: string]: boolean }>(() => {
             const readMap = {};
             Object.keys(state.noticeConfigMap).forEach((postId) => {
@@ -82,8 +89,7 @@ export const useNoticeStore = defineStore('notice', () => {
 
     const actions = {
         fetchNoticeReadState: async () => {
-            await fetchNoticeBoardId();
-            if (!boardId.value) throw new Error('Notice board not found');
+            if (!getters.boardId) throw new Error('Notice board not found');
             const userConfigApiQuery = new ApiQueryHelper()
                 .setFilters([{
                     k: 'user_id',
@@ -92,7 +98,7 @@ export const useNoticeStore = defineStore('notice', () => {
                 },
                 {
                     k: 'name',
-                    v: `console:board:${boardId.value}:`,
+                    v: `console:board:${getters.boardId}:`,
                     o: '',
                 }])
                 .setOnly('data', 'user_id');
@@ -108,11 +114,10 @@ export const useNoticeStore = defineStore('notice', () => {
         },
         updateNoticeReadState: async (postId: string, showPopup?: boolean) => {
             try {
-                await fetchNoticeBoardId();
-                if (!boardId.value) throw new Error('Notice board not found');
+                if (!getters.boardId) throw new Error('Notice board not found');
                 const result = await SpaceConnector.client.config.userConfig.set({
                     user_id: store.state.user.userId,
-                    name: `console:board:${boardId.value}:${postId}`,
+                    name: `console:board:${getters.boardId}:${postId}`,
                     data: { is_read: true, show_popup: showPopup },
                 });
                 state.noticeConfigMap = { ...state.noticeConfigMap, [postId]: result.data };
@@ -122,10 +127,9 @@ export const useNoticeStore = defineStore('notice', () => {
         },
         fetchNoticeCount: async () => {
             try {
-                await fetchNoticeBoardId();
-                if (!boardId.value) throw new Error('Notice board not found');
+                if (!getters.boardId) throw new Error('Notice board not found');
                 const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-                    board_id: boardId.value,
+                    board_id: getters.boardId,
                     query: { only: ['post_id'] },
                     domain_id: null,
                 });

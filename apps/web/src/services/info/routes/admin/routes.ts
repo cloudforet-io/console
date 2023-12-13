@@ -42,13 +42,13 @@ const infoRoute: RouteConfig = {
                     path: ':postId',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE.DETAIL._NAME),
                     meta: {
-                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, label: ({ params }) => params.id, copiable: true,
+                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, label: ({ params }) => params.postId, copiable: true,
                     },
                     component: AdminNoticeDetailPage as any,
                     props: true,
                 },
                 {
-                    path: ':postId/update',
+                    path: 'update/:postId',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE.UPDATE._NAME),
                     meta: { translationId: 'INFO.NOTICE.FORM.EDIT_TITLE', lnbVisible: true },
                     component: AdminNoticeUpdatePage as any,

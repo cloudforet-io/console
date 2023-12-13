@@ -101,7 +101,6 @@ export default {
                 const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
                     board_id: notice.board_id,
                     post_id: notice.post_id,
-
                 });
                 return result.files;
             } catch (e) {
