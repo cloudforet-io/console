@@ -2,6 +2,8 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { FavoriteListParameters, FavoriteListResponse } from '@/schema/add-ons/favorite/list';
+
 import type { FavoriteConfig, FavoriteState, FavoriteType } from '@/store/modules/favorite/type';
 import {
     FAVORITE_TYPE,
@@ -87,13 +89,13 @@ export const load: Action<FavoriteState, any> = async ({ state, commit }, itemTy
     if (state.isLoading[itemType]) return;
     commit('setIsLoading', { ...state.isLoading, [itemType]: true });
     try {
-        const { results } = await SpaceConnector.client.addOns.favorite.list({
+        const { results } = await SpaceConnector.client.addOns.favorite.list<FavoriteListParameters, FavoriteListResponse>({
             type: itemType,
         });
-        const favorites: FavoriteConfig[] = results.map((d) => ({
+        const favorites: FavoriteConfig[] = results?.map((d) => ({
             itemType: d.data.type,
             itemId: d.data.id,
-        }));
+        })) ?? [];
         commit(setCommitsByItemType[itemType], favorites);
     } catch (e) {
         commit(setCommitsByItemType[itemType], []);

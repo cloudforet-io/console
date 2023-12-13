@@ -104,3 +104,9 @@ onBeforeMount(async () => {
         />
     </div>
 </template>
+
+<style scoped lang="postcss">
+.button-group {
+    @apply flex gap-2;
+}
+</style>
