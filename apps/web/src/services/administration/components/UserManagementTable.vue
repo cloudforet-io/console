@@ -26,8 +26,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
-    calculateTime, userStateFormatter, userMfaFormatter, userRoleFormatter,
-} from '@/services/administration/composables/refined-user-data';
+    calculateTime, userStateFormatter, userMfaFormatter, useRoleFormatter,
+} from '@/services/administration/composables/refined-table-data';
 import {
     USER_SEARCH_HANDLERS, USER_TABLE_FIELDS,
 } from '@/services/administration/constants/user-table-constant';
@@ -147,11 +147,11 @@ const handleChange = async (options: any = {}) => {
             </template>
             <template #col-role_type-format="{value}">
                 <span class="role-type">
-                    <img :src="userRoleFormatter(value).image"
+                    <img :src="useRoleFormatter(value).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ userRoleFormatter(value, true).name }}</span>
+                    <span>{{ useRoleFormatter(value, true).name }}</span>
                 </span>
             </template>
             <template #col-last_accessed_at-format="{ value }">

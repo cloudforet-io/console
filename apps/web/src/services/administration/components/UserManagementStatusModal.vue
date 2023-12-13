@@ -20,7 +20,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
+import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import { USER_STATUS_TABLE_FIELDS } from '@/services/administration/constants/user-table-constant';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';

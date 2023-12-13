@@ -12,7 +12,7 @@ import { i18n } from '@/translations';
 
 import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
 import UserManagementTabPanels from '@/services/administration/components/UserManagementTabPanels.vue';
-import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
+import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import { USER_TAB_TABLE_FIELDS, USER_TABS } from '@/services/administration/constants/user-tab-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 

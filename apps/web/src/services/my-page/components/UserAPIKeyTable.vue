@@ -30,7 +30,7 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/composables/refined-user-data';
+import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import UserAPIKeyModal from '@/services/my-page/components/UserAPIKeyModal.vue';
 
 type CheckModalMode = 'enable' | 'disable' | 'delete';
