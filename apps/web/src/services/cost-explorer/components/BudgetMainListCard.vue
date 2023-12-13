@@ -10,7 +10,6 @@ import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usa
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -19,6 +18,7 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
@@ -37,7 +37,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
-const workspaceStore = useWorkspaceStore();
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     costDataSource: computed(() => allReferenceStore.getters.costDataSource),
@@ -46,6 +45,7 @@ const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
     linkLocation: computed<Location>(() => ({
@@ -55,17 +55,19 @@ const state = reactive({
         },
     })),
     isProject: computed(() => !!props.budgetUsage.project_id),
-    targetList: computed<string[]>(() => {
+    targetLabelList: computed<string[]>(() => {
+        const targetId = props.budgetUsage.project_id ?? props.budgetUsage.workspace_id;
+        if (!targetId) return [];
+
         const targetNameList: string[] = [];
         if (props.budgetUsage.project_id) { // for project
-            const targetId = props.budgetUsage.project_id;
             const targetProject: ProjectReferenceItem|undefined = storeState.projects[targetId];
             if (targetProject?.data?.groupInfo?.name) targetNameList.push(targetProject.data.groupInfo.name);
             targetNameList.push(targetProject?.name ?? targetId);
         } else if (props.budgetUsage.workspace_id) { // for workspace
-            const targetWorkspace = workspaceStore.getters.currentWorkspace;
+            const targetWorkspace = storeState.workspaces[targetId];
             if (targetWorkspace) {
-                targetNameList.push(targetWorkspace.name ?? targetWorkspace.workspace_id);
+                targetNameList.push(targetWorkspace?.name ?? targetId);
             }
         }
         return targetNameList;
@@ -125,12 +127,12 @@ const state = reactive({
         <div class="card-header">
             <div class="left-part">
                 <div class="flex items-center mb-1">
-                    <span v-for="(targetName, index) in state.targetList"
+                    <span v-for="(targetName, index) in state.targetLabelList"
                           :key="`${targetName}-${index}`"
                           class="target-info"
-                          :class="{target: index === state.targetList.length - 1}"
+                          :class="{target: index === state.targetLabelList.length - 1}"
                     >
-                        <p-i v-if="state.isProject && index === state.targetList.length - 1"
+                        <p-i v-if="state.isProject && index === state.targetLabelList.length - 1"
                              name="ic_document-filled"
                              color="inherit"
                              width="1em"
@@ -138,7 +140,7 @@ const state = reactive({
                              class="mr-1"
                         />
                         {{ targetName }}
-                        <p-i v-if="index < state.targetList.length - 1"
+                        <p-i v-if="index < state.targetLabelList.length - 1"
                              name="ic_chevron-right-thin"
                              width="1em"
                              height="1em"
