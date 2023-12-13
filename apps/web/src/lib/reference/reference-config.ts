@@ -76,4 +76,9 @@ export const REFERENCE_TYPE_INFO = {
         name: 'Query Set',
         resourceType: 'inventory.CloudServiceQuerySet',
     },
+    workspace: {
+        type: 'workspace',
+        key: 'workspace_id',
+        name: 'Workspace',
+    },
 } as const;
