@@ -8,3 +8,9 @@ export interface PageAccessMenuItem {
     hideMenu: boolean;
     subMenuList?: PageAccessMenuItem[];
 }
+
+export type UpdateFormDataType = {
+    id: string;
+    key: string;
+    val: boolean;
+};

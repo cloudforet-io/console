@@ -3,23 +3,17 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PHeading } from '@spaceone/design-system';
-
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
 import type { RoleModel } from '@/schema/identity/role/model';
-import type { Policy } from '@/schema/identity/role/type';
-import { i18n } from '@/translations';
+import type { Policy, RoleType } from '@/schema/identity/role/type';
 
 import type { PagePermission } from '@/lib/access-control/config';
 
-import { useFormValidator } from '@/common/composables/form-validator';
-
-import PolicyListDataTable from '@/services/administration/components/PolicyListDataTable.vue';
-import RoleUpdatePageAccessForm from '@/services/administration/components/RoleUpdatePageAccessForm.vue';
-import RoleUpdatePageBaseInformation from '@/services/administration/components/RoleUpdatePageBaseInformation.vue';
+import RoleUpdateFormBaseInformation from '@/services/administration/components/RoleUpdateFormBaseInformation.vue';
+import RoleUpdateFormPermissionForm from '@/services/administration/components/RoleUpdateFormPermissionForm.vue';
+import RoleUpdateFormRoleType from '@/services/administration/components/RoleUpdateFormRoleType.vue';
 import { FORM_TYPE } from '@/services/administration/constants/role-constant';
-import type { BaseInfoFormData } from '@/services/administration/types/role-form-type';
 
 interface Props {
     initialRoleData?: RoleModel;
@@ -37,24 +31,22 @@ const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
 
 const state = reactive({
     isBaseInformationValid: false,
-    baseInfoFormData: {} as BaseInfoFormData,
+    baseInfoFormData: '' as string,
+    roleTypeData: '' as RoleType,
     pageAccessFormData: [] as PagePermission[],
     initialSelectedPolicyList: [] as Policy[],
-    isAllValid: computed<boolean>(() => isPolicySectionValid.value && state.isBaseInformationValid),
+    isAllValid: computed<boolean>(() => state.isBaseInformationValid),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
         const baseData = {
-            name: state.baseInfoFormData.roleName.trim(),
+            name: state.baseInfoFormData.trim(),
             // TODO: will be check after api is merged
             api_permissions: [],
             page_permissions: state.pageAccessFormData,
-            tags: {
-                description: state.baseInfoFormData.roleDescription,
-            },
         };
         return props.formType === FORM_TYPE.CREATE
             ? {
                 ...baseData,
-                role_type: state.baseInfoFormData.roleType,
+                role_type: state.roleTypeData,
             }
             : {
                 ...baseData,
@@ -63,28 +55,34 @@ const state = reactive({
     }),
 });
 
-const {
-    forms: {
-        selectedApiPermissionList,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-    isAllValid: isPolicySectionValid,
-} = useFormValidator({
-    selectedApiPermissionList: [] as string[],
-}, {
-    selectedApiPermissionList(val: string[]) {
-        if (!val.length) return i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY');
-        return true;
-    },
-});
-
-const handleUpdatePolicy = (value) => { setForm('selectedApiPermissionList', value); };
+// TODO: will be updated after api is merged
+// const {
+//     forms: {
+//         selectedApiPermissionList,
+//     },
+//     setForm,
+//     invalidState,
+//     invalidTexts,
+//     isAllValid: isPolicySectionValid,
+// } = useFormValidator({
+//     selectedApiPermissionList: [] as string[],
+// }, {
+//     selectedApiPermissionList(val: string[]) {
+//         if (!val.length) return i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY');
+//         return true;
+//     },
+// });
+//
+// const handleUpdatePolicy = (value) => { setForm('selectedApiPermissionList', value); };
 const handleBaseInfoValidate = (value: boolean) => {
     state.isBaseInformationValid = value;
 };
-const handleUpdateBaseInfoForm = (value) => { state.baseInfoFormData = value; };
+const handleUpdateBaseInformation = (value: string) => {
+    state.baseInfoFormData = value;
+};
+const handleUpdateUserType = (value: RoleType) => {
+    state.roleTypeData = value;
+};
 const handleUpdatePageAccessForm = (value) => { state.pageAccessFormData = value; };
 
 watch(() => state.isAllValid, (after) => {
@@ -96,54 +94,29 @@ watch(() => state.formData, (after) => {
 watch(() => props.initialRoleData, (initialRoleData) => {
     const isObjectEmpty = !Object.keys(initialRoleData).length;
     if (isObjectEmpty) return;
-    state.baseInfoFormData = {
-        roleName: initialRoleData?.name,
-        roleDescription: initialRoleData?.tags?.description,
-        roleType: initialRoleData?.role_type,
-    };
-    state.pageAccessFormData = props.initialRoleData?.page_permissions;
-    if (initialRoleData?.api_permissions?.length) {
-        state.initialSelectedPolicyList = initialRoleData.api_permissions;
-        setForm('selectedApiPermissionList', initialRoleData.api_permissions);
+    state.baseInfoFormData = initialRoleData?.name;
+    state.roleTypeData = initialRoleData?.role_type;
+    state.pageAccessFormData = props.initialRoleData?.permission_scopes;
+    if (initialRoleData?.permission_scopes?.length) {
+        state.initialSelectedPolicyList = initialRoleData.permission_scopes;
+        // setForm('selectedApiPermissionList', initialRoleData.permission_scopes);
     }
 });
 </script>
 
 <template>
     <div class="role-update-form">
-        <role-update-page-base-information :initial-form-data="state.baseInfoFormData"
-                                           :role-type-input-disabled="props.formType===FORM_TYPE.UPDATE"
+        <role-update-form-base-information :initial-data="state.baseInfoFormData"
                                            @update-validation="handleBaseInfoValidate"
-                                           @update-form="handleUpdateBaseInfoForm"
+                                           @update-form="handleUpdateBaseInformation"
         />
-        <role-update-page-access-form :initial-page-permissions="state.pageAccessFormData"
-                                      :role-type="state.baseInfoFormData.roleType"
-                                      @update-form="handleUpdatePageAccessForm"
+        <role-update-form-role-type :initial-data="state.roleTypeData"
+                                    @update-form="handleUpdateUserType"
         />
-        <policy-list-data-table class="policy-list-data-table"
-                                :initial-policy-list="state.initialSelectedPolicyList"
-                                :selectable="true"
-                                @update-selected-policy-list="handleUpdatePolicy"
-        >
-            <template #panel-top>
-                <p-heading heading-type="sub"
-                           :title="$t('IAM.ROLE.DETAIL.API_POLICY')"
-                >
-                    <template #extra>
-                        <span class="selected-count">({{ selectedApiPermissionList.length }} {{ $t('IAM.ROLE.FORM.SELECTED') }})</span>
-                    </template>
-                </p-heading>
-            </template>
-            <template #toolbox-table-bottom>
-                <div class="help-text-wrapper">
-                    <p v-if="invalidState.selectedApiPermissionList"
-                       class="policy-list-invalid-text"
-                    >
-                        {{ invalidTexts.selectedApiPermissionList }}
-                    </p>
-                </div>
-            </template>
-        </policy-list-data-table>
+        <role-update-form-permission-form :initial-page-permissions="state.pageAccessFormData"
+                                          :role-type="state.roleTypeData"
+                                          @update-form="handleUpdatePageAccessForm"
+        />
     </div>
 </template>
 
