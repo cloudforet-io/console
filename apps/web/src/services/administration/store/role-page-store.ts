@@ -3,11 +3,14 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleDeleteParameters } from '@/schema/identity/role/api-verbs/delete';
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
@@ -30,7 +33,12 @@ export const useRolePageStore = defineStore('role-page', {
         selectedIndices: [],
     }),
     getters: {
-        selectedRoles: (state) => state.selectedIndices.map((d) => state.roles[d]) || [],
+        selectedRoles: (state) => state.selectedIndices.reduce((refined: RoleModel[], idx: number) => {
+            if (state.roles[idx].role_type !== ROLE_TYPE.SYSTEM_ADMIN) {
+                refined.push(state.roles[idx]);
+            }
+            return refined;
+        }, []),
     },
     actions: {
         async listRoles(params: RoleListParameters) {
@@ -84,6 +92,16 @@ export const useRolePageStore = defineStore('role-page', {
                 });
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
+                throw e;
+            }
+        },
+        //
+        async listRoleBindings(params: RoleBindingListParameters) {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>(params);
+                return results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
                 throw e;
             }
         },

@@ -1,24 +1,25 @@
 <script lang="ts" setup>
-import {
-    onUnmounted, reactive,
-} from 'vue';
+import { onUnmounted } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PHeading,
+    PHorizontalLayout, PHeading, PButton,
 } from '@spaceone/design-system';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import RoleManagementTab from '@/services/administration/components/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/administration/components/RoleManagementTable.vue';
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-});
+const router = useRouter();
+
+/* Component */
+const handleCreateRole = () => {
+    router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME });
+};
 
 onUnmounted(() => {
     rolePageStore.$dispose();
@@ -33,12 +34,19 @@ onUnmounted(() => {
                    use-total-count
                    :total-count="rolePageState.totalCount"
                    :selected-count="rolePageState.selectedIndices.length"
-        />
+        >
+            <template #extra>
+                <p-button style-type="primary"
+                          icon-left="ic_plus_bold"
+                          @click="handleCreateRole"
+                >
+                    {{ $t('IAM.ROLE.CREATE') }}
+                </p-button>
+            </template>
+        </p-heading>
         <p-horizontal-layout class="role-toolbox-layout">
             <template #container="{ height }">
-                <role-management-table :table-height="height"
-                                       :manage-disabled="!state.hasManagePermission"
-                />
+                <role-management-table :table-height="height" />
             </template>
         </p-horizontal-layout>
         <role-management-tab />
