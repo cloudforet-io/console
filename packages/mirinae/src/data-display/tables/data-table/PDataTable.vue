@@ -416,10 +416,7 @@ export default defineComponent<DataTableProps>({
             item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
         });
 
-        const getSelectedState = (item, index) => {
-            if (props.getRowSelectable) return props.getRowSelectable(item, index);
-            return props.multiSelect ? proxyState.proxySelectIndex.some((d) => index === d) : proxyState.proxySelectIndex[0] === index;
-        };
+        const getSelectedState = (item, index) => (props.multiSelect ? proxyState.proxySelectIndex.some((d) => index === d) : proxyState.proxySelectIndex[0] === index);
 
         const checkboxToggle = (item, index) => {
             const newSelected = [...proxyState.proxySelectIndex];
