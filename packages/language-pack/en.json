@@ -1611,6 +1611,14 @@
 	"IAM": {
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin email",
+			"ALT_E_UPDATE_ADMIN_EMAIL": "Failed to update admin email",
+			"ALT_E_UPDATE_BRAND_ASSETS": "Failed to update brand assets",
+			"ALT_E_UPDATE_DISPLAY_NAME": "Failed to update display name",
+			"ALT_E_UPDATE_TIMEZONE_AND_LANGUAGE": "Failed to update timezone and language",
+			"ALT_S_UPDATE_ADMIN_EMAIL": "Admin email successfully updated",
+			"ALT_S_UPDATE_BRAND_ASSETS": "Brand assets successfully updated",
+			"ALT_S_UPDATE_DISPLAY_NAME": "Display name successfully updated",
+			"ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE": "Timezone and language successfully updated",
 			"BASE_INFORMATION": "Base Information",
 			"BRAND_ASSETS": "Brand Assets",
 			"CHANGE": "Change",

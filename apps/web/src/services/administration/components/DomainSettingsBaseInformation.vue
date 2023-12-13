@@ -6,26 +6,58 @@ import {
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DomainSettingsChangeAdminEmailModal
     from '@/services/administration/components/DomainSettingsChangeAdminEmailModal.vue';
 
 
+const domainConfigStore = useDomainConfigStore();
+const domainConfigGetters = domainConfigStore.getters;
 const storeState = reactive({
     domainId: computed<string>(() => store.state.domain.domainId),
     domainName: computed<string>(() => store.state.domain.name),
 });
 const state = reactive({
-    displayName: '',
-    adminEmail: '', // TODO: get admin email from API after backend is ready
-    isDisplayNameChanged: false,
+    displayName: undefined as string | undefined,
+    adminEmail: undefined as string | undefined,
+    isDisplayNameChanged: computed<boolean>(() => {
+        if (!state.displayName && !domainConfigGetters.displayName) return false;
+        return state.displayName !== domainConfigGetters.displayName;
+    }),
     adminEmailChangeModalVisible: false,
 });
 
+/* Util */
+const init = () => {
+    state.displayName = domainConfigGetters.displayName;
+    state.adminEmail = domainConfigGetters.adminEmail;
+};
+
 /* Event */
+const handleClickSaveDisplayName = async () => {
+    try {
+        await domainConfigStore.updateDomainConfig({
+            display_name: state.displayName,
+        });
+        showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_DISPLAY_NAME'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_UPDATE_DISPLAY_NAME'));
+    }
+};
 const handleClickChangeAdminEmail = () => {
     state.adminEmailChangeModalVisible = true;
 };
+
+(async () => {
+    init();
+})();
 </script>
 
 <template>
@@ -54,6 +86,7 @@ const handleClickChangeAdminEmail = () => {
                     <p-text-input :value.sync="state.displayName" />
                     <p-button class="ml-2"
                               :disabled="!state.isDisplayNameChanged"
+                              @click="handleClickSaveDisplayName"
                     >
                         {{ $t('IAM.DOMAIN_SETTINGS.SAVE_CHANGE') }}
                     </p-button>

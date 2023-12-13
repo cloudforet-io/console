@@ -3,10 +3,19 @@ import {
     PHeading,
 } from '@spaceone/design-system';
 
+import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+
 import DomainSettingsBaseInformation from '@/services/administration/components/DomainSettingsBaseInformation.vue';
 import DomainSettingsBrandAssets from '@/services/administration/components/DomainSettingsBrandAssets.vue';
 import DomainSettingsTimezoneAndLanguage
     from '@/services/administration/components/DomainSettingsTimezoneAndLanguage.vue';
+
+
+const domainConfigStore = useDomainConfigStore();
+
+(async () => {
+    await domainConfigStore.fetchDomainConfig();
+})();
 </script>
 
 <template>

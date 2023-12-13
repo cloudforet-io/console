@@ -7,11 +7,14 @@ import {
 
 import { i18n } from '@/translations';
 
+import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
-
 
 
 interface Props {
@@ -24,6 +27,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
 }>();
 
+const domainConfigStore = useDomainConfigStore();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     loading: false,
@@ -47,9 +51,15 @@ const handleClickSendCode = () => {
     // TODO: send verification code to admin email
     state.isCodeSent = true;
 };
-const confirm = () => {
-    // TODO: verify verification code
-    emit('confirm');
+const confirm = async () => {
+    try {
+        await domainConfigStore.updateDomainConfig({
+            admin_email: adminEmail.value,
+        });
+        showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_ADMIN_EMAIL'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_UPDATE_ADMIN_EMAIL'));
+    }
 };
 
 watch(() => props.visible, (value) => {

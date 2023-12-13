@@ -1,22 +1,59 @@
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PHeading, PPaneLayout, PFieldTitle, PTextInput, PButton,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
 
+import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+
+const domainConfigStore = useDomainConfigStore();
+const domainConfigGetters = domainConfigStore.getters;
 const state = reactive({
-    isChanged: false,
-    wordtypeLogoUrl: '',
-    symbolFaviconUrl: '',
-    loginPageImageUrl: '',
+    isChanged: computed<boolean>(() => {
+        if ([state.wordtypeLogoUrl, state.symbolFaviconUrl, state.loginPageImageUrl,
+            domainConfigGetters.wordtypeLogoUrl, domainConfigGetters.symbolFaviconUrl, domainConfigGetters.loginPageImageUrl]
+            .every((d) => !d)) return false;
+        return (state.wordtypeLogoUrl !== domainConfigGetters.wordtypeLogoUrl)
+            || (state.symbolFaviconUrl !== domainConfigGetters.symbolFaviconUrl)
+            || (state.loginPageImageUrl !== domainConfigGetters.loginPageImageUrl);
+    }),
+    wordtypeLogoUrl: undefined as string | undefined,
+    symbolFaviconUrl: undefined as string | undefined,
+    loginPageImageUrl: undefined as string | undefined,
 });
 
-/* Event */
-const handleSaveChanges = () => {
-    // TODO: save changes
+/* Util */
+const init = () => {
+    state.wordtypeLogoUrl = domainConfigGetters.wordtypeLogoUrl;
+    state.symbolFaviconUrl = domainConfigGetters.symbolFaviconUrl;
+    state.loginPageImageUrl = domainConfigGetters.loginPageImageUrl;
 };
+
+/* Event */
+const handleSaveChanges = async () => {
+    try {
+        await domainConfigStore.updateDomainConfig({
+            wordtype_logo_url: state.wordtypeLogoUrl,
+            symbol_favicon_url: state.symbolFaviconUrl,
+            login_page_image_url: state.loginPageImageUrl,
+        });
+        showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_BRAND_ASSETS'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_UPDATE_BRAND_ASSETS'));
+    }
+};
+
+(async () => {
+    init();
+})();
 </script>
 
 <template>

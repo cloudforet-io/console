@@ -25,4 +25,5 @@ export interface ExtraSubMenu {
 
 export const DOMAIN_CONFIG_TYPE = {
     EXTRA_MENU: 'console:ext-menu',
+    SETTINGS: 'console:settings',
 } as const;
