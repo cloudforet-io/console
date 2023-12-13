@@ -65,12 +65,14 @@ const fetchBudgetUsages = async (): Promise<BudgetUsageAnalyzeResponse> => {
         state.loading = true;
         budgetUsageApiQueryHelper
             .setFilters(state.queryFilters)
-            .addFilter({ // TODO: check after api update
-                k: storeState.isAdminMode ? 'workspace_id' : 'project_id',
-                v: null,
-                o: '!=',
-            })
             .setPage(state.pageStart, state.pageLimit);
+        if (storeState.isAdminMode) {
+            budgetUsageApiQueryHelper.addFilter({ // TODO: check after api update
+                k: 'project_id',
+                v: null,
+                o: '=',
+            });
+        }
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
         return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
             query: {
