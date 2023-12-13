@@ -10,16 +10,17 @@
         />
         <p-toggle-button :value="collectorFormState.schedulePower"
                          show-state-text
+                         :read-only="props.readonly"
                          @change-toggle="handleChangeToggle"
         />
         <p-field-group v-if="collectorFormState.schedulePower"
                        class="hourly-schedule-field-group"
-                       :required="props.hoursReadonly"
+                       :required="props.hoursReadonly || props.readonly"
                        :label="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE_HOURLY')"
                        :help-text="$t('INVENTORY.COLLECTOR.MAIN.TIMEZONE') + ': ' + state.timezone"
         >
             <div class="hourly-schedule-wrapper"
-                 :class="{'is-read-mode': props.hoursReadonly}"
+                 :class="{'is-read-mode': props.hoursReadonly || props.readonly}"
             >
                 <span v-for="(hour) in hoursMatrix"
                       :key="hour"
@@ -63,6 +64,7 @@ import { useCollectorFormStore } from '@/services/asset-inventory/stores/collect
 
 const props = defineProps<{
     hoursReadonly?: boolean;
+    readonly?: boolean;
     disableLoading?: boolean;
     resetOnCollectorIdChange?: boolean;
     callApiOnPowerChange?: boolean;
@@ -126,7 +128,7 @@ const handleChangeToggle = async (value: boolean) => {
 };
 
 const handleClickHour = (hour: number) => {
-    if (props.hoursReadonly) return;
+    if (props.hoursReadonly || props.readonly) return;
     let utcHour: number;
     if (state.timezone === 'UTC') utcHour = hour;
     else {
