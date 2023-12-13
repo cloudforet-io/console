@@ -1,10 +1,13 @@
 <template>
-    <div :class="{'gnb': true, 'admin-gnb': isAdminMode}">
+    <div ref="gnbRef"
+         :class="{'gnb': true, 'admin-gnb': isAdminMode}"
+    >
         <div class="left-part">
             <div class="site-map-wrapper">
                 <site-map :menu-list="siteMapMenuList"
                           :visible.sync="showSiteMap"
                           :disabled="!hasPermission"
+                          :is-admin-mode="isAdminMode"
                 />
             </div>
 
@@ -13,25 +16,32 @@
                           :is-admin-mode="isAdminMode"
             />
 
-            <div class="gnb-menu-warpper">
-                <g-n-b-menu v-for="(menu, idx) in gnbMenuList"
-                            :key="`gnb-menu-${idx}`"
-                            :is-admin-mode="isAdminMode"
-                            :show="menu.show"
-                            :menu-id="menu.id"
-                            :label="menu.label"
-                            :to="menu.to"
-                            :sub-menu-list="menu.subMenuList"
-                            :has-permission="hasPermission"
-                            :is-opened="openedMenu === menu.id"
-                            :is-selected="selectedMenu === menu.id"
-                            :highlight-tag="menu.highlightTag"
-                            @open-menu="handleOpenMenu"
-                            @hide-menu="hideMenu"
-                />
-            </div>
+            <g-n-b-menu v-for="(menu, idx) in visibleGnbMenuList"
+                        ref="gnbMenuRef"
+                        :key="`gnb-menu-${idx}`"
+                        :class="{ 'gnb-menu-list': true, 'gnb-first-menu': idx === 0 }"
+                        :is-admin-mode="isAdminMode"
+                        :show="menu.show"
+                        :menu-id="menu.id"
+                        :label="menu.label"
+                        :to="menu.to"
+                        :sub-menu-list="menu.subMenuList"
+                        :has-permission="hasPermission"
+                        :is-opened="openedMenu === menu.id"
+                        :is-selected="getMenuIsSelected(menu.id)"
+                        :highlight-tag="menu.highlightTag"
+                        @open-menu="handleOpenMenu"
+                        @hide-menu="hideMenu"
+            />
+            <g-n-b-invisible-menu-dropdown v-if="invisibleGnbMenuList.length"
+                                           :is-admin-mode="isAdminMode"
+                                           :menu="invisibleGnbMenuList"
+                                           :selected-menu-id="selectedInvisibleGNBMenuId"
+                                           @select-menu="handleSelectGNBMenu"
+            />
         </div>
-        <g-n-b-toolset class="right-part"
+        <g-n-b-toolset ref="gnbToolsetRef"
+                       class="right-part"
                        :opened-menu="openedMenu"
                        @open-menu="handleOpenMenu"
                        @hide-menu="hideMenu"
@@ -40,11 +50,14 @@
 </template>
 
 <script lang="ts">
+import type { Ref } from 'vue';
 import {
-    reactive, toRefs, computed, getCurrentInstance, defineComponent, onMounted,
+    reactive, toRefs, computed, defineComponent, onMounted, ref, watch, nextTick,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
+import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context-menu/type';
+import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { includes } from 'lodash';
 
 import { store } from '@/store';
@@ -59,23 +72,30 @@ import { isUserAccessibleToMenu } from '@/lib/access-control';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
 
+import { useGnbContainerWidth } from '@/common/modules/navigations/gnb/composables/use-gnb-container-width';
+import GNBInvisibleMenuDropdown from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBInvisibleMenuDropdown.vue';
 import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBHeader from '@/common/modules/navigations/gnb/modules/GNBHeader.vue';
 import GNBToolset from '@/common/modules/navigations/gnb/modules/GNBToolset.vue';
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 
+
 const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
+const DEFAULT_INVISIBLE_MENU_WIDTH = 64;
+const MINIMAL_GAP_BETWEEN_MENU_N_TOOLSET = 16;
 
 export default defineComponent({
     name: 'GNB',
     components: {
+        GNBInvisibleMenuDropdown,
         GNBHeader,
         GNBMenu,
         SiteMap,
         GNBToolset,
     },
     setup() {
-        const vm = getCurrentInstance()?.proxy as Vue;
+        const router = useRouter();
+        const route = useRoute();
         const appContextStore = useAppContextStore();
 
         const state = reactive({
@@ -85,15 +105,40 @@ export default defineComponent({
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: ROOT_ROUTE._NAME } : null)),
             gnbMenuList: computed<GNBMenuType[]>(() => {
-                let result = [...store.getters['display/GNBMenuList']];
-                if (state.integrationMenu) result = [...result, state.integrationMenu];
+                let menuList = [...store.getters['display/GNBMenuList']];
+                if (state.integrationMenu) menuList = [...menuList, state.integrationMenu];
+                return menuList;
+            }),
+            visibleGnbMenuList: computed<GNBMenuType[]>(() => {
+                const menuList = state.gnbMenuList;
+                const result = menuList.slice(0, state.availableMenuCount);
                 return result;
             }),
-            siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
-            selectedMenu: computed(() => {
-                const pathRegex = vm.$route.path.match(/\/(\w+)/);
-                return pathRegex ? pathRegex[1] : null;
+            invisibleGnbMenuList: computed<MenuItem[]>(() => {
+                const menuList = state.gnbMenuList.slice(state.availableMenuCount);
+                let result = [] as MenuItem[];
+                menuList.forEach((menu) => {
+                    const dividerItem = result.length ? [{ type: 'divider' }] : [];
+                    result = [
+                        ...result,
+                        ...dividerItem,
+                        {
+                            ...menu,
+                            name: menu.id,
+                            type: 'header',
+                        },
+                    ];
+                    if (menu.subMenuList) {
+                        result = [...result, ...convertGNBMenuToMenuItem(menu.subMenuList)];
+                    }
+                });
+                return result;
             }),
+            selectedInvisibleGNBMenuId: computed(() => {
+                const selectedMenu = state.invisibleGnbMenuList.find((menu) => getMenuIsSelected(menu.id) && menu.type === 'item');
+                return selectedMenu?.id;
+            }),
+            siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
             integrationMenu: computed<GNBMenuType | undefined>(() => {
                 const extraMenu = store.getters['domain/domainExtraMenu'];
                 if (extraMenu?.title) {
@@ -106,29 +151,98 @@ export default defineComponent({
                 }
                 return undefined;
             }),
+            availableMenuCount: 0,
+            isInvisibleMenuExists: false,
         });
+
+        const getMenuIsSelected = (menuId?: MenuId): boolean => {
+            if (!menuId) return false;
+            const matchedPaths = route.matched;
+            return matchedPaths.some((matchedPath) => matchedPath.meta?.menuId === menuId);
+        };
+
+        const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenuType = 'item'): MenuItem[] => menuList.map((menu) => ({
+            ...menu,
+            name: menu.id,
+            type: menuType,
+        }));
+
+        const gnbRef = ref<HTMLElement|null>(null);
+        const gnbMenuRef = ref<(InstanceType<typeof GNBMenu>)[]>();
+        const gnbToolsetRef = ref<InstanceType<typeof GNBToolset>>();
+        const gnbHeaderRef = ref<InstanceType<typeof GNBHeader>>();
+        const { containerWidth } = useGnbContainerWidth({ containerRef: gnbRef, observeResize: true });
 
         /* event */
         const hideMenu = () => {
             state.openedMenu = '';
         };
-        const handleOpenMenu = (menuName: MenuId) => {
-            if (state.openedMenu === menuName) {
+        const handleOpenMenu = (menuId: MenuId) => {
+            if (state.openedMenu === menuId) {
                 hideMenu();
-            } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuName)) {
-                state.openedMenu = menuName;
+            } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuId)) {
+                state.openedMenu = menuId;
                 state.showSiteMap = false;
             }
         };
+
+        const handleSelectGNBMenu = (menuId: string) => {
+            if (router.currentRoute.name === menuId) return;
+            const selectedRoute = state.invisibleGnbMenuList.find((menu) => menu.id === menuId)?.to;
+            router.push(selectedRoute);
+        };
+
+
+        // GNB Layout helpers
+        const getComponentWidth = (componentRef: Ref<InstanceType<any>>) => componentRef.value?.$el.clientWidth ?? 0;
+        const getAvailableGNBMenuWidth = (gnbWidth: number): number => {
+            const gnbToolsetWidth = getComponentWidth(gnbToolsetRef);
+            const gnbHeaderWidth = getComponentWidth(gnbHeaderRef);
+            const invisibleMenuWidth = state.isInvisibleMenuExists ? DEFAULT_INVISIBLE_MENU_WIDTH : 0;
+            return gnbWidth - (gnbToolsetWidth + gnbHeaderWidth + invisibleMenuWidth + MINIMAL_GAP_BETWEEN_MENU_N_TOOLSET);
+        };
+        const getVisibleMenuCountWithinWidth = (availableWidth: number): number => {
+            let visibleMenuCount = 0;
+            let _availableWidth = availableWidth;
+            const menuRefs = gnbMenuRef.value;
+
+            menuRefs?.forEach((menuRef) => {
+                _availableWidth -= menuRef.$el.clientWidth;
+                if (_availableWidth > 0) visibleMenuCount += 1;
+            });
+            return visibleMenuCount;
+        };
+        const updateGNBLayout = (gnbWidth: number) => {
+            const availableWidth = getAvailableGNBMenuWidth(gnbWidth);
+            const visibleMenuCount = getVisibleMenuCountWithinWidth(availableWidth);
+
+            state.availableMenuCount = visibleMenuCount;
+            state.isInvisibleMenuExists = visibleMenuCount < state.gnbMenuList.length;
+        };
+
 
         onMounted(() => {
             store.dispatch('domain/loadExtraMenu');
         });
 
+
+        watch([containerWidth, state.isAdminMode], async ([changedWidth]) => {
+            if (!changedWidth) return;
+            state.availableMenuCount = state.gnbMenuList.length;
+            await nextTick();
+            updateGNBLayout(changedWidth);
+        }, { immediate: true });
+
         return {
+            gnbRef,
+            gnbMenuRef,
+            gnbHeaderRef,
+            gnbToolsetRef,
             ...toRefs(state),
             hideMenu,
             handleOpenMenu,
+            handleSelectGNBMenu,
+            getMenuIsSelected,
         };
     },
 });
@@ -149,28 +263,23 @@ export default defineComponent({
     .left-part {
         @apply h-full w-full flex;
 
-        @screen tablet {
-            padding-left: 0;
-        }
-
-        @screen mobile {
-            padding-left: 0;
-        }
         .site-map-wrapper {
-            display: none;
-            margin: 0 0.75rem;
+            @apply hidden;
+            padding-left: 1.25rem;
 
-            @screen tablet {
-                display: inline-block;
+            @screen mobile {
+                @apply inline-flex items-center;
+            }
+        }
+
+        .gnb-menu-list {
+            &.gnb-first-menu {
+                padding-left: 0.75rem;
             }
 
             @screen mobile {
-                display: inline-block;
+                @apply hidden;
             }
-        }
-
-        .gnb-menu-warpper {
-            @apply inline-flex;
         }
     }
     .right-part {
