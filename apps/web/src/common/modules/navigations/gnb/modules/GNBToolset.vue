@@ -97,7 +97,6 @@ export default defineComponent({
             }),
             isSelected: computed(() => {
                 const matched = route.matched;
-                console.debug('matched', matched);
                 return matched.some((item) => item.meta.menuId === MENU_ID.NOTICE);
             }),
         });
