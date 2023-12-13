@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onBeforeMount, reactive,
+} from 'vue';
 
 import { PButton, PHeading } from '@spaceone/design-system';
 
@@ -19,12 +21,12 @@ import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store
 
 
 const props = defineProps<{
-    boardId?: string;
-    postId?: string;
+    postId: string;
 }>();
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const noticeDetailGetters = noticeDetailStore.getters;
 
 const state = reactive({
     hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
@@ -37,13 +39,13 @@ const state = reactive({
 });
 
 const handleClickEditButton = () => {
-    if (!props.boardId || !props.postId) {
+    if (!noticeDetailGetters.boardId || !props.postId) {
         ErrorHandler.handleError(new Error('boardId or postId is undefined'));
         return;
     }
     SpaceRouter.router.push({
         name: INFO_ROUTE.NOTICE.UPDATE._NAME,
-        params: { boardId: props.boardId, postId: props.postId },
+        params: { boardId: noticeDetailGetters.boardId, postId: props.postId },
     });
 };
 
@@ -64,6 +66,10 @@ const handleDeleteNoticeConfirm = async () => {
     }
 };
 
+onBeforeMount(async () => {
+    noticeDetailStore.reset(); // do not reset on unmounted for the case of moving to update page
+    await noticeDetailStore.getNoticePost(props.postId);
+});
 </script>
 
 <template>
@@ -90,9 +96,7 @@ const handleDeleteNoticeConfirm = async () => {
                 </div>
             </template>
         </p-heading>
-        <notice-detail :board-id="props.boardId"
-                       :post-id="props.postId"
-        />
+        <notice-detail :post-id="props.postId" />
         <delete-modal :header-title="$t('INFO.NOTICE.FORM.DELETE_MODAL_TITLE')"
                       :visible.sync="state.deleteModalVisible"
                       :contents="$t('INFO.NOTICE.FORM.DELETE_MODAL_CONTENTS')"

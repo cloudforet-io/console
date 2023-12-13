@@ -32,10 +32,10 @@ const infoRoute: RouteConfig = {
                     component: NoticeMainPage as any,
                 },
                 {
-                    path: ':boardId/:postId',
+                    path: ':postId',
                     name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                     meta: {
-                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.id, copiable: true,
+                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.postId, copiable: true,
                     },
                     component: NoticeDetailPage as any,
                     props: true,

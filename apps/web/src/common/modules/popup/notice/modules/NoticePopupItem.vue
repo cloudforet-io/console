@@ -53,8 +53,10 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
 import type { PostModel } from '@/schema/board/post/model';
-import { store } from '@/store';
+
+import { useNoticeStore } from '@/store/notice';
 
 import type { FileInfo } from '@/lib/file-manager/type';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
@@ -86,6 +88,8 @@ export default {
         },
     },
     setup(props) {
+        const noticeStore = useNoticeStore();
+
         const state = reactive({
             noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.item?.post_type)),
             popupVisible: true,
@@ -93,28 +97,23 @@ export default {
         const files = computedAsync<FileInfo[]>(async () => {
             const notice = props.item;
             if (!notice) return [];
-            const result: PostModel = await SpaceConnector.clientV2.board.post.get({
-                board_id: notice.board_id,
-                post_id: notice.post_id,
-            });
-            return result.files;
+            try {
+                const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
+                    board_id: notice.board_id,
+                    post_id: notice.post_id,
+                });
+                return result.files;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            }
         });
         const { attachments } = useFileAttachments(files);
 
         const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
             state.popupVisible = false;
             if (neverShowPopup) {
-                try {
-                    await SpaceConnector.client.config.userConfig.set({
-                        user_id: store.state.user.userId,
-                        name: `console:board:${props.item.board_id}:${props.item.post_id}`,
-                        data: {
-                            show_popup: false,
-                        },
-                    });
-                } catch (e) {
-                    ErrorHandler.handleError(e);
-                }
+                await noticeStore.updateNoticeReadState(props.item.post_id, false);
             }
         };
 

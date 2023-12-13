@@ -19,8 +19,6 @@ import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice';
 
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import GNBNotiItem from '@/common/modules/navigations/gnb/modules/gnb-noti/modules/GNBNotiItem.vue';
 
@@ -42,7 +40,6 @@ const emit = defineEmits<{(event: 'close'): void;
 const state = reactive({
     loading: true,
     timezone: computed<string>(() => store.state.user.timezone),
-    boardId: undefined as undefined | string,
     noticeItemsRef: null as HTMLElement|null,
     noticeData: [] as PostModel[],
     items: computed<NoticeItem[]>(() => {
@@ -77,8 +74,9 @@ if (state.domainName === 'root') {
 }
 const listNotice = async () => {
     try {
+        if (!noticeGetters.boardId) throw new Error('boardId is undefined');
         const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-            board_id: state.boardId,
+            board_id: noticeGetters.boardId,
             query: noticeApiHelper.data,
             domain_id: null,
         });
@@ -94,9 +92,10 @@ const listNotice = async () => {
 /* Event */
 const handleSelectNotice = (postId: string) => {
     emit('close');
+    if (!noticeGetters.boardId) return;
     SpaceRouter.router.push({
         name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-        params: { boardId: state.boardId, postId },
+        params: { boardId: noticeGetters.boardId, postId },
     }).catch(() => {});
 };
 const handleClickViewAllNotice = () => {
@@ -107,10 +106,7 @@ const handleClickViewAllNotice = () => {
 /* Init */
 const init = async () => {
     state.loading = true;
-    state.boardId = await getNoticeBoardId();
-    if (state.boardId) {
-        await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
-    }
+    await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
     state.loading = false;
 };
 (async () => {

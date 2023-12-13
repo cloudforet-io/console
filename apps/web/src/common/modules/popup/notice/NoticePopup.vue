@@ -23,6 +23,8 @@ import type { PostListParameters, PostListResponse } from '@/schema/board/post/a
 import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 
+import { useNoticeStore } from '@/store/notice';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupItem.vue';
 
@@ -34,6 +36,9 @@ export default {
         NoticePopupItem,
     },
     setup() {
+        const noticeStore = useNoticeStore();
+        const noticeGetters = noticeStore.getters;
+
         const state = reactive({
             isSessionExpired: computed<boolean>(() => store.state.user.isSessionExpired),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
@@ -71,23 +76,12 @@ export default {
             }
         };
 
-        const getNoticeBoard = async (): Promise<string|undefined> => {
-            try {
-                const { results } = await SpaceConnector.client.board.board.list();
-                return results.filter((d) => d.name === 'Notice')[0]?.board_id;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return undefined;
-            }
-        };
-
         const getPostList = async (): Promise<void> => {
             try {
-                const noticeBoard = await getNoticeBoard();
-                if (!noticeBoard) return;
+                if (!noticeGetters.boardId) throw new Error('Notice board not found');
                 const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
                     domain_id: null,
-                    board_id: noticeBoard,
+                    board_id: noticeGetters.boardId,
                     query: apiQueryForPostList,
                 });
                 const postIdList = await getUserConfigBoardPostIdList();

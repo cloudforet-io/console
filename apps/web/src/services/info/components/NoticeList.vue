@@ -26,8 +26,6 @@ import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice';
 
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ListItem from '@/services/info/components/NoticeListItem.vue';
@@ -57,7 +55,6 @@ const state = reactive({
     loading: false,
     noticeItems: [] as PostModel[],
     noticeItemTotalCount: 0,
-    boardId: undefined as undefined | string,
     searchText: undefined as undefined | string,
 });
 
@@ -78,9 +75,9 @@ let noticeApiHelper = initNoticeApiHelper();
 const listNotice = async () => {
     state.loading = true;
     try {
-        if (!state.boardId) throw new Error('boardId is undefined');
+        if (!noticeGetters.boardId) throw new Error('boardId is undefined');
         const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-            board_id: state.boardId,
+            board_id: noticeGetters.boardId,
             query: noticeApiHelper.data,
             domain_id: null,
         });
@@ -113,7 +110,7 @@ const loadSearchListSet = async () => {
     } else {
         noticeApiHelper = getSearchFilter();
     }
-    if (state.boardId) await listNotice();
+    if (noticeGetters.boardId) await listNotice();
 };
 
 /* event */
@@ -129,20 +126,19 @@ const handleClickNotice = (postId: string) => {
     SpaceRouter.router.push({
         name: INFO_ROUTE.NOTICE.DETAIL._NAME,
         params: {
-            boardId: state.boardId ?? '',
+            boardId: noticeGetters.boardId ?? '',
             postId,
         },
     });
 };
 const handlePageChange = (page: number) => {
     noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
-    if (state.boardId) listNotice();
+    if (noticeGetters.boardId) listNotice();
 };
 
 (async () => {
     state.loading = true;
-    state.boardId = await getNoticeBoardId();
-    if (state.boardId) {
+    if (noticeGetters.boardId) {
         await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
     }
     state.loading = false;
