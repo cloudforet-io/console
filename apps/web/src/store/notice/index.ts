@@ -1,5 +1,6 @@
+import { asyncComputed } from '@vueuse/core';
 import {
-    computed, reactive,
+    computed, reactive, ref,
 } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -7,11 +8,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { BoardListParameters, BoardListResponse } from '@/schema/board/board/api-verbs/list';
 import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -28,14 +28,32 @@ type NoticeConfigMap = Record<string, NoticeConfigData>;
 
 export const useNoticeStore = defineStore('notice', () => {
     const state = reactive({
-        boardId: undefined as undefined|string,
         noticeConfigMap: {} as NoticeConfigMap,
         totalNoticeIdList: [] as string[],
         totalNoticeCount: 0,
     });
 
+    const boardId = ref<string|undefined>();
+    const evaluatingBoardId = ref(false);
+    const fetchNoticeBoardId = async () => {
+        try {
+            if (boardId.value) return;
+            if (evaluatingBoardId.value) return;
+            const { results } = await SpaceConnector.clientV2.board.board.list<BoardListParameters, BoardListResponse>({
+                name: 'Notice',
+            });
+            boardId.value = results?.[0]?.board_id;
+        } catch (e) {
+            ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+        }
+    };
+
     const getters = reactive({
         userId: computed<string>(() => store.state.user.userId),
+        boardId: asyncComputed<string|undefined>(async () => {
+            await fetchNoticeBoardId();
+            return boardId.value;
+        }, undefined, { evaluating: evaluatingBoardId }),
         isReadMap: computed<{ [key: string]: boolean }>(() => {
             const readMap = {};
             Object.keys(state.noticeConfigMap).forEach((postId) => {
@@ -62,69 +80,67 @@ export const useNoticeStore = defineStore('notice', () => {
         return configMap;
     };
 
-    const fetchNoticeReadState = async () => {
-        if (!state.boardId) state.boardId = await getNoticeBoardId();
-        const userConfigApiQuery = new ApiQueryHelper()
-            .setFilters([{
-                k: 'user_id',
-                v: getters.userId,
-                o: '=',
-            },
-            {
-                k: 'name',
-                v: `console:board:${state.boardId}:`,
-                o: '',
-            }])
-            .setOnly('data', 'user_id');
-        try {
-            const { results } = await SpaceConnector.client.config.userConfig.list({
-                query: userConfigApiQuery.data,
-            });
-            state.noticeConfigMap = convertUserConfigToNoticeConfigMap(results);
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            state.noticeConfigMap = {};
-        }
-    };
-    const updateNoticeReadState = async (postId: string, showPopup?: boolean) => {
-        try {
-            if (!state.boardId) state.boardId = await getNoticeBoardId();
-            const result = await SpaceConnector.client.config.userConfig.set({
-                user_id: store.state.user.userId,
-                name: `console:board:${state.boardId}:${postId}`,
-                data: { is_read: true, show_popup: showPopup },
-            });
-            state.noticeConfigMap = { ...state.noticeConfigMap, [postId]: result.data };
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    };
-
-    const noticeApiHelper = new ApiQueryHelper().setOnly('post_id');
-    const fetchNoticeCount = async () => {
-        try {
-            if (!state.boardId) {
-                state.boardId = await getNoticeBoardId();
-                if (!state.boardId) throw new Error('Notice board not found');
+    const actions = {
+        fetchNoticeReadState: async () => {
+            await fetchNoticeBoardId();
+            if (!boardId.value) throw new Error('Notice board not found');
+            const userConfigApiQuery = new ApiQueryHelper()
+                .setFilters([{
+                    k: 'user_id',
+                    v: getters.userId,
+                    o: '=',
+                },
+                {
+                    k: 'name',
+                    v: `console:board:${boardId.value}:`,
+                    o: '',
+                }])
+                .setOnly('data', 'user_id');
+            try {
+                const { results } = await SpaceConnector.client.config.userConfig.list({
+                    query: userConfigApiQuery.data,
+                });
+                state.noticeConfigMap = convertUserConfigToNoticeConfigMap(results);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.noticeConfigMap = {};
             }
-            const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-                board_id: state.boardId,
-                query: noticeApiHelper.data,
-                domain_id: null,
-            });
-            state.totalNoticeIdList = results?.map((post) => post.post_id) ?? [];
-            state.totalNoticeCount = total_count ?? 0;
-        } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-        }
+        },
+        updateNoticeReadState: async (postId: string, showPopup?: boolean) => {
+            try {
+                await fetchNoticeBoardId();
+                if (!boardId.value) throw new Error('Notice board not found');
+                const result = await SpaceConnector.client.config.userConfig.set({
+                    user_id: store.state.user.userId,
+                    name: `console:board:${boardId.value}:${postId}`,
+                    data: { is_read: true, show_popup: showPopup },
+                });
+                state.noticeConfigMap = { ...state.noticeConfigMap, [postId]: result.data };
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        fetchNoticeCount: async () => {
+            try {
+                await fetchNoticeBoardId();
+                if (!boardId.value) throw new Error('Notice board not found');
+                const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
+                    board_id: boardId.value,
+                    query: { only: ['post_id'] },
+                    domain_id: null,
+                });
+                state.totalNoticeIdList = results?.map((post) => post.post_id) ?? [];
+                state.totalNoticeCount = total_count ?? 0;
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+            }
+        },
     };
 
 
     return {
         state,
         getters,
-        fetchNoticeReadState,
-        updateNoticeReadState,
-        fetchNoticeCount,
+        ...actions,
     };
 });
