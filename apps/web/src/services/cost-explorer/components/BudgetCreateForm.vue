@@ -12,9 +12,7 @@ import { SpaceRouter } from '@/router';
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -27,21 +25,19 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import type { BudgetAmountPlanInfo } from '@/services/cost-explorer/types/budget-form-type';
 
 
-
-type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_group_id'|'project_id'|'data_source_id'>;
+type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_id'|'data_source_id'|'workspace_id'>;
 
 const router = useRouter();
-const allReferenceStore = useAllReferenceStore();
-
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
-    project: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    projectGroup: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    dataSource: computed(() => allReferenceStore.getters.costDataSource),
     baseInfo: {} as BudgetBaseInfo,
     isBaseInfoValid: false,
     amountPlanInfo: {} as BudgetAmountPlanInfo,
     isAmountPlanInfoValid: false,
-    isAllValid: computed(() => state.isBaseInfoValid && state.isAmountPlanInfoValid),
+    isAllValid: computed<boolean>(() => state.isBaseInfoValid && state.isAmountPlanInfoValid),
     loading: false,
 });
 
@@ -56,18 +52,16 @@ const createBudget = async () => {
         });
 
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
-        router.push({
+        await router.push({
             name: COST_EXPLORER_ROUTE.BUDGET._NAME,
         });
     } catch (e:any) {
         const ALREADY_EXIST_ERROR_CODE = 'ERROR_BUDGET_ALREADY_EXIST';
         if (e.code === ALREADY_EXIST_ERROR_CODE) {
-            const selectedProjectOrProjectGroupName = state.baseInfo.project_group_id
-                ? state.projectGroup[state.baseInfo.project_group_id]?.label
-                : state.project[state.baseInfo.project_id]?.label;
+            const targetId = storeState.isAdminMode ? state.baseInfo.workspace_id : state.baseInfo.project_id;
             ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET_ALREADY_EXIST', {
-                dataSourceName: state.dataSource[state.baseInfo.data_source_id]?.label,
-                name: selectedProjectOrProjectGroupName,
+                dataSourceName: state.baseInfo.data_source_id,
+                name: targetId,
             }));
         } else {
             ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));
@@ -99,7 +93,7 @@ const handleClickConfirm = () => {
         <budget-create-form-base-info @update="handleChangeBaseInfo" />
         <budget-create-form-amount-plan
             class="mt-4"
-            :project-group-id="state.baseInfo.project_group_id"
+            :workspace-id="state.baseInfo.workspace_id"
             :project-id="state.baseInfo.project_id"
             :provider-filter="state.baseInfo.provider_filter"
             :data-source-id="state.baseInfo.data_source_id"

@@ -27,7 +27,7 @@ export interface BudgetModel {
     budget_id: string;
     name: string;
     project_id?: string;
-    project_group_id?: string;
+    workspace_id?: string;
     limit: number;
     planned_limits: BudgetPlannedLimit[];
     currency: Currency;
