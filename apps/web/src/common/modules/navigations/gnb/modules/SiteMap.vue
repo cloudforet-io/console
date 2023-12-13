@@ -5,7 +5,7 @@
          @click.stop
     >
         <div class="sitemap-button"
-             :class="visible ? 'visible' : ''"
+             :class="{'visible' : visible, 'is-admin': isAdminMode}"
              role="button"
              tabindex="0"
              @click="handleSiteMapButtonClick"
@@ -101,6 +101,10 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     props: {
+        isAdminMode: {
+            type: Boolean,
+            default: false,
+        },
         disabled: {
             type: Boolean,
             default: false,
@@ -151,6 +155,9 @@ export default {
         position: relative;
         cursor: pointer;
         text-decoration: none;
+        &.is-admin {
+            @apply text-white;
+        }
         &:hover, &.visible {
             @apply text-violet-600;
             .sitemap-icon {

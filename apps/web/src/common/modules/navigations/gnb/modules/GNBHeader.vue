@@ -67,7 +67,7 @@ const selectWorkspace = (workspaceId: string): void => {
          data-gtm="gtm-gnb-logo"
     >
         <component :is="props.to ? 'router-link' : 'div'"
-                   class="logo-wrapper"
+                   class="title-wrapper"
                    :to="props.to"
         >
             <span v-if="props.isAdminMode"
@@ -75,7 +75,9 @@ const selectWorkspace = (workspaceId: string): void => {
             >
                 Admin
             </span>
-            <div v-else>
+            <div v-else
+                 class="logo-wrapper"
+            >
                 <img v-if="state.ciLogoImage"
                      class="logo-character"
                      :src="state.ciLogoImage"
@@ -146,18 +148,20 @@ const selectWorkspace = (workspaceId: string): void => {
         width: 8.75rem;
     }
 
-    .logo-wrapper {
+    .title-wrapper {
         @apply inline-block;
-        width: 2rem;
-        height: 2rem;
 
         .admin-title {
-            @apply text-label-xl text-violet-100;
+            @apply text-label-xl text-violet-100 w-full;
         }
-        .logo-character {
-            display: inline-block;
+        .logo-wrapper {
             width: 2rem;
             height: 2rem;
+            .logo-character {
+                display: inline-block;
+                width: 2rem;
+                height: 2rem;
+            }
         }
     }
 

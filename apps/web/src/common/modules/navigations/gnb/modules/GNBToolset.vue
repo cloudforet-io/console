@@ -12,8 +12,16 @@
                     :visible="openedMenu === 'notifications'"
                     @update:visible="updateOpenedMenu('notifications', $event)"
         />
-        <g-n-b-profile :visible="openedMenu === 'profile'"
+        <g-n-b-profile v-if="!isAdminMode"
+                       :visible="openedMenu === 'profile'"
                        @update:visible="updateOpenedMenu('profile', $event)"
+        />
+        <g-n-b-menu v-if="isAdminMode"
+                    is-admin-mode
+                    :menu-id="noticeMenuItem.id"
+                    :label="noticeMenuItem.label"
+                    :to="noticeMenuItem.to"
+                    :is-selected="isSelected"
         />
         <p-toggle-button v-if="isDomainAdmin"
                          class="temporary-admin-mode-toggle"
@@ -28,16 +36,24 @@ import type { SetupContext } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PToggleButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import type { DisplayMenu } from '@/store/modules/display/type';
 
+import type { MenuInfo } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
+import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
 import GNBNoti from '@/common/modules/navigations/gnb/modules/gnb-noti/GNBNoti.vue';
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
@@ -50,6 +66,7 @@ export default defineComponent({
         GNBRecentFavorite,
         GNBSearch,
         GNBNoti,
+        GNBMenu,
         PToggleButton,
     },
     props: {
@@ -60,11 +77,28 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const router = useRouter();
+        const route = useRoute();
         const appContextStore = useAppContextStore();
         const state = reactive({
             isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             timezone: computed(() => store.state.user.timezone),
+        });
+
+        const noticeState = reactive({
+            noticeMenuItem: computed<DisplayMenu>(() => {
+                const menuInfo: MenuInfo = MENU_INFO_MAP[MENU_ID.NOTICE];
+
+                return {
+                    id: MENU_ID.NOTICE,
+                    label: i18n.t(menuInfo.translationId),
+                    to: { name: makeAdminRouteName(menuInfo.routeName) },
+                };
+            }),
+            isSelected: computed(() => {
+                const matched = route.matched;
+                return matched.some((item) => item.meta.menuId === MENU_ID.NOTICE);
+            }),
         });
 
         const adminToggleState = reactive({
@@ -94,6 +128,7 @@ export default defineComponent({
 
         return {
             ...toRefs(state),
+            ...toRefs(noticeState),
             ...toRefs(adminToggleState),
             hideMenu,
             openMenu,

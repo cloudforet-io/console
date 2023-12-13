@@ -4,7 +4,7 @@
          @click.stop
          @keydown.esc="hideNotiMenu"
     >
-        <span class="menu-button"
+        <span :class="{'menu-button': true, 'opened': visible}"
               tabindex="0"
               role="button"
               @click.stop="handleNotiButtonClick"
@@ -14,6 +14,8 @@
                  :class="{ disabled: isNoRoleUser }"
                  :name="hasNotifications ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
                  :color="hasNotifications ? undefined : 'inherit'"
+                 width="1.375rem"
+                 height="1.375rem"
             />
         </span>
         <p-tab v-show="visible"
@@ -181,19 +183,19 @@ export default defineComponent<Props>({
     position: relative;
 
     .menu-button {
-        @apply text-gray-500;
+        @apply inline-flex items-center justify-center text-gray-500 rounded-full;
+        width: 2rem;
+        height: 2rem;
         line-height: $gnb-height;
         cursor: pointer;
-        margin-left: 1.25rem;
+        margin-left: 0.25rem;
 
-        &.opened {
-            @apply text-violet-400;
+        &:hover {
+            @apply text-blue-600 bg-blue-100;
         }
 
-        @media (hover: hover) {
-            &:hover {
-                @apply text-violet-400;
-            }
+        &.opened {
+            @apply text-blue-600 bg-blue-200;
         }
 
         .disabled {
