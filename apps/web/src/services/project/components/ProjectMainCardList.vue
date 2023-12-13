@@ -122,7 +122,6 @@ const fetchProjectList = async () => {
         const params: ProjectListParameters = {
             query: listProjectApiQueryHelper.data,
             project_group_id: state.groupId,
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         };
         const { status, response } = await listProjectFetcher(params);
         if (status === 'succeed') {
@@ -175,7 +174,6 @@ const fetchServiceAccountList = async (projectIdList: string[]) => {
         .setOnly('provider', 'project_id', 'service_account_id');
     try {
         const res = await SpaceConnector.clientV2.identity.serviceAccount.list({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             query: {
                 ...listServiceAccountApiQueryHelper.data,
             },
@@ -189,11 +187,13 @@ const fetchServiceAccountList = async (projectIdList: string[]) => {
 
 /* Event */
 const handleChange = async (options?: any) => {
-    state.searchText = options.searchText;
-    if (options.pageLimit !== undefined) {
+    if (options?.searchText !== undefined) {
+        state.searchText = options.searchText;
+    }
+    if (options?.pageLimit !== undefined) {
         state.pageSize = options.pageLimit;
     }
-    if (options.pageStart !== undefined) {
+    if (options?.pageStart !== undefined) {
         state.pageStart = options.pageStart;
     }
     await fetchAll();
