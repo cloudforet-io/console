@@ -504,6 +504,7 @@
 					"CREATE_BUDGET": "예산 생성",
 					"DATA_SOURCE": "데이터 소스",
 					"DESC": "내림차순",
+					"MANAGED_BY_ADMIN": "",
 					"NO_BUDGET": "예산 없음",
 					"OVERSPENT": "예산초과",
 					"PERIOD": "기준 기간",

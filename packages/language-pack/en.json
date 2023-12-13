@@ -504,6 +504,7 @@
 					"CREATE_BUDGET": "Create Budget",
 					"DATA_SOURCE": "Data Source",
 					"DESC": "Desc",
+					"MANAGED_BY_ADMIN": "Managed by admins",
 					"NO_BUDGET": "No Budget",
 					"OVERSPENT": "Overspent",
 					"PERIOD": "Period",
