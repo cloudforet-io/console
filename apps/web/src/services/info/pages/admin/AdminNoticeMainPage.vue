@@ -52,8 +52,4 @@ export default {
 };
 </script>
 
-<style scoped lang="postcss">
-.button-group {
-    @apply flex gap-2;
-}
-</style>
+
