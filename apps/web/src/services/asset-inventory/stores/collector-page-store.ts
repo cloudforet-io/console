@@ -4,7 +4,8 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CollectorModel, Schedule } from '@/schema/inventory/collector/model';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { Schedule } from '@/schema/inventory/collector/type';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
@@ -59,7 +60,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         async getCollectorList(queryData: Query) {
             this.loading.collectorList = true;
             try {
-                const res = await SpaceConnector.client.inventory.collector.list({
+                const res = await SpaceConnector.clientV2.inventory.collector.list({
                     query: queryData,
                 });
                 this.collectors = res.results;
@@ -110,7 +111,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
         async getJobs() {
             try {
-                const res = await SpaceConnector.client.inventory.job.list();
+                const res = await SpaceConnector.clientV2.inventory.job.list();
                 this.recentJobs = res.results;
             } catch (e) {
                 ErrorHandler.handleError(e);

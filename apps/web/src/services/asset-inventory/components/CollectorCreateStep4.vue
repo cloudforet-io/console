@@ -59,7 +59,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { CollectorCreateParameter, CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -104,7 +105,7 @@ const handleClickPrevButton = () => {
 const handleClickCreateButton = async () => {
     try {
         state.createLoading = true;
-        const params: CollectorCreateParameter = {
+        const params: CollectorCreateParameters = {
             name: collectorFormState.name,
             provider: collectorFormState.provider ?? collectorFormState.repositoryPlugin?.provider,
             plugin_info: {

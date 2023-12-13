@@ -134,6 +134,7 @@ const state = reactive({
             const recentJobAnalyze = matchedJob ? matchedJob.job_status : [];
             return {
                 collectorId: d.collector_id,
+                workspaceId: d.workspace_id,
                 name: d.name,
                 plugin: {
                     name: plugins[d.plugin_info.plugin_id]?.label,

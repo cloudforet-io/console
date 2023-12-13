@@ -63,12 +63,13 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { UPGRADE_MODE } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
+import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
+import { UPGRADE_MODE } from '@/schema/inventory/collector/constant';
 import type {
     CollectorModel,
     CollectorPluginModel,
-    CollectorUpdateParameter,
-    CollectorUpdatePluginParameter,
+
 
 } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
@@ -130,7 +131,7 @@ const state = reactive({
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdatePluginParameter = {
+    const params: CollectorUpdatePluginParameters = {
         collector_id: collectorFormStore.collectorId,
         version: collectorFormState.version,
         upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
@@ -139,7 +140,7 @@ const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         tags: collectorFormState.tags,
     };

@@ -44,7 +44,7 @@ export const useCollectorDataModalStore = defineStore('collector-data-modal', {
         async getJobs(collectorId: string) {
             this.initLoading = true;
             try {
-                const res = await SpaceConnector.client.inventory.job.list({ collector_id: collectorId });
+                const res = await SpaceConnector.clientV2.inventory.job.list({ collector_id: collectorId });
                 if (res.results.length > 0) {
                     if (this.selectedSecret) {
                         const filteredJobs = res.results.filter((job) => job.secret_id);
