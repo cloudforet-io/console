@@ -26,8 +26,7 @@
             >
                 {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
             </p-text-button>
-            <p-button icon-left="ic_arrow-left"
-                      style-type="transparent"
+            <p-button style-type="transparent"
                       class="step-left-base-button"
                       size="lg"
                       @click="handleClickPrevButton"
@@ -36,6 +35,8 @@
             </p-button>
             <p-button :disabled="!state.isAllFormValid"
                       class="step-right-button"
+                      style-type="substitutive"
+                      icon-right="ic_arrow-right"
                       size="lg"
                       @click="handleClickNextButton"
             >
