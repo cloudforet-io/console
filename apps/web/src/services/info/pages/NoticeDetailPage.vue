@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { onBeforeMount, onUnmounted } from 'vue';
+
 import { PHeading } from '@spaceone/design-system';
 
 import NoticeDetail from '@/services/info/components/NoticeDetail.vue';
@@ -11,7 +13,12 @@ const props = defineProps<{
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 
-noticeDetailStore.getNoticePost(props.postId);
+onBeforeMount(() => {
+    noticeDetailStore.getNoticePost(props.postId);
+});
+onUnmounted(() => {
+    noticeDetailStore.reset();
+});
 </script>
 
 <template>

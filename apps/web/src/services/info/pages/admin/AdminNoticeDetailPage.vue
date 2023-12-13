@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import {
+    computed, onBeforeMount, onUnmounted, reactive,
+} from 'vue';
 
 import { PButton, PHeading } from '@spaceone/design-system';
 
@@ -25,8 +27,6 @@ const props = defineProps<{
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 const noticeDetailGetters = noticeDetailStore.getters;
-
-noticeDetailStore.getNoticePost(props.postId);
 
 const state = reactive({
     hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
@@ -66,6 +66,12 @@ const handleDeleteNoticeConfirm = async () => {
     }
 };
 
+onBeforeMount(() => {
+    noticeDetailStore.getNoticePost(props.postId);
+});
+onUnmounted(() => {
+    noticeDetailStore.reset();
+});
 </script>
 
 <template>
