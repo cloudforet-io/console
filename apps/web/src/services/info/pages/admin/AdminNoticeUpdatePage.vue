@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { watch } from 'vue';
+import { onBeforeMount, watch } from 'vue';
 
 import { PHeading } from '@spaceone/design-system';
 
@@ -29,10 +29,10 @@ export default {
     props: {
         postId: {
             type: String,
-            default: undefined,
+            default: '',
         },
     },
-    setup() {
+    setup(props) {
         const noticeDetailStore = useNoticeDetailStore();
         const noticeDetailState = noticeDetailStore.state;
 
@@ -45,6 +45,12 @@ export default {
                 notice.scope === 'PUBLIC'
                 || !(notice.scope === 'DOMAIN' && store.getters['user/hasDomainRole'])
             ) SpaceRouter.router.back();
+        });
+
+        onBeforeMount(async () => {
+            if (props.postId === noticeDetailState.post?.post_id) return;
+            noticeDetailStore.reset();
+            await noticeDetailStore.getNoticePost(props.postId);
         });
 
         return {

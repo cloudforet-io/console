@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onBeforeMount, onUnmounted, reactive,
+    computed, onBeforeMount, reactive,
 } from 'vue';
 
 import { PButton, PHeading } from '@spaceone/design-system';
@@ -66,11 +66,9 @@ const handleDeleteNoticeConfirm = async () => {
     }
 };
 
-onBeforeMount(() => {
-    noticeDetailStore.getNoticePost(props.postId);
-});
-onUnmounted(() => {
-    noticeDetailStore.reset();
+onBeforeMount(async () => {
+    noticeDetailStore.reset(); // do not reset on unmounted for the case of moving to update page
+    await noticeDetailStore.getNoticePost(props.postId);
 });
 </script>
 
