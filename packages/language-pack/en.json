@@ -1671,7 +1671,8 @@
 			"CREATE": "Create",
 			"DELETE": "Delete",
 			"DETAIL": {
-				"API_POLICY": "API Policy Attachment",
+				"ALL_PERMISSIONS": "This role has all API permissions of Admin.",
+				"API_POLICY": "API Policy",
 				"BASE_INFORMATION": "Base Information",
 				"CREATED_AT": "Created",
 				"DESCRIPTION": "Description",
