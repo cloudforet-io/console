@@ -78,7 +78,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             hours: collectorFormState.scheduleHours,
         },
     };
-    return SpaceConnector.client.inventory.collector.update(params);
+    return SpaceConnector.clientV2.inventory.collector.update(params);
 };
 
 const handleClickEdit = () => {

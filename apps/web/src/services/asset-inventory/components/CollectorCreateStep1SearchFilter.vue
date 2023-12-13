@@ -121,17 +121,19 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { RepositoryInfo } from '@/schema/repository/plugin/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RepositoryInfo } from '@/services/asset-inventory/collector/model';
 import { repositoryColorMap, repositoryIconMap } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
+
+
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
@@ -172,7 +174,7 @@ const repoApiQuery = new ApiQueryHelper();
 const getRepositories = async () => {
     try {
         repoApiQuery.setSort('repository_type', true);
-        const res = await SpaceConnector.client.repository.repository.list({
+        const res = await SpaceConnector.clientV2.repository.repository.list({
             query: repoApiQuery.data,
         });
         state.repositories = res.results;

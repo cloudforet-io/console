@@ -39,6 +39,11 @@ import { PButtonModal } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
+import type { JobModel } from '@/schema/inventory/job/model';
+import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
+import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -118,7 +123,7 @@ const handleClickConfirm = async () => {
 
     state.loading = true;
     try {
-        await SpaceConnector.client.inventory.collector.collect({
+        await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
             collector_id: collectorDataModalState.selectedCollector.collector_id,
             secret_id: collectorDataModalState.selectedSecret?.secret_id,
         });
@@ -143,7 +148,7 @@ const fetchSecrets = async (provider: string, serviceAccounts: string[]) => {
         else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
     }
     try {
-        const { total_count } = await SpaceConnector.client.secret.secret.list({
+        const { total_count } = await SpaceConnector.clientV2.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
             query: apiQueryHelper.data,
         });
         state.secretsCount = total_count;

@@ -16,14 +16,15 @@
                 {{ $t('INVENTORY.COLLECTOR.CREATE.SELECT_OTHER_PLUGIN') }}
             </p-text-button>
             <div class="right-area">
-                <p-button icon-left="ic_arrow-left"
-                          style-type="transparent"
+                <p-button style-type="transparent"
                           size="lg"
                           @click="handleClickPrevButton"
                 >
                     {{ $t('INVENTORY.COLLECTOR.CREATE.PREVIOUS') }}
                 </p-button>
                 <p-button :disabled="!state.isAllFormValid"
+                          style-type="substitutive"
+                          icon-right="ic_arrow-right"
                           size="lg"
                           @click="handleClickNextButton"
                 >

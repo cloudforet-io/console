@@ -186,7 +186,7 @@ defineExpose({ setPathFrom });
 const getCollector = async (): Promise<CollectorModel|null> => {
     state.loading = true;
     try {
-        const result = await SpaceConnector.client.inventory.collector.get({
+        const result = await SpaceConnector.clientV2.inventory.collector.get({
             collector_id: props.collectorId,
         });
         return result;
@@ -198,7 +198,7 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => SpaceConnector.client.inventory.collector.delete({
+const fetchDeleteCollector = async () => SpaceConnector.clientV2.inventory.collector.delete({
     collectors: [collectorFormStore.collectorId],
 });
 

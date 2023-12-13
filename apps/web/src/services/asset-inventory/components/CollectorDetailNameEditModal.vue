@@ -55,7 +55,7 @@ const fetchUpdateCollectorName = async (): Promise<CollectorModel> => {
         collector_id: collectorFormStore.collectorId,
         name: collectorFormState.name,
     };
-    return SpaceConnector.client.inventory.collector.update(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 
 const handleUpdateIsValid = (value: boolean) => {

@@ -2,6 +2,10 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+
 import type { CollectorReferenceMap, CollectorReferenceState } from '@/store/modules/reference/collector/type';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
@@ -22,14 +26,14 @@ export const load: Action<CollectorReferenceState, any> = async ({ state, commit
     ) return;
 
     try {
-        const response = await SpaceConnector.clientV2.inventory.collector.list({
+        const response = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
             query: {
                 only: ['collector_id', 'name', 'tags'],
             },
         }, { timeout: 3000 });
         const collectors: CollectorReferenceMap = {};
 
-        response.results.forEach((collectorInfo: any): void => {
+        (response.results ?? []).forEach((collectorInfo: any): void => {
             collectors[collectorInfo.collector_id] = {
                 key: collectorInfo.collector_id,
                 label: collectorInfo.name,

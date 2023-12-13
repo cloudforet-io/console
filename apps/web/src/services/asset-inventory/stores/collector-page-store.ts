@@ -120,7 +120,7 @@ export const useCollectorPageStore = defineStore('collector-page', {
         },
         async updateCollectorSchedule(params) {
             try {
-                const response = await SpaceConnector.client.inventory.collector.update(params);
+                const response = await SpaceConnector.clientV2.inventory.collector.update(params);
                 const updatedCollectorIndex = this.collectors.findIndex((collector) => collector.collector_id === response.collector_id);
                 this.collectors[updatedCollectorIndex] = response;
                 showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
