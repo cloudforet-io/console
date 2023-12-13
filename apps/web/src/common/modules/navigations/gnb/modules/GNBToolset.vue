@@ -23,11 +23,7 @@
                     :to="noticeMenuItem.to"
                     :is-selected="isSelected"
         />
-        <p-toggle-button v-if="isDomainAdmin"
-                         class="temporary-admin-mode-toggle"
-                         :value="checked"
-                         @change-toggle="toggleAdminMode"
-        />
+        <g-n-b-admin-toggle-button v-if="isDomainAdmin" />
     </div>
 </template>
 
@@ -37,8 +33,6 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
-
-import { PToggleButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -58,6 +52,7 @@ import GNBNoti from '@/common/modules/navigations/gnb/modules/gnb-noti/GNBNoti.v
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 import GNBRecentFavorite from '@/common/modules/navigations/gnb/modules/gnb-recent-favorite/GNBRecentFavorite.vue';
 import GNBSearch from '@/common/modules/navigations/gnb/modules/gnb-search/GNBSearch.vue';
+import GNBAdminToggleButton from '@/common/modules/navigations/gnb/modules/GNBAdminToggleButton.vue';
 
 export default defineComponent({
     name: 'GNBToolset',
@@ -67,7 +62,7 @@ export default defineComponent({
         GNBSearch,
         GNBNoti,
         GNBMenu,
-        PToggleButton,
+        GNBAdminToggleButton,
     },
     props: {
         openedMenu: {
@@ -138,12 +133,3 @@ export default defineComponent({
     },
 });
 </script>
-
-
-<style lang="postcss" scoped>
-.gnb-toolset {
-    .temporary-admin-mode-toggle {
-        margin-left: 1rem;
-    }
-}
-</style>
