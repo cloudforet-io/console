@@ -59,8 +59,10 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
 import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -129,7 +131,7 @@ const handleClickCreateButton = async () => {
             exclude_service_accounts: collectorFormStore.serviceAccounts,
         };
         Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-        const res:CollectorModel = await SpaceConnector.client.inventory.collector.create(params);
+        const res:CollectorModel = await SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
@@ -153,9 +155,13 @@ const handleConfirmCreateCollector = async () => {
     try {
         state.collectLoading = true;
         // After the collector created, if the user clicks the collect button, the collector will be executed.
-        await SpaceConnector.client.inventory.collector.collect({
-            collector_id: state.createdCollectorId,
-        });
+        if (state.createdCollectorId) {
+            await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
+                collector_id: state.createdCollectorId,
+            });
+        } else {
+            throw new Error('createdCollectorId is undefined');
+        }
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
         goToCollectorDetailPage();
     } catch (e) {

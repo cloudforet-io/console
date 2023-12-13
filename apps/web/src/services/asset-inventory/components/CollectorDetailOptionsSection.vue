@@ -122,7 +122,7 @@ const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
         collector_id: collectorFormStore.collectorId,
         options: collectorFormState.options,
     };
-    return SpaceConnector.client.inventory.collector.updatePlugin(params);
+    return SpaceConnector.clientV2.inventory.collector.updatePlugin(params);
 };
 const handleClickEdit = () => {
     state.isEditMode = true;
