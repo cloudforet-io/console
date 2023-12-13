@@ -11,7 +11,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
-import { userRoleFormatter } from '@/services/administration/composables/refined-user-data';
+import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 
 const modalSettingStore = useUserModalSettingStore();
@@ -94,14 +94,14 @@ watch(() => state.selectedItems, (selectedItems) => {
             >
                 <template #dropdown-left-area>
                     <img v-if="state.selectedItems.length > 0"
-                         :src="userRoleFormatter(state.selectedItems[0]?.role_type).image"
+                         :src="useRoleFormatter(state.selectedItems[0]?.role_type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
                 </template>
                 <template #menu-item--format="{item}">
                     <div class="role-menu-item">
-                        <img :src="userRoleFormatter(item.role_type).image"
+                        <img :src="useRoleFormatter(item.role_type).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >

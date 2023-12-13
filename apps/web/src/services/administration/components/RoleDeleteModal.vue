@@ -3,12 +3,8 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
-import { PDataTable, PBadge } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import { PDataTable } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { RoleBindingListParameters, RoleBindingListResponse } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -21,12 +17,16 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
+import {
+    ROLE_DELETE_TABLE_FIELDS,
+    ROLE_UN_DELETABLE_TABLE_FIELDS,
+} from '@/services/administration/constants/role-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 
 interface UnDeletableRole {
     roleName: string;
-    roleDescription: string;
+    roleId: string;
     roleType: string;
     assignTo: { resource_id: string; resource_type: string };
 }
@@ -49,23 +49,32 @@ const state = reactive({
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
-    fields: [
-        { name: 'name', label: 'Name' },
-        { name: 'tags.description', label: 'Description' },
-        { name: 'role_type', label: 'Role Type' },
-        { name: 'created_at', label: 'Created' },
-    ] as DataTableField[],
     unDeletableRoles: [] as UnDeletableRole[],
-    unDeletableRoleFields: [
-        { name: 'roleName', label: 'Role Name' },
-        { name: 'roleDescription', label: 'Role Description' },
-        { name: 'roleType', label: 'Role Type' },
-        { name: 'assignTo', label: 'Assigned To' },
-    ] as DataTableField[],
     isDeletable: computed(() => state.unDeletableRoles.length === 0),
     headerTitle: computed(() => (state.isDeletable ? i18n.t('IAM.ROLE.MODAL.DELETE_TITLE') : i18n.t('IAM.ROLE.MODAL.DELETE_TITLE_CANNOT'))),
 });
 
+/* API */
+const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
+    state.loading = true;
+    try {
+        const results = await rolePageStore.listRoleBindings({
+            role_id: role.role_id,
+        });
+        const roleBindingList: UnDeletableRole[] = results?.map((roleBinding: RoleBindingModel) => ({
+            roleName: role.name,
+            roleId: role.role_id,
+            roleType: role.role_type,
+            assignTo: { resource_id: roleBinding.user_id, resource_type: 'identity.User' },
+        })) ?? [];
+        state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.unDeletableRoles = [];
+    } finally {
+        state.loading = false;
+    }
+}));
 const handleDelete = async () => {
     let isAllSucceed = true;
     await Promise.all(rolePageStore.selectedRoles.map(async (role) => {
@@ -82,48 +91,30 @@ const handleDelete = async () => {
     }
 };
 
-const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, RoleBindingListResponse>({
-            role_id: role.role_id,
-        });
-        const roleBindingList: UnDeletableRole[] = results?.map((roleBinding: RoleBindingModel) => ({
-            roleName: role.name,
-            roleDescription: role.tags?.description,
-            roleType: role.role_type,
-            assignTo: { resource_id: roleBinding.user_id, resource_type: 'identity.User' },
-        })) ?? [];
-        state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
-    } catch (e) {
-        ErrorHandler.handleError(e);
+/* Watcher */
+watch(() => state.proxyVisible, async (after) => {
+    if (after) {
         state.unDeletableRoles = [];
+        await getRoleBindingList();
     }
-}));
+}, { immediate: true });
 
+/* Init */
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/user/load'),
     ]);
 })();
-
-/* Watcher */
-watch(() => state.proxyVisible, async (after) => {
-    state.loading = true;
-    if (after) {
-        state.unDeletableRoles = [];
-        await getRoleBindingList();
-        state.loading = false;
-    }
-}, { immediate: true });
 </script>
 
 <template>
     <delete-modal :visible.sync="state.proxyVisible"
-                  size="lg"
+                  size="md"
                   :header-title="state.headerTitle"
                   :hide-footer="!state.isDeletable"
                   :loading="state.loading"
                   :enable-scroll="true"
+                  class="role-delete-modal"
                   @confirm="handleDelete"
     >
         <template #delete-modal-body>
@@ -135,38 +126,34 @@ watch(() => state.proxyVisible, async (after) => {
             <p-data-table v-if="state.isDeletable"
                           class="role-data-table"
                           :items="rolePageStore.selectedRoles"
-                          :fields="state.fields"
+                          :fields="ROLE_DELETE_TABLE_FIELDS"
                           :loading="state.loading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
             >
                 <template #col-role_type-format="{ value }">
-                    <p-badge v-if="value"
-                             badge-type="solid-outline"
-                             :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
-                    >
-                        {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
-                    </p-badge>
-                </template>
-                <template #col-tags.description-format="{ value }">
-                    {{ value ? value : '--' }}
+                    <span class="role-type">
+                        <img :src="useRoleFormatter(value).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span>{{ useRoleFormatter(value).name }}</span>
+                    </span>
                 </template>
             </p-data-table>
             <p-data-table v-else
                           :items="state.unDeletableRoles"
-                          :fields="state.unDeletableRoleFields"
+                          :fields="ROLE_UN_DELETABLE_TABLE_FIELDS"
                           :loading="state.loading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 19.5rem)' }"
             >
-                <template #col-roleDescription-format="{ value }">
-                    {{ value ? value : '--' }}
-                </template>
                 <template #col-roleType-format="{ value }">
-                    <p-badge v-if="value"
-                             badge-type="solid-outline"
-                             :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
-                    >
-                        {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
-                    </p-badge>
+                    <span class="role-type">
+                        <img :src="useRoleFormatter(value).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span>{{ useRoleFormatter(value).name }}</span>
+                    </span>
                 </template>
                 <template #col-assignTo-format="{ value }">
                     {{ state.users[value.resource_id] ? state.users[value.resource_id].label : '--' }}
@@ -175,3 +162,17 @@ watch(() => state.proxyVisible, async (after) => {
         </template>
     </delete-modal>
 </template>
+
+<style scoped lang="postcss">
+.role-delete-modal {
+    .role-type {
+        @apply flex items-center;
+        gap: 0.5rem;
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    }
+}
+</style>

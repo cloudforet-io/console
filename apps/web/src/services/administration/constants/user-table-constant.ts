@@ -38,48 +38,31 @@ export const USER_MFA_COLOR = {
 } as const;
 
 export const USER_SEARCH_HANDLERS = {
-    keyItemSets: [{
-        title: 'Properties',
-        items: [
-            {
-                name: 'user_id',
-                label: 'User ID',
-            },
-            {
-                name: 'name',
-                label: 'Name',
-            },
-            {
-                name: 'state',
-                label: 'State',
-            },
-            {
-                name: 'email',
-                label: 'E-mail',
-            },
-            {
-                name: 'auth_type',
-                label: 'Auth Type',
-            },
-            {
-                name: 'last_accessed_at',
-                label: 'Last Activity',
-                dataType: 'datetime',
-            },
-            {
-                name: 'timezone',
-                label: 'Timezone',
-            },
-        ],
-    },
-    {
-        title: 'Advanced',
-        items: [{
-            name: 'tags',
-            label: 'Tags',
-            dataType: 'object',
-        }],
-    }] as KeyItemSet[],
+    keyItemSets: [
+        {
+            title: 'Properties',
+            items: [
+                { name: 'user_id', label: 'User ID' },
+                { name: 'name', label: 'Name' },
+                { name: 'state', label: 'State' },
+                { name: 'email', label: 'E-mail' },
+                { name: 'auth_type', label: 'Auth Type' },
+                {
+                    name: 'last_accessed_at',
+                    label: 'Last Activity',
+                    dataType: 'datetime',
+                },
+                { name: 'timezone', label: 'Timezone' },
+            ],
+        },
+        {
+            title: 'Advanced',
+            items: [{
+                name: 'tags',
+                label: 'Tags',
+                dataType: 'object',
+            }],
+        }] as KeyItemSet[],
     valueHandlerMap: {
         user_id: makeDistinctValueHandler('identity.User', 'user_id'),
         name: makeDistinctValueHandler('identity.User', 'name'),

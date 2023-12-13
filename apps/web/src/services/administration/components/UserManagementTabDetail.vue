@@ -21,9 +21,9 @@ import config from '@/lib/config';
 
 import {
     calculateTime,
-    userRoleFormatter,
+    useRoleFormatter,
     userStateFormatter,
-} from '@/services/administration/composables/refined-user-data';
+} from '@/services/administration/composables/refined-table-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const route = useRoute();
@@ -118,11 +118,11 @@ watch(() => state.selectedUser.user_id, (value) => {
             </template>
             <template #data-role_type="{value}">
                 <span class="role-type">
-                    <img :src="userRoleFormatter(value).image"
+                    <img :src="useRoleFormatter(value).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ userRoleFormatter(value).name }}</span>
+                    <span>{{ useRoleFormatter(value).name }}</span>
                 </span>
             </template>
             <template #data-role_binding_info="{value}">
