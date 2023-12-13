@@ -5,12 +5,13 @@ export interface BudgetUsageAnalyzeResult {
     total_spent: number;
     name?: string;
     project_id?: string;
-    project_group_id?: string;
+    workspace_id?: string;
     data_source_id?: string;
     provider_filter?: {
         state?: string;
         providers?: string[];
     };
+    permission_group: 'WORKSPACE' | 'DOMAIN';
 }
 
 export interface BudgetUsageAnalyzeResponse {
