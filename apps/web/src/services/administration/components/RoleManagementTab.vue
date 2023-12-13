@@ -18,10 +18,6 @@ import { useRolePageStore } from '@/services/administration/store/role-page-stor
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 
-const storeState = reactive({
-    timezone: computed(() => storeState.userInfo.timezone || 'UTC'),
-});
-
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
