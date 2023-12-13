@@ -46,7 +46,7 @@ const infoRoute: RouteConfig = {
                     props: true,
                 },
                 {
-                    path: ':boardId/:postId',
+                    path: ':postId',
                     name: makeAdminRouteName(INFO_ROUTE.NOTICE.DETAIL._NAME),
                     meta: {
                         translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, label: ({ params }) => params.id, copiable: true,
