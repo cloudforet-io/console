@@ -56,12 +56,26 @@ export default defineComponent({
                 {
                     type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.POLICY].translationId), id: MENU_ID.POLICY, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.POLICY._NAME) },
                 },
+                { type: 'divider' },
+                {
+                    type: 'title',
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.PREFERENCE].translationId),
+                    id: MENU_ID.PREFERENCE,
+                    foldable: false,
+                },
+                {
+                    type: 'item',
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId),
+                    id: MENU_ID.DOMAIN_SETTINGS,
+                    to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME) },
+                },
             ]),
-            menuSet: computed<LNBMenu[]>(() => [
-                ...filterLNBMenuByPermission([
-                    ...(state.isAdminMode ? state.adminModeMenuSet : state.userModeMenuSet),
-                ], store.getters['user/pagePermissionList']),
-            ]),
+            menuSet: computed<LNBMenu[]>(() => {
+                if (state.isAdminMode) return state.adminModeMenuSet;
+                return [
+                    ...filterLNBMenuByPermission(state.userModeMenuSet, store.getters['user/pagePermissionList']),
+                ];
+            }),
         });
         return {
             ...toRefs(state),

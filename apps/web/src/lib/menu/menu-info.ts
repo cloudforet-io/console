@@ -134,7 +134,7 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
     [MENU_ID.PREFERENCE]: {
         menuId: MENU_ID.PREFERENCE,
         routeName: ADMINISTRATION_ROUTE.PREFERENCE._NAME,
-        translationId: 'MENU.ADMINISTRATION_PRFERENCE',
+        translationId: 'MENU.ADMINISTRATION_PREFERENCE',
     },
     [MENU_ID.DOMAIN_SETTINGS]: {
         menuId: MENU_ID.DOMAIN_SETTINGS,

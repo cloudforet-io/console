@@ -116,7 +116,9 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
 
     _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
-    _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+    if (!isAdminMode) {
+        _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+    }
 
     return _allGnbMenuList;
 };
