@@ -1740,7 +1740,7 @@
 				"ROLE_TYPE_USER_DESC": "유저가 직접 생성하거나 초대받은 프로젝트와 프로젝트 그룹, 그리고 해당 프로젝트 그룹의 하위 프로젝트들만 접근하여 관리가 가능합니다."
 			},
 			"MODAL": {
-				"DELETE_HELP_TEXT": "다음의 역할(Role)들의 경우 이미 할당받은 유저가 있습니다.",
+				"DELETE_HELP_TEXT": "",
 				"DELETE_TITLE": "선택한 항목을 삭제하시겠습니까?",
 				"DELETE_TITLE_CANNOT": "해당 역할(Role)은 삭제가 불가합니다"
 			},

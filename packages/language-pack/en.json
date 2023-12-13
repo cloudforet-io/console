@@ -1740,7 +1740,7 @@
 				"ROLE_TYPE_USER_DESC": "Only invited(or self-made) projects/project groups and their child projects can be managed."
 			},
 			"MODAL": {
-				"DELETE_HELP_TEXT": "Please note that the following role has the assigned users / project member.",
+				"DELETE_HELP_TEXT": "The role below assigned to some users. To delete this role, first you should remove it from assigned users.",
 				"DELETE_TITLE": "Are you sure you want to delete selected item?",
 				"DELETE_TITLE_CANNOT": "Cannot delete this role"
 			},
