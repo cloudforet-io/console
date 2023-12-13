@@ -1609,6 +1609,28 @@
 		}
 	},
 	"IAM": {
+		"DOMAIN_SETTINGS": {
+			"ADMIN_EMAIL": "",
+			"BASE_INFORMATION": "기본 정보",
+			"BRAND_ASSETS": "",
+			"CHANGE": "변경",
+			"CHANGE_ADMIN_EMAIL": "",
+			"DISPLAY_NAME": "",
+			"DOMAIN_ID": "도메인 아이디",
+			"DOMAIN_NAME": "도메인 이름",
+			"EMAIL_INVALID": "잘못된 이메일 형식입니다.",
+			"LANGUAGE": "언어",
+			"LOGIN_PAGE_MAIN_IMAGE_DESCRIPTION": "",
+			"SAVE_CHANGE": "변경사항 저장",
+			"SAVE_CHANGES": "변경사항 저장",
+			"SEND_CODE": "인증 코드 전송",
+			"SYMBOL_FAVICON_DESCRIPTION": "",
+			"TIMEZONE": "타임존",
+			"TIMEZONE_AND_LANGUAGE": "",
+			"VERIFICATION_CODE": "인증 코드",
+			"VERIFICATION_CODE_INVALID": "필수 입력 항목입니다.",
+			"WORDTYPE_LOGO_DESCRIPTION": ""
+		},
 		"POLICY": {
 			"FORM": {
 				"CANCEL": "취소",
@@ -2499,8 +2521,10 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "추가 설정",
 		"ADMINISTRATION": "관리",
+		"ADMINISTRATION_DOMAIN_SETTINGS": "",
 		"ADMINISTRATION_IAM": "사용자 및 권한 관리",
 		"ADMINISTRATION_POLICY": "정책",
+		"ADMINISTRATION_PREFERENCE": "",
 		"ADMINISTRATION_ROLE": "역할",
 		"ADMINISTRATION_USER": "사용자",
 		"ALERT_MANAGER": "얼럿 매니저",

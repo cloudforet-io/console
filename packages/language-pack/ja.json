@@ -1609,6 +1609,28 @@
 		}
 	},
 	"IAM": {
+		"DOMAIN_SETTINGS": {
+			"ADMIN_EMAIL": "",
+			"BASE_INFORMATION": "基本情報",
+			"BRAND_ASSETS": "",
+			"CHANGE": "変更",
+			"CHANGE_ADMIN_EMAIL": "",
+			"DISPLAY_NAME": "",
+			"DOMAIN_ID": "ドメインID",
+			"DOMAIN_NAME": "ドメイン名",
+			"EMAIL_INVALID": "無効なメール形式です",
+			"LANGUAGE": "言語",
+			"LOGIN_PAGE_MAIN_IMAGE_DESCRIPTION": "",
+			"SAVE_CHANGE": "変更事項保存",
+			"SAVE_CHANGES": "変更事項保存",
+			"SEND_CODE": "認証コードを送信",
+			"SYMBOL_FAVICON_DESCRIPTION": "",
+			"TIMEZONE": "タイムゾーン",
+			"TIMEZONE_AND_LANGUAGE": "",
+			"VERIFICATION_CODE": "認証コード",
+			"VERIFICATION_CODE_INVALID": "必須入力項目です。",
+			"WORDTYPE_LOGO_DESCRIPTION": ""
+		},
 		"POLICY": {
 			"FORM": {
 				"CANCEL": "取消",
@@ -2499,8 +2521,10 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
+		"ADMINISTRATION_DOMAIN_SETTINGS": "",
 		"ADMINISTRATION_IAM": "ユーザー及び権限管理",
 		"ADMINISTRATION_POLICY": "Policy",
+		"ADMINISTRATION_PREFERENCE": "",
 		"ADMINISTRATION_ROLE": "役割",
 		"ADMINISTRATION_USER": "ユーザー",
 		"ALERT_MANAGER": "アラートマネージャー",
