@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onBeforeUnmount, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -36,12 +36,12 @@ import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store
 import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
 
 const props = defineProps<{
-    boardId?: string;
     postId?: string;
 }>();
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+const noticeDetailGetters = noticeDetailStore.getters;
 
 const state = reactive({
     timezone: computed(() => store.state.user.timezone),
@@ -50,18 +50,18 @@ const state = reactive({
     postType: computed<NoticePostType>(() => state.noticePostData?.post_type ?? NOTICE_POST_TYPE.INTERNAL),
     prevNoticePost: undefined as PostModel | undefined,
     prevPostRoute: computed<Location|undefined>(() => {
-        if (!props.boardId || !state.prevNoticePost) return undefined;
+        if (!noticeDetailGetters.boardId || !state.prevNoticePost) return undefined;
         return {
             name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-            params: { boardId: props.boardId, postId: state.prevNoticePost.post_id },
+            params: { boardId: noticeDetailGetters.boardId, postId: state.prevNoticePost.post_id },
         };
     }),
     nextNoticePost: undefined as PostModel | undefined,
     nextPostRoute: computed<Location|undefined>(() => {
-        if (!props.boardId || !state.nextNoticePost) return undefined;
+        if (!noticeDetailGetters.boardId || !state.nextNoticePost) return undefined;
         return {
             name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-            params: { boardId: props.boardId, postId: state.nextNoticePost.post_id },
+            params: { boardId: noticeDetailGetters.boardId, postId: state.nextNoticePost.post_id },
         };
     }),
     domainName: computed<string>(() => store.state.domain.name ?? ''),
@@ -77,7 +77,7 @@ const { attachments } = useFileAttachments(files);
 /* Api */
 const getNextPostData = async (createdAt: string) => {
     try {
-        if (!props.boardId) throw new Error('boardId is undefined');
+        if (!noticeDetailGetters.boardId) throw new Error('boardId is undefined');
 
         const nextPostApiQueryHelper = new ApiQueryHelper()
             .setPage(1, 1)
@@ -92,7 +92,7 @@ const getNextPostData = async (createdAt: string) => {
         }
         const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
             domain_id: null,
-            board_id: props.boardId,
+            board_id: noticeDetailGetters.boardId,
             query: nextPostApiQueryHelper.data,
         });
         state.nextNoticePost = results?.length ? results[0] : undefined;
@@ -103,7 +103,7 @@ const getNextPostData = async (createdAt: string) => {
 };
 const getPrevPostData = async (createdAt: string) => {
     try {
-        if (!props.boardId) throw new Error('boardId is undefined');
+        if (!noticeDetailGetters.boardId) throw new Error('boardId is undefined');
 
         const prevPostApiQueryHelper = new ApiQueryHelper()
             .setPage(1, 1)
@@ -118,7 +118,7 @@ const getPrevPostData = async (createdAt: string) => {
         }
         const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
             domain_id: null,
-            board_id: props.boardId,
+            board_id: noticeDetailGetters.boardId,
             query: prevPostApiQueryHelper.data,
         });
         state.prevNoticePost = results?.length ? results[0] : undefined;
@@ -164,7 +164,7 @@ const handlePostClick = (direction: 'next'|'prev') => {
 
 const initPage = async (postId: string) => {
     state.loading = true;
-    await noticeDetailStore.getNoticePost(postId, props.boardId);
+    await noticeDetailStore.getNoticePost(postId);
     if (state.hasSystemRoleUser) await getPostDomainName();
     if (state.noticePostData?.created_at) {
         await getNextPostData(state.noticePostData.created_at);
@@ -179,10 +179,6 @@ const initPage = async (postId: string) => {
 watch(() => props.postId, (postId) => {
     if (postId) initPage(postId);
 }, { immediate: true });
-
-onBeforeUnmount(() => {
-    noticeDetailStore.reset();
-});
 
 </script>
 
