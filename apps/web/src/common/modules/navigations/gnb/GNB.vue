@@ -226,7 +226,7 @@ export default defineComponent({
         });
 
 
-        watch([containerWidth, state.isAdminMode], async ([changedWidth]) => {
+        watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {
             if (!changedWidth) return;
             state.availableMenuCount = state.gnbMenuList.length;
             await nextTick();
