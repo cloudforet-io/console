@@ -3,13 +3,14 @@ import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PDivider, PI,
+    PDivider, PI, PBadge,
 } from '@spaceone/design-system';
 
 import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -36,6 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
+const workspaceStore = useWorkspaceStore();
 const storeState = reactive({
     isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     costDataSource: computed(() => allReferenceStore.getters.costDataSource),
@@ -52,18 +54,21 @@ const state = reactive({
             budgetId: props.budgetUsage.budget_id,
         },
     })),
+    isProject: computed(() => !!props.budgetUsage.project_id),
     targetList: computed<string[]>(() => {
-        // admin mode
-        if (storeState.isAdminMode) {
-            return ['Workspace Name']; // TODO: temporary
+        const targetNameList: string[] = [];
+        if (props.budgetUsage.project_id) { // for project
+            const targetId = props.budgetUsage.project_id;
+            const targetProject: ProjectReferenceItem|undefined = storeState.projects[targetId];
+            if (targetProject?.data?.groupInfo?.name) targetNameList.push(targetProject.data.groupInfo.name);
+            targetNameList.push(targetProject?.name ?? targetId);
+        } else if (props.budgetUsage.workspace_id) { // for workspace
+            const targetWorkspace = workspaceStore.getters.currentWorkspace;
+            if (targetWorkspace) {
+                targetNameList.push(targetWorkspace.name ?? targetWorkspace.workspace_id);
+            }
         }
-        // user mode
-        const projectNameList: string[] = [];
-        const targetProjectId = props.budgetUsage.project_id as string;
-        const targetProject: ProjectReferenceItem|undefined = storeState.projects[targetProjectId];
-        if (targetProject?.data?.groupInfo?.name) projectNameList.push(targetProject.data.groupInfo.name);
-        projectNameList.push(targetProject?.name ?? targetProjectId);
-        return projectNameList;
+        return targetNameList;
     }),
     cost: computed<number>(() => props.budgetUsage.total_spent ?? 0),
     limit: computed<number>(() => props.budgetUsage.total_budget ?? 0),
@@ -118,30 +123,41 @@ const state = reactive({
                  class="budget-main-list-card"
     >
         <div class="card-header">
-            <div class="flex items-center mb-1">
-                <span v-for="(targetName, index) in state.targetList"
-                      :key="`${targetName}-${index}`"
-                      class="target-info"
-                      :class="{target: index === state.targetList.length - 1}"
-                >
-                    <p-i v-if="!storeState.isAdminMode && index === state.targetList.length - 1"
-                         name="ic_document-filled"
-                         color="inherit"
-                         width="1em"
-                         height="1em"
-                         class="mr-1"
-                    />
-                    {{ targetName }}
-                    <p-i v-if="index < state.targetList.length - 1"
-                         name="ic_chevron-right-thin"
-                         width="1em"
-                         height="1em"
-                    />
-                </span>
+            <div class="left-part">
+                <div class="flex items-center mb-1">
+                    <span v-for="(targetName, index) in state.targetList"
+                          :key="`${targetName}-${index}`"
+                          class="target-info"
+                          :class="{target: index === state.targetList.length - 1}"
+                    >
+                        <p-i v-if="state.isProject && index === state.targetList.length - 1"
+                             name="ic_document-filled"
+                             color="inherit"
+                             width="1em"
+                             height="1em"
+                             class="mr-1"
+                        />
+                        {{ targetName }}
+                        <p-i v-if="index < state.targetList.length - 1"
+                             name="ic_chevron-right-thin"
+                             width="1em"
+                             height="1em"
+                        />
+                    </span>
+                </div>
+                <p class="budget-name">
+                    {{ props.budgetUsage.name }}
+                </p>
             </div>
-            <p class="budget-name">
-                {{ props.budgetUsage.name }}
-            </p>
+            <div v-if="!state.isProject && !storeState.isAdminMode"
+                 class="right-part"
+            >
+                <p-badge style-type="indigo100"
+                         badge-type="subtle"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MANAGED_BY_ADMIN') }}
+                </p-badge>
+            </div>
         </div>
         <p-divider />
         <div class="card-body">
@@ -196,6 +212,9 @@ const state = reactive({
     }
     line-height: 1.2;
     .card-header {
+        display: flex;
+        align-content: center;
+        justify-content: space-between;
         padding: 1rem;
         .budget-name {
             @apply text-gray-900 font-bold;
@@ -209,6 +228,10 @@ const state = reactive({
             &.target {
                 @apply text-gray-700;
             }
+        }
+        .right-part {
+            display: flex;
+            align-items: center;
         }
     }
     .card-body {

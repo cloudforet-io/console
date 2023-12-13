@@ -504,6 +504,7 @@
 					"CREATE_BUDGET": "予算作成",
 					"DATA_SOURCE": "データソース",
 					"DESC": "降順",
+					"MANAGED_BY_ADMIN": "",
 					"NO_BUDGET": "予算なし",
 					"OVERSPENT": "予算超過",
 					"PERIOD": "期間",
