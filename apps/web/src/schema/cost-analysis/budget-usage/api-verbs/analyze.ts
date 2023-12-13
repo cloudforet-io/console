@@ -1,3 +1,6 @@
+import type { PermissionGroup } from '@/schema/identity/role-binding/type';
+
+
 export interface BudgetUsageAnalyzeResult {
     budget_id: string;
     budget_usage: number;
@@ -11,7 +14,7 @@ export interface BudgetUsageAnalyzeResult {
         state?: string;
         providers?: string[];
     };
-    permission_group: 'WORKSPACE' | 'DOMAIN';
+    permission_group: Extract<PermissionGroup, 'WORKSPACE' | 'DOMAIN'>;
 }
 
 export interface BudgetUsageAnalyzeResponse {
