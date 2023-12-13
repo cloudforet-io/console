@@ -3,6 +3,8 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectModel } from '@/schema/identity/project/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
@@ -128,6 +130,16 @@ export const useUserPageStore = defineStore('user-page', {
                 await SpaceConnector.clientV2.identity.roleBinding.delete<RoleDeleteParameters>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
+            }
+        },
+        //
+        async listProjects(params: ProjectListParameters) {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
+                return results || [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
             }
         },
     },

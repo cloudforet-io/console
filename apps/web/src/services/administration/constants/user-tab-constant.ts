@@ -1,4 +1,4 @@
-export const userTabTableFields = [
+export const USER_TAB_TABLE_FIELDS = [
     { name: 'user_id', label: 'User ID', sortable: false },
     { name: 'name', label: 'Name', sortable: false },
     { name: 'state', label: 'State', sortable: false },
@@ -8,4 +8,11 @@ export const userTabTableFields = [
     { name: 'auth_type', label: 'Auth Type', sortable: false },
     { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
     { name: 'timezone', label: 'Timezone', sortable: false },
-];
+] as const;
+
+export const USER_TABS = {
+    DETAIL: 'detail',
+    PROJECTS: 'projects',
+    TAG: 'tag',
+    DATA: 'data',
+} as const;
