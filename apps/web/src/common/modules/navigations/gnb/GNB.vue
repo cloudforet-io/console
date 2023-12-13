@@ -226,12 +226,11 @@ export default defineComponent({
         });
 
 
-        watch([containerWidth, state.isAdminMode], ([changedWidth]) => {
+        watch([containerWidth, state.isAdminMode], async ([changedWidth]) => {
             if (!changedWidth) return;
             state.availableMenuCount = state.gnbMenuList.length;
-            nextTick(() => {
-                updateGNBLayout(changedWidth);
-            });
+            await nextTick();
+            updateGNBLayout(changedWidth);
         }, { immediate: true });
 
         return {
