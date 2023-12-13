@@ -1,4 +1,4 @@
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -10,58 +10,67 @@ import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import type { PostModel } from '@/schema/board/post/model';
 
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
+import { useNoticeStore } from '@/store/notice';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export const useNoticeDetailStore = defineStore('notice-detail', () => {
+    const noticeStore = useNoticeStore();
+    const noticeGetters = noticeStore.getters;
+
     const state = reactive({
-        boardId: undefined as undefined | string,
         post: undefined as undefined | PostModel,
     });
 
-    const setBoardId = async (boardId?: string) => {
-        if (boardId && boardId === state.boardId) return;
-        state.boardId = await getNoticeBoardId();
-    };
+    const getters = reactive({
+        boardId: computed<string|undefined>(() => noticeGetters.boardId),
+    });
+
     const actions = {
-        getNoticePost: async (postId: string, boardId?: string) => {
+        getNoticePost: async (postId: string) => {
             try {
-                await setBoardId(boardId);
-                if (!state.boardId) throw new Error('Notice board not found');
+                if (!getters.boardId) throw new Error('Notice board not found');
 
                 const result = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
-                    board_id: state.boardId,
+                    board_id: getters.boardId,
                     post_id: postId,
                 });
                 state.post = result;
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.post = undefined;
             }
         },
         deleteNoticePost: async (postId: string) => {
-            if (!state.boardId) throw new Error('Notice board not found');
+            if (!getters.boardId) throw new Error('Notice board not found');
             await SpaceConnector.clientV2.board.post.delete<PostDeleteParameters>({
                 post_id: postId,
-                board_id: state.boardId,
+                board_id: getters.boardId,
             });
             state.post = undefined;
         },
-        updateNoticePost: async (params: PostUpdateParameters) => {
-            const post = await SpaceConnector.clientV2.board.post.update<PostUpdateParameters, PostModel>(params);
+        updateNoticePost: async (params: Omit<PostUpdateParameters, 'board_id'|'post_id'>) => {
+            if (!getters.boardId) throw new Error('Notice board not found');
+            if (!state.post) throw new Error('Notice post not found');
+            const post = await SpaceConnector.clientV2.board.post.update<PostUpdateParameters, PostModel>({
+                ...params,
+                post_id: state.post.post_id,
+                board_id: getters.boardId,
+            });
             state.post = post;
         },
-        createNoticePost: async (params: PostCreateParameters) => {
-            await SpaceConnector.clientV2.board.post.create(params);
+        createNoticePost: async (params: Omit<PostCreateParameters, 'board_id'>) => {
+            if (!getters.boardId) throw new Error('Notice board not found');
+            await SpaceConnector.clientV2.board.post.create({ ...params, board_id: getters.boardId });
         },
         reset: () => {
-            state.boardId = undefined;
             state.post = undefined;
         },
     };
 
     return {
         state,
+        getters,
         ...actions,
     };
 });
