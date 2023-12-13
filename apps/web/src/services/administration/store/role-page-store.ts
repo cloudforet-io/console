@@ -28,9 +28,9 @@ interface RolePageState {
 export const useRolePageStore = defineStore('role-page', {
     state: (): RolePageState => ({
         loading: false,
-        roles: [],
+        roles: [] as RoleModel[],
         totalCount: 0,
-        selectedIndices: [],
+        selectedIndices: [] as number[],
     }),
     getters: {
         selectedRoles: (state) => state.selectedIndices.reduce((refined: RoleModel[], idx: number) => {
@@ -57,11 +57,8 @@ export const useRolePageStore = defineStore('role-page', {
             }
         },
         async getRoleDetail(params: RoleGetParameters) {
-            const { role_id } = params;
             try {
-                return await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
-                    role_id,
-                });
+                return await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
