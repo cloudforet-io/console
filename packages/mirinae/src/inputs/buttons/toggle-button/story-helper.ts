@@ -43,6 +43,60 @@ export const getToggleButtonArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    trueStateText: {
+        name: 'trueStateText',
+        type: { name: 'string' },
+        description: 'StateText when toggle is true',
+        defaultValue: 'ON',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'ON',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    falseStateText: {
+        name: 'falseStateText',
+        type: { name: 'string' },
+        description: 'StateText when toggle is false',
+        defaultValue: 'OFF',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'OFF',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    readOnly: {
+        name: 'readOnly',
+        type: { name: 'boolean' },
+        description: 'Button does not react on mouse events, and show only state text',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     position: {
         name: 'position',
         type: { name: 'string' },
