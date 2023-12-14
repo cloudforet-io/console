@@ -7,7 +7,7 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-import { isEmpty } from 'lodash';
+import { cloneDeep, isEmpty } from 'lodash';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -94,15 +94,34 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
 /* Component */
 const handleSelectDropdown = (name) => {
     switch (name) {
-    case APP_DROPDOWN_MODAL_TYPE.EDIT: clickFormModal(name);
+    case APP_DROPDOWN_MODAL_TYPE.EDIT: clickFormModal({
+        name,
+        title: i18n.t('IAM.APP.MODAL.EDIT_TITLE') as string,
+    });
         break;
-    case APP_DROPDOWN_MODAL_TYPE.DELETE: clickStateModal(name);
+    case APP_DROPDOWN_MODAL_TYPE.DELETE: clickStatusModal({
+        name,
+        title: i18n.t('IAM.APP.MODAL.DELETE_TITLE') as string,
+        theme: 'alert',
+    });
         break;
-    case APP_DROPDOWN_MODAL_TYPE.REGENERATE: clickStateModal(name);
+    case APP_DROPDOWN_MODAL_TYPE.REGENERATE: clickStatusModal({
+        name,
+        title: i18n.t('IAM.APP.MODAL.REGENERATE_TITLE') as string,
+        theme: 'primary',
+    });
         break;
-    case APP_DROPDOWN_MODAL_TYPE.ENABLE: clickStateModal(name);
+    case APP_DROPDOWN_MODAL_TYPE.ENABLE: clickStatusModal({
+        name,
+        title: i18n.t('IAM.APP.MODAL.ENABLE_TITLE') as string,
+        theme: 'primary',
+    });
         break;
-    case APP_DROPDOWN_MODAL_TYPE.DISABLE: clickStateModal(name);
+    case APP_DROPDOWN_MODAL_TYPE.DISABLE: clickStatusModal({
+        name,
+        title: i18n.t('IAM.APP.MODAL.DISABLE_TITLE') as string,
+        theme: 'alert',
+    });
         break;
     default: break;
     }
@@ -117,16 +136,21 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     }
     await getListApps();
 };
-const clickFormModal = (name: string) => {
+const clickFormModal = ({ name, title }) => {
     appPageStore.$patch((_state) => {
         _state.modal.type = name;
+        _state.modal.title = title;
         _state.modal.visible.form = true;
+        _state.modal = cloneDeep(_state.modal);
     });
 };
-const clickStateModal = (name: string) => {
+const clickStatusModal = ({ name, title, theme }) => {
     appPageStore.$patch((_state) => {
         _state.modal.type = name;
+        _state.modal.title = title;
         _state.modal.visible.status = true;
+        _state.modal.themeColor = theme;
+        _state.modal = cloneDeep(_state.modal);
     });
 };
 
