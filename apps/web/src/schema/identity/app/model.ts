@@ -1,4 +1,4 @@
-import type { TimeStamp } from '@/schema/_common/model';
+import type { TimeStamp, Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type { AppStatusType } from '@/schema/identity/app/type';
 import type { RoleType } from '@/schema/identity/role/type';
@@ -16,6 +16,7 @@ export interface AppModel {
     domain_id: string;
     created_at: TimeStamp;
     last_accessed_at: TimeStamp;
-    expired_at: TimeStamp
+    expired_at: TimeStamp;
+    tags?: Tags[];
 }
 

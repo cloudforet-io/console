@@ -1609,6 +1609,14 @@
 		}
 	},
 	"IAM": {
+		"APP": {
+			"ACTION": "Action",
+			"CREATE": "Create",
+			"DELETE": "Delete",
+			"EDIT": "Edit",
+			"REGENERATE": "Regenerate API Key",
+			"TITLE": "App"
+		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin email",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Failed to update admin email",

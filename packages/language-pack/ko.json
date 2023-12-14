@@ -1609,6 +1609,14 @@
 		}
 	},
 	"IAM": {
+		"APP": {
+			"ACTION": "작업",
+			"CREATE": "생성",
+			"DELETE": "삭제",
+			"EDIT": "수정",
+			"REGENERATE": "",
+			"TITLE": ""
+		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "",
