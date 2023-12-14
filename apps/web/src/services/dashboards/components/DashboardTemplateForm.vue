@@ -1,121 +1,3 @@
-<template>
-    <div class="dashboard-template-wrapper">
-        <p-search
-            :value.sync="state.searchValue"
-            @update:value="handleInputSearch"
-        />
-        <div
-            ref="templateContainerRef"
-            class="dashboard-template-container"
-        >
-            <div class="card-container default-dashboard-board">
-                <span class="card-wrapper-title">
-                    {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
-                </span>
-                <div class="card-wrapper">
-                    <p-board
-                        selectable
-                        style-type="cards"
-                        :style-options="{ column: 3 }"
-                        :board-sets="defaultTemplateState.boardSets"
-                        :selected-item="state.selectedTemplateName"
-                        @item-click="handleSelectTemplate"
-                    >
-                        <template #item-content="{board}">
-                            <div class="content-layout">
-                                <p-i :name="board.description.icon"
-                                     width="2.5rem"
-                                     height="2.5rem"
-                                />
-                                <strong class="dashboard-name">{{ board.name }}</strong>
-                                <div class="dashboard-label-wrapper">
-                                    <p-label v-for="(label, idx) in board.labels"
-                                             :key="`board-${board.name}-label-${idx}`"
-                                             :text="label"
-                                             :click-stop="false"
-                                    />
-                                </div>
-                                <span class="dashboard-description-text">{{ board.description.text }}</span>
-                            </div>
-                        </template>
-                        <template #item-overlay-content="{board}">
-                            <p-link v-if="board.description?.preview_image"
-                                    action-icon="internal-link"
-                                    size="md"
-                                    highlight
-                                    new-tab
-                                    :text="$t('DASHBOARDS.CREATE.PREVIEW')"
-                                    :href="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
-                            />
-                        </template>
-                    </p-board>
-                    <p-text-pagination
-                        v-show="defaultTemplateState.allPage >= 2"
-                        :this-page="defaultTemplateState.thisPage"
-                        :all-page="defaultTemplateState.allPage"
-                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
-                    />
-                </div>
-            </div>
-            <div v-if="existingTemplateState.boardSets.length"
-                 class="card-container existing-dashboard-board"
-            >
-                <span class="card-wrapper-title">
-                    {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
-                </span>
-                <div class="card-wrapper">
-                    <p-board
-                        selectable
-                        style-type="cards"
-                        :board-sets="existingTemplateState.boardSets"
-                        :selected-item="state.selectedTemplateName"
-                        @item-click="handleSelectTemplate"
-                    >
-                        <template #item-content="{board}">
-                            <div class="content-layout">
-                                <strong class="dashboard-name">{{ board.name }}</strong>
-                                <div class="dashboard-info">
-                                    {{ board.groupLabel }}
-                                </div>
-                                <div v-if="board.labels.length > 0"
-                                     class="dashboard-label-wrapper"
-                                >
-                                    <p-label v-for="(label, idx) in board.labels"
-                                             :key="`board-${board.name}-label-${idx}`"
-                                             :text="label"
-                                             :click-stop="false"
-                                    />
-                                </div>
-                            </div>
-                        </template>
-                        <template #item-overlay-content="{board}">
-                            <p-link class="legend"
-                                    action-icon="internal-link"
-                                    new-tab
-                                    highlight
-                                    :text="$t('DASHBOARDS.CREATE.VIEW')"
-                                    :to="getDashboardLocation(board)"
-                            />
-                        </template>
-                    </p-board>
-                    <p-text-pagination
-                        v-show="existingTemplateState.allPage >= 2"
-                        :this-page="existingTemplateState.thisPage"
-                        :all-page="existingTemplateState.allPage"
-                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
-                    />
-                </div>
-            </div>
-            <p-empty
-                v-show="!defaultTemplateState.boardSets.length && !existingTemplateState.boardSets.length"
-                show-image
-            >
-                {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
-            </p-empty>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, nextTick, reactive, ref,
@@ -240,6 +122,124 @@ const handleInputSearch = () => {
     handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();
 </script>
+
+<template>
+    <div class="dashboard-template-wrapper">
+        <p-search
+            :value.sync="state.searchValue"
+            @update:value="handleInputSearch"
+        />
+        <div
+            ref="templateContainerRef"
+            class="dashboard-template-container"
+        >
+            <div class="card-container default-dashboard-board">
+                <span class="card-wrapper-title">
+                    {{ $t('DASHBOARDS.CREATE.LABEL_DEFAULT_TEMPLATE') }}
+                </span>
+                <div class="card-wrapper">
+                    <p-board
+                        selectable
+                        style-type="cards"
+                        :style-options="{ column: 3 }"
+                        :board-sets="defaultTemplateState.boardSets"
+                        :selected-item="state.selectedTemplateName"
+                        @item-click="handleSelectTemplate"
+                    >
+                        <template #item-content="{board}">
+                            <div class="content-layout">
+                                <p-i :name="board.description.icon"
+                                     width="2.5rem"
+                                     height="2.5rem"
+                                />
+                                <strong class="dashboard-name">{{ board.name }}</strong>
+                                <div class="dashboard-label-wrapper">
+                                    <p-label v-for="(label, idx) in board.labels"
+                                             :key="`board-${board.name}-label-${idx}`"
+                                             :text="label"
+                                             :click-stop="false"
+                                    />
+                                </div>
+                                <span class="dashboard-description-text">{{ board.description.text }}</span>
+                            </div>
+                        </template>
+                        <template #item-overlay-content="{board}">
+                            <p-link v-if="board.description?.preview_image"
+                                    action-icon="internal-link"
+                                    size="md"
+                                    highlight
+                                    new-tab
+                                    :text="$t('DASHBOARDS.CREATE.PREVIEW')"
+                                    :href="`/images/dashboard-previews/dashboard-img_${board.description?.preview_image}--thumbnail.png`"
+                            />
+                        </template>
+                    </p-board>
+                    <p-text-pagination
+                        v-show="defaultTemplateState.allPage >= 2"
+                        :this-page="defaultTemplateState.thisPage"
+                        :all-page="defaultTemplateState.allPage"
+                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
+                    />
+                </div>
+            </div>
+            <div v-if="existingTemplateState.boardSets.length"
+                 class="card-container existing-dashboard-board"
+            >
+                <span class="card-wrapper-title">
+                    {{ $t('DASHBOARDS.CREATE.LABEL_EXISTING_DASHBOARD') }}
+                </span>
+                <div class="card-wrapper">
+                    <p-board
+                        selectable
+                        style-type="cards"
+                        :board-sets="existingTemplateState.boardSets"
+                        :selected-item="state.selectedTemplateName"
+                        @item-click="handleSelectTemplate"
+                    >
+                        <template #item-content="{board}">
+                            <div class="content-layout">
+                                <strong class="dashboard-name">{{ board.name }}</strong>
+                                <div class="dashboard-info">
+                                    {{ board.groupLabel }}
+                                </div>
+                                <div v-if="board.labels.length > 0"
+                                     class="dashboard-label-wrapper"
+                                >
+                                    <p-label v-for="(label, idx) in board.labels"
+                                             :key="`board-${board.name}-label-${idx}`"
+                                             :text="label"
+                                             :click-stop="false"
+                                    />
+                                </div>
+                            </div>
+                        </template>
+                        <template #item-overlay-content="{board}">
+                            <p-link class="legend"
+                                    action-icon="internal-link"
+                                    new-tab
+                                    highlight
+                                    :text="$t('DASHBOARDS.CREATE.VIEW')"
+                                    :to="getDashboardLocation(board)"
+                            />
+                        </template>
+                    </p-board>
+                    <p-text-pagination
+                        v-show="existingTemplateState.allPage >= 2"
+                        :this-page="existingTemplateState.thisPage"
+                        :all-page="existingTemplateState.allPage"
+                        @pageChange="handleChangePagination($event, TEMPLATE_TYPE.EXISTING)"
+                    />
+                </div>
+            </div>
+            <p-empty
+                v-show="!defaultTemplateState.boardSets.length && !existingTemplateState.boardSets.length"
+                show-image
+            >
+                {{ $t('DASHBOARDS.CREATE.NO_DATA') }}
+            </p-empty>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-template-wrapper {

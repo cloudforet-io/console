@@ -1,46 +1,3 @@
-<template>
-    <div v-on-click-outside="handleEscape"
-         class="dashboard-labels"
-         @keydown.esc="handleEscape"
-         @keydown.enter="handlePushLabel"
-    >
-        <p-label
-            v-for="(label, index) in state.labelList"
-            :key="`dashboard-label-${index}`"
-            :text="label"
-            :deletable="props.editable"
-            @delete="handleDelete(index)"
-        />
-        <p-icon-button v-if="!state.inputMode && props.editable"
-                       style-type="tertiary"
-                       name="ic_plus_bold"
-                       size="sm"
-                       shape="square"
-                       @click="handleClickPlus"
-        />
-        <span v-if="!state.inputMode && !state.labelList.length && props.editable"
-              class="dashboard-labels-add-info"
-              @click="handleClickPlus"
-        >
-            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
-        </span>
-        <p-field-group
-            v-if="state.inputMode"
-            :invalid="invalidState.inputText"
-            :invalid-text="invalidTexts.inputText"
-        >
-            <p-text-input
-                :value="inputText"
-                :is-focused.sync="state.isInputFocused"
-                :invalid="invalidState.inputText"
-                size="sm"
-                :placeholder="$t('DASHBOARDS.CUSTOMIZE.ENTER_NEW_LABEL')"
-                @update:value="setForm('inputText', $event)"
-            />
-        </p-field-group>
-    </div>
-</template>
-
 <script setup lang="ts">
 // CAUTION: this vOnClickOutside is using !! Please do not remove.
 import { vOnClickOutside } from '@vueuse/components';
@@ -118,6 +75,50 @@ const handleDelete = (index: number) => {
 };
 
 </script>
+
+<template>
+    <div v-on-click-outside="handleEscape"
+         class="dashboard-labels"
+         @keydown.esc="handleEscape"
+         @keydown.enter="handlePushLabel"
+    >
+        <p-label
+            v-for="(label, index) in state.labelList"
+            :key="`dashboard-label-${index}`"
+            :text="label"
+            :deletable="props.editable"
+            @delete="handleDelete(index)"
+        />
+        <p-icon-button v-if="!state.inputMode && props.editable"
+                       style-type="tertiary"
+                       name="ic_plus_bold"
+                       size="sm"
+                       shape="square"
+                       @click="handleClickPlus"
+        />
+        <span v-if="!state.inputMode && !state.labelList.length && props.editable"
+              class="dashboard-labels-add-info"
+              @click="handleClickPlus"
+        >
+            {{ $t('DASHBOARDS.CUSTOMIZE.ADD_LABEL') }}
+        </span>
+        <p-field-group
+            v-if="state.inputMode"
+            :invalid="invalidState.inputText"
+            :invalid-text="invalidTexts.inputText"
+        >
+            <p-text-input
+                :value="inputText"
+                :is-focused.sync="state.isInputFocused"
+                :invalid="invalidState.inputText"
+                size="sm"
+                :placeholder="$t('DASHBOARDS.CUSTOMIZE.ENTER_NEW_LABEL')"
+                @update:value="setForm('inputText', $event)"
+            />
+        </p-field-group>
+    </div>
+</template>
+
 <style lang="postcss" scoped>
 .dashboard-labels {
     display: flex;

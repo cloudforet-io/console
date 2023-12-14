@@ -1,34 +1,3 @@
-<template>
-    <div class="dashboard-customize">
-        <dashboard-customize-page-name :name.sync="state.name"
-                                       :dashboard-id="props.dashboardId"
-                                       @update:name="handleUpdateDashboardName"
-                                       @click-back-button="goBack"
-        />
-        <div class="filters-box">
-            <dashboard-labels editable />
-            <dashboard-toolset />
-        </div>
-        <p-divider />
-        <div class="dashboard-selectors">
-            <dashboard-variables class="variable-selector-wrapper"
-                                 disable-save-button
-                                 is-manageable
-            />
-            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                        refresh-disabled
-            />
-        </div>
-        <dashboard-widget-container edit-mode />
-        <dashboard-customize-sidebar :loading="props.loading"
-                                     :save-button-text="props.saveButtonText"
-                                     :hide-cancel-button="props.hideCancelButton"
-                                     @save="handleSave"
-                                     @cancel="goBack"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, onBeforeUnmount, onMounted, reactive, watch,
@@ -123,6 +92,38 @@ onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleUnload);
 });
 </script>
+
+<template>
+    <div class="dashboard-customize">
+        <dashboard-customize-page-name :name.sync="state.name"
+                                       :dashboard-id="props.dashboardId"
+                                       @update:name="handleUpdateDashboardName"
+                                       @click-back-button="goBack"
+        />
+        <div class="filters-box">
+            <dashboard-labels editable />
+            <dashboard-toolset />
+        </div>
+        <p-divider />
+        <div class="dashboard-selectors">
+            <dashboard-variables class="variable-selector-wrapper"
+                                 disable-save-button
+                                 is-manageable
+            />
+            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                        :loading="props.loading"
+                                        refresh-disabled
+            />
+        </div>
+        <dashboard-widget-container edit-mode />
+        <dashboard-customize-sidebar :loading="props.loading"
+                                     :save-button-text="props.saveButtonText"
+                                     :hide-cancel-button="props.hideCancelButton"
+                                     @save="handleSave"
+                                     @cancel="goBack"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-customize {

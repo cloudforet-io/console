@@ -4,7 +4,7 @@
         <div class="dashboard-viewers-wrapper">
             <p-radio-group direction="vertical">
                 <p-radio
-                    :selected="isPublicViewer"
+                    :selected="state.isPublicViewer"
                     @change="handleSelectViewer(DASHBOARD_VIEWER.PUBLIC)"
                 >
                     {{ $t('DASHBOARDS.CREATE.PUBLIC') }}
@@ -13,7 +13,7 @@
                     {{ $t('DASHBOARDS.CREATE.PUBLIC_DESC') }}
                 </p>
                 <p-radio
-                    :selected="!isPublicViewer"
+                    :selected="!state.isPublicViewer"
                     @change="handleSelectViewer(DASHBOARD_VIEWER.PRIVATE)"
                 >
                     <p-i name="ic_lock-filled"
@@ -31,9 +31,8 @@
     </section>
 </template>
 
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
+<script lang="ts" setup>
+import { reactive } from 'vue';
 
 import {
     PFieldTitle, PRadioGroup, PRadio, PI,
@@ -42,30 +41,25 @@ import {
 import { DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { DashboardViewer } from '@/schema/dashboard/_types/dashboard-type';
 
-export default {
-    name: 'DashboardViewerForm',
-    components: {
-        PFieldTitle,
-        PRadioGroup,
-        PRadio,
-        PI,
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            isPublicViewer: true,
-        });
+import { useProxyValue } from '@/common/composables/proxy-state';
 
-        const handleSelectViewer = (viewerType: DashboardViewer) => {
-            state.isPublicViewer = viewerType === DASHBOARD_VIEWER.PUBLIC;
-            emit('update:dashboardViewerType', viewerType);
-        };
 
-        return {
-            ...toRefs(state),
-            DASHBOARD_VIEWER,
-            handleSelectViewer,
-        };
-    },
+interface Props {
+    dashboardViewerType: DashboardViewer;
+}
+const props = withDefaults(defineProps<Props>(), {
+    dashboardViewerType: DASHBOARD_VIEWER.PUBLIC,
+});
+const emit = defineEmits<{(event: 'update:dashboard-viewer-type', dashboardViewerType: DashboardViewer): void;
+}>();
+const state = reactive({
+    proxyDashboardViewerType: useProxyValue('dashboardViewerType', props, emit),
+    isPublicViewer: true,
+});
+
+const handleSelectViewer = (viewerType: DashboardViewer) => {
+    state.isPublicViewer = viewerType === DASHBOARD_VIEWER.PUBLIC;
+    state.proxyDashboardViewerType = viewerType;
 };
 </script>
 

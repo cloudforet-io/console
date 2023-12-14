@@ -1,64 +1,3 @@
-<template>
-    <div class="list-wrapper">
-        <div class="variable-select-filter">
-            <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
-            <p-select-status v-for="(type, idx) in variableFilterList"
-                             :key="`variable-type-${idx}`"
-                             :selected="selectedVariableType"
-                             :value="type.name"
-                             @change="handleSelectType"
-            >
-                {{ type.label }}
-            </p-select-status>
-        </div>
-        <p-data-table class="variable-table"
-                      :items="orderedVariables"
-                      :fields="variableFields"
-        >
-            <template #col-selection_type-format="{ value }">
-                <span>{{ selectionType[value] }}</span>
-            </template>
-            <template #col-variable_type-format="{ value }">
-                <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
-                         badge-type="solid-outline"
-                >
-                    {{ variableType[value] }}
-                </p-badge>
-            </template>
-            <template #col-use-format="{ value, item }">
-                <p-toggle-button :value="value"
-                                 :disabled="item.disabled || item.required"
-                                 @change-toggle="handleToggleUse(item.propertyName, value)"
-                />
-            </template>
-            <template #col-description-format="{ value }">
-                <p-collapsible-panel class="options-area"
-                                     is-collapsed
-                                     :line-clamp="1"
-                >
-                    {{ $t(value) }}
-                </p-collapsible-panel>
-            </template>
-            <template #col-managable-format="{ value }">
-                <div v-if="value"
-                     class="button-wrapper"
-                >
-                    <p-icon-button name="ic_duplicate"
-                                   @click="handleClonrVariable(value)"
-                    />
-                    <p-icon-button name="ic_edit"
-                                   @click="handleEditVariable(value)"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   style-type="negative-transparent"
-                                   @click="handleDeleteVariable(value)"
-                    />
-                </div>
-            </template>
-        </p-data-table>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive, toRefs, watch,
@@ -183,6 +122,67 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <div class="list-wrapper">
+        <div class="variable-select-filter">
+            <span class="filter-header">{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.FILTER_TITLE') }}</span>
+            <p-select-status v-for="(type, idx) in variableFilterList"
+                             :key="`variable-type-${idx}`"
+                             :selected="selectedVariableType"
+                             :value="type.name"
+                             @change="handleSelectType"
+            >
+                {{ type.label }}
+            </p-select-status>
+        </div>
+        <p-data-table class="variable-table"
+                      :items="orderedVariables"
+                      :fields="variableFields"
+        >
+            <template #col-selection_type-format="{ value }">
+                <span>{{ selectionType[value] }}</span>
+            </template>
+            <template #col-variable_type-format="{ value }">
+                <p-badge :style-type="variableTypeBadgeStyleFormatter(value)"
+                         badge-type="solid-outline"
+                >
+                    {{ variableType[value] }}
+                </p-badge>
+            </template>
+            <template #col-use-format="{ value, item }">
+                <p-toggle-button :value="value"
+                                 :disabled="item.disabled || item.required"
+                                 @change-toggle="handleToggleUse(item.propertyName, value)"
+                />
+            </template>
+            <template #col-description-format="{ value }">
+                <p-collapsible-panel class="options-area"
+                                     is-collapsed
+                                     :line-clamp="1"
+                >
+                    {{ $t(value) }}
+                </p-collapsible-panel>
+            </template>
+            <template #col-managable-format="{ value }">
+                <div v-if="value"
+                     class="button-wrapper"
+                >
+                    <p-icon-button name="ic_duplicate"
+                                   @click="handleClonrVariable(value)"
+                    />
+                    <p-icon-button name="ic_edit"
+                                   @click="handleEditVariable(value)"
+                    />
+                    <p-icon-button name="ic_delete"
+                                   style-type="negative-transparent"
+                                   @click="handleDeleteVariable(value)"
+                    />
+                </div>
+            </template>
+        </p-data-table>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .list-wrapper {

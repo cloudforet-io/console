@@ -1,13 +1,5 @@
-<template>
-    <delete-modal :header-title="$t('DASHBOARDS.FORM.DELETE_TITLE')"
-                  :visible.sync="proxyVisible"
-                  :loading="loading"
-                  @confirm="handleDeleteDashboardConfirm"
-    />
-</template>
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import { computed, reactive, toRefs } from 'vue';
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -22,56 +14,52 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
-export default {
-    name: 'DashboardDeleteModal',
-    components: {
-        DeleteModal,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-            required: true,
-        },
-        dashboardId: {
-            type: String,
-            default: undefined,
-            required: true,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            dashboardId: computed<string>(() => props.dashboardId),
-            isProjectDashboard: computed<boolean>(() => state.dashboardId.startsWith('project')),
-            loading: false,
-        });
+interface Props {
+    visible?: boolean;
+    dashboardId?: string;
+}
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    dashboardId: undefined,
+});
+const emit = defineEmits<{(e: 'update:visible'): void,
+}>();
 
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    dashboardId: computed<string>(() => props.dashboardId),
+    isProjectDashboard: computed<boolean>(() => state.dashboardId.startsWith('project')),
+    loading: false,
+});
 
-        const handleDeleteDashboardConfirm = async () => {
-            try {
-                state.loading = true;
-                if (state.isProjectDashboard) {
-                    await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
-                        project_dashboard_id: state.dashboardId,
-                    });
-                    await store.dispatch('dashboard/loadProjectDashboard');
-                } else {
-                    await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
-                        domain_dashboard_id: state.dashboardId,
-                    });
-                    await store.dispatch('dashboard/loadDomainDashboard');
-                }
-                await SpaceRouter.router.replace({ name: DASHBOARDS_ROUTE.ALL._NAME });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
-            } finally {
-                state.loading = false;
-                state.proxyVisible = false;
-            }
-        };
-
-        return { ...toRefs(state), handleDeleteDashboardConfirm };
-    },
+const handleDeleteDashboardConfirm = async () => {
+    try {
+        state.loading = true;
+        if (state.isProjectDashboard) {
+            await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
+                project_dashboard_id: state.dashboardId,
+            });
+            await store.dispatch('dashboard/loadProjectDashboard');
+        } else {
+            await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
+                domain_dashboard_id: state.dashboardId,
+            });
+            await store.dispatch('dashboard/loadDomainDashboard');
+        }
+        await SpaceRouter.router.replace({ name: DASHBOARDS_ROUTE.ALL._NAME });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
+    } finally {
+        state.loading = false;
+        state.proxyVisible = false;
+    }
 };
 </script>
+
+<template>
+    <delete-modal :header-title="$t('DASHBOARDS.FORM.DELETE_TITLE')"
+                  :visible.sync="state.proxyVisible"
+                  :loading="state.loading"
+                  @confirm="handleDeleteDashboardConfirm"
+    />
+</template>
