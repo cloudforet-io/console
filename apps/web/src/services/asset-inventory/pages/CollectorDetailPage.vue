@@ -1,5 +1,13 @@
 <template>
     <div class="collector-detail-page">
+        <portal to="page-top-notification">
+            <scoped-notification v-if="state.isNotiVisible"
+                                 :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
+                                 title-icon="ic_info-circle"
+                                 type="info"
+                                 hide-header-close-button
+            />
+        </portal>
         <p-heading :title="state.collectorName"
                    show-back-button
                    @click-back-button="handleClickBackButton"
@@ -112,6 +120,7 @@ import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -162,6 +171,7 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 
 const queryHelper = new QueryHelper();
 const state = reactive({
+    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
