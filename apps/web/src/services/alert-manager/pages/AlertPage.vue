@@ -15,9 +15,7 @@ import { queryStringToString } from '@/lib/router-query-string';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import AlertMainAssignedAlertPanel from '@/services/alert-manager/components/AlertMainAssignedAlertPanel.vue';
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
-import AlertMainNewAssignedAlertListCard from '@/services/alert-manager/components/AlertMainNewAssignedAlertListCard.vue';
 import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertListPageUrlQuery, AlertListTableFilters,
@@ -42,13 +40,6 @@ const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {
             ...query,
         },
     }).catch(() => {});
-};
-
-const onSelectAlertState = (alertState) => {
-    state.alertState = alertState;
-    state.assigned = ASSIGNED_STATE.ASSIGNED_TO_ME;
-    state.urgency = ALERT_URGENCY.ALL;
-    replaceAlertListPageUrlQuery({ state: alertState, urgency: state.urgency, assigned: state.assigned });
 };
 
 const onUpdateTable = (changed: Partial<AlertListTableFilters>) => {
@@ -78,8 +69,6 @@ const onUpdateTable = (changed: Partial<AlertListTableFilters>) => {
     <div class="alert-page">
         <p-heading :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
         <div class="content-wrapper grid grid-cols-12 gap-4">
-            <alert-main-new-assigned-alert-list-card class="col-span-12" />
-            <alert-main-assigned-alert-panel @select="onSelectAlertState" />
             <alert-main-data-table
                 :alert-state="state.alertState"
                 :urgency="state.urgency"
