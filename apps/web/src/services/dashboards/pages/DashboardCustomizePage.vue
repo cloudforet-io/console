@@ -1,13 +1,3 @@
-<template>
-    <div class="dashboard-customize-page">
-        <dashboard-customize :dashboard-id="props.dashboardId"
-                             :loading="state.loading"
-                             @go-back="handleClickBackButton"
-                             @save="updateDashboardData"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import { reactive, defineProps } from 'vue';
 
@@ -79,3 +69,13 @@ const updateDashboardData = async () => {
     }
 };
 </script>
+
+<template>
+    <div class="dashboard-customize-page">
+        <dashboard-customize :dashboard-id="props.dashboardId"
+                             :loading="state.loading"
+                             @go-back="handleClickBackButton"
+                             @save="updateDashboardData"
+        />
+    </div>
+</template>
