@@ -10,6 +10,7 @@ import WorkspaceOwnerImage from '@/assets/images/role/img_avatar_workspace-owner
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
+import { APP_STATE_COLOR } from '@/services/administration/constants/app-constant';
 import { USER_MFA_COLOR, USER_STATE_COLOR } from '@/services/administration/constants/user-table-constant';
 
 export const calculateTime = (lastAccessedDay, timezone) => {
@@ -59,3 +60,6 @@ export const useRoleFormatter = (type: RoleType, isWorkspace?: boolean) => {
     };
     }
 };
+export const appStateFormatter = colorBindFactory(APP_STATE_COLOR, (value) => value.toLowerCase());
+
+

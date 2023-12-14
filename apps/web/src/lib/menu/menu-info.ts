@@ -126,10 +126,10 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: ADMINISTRATION_ROUTE.IAM.ROLE._NAME,
         translationId: 'MENU.ADMINISTRATION_ROLE',
     },
-    [MENU_ID.POLICY]: {
-        menuId: MENU_ID.POLICY,
-        routeName: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
-        translationId: 'MENU.ADMINISTRATION_POLICY',
+    [MENU_ID.APP]: {
+        menuId: MENU_ID.APP,
+        routeName: ADMINISTRATION_ROUTE.IAM.APP._NAME,
+        translationId: 'MENU.ADMINISTRATION_APP',
     },
     [MENU_ID.PREFERENCE]: {
         menuId: MENU_ID.PREFERENCE,

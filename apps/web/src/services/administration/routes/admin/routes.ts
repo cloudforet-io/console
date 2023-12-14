@@ -9,12 +9,10 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
 const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 
 const UserPage = () => import('@/services/administration/pages/UserPage.vue');
-const RolePage = () => import('@/services/administration/pages/RolePage.vue');
-const RoleCreatePage = () => import('@/services/administration/pages/RoleCreatePage.vue');
-const RoleUpdatePage = () => import('@/services/administration/pages/RoleUpdatePage.vue');
-const PolicyPage = () => import('@/services/administration/pages/PolicyPage.vue');
-const PolicyCreatePage = () => import('@/services/administration/pages/PolicyCreatePage.vue');
-const PolicyDetailPage = () => import('@/services/administration/pages/PolicyDetailPage.vue');
+const AppPage = () => import('@/services/administration/pages/AppPage.vue');
+const RolePage = () => import('@/services/administration/pages/admin/RolePage.vue');
+const RoleCreatePage = () => import('@/services/administration/pages/admin/RoleCreatePage.vue');
+const RoleUpdatePage = () => import('@/services/administration/pages/admin/RoleUpdatePage.vue');
 
 const DomainSettingsPage = () => import('@/services/administration/pages/admin/AdminDomainSettingsPage.vue');
 
@@ -43,6 +41,12 @@ const adminAdministrationRoutes: RouteConfig = {
                     component: UserPage as any,
                 },
                 {
+                    path: 'app',
+                    name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.APP._NAME),
+                    meta: { lnbVisible: true, menuId: MENU_ID.APP },
+                    component: AppPage as any,
+                },
+                {
                     path: 'role',
                     meta: { menuId: MENU_ID.ROLE },
                     component: { template: '<router-view />' },
@@ -66,34 +70,6 @@ const adminAdministrationRoutes: RouteConfig = {
                             meta: { translationId: 'IAM.ROLE.FORM.EDIT_TITLE' },
                             props: true,
                             component: RoleUpdatePage,
-                        },
-                    ],
-                },
-                {
-                    path: 'policy',
-                    meta: { menuId: MENU_ID.POLICY },
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: '/',
-                            name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.POLICY._NAME),
-                            meta: { lnbVisible: true },
-                            props: true,
-                            component: PolicyPage,
-                        },
-                        {
-                            path: 'create',
-                            name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME),
-                            meta: { lnbVisible: false, translationId: 'IAM.POLICY.FORM.CREATE_TITLE' },
-                            props: true,
-                            component: PolicyCreatePage,
-                        },
-                        {
-                            path: ':id?',
-                            name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME),
-                            meta: { lnbVisible: true, label: ({ params }) => params.id, copiable: true },
-                            props: true,
-                            component: PolicyDetailPage,
                         },
                     ],
                 },

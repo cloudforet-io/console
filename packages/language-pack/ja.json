@@ -1609,6 +1609,14 @@
 		}
 	},
 	"IAM": {
+		"APP": {
+			"ACTION": "作業",
+			"CREATE": "作成",
+			"DELETE": "削除",
+			"EDIT": "編集",
+			"REGENERATE": "",
+			"TITLE": ""
+		},
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "",
@@ -2534,6 +2542,7 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "追加設定",
 		"ADMINISTRATION": "管理",
+		"ADMINISTRATION_APP": "",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "",
 		"ADMINISTRATION_IAM": "ユーザー及び権限管理",
 		"ADMINISTRATION_POLICY": "Policy",

@@ -23,7 +23,7 @@ export const MENU_ID = Object.freeze({
     IAM: 'iam',
     USER: 'user',
     ROLE: 'role',
-    POLICY: 'policy',
+    APP: 'app',
     PREFERENCE: 'preference',
     DOMAIN_SETTINGS: 'domain_settings',
     WORKSPACES: 'workspaces',

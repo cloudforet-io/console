@@ -51,6 +51,7 @@ export const MENU_LIST: Menu[] = [
                 needPermissionByRole: true,
                 subMenuList: [
                     { id: MENU_ID.USER, needPermissionByRole: true },
+                    { id: MENU_ID.APP, needPermissionByRole: true },
                 ],
             },
         ],
@@ -115,7 +116,7 @@ export const ADMIN_MENU_LIST: Menu[] = [
                 subMenuList: [
                     { id: MENU_ID.USER },
                     { id: MENU_ID.ROLE },
-                    { id: MENU_ID.POLICY },
+                    { id: MENU_ID.APP },
                 ],
             },
             {
