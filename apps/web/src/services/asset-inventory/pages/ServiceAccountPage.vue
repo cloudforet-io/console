@@ -304,6 +304,22 @@ watch(() => tableState.selectedAccountType, () => {
                     {{ status.label }}
                 </p-select-status>
             </div>
+            <p-heading use-total-count
+                       class="service-account-table-heading"
+                       :title="tableState.isTrustedAccount ? 'Trusted Account' : 'General Account'"
+                       :total-count="typeOptionState.totalCount"
+                       heading-type="sub"
+            >
+                <template #extra>
+                    <p-button style-type="primary"
+                              icon-left="ic_plus_bold"
+                              :disabled="!tableState.hasManagePermission"
+                              @click="clickAddServiceAccount"
+                    >
+                        {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.CREATE') }}
+                    </p-button>
+                </template>
+            </p-heading>
             <p-dynamic-layout v-if="tableState.schema"
                               class="service-account-table"
                               type="query-search-table"
@@ -320,17 +336,7 @@ watch(() => tableState.selectedAccountType, () => {
                               @export="exportServiceAccountData"
                               @click-settings="handleClickSettings"
                               @click-row="handleClickRow"
-            >
-                <template #toolbox-left>
-                    <p-button style-type="primary"
-                              icon-left="ic_plus_bold"
-                              :disabled="!tableState.hasManagePermission"
-                              @click="clickAddServiceAccount"
-                    >
-                        {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
-                    </p-button>
-                </template>
-            </p-dynamic-layout>
+            />
         </component>
         <custom-field-modal v-model="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
@@ -341,6 +347,10 @@ watch(() => tableState.selectedAccountType, () => {
 </template>
 
 <style lang="postcss" scoped>
+
+.service-account-table-heading {
+    margin-bottom: 0;
+}
 
 .service-account-provider-list {
     margin-bottom: 1.5rem;
