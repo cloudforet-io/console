@@ -2381,6 +2381,7 @@
 				"LAST_COLLECTED": "最後に収集した時間",
 				"NAME": "名前",
 				"NO_TAG": "タグなし",
+				"PAGE_NOTIFICATION": "",
 				"PLUGIN": "プラグイン",
 				"PLUGIN_ID": "プラグイン ID",
 				"REGION": "Region",

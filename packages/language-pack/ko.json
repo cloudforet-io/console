@@ -2381,6 +2381,7 @@
 				"LAST_COLLECTED": "최근 수집 시간",
 				"NAME": "이름",
 				"NO_TAG": "지정한 태그 없음",
+				"PAGE_NOTIFICATION": "",
 				"PLUGIN": "플러그인",
 				"PLUGIN_ID": "플러그인 ID",
 				"REGION": "Region",
