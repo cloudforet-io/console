@@ -30,5 +30,5 @@ export const initUserAndAuth = async (store, config) => {
 
     SpaceConnector.flushToken();
     store.dispatch('user/setIsSessionExpired', true);
-    return undefined;
+    throw new Error('Site initialization failed: Invalid user');
 };

@@ -58,27 +58,30 @@ const init = async (store) => {
         await initDomain(store, config);
     } catch (e) {
         initRouter();
-        throw new Error('Site initialization failed: No matched domain');
+        throw new Error();
     }
 
     const domainId = store.state.domain.domainId;
     initModeSetting();
     initRouter(domainId);
-    const userId = await initUserAndAuth(store, config);
-
-    if (userId) {
-        await initWorkspace(store);
-        prefetchResources();
-        initI18n(store);
-        initDayjs();
-        initQueryHelper(store);
-        initGtag(store, config);
-        initGtm(config);
-        initAmcharts(config);
-        initAmcharts5(config);
-        initErrorHandler(store);
-        initRequestIdleCallback();
-        await checkSsoAccessToken(store);
+    try {
+        const userId = await initUserAndAuth(store, config);
+        if (userId) {
+            await initWorkspace(store);
+            prefetchResources();
+            initI18n(store);
+            initDayjs();
+            initQueryHelper(store);
+            initGtag(store, config);
+            initGtm(config);
+            initAmcharts(config);
+            initAmcharts5(config);
+            initErrorHandler(store);
+            initRequestIdleCallback();
+            await checkSsoAccessToken(store);
+        }
+    } catch (e) {
+        console.error(e);
     }
 };
 
