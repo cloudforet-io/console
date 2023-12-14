@@ -2356,6 +2356,7 @@
 				"LAST_COLLECTED": "Last Collected",
 				"NAME": "Name",
 				"NO_TAG": "No Tags",
+				"PAGE_NOTIFICATION": "This collector’s settings can be changed in admin mode.",
 				"PLUGIN": "Plugin",
 				"PLUGIN_ID": "Plugin ID",
 				"REGION": "Region",
