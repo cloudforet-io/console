@@ -16,15 +16,6 @@ export const ADMINISTRATION_ROUTE = Object.freeze({
                 _NAME: `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.ROLE}.edit`,
             },
         },
-        POLICY: {
-            _NAME: `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.POLICY}`,
-            CREATE: {
-                _NAME: `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.POLICY}.create`,
-            },
-            DETAIL: {
-                _NAME: `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.POLICY}.detail`,
-            },
-        },
     },
     PREFERENCE: {
         _NAME: `${MENU_ID.ADMINISTRATION}.${MENU_ID.PREFERENCE}`,
