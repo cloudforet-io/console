@@ -1,23 +1,27 @@
 <script lang="ts" setup>
 import { onUnmounted } from 'vue';
-import { useRouter } from 'vue-router/composables';
 
 import {
     PHorizontalLayout, PHeading, PButton,
 } from '@spaceone/design-system';
 
+import { i18n } from '@/translations';
+
+import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
 import AppManagementTable from '@/services/administration/components/AppManagementTable.vue';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
 
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 
-const router = useRouter();
-
 /* Component */
 const handleCreateApp = () => {
-    router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME });
+    appPageStore.$patch((_state) => {
+        _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
+        _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
+        _state.modal.visible.form = true;
+    });
 };
 
 onUnmounted(() => {
@@ -47,6 +51,7 @@ onUnmounted(() => {
                 <app-management-table :table-height="height" />
             </template>
         </p-horizontal-layout>
+        <app-management-form-modal />
     </section>
 </template>
 
