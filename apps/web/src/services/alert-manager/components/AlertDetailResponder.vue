@@ -33,7 +33,7 @@ import TranslateResult = VueI18n.TranslateResult;
 
 interface Props {
     id?: string;
-    alertData?: AlertModel;
+    alertData?: Partial<AlertModel>;
     manageDisabled?: boolean;
 }
 interface Rule {
