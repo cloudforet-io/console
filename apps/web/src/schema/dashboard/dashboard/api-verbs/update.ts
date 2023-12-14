@@ -5,7 +5,7 @@ import type {
 
 
 export interface UpdateDashboardParameters {
-    domain_id: string;
+    dashboard_id: string;
     name?: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
