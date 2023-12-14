@@ -2,7 +2,6 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 
 // eslint-disable-next-line import/no-cycle
-import dashboard from './modules/dashboard';
 // eslint-disable-next-line import/no-cycle
 import display from './modules/display';
 import domain from './modules/domain';
@@ -20,7 +19,6 @@ Vue.use(Vuex);
 const store = new Vuex.Store<any>({
     modules: {
         user,
-        dashboard,
         settings,
         domain,
         favorite,
