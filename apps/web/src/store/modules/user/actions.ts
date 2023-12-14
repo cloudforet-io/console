@@ -113,7 +113,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
         auth_type: signInRequest.authType,
         credentials: signInRequest.credentials,
         verify_code: signInRequest.verify_code,
-        grant_type: 'CLIENT_CREDENTIALS',
+        // grant_type: 'CLIENT_CREDENTIALS',
     }, { skipAuthRefresh: true });
 
     SpaceConnector.setToken(response.access_token, response.refresh_token);
