@@ -1679,7 +1679,8 @@
 			"CREATE": "作成",
 			"DELETE": "削除",
 			"DETAIL": {
-				"API_POLICY": "APIポリシー接続",
+				"ALL_PERMISSIONS": "",
+				"API_POLICY": "",
 				"BASE_INFORMATION": "基本情報",
 				"CREATED_AT": "作成日",
 				"DESCRIPTION": "説明",

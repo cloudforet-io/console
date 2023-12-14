@@ -5,6 +5,8 @@ import {
 
 import { PDataTable } from '@spaceone/design-system';
 
+import { iso8601Formatter } from '@cloudforet/utils';
+
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -45,6 +47,9 @@ const emit = defineEmits<{(e: ':update:visible'): void,
     (e: 'refresh'): void,
 }>();
 
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+});
 const state = reactive({
     users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
     loading: true,
@@ -138,6 +143,9 @@ watch(() => state.proxyVisible, async (after) => {
                         >
                         <span>{{ useRoleFormatter(value).name }}</span>
                     </span>
+                </template>
+                <template #col-created_at-format="{ value }">
+                    {{ iso8601Formatter(value, storeState.timezone) }}
                 </template>
             </p-data-table>
             <p-data-table v-else

@@ -7,10 +7,10 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-import dayjs from 'dayjs';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
@@ -61,7 +61,7 @@ const storeState = reactive({
 const state = reactive({
     refinedUserItems: computed(() => rolePageState.roles.map((role) => ({
         ...role,
-        created_at: dayjs.tz(dayjs.utc(role.created_at), storeState.timezone).format('YYYY-MM-DD hh:mm:ss'),
+        created_at: iso8601Formatter(role.created_at, storeState.timezone),
     }))),
     tags: roleListApiQueryHelper.setKeyItemSets(ROLE_SEARCH_HANDLERS.keyItemSets).queryTags,
 });

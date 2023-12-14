@@ -177,3 +177,9 @@ export const ROLE_UN_DELETABLE_TABLE_FIELDS = [
     { name: 'roleType', label: 'Role Type' },
     { name: 'assignTo', label: 'Assigned To' },
 ] as const;
+
+export const ROLE_TAB_TABLE_FIELDS = [
+    { name: 'name', label: 'Name' },
+    { name: 'role_type', label: 'Role Type' },
+    { name: 'created_at', label: 'Created', sortable: false },
+] as const;

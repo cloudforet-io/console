@@ -5,108 +5,81 @@ import {
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PLink, PBadge, PDataTable, PDefinitionTable, PHeading,
+    PDefinitionTable, PHeading, PI,
 } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { PolicyModel } from '@/schema/identity/policy/model';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import type { PagePermission } from '@/lib/access-control/config';
 import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
     usePageAccessDefinitionTableData,
 } from '@/services/administration/composables/page-access-definition-table-data';
-import { POLICY_TYPE } from '@/services/administration/constants/policy-constant';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
-import { policyTypeBadgeColorFormatter } from '@/services/administration/helpers/policy-helper';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
-import type { PolicyType } from '@/services/administration/types/policy-type';
 
 type DataTableTranslationField = DataTableField | {
     label?: TranslateResult | string;
 };
-interface Props {
-    roleId: string;
+interface DetailMenuItems {
+    name: string;
+    label: string;
+    fields?: DataTableTranslationField[];
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    roleId: '',
-});
+const rolePageStore = useRolePageStore();
+const rolePageState = rolePageStore.$state;
 
-const RolePageStore = useRolePageStore();
+const detailMenuItems = computed<DetailMenuItems[]>(() => [
+    {
+        name: 'base_information',
+        label: i18n.t('IAM.ROLE.DETAIL.BASE_INFORMATION') as string,
+        fields: [
+            { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') },
+            { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE'), disableCopy: true },
+            { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
+        ],
+    },
+    {
+        name: 'page_access',
+        label: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS') as string,
+    },
+    {
+        name: 'api_policy',
+        label: i18n.t('IAM.ROLE.DETAIL.API_POLICY') as string,
+    },
+]);
 
-const baseInfoState = reactive({
-    title: computed(() => i18n.t('IAM.ROLE.DETAIL.BASE_INFORMATION')),
-    loading: true,
-    timezone: computed(() => store.state.user.timezone || 'UTC'),
-    fields: computed<DataTableTranslationField[]>(() => [
-        { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') },
-        { name: 'tags.description', label: i18n.t('IAM.ROLE.DETAIL.DESCRIPTION') },
-        { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE'), disableCopy: true },
-        { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
-    ]),
-    data: {} as Partial<RoleModel>,
-    pagePermissions: computed(() => baseInfoState.data?.page_permissions),
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
-const pageAccessState = reactive({
-    title: i18n.t('IAM.ROLE.DETAIL.PAGE_ACCESS'),
+const state = reactive({
     loading: false,
-    pageAccessDataList: usePageAccessDefinitionTableData(computed(() => baseInfoState.pagePermissions ?? [])),
-});
-const policyState = reactive({
-    fields: [
-        { name: 'name', label: 'Policy Name' },
-        { name: 'policy_type', label: 'Policy Type' },
-        { name: 'policy_id', label: 'Policy ID', sortable: false },
-        { name: 'tags.description', label: 'Policy Description', sortable: false },
-    ] as DataTableField[],
-    items: [] as (PolicyModel | { policy_type: PolicyType })[],
+    data: {} as Partial<RoleModel>,
+    selectedRole: computed<RoleModel>(() => rolePageStore.selectedRoles[0]),
+    permissionScopes: computed<string[]>(() => state.data?.permission_scopes ?? []),
+    pageAccess: computed<PagePermission[]>(() => state.data?.page_access ?? []),
+    pageAccessDataList: usePageAccessDefinitionTableData(computed(() => state.pageAccess ?? [])),
 });
 
 /* Api */
-const getPolicy = async (policy) => {
-    try {
-        let res;
-        if (policy.policy_type === POLICY_TYPE.MANAGED) {
-            res = await SpaceConnector.client.repository.policy.get({
-                policy_id: policy.policy_id,
-                policy_type: policy.policy_type,
-            });
-        } else {
-            res = await SpaceConnector.client.identity.policy.get({
-                policy_id: policy.policy_id,
-                policy_type: policy.policy_type,
-            });
-        }
-        res.policy_type = policy.policy_type;
-        return res;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        return undefined;
-    }
-};
 const getRoleDetailData = async (roleId) => {
-    baseInfoState.loading = true;
-    pageAccessState.loading = true;
+    state.loading = true;
     try {
-        baseInfoState.data = await RolePageStore.getRoleDetail({ role_id: roleId });
+        state.data = await rolePageStore.getRoleDetail({ role_id: roleId });
     } catch (e) {
-        baseInfoState.data = {};
+        state.data = {};
     } finally {
-        baseInfoState.loading = false;
-        pageAccessState.loading = false;
+        state.loading = false;
     }
 };
+// TODO: will be changed after API is ready
 const convertPagePermissionLabel = (data) => {
     switch (data) {
     case PAGE_PERMISSION_TYPE.MANAGE:
@@ -118,109 +91,127 @@ const convertPagePermissionLabel = (data) => {
     }
 };
 
-/* Init */
-const initPolicy = async (policies) => {
-    policyState.items = [];
-    await Promise.all(policies.map(async (policy) => {
-        const result = await getPolicy(policy);
-        if (result) policyState.items.push(result);
-    }));
-};
-
 /* Watcher */
-watch(() => props.roleId, async () => {
-    const roleId = props.roleId;
-    await getRoleDetailData(roleId);
-    //
-    await initPolicy(baseInfoState.data.policies ?? []);
+watch(() => state.selectedRole.role_id, async (roleId) => {
+    const selectedRoleId = rolePageStore.selectedRoles.length === 0 && rolePageState.selectedIndices.length !== 0
+        ? rolePageState.roles[rolePageState.selectedIndices[0]].role_id
+        : roleId;
+    await getRoleDetailData(selectedRoleId);
 }, { immediate: true });
 </script>
 
 <template>
-    <div>
-        <p-heading heading-type="sub"
-                   :title="baseInfoState.title"
-        />
-        <p-definition-table :fields="policyState.fields"
-                            :data="data"
-                            :loading="baseInfoState.loading"
-                            :skeleton-rows="4"
-                            v-on="$listeners"
+    <div class="role-management-tab-detail">
+        <div v-for="(item, idx) in detailMenuItems"
+             :key="`detail-menu-item-${idx}`"
         >
-            <template #data-created_at="{ data }">
-                {{ iso8601Formatter(data, baseInfoState.timezone) }}
-            </template>
-            <template #data-role_type="{ data }">
-                <p-badge v-if="data"
-                         badge-type="solid-outline"
-                         :style-type="ROLE_TYPE_BADGE_OPTION[data].styleType"
+            <p-heading heading-type="sub"
+                       :title="item.label"
+            />
+            <div class="detail-menu-content">
+                <p-definition-table v-if="item.name === 'base_information'"
+                                    :fields="item.fields"
+                                    :data="state.data"
+                                    :loading="state.loading"
+                                    :skeleton-rows="4"
+                                    class="base-information-table"
+                                    v-on="$listeners"
                 >
-                    {{ ROLE_TYPE_BADGE_OPTION[data] ? ROLE_TYPE_BADGE_OPTION[data].label : '' }}
-                </p-badge>
-            </template>
-        </p-definition-table>
-        <p-heading heading-type="sub"
-                   :title="pageAccessState.title"
-        />
-        <div v-for="pageAccessData in pageAccessState.pageAccessDataList"
-             :key="pageAccessData.label"
-        >
-            <h4 class="definition-table-header">
-                {{ pageAccessData.label }}
-            </h4>
-            <p-definition-table :fields="pageAccessData.fields"
-                                :data="pageAccessData.data"
-                                :loading="pageAccessState.loading"
-                                :skeleton-rows="3"
-                                disable-copy
-                                class="page-access-table"
-                                v-on="$listeners"
-            >
-                <template #data="{ data }">
-                    {{ convertPagePermissionLabel(data) }}
-                </template>
-            </p-definition-table>
+                    <template #data-created_at="{ data }">
+                        {{ iso8601Formatter(data, storeState.timezone) }}
+                    </template>
+                    <template #data-role_type="{ data }">
+                        <span class="role-type">
+                            <img :src="useRoleFormatter(data).image"
+                                 alt="role-type-icon"
+                                 class="role-type-icon"
+                            >
+                            <span>{{ useRoleFormatter(data).name }}</span>
+                        </span>
+                    </template>
+                </p-definition-table>
+                <div v-for="pageAccessData in state.pageAccessDataList"
+                     v-else-if="item.name === 'page_access'"
+                     :key="pageAccessData.label"
+                     class="page-access-table-wrapper"
+                >
+                    <h4 class="definition-table-header">
+                        {{ pageAccessData.label }}
+                    </h4>
+                    <p-definition-table :fields="pageAccessData.fields"
+                                        :data="pageAccessData.data"
+                                        :loading="state.loading"
+                                        :skeleton-rows="3"
+                                        disable-copy
+                                        class="page-access-table"
+                                        v-on="$listeners"
+                    >
+                        <template #data="{ data }">
+                            {{ convertPagePermissionLabel(data) }}
+                        </template>
+                    </p-definition-table>
+                </div>
+                <div v-else-if="item.name === 'api_policy'"
+                     class="api-policy-table"
+                >
+                    <div v-if="state.permissionScopes.length === 0"
+                         class="has-all-permissions"
+                    >
+                        <p-i name="ic_plugs"
+                             width="2rem"
+                             height="2rem"
+                             color="inherit"
+                        />
+                        <span class="text">
+                            {{ $t('IAM.ROLE.DETAIL.ALL_PERMISSIONS') }}
+                        </span>
+                    </div>
+                    <!-- TODO: will be updated after API is ready-->
+                    <div v-else>
+                        temp
+                    </div>
+                </div>
+            </div>
         </div>
-        <p-heading heading-type="sub">
-            {{ $t('IAM.ROLE.DETAIL.API_POLICY') }}
-        </p-heading>
-        <p-data-table :fields="policyState.fields"
-                      :items="policyState.items"
-                      :loading="baseInfoState.loading"
-                      :sortable="true"
-                      sort-by="name"
-                      :sort-desc="true"
-        >
-            <template #col-policy_type-format="{ value }">
-                <p-badge badge-type="solid-outline"
-                         :style-type="policyTypeBadgeColorFormatter(value)"
-                >
-                    {{ value }}
-                </p-badge>
-            </template>
-            <template #col-policy_id-format="{ value, item }">
-                <p-link :highlight="true"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
-                        new-tab
-                        :to="{
-                            name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
-                            params: { id: value },
-                            query: { type: item.policy_type }
-                        }"
-                >
-                    {{ value }}
-                </p-link>
-            </template>
-        </p-data-table>
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.definition-table-header {
-    @apply ml-4 mb-3 text-violet-700 font-bold;
+.role-management-tab-detail {
+    @apply flex flex-col;
+    gap: 0.625rem;
+    .detail-menu-content {
+        .base-information-table {
+            min-height: unset;
+            .role-type {
+                @apply flex items-center;
+                gap: 0.5rem;
+                .role-type-icon {
+                    @apply rounded-full;
+                    width: 1rem;
+                    height: 1rem;
+                }
+            }
+        }
+        .page-access-table-wrapper {
+            .definition-table-header {
+                @apply ml-4 mb-3 text-violet-700 font-bold;
+            }
+            .page-access-table {
+                min-height: unset;
+                margin-bottom: 1rem;
+            }
+        }
+        .api-policy-table {
+            padding-right: 1rem;
+            padding-left: 1rem;
+            .has-all-permissions {
+                @apply flex items-center border border-gray-200 rounded-md;
+                padding: 1rem;
+                gap: 0.5rem;
+            }
+        }
+    }
 }
-.page-access-table {
-    min-height: unset;
-    margin-bottom: 1rem;
-}
+
 </style>
