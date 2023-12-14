@@ -1,49 +1,6 @@
-<template>
-    <div class="dashboard-main-select-filter">
-        <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_VIWERS') }}</span>
-        <p-select-status v-for="(view, idx) in viewerFilterList"
-                         :key="`view-${idx}`"
-                         :selected="viewersStatus"
-                         class="select-desktop"
-                         :value="view.name"
-                         @change="handleChangeViewers"
-        >
-            {{ view.label }}
-        </p-select-status>
-        <p-select-dropdown class="select-tablet"
-                           :menu="viewerFilterList"
-                           :selected="viewersStatus"
-                           style-type="transparent"
-                           @update:selected="handleChangeViewers"
-        />
-        <template v-if="pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] && pagePermission[MENU_ID.PROJECT_DASHBOARDS]">
-            <p-divider class="divider"
-                       vertical
-            />
-            <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_SCOPE') }}</span>
-            <p-select-status v-for="(scope, idx) in scopeFilterList"
-                             :key="`scope-${idx}`"
-                             :selected="scopeStatus"
-                             class="select-desktop"
-                             :value="scope.name"
-                             @change="handleChangeScope"
-            >
-                {{ scope.label }}
-            </p-select-status>
-            <p-select-dropdown class="select-tablet"
-                               :menu="scopeFilterList"
-                               :selected="scopeStatus"
-                               style-type="transparent"
-                               @update:selected="handleChangeScope"
-            />
-        </template>
-    </div>
-</template>
-
-<script lang="ts">
+<script lang="ts" setup>
 import {
-    computed, defineComponent,
-    reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import { PSelectDropdown, PSelectStatus, PDivider } from '@spaceone/design-system';
@@ -55,50 +12,80 @@ import { DASHBOARD_SCOPE_TYPE } from '@/store/modules/dashboard/type';
 
 import { MENU_ID } from '@/lib/menu/config';
 
+
 const VIEWERS_TYPE = {
     ALL: 'ALL',
     PUBLIC: 'PUBLIC',
     PRIVATE: 'PRIVATE',
 } as const;
 
-export default defineComponent({
-    name: 'AllDashboardsSelectFilter',
-    components: { PSelectStatus, PSelectDropdown, PDivider },
-    setup() {
-        const state = reactive({
-            viewerFilterList: computed(() => [
-                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: VIEWERS_TYPE.ALL },
-                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PUBLIC'), name: VIEWERS_TYPE.PUBLIC },
-                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: VIEWERS_TYPE.PRIVATE },
-            ]),
-            scopeFilterList: computed(() => [
-                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: DASHBOARD_SCOPE_TYPE.ALL },
-                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: DASHBOARD_SCOPE_TYPE.DOMAIN },
-                { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: DASHBOARD_SCOPE_TYPE.PROJECT },
-            ]),
-            viewersStatus: computed(() => store.state.dashboard.viewers),
-            scopeStatus: computed(() => store.state.dashboard.scope),
-            pagePermission: computed(() => store.getters['user/pagePermissionMap']),
-        });
-
-        const handleChangeViewers = (selected) => {
-            if (selected === state.viewersStatus) return;
-            store.dispatch('dashboard/setSelectedViewers', selected);
-        };
-        const handleChangeScope = (selected) => {
-            if (selected === state.scopeStatus) return;
-            store.dispatch('dashboard/setSelectedScope', selected);
-        };
-
-        return {
-            ...toRefs(state),
-            handleChangeViewers,
-            handleChangeScope,
-            MENU_ID,
-        };
-    },
+const state = reactive({
+    viewerFilterList: computed(() => [
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: VIEWERS_TYPE.ALL },
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PUBLIC'), name: VIEWERS_TYPE.PUBLIC },
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: VIEWERS_TYPE.PRIVATE },
+    ]),
+    scopeFilterList: computed(() => [
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: DASHBOARD_SCOPE_TYPE.ALL },
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: DASHBOARD_SCOPE_TYPE.DOMAIN },
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: DASHBOARD_SCOPE_TYPE.PROJECT },
+    ]),
+    viewersStatus: computed(() => store.state.dashboard.viewers),
+    scopeStatus: computed(() => store.state.dashboard.scope),
+    pagePermission: computed(() => store.getters['user/pagePermissionMap']),
 });
+
+const handleChangeViewers = (selected) => {
+    if (selected === state.viewersStatus) return;
+    store.dispatch('dashboard/setSelectedViewers', selected);
+};
+const handleChangeScope = (selected) => {
+    if (selected === state.scopeStatus) return;
+    store.dispatch('dashboard/setSelectedScope', selected);
+};
 </script>
+
+<template>
+    <div class="dashboard-main-select-filter">
+        <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_VIWERS') }}</span>
+        <p-select-status v-for="(view, idx) in state.viewerFilterList"
+                         :key="`view-${idx}`"
+                         :selected="state.viewersStatus"
+                         class="select-desktop"
+                         :value="view.name"
+                         @change="handleChangeViewers"
+        >
+            {{ view.label }}
+        </p-select-status>
+        <p-select-dropdown class="select-tablet"
+                           :menu="state.viewerFilterList"
+                           :selected="state.viewersStatus"
+                           style-type="transparent"
+                           @update:selected="handleChangeViewers"
+        />
+        <template v-if="state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] && state.pagePermission[MENU_ID.PROJECT_DASHBOARDS]">
+            <p-divider class="divider"
+                       vertical
+            />
+            <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_SCOPE') }}</span>
+            <p-select-status v-for="(scope, idx) in state.scopeFilterList"
+                             :key="`scope-${idx}`"
+                             :selected="state.scopeStatus"
+                             class="select-desktop"
+                             :value="scope.name"
+                             @change="handleChangeScope"
+            >
+                {{ scope.label }}
+            </p-select-status>
+            <p-select-dropdown class="select-tablet"
+                               :menu="state.scopeFilterList"
+                               :selected="state.scopeStatus"
+                               style-type="transparent"
+                               @update:selected="handleChangeScope"
+            />
+        </template>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-main-select-filter {

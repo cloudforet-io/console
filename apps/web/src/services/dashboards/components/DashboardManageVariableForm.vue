@@ -1,57 +1,3 @@
-<template>
-    <div
-        class="manage-wrapper"
-    >
-        <p-field-group class="name-field"
-                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
-                       :invalid="invalidState.name"
-                       :invalid-text="invalidTexts.name"
-                       required
-        >
-            <template #default="{ invalid }">
-                <p-text-input class="name-input"
-                              :value="name"
-                              :invalid="invalid"
-                              @update:value="setForm('name', $event)"
-                />
-            </template>
-        </p-field-group>
-        <p-field-group class="selection-type-field"
-                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
-                       required
-        >
-            <p-select-dropdown class="selection-type-dropdown"
-                               :menu="selectionMenu"
-                               :selected.sync="selectionType"
-            />
-        </p-field-group>
-        <p-field-group class="description-field"
-                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DESCRIPTION')"
-        >
-            <p-text-input class="description-input"
-                          :value="description"
-                          @update:value="setForm('description', $event)"
-            />
-        </p-field-group>
-        <dashboard-manage-variable-options-field :options-type.sync="optionsType"
-                                                 :options.sync="options"
-                                                 @update-options-invalid="handleUpdateOptionsInvalid"
-        />
-        <div class="button-wrapper">
-            <p-button style-type="tertiary"
-                      @click="handleCancel"
-            >
-                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
-            </p-button>
-            <p-button :disabled="formInvalidState.formInvalid"
-                      @click="handleSave"
-            >
-                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
-            </p-button>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, onMounted, reactive, toRefs,
@@ -228,6 +174,60 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <div
+        class="manage-wrapper"
+    >
+        <p-field-group class="name-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_NAME')"
+                       :invalid="invalidState.name"
+                       :invalid-text="invalidTexts.name"
+                       required
+        >
+            <template #default="{ invalid }">
+                <p-text-input class="name-input"
+                              :value="name"
+                              :invalid="invalid"
+                              @update:value="setForm('name', $event)"
+                />
+            </template>
+        </p-field-group>
+        <p-field-group class="selection-type-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_SELECTION_TYPE')"
+                       required
+        >
+            <p-select-dropdown class="selection-type-dropdown"
+                               :menu="selectionMenu"
+                               :selected.sync="selectionType"
+            />
+        </p-field-group>
+        <p-field-group class="description-field"
+                       :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DESCRIPTION')"
+        >
+            <p-text-input class="description-input"
+                          :value="description"
+                          @update:value="setForm('description', $event)"
+            />
+        </p-field-group>
+        <dashboard-manage-variable-options-field :options-type.sync="optionsType"
+                                                 :options.sync="options"
+                                                 @update-options-invalid="handleUpdateOptionsInvalid"
+        />
+        <div class="button-wrapper">
+            <p-button style-type="tertiary"
+                      @click="handleCancel"
+            >
+                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.CANCEL') }}
+            </p-button>
+            <p-button :disabled="formInvalidState.formInvalid"
+                      @click="handleSave"
+            >
+                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.SAVE') }}
+            </p-button>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .manage-wrapper {

@@ -1,26 +1,3 @@
-<template>
-    <p-heading show-back-button
-               @click-back-button="handleClickBackButton"
-    >
-        <p-skeleton v-if="state.loading"
-                    width="20rem"
-                    height="1.5rem"
-        />
-        <p-field-group v-else
-                       :invalid="invalidState.nameInput"
-                       :invalid-text="invalidTexts.nameInput"
-        >
-            <template #default="{invalid}">
-                <p-text-input :value="nameInput"
-                              :invalid="invalid"
-                              :placeholder="state.placeHolder"
-                              :is-focused.sync="isTextInputFocused"
-                              @update:value="handleInput"
-                />
-            </template>
-        </p-field-group>
-    </p-heading>
-</template>
 <script setup lang="ts">
 // Below directive is used. Do not remove!!!
 import {
@@ -107,6 +84,30 @@ onMounted(() => {
     await store.dispatch('dashboard/loadProjectDashboard');
 })();
 </script>
+
+<template>
+    <p-heading show-back-button
+               @click-back-button="handleClickBackButton"
+    >
+        <p-skeleton v-if="state.loading"
+                    width="20rem"
+                    height="1.5rem"
+        />
+        <p-field-group v-else
+                       :invalid="invalidState.nameInput"
+                       :invalid-text="invalidTexts.nameInput"
+        >
+            <template #default="{invalid}">
+                <p-text-input :value="nameInput"
+                              :invalid="invalid"
+                              :placeholder="state.placeHolder"
+                              :is-focused.sync="isTextInputFocused"
+                              @update:value="handleInput"
+                />
+            </template>
+        </p-field-group>
+    </p-heading>
+</template>
 
 <style scoped lang="postcss">
 .title-area {

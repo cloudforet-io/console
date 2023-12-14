@@ -1,36 +1,6 @@
-<template>
-    <section class="dashboard-scope-form">
-        <p-field-title>{{ $t('DASHBOARDS.CREATE.LABEL_SCOPE') }}</p-field-title>
-        <div class="dashboard-scope-wrapper">
-            <p-radio-group direction="vertical"
-                           class="dashboard-scope-radio-group"
-            >
-                <p-radio :selected="isDomainScope"
-                         :disabled="!workspaceManagePermission"
-                         @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.WORKSPACE') }}
-                </p-radio>
-                <p-radio :selected="!isDomainScope"
-                         :disabled="!projectManagePermission"
-                         @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
-                </p-radio>
-            </p-radio-group>
-            <project-select-dropdown v-show="!isDomainScope"
-                                     project-selectable
-                                     :project-group-selectable="false"
-                                     @select="handleSelectProjects"
-            />
-        </div>
-    </section>
-</template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
+<script lang="ts" setup>
 import {
-    defineComponent, onMounted, reactive, toRefs,
+    onMounted, reactive,
 } from 'vue';
 
 import {
@@ -44,65 +14,83 @@ import { store } from '@/store';
 import { MENU_ID } from '@/lib/menu/config';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
-export default defineComponent({
-    name: 'DashboardScopeForm',
-    components: {
-        PFieldTitle,
-        ProjectSelectDropdown,
-        PRadioGroup,
-        PRadio,
-    },
-    props: {
-        dashboardProject: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            isDomainScope: true,
-            projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
-            workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
-        });
 
-        const handleSelectScope = (scopeType: DashboardScope) => {
-            updateScope(scopeType);
-        };
+interface Props {
+    dashboardScope?: DashboardScope;
+}
+const props = withDefaults(defineProps<Props>(), {
+    dashboardScope: undefined,
+});
+const emit = defineEmits<{(event: 'set-project', project: ProjectTreeNodeData): void;
+    (event: 'update:dashboard-scope', scopeType: DashboardScope): void;
+}>();
 
-        const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
-            // Emit projects as project.
-            emit('set-project', projects[0]);
-        };
+const state = reactive({
+    isDomainScope: true,
+    dashboardScope: useProxyValue('dashboardScope', props, emit),
+    projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
+    workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
+});
 
-        const updateScope = (scopeType: DashboardScope) => {
-            state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
-            emit('update:dashboardScope', scopeType);
-        };
+const handleSelectScope = (scopeType: DashboardScope) => {
+    updateScope(scopeType);
+};
 
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
+const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
+    // Emit projects as project.
+    emit('set-project', projects[0]);
+};
 
-        onMounted(() => {
-            if (!(state.projectManagePermission || state.workspaceManagePermission)) return;
-            if (!state.projectManagePermission) updateScope(DASHBOARD_SCOPE.DOMAIN);
-            if (!state.workspaceManagePermission) updateScope(DASHBOARD_SCOPE.PROJECT);
-        });
+const updateScope = (scopeType: DashboardScope) => {
+    state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
+    state.dashboardScope = scopeType;
+};
 
-        return {
-            ...toRefs(state),
-            handleSelectScope,
-            handleSelectProjects,
-            DASHBOARD_SCOPE,
-        };
-    },
+// LOAD REFERENCE STORE
+(async () => {
+    await store.dispatch('reference/project/load');
+})();
+
+onMounted(() => {
+    if (!(state.projectManagePermission || state.workspaceManagePermission)) return;
+    if (!state.projectManagePermission) updateScope(DASHBOARD_SCOPE.DOMAIN);
+    if (!state.workspaceManagePermission) updateScope(DASHBOARD_SCOPE.PROJECT);
 });
 </script>
+
+<template>
+    <section class="dashboard-scope-form">
+        <p-field-title>{{ $t('DASHBOARDS.CREATE.LABEL_SCOPE') }}</p-field-title>
+        <div class="dashboard-scope-wrapper">
+            <p-radio-group direction="vertical"
+                           class="dashboard-scope-radio-group"
+            >
+                <p-radio :selected="state.isDomainScope"
+                         :disabled="!state.workspaceManagePermission"
+                         @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
+                >
+                    {{ $t('DASHBOARDS.CREATE.WORKSPACE') }}
+                </p-radio>
+                <p-radio :selected="!state.isDomainScope"
+                         :disabled="!state.projectManagePermission"
+                         @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
+                >
+                    {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
+                </p-radio>
+            </p-radio-group>
+            <project-select-dropdown v-show="!state.isDomainScope"
+                                     project-selectable
+                                     :project-group-selectable="false"
+                                     @select="handleSelectProjects"
+            />
+        </div>
+    </section>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-scope-form {

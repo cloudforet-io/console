@@ -1,57 +1,3 @@
-<template>
-    <overlay-page-layout :visible="visible"
-                         class="dashboard-manage-variable-overay"
-    >
-        <p-heading :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
-                   show-back-button
-                   @click-back-button="handleClickGoBackButton"
-        />
-        <div class="content-wrapper">
-            <p-heading heading-type="sub"
-                       :use-total-count="contentType === 'LIST'"
-                       :total-count="variableSchema.order.length"
-                       :title="titleSet[contentType]"
-            >
-                <template #extra>
-                    <div class="add-button-wrapper">
-                        <p-button v-if="contentType === 'LIST'"
-                                  icon-left="ic_plus_bold"
-                                  @click="handleChangeAddContent"
-                        >
-                            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD') }}
-                        </p-button>
-                        <p-button v-else-if="contentType === 'EDIT'"
-                                  icon-left="ic_delete"
-                                  style-type="negative-secondary"
-                                  @click="handleOpenDeleteModal"
-                        >
-                            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
-                        </p-button>
-                    </div>
-                </template>
-            </p-heading>
-            <dashboard-manage-variable-table v-if="contentType === 'LIST'"
-                                             @delete="handleOpenDeleteModal"
-                                             @edit="handleChangeEditContent"
-                                             @clone="handleChangeCloneContent"
-            />
-            <dashboard-manage-variable-form v-else
-                                            :content-type.sync="contentType"
-                                            :variable-names="variableNames"
-                                            :selected-variable="variableSchema.properties[selectedVariable]"
-                                            @save-click="handleSaveVariable"
-                                            @cancel-click="handleClickCancel"
-            />
-        </div>
-        <delete-modal :header-title="deleteModalState.headerTitle"
-                      :contents="deleteModalState.contents"
-                      :visible.sync="deleteModalState.visible"
-                      :loading="deleteModalState.loading"
-                      @confirm="handleConfirmModalAction"
-        />
-    </overlay-page-layout>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive, toRefs,
@@ -213,6 +159,60 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <overlay-page-layout :visible="visible"
+                         class="dashboard-manage-variable-overay"
+    >
+        <p-heading :title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE')"
+                   show-back-button
+                   @click-back-button="handleClickGoBackButton"
+        />
+        <div class="content-wrapper">
+            <p-heading heading-type="sub"
+                       :use-total-count="contentType === 'LIST'"
+                       :total-count="variableSchema.order.length"
+                       :title="titleSet[contentType]"
+            >
+                <template #extra>
+                    <div class="add-button-wrapper">
+                        <p-button v-if="contentType === 'LIST'"
+                                  icon-left="ic_plus_bold"
+                                  @click="handleChangeAddContent"
+                        >
+                            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD') }}
+                        </p-button>
+                        <p-button v-else-if="contentType === 'EDIT'"
+                                  icon-left="ic_delete"
+                                  style-type="negative-secondary"
+                                  @click="handleOpenDeleteModal"
+                        >
+                            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.DELETE') }}
+                        </p-button>
+                    </div>
+                </template>
+            </p-heading>
+            <dashboard-manage-variable-table v-if="contentType === 'LIST'"
+                                             @delete="handleOpenDeleteModal"
+                                             @edit="handleChangeEditContent"
+                                             @clone="handleChangeCloneContent"
+            />
+            <dashboard-manage-variable-form v-else
+                                            :content-type.sync="contentType"
+                                            :variable-names="variableNames"
+                                            :selected-variable="variableSchema.properties[selectedVariable]"
+                                            @save-click="handleSaveVariable"
+                                            @cancel-click="handleClickCancel"
+            />
+        </div>
+        <delete-modal :header-title="deleteModalState.headerTitle"
+                      :contents="deleteModalState.contents"
+                      :visible.sync="deleteModalState.visible"
+                      :loading="deleteModalState.loading"
+                      @confirm="handleConfirmModalAction"
+        />
+    </overlay-page-layout>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-manage-variable-overay {
