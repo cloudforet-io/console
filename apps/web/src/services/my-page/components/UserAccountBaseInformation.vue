@@ -113,7 +113,8 @@ watch(() => store.state.user.language, (language) => {
                           class="text-input"
             />
         </p-field-group>
-        <p-field-group required
+        <p-field-group v-if="state.userRole === 'DOMAIN_ADMIN'"
+                       required
                        :label="$t('COMMON.PROFILE.ROLE')"
                        class="input-form"
         >
