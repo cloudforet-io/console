@@ -11,6 +11,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
 const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 
 const UserPage = () => import('@/services/administration/pages/UserPage.vue');
+const AppPage = () => import('@/services/administration/pages/AppPage.vue');
 
 const administrationRoutes: RouteConfig = {
     path: 'administration',
@@ -31,6 +32,12 @@ const administrationRoutes: RouteConfig = {
                     name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
                     meta: { lnbVisible: true, menuId: MENU_ID.USER },
                     component: UserPage as any,
+                },
+                {
+                    path: 'app',
+                    name: ADMINISTRATION_ROUTE.IAM.APP._NAME,
+                    meta: { lnbVisible: true, menuId: MENU_ID.APP },
+                    component: AppPage as any,
                 },
             ],
         },

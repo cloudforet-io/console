@@ -2534,6 +2534,7 @@
 	"MENU": {
 		"ADDITIONAL_SETTINGS": "Additional Settings",
 		"ADMINISTRATION": "Administration",
+		"ADMINISTRATION_APP": "App",
 		"ADMINISTRATION_DOMAIN_SETTINGS": "Domain Settings",
 		"ADMINISTRATION_IAM": "IAM",
 		"ADMINISTRATION_POLICY": "Policy",
