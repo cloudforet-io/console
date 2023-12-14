@@ -14,6 +14,12 @@ export interface UserRole {
     pagePermissions: PagePermission[];
 }
 
+export interface RoleInfo {
+    roleType: RoleType;
+    roleId: string;
+    pageAccess: string[];
+}
+
 export interface UserState {
     isSessionExpired?: boolean;
     userId?: string;
@@ -25,6 +31,7 @@ export interface UserState {
     language?: string;
     timezone?: string;
     roles?: Array<UserRole>;
+    currentRoleInfo?: RoleInfo;
     requiredActions?: string[];
     emailVerified?: boolean;
     isSignInLoading?: boolean;
