@@ -9,6 +9,7 @@ import { cloneDeep } from 'lodash';
 import { i18n } from '@/translations';
 
 import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
+import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
 import AppManagementTable from '@/services/administration/components/AppManagementTable.vue';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
@@ -54,6 +55,7 @@ onUnmounted(() => {
             </template>
         </p-horizontal-layout>
         <app-management-form-modal />
+        <app-management-status-modal />
     </section>
 </template>
 
