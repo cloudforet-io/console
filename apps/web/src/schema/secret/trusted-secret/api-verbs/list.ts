@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { PermissionGroup } from '@/schema/identity/role-binding/type';
+import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 export interface TrustedSecretListParameters {
     query?: Query
@@ -9,6 +9,6 @@ export interface TrustedSecretListParameters {
     schema_id?: string;
     provider?: string;
     trusted_account_id?: string,
-    permission_group?: PermissionGroup,
+    permission_group?: ResourceGroup,
     workspace_id?: string,
 }

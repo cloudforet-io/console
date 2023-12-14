@@ -6,6 +6,10 @@ import {
     PButton, PHeading, PIconButton, screens,
 } from '@spaceone/design-system';
 
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
+
+const collectorDetailPageStore = useCollectorDetailPageStore();
+
 const props = defineProps<{
     title: TranslateResult;
     editMode?: boolean;
@@ -29,7 +33,7 @@ const handleClickEdit = () => {
                :use-total-count="props.totalCount !== undefined"
                :total-count="props.totalCount"
     >
-        <template v-if="!props.editMode && !props.hideEditButton"
+        <template v-if="!props.editMode && !props.hideEditButton && collectorDetailPageStore.getters.isEditableCollector"
                   #extra
         >
             <p-button v-if="width > screens.mobile.max"

@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout>
-        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
-                        :edit-mode="state.isEditMode"
-                        @click-edit="handleClickEdit"
+        <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
+                                         :edit-mode="state.isEditMode"
+                                         @click-edit="handleClickEdit"
         />
 
         <div v-if="!state.isEditMode"
@@ -82,7 +82,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorPluginInfo from '@/services/asset-inventory/components/CollectorDetailPluginInfo.vue';
 import PluginSummaryCards from '@/services/asset-inventory/components/CollectorDetailPluginSummaryCards.vue';
-import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
+import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorTags from '@/services/asset-inventory/components/CollectorDetailTags.vue';
 import CollectorTagForm from '@/services/asset-inventory/components/CollectorFormTag.vue';
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
@@ -148,7 +148,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
 };
 const getRepositoryPlugin = async (pluginId: string) => {
     try {
-        state.repositoryPlugin = await SpaceConnector.client.repository.plugin.get({
+        state.repositoryPlugin = await SpaceConnector.clientV2.repository.plugin.get({
             plugin_id: pluginId,
         });
     } catch (e) {

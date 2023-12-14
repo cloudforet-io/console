@@ -135,7 +135,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         async getVersions(pluginId: string) {
             try {
-                const res = await SpaceConnector.client.repository.plugin.getVersions({
+                const res = await SpaceConnector.clientV2.repository.plugin.getVersions({
                     plugin_id: pluginId,
                 });
                 this.versions = res.results;
