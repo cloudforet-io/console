@@ -68,7 +68,7 @@ export interface DashboardTemplate {
     variables: DashboardVariables;
     variables_schema: DashboardVariablesSchema;
     labels: (DashboardLabel|string)[];
-    version: string;
+    version: number|string;
 }
 
 export interface DashboardLayoutWidgetInfo {
