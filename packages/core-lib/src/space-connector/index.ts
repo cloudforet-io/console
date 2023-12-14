@@ -111,7 +111,7 @@ export class SpaceConnector {
         throw new Error('Not initialized client V2!');
     }
 
-    static setToken(accessToken: string, refreshToken: string): void {
+    static setToken(accessToken: string, refreshToken?: string): void {
         SpaceConnector.instance.tokenApi.setToken(accessToken, refreshToken);
         SpaceConnector.instance.setApiTokenCheckInterval();
     }
