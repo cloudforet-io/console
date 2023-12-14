@@ -7,7 +7,6 @@ import {
     PRadio, PRadioGroup, PFieldTitle,
 } from '@spaceone/design-system';
 
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 
@@ -31,7 +30,7 @@ const emit = defineEmits<{(event: 'set-project', project: ProjectTreeNodeData): 
 }>();
 
 const state = reactive({
-    isDomainScope: true,
+    isWorkspaceScope: true,
     dashboardScope: useProxyValue('dashboardScope', props, emit),
     projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
     workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
@@ -47,7 +46,7 @@ const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
 };
 
 const updateScope = (scopeType: DashboardScope) => {
-    state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
+    state.isWorkspaceScope = scopeType === 'WORKSPACE';
     state.dashboardScope = scopeType;
 };
 
@@ -58,8 +57,8 @@ const updateScope = (scopeType: DashboardScope) => {
 
 onMounted(() => {
     if (!(state.projectManagePermission || state.workspaceManagePermission)) return;
-    if (!state.projectManagePermission) updateScope(DASHBOARD_SCOPE.DOMAIN);
-    if (!state.workspaceManagePermission) updateScope(DASHBOARD_SCOPE.PROJECT);
+    if (!state.projectManagePermission) updateScope('WORKSPACE');
+    if (!state.workspaceManagePermission) updateScope('PROJECT');
 });
 </script>
 
@@ -70,20 +69,20 @@ onMounted(() => {
             <p-radio-group direction="vertical"
                            class="dashboard-scope-radio-group"
             >
-                <p-radio :selected="state.isDomainScope"
+                <p-radio :selected="state.isWorkspaceScope"
                          :disabled="!state.workspaceManagePermission"
-                         @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
+                         @change="handleSelectScope('WORKSPACE')"
                 >
                     {{ $t('DASHBOARDS.CREATE.WORKSPACE') }}
                 </p-radio>
-                <p-radio :selected="!state.isDomainScope"
+                <p-radio :selected="!state.isWorkspaceScope"
                          :disabled="!state.projectManagePermission"
-                         @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
+                         @change="handleSelectScope('PROJECT')"
                 >
                     {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
                 </p-radio>
             </p-radio-group>
-            <project-select-dropdown v-show="!state.isDomainScope"
+            <project-select-dropdown v-show="!state.isWorkspaceScope"
                                      project-selectable
                                      :project-group-selectable="false"
                                      @select="handleSelectProjects"

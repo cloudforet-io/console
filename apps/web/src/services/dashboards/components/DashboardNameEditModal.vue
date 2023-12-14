@@ -5,10 +5,9 @@ import {
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -31,6 +30,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm', value: string): void;
 }>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const {
@@ -54,43 +54,26 @@ const {
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.name, dashboardDetailState.projectId)),
 });
 
 // const _invalid_unique = 'Dashboard name must be unique'; i18n.t('VALIDATION_DASHBOARD_NAME_UNIQUE')
 // const _invalid_input = 'Please input dashboard name'; i18n.t('VALIDATION_DASHBOARD_NAME_INPUT')
 
-const isProjectDashboard = props.dashboardId?.startsWith('project');
-
 const updateDashboard = async () => {
     try {
-        if (isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
-                name: _name.value,
-            });
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
-                name: _name.value,
-            });
-        }
+        await dashboardStore.updateDashboard({
+            dashboard_id: props.dashboardId,
+            name: _name.value,
+        });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_EDIT_NAME'));
     }
 };
 
-const loadDashboard = async () => {
-    if (isProjectDashboard) {
-        await store.dispatch('dashboard/loadProjectDashboard');
-    } else {
-        await store.dispatch('dashboard/loadDomainDashboard');
-    }
-};
-
 const handleConfirm = async () => {
     await updateDashboard();
-    await loadDashboard();
+    await dashboardStore.load();
     state.proxyVisible = false;
     emit('confirm', _name.value);
 };

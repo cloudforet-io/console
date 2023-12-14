@@ -2,22 +2,21 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PBoard, PFieldTitle, PI, PLabel, PPagination,
 } from '@spaceone/design-system';
 import type { BoardSet } from '@spaceone/design-system/types/data-display/board/type';
 
-
 import { QueryHelper } from '@cloudforet/core-lib/query';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { SpaceRouter } from '@/router';
-import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -30,11 +29,9 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
+
 
 const PAGE_SIZE = 10;
-const DOMAIN_SCOPE_KEY = 'domain_dashboard_id';
-const PROJECT_SCOPE_KEY = 'project_dashboard_id';
 const DOMAIN_SCOPE_NAME = 'Workspace';
 
 interface Props {
@@ -47,29 +44,32 @@ const props = withDefaults(defineProps<Props>(), {
     fieldTitle: undefined,
     dashboardList: () => ([]),
 });
+type DashboardBoardSet = BoardSet & DashboardModel;
 
+const router = useRouter();
+
+const dashboardStore = useDashboardStore();
+const dashboardState = dashboardStore.state;
 const state = reactive({
     thisPage: 1,
     dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
-    dashboardScopeKey: computed(() => (props.scopeType === DASHBOARD_SCOPE.DOMAIN ? DOMAIN_SCOPE_KEY : PROJECT_SCOPE_KEY)),
     projectItems: computed(() => store.getters['reference/projectItems']),
     hasManagePermission: computed(() => {
-        const routeName = props.scopeType === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;
+        const routeName = props.scopeType === 'WORKSPACE' ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;
         return useManagePermissionState(routeName).value;
     }),
-    dashboardListByBoardSets: computed<BoardSet[]>(() => props.dashboardList
+    dashboardListByBoardSets: computed<DashboardBoardSet[]>(() => props.dashboardList
         .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
         .map((d) => {
             const dashboardWithBoardSet = {
                 ...d,
                 iconButtonSets: state.hasManagePermission ? convertBoardItemButtonSet(d) : [],
             };
-            const projectId = 'project_id';
-            if (d[projectId]) {
+            if (d.project_id) {
                 return (
                     {
                         ...dashboardWithBoardSet,
-                        groupLabel: state.projectItems[d[projectId]]?.label,
+                        label: state.projectItems[d.project_id]?.label || d.project_id,
                     }
                 );
             }
@@ -95,10 +95,10 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
         eventAction: () => {
             const routeName = props.scopeType ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
-            SpaceRouter.router.push({
+            router.push({
                 name: routeName,
                 params: {
-                    dashboardId: dashboardItem[state.dashboardScopeKey],
+                    dashboardId: dashboardItem.dashboard_id,
                 },
             });
         },
@@ -115,17 +115,17 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
         iconName: 'ic_delete',
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
         /* TODO: Implementation */
-        eventAction: () => handleClickDeleteDashboard(dashboardItem[state.dashboardScopeKey]),
+        eventAction: () => handleClickDeleteDashboard(dashboardItem.dashboard_id),
     },
 ];
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    const routeName = props.scopeType === DASHBOARD_SCOPE.PROJECT ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-    SpaceRouter.router.push({
+    const routeName = props.scopeType === 'PROJECT' ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
+    router.push({
         name: routeName,
         params: {
-            dashboardId: item[state.dashboardScopeKey],
+            dashboardId: item.dashboard_id,
         },
     });
 };
@@ -142,17 +142,7 @@ const handleClickDeleteDashboard = (dashboardId) => {
 const handleDeleteDashboardConfirm = async () => {
     try {
         deleteModalState.loading = true;
-        if (props.scopeType === 'domain') {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
-                domain_dashboard_id: deleteModalState.selectedId,
-            });
-            await store.dispatch('dashboard/loadDomainDashboard');
-        } else {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
-                project_dashboard_id: deleteModalState.selectedId,
-            });
-            await store.dispatch('dashboard/loadProjectDashboard');
-        }
+        await dashboardStore.deleteDashboard(deleteModalState.selectedId as string);
         showSuccessMessage(i18n.t('DASHBOARDS.FORM.ALT_S_DELETE_DASHBOARD'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
@@ -165,9 +155,9 @@ const handleDeleteDashboardConfirm = async () => {
 
 const labelQueryHelper = new QueryHelper();
 const handleSetQuery = (selectedLabel: string | string[]) => {
-    labelQueryHelper.setFilters(store.state.dashboard.searchFilters)
+    labelQueryHelper.setFilters(dashboardState.searchFilters)
         .addFilter({ k: 'label', o: '=', v: selectedLabel });
-    store.dispatch('dashboard/setSearchFilters', labelQueryHelper.filters);
+    dashboardStore.setSearchFilters(labelQueryHelper.filters);
 };
 const handlePage = (page: number) => {
     state.thisPage = page;
@@ -196,7 +186,7 @@ watch(() => props.dashboardList, () => {
             <template #item-content="{board}">
                 <div class="board-item-title-wrapper">
                     <div class="favorite-button-wrapper">
-                        <favorite-button :item-id="board[state.dashboardScopeKey]"
+                        <favorite-button :item-id="board.dashboard_id"
                                          :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                          scale="0.666"
                         />
@@ -213,13 +203,13 @@ watch(() => props.dashboardList, () => {
                              height="0.125rem"
                         />
                     </template>
-                    <span v-if="props.scopeType === DASHBOARD_SCOPE.DOMAIN">{{ DOMAIN_SCOPE_NAME }}</span>
-                    <span v-else>{{ board.groupLabel }}</span>
+                    <span v-if="props.scopeType === 'WORKSPACE'">{{ DOMAIN_SCOPE_NAME }}</span>
+                    <span v-else>{{ board.label }}</span>
                 </div>
                 <div class="label-wrapper">
-                    <p-label :class="{'item-label': true, 'viewers-label': true, 'private-label': board.viewers === DASHBOARD_VIEWER.PRIVATE}"
-                             :text="board.viewers === DASHBOARD_VIEWER.PUBLIC ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE')"
-                             :left-icon="board.viewers === DASHBOARD_VIEWER.PUBLIC ? 'ic_globe-filled' : 'ic_lock-filled'"
+                    <p-label :class="{'item-label': true, 'viewers-label': true, 'private-label': board.dashboard_type === 'PRIVATE'}"
+                             :text="board.dashboard_type === 'PUBLIC' ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE')"
+                             :left-icon="board.dashboard_type === 'PUBLIC' ? 'ic_globe-filled' : 'ic_lock-filled'"
                     />
                     <p-label v-for="(label, idx) in board.labels"
                              :key="`${board.name}-label-${idx}`"

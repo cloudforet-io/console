@@ -5,7 +5,6 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type {
     DashboardLayoutWidgetInfo,
@@ -13,14 +12,15 @@ import type {
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
+import type { GetDashboardParameters } from '@/schema/dashboard/dashboard/api-verbs/get';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 
 import getRandomId from '@/lib/random-id-generator';
 
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
+
 
 interface WidgetValidMap {
     [widgetKey: string]: boolean;
@@ -112,7 +112,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             if (state.projectId) return true;
             return !!state.dashboardId?.startsWith('project');
         },
-        dashboardViewer: (state) => state.dashboardInfo?.viewers ?? DASHBOARD_VIEWER.PRIVATE,
+        dashboardType: (state) => state.dashboardInfo?.dashboard_type ?? 'PRIVATE',
         isWidgetLayoutValid: (state) => Object.values(state.widgetValidMap).every((d) => d === true),
         isAllVariablesInitialized: (state) => {
             if (!state.dashboardInfo) return false;
@@ -151,7 +151,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
             const _dashboardInfo = cloneDeep(dashboardInfo);
             this.name = _dashboardInfo.name;
-            this.projectId = (_dashboardInfo as ProjectDashboardModel).project_id ?? '';
+            this.projectId = _dashboardInfo.project_id ?? '';
             this.settings = {
                 date_range: {
                     enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
@@ -191,12 +191,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             this.dashboardId = dashboardId;
             this.loadingDashboard = true;
             try {
-                let result: DashboardModel;
-                if (dashboardId?.startsWith('project')) {
-                    result = await SpaceConnector.clientV2.dashboard.projectDashboard.get({ project_dashboard_id: this.dashboardId });
-                } else {
-                    result = await SpaceConnector.clientV2.dashboard.domainDashboard.get({ domain_dashboard_id: this.dashboardId });
-                }
+                const result = await SpaceConnector.clientV2.dashboard.dashboard.get<GetDashboardParameters, DashboardModel>({
+                    dashboard_id: this.dashboardId as string,
+                });
                 this.setDashboardInfo(result);
             } catch (e) {
                 this.resetDashboardData();

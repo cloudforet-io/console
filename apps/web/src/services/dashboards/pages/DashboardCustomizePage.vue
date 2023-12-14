@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { reactive, defineProps } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -20,6 +20,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
@@ -35,7 +36,8 @@ const updateDashboardData = async () => {
     try {
         state.loading = true;
 
-        const apiParam = {
+        await dashboardStore.updateDashboard({
+            dashboard_id: props.dashboardId as string,
             name: dashboardDetailState.name,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
@@ -43,18 +45,7 @@ const updateDashboardData = async () => {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
             tags: { created_by: store.state.user.userId },
-        };
-        if (dashboardDetailStore.isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                ...apiParam,
-                project_dashboard_id: props.dashboardId,
-            });
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                ...apiParam,
-                domain_dashboard_id: props.dashboardId,
-            });
-        }
+        });
         const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
             name: routeName,

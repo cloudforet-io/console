@@ -1,5 +1,6 @@
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    DASHBOARD_VIEWER, REFRESH_INTERVAL_OPTIONS_MAP, DASHBOARD_SCOPE, DASHBOARD_LABEL,
+    REFRESH_INTERVAL_OPTIONS_MAP, DASHBOARD_LABEL,
 } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { InheritOptions, WidgetOptions, WidgetSize } from '@/schema/dashboard/_types/widget-type';
 
@@ -7,8 +8,7 @@ import type { ManagedVariableModelConfig } from '@/lib/variable-models';
 import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
 
 
-export type DashboardViewer = typeof DASHBOARD_VIEWER[keyof typeof DASHBOARD_VIEWER];
-export type DashboardScope = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
+export type DashboardScope = ResourceGroupType;
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
 export type DashboardType = 'PUBLIC' | 'PRIVATE';
 

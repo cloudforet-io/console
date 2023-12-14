@@ -5,15 +5,15 @@ import {
 
 import { PIconButton } from '@spaceone/design-system';
 
-import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 
@@ -30,7 +30,11 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const PRIVATE_ICON = 'ic_lock-filled';
 const appContextStore = useAppContextStore();
-
+const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
+const storeState = reactive({
+    projects: computed(() => store.getters['reference/projectItems']),
+});
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: true,
@@ -49,24 +53,23 @@ const state = reactive({
         }
         return result;
     }),
-    workspaceMenuSet: computed<LNBItem[]>(() => store.state.dashboard.domainItems.map((d) => ({
+    workspaceMenuSet: computed<LNBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
         type: 'item',
-        id: d.domain_dashboard_id,
+        id: d.dashboard_id,
         label: d.name,
         to: {
             name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME) : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
             params: {
-                dashboardId: d.domain_dashboard_id,
+                dashboardId: d.dashboard_id,
             },
         },
         favoriteOptions: {
             type: FAVORITE_TYPE.DASHBOARD,
-            id: d.domain_dashboard_id,
+            id: d.dashboard_id,
         },
-        icon: d.viewers === DASHBOARD_VIEWER.PRIVATE ? PRIVATE_ICON : undefined,
+        icon: d.dashboard_type === 'PRIVATE' ? PRIVATE_ICON : undefined,
     }))),
-    projectDashboardList: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
-    projectItems: computed(() => store.getters['reference/projectItems']),
+    projectDashboardList: computed<DashboardModel[]>(() => dashboardGetters.projectItems),
     projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectDashboardList)),
     menuSet: computed<LNBMenu[]>(() => [
         {
@@ -81,35 +84,33 @@ const state = reactive({
         },
         { type: 'divider' },
         { type: 'favorite-only' },
-        ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.DOMAIN, filterFavoriteItems(state.workspaceMenuSet)),
-        ...filterLNBItemsByPagePermission(DASHBOARD_SCOPE.PROJECT, filterFavoriteItems(state.projectMenuSet)),
+        ...filterLNBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)),
+        ...filterLNBItemsByPagePermission('PROJECT', filterFavoriteItems(state.projectMenuSet)),
     ]),
 });
 
 const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[]): LNBMenu[] => {
     const topTitle = {
         type: 'top-title',
-        label: scope === DASHBOARD_SCOPE.DOMAIN
+        label: scope === 'WORKSPACE'
             ? i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')
             : i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT'),
     } as LNBItem;
-    const routeName = scope === DASHBOARD_SCOPE.DOMAIN ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;
+    const routeName = scope === 'WORKSPACE' ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;
     const pagePermission = store.getters['user/pagePermissionMap'];
 
     if (pagePermission[routeName]) return [topTitle, ...items];
     return [];
 };
 
-const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMenu[] => {
-    const dashboardItemsWithGroup = {} as Record<string, ProjectDashboardModel[]>;
+const mashUpProjectGroup = (dashboardList: DashboardModel[] = []): LNBMenu[] => {
+    const dashboardItemsWithGroup = {} as Record<string, DashboardModel[]>;
     dashboardList.forEach((d) => {
-        const projectGroupLabel: string|undefined = state.projectItems[d.project_id]?.label;
-        if (projectGroupLabel) {
-            if (dashboardItemsWithGroup[projectGroupLabel]) {
-                dashboardItemsWithGroup[projectGroupLabel].push(d);
-            } else {
-                dashboardItemsWithGroup[projectGroupLabel] = [d];
-            }
+        const projectGroupLabel: string = storeState.projects[d.project_id]?.label || d.project_id;
+        if (dashboardItemsWithGroup[projectGroupLabel]) {
+            dashboardItemsWithGroup[projectGroupLabel].push(d);
+        } else {
+            dashboardItemsWithGroup[projectGroupLabel] = [d];
         }
     });
 
@@ -127,19 +128,19 @@ const mashUpProjectGroup = (dashboardList: ProjectDashboardModel[] = []): LNBMen
             },
             ...dashboardItemsWithGroup[d].map((board) => ({
                 type: MENU_ITEM_TYPE.ITEM,
-                id: board.project_dashboard_id,
+                id: board.dashboard_id,
                 label: board.name,
                 to: {
                     name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME) : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
                     params: {
-                        dashboardId: board.project_dashboard_id,
+                        dashboardId: board.dashboard_id,
                     },
                 },
                 favoriteOptions: {
                     type: FAVORITE_TYPE.DASHBOARD,
-                    id: board.project_dashboard_id,
+                    id: board.dashboard_id,
                 },
-                icon: board.viewers === DASHBOARD_VIEWER.PRIVATE ? PRIVATE_ICON : undefined,
+                icon: board.dashboard_type === 'PRIVATE' ? PRIVATE_ICON : undefined,
             })),
         ]);
     });
@@ -162,9 +163,8 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
 };
 
 (async () => {
-    await store.dispatch('dashboard/loadAllDashboard');
+    await dashboardStore.load();
 })();
-
 </script>
 
 <template>

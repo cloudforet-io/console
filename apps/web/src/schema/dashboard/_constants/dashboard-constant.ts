@@ -1,8 +1,3 @@
-export const DASHBOARD_VIEWER = {
-    PUBLIC: 'PUBLIC',
-    PRIVATE: 'PRIVATE',
-} as const;
-
 export const REFRESH_INTERVAL_OPTIONS_MAP = {
     off: 0,
     '15s': 15000,
@@ -12,11 +7,6 @@ export const REFRESH_INTERVAL_OPTIONS_MAP = {
     '10m': 600000,
     '30m': 1800000,
     '1h': 3600000,
-} as const;
-
-export const DASHBOARD_SCOPE = {
-    DOMAIN: 'domain',
-    PROJECT: 'project',
 } as const;
 
 export const DASHBOARD_LABEL = {

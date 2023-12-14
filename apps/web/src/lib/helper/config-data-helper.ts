@@ -1,7 +1,6 @@
 import { find } from 'lodash';
 
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
@@ -15,7 +14,6 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 
 type Config = FavoriteConfig & RecentConfig;
 
@@ -168,17 +166,16 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
     return results;
 };
 
-export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, dashboardList: DashboardModel[], type: DashboardScope): ReferenceData[] => {
+export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, dashboardList: DashboardModel[]): ReferenceData[] => {
     const results: ReferenceData[] = [];
-    const dashboardId = type === DASHBOARD_SCOPE.DOMAIN ? 'domain_dashboard_id' : 'project_dashboard_id';
     if (!config) return results;
 
     config.forEach((d) => {
-        const resource: DashboardModel|undefined = find(dashboardList, { [dashboardId]: d.itemId });
+        const resource: DashboardModel|undefined = find(dashboardList, { dashboard_id: d.itemId });
         if (resource) {
             results.push({
                 ...d,
-                name: resource[dashboardId],
+                name: resource.dashboard_id,
                 label: resource.name,
                 updatedAt: d.updatedAt,
                 icon: 'ic_service_dashboard',

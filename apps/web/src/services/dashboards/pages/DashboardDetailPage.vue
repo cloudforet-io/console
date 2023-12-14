@@ -7,12 +7,9 @@ import {
     PDivider, PI, PIconButton, PHeading, PSkeleton,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { SpaceRouter } from '@/router';
-import { DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
-import { store } from '@/store';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -41,6 +38,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
@@ -89,19 +87,10 @@ const handleRefresh = () => {
 };
 const handleUpdateLabels = async (labels: string[]) => {
     try {
-        const isProjectDashboard = props.dashboardId?.startsWith('project');
-        if (isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
-                labels,
-            });
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
-                labels,
-            });
-        }
-        await store.dispatch('dashboard/loadAllDashboard');
+        await dashboardStore.updateDashboard({
+            dashboard_id: props.dashboardId,
+            labels,
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
     }
@@ -135,7 +124,7 @@ onUnmounted(() => {
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+            <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardType === 'PUBLIC'"
                       #title-left-extra
             >
                 <div class="title-left-extra">
@@ -158,13 +147,13 @@ onUnmounted(() => {
                     </div>
                     <p-icon-button name="ic_edit-text"
                                    size="md"
-                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardType === 'PUBLIC'"
                                    @click="handleVisibleNameEditModal"
                     />
                     <p-icon-button name="ic_delete"
                                    size="md"
 
-                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardViewer === DASHBOARD_VIEWER.PUBLIC"
+                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardType === 'PUBLIC'"
                                    class="delete-button"
                                    @click="handleVisibleDeleteModal"
                     />
@@ -205,7 +194,7 @@ onUnmounted(() => {
                                 :dashboard-id="props.dashboardId"
         />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
-                               :dashboard="dashboardDetailState"
+                               :dashboard-detail-info="dashboardDetailState"
         />
     </div>
 </template>

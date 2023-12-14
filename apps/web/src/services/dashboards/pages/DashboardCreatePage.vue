@@ -25,13 +25,14 @@ import {
     PButton, PCenteredLayoutHeader,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { SpaceRouter } from '@/router';
-import { DASHBOARD_SCOPE, DASHBOARD_VIEWER } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DashboardScope, DashboardViewer } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardScope, DashboardType } from '@/schema/dashboard/_types/dashboard-type';
+import type { CreateDashboardParameters } from '@/schema/dashboard/dashboard/api-verbs/create';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -44,10 +45,10 @@ import DashboardTemplateForm from '@/services/dashboards/components/DashboardTem
 import DashboardViewerForm from '@/services/dashboards/components/DashboardViewerForm.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const {
@@ -62,15 +63,15 @@ const {
         return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
     },
     dashboardProject(value: ProjectTreeNodeData|undefined) {
-        return !value && state.dashboardScope === DASHBOARD_SCOPE.PROJECT
+        return !value && state.dashboardScope === 'PROJECT'
             ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
     },
 });
 
 const state = reactive({
     loading: false,
-    dashboardScope: DASHBOARD_SCOPE.DOMAIN as DashboardScope,
-    dashboardViewerType: DASHBOARD_VIEWER.PUBLIC as DashboardViewer,
+    dashboardScope: 'WORKSPACE' as DashboardScope,
+    dashboardType: 'PUBLIC' as DashboardType,
     steps: computed(() => [
         { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') },
         { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') },
@@ -78,8 +79,8 @@ const state = reactive({
     ]),
     currentStep: 1,
     isValid: computed(() => {
-        if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) return !!dashboardProject.value?.id;
-        if (state.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return true;
+        if (state.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
+        if (state.dashboardScope === 'WORKSPACE') return true;
         return false;
     }),
     closeConfirmModalVisible: false,
@@ -94,21 +95,12 @@ const goStep = (direction: 'prev'|'next') => {
 };
 
 const saveCurrentStateToStore = () => {
-    let _dashboardTemplate: DashboardModel;
-    if (state.dashboardScope === DASHBOARD_SCOPE.PROJECT) {
-        _dashboardTemplate = {
-            ...dashboardTemplate.value,
-            project_id: dashboardProject.value?.id ?? '',
-            name: '',
-            viewers: state.dashboardViewerType,
-        };
-    } else {
-        _dashboardTemplate = {
-            ...dashboardTemplate.value,
-            name: '',
-            viewers: state.dashboardViewerType,
-        };
-    }
+    const _dashboardTemplate: DashboardModel = {
+        ...dashboardTemplate.value,
+        project_id: dashboardProject.value?.id ?? '',
+        name: '',
+        dashboard_type: state.dashboardType,
+    };
 
     dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
     dashboardDetailStore.$patch({
@@ -121,7 +113,7 @@ const createDashboard = async () => {
     try {
         state.loading = true;
 
-        const apiParam = {
+        const apiParam: CreateDashboardParameters = {
             name: dashboardDetailState.name,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
@@ -129,23 +121,19 @@ const createDashboard = async () => {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
             tags: { created_by: store.state.user.userId },
-            viewers: dashboardDetailStore.dashboardViewer,
+            dashboard_type: dashboardDetailStore.dashboardType,
+            resource_group: dashboardDetailStore.isProjectDashboard ? 'PROJECT' : 'WORKSPACE',
         };
         if (dashboardDetailStore.isProjectDashboard) {
-            const result = await SpaceConnector.clientV2.dashboard.projectDashboard.create({
-                ...apiParam,
-                project_id: dashboardDetailState.projectId,
-            });
-            dashboardDetailStore.$patch({ dashboardId: result.project_dashboard_id });
-        } else {
-            const result = await SpaceConnector.clientV2.dashboard.domainDashboard.create(apiParam);
-            dashboardDetailStore.$patch({ dashboardId: result.domain_dashboard_id });
+            apiParam.project_id = dashboardDetailState.projectId;
         }
+
+        const createdDashboard = await dashboardStore.createDashboard(apiParam);
         const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
             name: routeName,
             params: {
-                dashboardId: dashboardDetailState.dashboardId as string,
+                dashboardId: createdDashboard.dashboard_id as string,
             },
         });
     } catch (e) {
@@ -182,7 +170,7 @@ defineExpose({ setPathFrom });
             <dashboard-scope-form :dashboard-scope.sync="state.dashboardScope"
                                   @set-project="setForm('dashboardProject', $event)"
             />
-            <dashboard-viewer-form :dashboard-viewer-type.sync="state.dashboardViewerType" />
+            <dashboard-viewer-form :dashboard-type.sync="state.dashboardType" />
             <div class="button-area">
                 <p-button
                     style-type="transparent"

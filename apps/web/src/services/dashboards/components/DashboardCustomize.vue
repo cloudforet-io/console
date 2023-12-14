@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import {
-    computed, onBeforeUnmount, onMounted, reactive, watch,
+    onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PDivider } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -38,16 +36,6 @@ const dashboardDetailState = dashboardDetailStore.$state;
 
 const state = reactive({
     name: dashboardDetailState.name,
-    apiParam: computed<Partial<DashboardTemplate>>(() => ({
-        name: dashboardDetailState.name,
-        labels: dashboardDetailState.labels,
-        settings: dashboardDetailState.settings,
-        layouts: [dashboardDetailState.dashboardWidgetInfoList],
-        variables: dashboardDetailState.variables,
-        variables_schema: dashboardDetailState.variablesSchema,
-        tags: { created_by: store.state.user.userId },
-    })),
-    isCreateMode: computed(() => !props.dashboardId),
 });
 
 /* Api */

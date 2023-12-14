@@ -7,11 +7,7 @@ import {
     PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
 } from '@spaceone/design-system';
 import type {
-    HandlerResponse,
-    KeyDataType,
-    KeyItem,
-    KeyItemSet,
-    ValueHandler, ValueMenuItem,
+    HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
 } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
@@ -19,53 +15,61 @@ import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/qu
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import { store } from '@/store';
 
-import { DASHBOARD_SCOPE_TYPE } from '@/store/modules/dashboard/type';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
 import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
+const dashboardStore = useDashboardStore();
+const dashboardState = dashboardStore.state;
+const dashboardGetters = dashboardStore.getters;
 const state = reactive({
-    viewersStatus: computed(() => store.state.dashboard.viewers),
-    scopeStatus: computed(() => store.state.dashboard.scope),
-    loading: computed(() => store.state.dashboard.loading),
-    workspaceDashboardList: computed(() => (state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] ? store.getters['dashboard/getDomainItems'] : [])),
-    projectDashboardList: computed(() => (state.pagePermission[MENU_ID.PROJECT_DASHBOARDS] ? store.getters['dashboard/getProjectItems'] : [])),
+    // viewersStatus: computed(() => dashboardState.dashboardType),
+    loading: computed(() => dashboardState.loading),
+    workspaceDashboardList: computed(() => {
+        if (!state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS]) return [];
+        let target = dashboardGetters.workspaceItems;
+        if (dashboardState.dashboardType) target = target.filter((d) => d.dashboard_type === dashboardState.dashboardType);
+        if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
+        return target;
+    }),
+    projectDashboardList: computed(() => {
+        if (!state.pagePermission[MENU_ID.PROJECT_DASHBOARDS]) return [];
+        let target = dashboardGetters.projectItems;
+        if (dashboardState.dashboardType) target = target.filter((d) => d.dashboard_type === dashboardState.dashboardType);
+        if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
+        return target;
+    }),
     dashboardTotalCount: computed(() => {
-        const domainDashboardCount = state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] ? store.getters['dashboard/getDomainDashboardCount'] : 0;
-        const projectDashboardCount = state.pagePermission[MENU_ID.PROJECT_DASHBOARDS] ? store.getters['dashboard/getProjectDashboardCount'] : 0;
-        return domainDashboardCount + projectDashboardCount;
+        const workspaceDashboardCount = state.workspaceDashboardList.length;
+        const projectDashboardCount = state.projectDashboardList.length;
+        return workspaceDashboardCount + projectDashboardCount;
     }),
     filteredDashboardStatus: computed(() => {
-        if (state.scopeStatus === DASHBOARD_SCOPE_TYPE.DOMAIN) {
+        if (dashboardState.scope === 'WORKSPACE') {
             return !!(state.workspaceDashboardList.length);
         }
-        if (state.scopeStatus === DASHBOARD_SCOPE_TYPE.PROJECT) {
+        if (dashboardState.scope === 'PROJECT') {
             return !!(state.projectDashboardList.length);
         }
         return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
     }),
-    projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
-    workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
-    hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
     pagePermission: computed(() => store.getters['user/pagePermissionMap']),
 });
 
 const searchQueryHelper = new QueryHelper();
 const queryState = reactive({
-    searchFilters: computed(() => store.state.dashboard.searchFilters),
+    searchFilters: computed(() => dashboardState.searchFilters),
     urlQueryString: computed(() => ({
-        viewers: store.state.dashboard.viewers === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.viewers),
-        scope: store.state.dashboard.scope === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.scope),
+        viewers: dashboardState.dashboardType ? primitiveToQueryString(dashboardState.dashboardType) : null,
+        scope: dashboardState.scope ? primitiveToQueryString(dashboardState.scope) : null,
         filters: searchQueryHelper.setFilters(queryState.searchFilters).rawQueryStrings,
     })),
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -75,16 +79,16 @@ const queryState = reactive({
         ],
     }]),
     valueHandlerMap: computed(() => ({
-        label: combinedDashboardLabelsAutoCompleteHandler(),
+        label: getDashboardValueHandler(),
     })),
-    queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(store.state.dashboard.searchFilters).queryTags),
+    queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
 });
 
 const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };
 const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
-        store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
+        dashboardStore.setSearchFilters(searchQueryHelper.filters);
     }
 };
 
@@ -93,33 +97,29 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     const useQueryValue = {
-        viewers: queryStringToString(currentQuery.viewers) ?? 'ALL',
-        scope: queryStringToString(currentQuery.scope) ?? 'ALL',
+        dashboardType: queryStringToString(currentQuery.dashboardType),
+        scope: queryStringToString(currentQuery.scope),
         filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
     };
 
-    /* TODO: init states from url query */
-    store.dispatch('dashboard/setSelectedViewers', useQueryValue.viewers);
-    store.dispatch('dashboard/setSelectedScope', useQueryValue.scope);
-    store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
+    dashboardStore.setDashboardType(useQueryValue.dashboardType);
+    dashboardStore.setScope(useQueryValue.scope);
+    dashboardStore.setSearchFilters(useQueryValue.filters);
 
-    /* TODO: implementation */
     urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
         replaceUrlQuery(urlQueryString);
     });
 };
 
-const combinedDashboardLabelsAutoCompleteHandler = (): ValueHandler | undefined => {
-    const projectLabelsValueHandler = makeDistinctValueHandler('dashboard.ProjectDashboard', 'labels');
-    const domainLabelsValueHandler = makeDistinctValueHandler('dashboard.DomainDashboard', 'labels');
-    if (!projectLabelsValueHandler && !domainLabelsValueHandler) return undefined;
+const getDashboardValueHandler = (): ValueHandler | undefined => {
+    const labelsValueHandler = makeDistinctValueHandler('dashboard.Dashboard', 'labels');
+    if (!labelsValueHandler) return undefined;
 
     return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
         const results = [] as ValueMenuItem[];
         const promises = [] as (HandlerResponse | Promise<HandlerResponse>)[];
 
-        if (projectLabelsValueHandler) promises.push(projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
-        if (domainLabelsValueHandler) promises.push(domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+        if (labelsValueHandler) promises.push(labelsValueHandler(inputText, keyItem, currentDataType, subPath));
         const responses = await Promise.allSettled(promises);
 
         // combine both of results and sort
@@ -157,7 +157,7 @@ onUnmounted(() => {
                    :total-count="state.dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="!state.hasOnlyViewPermission && (state.workspaceDashboardList || state.projectDashboardList)"
+                <p-button v-if="state.workspaceDashboardList || state.projectDashboardList"
                           icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
@@ -194,7 +194,6 @@ onUnmounted(() => {
                     </template>
                     <template #button>
                         <p-button icon-left="ic_plus_bold"
-                                  :disabled="state.hasOnlyViewPermission"
                                   @click="handleCreateDashboard"
                         >
                             {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
@@ -203,17 +202,17 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <dashboard-main-board-list v-if="(state.scopeStatus !== DASHBOARD_SCOPE_TYPE.PROJECT) && state.workspaceDashboardList.length"
-                                       :scope-type="DASHBOARD_SCOPE.DOMAIN"
+            <dashboard-main-board-list v-if="(dashboardState.scope !== 'PROJECT') && state.workspaceDashboardList.length"
+                                       scope-type="WORKSPACE"
                                        class="dashboard-list"
-                                       :class="{'full-mode': state.scopeStatus === DASHBOARD_SCOPE_TYPE.DOMAIN}"
+                                       :class="{'full-mode': dashboardState.scope === 'WORKSPACE'}"
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
                                        :dashboard-list="state.workspaceDashboardList"
             />
-            <dashboard-main-board-list v-if="state.scopeStatus !== DASHBOARD_SCOPE.DOMAIN && state.projectDashboardList.length"
-                                       :scope-type="DASHBOARD_SCOPE.PROJECT"
+            <dashboard-main-board-list v-if="dashboardState.scope !== 'WORKSPACE' && state.projectDashboardList.length"
+                                       scope-type="PROJECT"
                                        class="dashboard-list"
-                                       :class="{'full-mode': state.scopeStatus === DASHBOARD_SCOPE_TYPE.PROJECT}"
+                                       :class="{'full-mode': dashboardState.scope === 'PROJECT'}"
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
                                        :dashboard-list="state.projectDashboardList"
             />
