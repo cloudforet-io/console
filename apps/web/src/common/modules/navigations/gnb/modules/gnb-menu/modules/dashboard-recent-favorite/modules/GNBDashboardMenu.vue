@@ -47,12 +47,11 @@ import {
 import { PTab } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
@@ -71,7 +70,6 @@ import type {
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
-
 export default defineComponent({
     name: 'GNBDashboardMenu',
     components: {
@@ -82,10 +80,8 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const appContextStore = useAppContextStore();
-        const storeState = reactive({
-            domainItems: computed<DomainDashboardModel[]>(() => store.state.dashboard.domainItems),
-            projectItems: computed<ProjectDashboardModel[]>(() => store.state.dashboard.projectItems),
-        });
+        const dashboardStore = useDashboardStore();
+        const dashboardGetters = dashboardStore.getters;
         const state = reactive({
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             tabs: computed(() => ([
@@ -106,22 +102,10 @@ export default defineComponent({
                 },
             ] as DisplayMenu[]),
             isOverflown: false,
-            dashboardList: computed<GNBDashboardMenuItem[]>(() => {
-                const dashboardList: GNBDashboardMenuItem[] = [];
-                storeState.domainItems.forEach((domainItem) => {
-                    dashboardList.push({
-                        name: domainItem.name,
-                        dashboardId: domainItem.domain_dashboard_id,
-                    });
-                });
-                storeState.projectItems.forEach((projectItem) => {
-                    dashboardList.push({
-                        name: projectItem.name,
-                        dashboardId: projectItem.project_dashboard_id,
-                    });
-                });
-                return dashboardList;
-            }),
+            dashboardList: computed<GNBDashboardMenuItem[]>(() => [...dashboardGetters.workspaceItems, ...dashboardGetters.projectItems].map((item) => ({
+                name: item.name,
+                dashboardId: item.dashboard_id,
+            }))),
             projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
             workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
             hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
@@ -137,7 +121,7 @@ export default defineComponent({
             // CAUTION: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list in "GNBFavorite.vue".
             await Promise.allSettled([
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
-                store.dispatch('dashboard/loadAllDashboard'),
+                dashboardStore.load(),
             ]);
         })();
 

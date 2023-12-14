@@ -8,21 +8,17 @@ import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
 } from '@spaceone/design-system';
 
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import type { DashboardScope, DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
-import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
 import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type {
-    DashboardModel,
-} from '@/services/dashboards/types/dashboard-model-type';
 
-const DOMAIN_SCOPE_NAME = 'Workspace';
+
 const emit = defineEmits(['set-template']);
 
 type DashboardTemplateBoardSet = DashboardTemplate & { value: string };
@@ -36,6 +32,9 @@ interface Props {
 const props = defineProps<Props>();
 
 const templateContainerRef = ref<HTMLElement | null>(null);
+
+const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
@@ -60,25 +59,22 @@ const existingTemplateState = reactive({
     thisPage: 1,
     allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
     boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards
-        .map((d: DomainDashboardModel & ProjectDashboardModel) => {
-            const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
-            return {
-                ...d,
-                // below values are used only for render
-                value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
-                groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
-            };
-        })
+        .map((d: DashboardModel) => ({
+            ...d,
+            // below values are used only for render
+            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${d.dashboard_id}`,
+            groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
+        }))
         .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
     projectItems: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     groupLabel: computed<string>(() => {
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return DOMAIN_SCOPE_NAME;
+        if (props.dashboardScope === 'WORKSPACE') return 'Workspace';
         return '';
     }),
     dashboards: computed<DashboardModel[]>(() => {
         let dashboardItems;
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) dashboardItems = store.state.dashboard.domainItems;
-        else dashboardItems = store.state.dashboard.projectItems;
+        if (props.dashboardScope === 'WORKSPACE') dashboardItems = dashboardGetters.workspaceItems;
+        else dashboardItems = dashboardGetters.projectItems;
 
         return dashboardItems.filter((d) => d.name.includes(state.searchValue));
     }),
@@ -86,14 +82,12 @@ const existingTemplateState = reactive({
 });
 
 const getDashboardLocation = (board: DashboardModel): Location => {
-    const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
+    const isProjectDashboard = !!board.project_id?.length;
     const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
     return {
         name: routeName,
         params: {
-            dashboardId: isProjectDashboard
-                ? (board as ProjectDashboardModel).project_dashboard_id
-                : (board as DomainDashboardModel).domain_dashboard_id,
+            dashboardId: board.dashboard_id,
         },
     };
 };
@@ -114,10 +108,7 @@ const handleInputSearch = () => {
 };
 
 (async () => {
-    await Promise.allSettled([
-        store.dispatch('dashboard/loadProjectDashboard'),
-        store.dispatch('dashboard/loadDomainDashboard'),
-    ]);
+    await dashboardStore.load();
     await nextTick();
     handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();

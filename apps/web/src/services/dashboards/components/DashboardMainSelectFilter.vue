@@ -8,7 +8,7 @@ import { PSelectDropdown, PSelectStatus, PDivider } from '@spaceone/design-syste
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { DASHBOARD_SCOPE_TYPE } from '@/store/modules/dashboard/type';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { MENU_ID } from '@/lib/menu/config';
 
@@ -19,6 +19,8 @@ const VIEWERS_TYPE = {
     PRIVATE: 'PRIVATE',
 } as const;
 
+const dashboardStore = useDashboardStore();
+const dashboardState = dashboardStore.state;
 const state = reactive({
     viewerFilterList: computed(() => [
         { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: VIEWERS_TYPE.ALL },
@@ -26,22 +28,22 @@ const state = reactive({
         { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: VIEWERS_TYPE.PRIVATE },
     ]),
     scopeFilterList: computed(() => [
-        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: DASHBOARD_SCOPE_TYPE.ALL },
-        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: DASHBOARD_SCOPE_TYPE.DOMAIN },
-        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: DASHBOARD_SCOPE_TYPE.PROJECT },
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: 'ALL' },
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: 'WORKSPACE' },
+        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: 'PROJECT' },
     ]),
-    viewersStatus: computed(() => store.state.dashboard.viewers),
-    scopeStatus: computed(() => store.state.dashboard.scope),
+    viewersStatus: computed(() => dashboardState.dashboardType || VIEWERS_TYPE.ALL),
+    scopeStatus: computed(() => dashboardState.scope || 'ALL'),
     pagePermission: computed(() => store.getters['user/pagePermissionMap']),
 });
 
 const handleChangeViewers = (selected) => {
     if (selected === state.viewersStatus) return;
-    store.dispatch('dashboard/setSelectedViewers', selected);
+    dashboardStore.setDashboardType(selected === VIEWERS_TYPE.ALL ? undefined : selected);
 };
 const handleChangeScope = (selected) => {
     if (selected === state.scopeStatus) return;
-    store.dispatch('dashboard/setSelectedScope', selected);
+    dashboardStore.setScope(selected === 'ALL' ? undefined : selected);
 };
 </script>
 

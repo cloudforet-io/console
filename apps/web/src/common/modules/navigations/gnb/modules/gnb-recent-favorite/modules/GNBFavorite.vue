@@ -74,19 +74,18 @@ import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PButton, PI, PIconButton, PDataLoader, PEmpty,
+    PButton, PDataLoader, PEmpty, PI, PIconButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
@@ -102,7 +101,8 @@ import {
     convertDashboardConfigToReferenceData,
     convertMenuConfigToReferenceData,
     convertProjectConfigToReferenceData,
-    convertProjectGroupConfigToReferenceData, getParsedKeysWithManagedCostQueryFavoriteKey,
+    convertProjectGroupConfigToReferenceData,
+    getParsedKeysWithManagedCostQueryFavoriteKey,
 } from '@/lib/helper/config-data-helper';
 import type { MenuInfo } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
@@ -136,7 +136,8 @@ export default {
     props: {},
     setup(props, { emit }: SetupContext) {
         const allReferenceStore = useAllReferenceStore();
-
+        const dashboardStore = useDashboardStore();
+        const dashboardGetters = dashboardStore.getters;
 
         const state = reactive({
             loading: true,
@@ -215,13 +216,13 @@ export default {
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             costQuerySets: [] as CostQuerySetModel[],
-            domainDashboardItems: computed<DomainDashboardModel[]>(() => {
-                const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.WORKSPACE_DASHBOARDS, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
+            workspaceDashboardItems: computed<DashboardModel[]>(() => {
+                const isUserAccessibleToWorkspaceDashboards = isUserAccessibleToMenu(MENU_ID.WORKSPACE_DASHBOARDS, store.getters['user/pagePermissionList']);
+                return isUserAccessibleToWorkspaceDashboards ? dashboardGetters.workspaceItems : [];
             }),
-            projectDashboardItems: computed<ProjectDashboardModel[]>(() => {
+            projectDashboardItems: computed<DashboardModel[]>(() => {
                 const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.PROJECT_DASHBOARDS, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToProjectDashboards ? store.getters['dashboard/getProjectItems'] : [];
+                return isUserAccessibleToProjectDashboards ? dashboardGetters.projectItems : [];
             }),
             //
             favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
@@ -235,17 +236,10 @@ export default {
             favoriteDashboardItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
                 if (!isUserAccessibleToDashboards) return [];
-                const domainDashboardReferenceData = convertDashboardConfigToReferenceData(
+                return convertDashboardConfigToReferenceData(
                     store.state.favorite.dashboardItems,
-                    state.domainDashboardItems,
-                    DASHBOARD_SCOPE.DOMAIN,
+                    [...state.workspaceDashboardItems, ...state.projectDashboardItems],
                 );
-                const projectDashboardReferenceData = convertDashboardConfigToReferenceData(
-                    store.state.favorite.dashboardItems,
-                    state.projectDashboardItems,
-                    DASHBOARD_SCOPE.PROJECT,
-                );
-                return [...domainDashboardReferenceData, ...projectDashboardReferenceData];
             }),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pagePermissionList']);
@@ -308,7 +302,7 @@ export default {
                     SpaceRouter.router.push({ name: itemName }).catch(() => {});
                 }
             } else if (item.itemType === SUGGESTION_TYPE.DASHBOARD) {
-                const dashboardRouteName = item.name?.startsWith('domain') ? DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME;
+                const dashboardRouteName = item.name?.startsWith('workspace') ? DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME;
                 SpaceRouter.router.push({
                     name: dashboardRouteName,
                     params: {

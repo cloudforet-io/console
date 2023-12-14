@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// Below directive is used. Do not remove!!!
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
@@ -8,12 +7,14 @@ import {
     PFieldGroup, PHeading, PSkeleton, PTextInput,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 const props = defineProps<{
     name: string;
@@ -22,6 +23,7 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:name', value?: string): void,
     (e: 'click-back-button'): void}>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 
@@ -31,7 +33,7 @@ const state = reactive({
         return !dashboardDetailState.name;
     }),
     placeHolder: dashboardDetailState.placeholder,
-    dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.name, dashboardDetailState.projectId)),
 });
 const {
     forms: {
@@ -81,7 +83,7 @@ onMounted(() => {
 });
 
 (async () => {
-    await store.dispatch('dashboard/loadProjectDashboard');
+    await dashboardStore.load();
 })();
 </script>
 

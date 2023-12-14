@@ -1,3 +1,3 @@
 export interface GetDashboardParameters {
-    domain_id: string;
+    dashboard_id: string;
 }

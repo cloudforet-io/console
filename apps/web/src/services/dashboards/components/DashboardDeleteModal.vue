@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -25,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible'): void,
 }>();
 
+const dashboardStore = useDashboardStore();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     dashboardId: computed<string>(() => props.dashboardId),
@@ -35,17 +35,7 @@ const state = reactive({
 const handleDeleteDashboardConfirm = async () => {
     try {
         state.loading = true;
-        if (state.isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.delete({
-                project_dashboard_id: state.dashboardId,
-            });
-            await store.dispatch('dashboard/loadProjectDashboard');
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.delete({
-                domain_dashboard_id: state.dashboardId,
-            });
-            await store.dispatch('dashboard/loadDomainDashboard');
-        }
+        await dashboardStore.deleteDashboard(state.dashboardId);
         await SpaceRouter.router.replace({ name: DASHBOARDS_ROUTE.ALL._NAME });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));

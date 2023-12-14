@@ -39,11 +39,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
@@ -93,19 +92,21 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const allReferenceStore = useAllReferenceStore();
+        const dashboardStore = useDashboardStore();
+        const dashboardGetters = dashboardStore.getters;
 
         const storeState = reactive({
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            domainDashboardItems: computed<DomainDashboardModel[]>(() => {
-                const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.WORKSPACE_DASHBOARDS, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
+            workspaceDashboardItems: computed<DashboardModel[]>(() => {
+                const isUserAccessibleToWorkspaceDashboards = isUserAccessibleToMenu(MENU_ID.WORKSPACE_DASHBOARDS, store.getters['user/pagePermissionList']);
+                return isUserAccessibleToWorkspaceDashboards ? dashboardGetters.workspaceItems : [];
             }),
-            projectDashboardItems: computed<ProjectDashboardModel[]>(() => {
+            projectDashboardItems: computed<DashboardModel[]>(() => {
                 const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.PROJECT_DASHBOARDS, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToProjectDashboards ? store.getters['dashboard/getProjectItems'] : [];
+                return isUserAccessibleToProjectDashboards ? dashboardGetters.projectItems : [];
             }),
             dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
             recents: computed<RecentConfig[]>(() => store.state.recent.allItems),
@@ -149,17 +150,15 @@ export default defineComponent({
             recentDashboardItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
                 if (!isUserAccessibleToDashboards) return [];
-                const domainDashboardReferenceData = convertDashboardConfigToReferenceData(
-                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith(DASHBOARD_SCOPE.DOMAIN)),
-                    storeState.domainDashboardItems,
-                    DASHBOARD_SCOPE.DOMAIN,
+                const workspaceDashboardReferenceData = convertDashboardConfigToReferenceData(
+                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith('workspace')),
+                    storeState.workspaceDashboardItems,
                 );
                 const projectDashboardReferenceData = convertDashboardConfigToReferenceData(
-                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith(DASHBOARD_SCOPE.PROJECT)),
+                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith('project')),
                     storeState.projectDashboardItems,
-                    DASHBOARD_SCOPE.PROJECT,
                 );
-                return [...domainDashboardReferenceData, ...projectDashboardReferenceData];
+                return [...workspaceDashboardReferenceData, ...projectDashboardReferenceData];
             }),
             recentCostAnalysisItems: computed<RecentItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pagePermissionList']);
