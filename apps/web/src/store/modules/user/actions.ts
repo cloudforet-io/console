@@ -7,6 +7,9 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { MANAGED_ROLE_TYPE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
+import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
+import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
 import type { PagePermission } from '@/lib/access-control/config';
@@ -16,10 +19,9 @@ import type {
 } from './type';
 
 
-const getUserInfo = async (userId: string, domainId: string): Promise<Partial<UserState>> => {
-    const response = await SpaceConnector.clientV2.identity.user.get({
+const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
+    const response = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
         user_id: userId,
-        domain_id: domainId,
     });
     // TODO: refactor below code with new response
     return {
@@ -100,7 +102,7 @@ const generatePagePermissionsForManagedRole = (roleId: string): PagePermission[]
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
-    const response = await SpaceConnector.clientV2.identity.token.issue({
+    const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters>({
         domain_id: domainId,
         auth_type: signInRequest.authType,
         credentials: signInRequest.credentials,
@@ -111,7 +113,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
     const [, userId] = getUserInfoFromToken(response.access_token);
 
-    const userInfo = await getUserInfo(userId, domainId);
+    const userInfo = await getUserInfo(userId);
     commit('setUser', userInfo);
 
     const userRoles = await getUserRoles();

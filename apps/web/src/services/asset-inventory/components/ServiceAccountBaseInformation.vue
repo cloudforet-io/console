@@ -18,7 +18,6 @@ import type { ServiceAccountModel } from '@/schema/identity/service-account/mode
 import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountUpdateParameters } from '@/schema/identity/trusted-account/api-verbs/update';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -62,7 +61,6 @@ interface State {
     baseInformationSchema: Partial<SchemaModel>;
     baseInformationForm: Partial<BaseInformationForm>;
     originBaseInformationForm: ComputedRef<Partial<BaseInformationForm>>;
-    domainId: string; // TODO: remove domain_id after backend is ready
 }
 const state = reactive<State>({
     loading: false,
@@ -80,14 +78,12 @@ const state = reactive<State>({
             selectedProjectId: props.serviceAccountData?.project_id ?? '',
         }),
     })),
-    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
 /* Api */
 const getProvider = async () => {
     try {
         state.providerData = await SpaceConnector.clientV2.identity.provider.get<ProviderGetParameters, ProviderModel>({
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             provider: props.provider ?? '',
             workspace_id: undefined,
         });
@@ -101,7 +97,6 @@ const updateServiceAccount = async () => {
         state.loading = true;
         if (state.isTrustedAccount) {
             await SpaceConnector.clientV2.identity.trustedAccount.update<TrustedAccountUpdateParameters, TrustedAccountModel>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 trusted_account_id: props.serviceAccountId,
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
@@ -109,7 +104,6 @@ const updateServiceAccount = async () => {
             });
         } else {
             await SpaceConnector.clientV2.identity.serviceAccount.update<ServiceAccountUpdateParameters, ServiceAccountModel>({
-                domain_id: state.domainId, // TODO: remove domain_id after backend is ready
                 service_account_id: props.serviceAccountId,
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
@@ -128,7 +122,6 @@ const getBaseInformationSchema = async () => {
     try {
         state.baseInformationSchema = await SpaceConnector.clientV2.identity.schema.get<SchemaGetParameters, SchemaModel>({
             schema_id: `${props.provider}-service-account`,
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
             workspace_id: undefined,
         });
     } catch (e) {

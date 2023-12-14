@@ -64,7 +64,6 @@ const state = reactive({
     description: computed(() => state.providerSchemaData?.options?.help),
     enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
     baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
-    domainId: computed(() => store.state.domain.domainId), // TODO: remove domain_id after backend is ready
 });
 
 const formState = reactive({
@@ -93,7 +92,6 @@ const createAccount = async (): Promise<string|undefined> => {
             name: formState.baseInformationForm.accountName,
             data,
             permission_group: 'WORKSPACE',
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
         });
     } else {
         res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
@@ -103,7 +101,6 @@ const createAccount = async (): Promise<string|undefined> => {
             tags: formState.baseInformationForm.tags,
             trusted_account_id: formState.credentialForm.attachedTrustedAccountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,
-            domain_id: state.domainId, // TODO: remove domain_id after backend is ready
         });
     }
 

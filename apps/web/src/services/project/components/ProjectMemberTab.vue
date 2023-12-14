@@ -105,7 +105,6 @@ const fetchProjectUsers = async () => {
     try {
         const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.projectId,
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
         state.projectUserIdList = res.users ?? [];
         state.totalCount = res.users?.length ?? 0;
@@ -121,7 +120,6 @@ const fetchWorkspaceUserList = async () => {
     state.loading = true;
     try {
         const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-            domain_id: store.state.domain.domainId,
         });
         state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
         state.totalCount = res.total_count ?? 0;
@@ -138,7 +136,6 @@ const deleteProjectUser = async (items) => {
         await SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters>({
             project_id: props.projectId,
             users: items.map((it) => it.user_id),
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
         showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
     } catch (e) {

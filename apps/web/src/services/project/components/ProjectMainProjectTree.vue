@@ -13,7 +13,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ProjectGroupChangeParentGroupParameters } from '@/schema/identity/project-group/api-verbs/change-parent-group';
 import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
 import type { ProjectChangeProjectGroupParameters } from '@/schema/identity/project/api-verbs/change-project-group';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -161,7 +160,6 @@ watch(() => projectPageState.treeEditMode, async (treeEditMode) => {
 const handleFinishEdit = async (node, editText: string) => {
     try {
         await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: node.data.id,
             name: editText,
         });
@@ -176,7 +174,6 @@ const handleFinishEdit = async (node, editText: string) => {
 const updateProjectGroup = async (node, oldParent, parent) => {
     try {
         await SpaceConnector.clientV2.identity.projectGroup.changeParentGroup<ProjectGroupChangeParentGroupParameters>({
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
             project_group_id: node.data.id,
             parent_group_id: parent?.data?.id || undefined,
         });
@@ -192,7 +189,6 @@ const updateProject = async (node, oldParent, parent) => {
         await SpaceConnector.clientV2.identity.project.changeProjectGroup<ProjectChangeProjectGroupParameters>({
             project_id: node.data.id,
             project_group_id: parent?.data?.id || undefined,
-            domain_id: store.state.domain.domainId, // TODO: remove domain_id after backend is ready
         });
 
         // this is for refresh project list cards
