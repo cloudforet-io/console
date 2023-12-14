@@ -1609,14 +1609,38 @@
 		}
 	},
 	"IAM": {
+		"ALT_S_CREATE": "",
+		"ALT_S_CREATE_DESC": "",
 		"APP": {
 			"ACTION": "작업",
 			"CREATE": "생성",
 			"DELETE": "삭제",
+			"DISABLE": "비활성화",
 			"EDIT": "수정",
+			"ENABLE": "활성화",
+			"MODAL": {
+				"BTN_REGENERATE": "",
+				"COL_ADMIN_ROLE": "어드민 역할(Role)",
+				"COL_ADMIN_ROLE_PLACEHOLDER": "",
+				"COL_APP_ID": "",
+				"COL_APP_NAME": "",
+				"COL_EXPIRED_AT": "",
+				"COL_LASTED_AT": "",
+				"COL_NAME": "이름 ",
+				"COL_STATE": "상태",
+				"COL_TAG": "태그",
+				"COL_WORKSPACE_ROLE": "",
+				"CREATE_TITLE": "",
+				"DELETE_TITLE": "",
+				"DISABLE_TITLE": "",
+				"EDIT_TITLE": "",
+				"ENABLE_TITLE": "",
+				"REGENERATE_TITLE": ""
+			},
 			"REGENERATE": "",
 			"TITLE": ""
 		},
+		"CLI_DESC": "",
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "",
@@ -1647,6 +1671,7 @@
 			"VERIFICATION_CODE_INVALID": "필수 입력 항목입니다.",
 			"WORDTYPE_LOGO_DESCRIPTION": ""
 		},
+		"DOWNLOAD": "",
 		"POLICY": {
 			"FORM": {
 				"CANCEL": "취소",

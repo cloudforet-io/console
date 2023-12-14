@@ -1609,14 +1609,38 @@
 		}
 	},
 	"IAM": {
+		"ALT_S_CREATE": "{target} successfully created",
+		"ALT_S_CREATE_DESC": "You have to download the JSON or Config file before you continue. You will not be able to download the file again after close this.",
 		"APP": {
 			"ACTION": "Action",
 			"CREATE": "Create",
 			"DELETE": "Delete",
+			"DISABLE": "Disable",
 			"EDIT": "Edit",
+			"ENABLE": "Enable",
+			"MODAL": {
+				"BTN_REGENERATE": "Regenerate",
+				"COL_ADMIN_ROLE": "Admin Role",
+				"COL_ADMIN_ROLE_PLACEHOLDER": "Select a role",
+				"COL_APP_ID": "App ID",
+				"COL_APP_NAME": "App Name",
+				"COL_EXPIRED_AT": "Expiration Date",
+				"COL_LASTED_AT": "Last Accessed",
+				"COL_NAME": "Name",
+				"COL_STATE": "State",
+				"COL_TAG": "Tags",
+				"COL_WORKSPACE_ROLE": "Workspace OwnerRole",
+				"CREATE_TITLE": "Create App",
+				"DELETE_TITLE": "Are you sure you want to delete the App?",
+				"DISABLE_TITLE": "Are you sure you want to disable the App?",
+				"EDIT_TITLE": "Edit App Information",
+				"ENABLE_TITLE": "Are you sure you want to enable the App?",
+				"REGENERATE_TITLE": "Regenerate API key for selected App"
+			},
 			"REGENERATE": "Regenerate API Key",
 			"TITLE": "App"
 		},
+		"CLI_DESC": "The SpaceONE command-line tool, spacectl, allows you to run commands against resources managed by SpaceONE.",
 		"DOMAIN_SETTINGS": {
 			"ADMIN_EMAIL": "Admin email",
 			"ALT_E_UPDATE_ADMIN_EMAIL": "Failed to update admin email",
@@ -1647,6 +1671,7 @@
 			"VERIFICATION_CODE_INVALID": "Required field",
 			"WORDTYPE_LOGO_DESCRIPTION": "A wordtype logo shows up in your sign-in screen and represents your domain name.\n• Recommended 220 × 40 pixels\n• PNG, JPEG or GIF files"
 		},
+		"DOWNLOAD": "Donwload {path}",
 		"POLICY": {
 			"FORM": {
 				"CANCEL": "Cancel",
