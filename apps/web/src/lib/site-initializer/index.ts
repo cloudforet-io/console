@@ -21,6 +21,7 @@ import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
+import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
 
 
@@ -32,8 +33,8 @@ const initQueryHelper = (store) => {
     QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
-const initRouter = (domainName?: string) => {
-    if (!domainName) {
+const initRouter = (domainId?: string) => {
+    if (!domainId) {
         SpaceRouter.init(errorRoutes);
     } else {
         SpaceRouter.init(integralRoutes);
@@ -51,12 +52,21 @@ const removeInitializer = () => {
 
 const init = async (store) => {
     /* Init SpaceONE Console */
-    await initConfig();
-    await initApiClient(store, config);
-    const domainName = await initDomain(store, config);
+    try {
+        await initConfig();
+        await initApiClient(store, config);
+        await initDomain(store, config);
+    } catch (e) {
+        initRouter();
+        throw new Error('Site initialization failed: No matched domain');
+    }
 
-    if (domainName) {
-        initModeSetting();
+    const domainId = store.state.domain.domainId;
+    initModeSetting();
+    initRouter(domainId);
+    const userId = await initUserAndAuth(store, config);
+
+    if (userId) {
         await initWorkspace(store);
         prefetchResources();
         initI18n(store);
@@ -66,13 +76,9 @@ const init = async (store) => {
         initGtm(config);
         initAmcharts(config);
         initAmcharts5(config);
-        initRouter(domainName);
         initErrorHandler(store);
         initRequestIdleCallback();
         await checkSsoAccessToken(store);
-    } else {
-        initRouter();
-        throw new Error('Site initialization failed: No matched domain');
     }
 };
 

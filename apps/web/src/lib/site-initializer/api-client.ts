@@ -72,6 +72,8 @@ export const initApiClient = async (store, config) => {
         devConfig,
         getAfterCallApiMap(store),
     );
-    const isTokenAlive = SpaceConnector.isTokenAlive;
-    store.dispatch('user/setIsSessionExpired', !isTokenAlive);
+    // to be deprecated
+    // const isTokenAlive = SpaceConnector.isTokenAlive;
+    // store.dispatch('user/setIsSessionExpired', !isTokenAlive);
+    // store.dispatch('user/setIsSessionExpired', false);
 };
