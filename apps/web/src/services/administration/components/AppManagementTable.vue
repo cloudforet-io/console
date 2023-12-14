@@ -5,7 +5,6 @@ import { useRoute } from 'vue-router/composables';
 import {
     PToolboxTable, PSelectDropdown, PStatus, PCopyButton,
 } from '@spaceone/design-system';
-import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { isEmpty } from 'lodash';
@@ -26,20 +25,13 @@ import {
     appStateFormatter,
     calculateTime,
 } from '@/services/administration/composables/refined-table-data';
+import { APP_DROPDOWN_MODAL_TYPE, APP_TABLE_FIELDS } from '@/services/administration/constants/app-constant';
 import {
     ROLE_SEARCH_HANDLERS,
 } from '@/services/administration/constants/role-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
 
-
 const DEFAULT_PAGE_LIMIT = 15;
-const APP_DROPDOWN_MENU_ITEM = {
-    EDIT: 'edit',
-    DELETE: 'delete',
-    REGENERATE: 'regenerate',
-    ENABLE: 'enable',
-    DISABLE: 'disable',
-} as const;
 
 interface Props {
     tableHeight?: number;
@@ -66,57 +58,34 @@ const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 const state = reactive({
+    loading: false,
     refinedUserItems: computed(() => appPageState.apps.map((app) => ({
         ...app,
         last_accessed_at: calculateTime(app?.last_accessed_at, storeState.timezone),
     }))),
-    fields: computed<DefinitionField[]>(() => {
-        let additionalFields: DefinitionField = {
-            name: 'role_type',
-            label: 'Workspace Owner Role',
-        };
-        if (storeState.isAdminMode) {
-            additionalFields = {
-                name: 'role_type',
-                label: 'Admin Role',
-            };
-        }
-        return [
-            { name: 'name', label: 'App Name' },
-            { name: 'state', label: 'State' },
-            {
-                name: 'app_id', label: 'App ID', sortable: false, disableCopy: false,
-            },
-            additionalFields,
-            // { name: 'tags', label: 'Tags', sortable: false },
-            { name: 'last_accessed_at', label: 'Last Activity' },
-            { name: 'expired_at', label: 'Expiration Date' },
-            { name: 'created_at', label: 'Created' },
-        ];
-    }),
     tags: appListApiQueryHelper.setKeyItemSets(ROLE_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
-        type: 'item', name: APP_DROPDOWN_MENU_ITEM.EDIT, label: i18n.t('IAM.APP.EDIT'), disabled: !isEmpty(appPageState.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.EDIT, label: i18n.t('IAM.APP.EDIT'), disabled: isEmpty(appPageState.selectedApp),
     },
     {
-        type: 'item', name: APP_DROPDOWN_MENU_ITEM.DELETE, label: i18n.t('IAM.APP.DELETE'), disabled: !isEmpty(appPageState.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.DELETE, label: i18n.t('IAM.APP.DELETE'), disabled: isEmpty(appPageState.selectedApp),
     },
     { type: 'divider' },
     {
-        type: 'item', name: APP_DROPDOWN_MENU_ITEM.REGENERATE, label: i18n.t('IAM.APP.REGENERATE'), disabled: !isEmpty(appPageState.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.REGENERATE, label: i18n.t('IAM.APP.REGENERATE'), disabled: isEmpty(appPageState.selectedApp),
     },
     { type: 'divider' },
     {
         type: 'item',
-        name: APP_DROPDOWN_MENU_ITEM.ENABLE,
+        name: APP_DROPDOWN_MODAL_TYPE.ENABLE,
         label: i18n.t('IAM.APP.ENABLE'),
         disabled: !isEmpty(appPageState.selectedApp) && appPageState.selectedApp?.state === APP_STATUS_TYPE.EXPIRED,
     },
     {
         type: 'item',
-        name: APP_DROPDOWN_MENU_ITEM.DISABLE,
+        name: APP_DROPDOWN_MODAL_TYPE.DISABLE,
         label: i18n.t('IAM.APP.DISABLE'),
         disabled: !isEmpty(appPageState.selectedApp) && appPageState.selectedApp?.state === APP_STATUS_TYPE.EXPIRED,
     },
@@ -125,35 +94,15 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
 /* Component */
 const handleSelectDropdown = (name) => {
     switch (name) {
-    case APP_DROPDOWN_MENU_ITEM.EDIT:
-        appPageStore.$patch((_state) => {
-            _state.modal.type = name;
-            _state.modal.visible.update = true;
-        });
+    case APP_DROPDOWN_MODAL_TYPE.EDIT: clickFormModal(name);
         break;
-    case APP_DROPDOWN_MENU_ITEM.DELETE:
-        appPageStore.$patch((_state) => {
-            _state.modal.type = name;
-            _state.modal.visible.delete = true;
-        });
+    case APP_DROPDOWN_MODAL_TYPE.DELETE: clickStateModal(name);
         break;
-    case APP_DROPDOWN_MENU_ITEM.REGENERATE:
-        appPageStore.$patch((_state) => {
-            _state.modal.type = name;
-            _state.modal.visible.regenerate = true;
-        });
+    case APP_DROPDOWN_MODAL_TYPE.REGENERATE: clickStateModal(name);
         break;
-    case APP_DROPDOWN_MENU_ITEM.ENABLE:
-        appPageStore.$patch((_state) => {
-            _state.modal.type = name;
-            _state.modal.visible.enable = true;
-        });
+    case APP_DROPDOWN_MODAL_TYPE.ENABLE: clickStateModal(name);
         break;
-    case APP_DROPDOWN_MENU_ITEM.DISABLE:
-        appPageStore.$patch((_state) => {
-            _state.modal.type = name;
-            _state.modal.visible.disable = true;
-        });
+    case APP_DROPDOWN_MODAL_TYPE.DISABLE: clickStateModal(name);
         break;
     default: break;
     }
@@ -168,16 +117,31 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     }
     await getListApps();
 };
+const clickFormModal = (name: string) => {
+    appPageStore.$patch((_state) => {
+        _state.modal.type = name;
+        _state.modal.visible.form = true;
+    });
+};
+const clickStateModal = (name: string) => {
+    appPageStore.$patch((_state) => {
+        _state.modal.type = name;
+        _state.modal.visible.status = true;
+    });
+};
 
 /* API */
 const getListApps = async () => {
-    console.log('init!');
-    await appPageStore.listApps({ query: appListApiQuery });
+    state.loading = true;
+    try {
+        await appPageStore.listApps({ query: appListApiQuery });
+    } finally {
+        state.loading = false;
+    }
 };
 
 /* Init */
 (async () => {
-    console.log('?');
     await getListApps();
 })();
 </script>
@@ -187,11 +151,11 @@ const getListApps = async () => {
         <p-toolbox-table search-type="query"
                          selectable
                          sortable
-                         :loading="false"
+                         :loading="state.loading"
                          disabled
                          :multi-select="false"
                          :items="appPageState.apps"
-                         :fields="state.fields"
+                         :fields="APP_TABLE_FIELDS"
                          sort-by="name"
                          :sort-desc="true"
                          :total-count="appPageState.totalCount"

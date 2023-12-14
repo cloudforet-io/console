@@ -17,6 +17,6 @@ export interface AppModel {
     created_at: TimeStamp;
     last_accessed_at: TimeStamp;
     expired_at: TimeStamp;
-    tags?: Tags[];
+    tags?: Tags;
 }
 
