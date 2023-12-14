@@ -19,9 +19,10 @@ import type {
 } from './type';
 
 
-const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
+const getUserInfo = async (userId: string, domainId: string): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
         user_id: userId,
+        domain_id: domainId,
     });
     // TODO: refactor below code with new response
     return {
@@ -61,10 +62,12 @@ const getUserInfoFromToken = (token: string): string[] => {
     return [decodedToken.user_type, decodedToken.aud as string];
 };
 
-const getUserRoles = async (): Promise<Array<UserRole>> => {
+const getUserRoles = async (domainId: string): Promise<Array<UserRole>> => {
     try {
         const userRoles: Record<string, UserRole> = {};
-        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>();
+        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+            domain_id: domainId, // TODO: delete after backend is ready
+        });
 
         if (!results) return [];
 
@@ -113,10 +116,10 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
     const [, userId] = getUserInfoFromToken(response.access_token);
 
-    const userInfo = await getUserInfo(userId);
+    const userInfo = await getUserInfo(userId, domainId);
     commit('setUser', userInfo);
 
-    const userRoles = await getUserRoles();
+    const userRoles = await getUserRoles(domainId);
     commit('setRoles', userRoles);
 
     commit('setIsSessionExpired', false);
