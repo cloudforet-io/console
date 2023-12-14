@@ -12,6 +12,7 @@
             <div ref="containerRef"
                  class="right-container"
             >
+                <portal-target name="page-top-notification" />
                 <div class="header">
                     <p-breadcrumbs v-if="breadcrumbs.length"
                                    :routes="breadcrumbs"
