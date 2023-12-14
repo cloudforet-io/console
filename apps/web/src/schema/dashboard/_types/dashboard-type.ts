@@ -1,6 +1,3 @@
-import type { TranslateResult } from 'vue-i18n';
-
-
 import type {
     DASHBOARD_VIEWER, REFRESH_INTERVAL_OPTIONS_MAP, DASHBOARD_SCOPE, DASHBOARD_LABEL,
 } from '@/schema/dashboard/_constants/dashboard-constant';
@@ -13,6 +10,7 @@ import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '
 export type DashboardViewer = typeof DASHBOARD_VIEWER[keyof typeof DASHBOARD_VIEWER];
 export type DashboardScope = typeof DASHBOARD_SCOPE[keyof typeof DASHBOARD_SCOPE];
 export type DashboardLabel = typeof DASHBOARD_LABEL[keyof typeof DASHBOARD_LABEL];
+export type DashboardType = 'PUBLIC' | 'PRIVATE';
 
 // dashboard variable schema types
 export type VariableSelectionType = 'SINGLE' | 'MULTI';
@@ -71,11 +69,6 @@ export interface DashboardTemplate {
     variables_schema: DashboardVariablesSchema;
     labels: (DashboardLabel|string)[];
     version: string;
-    description?: {
-        preview_image?: string;
-        icon?: string;
-        text?: string | TranslateResult;
-    }
 }
 
 export interface DashboardLayoutWidgetInfo {
