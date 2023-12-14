@@ -146,7 +146,7 @@ watch(() => storeState.isEdit, (isEdit) => {
 </script>
 
 <template>
-    <p-button-modal class="user-management-form-modal"
+    <p-button-modal class="app-management-form-modal"
                     :header-title="appPageState.modal.title"
                     size="sm"
                     :fade="true"
@@ -202,7 +202,7 @@ watch(() => storeState.isEdit, (isEdit) => {
 </template>
 
 <style lang="postcss">
-.user-management-form-modal {
+.app-management-form-modal {
     display: initial;
 }
 </style>
