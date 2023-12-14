@@ -8,7 +8,7 @@ export interface RoleBindingModel {
     role_type: RoleType;
     user_id: string;
     role_id: string;
-    resource_group: ResourceGroupType;
+    resource_group: Extract<ResourceGroupType, 'WORKSPACE'|'DOMAIN'>;
     created_at: TimeStamp;
     workspace_id: string;
     domain_id: string;

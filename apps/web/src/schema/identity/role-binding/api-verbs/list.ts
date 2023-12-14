@@ -12,7 +12,7 @@ export interface RoleBindingListParameters {
     role_id?: string;
     role_type?: RoleType;
     workspace_id?: string;
-    resource_group?: ResourceGroupType;
+    resource_group?: Extract<ResourceGroupType, 'WORKSPACE'|'DOMAIN'>;
 }
 
 export type RoleBindingListResponse = ListResponse<RoleBindingModel>;
