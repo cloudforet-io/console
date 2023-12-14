@@ -1,5 +1,5 @@
 import type { Tags, TimeStamp } from '@/schema/_common/model';
-import type { PermissionGroup } from '@/schema/identity/role-binding/type';
+import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 export interface TrustedSecretModel {
     trusted_secret_id: string;
@@ -8,7 +8,7 @@ export interface TrustedSecretModel {
     schema_id: string;
     provider: string;
     trusted_account_id: string;
-    permission_group: PermissionGroup;
+    permission_group: ResourceGroup;
     workspace_id: string;
     created_at: TimeStamp;
 }

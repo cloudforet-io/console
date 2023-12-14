@@ -1,9 +1,9 @@
 <template>
     <p-pane-layout>
-        <section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
-                        :edit-mode="state.isEditMode"
-                        :hide-edit-button="state.isCollectorOptionsSchemaEmpty"
-                        @click-edit="handleClickEdit"
+        <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
+                                         :edit-mode="state.isEditMode"
+                                         :hide-edit-button="state.isCollectorOptionsSchemaEmpty"
+                                         @click-edit="handleClickEdit"
         />
         <p-definition-table v-if="!state.isEditMode"
                             :fields="state.fields"
@@ -77,7 +77,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
+import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 

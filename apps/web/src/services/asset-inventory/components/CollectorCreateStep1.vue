@@ -127,7 +127,7 @@ const getPlugins = async (): Promise<PluginModel[]> => {
             provider: collectorFormState.provider === 'all' ? null : collectorFormState.provider,
             query: pluginApiQuery.data,
         };
-        const res = await SpaceConnector.client.repository.plugin.list(params);
+        const res = await SpaceConnector.clientV2.repository.plugin.list(params);
         state.totalCount = res.total_count;
         return res.results;
     } catch (e) {

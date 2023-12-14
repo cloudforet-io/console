@@ -1,9 +1,9 @@
 <template>
     <p-pane-layout>
-        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
-                        :edit-mode="state.isEditMode"
-                        :total-count="state.totalCount"
-                        @click-edit="handleClickEdit"
+        <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
+                                         :edit-mode="state.isEditMode"
+                                         :total-count="state.totalCount"
+                                         @click-edit="handleClickEdit"
         />
 
         <attached-service-accounts v-if="!state.isEditMode"
@@ -65,7 +65,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AttachedServiceAccounts
     from '@/services/asset-inventory/components/CollectorDetailAttachedServiceAccounts.vue';
-import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
+import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import AttachedServiceAccountForm from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 

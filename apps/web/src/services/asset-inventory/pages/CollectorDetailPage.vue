@@ -106,6 +106,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
@@ -132,6 +133,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
@@ -147,6 +149,8 @@ const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
 
 const collectorDataModalStore = useCollectorDataModalStore();
+
+const collectorDetailPageStore = useCollectorDetailPageStore();
 
 watch(() => collectorFormState.originCollector, async (collector) => {
     if (collector) {
@@ -186,10 +190,9 @@ defineExpose({ setPathFrom });
 const getCollector = async (): Promise<CollectorModel|null> => {
     state.loading = true;
     try {
-        const result = await SpaceConnector.clientV2.inventory.collector.get({
+        return await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
             collector_id: props.collectorId,
         });
-        return result;
     } catch (e) {
         ErrorHandler.handleError(e);
         return null;
@@ -269,6 +272,7 @@ onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
+    collectorDetailPageStore.$reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
@@ -276,6 +280,9 @@ onMounted(async () => {
     if (collector) {
         collectorJobStore.getAllJobsCount();
         collectorFormStore.setOriginCollector(collector);
+        collectorDetailPageStore.$patch((_state) => {
+            _state.collector = collector;
+        });
         resume();
     }
 });
@@ -284,6 +291,7 @@ onUnmounted(() => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
+    collectorDetailPageStore.$reset();
 });
 
 
