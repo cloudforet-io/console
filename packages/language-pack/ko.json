@@ -1692,6 +1692,7 @@
 			},
 			"EDIT": "수정",
 			"FORM": {
+				"ACCESS": "",
 				"ALL": "전체",
 				"ALT_E_CREATE_ROLE": "역할(Role) 생성 실패",
 				"ALT_E_UPDATE_ROLE": "역할(Role) 변경 실패",
@@ -1700,6 +1701,9 @@
 				"CANCEL": "취소",
 				"CREATE": "생성",
 				"CREATE_TITLE": "역할(Role) 생성",
+				"DESC_ADMIN": "",
+				"DESC_WORKSPACE_MEMBER": "",
+				"DESC_WORKSPACE_OWNER": "",
 				"EDIT_TITLE": "역할(Role) 수정",
 				"MANAGE": "Manage",
 				"MENU": "메뉴",

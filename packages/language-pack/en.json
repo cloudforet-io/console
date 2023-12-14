@@ -1692,6 +1692,7 @@
 			},
 			"EDIT": "Edit",
 			"FORM": {
+				"ACCESS": "Access",
 				"ALL": "All",
 				"ALT_E_CREATE_ROLE": "Failed to create role",
 				"ALT_E_UPDATE_ROLE": "Failed to update role",
@@ -1700,6 +1701,9 @@
 				"CANCEL": "Cancel",
 				"CREATE": "Create",
 				"CREATE_TITLE": "Create Role",
+				"DESC_ADMIN": "Access to all workspaces, including\nAdmin mode.",
+				"DESC_WORKSPACE_MEMBER": "Access to projects they are invited to or\nhave been granted permission for.",
+				"DESC_WORKSPACE_OWNER": "Access to all projects within their\ndesignated workspace.",
 				"EDIT_TITLE": "Edit Role",
 				"MANAGE": "Manage",
 				"MENU": "Menu",

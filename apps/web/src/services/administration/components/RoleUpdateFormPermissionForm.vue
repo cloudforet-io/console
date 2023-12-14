@@ -16,10 +16,11 @@ import {
 } from '@/lib/access-control/page-permission-helper';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
-import RoleUpdatePageAccessMenuItem from '@/services/administration/components/RoleUpdatePageAccessMenuItem.vue';
+import RoleUpdateFormAccess from '@/services/administration/components/RoleUpdateFormAccess.vue';
+import RoleUpdateFormPolicy from '@/services/administration/components/RoleUpdateFormPolicy.vue';
 import { getPageAccessMenuList } from '@/services/administration/helpers/page-access-menu-list';
 import { getPagePermissions } from '@/services/administration/helpers/role-page-permission-helpert';
-import type { PageAccessMenuItem } from '@/services/administration/types/page-access-menu-type';
+import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/administration/types/page-access-menu-type';
 
 interface Props {
     initialPagePermissions?: PagePermission[];
@@ -66,7 +67,8 @@ const updateMenuItems = (item: PageAccessMenuItem, key: string, val: boolean, pa
 };
 
 /* Event */
-const handleUpdate = (menuId: string, key: 'isViewed' | 'isManaged', val: boolean) => {
+const handleUpdate = (value: UpdateFormDataType) => {
+    const { id: menuId, key, val } = value;
     const item = find(formState.menuItems, { id: menuId });
     const allItem = find(formState.menuItems, { id: 'all' }) as PageAccessMenuItem;
     if (item) {
@@ -108,90 +110,25 @@ watch(() => props.initialPagePermissions, (initialPagePermissions) => {
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, key] of Object.entries(pagePermissions)) {
         const itemAttribute = (key === PAGE_PERMISSION_TYPE.MANAGE) ? 'isManaged' : 'isViewed';
-        handleUpdate(itemId, itemAttribute, true);
+        handleUpdate({ id: itemId, key: itemAttribute, val: true });
     }
 });
 </script>
 
 <template>
-    <p-pane-layout class="role-create-page-access-form">
+    <p-pane-layout class="role-create-page-permission-form">
         <p-heading heading-type="sub"
-                   :title="$t('IAM.ROLE.DETAIL.PAGE_ACCESS')"
+                   :title="$t('IAM.ROLE.FORM.PERMISSION')"
         />
-        <div class="page-access-menu">
-            <div class="header-wrapper">
-                <span class="left-part">{{ $t('IAM.ROLE.FORM.MENU') }}</span>
-                <span class="right-part mr-6">{{ $t('IAM.ROLE.FORM.PERMISSION') }}</span>
-            </div>
-            <div class="content-wrapper">
-                <template v-for="menu in formState.menuItems">
-                    <div v-if="menu.id === 'all' || !state.hideAllMenu"
-                         :key="menu.id"
-                         class="menu-wrapper"
-                         :class="menu.id"
-                    >
-                        <role-update-page-access-menu-item :menu="menu"
-                                                           @update="handleUpdate"
-                        />
-                        <template v-for="subMenu in menu.subMenuList">
-                            <div v-if="menu.subMenuList && !menu.hideMenu && !state.hideAllMenu"
-                                 :key="subMenu.id"
-                                 class="sub-menu-wrapper"
-                            >
-                                <role-update-page-access-menu-item :menu="subMenu"
-                                                                   is-sub-menu
-                                                                   @update="handleUpdate"
-                                />
-                            </div>
-                        </template>
-                    </div>
-                </template>
-            </div>
-        </div>
+        <role-update-form-access :menu-items="formState.menuItems"
+                                 @update="handleUpdate"
+        />
+        <role-update-form-policy />
     </p-pane-layout>
 </template>
 
 <style lang="postcss" scoped>
-.role-create-page-access-form {
+.role-create-page-permission-form {
     @apply mx-0;
-    max-width: 100%;
-
-    .page-access-menu {
-        @apply border border-gray-200 rounded-md;
-        font-size: 0.875rem;
-        line-height: 1.25;
-        max-width: 43.5rem;
-        margin: 0 1rem 2.5rem 1rem;
-
-        .header-wrapper {
-            @apply text-gray-500 border-b border-gray-200;
-            display: flex;
-            font-size: 0.75rem;
-            line-height: 1.25;
-            padding: 0.5rem 1rem;
-        }
-        .content-wrapper {
-            height: 27.875rem;
-            overflow-y: auto;
-        }
-        .menu-wrapper {
-            @apply bg-gray-100 border border-gray-200 rounded-md;
-            margin: 0.5rem 1rem;
-            &.all {
-                @apply bg-transparent border-none;
-                margin: 0.5rem 1rem 0.5rem 0;
-            }
-            .sub-menu-wrapper {
-                @apply bg-white rounded-md;
-                margin: 0.25rem 0.5rem;
-            }
-        }
-        .left-part {
-            flex-grow: 1;
-        }
-        .right-part {
-            width: 12.5rem;
-        }
-    }
 }
 </style>
