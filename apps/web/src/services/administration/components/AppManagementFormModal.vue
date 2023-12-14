@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
+import { cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
@@ -17,6 +18,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
 
 const appContextStore = useAppContextStore();
@@ -25,6 +27,7 @@ const appPageState = appPageStore.$state;
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isEdit: computed(() => appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.EDIT),
 });
 const formState = reactive({
     name: '',
@@ -36,7 +39,7 @@ const dropdownState = reactive({
     loading: false,
     searchText: '',
     menuItems: [] as SelectDropdownMenuItem[],
-    selectedItems: [] as SelectDropdownMenuItem[],
+    selectedMenuItems: [] as SelectDropdownMenuItem[],
 });
 
 /* Component */
@@ -47,14 +50,12 @@ const menuHandler: AutocompleteHandler = async (inputText: string) => {
     };
 };
 const handleClose = () => {
-    formState.name = '';
-    formState.role = {} as SelectDropdownMenuItem;
-    formState.tags = {} as Tags;
-    dropdownState.searchText = '';
-    dropdownState.selectedItems = [];
     appPageStore.$patch((_state) => {
+        _state.modal.type = '';
         _state.modal.visible.form = false;
+        _state.modal = cloneDeep(_state.modal);
     });
+    initState();
 };
 const handleChangeTags = (items: InputItem[]) => {
     const refinedTags = items.map((item) => {
@@ -69,6 +70,17 @@ const handleChangeTags = (items: InputItem[]) => {
 };
 const handleSelectItem = (item: SelectDropdownMenuItem) => {
     formState.role = item;
+};
+const setFormState = () => {
+    formState.name = appPageState.selectedApp.name;
+    // formState.tags = appPageState.selectedApp.tags;
+};
+const initState = () => {
+    formState.name = '';
+    formState.role = {} as SelectDropdownMenuItem;
+    formState.tags = {} as Tags;
+    dropdownState.searchText = '';
+    dropdownState.selectedMenuItems = [];
 };
 
 /* API */
@@ -97,7 +109,6 @@ const fetchListRoles = async (inputText: string) => {
         dropdownState.menuItems = response.map((role) => ({
             label: role.name,
             name: role.role_id,
-            role_type: role.role_type,
         }));
     } finally {
         dropdownState.loading = false;
@@ -106,27 +117,44 @@ const fetchListRoles = async (inputText: string) => {
 // TODO: will be checked after implementing the API
 const handleConfirm = async () => {
     try {
-        await appPageStore.createApp({
-            name: formState.name,
-            role_id: formState.role.name,
-            tags: formState.tags,
-            resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
-        });
+        if (storeState.isEdit) {
+            await appPageStore.updateApp({
+                app_id: appPageState.selectedApp.app_id,
+                name: formState.name,
+                tags: formState.tags,
+            });
+        } else {
+            await appPageStore.createApp({
+                name: formState.name,
+                role_id: formState.role.name,
+                tags: formState.tags,
+                resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+            });
+        }
         handleClose();
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
+
+/* Watcher */
+watch(() => storeState.isEdit, (isEdit) => {
+    if (isEdit) {
+        setFormState();
+    }
+}, { immediate: true });
 </script>
 
 <template>
-    <p-button-modal class="user-management-form-modal"
+    <p-button-modal class="app-management-form-modal"
                     :header-title="appPageState.modal.title"
                     size="sm"
                     :fade="true"
                     :backdrop="true"
                     :visible="appPageState.modal.visible.form"
-                    :disabled="formState.name === '' || dropdownState.selectedItems.length === 0"
+                    :disabled="storeState.isEdit
+                        ? formState.name === ''
+                        : formState.name === '' || dropdownState.selectedMenuItems.length === 0"
                     :loading="appPageState.modal.loading"
                     @confirm="handleConfirm"
                     @cancel="handleClose"
@@ -142,7 +170,8 @@ const handleConfirm = async () => {
                               block
                 />
             </p-field-group>
-            <p-field-group :label="storeState.isAdminMode ? $t('IAM.APP.MODAL.COL_ADMIN_ROLE') : $t('IAM.APP.MODAL.COL_WORKSPACE_ROLE')"
+            <p-field-group v-if="!storeState.isEdit"
+                           :label="storeState.isAdminMode ? $t('IAM.APP.MODAL.COL_ADMIN_ROLE') : $t('IAM.APP.MODAL.COL_WORKSPACE_ROLE')"
                            required
             >
                 <p-select-dropdown use-fixed-menu-style
@@ -150,7 +179,7 @@ const handleConfirm = async () => {
                                    :visible-menu.sync="dropdownState.visible"
                                    :loading="dropdownState.loading"
                                    :search-text.sync="dropdownState.searchText"
-                                   :selected.sync="dropdownState.selectedItems"
+                                   :selected.sync="dropdownState.selectedMenuItems"
                                    :handler="menuHandler"
                                    is-filterable
                                    :multi-selectable="false"
@@ -173,7 +202,7 @@ const handleConfirm = async () => {
 </template>
 
 <style lang="postcss">
-.user-management-form-modal {
+.app-management-form-modal {
     display: initial;
 }
 </style>

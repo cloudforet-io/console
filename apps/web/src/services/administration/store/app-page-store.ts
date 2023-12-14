@@ -5,6 +5,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AppCreateParameters } from '@/schema/identity/app/api-verbs/create';
 import type { AppListParameters } from '@/schema/identity/app/api-verbs/list';
+import type { AppUpdateParameters } from '@/schema/identity/app/api-verbs/update';
 import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import type { RoleModel } from '@/schema/identity/role/model';
@@ -45,6 +46,17 @@ export const useAppPageStore = defineStore('app-page', {
             this.modal.loading = true;
             try {
                 await SpaceConnector.clientV2.identity.app.create<AppCreateParameters, AppModel>(params);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                throw e;
+            } finally {
+                this.modal.loading = false;
+            }
+        },
+        async updateApp(params: AppUpdateParameters) {
+            this.modal.loading = true;
+            try {
+                await SpaceConnector.clientV2.identity.app.update<AppUpdateParameters, AppModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;

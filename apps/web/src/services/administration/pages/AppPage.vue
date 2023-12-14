@@ -4,6 +4,7 @@ import { onUnmounted } from 'vue';
 import {
     PHorizontalLayout, PHeading, PButton,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -21,6 +22,7 @@ const handleCreateApp = () => {
         _state.modal.type = APP_DROPDOWN_MODAL_TYPE.CREATE;
         _state.modal.title = i18n.t('IAM.APP.MODAL.CREATE_TITLE') as string;
         _state.modal.visible.form = true;
+        _state.modal = cloneDeep(_state.modal);
     });
 };
 
