@@ -1,3 +1,5 @@
+import type { Action } from 'vuex';
+
 import type { JwtPayload } from 'jwt-decode';
 import jwtDecode from 'jwt-decode';
 
@@ -10,6 +12,7 @@ import type { RoleModel } from '@/schema/identity/role/model';
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
+import type { GrantType } from '@/schema/identity/user/type';
 import { setI18nLocale } from '@/translations';
 
 import type { PagePermission } from '@/lib/access-control/config';
@@ -110,6 +113,7 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
         auth_type: signInRequest.authType,
         credentials: signInRequest.credentials,
         verify_code: signInRequest.verify_code,
+        grant_type: 'CLIENT_CREDENTIALS',
     }, { skipAuthRefresh: true });
 
     SpaceConnector.setToken(response.access_token, response.refresh_token);
@@ -127,6 +131,22 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
 export const signOut = (): void => {
     SpaceConnector.flushToken();
+};
+
+export const grantRole: Action<UserState, any> = async ({ commit, rootState }, grantType: GrantType) => {
+    const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters>({
+        grant_type: grantType,
+    }, { skipAuthRefresh: true });
+
+    SpaceConnector.setToken(response.access_token);
+
+    const [, userId] = getUserInfoFromToken(response.access_token);
+
+    const userInfo = await getUserInfo(userId, rootState.domain.domainId);
+    commit('setUser', userInfo);
+
+    const userRoles = await getUserRoles(rootState.domain.domainId);
+    commit('setRoles', userRoles);
 };
 
 export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {

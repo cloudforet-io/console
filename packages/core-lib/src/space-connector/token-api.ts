@@ -65,11 +65,13 @@ export default class TokenAPI {
         this.refreshToken = undefined;
     }
 
-    setToken(accessToken: string, refreshToken: string): void {
+    setToken(accessToken: string, refreshToken?: string): void {
         this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
         LocalStorageAccessor.setItem(ACCESS_TOKEN_KEY, accessToken);
-        LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        if (refreshToken) {
+            this.refreshToken = refreshToken;
+            LocalStorageAccessor.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        }
         TokenAPI.unsetRefreshingState();
     }
 
