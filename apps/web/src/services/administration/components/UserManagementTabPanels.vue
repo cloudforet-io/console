@@ -3,10 +3,15 @@ import { computed, reactive, watch } from 'vue';
 
 import { PDataTable, PHeading } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { TimeStamp } from '@/schema/_common/model';
+import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
+import type { ProjectModel } from '@/schema/identity/project/model';
 import { i18n } from '@/translations';
 
-import { USER_TABS } from '@/services/administration/constants/user-tab-constant';
+import { USER_TABS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface TableItem {
@@ -32,16 +37,16 @@ const state = reactive({
     loading: false,
     tags: {},
     title: computed(() => (props.type === USER_TABS.PROJECTS
-        ? i18n.t('IDENTITY.USER.MAIN.ASSOCIATED_PROJECTS')
-        : i18n.t('IDENTITY.USER.MAIN.TAG'))),
+        ? i18n.t('IAM.USER.MAIN.ASSOCIATED_PROJECTS')
+        : i18n.t('IAM.USER.MAIN.TAG'))),
     items: [] as TableItem[],
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
     fields: computed(() => (props.type === USER_TABS.PROJECTS
         ? [
-            { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.PROJECT'), type: 'link' },
-            { name: 'date', label: i18n.t('IDENTITY.USER.MAIN.INVITED') },
+            { name: 'name', label: i18n.t('IAM.USER.MAIN.PROJECT'), type: 'link' },
+            { name: 'date', label: i18n.t('IAM.USER.MAIN.INVITED') },
         ]
         : [
             { name: 'key', label: i18n.t('COMMON.TAGS.KEY') },
@@ -53,14 +58,14 @@ const tableState = reactive({
 const getProjectItems = async () => {
     state.loading = true;
     try {
-        const response = await userPageStore.listProjects({
+        const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
             user_id: state.selectedUser.user_id,
         });
-        state.items = response.map((k) => ({
+        state.items = results?.map((k) => ({
             project_id: k.project_id,
             name: k.name,
             date: k.created_at,
-        }));
+        })) as TableItem[];
     } catch (e) {
         state.items = [];
     } finally {

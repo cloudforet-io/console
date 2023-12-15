@@ -42,7 +42,7 @@ const handleClickGenerate = () => {
 <template>
     <div class="user-management-add-password">
         <div class="title-wrapper">
-            <p-field-title :label="$t('IDENTITY.USER.FORM.PASSWORD_SEND_LINK')" />
+            <p-field-title :label="$t('IAM.USER.FORM.PASSWORD_SEND_LINK')" />
             <p-toggle-button v-model="state.passwordStatus"
                              @change-toggle="handleChangeToggleButton"
             />
@@ -52,7 +52,7 @@ const handleClickGenerate = () => {
         >
             <p-divider />
             <p-field-group
-                :label="$t('IDENTITY.USER.FORM.PASSWORD')"
+                :label="$t('IAM.USER.FORM.PASSWORD')"
                 :required="true"
                 :invalid="validationState.isPasswordValid"
                 :invalid-text="validationState.passwordInvalidText"
@@ -62,11 +62,11 @@ const handleClickGenerate = () => {
                     <p-button style-type="tertiary"
                               @click="handleClickGenerate"
                     >
-                        {{ $t('IDENTITY.USER.FORM.GENERATE') }}
+                        {{ $t('IAM.USER.FORM.GENERATE') }}
                     </p-button>
                     <p-text-input :value="formState.password"
                                   class="password-input"
-                                  :placeholder="$t('IDENTITY.USER.FORM.GENERATE_PLACEHOLDER')"
+                                  :placeholder="$t('IAM.USER.FORM.GENERATE_PLACEHOLDER')"
                                   :invalid="validationState.isPasswordValid"
                                   @update:value="handleChangeInput"
                                   @focusin="() => state.copyButtonVisible = false"

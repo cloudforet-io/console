@@ -23,14 +23,13 @@ const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
-/* API */
 const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('name', true);
+
+/* API */
 const refreshUserList = () => {
-    userPageStore.$patch((_state) => {
-        _state.loading.list = true;
-    });
+    userPageStore.$patch({ loading: true });
     try {
         if (storeState.isAdminMode) {
             userPageStore.listUsers({ query: userListApiQueryHelper.data });
@@ -38,21 +37,25 @@ const refreshUserList = () => {
             userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
         }
     } finally {
-        userPageStore.$patch((_state) => {
-            _state.loading.list = false;
-        });
+        userPageStore.$patch({ loading: false });
     }
 };
 
+/* Watcher */
+watch(() => storeState.isAdminMode, (isAdminMode) => {
+    userPageStore.$patch({ isAdminMode });
+}, { immediate: true });
+
+/* Init */
+(async () => {
+    await refreshUserList();
+})();
+
+/* Unmount */
 onUnmounted(() => {
     userPageStore.$dispose();
     userPageStore.$reset();
 });
-
-/* Watcher */
-watch(() => storeState.isAdminMode, async () => {
-    await refreshUserList();
-}, { immediate: true });
 </script>
 
 <template>
@@ -75,12 +78,5 @@ watch(() => storeState.isAdminMode, async () => {
 .user-page {
     @apply mx-0;
     max-width: 100%;
-}
-
-/* custom design-system component - p-horizontal-layout */
-:deep(.user-toolbox-layout) {
-    .horizontal-contents {
-        overflow: unset;
-    }
 }
 </style>

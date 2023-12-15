@@ -7,7 +7,7 @@ import type { Vue } from 'vue/types/vue';
 import {
     PStatus, PTableCheckModal,
 } from '@spaceone/design-system';
-import { map } from 'lodash';
+import { cloneDeep, map } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -21,15 +21,13 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
-import { USER_STATUS_TABLE_FIELDS } from '@/services/administration/constants/user-table-constant';
-import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
+import { USER_MODAL_TYPE, USER_STATUS_TABLE_FIELDS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 const vm = getCurrentInstance()?.proxy as Vue;
 
 const userPageStore = useUserPageStore();
-const modalSettingStore = useUserModalSettingStore();
-const modalSettingState = modalSettingStore.$state;
+const userPageState = userPageStore.$state;
 
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
@@ -44,16 +42,16 @@ const checkModalConfirm = async (items) => {
     state.loading = true;
 
     try {
-        if (modalSettingState.mode === 'delete') {
+        if (userPageStore.modal.type === USER_MODAL_TYPE.DELETE) {
             responses = await Promise.all(map(items, (item) => deleteUser(item.user_id)));
             userPageStore.$patch({ selectedIndices: [] });
-        } else if (modalSettingState.mode === 'enable') {
+        } else if (userPageStore.modal.type === USER_MODAL_TYPE.ENABLE) {
             languagePrefix = 'ENABLE';
             responses = await Promise.all(map(items, (item) => enableUser(item.user_id)));
-        } else if (modalSettingState.mode === 'disable') {
+        } else if (userPageStore.modal.type === USER_MODAL_TYPE.DISABLE) {
             languagePrefix = 'DISABLE';
             responses = await Promise.all(map(items, (item) => disableUser(item.user_id)));
-        } else if (modalSettingState.mode === 'remove') {
+        } else if (userPageStore.modal.type === USER_MODAL_TYPE.REMOVE) {
             languagePrefix = 'REMOVE';
             responses = await Promise.all(map(items, (item) => removeUser(item?.role_binding_info.role_binding_id)));
         }
@@ -61,11 +59,11 @@ const checkModalConfirm = async (items) => {
         const successCount = responses.filter((d) => d).length;
         const failCount = responses.length - successCount;
         if (successCount > 0) {
-            const languageCode = `IDENTITY.USER.MAIN.ALT_S_${languagePrefix}_USER`;
+            const languageCode = `IAM.USER.MAIN.MODAL.ALT_S_${languagePrefix}_USER`;
             showSuccessMessage(vm.$tc(languageCode, successCount), '');
             emit('confirm');
         } if (failCount > 0) {
-            const languageCode = `IDENTITY.USER.MAIN.ALT_E_${languagePrefix}_USER`;
+            const languageCode = `IAM.USER.MAIN.MODAL.ALT_E_${languagePrefix}_USER`;
             ErrorHandler.handleRequestError(new Error(''), vm.$tc(languageCode, failCount));
         }
     } catch (e: any) {
@@ -76,8 +74,9 @@ const checkModalConfirm = async (items) => {
     }
 };
 const handleClose = () => {
-    modalSettingStore.$patch((_state) => {
-        _state.visible.status = false;
+    userPageStore.$patch((_state) => {
+        _state.modal.visible.status = false;
+        _state.modal = cloneDeep(_state.modal);
     });
 };
 
@@ -126,9 +125,9 @@ const disableUser = async (userId: string): Promise<boolean> => {
 </script>
 
 <template>
-    <p-table-check-modal :visible="modalSettingState.visible.status"
-                         :header-title="modalSettingState.title"
-                         :theme-color="modalSettingState.themeColor"
+    <p-table-check-modal :visible="userPageState.modal.visible.status"
+                         :header-title="userPageState.modal.title"
+                         :theme-color="userPageState.modal.themeColor"
                          :fields="USER_STATUS_TABLE_FIELDS"
                          :loading="state.loading"
                          :items="userPageStore.selectedUsers"
