@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    onMounted, reactive,
+    reactive,
 } from 'vue';
 
 import {
@@ -10,9 +10,6 @@ import {
 import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 
-import { MENU_ID } from '@/lib/menu/config';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
@@ -32,8 +29,6 @@ const emit = defineEmits<{(event: 'set-project', project: ProjectTreeNodeData): 
 const state = reactive({
     isWorkspaceScope: true,
     dashboardScope: useProxyValue('dashboardScope', props, emit),
-    projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
-    workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
 });
 
 const handleSelectScope = (scopeType: DashboardScope) => {
@@ -54,12 +49,6 @@ const updateScope = (scopeType: DashboardScope) => {
 (async () => {
     await store.dispatch('reference/project/load');
 })();
-
-onMounted(() => {
-    if (!(state.projectManagePermission || state.workspaceManagePermission)) return;
-    if (!state.projectManagePermission) updateScope('WORKSPACE');
-    if (!state.workspaceManagePermission) updateScope('PROJECT');
-});
 </script>
 
 <template>
@@ -70,13 +59,11 @@ onMounted(() => {
                            class="dashboard-scope-radio-group"
             >
                 <p-radio :selected="state.isWorkspaceScope"
-                         :disabled="!state.workspaceManagePermission"
                          @change="handleSelectScope('WORKSPACE')"
                 >
                     {{ $t('DASHBOARDS.CREATE.WORKSPACE') }}
                 </p-radio>
                 <p-radio :selected="!state.isWorkspaceScope"
-                         :disabled="!state.projectManagePermission"
                          @change="handleSelectScope('PROJECT')"
                 >
                     {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}

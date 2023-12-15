@@ -55,9 +55,6 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
-import { MENU_ID } from '@/lib/menu/config';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import GNBSubMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBSubMenu.vue';
 import GNBDashboardFavorite
     from '@/common/modules/navigations/gnb/modules/gnb-menu/modules/dashboard-recent-favorite/modules/GNBDashboardFavorite.vue';
@@ -98,7 +95,6 @@ export default defineComponent({
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
                     to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
-                    show: !state.hasOnlyViewPermission,
                 },
             ] as DisplayMenu[]),
             isOverflown: false,
@@ -106,9 +102,6 @@ export default defineComponent({
                 name: item.name,
                 dashboardId: item.dashboard_id,
             }))),
-            projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
-            workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
-            hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
         });
         const hideMenu = () => {
             emit('close');

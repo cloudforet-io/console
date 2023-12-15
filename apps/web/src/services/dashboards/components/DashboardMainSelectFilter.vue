@@ -10,8 +10,6 @@ import { i18n } from '@/translations';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import { MENU_ID } from '@/lib/menu/config';
-
 
 const VIEWERS_TYPE = {
     ALL: 'ALL',
@@ -65,27 +63,25 @@ const handleChangeScope = (selected) => {
                            style-type="transparent"
                            @update:selected="handleChangeViewers"
         />
-        <template v-if="state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS] && state.pagePermission[MENU_ID.PROJECT_DASHBOARDS]">
-            <p-divider class="divider"
-                       vertical
-            />
-            <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_SCOPE') }}</span>
-            <p-select-status v-for="(scope, idx) in state.scopeFilterList"
-                             :key="`scope-${idx}`"
-                             :selected="state.scopeStatus"
-                             class="select-desktop"
-                             :value="scope.name"
-                             @change="handleChangeScope"
-            >
-                {{ scope.label }}
-            </p-select-status>
-            <p-select-dropdown class="select-tablet"
-                               :menu="state.scopeFilterList"
-                               :selected="state.scopeStatus"
-                               style-type="transparent"
-                               @update:selected="handleChangeScope"
-            />
-        </template>
+        <p-divider class="divider"
+                   vertical
+        />
+        <span class="filter-header">{{ $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_SCOPE') }}</span>
+        <p-select-status v-for="(scope, idx) in state.scopeFilterList"
+                         :key="`scope-${idx}`"
+                         :selected="state.scopeStatus"
+                         class="select-desktop"
+                         :value="scope.name"
+                         @change="handleChangeScope"
+        >
+            {{ scope.label }}
+        </p-select-status>
+        <p-select-dropdown class="select-tablet"
+                           :menu="state.scopeFilterList"
+                           :selected="state.scopeStatus"
+                           style-type="transparent"
+                           @update:selected="handleChangeScope"
+        />
     </div>
 </template>
 
