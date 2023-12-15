@@ -24,18 +24,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         translationId: 'MENU.DASHBOARDS',
         icon: 'ic_service_dashboard',
     },
-    [MENU_ID.PROJECT_DASHBOARDS]: {
-        menuId: MENU_ID.PROJECT_DASHBOARDS,
-        routeName: DASHBOARDS_ROUTE.PROJECT._NAME,
-        translationId: 'MENU.DASHBOARDS_PROJECT',
-        icon: 'ic_service_dashboard',
-    },
-    [MENU_ID.WORKSPACE_DASHBOARDS]: {
-        menuId: MENU_ID.WORKSPACE_DASHBOARDS,
-        routeName: DASHBOARDS_ROUTE.WORKSPACE._NAME,
-        translationId: 'MENU.DASHBOARDS_WORKSPACE',
-        icon: 'ic_service_dashboard',
-    },
     [MENU_ID.PROJECT]: {
         menuId: MENU_ID.PROJECT,
         routeName: PROJECT_ROUTE._NAME,
