@@ -1,8 +1,7 @@
-import type { AuthType, GrantType } from '@/schema/identity/user/type';
+import type { AuthType } from '@/schema/identity/user/type';
 
 
-export interface TokenIssueParameters {
-    grant_type: GrantType;
+export interface TokenTokenParameters {
     credentials?: Record<string, any>;
     auth_type?: AuthType;
     timeout?: number;

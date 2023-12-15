@@ -1,6 +1,6 @@
 import type { Mutation } from 'vuex';
 
-import type { UserState, UserRole } from './type';
+import type { UserState, UserRole, RoleInfo } from './type';
 
 export const setUser = (state: UserState, userInfo: UserState): void => {
     state.userId = userInfo.userId;
@@ -31,6 +31,9 @@ export const setRoles = (state: UserState, roles: Array<UserRole>): void => {
     state.roles = roles;
 };
 
+export const setCurrentRoleInfo = (state: UserState, currentRoleInfo: RoleInfo): void => {
+    state.currentRoleInfo = currentRoleInfo;
+};
 export const setIsSignInLoading: Mutation<UserState> = (state, isSignInLoading: boolean): void => {
     state.isSignInLoading = isSignInLoading;
 };

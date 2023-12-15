@@ -28,7 +28,9 @@ const state: UserState = {
     email: storedUserState.email,
     language: (storedUserState.language && languages[storedUserState.language]) ? storedUserState.language : 'en',
     timezone: storedUserState.timezone,
+    // TODO: to be deprecated
     roles: storedUserState.roles,
+    currentRoleInfo: storedUserState.currentRoleInfo,
     requiredActions: storedUserState.requiredActions,
     emailVerified: storedUserState.emailVerified,
     isSignInLoading: false,
