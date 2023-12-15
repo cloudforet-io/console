@@ -1867,6 +1867,7 @@
 				"CHECK_MODAL_DELETE_DESC": "{account} will be deleted permanently.",
 				"CHECK_MODAL_DELETE_TITLE": "Delete Service Account",
 				"CONSOLE": "Connect to Console",
+				"CREATE": "Create",
 				"DELETE": "Delete",
 				"NO_SELECTED_ACCOUNT": "Select a service account for more details.",
 				"PROVIDERS_TITLE": "Service Providers",

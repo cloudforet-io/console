@@ -1867,6 +1867,7 @@
 				"CHECK_MODAL_DELETE_DESC": "{account}を完全に削除します",
 				"CHECK_MODAL_DELETE_TITLE": "サービスアカウントの削除",
 				"CONSOLE": "コンソール接続",
+				"CREATE": "",
 				"DELETE": "削除",
 				"NO_SELECTED_ACCOUNT": "サービスアカウントを選択すると、詳細を見ることができます。",
 				"PROVIDERS_TITLE": "サービスプロバイダー",
