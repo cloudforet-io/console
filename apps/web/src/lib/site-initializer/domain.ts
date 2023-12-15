@@ -9,9 +9,7 @@ export const initDomain = async (store, config): Promise<string|undefined> => {
 
     try {
         await store.dispatch('domain/load', domainName);
-        return store.state.domain.name;
     } catch (e) {
-        console.error(e);
-        return undefined;
+        throw new Error(`Site initialization failed: ${e}`);
     }
 };

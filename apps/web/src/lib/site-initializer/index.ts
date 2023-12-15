@@ -21,6 +21,7 @@ import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
+import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
 import { initWorkspace } from '@/lib/site-initializer/workspace';
 
 
@@ -32,8 +33,8 @@ const initQueryHelper = (store) => {
     QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
-const initRouter = (domainName?: string) => {
-    if (!domainName) {
+const initRouter = (domainId?: string) => {
+    if (!domainId) {
         SpaceRouter.init(errorRoutes);
     } else {
         SpaceRouter.init(integralRoutes);
@@ -51,28 +52,36 @@ const removeInitializer = () => {
 
 const init = async (store) => {
     /* Init SpaceONE Console */
-    await initConfig();
-    await initApiClient(store, config);
-    const domainName = await initDomain(store, config);
-
-    if (domainName) {
-        initModeSetting();
-        await initWorkspace(store);
-        prefetchResources();
-        initI18n(store);
-        initDayjs();
-        initQueryHelper(store);
-        initGtag(store, config);
-        initGtm(config);
-        initAmcharts(config);
-        initAmcharts5(config);
-        initRouter(domainName);
-        initErrorHandler(store);
-        initRequestIdleCallback();
-        await checkSsoAccessToken(store);
-    } else {
+    try {
+        await initConfig();
+        await initApiClient(store, config);
+        await initDomain(store, config);
+    } catch (e) {
         initRouter();
-        throw new Error('Site initialization failed: No matched domain');
+        throw new Error();
+    }
+
+    const domainId = store.state.domain.domainId;
+    initModeSetting();
+    initRouter(domainId);
+    try {
+        const userId = await initUserAndAuth(store, config);
+        if (userId) {
+            await initWorkspace(store);
+            prefetchResources();
+            initI18n(store);
+            initDayjs();
+            initQueryHelper(store);
+            initGtag(store, config);
+            initGtm(config);
+            initAmcharts(config);
+            initAmcharts5(config);
+            initErrorHandler(store);
+            initRequestIdleCallback();
+            await checkSsoAccessToken(store);
+        }
+    } catch (e) {
+        console.error(e);
     }
 };
 
