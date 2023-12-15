@@ -7,6 +7,12 @@ import {
 
 import * as styles from '@/styles/colors';
 
+export const PASSWORD_TYPE = {
+    KEEP: 'KEEP',
+    RESET: 'RESET',
+    MANUALLY: 'MANUALLY',
+} as const;
+
 export const USER_MODAL_TYPE = {
     REMOVE: 'remove',
     ADD: 'add',
