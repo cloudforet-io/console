@@ -94,9 +94,8 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
         iconName: 'ic_edit',
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
         eventAction: () => {
-            const routeName = props.scopeType ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
             router.push({
-                name: routeName,
+                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                 params: {
                     dashboardId: dashboardItem.dashboard_id,
                 },
@@ -121,9 +120,8 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    const routeName = props.scopeType === 'PROJECT' ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
     router.push({
-        name: routeName,
+        name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: item.dashboard_id,
         },

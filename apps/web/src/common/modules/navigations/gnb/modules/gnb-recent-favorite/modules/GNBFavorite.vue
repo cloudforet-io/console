@@ -302,9 +302,8 @@ export default {
                     SpaceRouter.router.push({ name: itemName }).catch(() => {});
                 }
             } else if (item.itemType === SUGGESTION_TYPE.DASHBOARD) {
-                const dashboardRouteName = item.name?.startsWith('workspace') ? DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME;
                 SpaceRouter.router.push({
-                    name: dashboardRouteName,
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: {
                         dashboardId: itemName,
                     },

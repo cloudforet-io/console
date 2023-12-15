@@ -144,7 +144,7 @@ const handleClickGoBackButton = () => {
         });
     } else {
         SpaceRouter.router.replace({
-            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
             params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
         });
     }

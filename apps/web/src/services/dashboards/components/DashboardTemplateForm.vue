@@ -81,16 +81,12 @@ const existingTemplateState = reactive({
 
 });
 
-const getDashboardLocation = (board: DashboardModel): Location => {
-    const isProjectDashboard = !!board.project_id?.length;
-    const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-    return {
-        name: routeName,
-        params: {
-            dashboardId: board.dashboard_id,
-        },
-    };
-};
+const getDashboardLocation = (board: DashboardModel): Location => ({
+    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+    params: {
+        dashboardId: board.dashboard_id,
+    },
+});
 
 const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
     state.selectedTemplateName = selectedTemplate.value;

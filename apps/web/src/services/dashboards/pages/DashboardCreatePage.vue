@@ -129,9 +129,8 @@ const createDashboard = async () => {
         }
 
         const createdDashboard = await dashboardStore.createDashboard(apiParam);
-        const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
-            name: routeName,
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: createdDashboard.dashboard_id as string,
             },
@@ -148,7 +147,7 @@ const handleClickClose = () => {
 };
 
 const { setPathFrom, handleClickBackButton } = useGoBack({
-    name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
+    name: DASHBOARDS_ROUTE._NAME,
 });
 
 defineExpose({ setPathFrom });

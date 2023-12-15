@@ -115,15 +115,12 @@ export default defineComponent<Props>({
             hoveredItem: '',
         });
 
-        const dashboardRouteFormatter = (id) => {
-            const routeName = id.startsWith('project') ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-            return {
-                name: routeName,
-                params: {
-                    dashboardId: id,
-                },
-            };
-        };
+        const dashboardRouteFormatter = (id) => ({
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: id,
+            },
+        });
         const getIsHovered = (itemId: string):boolean => !!(state.hoveredItem && state.hoveredItem === itemId);
         const hideMenu = () => {
             emit('close');

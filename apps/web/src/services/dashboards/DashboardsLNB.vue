@@ -10,8 +10,6 @@ import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
-
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
@@ -20,7 +18,6 @@ import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favo
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import LNB from '@/common/modules/navigations/lnb/LNB.vue';
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
@@ -38,9 +35,6 @@ const storeState = reactive({
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: true,
-    projectManagePermission: useManagePermissionState(MENU_ID.PROJECT_DASHBOARDS),
-    workspaceManagePermission: useManagePermissionState(MENU_ID.WORKSPACE_DASHBOARDS),
-    hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
     showFavoriteOnly: false,
     header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
     favoriteItemMap: computed(() => {
@@ -58,7 +52,7 @@ const state = reactive({
         id: d.dashboard_id,
         label: d.name,
         to: {
-            name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME) : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: d.dashboard_id,
             },
@@ -78,7 +72,7 @@ const state = reactive({
             id: MENU_ID.DASHBOARDS,
             foldable: false,
             to: {
-                name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME,
+                name: DASHBOARDS_ROUTE.ALL._NAME,
             },
             hideFavorite: true,
         },
@@ -96,11 +90,7 @@ const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[])
             ? i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')
             : i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT'),
     } as LNBItem;
-    const routeName = scope === 'WORKSPACE' ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;
-    const pagePermission = store.getters['user/pagePermissionMap'];
-
-    if (pagePermission[routeName]) return [topTitle, ...items];
-    return [];
+    return [topTitle, ...items];
 };
 
 const mashUpProjectGroup = (dashboardList: DashboardModel[] = []): LNBMenu[] => {
@@ -131,7 +121,7 @@ const mashUpProjectGroup = (dashboardList: DashboardModel[] = []): LNBMenu[] => 
                 id: board.dashboard_id,
                 label: board.name,
                 to: {
-                    name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME) : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: {
                         dashboardId: board.dashboard_id,
                     },
@@ -177,7 +167,6 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
                 <span>{{ state.header }}</span>
                 <p-icon-button name="ic_plus_bold"
                                size="sm"
-                               :disabled="state.hasOnlyViewPermission"
                                @click="$router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME, path: DASHBOARDS_ROUTE.CREATE._NAME })"
                 />
             </div>

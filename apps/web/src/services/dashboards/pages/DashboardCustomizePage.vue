@@ -46,9 +46,8 @@ const updateDashboardData = async () => {
             variables_schema: dashboardDetailState.variablesSchema,
             tags: { created_by: store.state.user.userId },
         });
-        const routeName = dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
-            name: routeName,
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: props.dashboardId as string,
             },
