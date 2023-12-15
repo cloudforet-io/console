@@ -1,150 +1,152 @@
 <script lang="ts" setup>
 import {
-    getCurrentInstance, reactive,
+    computed, reactive,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRoute } from 'vue-router/composables';
 
 import {
-    PStatus, PTableCheckModal,
+    PButtonModal, PDefinitionTable, PStatus,
 } from '@spaceone/design-system';
-import { map } from 'lodash';
+import { cloneDeep } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { UserDeleteParameters } from '@/schema/identity/user/api-verbs/delete';
-import type { UserDisableParameters } from '@/schema/identity/user/api-verbs/disable';
-import type { UserEnableParameters } from '@/schema/identity/user/api-verbs/enable';
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
-import { USER_STATUS_TABLE_FIELDS } from '@/services/administration/constants/user-table-constant';
-import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
-import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import { appStateFormatter } from '@/services/administration/composables/refined-table-data';
+import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
+import { useAppPageStore } from '@/services/administration/store/app-page-store';
 
-const vm = getCurrentInstance()?.proxy as Vue;
+const DEFAULT_PAGE_LIMIT = 15;
 
-const userPageStore = useUserPageStore();
-const modalSettingStore = useUserModalSettingStore();
-const modalSettingState = modalSettingStore.$state;
+const appContextStore = useAppContextStore();
+const appPageStore = useAppPageStore();
+const appPageState = appPageStore.$state;
 
-const emit = defineEmits<{(e: 'confirm'): void; }>();
+const route = useRoute();
 
+const appListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
+    .setSort('name', true)
+    .setFiltersAsRawQueryString(route.query.filters);
+const appListApiQuery = appListApiQueryHelper.data;
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     loading: false,
+    confirmButton: computed(() => {
+        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+            return i18n.t('IAM.APP.DELETE');
+        }
+        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
+            return i18n.t('IAM.APP.ENABLE');
+        }
+        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
+            return i18n.t('IAM.APP.DISABLE');
+        }
+        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
+            return i18n.t('IAM.APP.MODAL.BTN_REGENERATE');
+        }
+        return '';
+    }),
 });
 
+const definitionFields = computed(() => [
+    { label: i18n.t('IAM.APP.MODAL.COL_NAME'), name: 'name' },
+    { label: i18n.t('IAM.APP.MODAL.COL_STATE'), name: 'state' },
+    { label: i18n.t('IAM.APP.MODAL.COL_APP_ID'), name: 'app_id' },
+    { label: i18n.t('IAM.APP.MODAL.COL_ROLE_ID'), name: 'role_id' },
+    { label: i18n.t('IAM.APP.MODAL.COL_LASTED_AT'), name: 'last_accessed_at' },
+    { label: i18n.t('IAM.APP.MODAL.COL_EXPIRED_AT'), name: 'expired_at' },
+]);
+
 /* Component */
-const checkModalConfirm = async (items) => {
-    let responses: boolean[] = [];
-    let languagePrefix = 'DELETE';
+const handleClose = () => {
+    appPageStore.$patch((_state) => {
+        _state.modal.type = '';
+        _state.modal.visible.status = false;
+        _state.modal = cloneDeep(_state.modal);
+    });
+    getListApps();
+};
+
+/* API */
+const checkModalConfirm = async () => {
     state.loading = true;
 
     try {
-        if (modalSettingState.mode === 'delete') {
-            responses = await Promise.all(map(items, (item) => deleteUser(item.user_id)));
-            userPageStore.$patch({ selectedIndices: [] });
-        } else if (modalSettingState.mode === 'enable') {
-            languagePrefix = 'ENABLE';
-            responses = await Promise.all(map(items, (item) => enableUser(item.user_id)));
-        } else if (modalSettingState.mode === 'disable') {
-            languagePrefix = 'DISABLE';
-            responses = await Promise.all(map(items, (item) => disableUser(item.user_id)));
-        } else if (modalSettingState.mode === 'remove') {
-            languagePrefix = 'REMOVE';
-            responses = await Promise.all(map(items, (item) => removeUser(item?.role_binding_info.role_binding_id)));
+        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+            await appPageStore.deleteApp({ app_id: appPageStore.selectedApp.app_id });
+        } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
+            await appPageStore.enableApp({ app_id: appPageStore.selectedApp.app_id });
+        } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
+            await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
+        } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
+            await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
         }
 
-        const successCount = responses.filter((d) => d).length;
-        const failCount = responses.length - successCount;
-        if (successCount > 0) {
-            const languageCode = `IDENTITY.USER.MAIN.ALT_S_${languagePrefix}_USER`;
-            showSuccessMessage(vm.$tc(languageCode, successCount), '');
-            emit('confirm');
-        } if (failCount > 0) {
-            const languageCode = `IDENTITY.USER.MAIN.ALT_E_${languagePrefix}_USER`;
-            ErrorHandler.handleRequestError(new Error(''), vm.$tc(languageCode, failCount));
-        }
+        // TODO: will be apply after making user page
+        appPageStore.$patch((_state) => {
+            _state.modal.visible.success = true;
+            _state.modal = cloneDeep(_state.modal);
+        });
     } catch (e: any) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, e.message);
     } finally {
         state.loading = false;
         handleClose();
     }
 };
-const handleClose = () => {
-    modalSettingStore.$patch((_state) => {
-        _state.visible.status = false;
-    });
-};
-
-/* API */
-const removeUser = async (role_binding_id: string): Promise<boolean> => {
+const getListApps = async () => {
+    state.loading = true;
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.delete({
-            role_binding_id,
-        });
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-
-const deleteUser = async (userId: string): Promise<boolean> => {
-    try {
-        await SpaceConnector.clientV2.identity.user.delete<UserDeleteParameters>({
-            user_id: userId,
-        });
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-const enableUser = async (userId: string): Promise<boolean> => {
-    try {
-        await SpaceConnector.clientV2.identity.user.enable<UserEnableParameters>({
-            user_id: userId,
-        });
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-const disableUser = async (userId: string): Promise<boolean> => {
-    try {
-        await SpaceConnector.clientV2.identity.user.disable<UserDisableParameters>({
-            user_id: userId,
-        });
-        return true;
-    } catch (e) {
-        return false;
+        await appPageStore.listApps({ query: appListApiQuery });
+    } finally {
+        state.loading = false;
     }
 };
 </script>
 
 <template>
-    <p-table-check-modal :visible="modalSettingState.visible.status"
-                         :header-title="modalSettingState.title"
-                         :theme-color="modalSettingState.themeColor"
-                         :fields="USER_STATUS_TABLE_FIELDS"
-                         :loading="state.loading"
-                         :items="userPageStore.selectedUsers"
-                         modal-size="md"
-                         @confirm="checkModalConfirm"
-                         @cancel="handleClose"
+    <p-button-modal :visible="appPageState.modal.visible.status"
+                    :header-title="appPageState.modal.title"
+                    :theme-color="appPageState.modal.themeColor"
+                    :loading="appPageState.modal.loading"
+                    modal-size="md"
+                    @confirm="checkModalConfirm"
+                    @cancel="handleClose"
     >
-        <template #col-state-format="{value}">
-            <p-status v-bind="userStateFormatter(value)"
-                      class="capitalize"
-            />
+        <template #body>
+            <p-definition-table :fields="definitionFields"
+                                :data="appPageStore.selectedApp"
+                                :skeleton-rows="6"
+                                block
+                                disable-copy
+            >
+                <template #data-state="{data}">
+                    <p-status v-bind="appStateFormatter(data)"
+                              class="capitalize"
+                    />
+                </template>
+                <template #data-expired_at="{data}">
+                    {{ iso8601Formatter(data, storeState.timezone) }}
+                </template>
+                <template #data-created_at="{data}">
+                    {{ iso8601Formatter(data, storeState.timezone) }}
+                </template>
+            </p-definition-table>
         </template>
-        <template #col-role_type-format="{ value }">
-            <span>
-                {{ value === ROLE_TYPE.WORKSPACE_OWNER ? $t('IDENTITY.USER.FORM.OWNER') : $t('IDENTITY.USER.FORM.MEMBER') }}
-            </span>
+        <template #confirm-button>
+            {{ state.confirmButton }}
         </template>
-    </p-table-check-modal>
+    </p-button-modal>
 </template>

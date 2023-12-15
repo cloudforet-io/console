@@ -1627,6 +1627,7 @@
 				"COL_EXPIRED_AT": "Expiration Date",
 				"COL_LASTED_AT": "Last Accessed",
 				"COL_NAME": "Name",
+				"COL_ROLE_ID": "Role ID",
 				"COL_STATE": "State",
 				"COL_TAG": "Tags",
 				"COL_WORKSPACE_ROLE": "Workspace OwnerRole",

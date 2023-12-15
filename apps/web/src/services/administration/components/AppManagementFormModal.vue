@@ -72,7 +72,7 @@ const handleSelectItem = (item: SelectDropdownMenuItem) => {
     formState.role = item;
 };
 const setFormState = () => {
-    formState.name = appPageState.selectedApp.name;
+    formState.name = appPageStore.selectedApp.name;
     // formState.tags = appPageState.selectedApp.tags;
 };
 const initState = () => {
@@ -119,7 +119,7 @@ const handleConfirm = async () => {
     try {
         if (storeState.isEdit) {
             await appPageStore.updateApp({
-                app_id: appPageState.selectedApp.app_id,
+                app_id: appPageStore.selectedApp.app_id,
                 name: formState.name,
                 tags: formState.tags,
             });

@@ -1627,6 +1627,7 @@
 				"COL_EXPIRED_AT": "",
 				"COL_LASTED_AT": "",
 				"COL_NAME": "お名前",
+				"COL_ROLE_ID": "",
 				"COL_STATE": "状態",
 				"COL_TAG": "タグ",
 				"COL_WORKSPACE_ROLE": "",

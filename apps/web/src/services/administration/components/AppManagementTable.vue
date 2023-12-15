@@ -67,27 +67,33 @@ const state = reactive({
 });
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
-        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.EDIT, label: i18n.t('IAM.APP.EDIT'), disabled: isEmpty(appPageState.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.EDIT, label: i18n.t('IAM.APP.EDIT'), disabled: isEmpty(appPageStore.selectedApp),
     },
     {
-        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.DELETE, label: i18n.t('IAM.APP.DELETE'), disabled: isEmpty(appPageState.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.DELETE, label: i18n.t('IAM.APP.DELETE'), disabled: isEmpty(appPageStore.selectedApp),
     },
     { type: 'divider' },
     {
-        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.REGENERATE, label: i18n.t('IAM.APP.REGENERATE'), disabled: isEmpty(appPageState.selectedApp),
+        type: 'item', name: APP_DROPDOWN_MODAL_TYPE.REGENERATE, label: i18n.t('IAM.APP.REGENERATE'), disabled: isEmpty(appPageStore.selectedApp),
     },
     { type: 'divider' },
     {
         type: 'item',
         name: APP_DROPDOWN_MODAL_TYPE.ENABLE,
         label: i18n.t('IAM.APP.ENABLE'),
-        disabled: !isEmpty(appPageState.selectedApp) && appPageState.selectedApp?.state === APP_STATUS_TYPE.EXPIRED,
+        disabled: isEmpty(appPageStore.selectedApp)
+            || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
+            || appPageStore.selectedApp?.state === APP_STATUS_TYPE.ENABLED)
+        ,
     },
     {
         type: 'item',
         name: APP_DROPDOWN_MODAL_TYPE.DISABLE,
         label: i18n.t('IAM.APP.DISABLE'),
-        disabled: !isEmpty(appPageState.selectedApp) && appPageState.selectedApp?.state === APP_STATUS_TYPE.EXPIRED,
+        disabled: isEmpty(appPageStore.selectedApp)
+            || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
+            || appPageStore.selectedApp?.state === APP_STATUS_TYPE.DISABLED)
+        ,
     },
 ]));
 
@@ -126,8 +132,8 @@ const handleSelectDropdown = (name) => {
     default: break;
     }
 };
-const handleSelect = (index: number) => {
-    appPageStore.$patch({ selectedApp: appPageState.apps[index] });
+const handleSelect = (index: number[]) => {
+    appPageStore.$patch({ selectedIndex: index });
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
     appListApiQuery = getApiQueryWithToolboxOptions(appListApiQueryHelper, options) ?? appListApiQuery;
@@ -181,6 +187,7 @@ const getListApps = async () => {
                          :items="appPageState.apps"
                          :fields="APP_TABLE_FIELDS"
                          sort-by="name"
+                         :select-index="appPageState.selectedIndex"
                          :sort-desc="true"
                          :total-count="appPageState.totalCount"
                          :query-tags="state.tags"
