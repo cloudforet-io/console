@@ -13,11 +13,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -28,9 +24,7 @@ import UserManagementTableToolbox from '@/services/administration/components/Use
 import {
     calculateTime, userStateFormatter, userMfaFormatter, useRoleFormatter,
 } from '@/services/administration/composables/refined-table-data';
-import {
-    USER_SEARCH_HANDLERS, USER_TABLE_FIELDS,
-} from '@/services/administration/constants/user-table-constant';
+import { USER_SEARCH_HANDLERS, USER_TABLE_FIELDS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
@@ -41,12 +35,10 @@ const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
 });
 
-const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const route = useRoute();
-
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const userListApiQueryHelper = new ApiQueryHelper()
@@ -54,23 +46,18 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true)
     .setFiltersAsRawQueryString(route.query.filters);
 
-const storeState = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    userRoleType: computed(() => store.state.user.roleType),
-    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-});
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
         api_key_count: user?.api_key_count ?? 0,
         mfa: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
-        last_accessed_at: calculateTime(user?.last_accessed_at, storeState.timezone),
+        last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
     tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
 const tableState = reactive({
-    userTableFields: computed(() => (!storeState.isAdminMode && storeState.userRoleType === ROLE_TYPE.WORKSPACE_OWNER
+    userTableFields: computed(() => (!userPageState.isAdminMode && userPageStore.isWorkspaceOwner
         ? [
             ...USER_TABLE_FIELDS,
             { name: 'role_binding_info', label: ' ', sortable: false },
@@ -102,7 +89,7 @@ const handleChange = async (options: any = {}) => {
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
     }
-    if (storeState.isAdminMode) {
+    if (userPageState.isAdminMode) {
         await userPageStore.listUsers({ query: userListApiQuery });
     } else {
         await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
@@ -117,7 +104,7 @@ const handleChange = async (options: any = {}) => {
             searchable
             selectable
             sortable
-            :loading="userPageState.loading.list"
+            :loading="userPageState.loading"
             :items="state.refinedUserItems"
             :select-index="userPageState.selectedIndices"
             :fields="tableState.userTableFields"
@@ -133,7 +120,7 @@ const handleChange = async (options: any = {}) => {
             @refresh="handleChange()"
         >
             <template #toolbox-left>
-                <user-management-table-toolbox v-if="storeState.isAdminMode" />
+                <user-management-table-toolbox v-if="userPageState.isAdminMode" />
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"

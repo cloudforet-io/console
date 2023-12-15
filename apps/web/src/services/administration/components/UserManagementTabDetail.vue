@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PDefinitionTable, PHeading, PI, PStatus,
@@ -15,8 +14,6 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useAppContextStore } from '@/store/app-context/app-context-store';
-
 import config from '@/lib/config';
 
 import {
@@ -26,19 +23,14 @@ import {
 } from '@/services/administration/composables/refined-table-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
-const route = useRoute();
-
-const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
 
 const storeState = reactive({
     userInfo: computed(() => store.state.user),
-    timezone: computed(() => storeState.userInfo.timezone || 'UTC'),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
+    loading: false,
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
@@ -52,58 +44,41 @@ const tableState = reactive({
         if (storeState.smtpEnabled) {
             additionalFields.push({
                 name: 'email',
-                label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL'),
+                label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL'),
             });
         }
         if (storeState.userInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER) {
             additionalRoleFields.push({
                 name: 'role_binding_info',
-                label: i18n.t('IDENTITY.USER.MAIN.WORKSPACE_ROLE'),
+                label: i18n.t('IAM.USER.MAIN.WORKSPACE_ROLE'),
             });
         }
         return [
-            { name: 'user_id', label: i18n.t('IDENTITY.USER.MAIN.USER_ID') },
-            { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
-            { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
+            { name: 'user_id', label: i18n.t('IAM.USER.MAIN.USER_ID') },
+            { name: 'name', label: i18n.t('IAM.USER.MAIN.NAME') },
+            { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') },
             ...additionalFields,
-            { name: 'mfa', label: i18n.t('IDENTITY.USER.MAIN.MFA'), disableCopy: true },
-            { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
-            { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
-            { name: 'role_type', label: i18n.t('IDENTITY.USER.MAIN.ROLE') },
+            { name: 'mfa', label: i18n.t('IAM.USER.MAIN.MFA'), disableCopy: true },
+            { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY') },
+            { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
+            { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE') },
             ...additionalRoleFields,
-            { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
-            { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
-            { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
+            { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE') },
+            { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE') },
+            { name: 'created_at', label: i18n.t('IAM.USER.MAIN.CREATED_AT') },
         ];
     }),
 });
-
-/* API */
-const getUserDetailData = async (userId) => {
-    if (storeState.isAdminMode) {
-        await userPageStore.getUser({ user_id: userId || state.selectedUser.user_id });
-    } else {
-        await userPageStore.getWorkspaceUser({
-            user_id: userId || state.selectedUser.user_id,
-            workspace_id: route.params?.workspaceId || '',
-        });
-    }
-};
-
-/* Watcher */
-watch(() => state.selectedUser.user_id, (value) => {
-    getUserDetailData(value);
-}, { immediate: true });
 </script>
 
 <template>
     <div>
         <p-heading heading-type="sub"
-                   :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
+                   :title="$t('IAM.USER.ACCOUNT.BASE_INFORMATION')"
         />
         <p-definition-table :fields="tableState.fields"
                             :data="tableState.refinedUserItems"
-                            :loading="userPageState.loading.detail"
+                            :loading="state.loading"
                             :skeleton-rows="7"
                             class="user-definition-table"
                             v-on="$listeners"
@@ -142,20 +117,23 @@ watch(() => state.selectedUser.user_id, (value) => {
                     No Activity
                 </span>
                 <span v-else-if="data === 0">
-                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                    {{ $t('IAM.USER.MAIN.TODAY') }}
                 </span>
                 <span v-else-if="data === 1">
-                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                    {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ data }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                    {{ data }} {{ $t('IAM.USER.MAIN.DAYS') }}
                 </span>
             </template>
             <template #data-created_at="{data}">
-                {{ iso8601Formatter(data, storeState.timezone) }}
+                {{ iso8601Formatter(data, userPageStore.timezone) }}
             </template>
             <template #extra="{label}">
-                <span v-if="storeState.isAdminMode && tableState.refinedUserItems.email && label === $t('IDENTITY.USER.MAIN.NOTIFICATION_EMAIL')">
+                <span v-if="userPageStore.isAdminMode
+                    && tableState.refinedUserItems.email
+                    && label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')"
+                >
                     <span v-if="tableState.refinedUserItems.email_verified">
                         <p-i name="ic_verified"
                              height="1rem"
@@ -167,7 +145,7 @@ watch(() => state.selectedUser.user_id, (value) => {
                     <span v-else
                           class="not-verified"
                     >
-                        {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
+                        {{ $t('IAM.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
                     </span>
                 </span>
             </template>

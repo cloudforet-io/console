@@ -4,9 +4,8 @@ interface Page {
     start: number;
     limit: number;
 }
-export interface FindUserParameters {
+export interface FindWorkspaceUserParameters {
     keyword: string;
     state?: UserState;
-    exclude_workspace_id?: string;
     page?: Page;
 }

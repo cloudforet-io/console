@@ -11,7 +11,7 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
 import { APP_STATE_COLOR } from '@/services/administration/constants/app-constant';
-import { USER_MFA_COLOR, USER_STATE_COLOR } from '@/services/administration/constants/user-table-constant';
+import { USER_MFA_COLOR, USER_STATE_COLOR } from '@/services/administration/constants/user-constant';
 
 export const calculateTime = (lastAccessedDay, timezone) => {
     const today = dayjs().toISOString();

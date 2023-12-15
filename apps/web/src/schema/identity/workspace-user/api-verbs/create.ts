@@ -12,5 +12,4 @@ export interface WorkspaceUserCreateParameters {
     tags?: Tags;
     reset_password?: boolean;
     role_id: string;
-    workspace_id: string;
 }

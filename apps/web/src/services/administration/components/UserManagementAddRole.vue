@@ -6,20 +6,24 @@ import {
 } from '@spaceone/design-system';
 import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
-import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
 
-const modalSettingStore = useUserModalSettingStore();
 
 const emit = defineEmits<{(e: 'change-role', role: AddModalMenuItem): void}>();
 
 const state = reactive({
-    loading: false,
+    loading: true,
     menuVisible: false,
     menuItems: [] as AddModalMenuItem[],
     selectedItems: [] as AddModalMenuItem[],
@@ -27,6 +31,10 @@ const state = reactive({
 const formState = reactive({
     searchText: '',
 });
+
+const roleListApiQueryHelper = new ApiQueryHelper()
+    .setPageStart(1).setPageLimit(15)
+    .setSort('name', true);
 
 /* Component */
 const menuHandler: AutocompleteHandler = async (inputText: string) => {
@@ -37,12 +45,9 @@ const menuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 
 /* API */
-const roleListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('name', true);
-
 const fetchListRoles = async (inputText: string) => {
     state.loading = true;
+
     roleListApiQueryHelper.setFilters([{
         k: 'role_type',
         v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
@@ -55,16 +60,17 @@ const fetchListRoles = async (inputText: string) => {
             o: '',
         });
     }
-
     try {
-        const response = await modalSettingStore.listRoles({
+        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
             query: roleListApiQueryHelper.data,
         });
-        state.menuItems = response.map((role) => ({
+        state.menuItems = results?.map((role) => ({
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
-        }));
+        })) as AddModalMenuItem[];
+    } catch (e) {
+        ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
     }
@@ -78,11 +84,11 @@ watch(() => state.selectedItems, (selectedItems) => {
 
 <template>
     <div class="user-role-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.ROLE_TITLE')"
+        <p-field-group :label="$t('IAM.USER.FORM.ROLE_TITLE')"
                        required
         >
             <p-select-dropdown use-fixed-menu-style
-                               :placeholder="$t('IDENTITY.USER.FORM.ROLE_PLACEHOLDER')"
+                               :placeholder="$t('IAM.USER.FORM.ROLE_PLACEHOLDER')"
                                :visible-menu.sync="state.menuVisible"
                                :loading="state.loading"
                                :search-text.sync="formState.searchText"
@@ -110,7 +116,7 @@ watch(() => state.selectedItems, (selectedItems) => {
                     </div>
                 </template>
                 <template #no-data-area>
-                    <p-empty v-if="state.menuItems.length === 0"
+                    <p-empty v-if="state.menuItems.length === 0 && !state.loading"
                              image-size="md"
                              show-image
                              class="no-data-wrapper"
@@ -120,7 +126,7 @@ watch(() => state.selectedItems, (selectedItems) => {
                                  alt="empty-options"
                             >
                         </template>
-                        {{ $t('INVENTORY.COLLECTOR.NO_DATA') }}
+                        {{ $t('IAM.USER.FORM.NO_DATA') }}
                     </p-empty>
                 </template>
             </p-select-dropdown>

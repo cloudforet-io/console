@@ -3,7 +3,6 @@ import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { AuthType, UserState } from '@/schema/identity/user/type';
 
-
 export interface WorkspaceUserModel {
     user_id: string;
     name: string;
@@ -19,4 +18,11 @@ export interface WorkspaceUserModel {
     domain_id: string;
     created_at: TimeStamp;
     last_accessed_at: TimeStamp;
+}
+
+export interface SummaryWorkspaceUserModel {
+    user_id: string,
+    name: string,
+    state: UserState,
+
 }

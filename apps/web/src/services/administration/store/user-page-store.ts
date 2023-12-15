@@ -3,12 +3,9 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
-import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
@@ -19,29 +16,25 @@ import type { UserListItemType } from '@/services/administration/types/user-type
 
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
-        loading: {
-            list: false,
-            detail: false,
-        },
-        modalLoading: false,
+        isAdminMode: false,
+        loading: false,
         users: [] as UserListItemType[],
         totalCount: 0,
         selectedIndices: [],
-        // TODO: plan to organize it after completing the modal.
-        modalVisible: {
-            form: false,
-            //
-            status: false,
-            create: false,
-            //
-            update: false,
-            delete: false,
-            enable: false,
-            disable: false,
+        modal: {
+            type: '',
+            title: '',
+            themeColor: 'primary',
+            visible: {
+                add: false,
+                form: false,
+                status: false,
+            },
         },
     }),
     getters: {
-        timezone: () => store.state.user.timezone || 'UTC',
+        timezone: () => store.state.user.timezone,
+        isWorkspaceOwner: () => store.state.user.roleType === ROLE_TYPE.WORKSPACE_OWNER,
         selectedUsers: (state) => {
             const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
@@ -51,7 +44,7 @@ export const useUserPageStore = defineStore('user-page', {
         },
     },
     actions: {
-        // Admin mode
+        // User
         async listUsers(params: UserListParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
@@ -65,17 +58,7 @@ export const useUserPageStore = defineStore('user-page', {
                 throw e;
             }
         },
-        async getUser(params: UserGetParameters) {
-            this.loading.detail = true;
-            try {
-                await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                this.loading.detail = false;
-            }
-        },
-        // Workspace mode
+        // Workspace User
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
@@ -89,26 +72,6 @@ export const useUserPageStore = defineStore('user-page', {
                 ErrorHandler.handleError(e);
                 this.users = [];
                 this.totalCount = 0;
-                throw e;
-            }
-        },
-        async getWorkspaceUser(params: WorkspaceUserGetParameters) {
-            this.loading.detail = true;
-            try {
-                await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                this.loading.detail = false;
-            }
-        },
-        //
-        async listProjects(params: ProjectListParameters) {
-            try {
-                const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>(params);
-                return results || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
                 throw e;
             }
         },

@@ -11,22 +11,20 @@ import {
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { debounce, isEmpty } from 'lodash';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AuthType } from '@/schema/identity/user/type';
+import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
+import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
+import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { checkEmailFormat } from '@/services/administration/helpers/user-management-form-validations';
-import { useUserModalSettingStore } from '@/services/administration/store/user-modal-setting-store';
-import { useUserPageStore } from '@/services/administration/store/user-page-store';
-
-const modalSettingStore = useUserModalSettingStore();
-const userPageStore = useUserPageStore();
-const workspaceStore = useWorkspaceStore();
 
 const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
@@ -62,37 +60,22 @@ const validationState = reactive({
     userIdInvalidText: '' as TranslateResult,
 });
 
-const userListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
-    .setSort('name', true);
-
 /* Component */
-const hideMenu = async () => {
-    emit('change-list', state.selectedItems);
+const hideMenu = () => {
     state.menuVisible = false;
-    state.menuItems = [];
-    await userPageStore.listWorkspaceUsers({ query: userListApiQueryHelper.data });
 };
-const handleClickUserIdInput = async () => {
+const handleClickTextInput = async () => {
     state.menuVisible = true;
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
-const handleClickDeleteButton = (idx: number) => {
-    state.selectedItems.splice(idx, 1);
-};
-const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
-    state.selectedItems.push(menuItem);
-    await hideMenu();
-};
-const handleChangeUserIdInput = debounce(async (searchText: string) => {
+const handleChangeTextInput = debounce(async (searchText: string) => {
     formState.searchText = searchText;
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
     await fetchListUsers();
 }, 200);
-
-const handleClickEnter = async () => {
+const handleEnterTextInput = async () => {
     if (formState.searchText === '') return;
     const { isValid, invalidText } = checkEmailFormat(formState.searchText);
     if (!isValid) {
@@ -100,8 +83,15 @@ const handleClickEnter = async () => {
         validationState.userIdInvalidText = invalidText;
         await hideMenu();
     } else {
-        await fetchListWorkspaceUsers(formState.searchText);
+        await fetchGetWorkspaceUsers(formState.searchText);
     }
+};
+const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
+    state.selectedItems.push(menuItem);
+    await hideMenu();
+};
+const handleClickDeleteButton = (idx: number) => {
+    state.selectedItems.splice(idx, 1);
 };
 const handleSelectAuthTypeItem = (idx: number) => {
     state.selectedItems[idx].auth_type = state.selectedAuthType;
@@ -112,26 +102,25 @@ const fetchListUsers = async () => {
     state.loading = true;
 
     try {
-        const response = await modalSettingStore.listUsers({
+        const { results } = await SpaceConnector.clientV2.identity.workspaceUser.find<FindWorkspaceUserParameters, ListResponse<SummaryWorkspaceUserModel>>({
             keyword: formState.searchText || '@',
-            exclude_workspace_id: workspaceStore.getters.currentWorkspaceId,
         });
-        state.menuItems = response.map((user) => ({
+        state.menuItems = results?.map((user) => ({
             user_id: user.user_id,
             label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
             name: user.user_id,
-            auth_type: user.auth_type,
-        }));
+        })) as AddModalMenuItem[];
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+        state.menuItems = [];
     } finally {
         state.loading = false;
     }
 };
-const fetchListWorkspaceUsers = async (userId: string) => {
-    const params = {
+const fetchGetWorkspaceUsers = async (userId: string) => {
+    const response = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>({
         user_id: userId,
-        workspace_id: workspaceStore.getters.currentWorkspaceId,
-    };
-    const response = await modalSettingStore.getWorkspaceUser(params);
+    });
     if (isEmpty(response)) {
         state.selectedItems.push({
             user_id: userId,
@@ -156,13 +145,16 @@ watch(() => state.menuVisible, async (menuVisible) => {
         formState.searchText = '';
         state.selectedAuthType = state.authTypeMenuItems[0].name as AuthType;
         await fetchListUsers();
+    } else {
+        state.menuItems = [];
+        emit('change-list', state.selectedItems);
     }
 });
 </script>
 
 <template>
     <div class="user-info-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
+        <p-field-group :label="$t('IAM.USER.FORM.USER_ID')"
                        required
                        :invalid="validationState.userIdInvalid"
                        :invalid-text="validationState.userIdInvalidText"
@@ -175,9 +167,9 @@ watch(() => state.menuVisible, async (menuVisible) => {
                                   :value="formState.searchText"
                                   :invalid="invalid"
                                   class="user-id-input"
-                                  @click="handleClickUserIdInput"
-                                  @keyup.enter="handleClickEnter"
-                                  @update:value="handleChangeUserIdInput"
+                                  @click="handleClickTextInput"
+                                  @keyup.enter="handleEnterTextInput"
+                                  @update:value="handleChangeTextInput"
                     />
                     <p-context-menu v-if="state.menuVisible && state.menuItems.length > 0"
                                     ref="contextMenuRef"
@@ -193,10 +185,10 @@ watch(() => state.menuVisible, async (menuVisible) => {
         </p-field-group>
         <p-empty v-if="state.selectedItems.length === 0"
                  show-image
-                 :title="$t('IDENTITY.USER.FORM.NO_USER')"
+                 :title="$t('IAM.USER.FORM.NO_USER')"
                  class="empty-wrapper"
         >
-            {{ $t('IDENTITY.USER.FORM.NO_USER_DESC') }}
+            {{ $t('IAM.USER.FORM.NO_USER_DESC') }}
         </p-empty>
         <div v-else
              class="selected-user-list"
