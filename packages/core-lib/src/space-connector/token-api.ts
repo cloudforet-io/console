@@ -7,8 +7,9 @@ import jwtDecode from 'jwt-decode';
 
 import { LocalStorageAccessor } from '@/local-storage-accessor';
 import type {
-    AxiosPostResponse,
+    AxiosPostResponse, DevConfig,
     SessionTimeoutCallback,
+    AuthConfig,
 } from '@/space-connector/type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
@@ -20,6 +21,8 @@ const VERBOSE = false;
 
 export default class TokenAPI {
     private static instance: TokenAPI;
+
+    private static authConfig: AuthConfig;
 
     static getInstance(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
         if (!this.instance) {
@@ -34,9 +37,10 @@ export default class TokenAPI {
 
     private refreshToken?: string;
 
+
     private readonly sessionTimeoutCallback: SessionTimeoutCallback;
 
-    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
+    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback, authConfig?: DevConfig['authConfig']) {
         // init refreshing state to avoid passing refreshing process
         TokenAPI.unsetRefreshingState();
         this.sessionTimeoutCallback = sessionTimeoutCallback;
@@ -48,6 +52,8 @@ export default class TokenAPI {
             baseURL,
         };
         this.refreshInstance = axios.create(axiosConfig);
+
+        TokenAPI.authConfig = authConfig ?? {};
 
         this.loadToken();
         this.setAxiosInterceptors();
@@ -96,9 +102,8 @@ export default class TokenAPI {
     }
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean|undefined> {
-        if (!this.refreshToken) {
-            return false;
-        }
+        if (TokenAPI.authConfig.skipTokenCheck) { return true; }
+        if (!this.refreshToken) { return false; }
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();

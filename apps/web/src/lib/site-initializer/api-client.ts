@@ -60,7 +60,7 @@ const getAuthConfig = (config): AuthConfig => ({
 
 export const initApiClient = async (store, config) => {
     const endpoints = getApiEndpoints(config);
-    const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback(store));
+    const tokenApi = new TokenAPI(endpoints[1], getSessionTimeoutCallback(store), getAuthConfig(config));
     const devConfig: DevConfig = {
         enabled: config.get('DEV.ENABLED'),
         mockConfig: getMockConfig(config),
