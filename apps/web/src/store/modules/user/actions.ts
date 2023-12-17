@@ -152,19 +152,23 @@ export const signOut = (): void => {
 };
 
 export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
-    const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters>({
-        grant_type: 'API_KEY',
-        scope: grantRequest.scope,
-        token: grantRequest.token,
-        workspace_id: grantRequest.workspace_id,
-    }, { skipAuthRefresh: true });
+    try {
+        const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters>({
+            grant_type: 'API_KEY',
+            scope: grantRequest.scope,
+            token: grantRequest.token,
+            workspace_id: grantRequest.workspace_id,
+        }, { skipAuthRefresh: true });
 
-    SpaceConnector.setToken(response.access_token);
-    const [, userId] = getUserInfoFromToken(response.access_token);
+        SpaceConnector.setToken(response.access_token);
+        const [, userId] = getUserInfoFromToken(response.access_token);
 
 
-    const roleInfo = await getUserRole(userId);
-    commit('setCurrentRoleInfo', roleInfo);
+        const roleInfo = await getUserRole(userId);
+        commit('setCurrentRoleInfo', roleInfo);
+    } catch (e) {
+        throw new Error(`Role Grant Error: ${e}`);
+    }
 };
 
 export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
