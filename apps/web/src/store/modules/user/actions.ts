@@ -11,7 +11,6 @@ import { MANAGED_ROLE_TYPE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
 import type { TokenTokenParameters } from '@/schema/identity/token/api-verbs/token';
-import type { GrantScope } from '@/schema/identity/token/type';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
@@ -152,21 +151,24 @@ export const signOut = (): void => {
     SpaceConnector.flushToken();
 };
 
-export const grantRole: Action<UserState, any> = async ({ commit }, grantScope: GrantScope, workspace_id?: string) => {
-    const accessToekn = 'access token';
-    const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters>({
-        grant_type: 'API_KEY',
-        scope: grantScope,
-        token: accessToekn,
-        workspace_id,
-    }, { skipAuthRefresh: true });
+export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+    try {
+        const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters>({
+            grant_type: 'API_KEY',
+            scope: grantRequest.scope,
+            token: grantRequest.token,
+            workspace_id: grantRequest.workspace_id,
+        }, { skipAuthRefresh: true });
 
-    SpaceConnector.setToken(response.access_token);
-    const [, userId] = getUserInfoFromToken(response.access_token);
+        SpaceConnector.setToken(response.access_token);
+        const [, userId] = getUserInfoFromToken(response.access_token);
 
 
-    const roleInfo = await getUserRole(userId);
-    commit('setCurrentRoleInfo', roleInfo);
+        const roleInfo = await getUserRole(userId);
+        commit('setCurrentRoleInfo', roleInfo);
+    } catch (e) {
+        throw new Error(`Role Grant Error: ${e}`);
+    }
 };
 
 export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {

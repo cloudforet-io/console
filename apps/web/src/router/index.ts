@@ -68,6 +68,26 @@ export class SpaceRouter {
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
+
+            // Grant API Key
+            const accessToken = SpaceConnector.getAccessToken();
+            const isDuplicatedRoute = to.name === from.name;
+            if (accessToken && isTokenAlive && !isDuplicatedRoute) {
+                let scope: string;
+                if (to.name?.startsWith('admin.')) {
+                    scope = 'DOMAIN';
+                } else if (to.params.workspaceId) {
+                    scope = 'WORKSPACE';
+                } else scope = 'USER';
+                const grantRequest = {
+                    scope,
+                    workspace_id: to.params.workspaceId,
+                    token: accessToken,
+                };
+
+                await SpaceRouter.router.app.$store.dispatch('user/grantRole', grantRequest);
+            }
+
             /* Redirect Logic for Workspace and Admin Modes
             * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent
             * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
