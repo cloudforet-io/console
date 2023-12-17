@@ -17,8 +17,7 @@ const flattenSubMenuList = (subMenuList?: Menu[], translationIds?: string[]): Pa
             results.push({
                 id: subMenu.id,
                 translationIds: [...translationIds || [], menuInfo.translationId],
-                isViewed: false,
-                isManaged: false,
+                isAccessible: false,
                 hideMenu: false,
             });
         }
@@ -34,8 +33,7 @@ export const getPageAccessMenuList = (defaultItems: PageAccessMenuItem[] = []): 
             results.push({
                 id: menu.id,
                 translationIds: [menuInfo.translationId],
-                isViewed: false,
-                isManaged: false,
+                isAccessible: false,
                 hideMenu: false,
                 isParent: true,
                 subMenuList: flattenSubMenuList(menu?.subMenuList),

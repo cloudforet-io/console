@@ -27,15 +27,13 @@ const state = reactive({
 
 /* Components */
 const handleToggleMenuVisible = () => {
-    const key = 'hideMenu';
     const val = !props.menu.hideMenu;
-    emit('update', { id: props.menu.id, key, val });
+    emit('update', { id: props.menu.id, val, isHideMenu: true });
 };
 // TODO: will be check after api is ready
 const handleChangeToggle = () => {
-    const key = 'isManaged';
-    const val = !props.menu.isManaged;
-    emit('update', { id: props.menu.id, key, val });
+    const val = !props.menu.isAccessible;
+    emit('update', { id: props.menu.id, val });
 };
 </script>
 

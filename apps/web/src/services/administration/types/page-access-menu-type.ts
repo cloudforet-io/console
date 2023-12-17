@@ -2,8 +2,7 @@
 export interface PageAccessMenuItem {
     id: string;
     translationIds: string[];
-    isViewed: boolean;
-    isManaged: boolean;
+    isAccessible: boolean;
     isParent?: boolean;
     hideMenu: boolean;
     subMenuList?: PageAccessMenuItem[];
@@ -11,6 +10,6 @@ export interface PageAccessMenuItem {
 
 export type UpdateFormDataType = {
     id: string;
-    key: string;
     val: boolean;
+    isHideMenu?: boolean;
 };
