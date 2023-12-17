@@ -29,16 +29,11 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
 
     const actions = {
         async load(userId?: string) {
-            // TODO: remove this
-            const domainId = store.state.domain.domainId;
             if (!userId) {
                 state.items = [];
                 return;
             }
-            const { results } = await SpaceConnector.clientV2.identity.user.getWorkspaces<GetWorkspacesParameters, ListResponse<WorkspaceModel>>({
-                user_id: userId,
-                domain_id: domainId,
-            });
+            const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<GetWorkspacesParameters, ListResponse<WorkspaceModel>>();
             state.items = results || [];
         },
         setCurrentWorkspace(workspaceId?: string) {
@@ -69,6 +64,8 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
 const EXCLUDED_DOMAIN_ID_API_LIST = [
     '/identity/domain/get-auth-info',
     '/identity/endpoint/list',
+    '/identity/user-profile/get_workspaces',
+    '/identity/token/grant',
 ];
 
 const setDefaultParamsToSpaceConnector = (workspaceId: string) => {

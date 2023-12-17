@@ -1,7 +1,7 @@
 import type { AuthType } from '@/schema/identity/user/type';
 
 
-export interface TokenTokenParameters {
+export interface TokenIssueParameters {
     credentials?: Record<string, any>;
     auth_type?: AuthType;
     timeout?: number;
