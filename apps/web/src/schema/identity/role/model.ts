@@ -6,7 +6,7 @@ export interface RoleModel {
     role_id: string;
     name: string;
     role_type: RoleType;
-    permission_scopes: string[];
+    permissions: string[];
     page_access: string[];
     tags?: Tags;
     is_managed: boolean;
