@@ -9,7 +9,6 @@ import { find, isEqual } from 'lodash';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
-import type { PagePermission } from '@/lib/access-control/config';
 import {
     getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
@@ -17,8 +16,10 @@ import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
 import RoleUpdateFormAccess from '@/services/administration/components/RoleUpdateFormAccess.vue';
 import RoleUpdateFormPolicy from '@/services/administration/components/RoleUpdateFormPolicy.vue';
-import { getPageAccessMenuList } from '@/services/administration/helpers/page-access-menu-list';
-import { getPagePermissions } from '@/services/administration/helpers/role-page-permission-helpert';
+import {
+    getPageAccessMenuListByRoleType,
+} from '@/services/administration/helpers/page-access-menu-list';
+import { getPageAccessList } from '@/services/administration/helpers/role-page-access-permission-helper';
 import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/administration/types/page-access-menu-type';
 
 interface Props {
@@ -31,20 +32,20 @@ const props = withDefaults(defineProps<Props>(), {
     roleType: ROLE_TYPE.WORKSPACE_OWNER,
 });
 
-const emit = defineEmits<{(e: 'update-form', after: PagePermission[]): void,
+const emit = defineEmits<{(e: 'update-form', after: string[]): void,
 }>();
 
 const state = reactive({
     hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),
-    pagePermissions: computed<PagePermission[]>(() => getPagePermissions(formState.menuItems, props.roleType)),
+    pageAccessPermissions: computed<string[]>(() => getPageAccessList(formState.menuItems)),
 });
 const formState = reactive({
-    menuItems: getPageAccessMenuList([{
+    menuItems: getPageAccessMenuListByRoleType([{
         id: 'all',
         translationIds: ['IAM.ROLE.FORM.ALL'],
         isAccessible: false,
         hideMenu: false,
-    }]),
+    }], props.roleType),
 });
 
 /* Util */
@@ -95,15 +96,15 @@ const handleUpdate = (value: UpdateFormDataType) => {
 };
 
 /* Watcher */
-watch(() => state.pagePermissions, (pagePermissions, prevPagePermissions) => {
-    if (isEqual(pagePermissions, prevPagePermissions)) return;
-    emit('update-form', pagePermissions);
+watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessPermissions) => {
+    if (isEqual(pageAccessPermissions, prevPageAccessPermissions)) return;
+    emit('update-form', pageAccessPermissions);
 });
 watch(() => props.initialPagePermissions, (initialPagePermissions) => {
     // init formState.menuItems
-    const pagePermissions = getPagePermissionMapFromRaw(initialPagePermissions, MENU_LIST);
+    const pageAccessPermissionMap = getPagePermissionMapFromRaw(initialPagePermissions, MENU_LIST);
     // eslint-disable-next-line no-restricted-syntax
-    for (const [itemId, accessible] of Object.entries(pagePermissions)) {
+    for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
         handleUpdate({ id: itemId, val: accessible });
     }
 });
