@@ -1,16 +1,17 @@
+// TODO: change file name to page-access-helper.ts
 
-import type { PageAccessType } from '@/store/modules/user/type';
+
+import type { RoleType } from '@/schema/identity/role/type';
 
 import type {
     PagePermissionMap,
     PagePermissionTuple, PagePermissionType,
-    PagePermission,
 } from '@/lib/access-control/config';
 import {
-    BASIC_USER_DEFAULT_PERMISSIONS,
+    DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
     NO_ROLE_USER_DEFAULT_PERMISSIONS,
     PAGE_PERMISSION_TYPE,
-    SYSTEM_USER_DEFAULT_PERMISSIONS,
+    SYSTEM_USER_DEFAULT_PERMISSIONS, WORKSPACE_MEMBER_DEFAULT_PERMISSIONS, WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
 } from '@/lib/access-control/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 
@@ -19,18 +20,20 @@ import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
 
 
-export const getDefaultPagePermissionList = (pageAccessType?: PageAccessType): PagePermissionTuple[] => {
-    if (pageAccessType === 'SYSTEM') return SYSTEM_USER_DEFAULT_PERMISSIONS;
-    if (pageAccessType === 'USER') return BASIC_USER_DEFAULT_PERMISSIONS;
+export const getDefaultPagePermissionList = (roleType?: RoleType): MenuId[] => {
+    if (roleType === 'SYSTEM_ADMIN') return SYSTEM_USER_DEFAULT_PERMISSIONS;
+    if (roleType === 'DOMAIN_ADMIN') return DOMAIN_ADMIN_DEFAULT_PERMISSIONS;
+    if (roleType === 'WORKSPACE_OWNER') return WORKSPACE_OWNER_DEFAULT_PERMISSIONS;
+    if (roleType === 'WORKSPACE_MEMBER') return WORKSPACE_MEMBER_DEFAULT_PERMISSIONS;
     return NO_ROLE_USER_DEFAULT_PERMISSIONS;
 };
 
-export const getProperPermissionType = (permissionA: PagePermissionType = PAGE_PERMISSION_TYPE.VIEW, permissionB: PagePermissionType = PAGE_PERMISSION_TYPE.VIEW): PagePermissionType => {
-    if (permissionA === PAGE_PERMISSION_TYPE.MANAGE || permissionB === PAGE_PERMISSION_TYPE.MANAGE) return PAGE_PERMISSION_TYPE.MANAGE;
-    return PAGE_PERMISSION_TYPE.VIEW;
+export const getProperPermissionType = (accessibleA: boolean, accessibleB: boolean): boolean => {
+    if (accessibleA && accessibleB) return true;
+    return false;
 };
 
-export const flattenMenu = (menuList: Menu[]) => menuList.flatMap((menu) => [
+export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu) => [
     { id: menu.id, needPermissionByRole: menu.needPermissionByRole },
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
@@ -42,18 +45,16 @@ const filterMenuByPermission = (menuList: Menu[]): Menu[] => menuList.filter((me
     }));
 
 
-export const getPagePermissionMapFromRaw = (pagePermissions: PagePermission[], menuList: Menu[]): PagePermissionMap => {
+export const getPagePermissionMapFromRaw = (pagePermissions: string[], menuList: Menu[]): PagePermissionMap => {
     const result = {} as PagePermissionMap;
     const filterdMenuListByRequiredPermission = filterMenuByPermission(menuList);
     const flattendPermissionRequiredMenuList = flattenMenu(filterdMenuListByRequiredPermission);
 
-    pagePermissions.forEach((data) => {
-        const { page, permission } = data ?? { page: '' };
-
+    pagePermissions.forEach((page) => {
         // in case of wildcard
         if (page === '*') {
             flattendPermissionRequiredMenuList.forEach(({ id }) => {
-                result[id] = getProperPermissionType(permission, result[id]);
+                result[id] = true;
             });
             // in case of service wildcard
         } else if (page.endsWith('*')) {
@@ -61,12 +62,14 @@ export const getPagePermissionMapFromRaw = (pagePermissions: PagePermission[], m
             const foundServiceMenuById = filterdMenuListByRequiredPermission.find(({ id }) => id === menuId);
             if (!foundServiceMenuById) return;
             flattenMenu([foundServiceMenuById]).forEach(({ id }) => {
-                result[id] = getProperPermissionType(permission, result[id]);
+                result[id] = true;
             });
 
             // general case
         } else {
-            result[page] = getProperPermissionType(permission, result[page]);
+            const pageHierarchyList = page.split('.');
+            const menuIdByPageName = page.split('.')[pageHierarchyList.length];
+            result[menuIdByPageName] = true;
         }
     });
     return result;
