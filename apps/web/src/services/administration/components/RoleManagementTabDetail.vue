@@ -15,8 +15,6 @@ import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PagePermission } from '@/lib/access-control/config';
-
 import {
     usePageAccessDefinitionTableData,
 } from '@/services/administration/composables/page-access-definition-table-data';
@@ -63,7 +61,7 @@ const state = reactive({
     data: {} as Partial<RoleModel>,
     selectedRole: computed<RoleModel>(() => rolePageStore.selectedRoles[0]),
     permissionScopes: computed<string[]>(() => state.data?.permission_scopes ?? []),
-    pageAccess: computed<PagePermission[]>(() => state.data?.page_access ?? []),
+    pageAccess: computed<string[]>(() => state.data?.page_access ?? []),
     pageAccessDataList: usePageAccessDefinitionTableData(computed(() => state.pageAccess ?? [])),
 });
 

@@ -39,7 +39,7 @@ const state = reactive({
             name: state.baseInfoFormData.trim(),
             // TODO: will be check after api is merged
             api_permissions: [],
-            page_permissions: state.pageAccessFormData,
+            page_access: state.pageAccessFormData,
         };
         return props.formType === FORM_TYPE.CREATE
             ? {
