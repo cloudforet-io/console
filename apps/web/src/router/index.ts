@@ -102,7 +102,7 @@ export class SpaceRouter {
                 if (adminRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
                     nextLocation = {
                         ...to,
-                        name: makeAdminRouteName(to.name),
+                        name: adminRouteName,
                     };
                 } else {
                     nextLocation = {
