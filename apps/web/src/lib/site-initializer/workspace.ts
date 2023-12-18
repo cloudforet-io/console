@@ -2,10 +2,7 @@ import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store
 import { pinia } from '@/store/pinia';
 
 
-
-export const initWorkspace = async (store): Promise<string|undefined> => {
-    const userId = store.state.user.userId;
-
+export const initWorkspace = async (userId): Promise<string|undefined> => {
     // NOTE: this is to use pinia store outside vue component
     useWorkspaceStore(pinia);
 

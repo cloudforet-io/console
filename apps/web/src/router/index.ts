@@ -64,7 +64,7 @@ export class SpaceRouter {
             const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
 
 
-            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store'].getters.isAdminMode;
+            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
@@ -86,7 +86,7 @@ export class SpaceRouter {
                     token: refreshToken,
                 };
 
-                await SpaceRouter.router.app.$store.dispatch('user/grantRole', grantRequest);
+                await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
             }
 
             /* Redirect Logic for Workspace and Admin Modes

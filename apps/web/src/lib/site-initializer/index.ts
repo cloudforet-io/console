@@ -33,12 +33,14 @@ const initQueryHelper = (store) => {
     QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
+let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
     if (!domainId) {
         SpaceRouter.init(errorRoutes);
     } else {
         SpaceRouter.init(integralRoutes);
     }
+    isRouterInitialized = true;
 };
 
 const initI18n = (store) => {
@@ -55,33 +57,25 @@ const init = async (store) => {
     try {
         await initConfig();
         await initApiClient(store, config);
-        await initDomain(store, config);
-    } catch (e) {
-        initRouter();
-        throw new Error();
-    }
-
-    const domainId = store.state.domain.domainId;
-    initModeSetting();
-    initRouter(domainId);
-    try {
+        const domainId = await initDomain(store, config);
         const userId = await initUserAndAuth(store, config);
-        if (userId) {
-            await initWorkspace(store);
-            prefetchResources();
-            initI18n(store);
-            initDayjs();
-            initQueryHelper(store);
-            initGtag(store, config);
-            initGtm(config);
-            initAmcharts(config);
-            initAmcharts5(config);
-            initErrorHandler(store);
-            initRequestIdleCallback();
-            await checkSsoAccessToken(store);
-        }
+        await initWorkspace(userId);
+        initModeSetting();
+        initRouter(domainId);
+        prefetchResources();
+        initI18n(store);
+        initDayjs();
+        initQueryHelper(store);
+        initGtag(store, config);
+        initGtm(config);
+        initAmcharts(config);
+        initAmcharts5(config);
+        initErrorHandler(store);
+        initRequestIdleCallback();
+        await checkSsoAccessToken(store);
     } catch (e) {
-        console.error(e);
+        if (!isRouterInitialized) initRouter();
+        throw e;
     }
 };
 
