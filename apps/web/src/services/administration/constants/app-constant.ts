@@ -31,7 +31,7 @@ export const APP_TABLE_FIELDS = [
         name: 'app_id', label: 'App ID', sortable: false, disableCopy: false,
     },
     { name: 'role_id', label: 'Role ID' },
-    // { name: 'tags', label: 'Tags', sortable: false },
+    { name: 'tags', label: 'Tags', sortable: false },
     { name: 'last_accessed_at', label: 'Last Activity' },
     { name: 'expired_at', label: 'Expiration Date' },
     { name: 'created_at', label: 'Created' },

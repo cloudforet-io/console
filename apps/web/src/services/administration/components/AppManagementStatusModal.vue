@@ -31,6 +31,9 @@ const appPageState = appPageStore.$state;
 
 const route = useRoute();
 
+const emit = defineEmits<{(e: 'confirm', app_key_id: string): void;
+}>();
+
 const appListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
     .setSort('name', true)
@@ -91,14 +94,13 @@ const checkModalConfirm = async () => {
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
             await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
         } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
-            await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
+            const res = await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
+            emit('confirm', res.api_key_id);
+            appPageStore.$patch((_state) => {
+                _state.modal.visible.apiKey = true;
+                _state.modal = cloneDeep(_state.modal);
+            });
         }
-
-        // TODO: will be apply after making user page
-        appPageStore.$patch((_state) => {
-            _state.modal.visible.success = true;
-            _state.modal = cloneDeep(_state.modal);
-        });
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     } finally {
