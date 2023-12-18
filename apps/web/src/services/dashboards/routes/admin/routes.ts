@@ -12,7 +12,7 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
 const AdminDashboardMainPage = () => import('@/services/dashboards/pages/admin/AdminDashboardMainPage.vue');
-const DashboardCreatePage = () => import('@/services/dashboards/pages/DashboardCreatePage.vue');
+const AdminDashboardCreatePage = () => import('@/services/dashboards/pages/admin/AdminDashboardCreatePage.vue');
 const DashboardCustomizePage = () => import('@/services/dashboards/pages/DashboardCustomizePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardDetailPage.vue');
 
@@ -41,7 +41,7 @@ const adminDashboardsRoute: RouteConfig = {
                         centeredLayout: true,
                         translationId: 'DASHBOARDS.CREATE.TITLE',
                     },
-                    component: DashboardCreatePage,
+                    component: AdminDashboardCreatePage,
                 },
                 {
                     path: 'detail/:dashboardId',

@@ -26,7 +26,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import type { DashboardScope, DashboardType } from '@/schema/dashboard/_types/dashboard-type';
 import type { CreateDashboardParameters } from '@/schema/dashboard/dashboard/api-verbs/create';
 import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
@@ -40,12 +39,9 @@ import { useFormValidator } from '@/common/composables/form-validator';
 import { useGoBack } from '@/common/composables/go-back';
 
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
-import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
-import DashboardViewerForm from '@/services/dashboards/components/DashboardViewerForm.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
 interface Step {
@@ -56,37 +52,24 @@ const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
 const {
-    forms: { dashboardTemplate, dashboardProject },
+    forms: { dashboardTemplate },
     setForm,
     isAllValid,
 } = useFormValidator({
     dashboardTemplate: {} as DashboardModel,
-    dashboardProject: undefined as undefined|ProjectTreeNodeData,
 }, {
     dashboardTemplate(value: DashboardModel) {
         return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
-    },
-    dashboardProject(value: ProjectTreeNodeData|undefined) {
-        return !value && state.dashboardScope === 'PROJECT'
-            ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
     },
 });
 
 const state = reactive({
     loading: false,
-    dashboardScope: 'WORKSPACE' as DashboardScope,
-    dashboardType: 'PUBLIC' as DashboardType,
     steps: computed<Step[]>(() => [
-        { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
-        { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') as string },
-        { step: 3 },
+        { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') as string },
+        { step: 2 },
     ]),
     currentStep: 1,
-    isValid: computed(() => {
-        if (state.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
-        if (state.dashboardScope === 'WORKSPACE') return true;
-        return false;
-    }),
     closeConfirmModalVisible: false,
 });
 
@@ -101,9 +84,7 @@ const goStep = (direction: 'prev'|'next') => {
 const saveCurrentStateToStore = () => {
     const _dashboardTemplate: DashboardModel = {
         ...dashboardTemplate.value,
-        project_id: dashboardProject.value?.id ?? '',
         name: '',
-        dashboard_type: state.dashboardType,
     };
 
     dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
@@ -151,7 +132,7 @@ const handleClickClose = () => {
 };
 
 const { setPathFrom, handleClickBackButton } = useGoBack({
-    name: DASHBOARDS_ROUTE._NAME,
+    name: DASHBOARDS_ROUTE.ALL._NAME,
 });
 
 defineExpose({ setPathFrom });
@@ -170,39 +151,7 @@ defineExpose({ setPathFrom });
                                       show-close-button
                                       @close="handleClickClose"
             />
-            <dashboard-scope-form :dashboard-scope.sync="state.dashboardScope"
-                                  @set-project="setForm('dashboardProject', $event)"
-            />
-            <dashboard-viewer-form :dashboard-type.sync="state.dashboardType" />
-            <div class="button-area">
-                <p-button
-                    style-type="transparent"
-                    size="lg"
-                    @click="$router.go(-1)"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CANCEL') }}
-                </p-button>
-                <p-button
-                    style-type="primary"
-                    size="lg"
-                    :disabled="!state.isValid"
-                    @click="goStep('next')"
-                >
-                    {{ $t('DASHBOARDS.CREATE.CONTINUE') }}
-                </p-button>
-            </div>
-        </div>
-        <div v-if="state.currentStep === state.steps[1].step">
-            <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
-                                      :description="state.steps[state.currentStep - 1].description"
-                                      :total-steps="state.steps.length"
-                                      :current-step="state.currentStep"
-                                      show-step
-                                      show-close-button
-                                      @close="handleClickClose"
-            />
             <dashboard-template-form
-                :dashboard-scope="state.dashboardScope"
                 @set-template="setForm('dashboardTemplate', $event)"
             />
             <div class="button-area">
@@ -224,7 +173,7 @@ defineExpose({ setPathFrom });
                 </p-button>
             </div>
         </div>
-        <div v-if="state.currentStep === state.steps[2].step">
+        <div v-if="state.currentStep === state.steps[1].step">
             <p-centered-layout-header :title="$t('DASHBOARDS.CREATE.TITLE')"
                                       :total-steps="state.steps.length"
                                       :current-step="state.currentStep"

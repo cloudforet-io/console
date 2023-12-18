@@ -26,7 +26,7 @@ type DashboardTemplateBoardSet = DashboardTemplate & { value: string };
 const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
 type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
 interface Props {
-    dashboardScope: DashboardScope;
+    dashboardScope?: DashboardScope;
 }
 
 const props = defineProps<Props>();
