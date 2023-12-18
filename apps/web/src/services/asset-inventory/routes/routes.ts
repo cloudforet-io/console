@@ -38,7 +38,7 @@ const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
     meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AssetInventoryContainer,
     children: [
         {

@@ -103,7 +103,7 @@ export default defineComponent({
             openedMenu: '',
             showSiteMap: false,
             hasPermission: computed((() => store.getters['user/hasPermission'])),
-            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pagePermissionList']) ? { name: ROOT_ROUTE._NAME } : null)),
+            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pageAccessPermissionList']) ? { name: ROOT_ROUTE._NAME } : null)),
             gnbMenuList: computed<GNBMenuType[]>(() => {
                 let menuList = [...store.getters['display/GNBMenuList']];
                 if (state.integrationMenu) menuList = [...menuList, state.integrationMenu];

@@ -32,7 +32,7 @@ const state = reactive({
     ]),
     viewersStatus: computed(() => dashboardState.dashboardType || VIEWERS_TYPE.ALL),
     scopeStatus: computed(() => dashboardState.scope || 'ALL'),
-    pagePermission: computed(() => store.getters['user/pagePermissionMap']),
+    pagePermission: computed(() => store.getters['user/pageAccessPermissionMap']),
 });
 
 const handleChangeViewers = (selected) => {

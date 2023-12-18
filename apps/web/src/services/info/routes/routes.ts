@@ -17,7 +17,7 @@ const infoRoute: RouteConfig = {
     path: 'info',
     name: INFO_ROUTE._NAME,
     meta: { menuId: MENU_ID.INFO, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: InfoContainer,
     children: [
         {

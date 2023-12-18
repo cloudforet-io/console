@@ -13,7 +13,9 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import {
+    filterLNBMenuByAccessPermission,
+} from '@/lib/access-control/page-access-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -38,7 +40,7 @@ export default defineComponent({
                         to: { name: INFO_ROUTE.NOTICE._NAME },
                     },
                 ];
-                return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);
+                return filterLNBMenuByAccessPermission(allLnbMenu, store.getters['user/pageAccessPermissionList']);
             }),
         });
 

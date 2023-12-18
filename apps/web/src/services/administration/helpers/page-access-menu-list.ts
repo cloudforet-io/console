@@ -1,6 +1,6 @@
 import type { RoleType } from '@/schema/identity/role/type';
 
-import { getDefaultPagePermissionList } from '@/lib/access-control/page-permission-helper';
+import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-permission-helper';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -30,7 +30,7 @@ const flattenSubMenuList = (subMenuList: Menu[], defaultMenuIds: MenuId[], trans
 
 export const getPageAccessMenuListByRoleType = (defaultItems: PageAccessMenuItem[] = [], roleType: RoleType): PageAccessMenuItem[] => {
     const results: PageAccessMenuItem[] = [];
-    const defaultMenuIdsByRoleType = getDefaultPagePermissionList(roleType);
+    const defaultMenuIdsByRoleType = getDefaultPageAccessPermissionList(roleType);
     MENU_LIST.forEach((menu) => {
         if (menu.needPermissionByRole && defaultMenuIdsByRoleType.includes(menu.id)) {
             const menuInfo = MENU_INFO_MAP[menu.id];

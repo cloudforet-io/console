@@ -19,7 +19,9 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import {
+    filterLNBMenuByAccessPermission,
+} from '@/lib/access-control/page-access-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -76,7 +78,7 @@ export default defineComponent({
             menuSet: computed<LNBMenu[]>(() => {
                 if (state.isAdminMode) return state.adminModeMenuSet;
                 return [
-                    ...filterLNBMenuByPermission(state.userModeMenuSet, store.getters['user/pagePermissionList']),
+                    ...filterLNBMenuByAccessPermission(state.userModeMenuSet, store.getters['user/pageAccessPermissionList']),
                 ];
             }),
         });

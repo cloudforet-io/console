@@ -7,10 +7,10 @@ import type { DefinitionField } from '@spaceone/design-system/types/data-display
 
 import { i18n } from '@/translations';
 
-import type { PagePermissionMap } from '@/lib/access-control/config';
+import type { PageAccessPermissionMap } from '@/lib/access-control/config';
 import {
-    getPagePermissionMapFromRaw,
-} from '@/lib/access-control/page-permission-helper';
+    getPageAccessPermissionMapFromRawData,
+} from '@/lib/access-control/page-access-permission-helper';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -22,7 +22,7 @@ interface PageAccessDefinitionTableData {
     data: Record<string, boolean>;
     fields: DefinitionField[];
 }
-const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, subMenuList: Menu[], labels: Array<string|TranslateResult> = []): PageAccessDefinitionTableData => {
+const flattenPageAccessDefinitionData = (pagePermissionMap: PageAccessPermissionMap, subMenuList: Menu[], labels: Array<string|TranslateResult> = []): PageAccessDefinitionTableData => {
     let result: PageAccessDefinitionTableData = {
         data: {},
         fields: [],
@@ -46,7 +46,7 @@ const flattenPageAccessDefinitionData = (pagePermissionMap: PagePermissionMap, s
 };
 // eslint-disable-next-line max-len
 export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef<string[]>): ComputedRef<PageAccessDefinitionTableData[]> => computed<PageAccessDefinitionTableData[]>(() => {
-    const pagePermissionMap = getPagePermissionMapFromRaw(pagePermissionData.value, MENU_LIST);
+    const pagePermissionMap = getPageAccessPermissionMapFromRawData(pagePermissionData.value);
     const results: PageAccessDefinitionTableData[] = [];
     MENU_LIST.forEach((menu) => {
         if (!menu.needPermissionByRole) return;

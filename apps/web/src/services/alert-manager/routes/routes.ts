@@ -19,7 +19,7 @@ const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
     meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AlertManagerContainer,
     children: [
         {

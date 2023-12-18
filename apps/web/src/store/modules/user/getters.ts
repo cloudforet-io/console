@@ -3,11 +3,10 @@ import type { Getter } from 'vuex';
 import { languages } from '@/store/modules/user/config';
 
 import {
-    getDefaultPagePermissionList,
-    getPagePermissionMapFromRaw,
-} from '@/lib/access-control/page-permission-helper';
+    getDefaultPageAccessPermissionList,
+    getPageAccessPermissionMapFromRawData,
+} from '@/lib/access-control/page-access-permission-helper';
 import type { MenuId } from '@/lib/menu/config';
-import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
 import type { UserState } from './type';
 
@@ -69,12 +68,11 @@ export const hasPermission = (): boolean => true;
 
 export const getCurrentRoleInfo = (state: UserState): any => state.currentRoleInfo;
 
-// TODO: change pagePermissionList to pageAccessList
-export const pagePermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
+export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? [];
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions, MENU_LIST);
-    const defaultPagePermissionList = getDefaultPagePermissionList(roleType);
+    const pagePermissionMap = getPageAccessPermissionMapFromRawData(roleBasePagePermissions);
+    const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
     Object.keys(pagePermissionMap).forEach((menuId) => {
         if (!defaultPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = false;
     });
@@ -82,7 +80,7 @@ export const pagePermissionList: Getter<UserState, any> = (state, getters): Menu
     return Object.entries(pagePermissionMap).filter(([, accessible]) => accessible).map(([page]) => page as MenuId);
 };
 
-export const pagePermissionMap: Getter<UserState, any> = (state, getters): Record<string, boolean> => {
+export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): Record<string, boolean> => {
     const result: Record<string, boolean> = {};
     getters.pagePermissionList.forEach((MenuId) => {
         if (!result[MenuId]) result[MenuId] = true;

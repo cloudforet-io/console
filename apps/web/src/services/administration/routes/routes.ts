@@ -17,14 +17,14 @@ const administrationRoutes: RouteConfig = {
     path: 'administration',
     name: ADMINISTRATION_ROUTE._NAME,
     meta: { menuId: MENU_ID.ADMINISTRATION, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AdministrationContainer,
     children: [
         {
             path: 'iam',
             name: ADMINISTRATION_ROUTE.IAM._NAME,
             meta: { menuId: MENU_ID.IAM },
-            redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+            redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
             component: { template: '<router-view />' },
             children: [
                 {

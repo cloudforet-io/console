@@ -25,7 +25,7 @@ const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
     meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: CostExplorerContainer,
     children: [
         {

@@ -10,7 +10,9 @@ import { computed, reactive, toRefs } from 'vue';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import {
+    filterLNBMenuByAccessPermission,
+} from '@/lib/access-control/page-access-permission-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -26,12 +28,12 @@ export default {
     setup() {
         const state = reactive({
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.ALERT_MANAGER].translationId)),
-            menuSet: computed<LNBMenu[]>(() => filterLNBMenuByPermission(lnbMenuIds.map((id) => {
+            menuSet: computed<LNBMenu[]>(() => filterLNBMenuByAccessPermission(lnbMenuIds.map((id) => {
                 const menuInfo = MENU_INFO_MAP[id];
                 return ({
                     type: 'item', id, label: i18n.t(menuInfo.translationId), to: { name: menuInfo.routeName },
                 });
-            }), store.getters['user/pagePermissionList'])),
+            }), store.getters['user/pageAccessPermissionList'])),
         });
 
         return {

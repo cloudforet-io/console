@@ -58,7 +58,7 @@ const onSignIn = async () => {
         }
 
         const resolvedRoute = router.resolve(props.nextPath);
-        const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pagePermissionList']);
+        const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
         if (isAccessible) {
             await router.push(props.nextPath);
         } else {

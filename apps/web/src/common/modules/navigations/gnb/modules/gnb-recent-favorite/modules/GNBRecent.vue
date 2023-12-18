@@ -118,35 +118,35 @@ export default defineComponent({
                 storeState.menuItems,
             )),
             recentCloudServiceItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.CLOUD_SERVICE),
                     storeState.cloudServiceTypes,
                 ) : [];
             }),
             recentProjectItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertProjectConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.PROJECT),
                     storeState.projects,
                 ) : [];
             }),
             recentProjectGroupItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertProjectGroupConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.PROJECT_GROUP),
                     storeState.projectGroups,
                 ) : [];
             }),
             recentDashboardItems: computed<FavoriteItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertDashboardConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD),
                     dashboardState.items,
                 ) : [];
             }),
             recentCostAnalysisItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible
                     ? convertCostAnalysisConfigToReferenceData(
                         storeState.recents.filter((d) => d.itemType === RECENT_TYPE.COST_ANALYSIS),

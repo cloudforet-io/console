@@ -75,7 +75,7 @@ const onSignIn = async (userId:string) => {
 
         const resolvedRoute = router.resolve(props.nextPath);
         const isAdminRoute = resolvedRoute.route.matched.some((route) => route.path === '/admin');
-        const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pagePermissionList']);
+        const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
         if (isAccessible) {
             if (isAdminRoute) appContextStore.switchToAdminMode();
             await router.push(resolvedRoute.location);

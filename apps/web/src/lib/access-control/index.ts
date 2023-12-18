@@ -4,7 +4,7 @@ import { clone } from 'lodash';
 
 import type { AccessLevel } from '@/lib/access-control/config';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { flattenMenu, getPermissionOfMenu } from '@/lib/access-control/page-permission-helper';
+import { flattenMenu, getAccessPermissionOfMenu } from '@/lib/access-control/page-access-permission-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
@@ -48,7 +48,7 @@ export const getUserAccessLevel = (
     } else {
         const menuId = route?.meta?.menuId;
         if (!menuId) return ACCESS_LEVEL.AUTHENTICATED;
-        isAccessible = getPermissionOfMenu(menuId, pagePermissions);
+        isAccessible = getAccessPermissionOfMenu(menuId, pagePermissions);
     }
 
     return getAccessTypeFromPermission(isAccessible);
