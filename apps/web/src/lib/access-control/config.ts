@@ -4,24 +4,11 @@ import { MENU_ID } from '@/lib/menu/config';
 export const ACCESS_LEVEL = {
     EXCLUDE_AUTH: 0,
     AUTHENTICATED: 1,
-    VIEW_PERMISSION: 2,
-    MANAGE_PERMISSION: 3,
-    ADMIN_PERMISSION: 4,
+    WORKSPACE_PERMISSION: 2,
+    ADMIN_PERMISSION: 3,
 } as const;
 
 export type AccessLevel = typeof ACCESS_LEVEL[keyof typeof ACCESS_LEVEL];
-
-export const PAGE_PERMISSION_TYPE = {
-    VIEW: 'VIEW',
-    MANAGE: 'MANAGE',
-} as const;
-
-export type PagePermissionType = typeof PAGE_PERMISSION_TYPE[keyof typeof PAGE_PERMISSION_TYPE];
-
-export interface PagePermission {
-    page: string;
-    permission: PagePermissionType;
-}
 
 export interface AccessInfo {
     referenceMenuIds: MenuId[];
@@ -30,8 +17,6 @@ export interface AccessInfo {
 // refined page permission types. page NEVER includes wildcard.
 // export type PagePermissionMap = Record<string, PagePermissionType>;
 export type PagePermissionMap = Record<string, boolean>;
-
-export type PagePermissionTuple = [page: string, permission: PagePermissionType];
 
 // export const BASIC_USER_DEFAULT_PERMISSIONS: MenuId[] = [
 //     MENU_ID.HOME_DASHBOARD,
