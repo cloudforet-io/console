@@ -33,12 +33,14 @@ const initQueryHelper = (store) => {
     QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
+let isRouterInitialized = false;
 const initRouter = (domainId?: string) => {
     if (!domainId) {
         SpaceRouter.init(errorRoutes);
     } else {
         SpaceRouter.init(integralRoutes);
     }
+    isRouterInitialized = true;
 };
 
 const initI18n = (store) => {
@@ -72,7 +74,7 @@ const init = async (store) => {
         initRequestIdleCallback();
         await checkSsoAccessToken(store);
     } catch (e) {
-        initRouter();
+        if (!isRouterInitialized) initRouter();
         throw e;
     }
 };
