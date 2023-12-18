@@ -82,7 +82,7 @@ export const pageAccessPermissionList: Getter<UserState, any> = (state, getters)
 
 export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): Record<string, boolean> => {
     const result: Record<string, boolean> = {};
-    getters.pagePermissionList.forEach((MenuId) => {
+    getters.pageAccessPermissionList.forEach((MenuId) => {
         if (!result[MenuId]) result[MenuId] = true;
     });
     return result;
