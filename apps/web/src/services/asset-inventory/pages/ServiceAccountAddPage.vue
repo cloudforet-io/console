@@ -91,7 +91,7 @@ const createAccount = async (): Promise<string|undefined> => {
             provider: props.provider,
             name: formState.baseInformationForm.accountName,
             data,
-            permission_group: 'WORKSPACE',
+            resource_group: 'WORKSPACE',
         });
     } else {
         res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
@@ -145,14 +145,14 @@ const createSecret = async (accountId: string): Promise<void> => {
             name: formState.baseInformationForm.accountName + accountId,
             data,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,
-            permission_group: 'WORKSPACE',
+            resource_group: 'WORKSPACE',
             trusted_account_id: attachedTrustedAccountId,
         });
     } else {
         await SpaceConnector.client.secret.secret.create<SecretCreateParameters, SecretModel>({
             name: formState.baseInformationForm.accountName + accountId,
             data,
-            permission_group: 'PROJECT',
+            resource_group: 'PROJECT',
             service_account_id: accountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,
             trusted_secret_id: attachedTrustedAccountId ? await getTrustedSecretId(attachedTrustedAccountId) : undefined,

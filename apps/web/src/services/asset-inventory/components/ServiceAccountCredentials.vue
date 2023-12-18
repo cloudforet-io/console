@@ -113,7 +113,7 @@ const createGeneralSecret = async () => {
             schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             service_account_id: props.serviceAccountId,
             trusted_secret_id: state.credentialForm.attachedTrustedAccountId ? await getTrustedSecretId(state.credentialForm.attachedTrustedAccountId) : undefined,
-            permission_group: 'PROJECT',
+            resource_group: 'PROJECT',
             project_id: props.projectId,
         });
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_CREDENTIALS'), '');

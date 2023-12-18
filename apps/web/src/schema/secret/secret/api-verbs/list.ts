@@ -10,6 +10,6 @@ export interface SecretListParameters {
     provider?: string;
     service_account_id?: string,
     trusted_secret_id?: string,
-    permission_group?: ResourceGroup,
+    resource_group?: ResourceGroup,
     workspace_id?: string,
 }

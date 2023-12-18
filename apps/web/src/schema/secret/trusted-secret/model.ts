@@ -8,7 +8,7 @@ export interface TrustedSecretModel {
     schema_id: string;
     provider: string;
     trusted_account_id: string;
-    permission_group: ResourceGroup;
+    resource_group: ResourceGroup;
     workspace_id: string;
     created_at: TimeStamp;
 }

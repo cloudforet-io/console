@@ -1,4 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
+import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 export interface TrustedAccountModel {
     trusted_account_id: string;
@@ -8,7 +9,7 @@ export interface TrustedAccountModel {
     },
     provider: string;
     tags: Tags;
-    permission_group: 'DOMAIN' | 'WORKSPACE';
+    resource_group: Extract<ResourceGroup, 'DOMAIN' | 'WORKSPACE'>;
     workspace_id?: string;
     created_at?: string;
 }

@@ -7,7 +7,7 @@ export interface TrustedSecretCreateParameters {
     tags?: Tags,
     schema_id?: string,
     trusted_account_id?: string,
-    permission_group: ResourceGroup,
+    resource_group: Extract<ResourceGroup, 'DOMAIN' | 'WORKSPACE'>,
     project_id?: string,
     workspace_id?: string,
 }
