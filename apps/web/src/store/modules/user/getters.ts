@@ -71,8 +71,8 @@ export const getCurrentRoleInfo = (state: UserState): any => state.currentRoleIn
 
 // TODO: change pagePermissionList to pageAccessList
 export const pagePermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
-    const roleBasePagePermissions = getters.getCurrentRoleInfo.pageAccess ?? [];
-    const roleType = getters.getCurrentRoleInfo.roleType;
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? [];
+    const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
     const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions, MENU_LIST);
     const defaultPagePermissionList = getDefaultPagePermissionList(roleType);
     Object.keys(pagePermissionMap).forEach((menuId) => {
