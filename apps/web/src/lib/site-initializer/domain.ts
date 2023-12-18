@@ -1,4 +1,4 @@
-export const initDomain = async (store, config): Promise<string|undefined> => {
+export const initDomain = async (store, config): Promise<string> => {
     let domainName;
     if (config.get('DOMAIN_NAME_REF') === 'hostname') {
         const { hostname } = window.location;
@@ -7,9 +7,6 @@ export const initDomain = async (store, config): Promise<string|undefined> => {
         domainName = config.get('DOMAIN_NAME');
     }
 
-    try {
-        await store.dispatch('domain/load', domainName);
-    } catch (e) {
-        throw new Error(`Site initialization failed: ${e}`);
-    }
+    await store.dispatch('domain/load', domainName);
+    return store.state.domain.domainId;
 };

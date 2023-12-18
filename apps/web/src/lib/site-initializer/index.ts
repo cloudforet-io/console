@@ -55,33 +55,25 @@ const init = async (store) => {
     try {
         await initConfig();
         await initApiClient(store, config);
-        await initDomain(store, config);
+        const domainId = await initDomain(store, config);
+        const userId = await initUserAndAuth(store, config);
+        await initWorkspace(userId);
+        initModeSetting();
+        initRouter(domainId);
+        prefetchResources();
+        initI18n(store);
+        initDayjs();
+        initQueryHelper(store);
+        initGtag(store, config);
+        initGtm(config);
+        initAmcharts(config);
+        initAmcharts5(config);
+        initErrorHandler(store);
+        initRequestIdleCallback();
+        await checkSsoAccessToken(store);
     } catch (e) {
         initRouter();
-        throw new Error();
-    }
-
-    const domainId = store.state.domain.domainId;
-    initModeSetting();
-    initRouter(domainId);
-    try {
-        const userId = await initUserAndAuth(store, config);
-        if (userId) {
-            await initWorkspace(store);
-            prefetchResources();
-            initI18n(store);
-            initDayjs();
-            initQueryHelper(store);
-            initGtag(store, config);
-            initGtm(config);
-            initAmcharts(config);
-            initAmcharts5(config);
-            initErrorHandler(store);
-            initRequestIdleCallback();
-            await checkSsoAccessToken(store);
-        }
-    } catch (e) {
-        console.error(e);
+        throw e;
     }
 };
 
