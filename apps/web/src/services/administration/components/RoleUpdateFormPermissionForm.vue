@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive, ref, watch, watchEffect,
 } from 'vue';
 
 import { PPaneLayout, PHeading } from '@spaceone/design-system';
@@ -18,7 +18,7 @@ import RoleUpdateFormPolicy from '@/services/administration/components/RoleUpdat
 import {
     getPageAccessMenuListByRoleType,
 } from '@/services/administration/helpers/page-access-menu-list';
-import { getPageAccessList } from '@/services/administration/helpers/role-page-access-permission-helper';
+import { getPageAccessList } from '@/services/administration/helpers/role-page-permission-helper';
 import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/administration/types/page-access-menu-type';
 
 interface Props {
@@ -32,50 +32,40 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update-form', after: string[]): void,
+    (e: 'update-editor', after: string[]): void,
 }>();
 
+const menuItems = ref([] as PageAccessMenuItem[]);
 const state = reactive({
-    hideAllMenu: computed(() => formState.menuItems.find((d) => d.id === 'all')?.hideMenu),
-    pageAccessPermissions: computed<string[]>(() => getPageAccessList(formState.menuItems)),
-});
-const formState = reactive({
-    menuItems: getPageAccessMenuListByRoleType([{
-        id: 'all',
-        translationIds: ['IAM.ROLE.FORM.ALL'],
-        isAccessible: false,
-        hideMenu: false,
-    }], props.roleType),
+    pageAccessPermissions: computed(() => getPageAccessList(menuItems.value)),
 });
 
-/* Util */
+/* Components */
 const updateMenuItems = (item: PageAccessMenuItem, val: boolean, parentItem?: PageAccessMenuItem) => {
     item.isAccessible = val;
     if (parentItem && !val) parentItem.isAccessible = val;
     if (item?.subMenuList?.length) {
         item.subMenuList.forEach((subMenu) => {
-            if (subMenu.isAccessible) return;
             subMenu.isAccessible = val;
         });
     }
 };
-
-/* Event */
-const handleUpdate = (value: UpdateFormDataType) => {
+const handleUpdateForm = (value: UpdateFormDataType) => {
     const { id: menuId, val, isHideMenu } = value;
-    const item = find(formState.menuItems, { id: menuId });
-    const allItem = find(formState.menuItems, { id: 'all' }) as PageAccessMenuItem;
+    const item = find(menuItems.value, { id: menuId });
+    const allItem = find(menuItems.value, { id: 'all' }) as PageAccessMenuItem;
     if (item) {
         if (isHideMenu) {
             item.hideMenu = val;
         } else if (item.id === 'all') {
-            formState.menuItems.forEach((menu) => {
+            menuItems.value.forEach((menu) => {
                 updateMenuItems(menu, val);
             });
         } else {
             updateMenuItems(item, val, allItem);
         }
     } else {
-        formState.menuItems.forEach((menuItem) => {
+        menuItems.value.forEach((menuItem) => {
             if (menuItem?.subMenuList?.length) {
                 const subItem = find(menuItem.subMenuList, { id: menuId });
                 if (subItem) {
@@ -88,10 +78,13 @@ const handleUpdate = (value: UpdateFormDataType) => {
     }
 
     // activate 'all' menu if every menu were activated
-    const menus = formState.menuItems.filter((d) => d.id !== 'all');
+    const menus = menuItems.value.filter((d) => d.id !== 'all');
     if (menus.every((d) => d.isAccessible)) {
         updateMenuItems(allItem, val);
     }
+};
+const handleUpdateEditor = (value: string) => {
+    emit('update-editor', value.split('\n'));
 };
 
 /* Watcher */
@@ -104,8 +97,16 @@ watch(() => props.initialPagePermissions, (initialPagePermissions) => {
     const pageAccessPermissionMap = getPageAccessPermissionMapFromRawData(initialPagePermissions);
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
-        handleUpdate({ id: itemId, val: accessible });
+        handleUpdateForm({ id: itemId, val: accessible });
     }
+}, { immediate: true });
+watchEffect(() => {
+    menuItems.value = getPageAccessMenuListByRoleType([{
+        id: 'all',
+        translationIds: ['IAM.ROLE.FORM.ALL'],
+        isAccessible: false,
+        hideMenu: false,
+    }], props.roleType);
 });
 </script>
 
@@ -114,10 +115,10 @@ watch(() => props.initialPagePermissions, (initialPagePermissions) => {
         <p-heading heading-type="sub"
                    :title="$t('IAM.ROLE.FORM.PERMISSION')"
         />
-        <role-update-form-access :menu-items="formState.menuItems"
-                                 @update="handleUpdate"
+        <role-update-form-access :menu-items="menuItems"
+                                 @update="handleUpdateForm"
         />
-        <role-update-form-policy />
+        <role-update-form-policy @update="handleUpdateEditor" />
     </p-pane-layout>
 </template>
 

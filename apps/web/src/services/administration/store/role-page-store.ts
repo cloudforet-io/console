@@ -84,7 +84,7 @@ export const useRolePageStore = defineStore('role-page', {
         async deleteRole(params: RoleDeleteParameters) {
             const { role_id } = params;
             try {
-                await SpaceConnector.client.identity.role.delete({
+                await SpaceConnector.clientV2.identity.role.delete({
                     role_id,
                 });
             } catch (e) {

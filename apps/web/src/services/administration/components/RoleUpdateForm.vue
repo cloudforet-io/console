@@ -5,6 +5,7 @@ import {
 
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { Policy, RoleType } from '@/schema/identity/role/type';
 
@@ -30,15 +31,16 @@ const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
 const state = reactive({
     isBaseInformationValid: false,
     baseInfoFormData: '' as string,
-    roleTypeData: '' as RoleType,
+    roleTypeData: ROLE_TYPE.DOMAIN_ADMIN as RoleType,
     pageAccessFormData: [] as string[],
+    permissionsData: [] as string[],
+
     initialSelectedPolicyList: [] as Policy[],
     isAllValid: computed<boolean>(() => state.isBaseInformationValid),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
         const baseData = {
             name: state.baseInfoFormData.trim(),
-            // TODO: will be check after api is merged
-            api_permissions: [],
+            permissions: state.permissionsData,
             page_access: state.pageAccessFormData,
         };
         return props.formType === FORM_TYPE.CREATE
@@ -53,25 +55,6 @@ const state = reactive({
     }),
 });
 
-// TODO: will be updated after api is merged
-// const {
-//     forms: {
-//         selectedApiPermissionList,
-//     },
-//     setForm,
-//     invalidState,
-//     invalidTexts,
-//     isAllValid: isPolicySectionValid,
-// } = useFormValidator({
-//     selectedApiPermissionList: [] as string[],
-// }, {
-//     selectedApiPermissionList(val: string[]) {
-//         if (!val.length) return i18n.t('IAM.ROLE.FORM.VALIDATION_API_POLICY');
-//         return true;
-//     },
-// });
-//
-// const handleUpdatePolicy = (value) => { setForm('selectedApiPermissionList', value); };
 const handleBaseInfoValidate = (value: boolean) => {
     state.isBaseInformationValid = value;
 };
@@ -81,7 +64,12 @@ const handleUpdateBaseInformation = (value: string) => {
 const handleUpdateUserType = (value: RoleType) => {
     state.roleTypeData = value;
 };
-const handleUpdatePageAccessForm = (value) => { state.pageAccessFormData = value; };
+const handleUpdatePageAccessForm = (value) => {
+    state.pageAccessFormData = value;
+};
+const handleUpdatePolicy = (value: string[]) => {
+    state.permissionsData = value;
+};
 
 watch(() => state.isAllValid, (after) => {
     emit('update-validation', after);
@@ -114,6 +102,7 @@ watch(() => props.initialRoleData, (initialRoleData) => {
         <role-update-form-permission-form :initial-page-permissions="state.pageAccessFormData"
                                           :role-type="state.roleTypeData"
                                           @update-form="handleUpdatePageAccessForm"
+                                          @update-editor="handleUpdatePolicy"
         />
     </div>
 </template>
