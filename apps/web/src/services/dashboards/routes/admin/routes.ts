@@ -13,8 +13,8 @@ import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
 const AdminDashboardMainPage = () => import('@/services/dashboards/pages/admin/AdminDashboardMainPage.vue');
 const AdminDashboardCreatePage = () => import('@/services/dashboards/pages/admin/AdminDashboardCreatePage.vue');
-const DashboardCustomizePage = () => import('@/services/dashboards/pages/DashboardCustomizePage.vue');
-const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardDetailPage.vue');
+const AdminDashboardCustomizePage = () => import('@/services/dashboards/pages/admin/AdminDashboardCustomizePage.vue');
+const AdminDashboardDetailPage = () => import('@/services/dashboards/pages/admin/AdminDashboardDetailPage.vue');
 
 const adminDashboardsRoute: RouteConfig = {
     path: 'dashboards',
@@ -48,7 +48,7 @@ const adminDashboardsRoute: RouteConfig = {
                     name: makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME),
                     meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                     props: true,
-                    component: DashboardDetailPage,
+                    component: AdminDashboardDetailPage,
                 },
                 {
                     path: 'customize/:dashboardId?',
@@ -79,7 +79,7 @@ const adminDashboardsRoute: RouteConfig = {
                         },
                     },
                     props: true,
-                    component: DashboardCustomizePage,
+                    component: AdminDashboardCustomizePage,
                 },
             ],
         },
