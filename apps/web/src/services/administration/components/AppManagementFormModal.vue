@@ -25,7 +25,7 @@ const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 
-const emit = defineEmits<{(e: 'confirm', app_key_id?: string): void;
+const emit = defineEmits<{(e: 'confirm', appKeyId?: string): void;
 }>();
 
 const storeState = reactive({
