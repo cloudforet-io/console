@@ -4,17 +4,21 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { GetUserConfigParameters } from '@/schema/config/user-config/api-verbs/get';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
+import type { SchemaType } from '@/schema/identity/schema/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { getDefaultDetailSchema, getDefaultSearchSchema, getDefaultTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/dynamic-layout-schema-template';
 import type { GetSchemaParams } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
 
 
-const getCustomSchema = async ({ userType, userId }, provider, schemaType) => {
+const getCustomSchema = async ({ userType, userId }, provider, schemaType?:SchemaType):Promise<DynamicLayout | undefined> => {
     const userConfigName = `console:${userType}:${userId}:page-schema:${schemaType}?provider=${provider}:table`;
-    let userConfig;
+    let userConfig:UserConfigModel<DynamicLayout>|undefined;
     try {
-        userConfig = await SpaceConnector.client.config.userConfig.get({
+        userConfig = await SpaceConnector.client.config.userConfig.get<GetUserConfigParameters, UserConfigModel<DynamicLayout>>({
             name: userConfigName,
             workspace_id: undefined,
         });
@@ -22,7 +26,7 @@ const getCustomSchema = async ({ userType, userId }, provider, schemaType) => {
         ErrorHandler.handleError(e);
         userConfig = undefined;
     }
-    return userConfig;
+    return Object.keys(userConfig?.data ?? {}).length ? userConfig?.data : undefined;
 };
 
 
