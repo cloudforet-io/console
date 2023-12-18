@@ -61,6 +61,10 @@ const getProjectItems = async () => {
         const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
             user_id: state.selectedUser.user_id,
         });
+        if (!results) {
+            state.items = [];
+            return;
+        }
         state.items = results?.map((k) => ({
             project_id: k.project_id,
             name: k.name,
@@ -78,7 +82,6 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
     if (props.type === USER_TABS.PROJECTS) {
         await getProjectItems();
     } else {
-        // TODO: will be changed to array
         state.items = Object.entries(state.selectedUser.tags || {}).map(([k, v]) => ({
             key: k,
             value: v,

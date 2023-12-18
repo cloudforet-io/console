@@ -34,7 +34,7 @@ export const useUserPageStore = defineStore('user-page', {
     }),
     getters: {
         timezone: () => store.state.user.timezone,
-        isWorkspaceOwner: () => store.state.user.roleType === ROLE_TYPE.WORKSPACE_OWNER,
+        isWorkspaceOwner: () => store.state.user.currentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER,
         selectedUsers: (state) => {
             const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {

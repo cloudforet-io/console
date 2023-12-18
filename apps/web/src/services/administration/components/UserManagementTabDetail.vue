@@ -10,7 +10,6 @@ import type { DefinitionField } from '@spaceone/design-system/src/data-display/t
 
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -41,27 +40,30 @@ const tableState = reactive({
     fields: computed<DefinitionField[]>(() => {
         const additionalFields: DefinitionField[] = [];
         const additionalRoleFields: DefinitionField[] = [];
-        if (storeState.smtpEnabled) {
-            additionalFields.push({
-                name: 'email',
-                label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL'),
-            });
-        }
-        if (storeState.userInfo.roleType === ROLE_TYPE.WORKSPACE_MEMBER) {
+        if (userPageStore.isAdminMode) {
+            if (storeState.smtpEnabled) {
+                additionalFields.push(
+                    { name: 'email', label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL') },
+                );
+            }
+            additionalFields.push(
+                { name: 'mfa', label: i18n.t('IAM.USER.MAIN.MFA'), disableCopy: true },
+            );
+        } else {
             additionalRoleFields.push({
                 name: 'role_binding_info',
-                label: i18n.t('IAM.USER.MAIN.WORKSPACE_ROLE'),
+                label: i18n.t('IAM.USER.MAIN.ROLE'),
             });
         }
+
         return [
             { name: 'user_id', label: i18n.t('IAM.USER.MAIN.USER_ID') },
             { name: 'name', label: i18n.t('IAM.USER.MAIN.NAME') },
             { name: 'state', label: i18n.t('IAM.USER.MAIN.STATE') },
             ...additionalFields,
-            { name: 'mfa', label: i18n.t('IAM.USER.MAIN.MFA'), disableCopy: true },
             { name: 'last_accessed_at', label: i18n.t('IAM.USER.MAIN.LAST_ACTIVITY') },
             { name: 'domain_id', label: i18n.t('IAM.USER.MAIN.DOMAIN_ID') },
-            { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE') },
+            { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') },
             ...additionalRoleFields,
             { name: 'language', label: i18n.t('IAM.USER.MAIN.LANGUAGE') },
             { name: 'timezone', label: i18n.t('IAM.USER.MAIN.TIMEZONE') },
@@ -101,7 +103,7 @@ const tableState = reactive({
                 </span>
             </template>
             <template #data-role_binding_info="{value}">
-                {{ value.role_type }}
+                {{ useRoleFormatter(value.role_type).name }}
             </template>
             <template #data-email="{data}">
                 <span class="notification-email-wrapper">
