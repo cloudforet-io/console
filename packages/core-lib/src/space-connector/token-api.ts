@@ -75,7 +75,7 @@ export default class TokenAPI {
         TokenAPI.unsetRefreshingState();
     }
 
-    getRefreshToken(): string|undefined {
+    getRefreshToken(): string|undefined|null {
         return this.refreshToken;
     }
 

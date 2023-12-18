@@ -116,8 +116,8 @@ export class SpaceConnector {
         SpaceConnector.instance.setApiTokenCheckInterval();
     }
 
-    static getAccessToken(): string|undefined|null {
-        return SpaceConnector.instance.tokenApi.getAccessToken();
+    static getRefreshToken(): string|undefined|null {
+        return SpaceConnector.instance.tokenApi.getRefreshToken();
     }
 
     static flushToken(): void {
