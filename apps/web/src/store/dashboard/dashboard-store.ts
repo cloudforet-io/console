@@ -104,6 +104,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             state.loading = false;
         }
     };
+
     const createDashboard = async (params: CreateDashboardParameters): Promise<DashboardModel> => {
         try {
             const result = await SpaceConnector.clientV2.dashboard.dashboard.create<CreateDashboardParameters, DashboardModel>(params);
