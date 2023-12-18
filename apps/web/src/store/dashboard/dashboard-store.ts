@@ -17,6 +17,8 @@ import type { UpdateDashboardParameters } from '@/schema/dashboard/dashboard/api
 import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -48,6 +50,11 @@ const getItems = (items: DashboardModel[], filters: ConsoleFilter[], dashboardTy
 };
 
 export const useDashboardStore = defineStore('dashboard', () => {
+    const appContextStore = useAppContextStore();
+
+    const _state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
     const state = reactive({
         items: [] as DashboardModel[],
         totalCount: 0,
@@ -58,6 +65,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     });
 
     const getters = reactive({
+        domainItems: computed(() => state.items),
         workspaceItems: computed(() => state.items.filter((item) => item.resource_group === 'WORKSPACE')),
         projectItems: computed(() => state.items.filter((item) => item.resource_group === 'PROJECT')),
     });
@@ -84,13 +92,16 @@ export const useDashboardStore = defineStore('dashboard', () => {
     /* Actions */
     const load = async (params?: ListDashboardParameters) => {
         const query = getApiQuery();
-        const _params = {
+        const _params: ListDashboardParameters = {
             ...params,
             query: {
                 ...(params?.query || {}),
                 ...query,
             },
         };
+        if (_state.isAdminMode) {
+            _params.resource_group = 'DOMAIN';
+        }
         state.loading = true;
         try {
             const res = await SpaceConnector.clientV2.dashboard.dashboard.list<ListDashboardParameters, ListResponse<DashboardModel>>(_params);

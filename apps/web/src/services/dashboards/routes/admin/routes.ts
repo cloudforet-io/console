@@ -11,7 +11,7 @@ import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 const DashboardsContainer = () => import('@/services/dashboards/DashboardsContainer.vue');
-const DashboardsMainPage = () => import('@/services/dashboards/pages/DashboardsMainPage.vue');
+const AdminDashboardMainPage = () => import('@/services/dashboards/pages/admin/AdminDashboardMainPage.vue');
 const DashboardCreatePage = () => import('@/services/dashboards/pages/DashboardCreatePage.vue');
 const DashboardCustomizePage = () => import('@/services/dashboards/pages/DashboardCustomizePage.vue');
 const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardDetailPage.vue');
@@ -32,7 +32,7 @@ const adminDashboardsRoute: RouteConfig = {
                     path: 'all',
                     name: makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME),
                     meta: { lnbVisible: true, translationId: 'DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL' },
-                    component: DashboardsMainPage,
+                    component: AdminDashboardMainPage,
                 },
                 {
                     path: 'create',

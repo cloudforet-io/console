@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { reactive } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
@@ -27,15 +27,13 @@ const emit = defineEmits<{(e: 'update:visible'): void,
 const dashboardStore = useDashboardStore();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    dashboardId: computed<string>(() => props.dashboardId),
-    isProjectDashboard: computed<boolean>(() => state.dashboardId.startsWith('project')),
     loading: false,
 });
 
 const handleDeleteDashboardConfirm = async () => {
     try {
         state.loading = true;
-        await dashboardStore.deleteDashboard(state.dashboardId);
+        await dashboardStore.deleteDashboard(props.dashboardId);
         await SpaceRouter.router.replace({ name: DASHBOARDS_ROUTE.ALL._NAME });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));

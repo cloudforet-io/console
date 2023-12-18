@@ -16,16 +16,14 @@ import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
+import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
@@ -46,8 +44,12 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 
 const router = useRouter();
 
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     thisPage: 1,
     dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
@@ -72,9 +74,7 @@ const state = reactive({
 });
 
 const deleteModalState = reactive({
-    headerTitle: i18n.t('DASHBOARDS.FORM.DELETE_TITLE'),
     visible: false,
-    loading: false,
     selectedId: undefined as string|undefined,
 });
 
@@ -107,7 +107,6 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
     {
         iconName: 'ic_delete',
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
-        /* TODO: Implementation */
         eventAction: () => handleClickDeleteDashboard(dashboardItem.dashboard_id),
     },
 ];
@@ -126,23 +125,9 @@ const handleUpdateCloneModal = (visible: boolean) => {
     cloneModalState.dashboardConfig = {};
 };
 
-const handleClickDeleteDashboard = (dashboardId) => {
+const handleClickDeleteDashboard = (dashboardId: string) => {
     deleteModalState.selectedId = dashboardId;
     deleteModalState.visible = true;
-};
-
-const handleDeleteDashboardConfirm = async () => {
-    try {
-        deleteModalState.loading = true;
-        await dashboardStore.deleteDashboard(deleteModalState.selectedId as string);
-        showSuccessMessage(i18n.t('DASHBOARDS.FORM.ALT_S_DELETE_DASHBOARD'), '');
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_DELETE_DASHBOARD'));
-    } finally {
-        deleteModalState.loading = false;
-        deleteModalState.visible = false;
-        deleteModalState.selectedId = undefined;
-    }
 };
 
 const labelQueryHelper = new QueryHelper();
@@ -190,16 +175,19 @@ watch(() => props.dashboardList, () => {
                 <div class="board-item-description">
                     <template v-if="board.tags.created_by">
                         <span>{{ board.tags.created_by }}</span>
+                    </template>
+                    <template v-if="!storeState.isAdminMode">
                         <p-i name="ic_dot"
                              width="0.125rem"
                              height="0.125rem"
                         />
+                        <span v-if="props.scopeType === 'WORKSPACE'">{{ DOMAIN_SCOPE_NAME }}</span>
+                        <span v-else>{{ board.label }}</span>
                     </template>
-                    <span v-if="props.scopeType === 'WORKSPACE'">{{ DOMAIN_SCOPE_NAME }}</span>
-                    <span v-else>{{ board.label }}</span>
                 </div>
                 <div class="label-wrapper">
-                    <p-label :class="{'item-label': true, 'viewers-label': true, 'private-label': board.dashboard_type === 'PRIVATE'}"
+                    <p-label v-if="!storeState.isAdminMode"
+                             :class="{'item-label': true, 'viewers-label': true, 'private-label': board.dashboard_type === 'PRIVATE'}"
                              :text="board.dashboard_type === 'PUBLIC' ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE')"
                              :left-icon="board.dashboard_type === 'PUBLIC' ? 'ic_globe-filled' : 'ic_lock-filled'"
                     />
@@ -222,10 +210,9 @@ watch(() => props.dashboardList, () => {
                           @change="handlePage"
             />
         </div>
-        <delete-modal :header-title="deleteModalState.headerTitle"
-                      :visible.sync="deleteModalState.visible"
-                      :loading="deleteModalState.loading"
-                      @confirm="handleDeleteDashboardConfirm"
+        <dashboard-delete-modal
+            :visible.sync="deleteModalState.visible"
+            :dashboard-id="deleteModalState.selectedId"
         />
         <dashboard-clone-modal :visible.sync="cloneModalState.visible"
                                :dashboard="cloneModalState.dashboardConfig"
