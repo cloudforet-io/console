@@ -4,25 +4,18 @@ import {
 } from 'vue';
 
 import {
-    PDivider, PI, PIconButton, PHeading, PSkeleton,
+    PDivider,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
-import { gray } from '@/styles/colors';
-
-import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
-import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
-import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
+import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
 import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
-import DashboardNameEditModal from '@/services/dashboards/components/DashboardNameEditModal.vue';
 import DashboardRefreshDropdown from '@/services/dashboards/components/DashboardRefreshDropdown.vue';
 import DashboardToolset from '@/services/dashboards/components/DashboardToolset.vue';
 import DashboardVariables from '@/services/dashboards/components/DashboardVariables.vue';
@@ -30,8 +23,6 @@ import DashboardWidgetContainer from '@/services/dashboards/components/Dashboard
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 
-
-const PUBLIC_ICON_COLOR = gray[500];
 
 interface Props {
     dashboardId: string;
@@ -58,25 +49,6 @@ const getDashboardData = async (dashboardId: string) => {
         ErrorHandler.handleError(e);
         await SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.ALL._NAME });
     }
-};
-
-// name edit
-const handleVisibleNameEditModal = () => {
-    state.nameEditModalVisible = true;
-};
-const handleNameUpdate = (name: string) => {
-    dashboardDetailStore.$patch({ name });
-    dashboardDetailStore.setOriginDashboardName(name);
-};
-
-// delete dashboard
-const handleVisibleDeleteModal = () => {
-    state.deleteModalVisible = true;
-};
-
-// clone dashboard
-const handleVisibleCloneModal = () => {
-    state.cloneModalVisible = true;
 };
 
 // else
@@ -119,54 +91,7 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboard-detail-page">
-        <p-heading :title="dashboardDetailState.name">
-            <p-skeleton v-if="!dashboardDetailState.name"
-                        width="20rem"
-                        height="1.5rem"
-            />
-            <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardType === 'PUBLIC'"
-                      #title-left-extra
-            >
-                <div class="title-left-extra">
-                    <p-i name="ic_globe-filled"
-                         width="1rem"
-                         height="1rem"
-                         :color="PUBLIC_ICON_COLOR"
-                    />
-                </div>
-            </template>
-            <template v-if="dashboardDetailState.name"
-                      #title-right-extra
-            >
-                <div class="title-right-extra">
-                    <div class="favorite-button-wrapper">
-                        <favorite-button :item-id="props.dashboardId"
-                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                         scale="0.8"
-                        />
-                    </div>
-                    <p-icon-button name="ic_edit-text"
-                                   size="md"
-                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardType === 'PUBLIC'"
-                                   @click="handleVisibleNameEditModal"
-                    />
-                    <p-icon-button name="ic_delete"
-                                   size="md"
-
-                                   :disabled="!state.hasManagePermission && dashboardDetailStore.dashboardType === 'PUBLIC'"
-                                   class="delete-button"
-                                   @click="handleVisibleDeleteModal"
-                    />
-                </div>
-            </template>
-            <template #extra>
-                <dashboard-control-buttons v-if="state.hasManagePermission"
-                                           :dashboard-id="props.dashboardId"
-                                           :name="dashboardDetailState.name"
-                                           @update:visible-clone-modal="handleVisibleCloneModal"
-                />
-            </template>
-        </p-heading>
+        <dashboard-detail-header dashboard-id="props.dashboardId" />
         <div class="filter-box">
             <dashboard-labels :editable="state.hasManagePermission"
                               @update-labels="handleUpdateLabels"
@@ -185,40 +110,11 @@ onUnmounted(() => {
             />
         </div>
         <dashboard-widget-container ref="widgetContainerRef" />
-        <dashboard-name-edit-modal :visible.sync="state.nameEditModalVisible"
-                                   :dashboard-id="props.dashboardId"
-                                   :name="dashboardDetailState.name"
-                                   @confirm="handleNameUpdate"
-        />
-        <dashboard-delete-modal :visible.sync="state.deleteModalVisible"
-                                :dashboard-id="props.dashboardId"
-        />
-        <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
-                               :dashboard-detail-info="dashboardDetailState"
-        />
     </div>
 </template>
 
 <style lang="postcss" scoped>
-.p-heading {
-    margin-bottom: 0.75rem;
-}
 .dashboard-detail-page {
-    .title-left-extra {
-        @apply inline-block;
-        height: 2rem;
-        margin-top: 0.075rem;
-    }
-    .title-right-extra {
-        @apply flex-shrink-0 inline-flex items-center;
-        margin-bottom: -0.25rem;
-        gap: 0.5rem;
-        .favorite-button-wrapper {
-            @apply flex items-center justify-center;
-            width: 1.25rem;
-            height: 1.25rem;
-        }
-    }
     .divider {
         @apply mb-6;
     }
