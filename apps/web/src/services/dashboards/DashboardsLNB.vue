@@ -30,10 +30,10 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed(() => store.getters['reference/projectItems']),
 });
 const state = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: true,
     showFavoriteOnly: false,
     header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.DASHBOARDS].translationId)),
@@ -47,6 +47,21 @@ const state = reactive({
         }
         return result;
     }),
+    domainMenuSet: computed<LNBItem[]>(() => dashboardGetters.domainItems.map((d) => ({
+        type: 'item',
+        id: d.dashboard_id,
+        label: d.name,
+        to: {
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            params: {
+                dashboardId: d.dashboard_id,
+            },
+        },
+        favoriteOptions: {
+            type: FAVORITE_TYPE.DASHBOARD,
+            id: d.dashboard_id,
+        },
+    }))),
     workspaceMenuSet: computed<LNBItem[]>(() => dashboardGetters.workspaceItems.map((d) => ({
         type: 'item',
         id: d.dashboard_id,
@@ -63,24 +78,35 @@ const state = reactive({
         },
         icon: d.dashboard_type === 'PRIVATE' ? PRIVATE_ICON : undefined,
     }))),
-    projectDashboardList: computed<DashboardModel[]>(() => dashboardGetters.projectItems),
-    projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(state.projectDashboardList)),
-    menuSet: computed<LNBMenu[]>(() => [
-        {
-            type: 'item',
-            label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
-            id: MENU_ID.DASHBOARDS,
-            foldable: false,
-            to: {
-                name: DASHBOARDS_ROUTE.ALL._NAME,
+    projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(dashboardGetters.projectItems)),
+    menuSet: computed<LNBMenu[]>(() => {
+        const defaultMenuSet = [
+            {
+                type: 'item',
+                label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.VIEW_ALL'),
+                id: MENU_ID.DASHBOARDS,
+                foldable: false,
+                to: {
+                    name: DASHBOARDS_ROUTE.ALL._NAME,
+                },
+                hideFavorite: true,
             },
-            hideFavorite: true,
-        },
-        { type: 'divider' },
-        { type: 'favorite-only' },
-        ...filterLNBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)),
-        ...filterLNBItemsByPagePermission('PROJECT', filterFavoriteItems(state.projectMenuSet)),
-    ]),
+            { type: 'divider' },
+            { type: 'favorite-only' },
+        ];
+
+        if (storeState.isAdminMode) {
+            return [
+                ...defaultMenuSet,
+                ...state.domainMenuSet,
+            ];
+        }
+        return [
+            ...defaultMenuSet,
+            ...filterLNBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)),
+            ...filterLNBItemsByPagePermission('PROJECT', filterFavoriteItems(state.projectMenuSet)),
+        ];
+    }),
 });
 
 const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[]): LNBMenu[] => {
