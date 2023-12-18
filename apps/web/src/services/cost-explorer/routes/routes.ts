@@ -24,7 +24,7 @@ const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDeta
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
-    meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: CostExplorerContainer,
     children: [
@@ -105,7 +105,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
                     component: BudgetCreatePage as any,
                 },
                 {

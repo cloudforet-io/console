@@ -18,8 +18,7 @@ import type {
     DisplayState, DisplayMenu, SidebarProps,
 } from '@/store/modules/display/type';
 
-import type { PagePermissionTuple } from '@/lib/access-control/config';
-import type { Menu, MenuInfo } from '@/lib/menu/config';
+import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -78,16 +77,16 @@ const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayM
     return results;
 }, [] as DisplayMenu[]);
 
-const filterMenuByPermission = (menuList: DisplayMenu[], pagePermissionList: PagePermissionTuple[]): DisplayMenu[] => menuList.reduce((results, _menu) => {
+const filterMenuByAccessPermission = (menuList: DisplayMenu[], pagePermissionList: MenuId[]): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const menu = { ..._menu };
 
     if (menu.subMenuList) {
-        menu.subMenuList = filterMenuByPermission(menu.subMenuList, pagePermissionList);
+        menu.subMenuList = filterMenuByAccessPermission(menu.subMenuList, pagePermissionList);
     }
 
     if (menu.subMenuList?.length) results.push(menu);
     else {
-        const hasPermission = pagePermissionList.some(([permissionMenuId]) => permissionMenuId === menu.id);
+        const hasPermission = pagePermissionList.some((menuId) => menuId === menu.id);
         if (hasPermission) results.push(menu);
     }
 
@@ -117,7 +116,7 @@ export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState
     _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
     if (!isAdminMode) {
-        _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+        _allGnbMenuList = filterMenuByAccessPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
     }
 
     return _allGnbMenuList;

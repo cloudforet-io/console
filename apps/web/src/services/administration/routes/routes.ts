@@ -16,7 +16,7 @@ const AppPage = () => import('@/services/administration/pages/AppPage.vue');
 const administrationRoutes: RouteConfig = {
     path: 'administration',
     name: ADMINISTRATION_ROUTE._NAME,
-    meta: { menuId: MENU_ID.ADMINISTRATION, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.ADMINISTRATION, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: AdministrationContainer,
     children: [

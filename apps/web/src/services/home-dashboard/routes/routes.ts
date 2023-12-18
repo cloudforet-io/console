@@ -9,6 +9,6 @@ const HomeDashboard = () => import('@/services/home-dashboard/pages/HomeDashboar
 export default {
     path: 'home-dashboard',
     name: HOME_DASHBOARD_ROUTE._NAME,
-    meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
     component: HomeDashboard,
 } as RouteConfig;

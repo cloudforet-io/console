@@ -3,8 +3,8 @@ import type { Action } from 'vuex';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
-import { MANAGED_ROLE_TYPE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleType } from '@/schema/identity/role/type';
 import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { TokenGrantModel, TokenIssueModel } from '@/schema/identity/token/model';
@@ -12,7 +12,7 @@ import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
-import { MENU_ID } from '@/lib/menu/config';
+import { MANAGED_ROLES } from '@/store/modules/user/config';
 
 import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
@@ -51,17 +51,27 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     await SpaceConnector.clientV2.identity.user.update(request);
 };
 
+const getRoleTypeByManagedRoleId = (roleId: string): RoleType => MANAGED_ROLES[roleId];
+
 const getGrantedRole = async (roleId: string): Promise<RoleInfo|undefined> => {
+    const MANAGED_ROLE_IDS: string[] = Object.keys(MANAGED_ROLES);
+    const isManagedRole = MANAGED_ROLE_IDS.includes(roleId);
+    if (isManagedRole) {
+        return {
+            roleType: getRoleTypeByManagedRoleId(roleId),
+            roleId,
+            pageAccess: ['*'],
+        };
+    }
     try {
         const response = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
             role_id: roleId,
         });
 
-        const isManagedRole = roleId.startsWith('managed-');
         return {
             roleType: response.role_type,
             roleId: response.role_id,
-            pageAccess: isManagedRole ? generatePageAccessForManagedRole(roleId) : response.page_access,
+            pageAccess: response.page_access,
         };
     } catch (e) {
         console.error(`Role Load Error: ${e}`);
@@ -69,37 +79,37 @@ const getGrantedRole = async (roleId: string): Promise<RoleInfo|undefined> => {
     }
 };
 
-const generatePageAccessForManagedRole = (roleId: string): string[] => {
-    if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.DOMAIN_ADMIN]) {
-        return ['*'];
-    } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_OWNER]) {
-        return [
-            MENU_ID.HOME_DASHBOARD,
-            `${MENU_ID.DASHBOARDS}.*`,
-            `${MENU_ID.PROJECT}.*`,
-            `${MENU_ID.ASSET_INVENTORY}.*`,
-            `${MENU_ID.COST_EXPLORER}.*`,
-            `${MENU_ID.ALERT_MANAGER}.*`,
-            `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.USER}`,
-            `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.APP}`,
-            `${MENU_ID.MY_PAGE}.*`,
-            `${MENU_ID.INFO}.*`,
-        ];
-    } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_MEMBER]) {
-        return [
-            MENU_ID.HOME_DASHBOARD,
-            `${MENU_ID.DASHBOARDS}.*`,
-            `${MENU_ID.PROJECT}.*`,
-            `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}`,
-            `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
-            `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}`,
-            `${MENU_ID.COST_EXPLORER}.*`,
-            `${MENU_ID.ALERT_MANAGER}.*`,
-            `${MENU_ID.MY_PAGE}.*`,
-            `${MENU_ID.INFO}.*`,
-        ];
-    } return [];
-};
+// const generatePageAccessForManagedRole = (roleId: string): string[] => {
+//     if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.DOMAIN_ADMIN]) {
+//         return ['*'];
+//     } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_OWNER]) {
+//         return [
+//             MENU_ID.HOME_DASHBOARD,
+//             `${MENU_ID.DASHBOARDS}.*`,
+//             `${MENU_ID.PROJECT}.*`,
+//             `${MENU_ID.ASSET_INVENTORY}.*`,
+//             `${MENU_ID.COST_EXPLORER}.*`,
+//             `${MENU_ID.ALERT_MANAGER}.*`,
+//             `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.USER}`,
+//             `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.APP}`,
+//             `${MENU_ID.MY_PAGE}.*`,
+//             `${MENU_ID.INFO}.*`,
+//         ];
+//     } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_MEMBER]) {
+//         return [
+//             MENU_ID.HOME_DASHBOARD,
+//             `${MENU_ID.DASHBOARDS}.*`,
+//             `${MENU_ID.PROJECT}.*`,
+//             `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}`,
+//             `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
+//             `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}`,
+//             `${MENU_ID.COST_EXPLORER}.*`,
+//             `${MENU_ID.ALERT_MANAGER}.*`,
+//             `${MENU_ID.MY_PAGE}.*`,
+//             `${MENU_ID.INFO}.*`,
+//         ];
+//     } return [];
+// };
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
@@ -125,7 +135,7 @@ export const signOut = (): void => {
 export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
     try {
         const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>({
-            grant_type: 'API_KEY',
+            grant_type: 'REFRESH_TOKEN',
             scope: grantRequest.scope,
             token: grantRequest.token,
             workspace_id: grantRequest.workspace_id,

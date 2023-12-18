@@ -37,7 +37,7 @@ const CollectorDetailPage = () => import('@/services/asset-inventory/pages/Colle
 const assetInventoryRoute: RouteConfig = {
     path: 'asset-inventory',
     name: ASSET_INVENTORY_ROUTE._NAME,
-    meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.ASSET_INVENTORY, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: AssetInventoryContainer,
     children: [
@@ -107,7 +107,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: 'create',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR.CREATE._NAME,
-                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION, centeredLayout: true },
+                    meta: { translationId: 'PLUGIN.COLLECTOR.CREATE.TITLE', accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION, centeredLayout: true },
                     component: CreateCollectorPage as any,
                 },
                 {
@@ -171,7 +171,7 @@ const assetInventoryRoute: RouteConfig = {
                         translationId: ({ params }) => (['IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', {
                             type: ACCOUNT_TYPE_BADGE_OPTION[params.serviceAccountType].label,
                         }]),
-                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
+                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                     },
                     props: true,
                     component: ServiceAccountAddPage as any,

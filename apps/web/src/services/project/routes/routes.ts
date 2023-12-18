@@ -31,22 +31,24 @@ export default {
         {
             path: '/',
             name: PROJECT_ROUTE._NAME,
-            meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
             props: true,
             component: ProjectPage,
         },
         {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-            redirect: ':id/summary',
+            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+            // redirect: ':id/summary',
+            redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: 'summary',
+                    // redirect: 'summary',
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDetailPage,
                     children: [

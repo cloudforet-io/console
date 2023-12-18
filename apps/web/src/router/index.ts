@@ -70,9 +70,9 @@ export class SpaceRouter {
 
 
             // Grant API Key
-            const accessToken = SpaceConnector.getAccessToken();
+            const refreshToken = SpaceConnector.getRefreshToken();
             const isDuplicatedRoute = to.name === from.name;
-            if (accessToken && isTokenAlive && !isDuplicatedRoute) {
+            if (refreshToken && isTokenAlive && !isDuplicatedRoute) {
                 let scope: string;
                 if (to.name?.startsWith('admin.')) {
                     scope = 'DOMAIN';
@@ -82,7 +82,7 @@ export class SpaceRouter {
                 const grantRequest = {
                     scope,
                     workspace_id: to.params.workspaceId,
-                    token: accessToken,
+                    token: refreshToken,
                 };
 
                 await SpaceRouter.router.app.$store.dispatch('user/grantRole', grantRequest);

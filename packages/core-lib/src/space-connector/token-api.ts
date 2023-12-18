@@ -13,7 +13,7 @@ import type {
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
-const REFRESH_URL = '/identity/token/refresh';
+const REFRESH_URL = '/identity/token/grant';
 const IS_REFRESHING_KEY = 'spaceConnector/isRefreshing';
 
 const VERBOSE = false;
@@ -75,7 +75,7 @@ export default class TokenAPI {
         TokenAPI.unsetRefreshingState();
     }
 
-    getRefreshToken(): string|undefined {
+    getRefreshToken(): string|undefined|null {
         return this.refreshToken;
     }
 
@@ -102,7 +102,15 @@ export default class TokenAPI {
         if (TokenAPI.checkRefreshingState() !== 'true') {
             try {
                 TokenAPI.setRefreshingState();
-                const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {});
+                const { rol, wid } = jwtDecode<JwtPayload&{rol: string, wid: string}>(this.refreshToken);
+                let scope = 'USER';
+                if (rol === 'SYSTEM_ADMIN') scope = 'SYSTEM';
+                if (rol === 'DOMAIN_ADMIN') scope = 'DOMAIN';
+                if (rol === 'WORKSPACE_OWNER' || rol === 'WORKSPACE_MEMBER') scope = 'WORKSPACE';
+
+                const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL, {
+                    grant_type: 'REFRESH_TOKEN', token: this.refreshToken, scope, workspaceId: wid,
+                });
                 this.setToken(response.data.access_token, response.data.refresh_token);
                 if (VERBOSE) {
                     const decoded = jwtDecode<JwtPayload&{ttl: number}>(response.data.refresh_token);

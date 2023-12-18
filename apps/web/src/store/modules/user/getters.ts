@@ -2,15 +2,14 @@ import type { Getter } from 'vuex';
 
 import { languages } from '@/store/modules/user/config';
 
-import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/config';
-import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
     getDefaultPagePermissionList,
-    getPagePermissionMapFromRaw, getProperPermissionType,
+    getPagePermissionMapFromRaw,
 } from '@/lib/access-control/page-permission-helper';
+import type { MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
-import type { UserState, PageAccessType } from './type';
+import type { UserState } from './type';
 
 
 // TODO: temporary defence
@@ -51,9 +50,9 @@ export const roleNames = (state: UserState): Array<string> => {
     }
     return ['No Role'];
 };
-export const isNoRoleUser = (state: UserState): boolean => !state.roles?.length;
+export const isNoRoleUser = (state: UserState): boolean => !state.currentRoleInfo?.roleId;
 
-// TODO: refactor hasDomainRole
+// TODO: refactor hasDomainRole need more exact planning roleType and grant roleType
 // export const hasDomainRole = (state: UserState): boolean => {
 //     if (state.roles) {
 //         return state.roleType === 'DOMAIN_ADMIN';
@@ -62,36 +61,31 @@ export const isNoRoleUser = (state: UserState): boolean => !state.roles?.length;
 //     return false;
 export const hasDomainRole = (): boolean => true;
 
-export const hasSystemRole = (state: UserState): boolean => {
-    if (state.roles) {
-        return state.roles.some((role) => role.roleType === 'SYSTEM_ADMIN');
-    }
-
-    return false;
-};
+export const hasSystemRole = (state: UserState): boolean => state.currentRoleInfo?.roleType === 'SYSTEM_ADMIN';
 
 // TODO: you must recover this after new role rebuild
 // export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
 export const hasPermission = (): boolean => true;
 
-export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
-    const roleBasePagePermissions = state.roles?.flatMap((role) => role.pagePermissions) ?? [];
+export const getCurrentRoleInfo = (state: UserState): any => state.currentRoleInfo;
+
+// TODO: change pagePermissionList to pageAccessList
+export const pagePermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? [];
+    const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
     const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions, MENU_LIST);
-    // merge role based page permissions and default page permissions
-    let pageAccessType: PageAccessType|undefined;
-    if (getters.hasSystemRole) pageAccessType = 'SYSTEM';
-    else if (getters.hasPermission) pageAccessType = 'USER';
-    getDefaultPagePermissionList(pageAccessType).forEach(([page, permission]) => {
-        pagePermissionMap[page] = getProperPermissionType(permission, pagePermissionMap[page]);
+    const defaultPagePermissionList = getDefaultPagePermissionList(roleType);
+    Object.keys(pagePermissionMap).forEach((menuId) => {
+        if (!defaultPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = false;
     });
-    return Object.entries(pagePermissionMap);
+
+    return Object.entries(pagePermissionMap).filter(([, accessible]) => accessible).map(([page]) => page as MenuId);
 };
 
-export const pagePermissionMap: Getter<UserState, any> = (state, getters): Record<string, PagePermissionType> => {
-    const result: Record<string, PagePermissionType> = {};
-    getters.pagePermissionList.forEach(([page, permission]) => {
-        if (!result[page]) result[page] = permission;
-        else if (permission === PAGE_PERMISSION_TYPE.MANAGE) result[page] = PAGE_PERMISSION_TYPE.MANAGE;
+export const pagePermissionMap: Getter<UserState, any> = (state, getters): Record<string, boolean> => {
+    const result: Record<string, boolean> = {};
+    getters.pagePermissionList.forEach((MenuId) => {
+        if (!result[MenuId]) result[MenuId] = true;
     });
     return result;
 };
