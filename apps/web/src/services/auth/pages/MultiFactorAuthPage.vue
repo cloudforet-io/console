@@ -11,6 +11,8 @@ import { store } from '@/store';
 // CAUTION: To prevent the issue of i18n imported in the template not being applied in the 'script setup' structure.
 import { i18n as _i18n } from '@/translations';
 
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -22,6 +24,8 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 const route = useRoute();
 const router = useRouter();
+const workspaceStore = useWorkspaceStore();
+
 
 const { password, userId, authType } = route.params;
 
@@ -79,7 +83,8 @@ const handleClickConfirmButton = async () => {
         if (store.state.user.requiredActions?.includes('UPDATE_PASSWORD')) {
             await router.push({ name: AUTH_ROUTE.PASSWORD._NAME });
         } else {
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
+            const hasBoundWorkspace = workspaceStore.getters.workspaceList.length > 0;
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
             await router.push(defaultRoute);
         }
         validationState.verificationCode = '';
