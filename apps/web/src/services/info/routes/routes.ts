@@ -16,7 +16,7 @@ const NoticeDetailPage = () => import('@/services/info/pages/NoticeDetailPage.vu
 const infoRoute: RouteConfig = {
     path: 'info',
     name: INFO_ROUTE._NAME,
-    meta: { menuId: MENU_ID.INFO, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.INFO, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: InfoContainer,
     children: [
@@ -35,7 +35,7 @@ const infoRoute: RouteConfig = {
                     path: ':postId',
                     name: INFO_ROUTE.NOTICE.DETAIL._NAME,
                     meta: {
-                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION, label: ({ params }) => params.postId, copiable: true,
+                        translationId: 'INFO.NOTICE.DETAIL.DETAIL_TITLE', lnbVisible: true, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION, label: ({ params }) => params.postId, copiable: true,
                     },
                     component: NoticeDetailPage as any,
                     props: true,

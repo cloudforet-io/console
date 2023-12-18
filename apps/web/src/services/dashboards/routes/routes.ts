@@ -20,7 +20,7 @@ const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardD
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
-    meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+    meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
     component: DashboardsContainer,
     children: [
@@ -41,7 +41,7 @@ const dashboardsRoute: RouteConfig = {
                     meta: {
                         centeredLayout: true,
                         translationId: 'DASHBOARDS.CREATE.TITLE',
-                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
+                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                     },
                     component: DashboardCreatePage,
                 },
@@ -56,7 +56,7 @@ const dashboardsRoute: RouteConfig = {
                     path: 'customize/:dashboardId?',
                     name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                     meta: {
-                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
+                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                         breadcrumbs: ({ params }) => {
                             const breadcrumbs: Breadcrumb[] = [
                                 {
