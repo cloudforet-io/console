@@ -92,7 +92,8 @@ const typeOptionState = reactive({
 const tableState = reactive({
     hasManagePermission: useManagePermissionState(),
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
-    schema: null as null|DynamicLayout,
+    schema: computed<DynamicLayout|undefined>(() => (tableState.isTrustedAccount
+        ? serviceAccountSchemaStore.state.trustedAccountTableSchema : serviceAccountSchemaStore.state.generalAccountTableSchema)),
     schemaOptions: computed<DynamicLayoutOptions>(() => tableState.schema?.options ?? {}),
     visibleCustomFieldModal: false,
     accountTypeList: computed(() => [
@@ -228,12 +229,8 @@ const handleDynamicLayoutFetch = (changed) => {
     fetchTableData(changed);
 };
 /** ******* Page Init ******* */
-const setTableSchema = (type: AccountType) => {
-    tableState.schema = type === 'TRUSTED' ? serviceAccountSchemaStore.state.trustedAccountTableSchema : serviceAccountSchemaStore.state.generalAccountTableSchema;
-};
 
 const reloadTable = async () => {
-    setTableSchema(tableState.isTrustedAccount ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
     await listServiceAccountData();
 };
 
@@ -263,7 +260,6 @@ watch(() => tableState.searchFilters, (searchFilters) => {
     }
 });
 watch(() => tableState.selectedAccountType, () => {
-    setTableSchema(tableState.isTrustedAccount ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
     listServiceAccountData();
 }, { immediate: true });
 
@@ -274,7 +270,6 @@ watch(() => tableState.selectedAccountType, () => {
     ];
     if (state.selectedProvider) actionList.push(serviceAccountSchemaStore.setProviderSchema(state.selectedProvider));
     await Promise.allSettled(actionList);
-    setTableSchema(tableState.isTrustedAccount ? ACCOUNT_TYPE.TRUSTED : ACCOUNT_TYPE.GENERAL);
 })();
 </script>
 
