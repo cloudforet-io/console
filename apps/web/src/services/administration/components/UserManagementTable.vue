@@ -5,14 +5,21 @@ import {
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PBadge, PStatus, PToolboxTable, PButton,
+    PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
+import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -20,9 +27,10 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
-    calculateTime, userStateFormatter, userMfaFormatter, useRoleFormatter,
+    calculateTime, userStateFormatter, useRoleFormatter,
 } from '@/services/administration/composables/refined-table-data';
 import { USER_SEARCH_HANDLERS, USER_TABLE_FIELDS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
@@ -45,6 +53,7 @@ const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(1).setPageLimit(15)
     .setSort('name', true)
     .setFiltersAsRawQueryString(route.query.filters);
+const roleListApiQueryHelper = new ApiQueryHelper();
 
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
@@ -57,18 +66,57 @@ const state = reactive({
     tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
 const tableState = reactive({
-    userTableFields: computed(() => (!userPageState.isAdminMode && userPageStore.isWorkspaceOwner
+    userTableFields: computed(() => (userPageStore.isWorkspaceOwner
         ? [
             ...USER_TABLE_FIELDS,
             { name: 'role_binding_info', label: ' ', sortable: false },
         ]
-        : USER_TABLE_FIELDS
-    )),
+        : USER_TABLE_FIELDS)),
+});
+const dropdownState = reactive({
+    loading: false,
+    visibleMenu: false,
+    searchText: '',
+    selectedItems: [] as SelectDropdownMenuItem[],
+    menuItems: [] as SelectDropdownMenuItem[],
 });
 
 /* Component */
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
+};
+const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
+    await fetchListRoles(inputText);
+    return {
+        results: dropdownState.menuItems,
+    };
+};
+const handleSelectDropdownItem = async (value, rowIndex) => {
+    try {
+        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
+            user_id: state.refinedUserItems[rowIndex].user_id || '',
+            role_id: value.name || '',
+            resource_group: RESOURCE_GROUP.WORKSPACE,
+        });
+        showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
+        emit('confirm');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+    }
+};
+
+/* API */
+let userListApiQuery = userListApiQueryHelper.data;
+const handleChange = async (options: any = {}) => {
+    userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
+    if (options.queryTags !== undefined) {
+        await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
+    }
+    if (userPageState.isAdminMode) {
+        await userPageStore.listUsers({ query: userListApiQuery });
+    } else {
+        await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+    }
 };
 const handleClickButton = async (value: RoleBindingModel) => {
     try {
@@ -82,17 +130,34 @@ const handleClickButton = async (value: RoleBindingModel) => {
         ErrorHandler.handleError(e);
     }
 };
-/* API */
-let userListApiQuery = userListApiQueryHelper.data;
-const handleChange = async (options: any = {}) => {
-    userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
-    if (options.queryTags !== undefined) {
-        await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
+const fetchListRoles = async (inputText: string) => {
+    dropdownState.loading = true;
+
+    roleListApiQueryHelper.setFilters([{
+        k: 'role_type',
+        v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
+        o: '=',
+    }]);
+    if (inputText) {
+        roleListApiQueryHelper.addFilter({
+            k: 'name',
+            v: inputText,
+            o: '',
+        });
     }
-    if (userPageState.isAdminMode) {
-        await userPageStore.listUsers({ query: userListApiQuery });
-    } else {
-        await userPageStore.listWorkspaceUsers({ query: userListApiQuery });
+    try {
+        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
+            query: roleListApiQueryHelper.data,
+        });
+        dropdownState.menuItems = results?.map((role) => ({
+            label: role.name,
+            name: role.role_id,
+            role_type: role.role_type,
+        })) as AddModalMenuItem[];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        dropdownState.loading = false;
     }
 };
 </script>
@@ -127,19 +192,45 @@ const handleChange = async (options: any = {}) => {
                           class="capitalize"
                 />
             </template>
-            <template #col-mfa-format="{value}">
-                <p-status v-bind="userMfaFormatter(value)"
-                          class="capitalize"
-                />
-            </template>
-            <template #col-role_type-format="{value}">
-                <span class="role-type">
-                    <img :src="useRoleFormatter(value).image"
-                         alt="role-type-icon"
-                         class="role-type-icon"
+            <template #col-role_type-format="{value, rowIndex}">
+                <div class="role-type-wrapper">
+                    <p-tooltip position="bottom"
+                               :contents="useRoleFormatter(value).name"
+                               class="tooltip"
                     >
+                        <img :src="useRoleFormatter(value).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                    </p-tooltip>
                     <span>{{ useRoleFormatter(value, true).name }}</span>
-                </span>
+                    <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && value !== ROLE_TYPE.DOMAIN_ADMIN"
+                                       is-filterable
+                                       use-fixed-menu-style
+                                       menu-position="right"
+                                       style-type="icon-button"
+                                       :visible-menu="dropdownState.visibleMenu"
+                                       :loading="dropdownState.loading"
+                                       :search-text.sync="dropdownState.searchText"
+                                       :selected="dropdownState.selectedItems"
+                                       :handler="dropdownMenuHandler"
+                                       class="role-select-dropdown"
+                                       @select="handleSelectDropdownItem($event, rowIndex)"
+                    >
+                        <template #menu-item--format="{item}">
+                            <div class="role-menu-item">
+                                <img :src="useRoleFormatter(item.role_type).image"
+                                     alt="role-type-icon"
+                                     class="role-type-icon"
+                                >
+                                <div class="role-info-wrapper">
+                                    <span>{{ item.label }}</span>
+                                    <span class="role-type">({{ item.role_type }})</span>
+                                </div>
+                            </div>
+                        </template>
+                    </p-select-dropdown>
+                </div>
             </template>
             <template #col-last_accessed_at-format="{ value }">
                 <span v-if="value === -1">
@@ -186,13 +277,37 @@ const handleChange = async (options: any = {}) => {
 
 <style lang="postcss" scoped>
 .user-management-table {
-    .role-type {
+    .role-type-wrapper {
         @apply flex items-center;
-        gap: 0.5rem;
+        gap: 0.25rem;
+        .tooltip {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 0.25rem;
+        }
         .role-type-icon {
             @apply rounded-full;
             width: 1.5rem;
             height: 1.5rem;
+        }
+        .role-select-dropdown {
+            width: auto;
+            .role-menu-item {
+                @apply flex items-center;
+                gap: 0.25rem;
+                .role-type-icon {
+                    width: 1rem;
+                    height: 1rem;
+                }
+                .role-info-wrapper {
+                    @apply flex flex-col;
+                    gap: 0.25rem;
+                    .role-type {
+                        @apply text-gray-500;
+                    }
+                }
+            }
         }
     }
 }
