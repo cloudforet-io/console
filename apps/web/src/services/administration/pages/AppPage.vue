@@ -1,21 +1,25 @@
 <script lang="ts" setup>
-import { onUnmounted } from 'vue';
+import { computed, onUnmounted, reactive } from 'vue';
 
 import {
     PHorizontalLayout, PHeading, PButton,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
-import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
 import AppManagementTable from '@/services/administration/components/AppManagementTable.vue';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
 
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
+
+const storeState = reactive({
+    roleType: computed(() => store.state.user.roleType),
+});
 
 /* Component */
 const handleCreateApp = () => {
@@ -41,7 +45,8 @@ onUnmounted(() => {
                    :total-count="appPageState.totalCount"
         >
             <template #extra>
-                <p-button style-type="primary"
+                <p-button v-if="storeState.roleType !== ROLE_TYPE.WORKSPACE_MEMBER"
+                          style-type="primary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateApp"
                 >
@@ -54,8 +59,6 @@ onUnmounted(() => {
                 <app-management-table :table-height="height" />
             </template>
         </p-horizontal-layout>
-        <app-management-form-modal />
-        <app-management-status-modal />
     </section>
 </template>
 

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PToolboxTable, PSelectDropdown, PStatus, PCopyButton,
+    PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -13,6 +13,7 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ApiKeyModel } from '@/schema/identity/api-key/model';
 import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -21,15 +22,24 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
+import UserAPIKeyModal from '@/common/components/modals/UserAPIKeyModal.vue';
+
+import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
+import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
 import {
     appStateFormatter,
     calculateTime,
 } from '@/services/administration/composables/refined-table-data';
-import { APP_DROPDOWN_MODAL_TYPE, APP_TABLE_FIELDS } from '@/services/administration/constants/app-constant';
+import {
+    APP_DROPDOWN_MODAL_TYPE,
+    APP_SEARCH_HANDLERS,
+    APP_TABLE_FIELDS,
+} from '@/services/administration/constants/app-constant';
 import {
     ROLE_SEARCH_HANDLERS,
 } from '@/services/administration/constants/role-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
+
 
 const DEFAULT_PAGE_LIMIT = 15;
 
@@ -64,6 +74,10 @@ const state = reactive({
         last_accessed_at: calculateTime(app?.last_accessed_at, storeState.timezone),
     }))),
     tags: appListApiQueryHelper.setKeyItemSets(ROLE_SEARCH_HANDLERS.keyItemSets).queryTags,
+});
+const modalState = reactive({
+    apiKeyModalVisible: false,
+    item: {} as ApiKeyModel,
 });
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
@@ -159,6 +173,22 @@ const clickStatusModal = ({ name, title, theme }) => {
         _state.modal = cloneDeep(_state.modal);
     });
 };
+const handleChangeModalVisible = (value) => {
+    appPageStore.$patch((_state) => {
+        _state.modal.visible.apiKey = value;
+        _state.modal = cloneDeep(_state.modal);
+    });
+};
+const handleConfirmButton = (value: string) => {
+    if (value) {
+        modalState.item.api_key_id = value;
+        return;
+    }
+    handleClickModalConfirm();
+};
+const handleClickModalConfirm = async () => {
+    await getListApps();
+};
 
 /* API */
 const getListApps = async () => {
@@ -169,6 +199,11 @@ const getListApps = async () => {
         state.loading = false;
     }
 };
+
+/* Watcher */
+watch(() => appPageState.modal.visible.apiKey, (visible) => {
+    modalState.apiKeyModalVisible = visible;
+});
 
 /* Init */
 (async () => {
@@ -184,10 +219,12 @@ const getListApps = async () => {
                          :loading="state.loading"
                          disabled
                          :multi-select="false"
-                         :items="appPageState.apps"
+                         :items="state.refinedUserItems"
                          :fields="APP_TABLE_FIELDS"
                          sort-by="name"
                          :select-index="appPageState.selectedIndex"
+                         :key-item-sets="APP_SEARCH_HANDLERS.keyItemSets"
+                         :value-handler-map="APP_SEARCH_HANDLERS.valueHandlerMap"
                          :sort-desc="true"
                          :total-count="appPageState.totalCount"
                          :query-tags="state.tags"
@@ -214,23 +251,36 @@ const getListApps = async () => {
                     <p-copy-button :value="value" />
                 </span>
             </template>
-            <!-- TODO: will be updated after api is ready -->
-            <!--            <template #col-tags-format="{value}">-->
-            <!--                <template v-if="!!Object.keys(value).length">-->
-            <!--                    <p-badge v-for="([key, val], idx) in Object.entries(value)"-->
-            <!--                             :key="`${key}-${val}-${idx}`"-->
-            <!--                             badge-type="subtle"-->
-            <!--                             shape="square"-->
-            <!--                             style-type="gray200"-->
-            <!--                             class="mr-2"-->
-            <!--                    >-->
-            <!--                        {{ key }}: {{ val }}-->
-            <!--                    </p-badge>-->
-            <!--                </template>-->
-            <!--                <template v-else>-->
-            <!--                    <span />-->
-            <!--                </template>-->
-            <!--            </template>-->
+            <template #col-tags-format="{value}">
+                <template v-if="!!Object.keys(value).length">
+                    <p-badge v-for="([key, val], idx) in Object.entries(value)"
+                             :key="`${key}-${val}-${idx}`"
+                             badge-type="subtle"
+                             shape="square"
+                             style-type="gray200"
+                             class="mr-2"
+                    >
+                        {{ key }}: {{ val }}
+                    </p-badge>
+                </template>
+                <template v-else>
+                    <span />
+                </template>
+            </template>
+            <template #col-last_accessed_at-format="{ value }">
+                <span v-if="value === -1">
+                    No Activity
+                </span>
+                <span v-else-if="value === 0">
+                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                </span>
+                <span v-else-if="value === 1">
+                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                </span>
+                <span v-else>
+                    {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                </span>
+            </template>
             <template #col-expired_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
@@ -238,6 +288,14 @@ const getListApps = async () => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
         </p-toolbox-table>
+        <user-a-p-i-key-modal v-if="modalState.apiKeyModalVisible"
+                              :visible="modalState.apiKeyModalVisible"
+                              :api-key-item="modalState.item"
+                              @clickButton="handleClickModalConfirm"
+                              @update:visible="handleChangeModalVisible"
+        />
+        <app-management-form-modal @confirm="handleConfirmButton" />
+        <app-management-status-modal @confirm="handleConfirmButton" />
     </section>
 </template>
 

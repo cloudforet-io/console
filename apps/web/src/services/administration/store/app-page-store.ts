@@ -29,7 +29,7 @@ export const useAppPageStore = defineStore('app-page', {
             visible: {
                 form: false,
                 status: false,
-                success: false,
+                apiKey: false,
             },
         },
     }),
@@ -40,7 +40,10 @@ export const useAppPageStore = defineStore('app-page', {
         async listApps(params: AppListParameters) {
             try {
                 const res = await SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>(params);
-                this.apps = res.results || [];
+                this.apps = res.results?.map((item) => ({
+                    ...item,
+                    tags: item.tags || {},
+                })) || [];
                 this.selectedIndex = [];
                 this.totalCount = res.total_count ?? 0;
             } catch (e) {
@@ -53,7 +56,7 @@ export const useAppPageStore = defineStore('app-page', {
         async createApp(params: AppCreateParameters) {
             this.modal.loading = true;
             try {
-                await SpaceConnector.clientV2.identity.app.create<AppCreateParameters, AppModel>(params);
+                return await SpaceConnector.clientV2.identity.app.create<AppCreateParameters, AppModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
@@ -108,7 +111,7 @@ export const useAppPageStore = defineStore('app-page', {
         async regenerateApp(params: AppGenerateApiKeyParameters) {
             this.modal.loading = true;
             try {
-                await SpaceConnector.clientV2.identity.app.generateApiKey<AppGenerateApiKeyParameters, AppModel>(params);
+                return await SpaceConnector.clientV2.identity.app.generateApiKey<AppGenerateApiKeyParameters, AppModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
