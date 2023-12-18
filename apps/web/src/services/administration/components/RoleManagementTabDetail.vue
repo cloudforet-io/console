@@ -15,9 +15,6 @@ import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { PagePermission } from '@/lib/access-control/config';
-import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
-
 import {
     usePageAccessDefinitionTableData,
 } from '@/services/administration/composables/page-access-definition-table-data';
@@ -64,7 +61,7 @@ const state = reactive({
     data: {} as Partial<RoleModel>,
     selectedRole: computed<RoleModel>(() => rolePageStore.selectedRoles[0]),
     permissionScopes: computed<string[]>(() => state.data?.permission_scopes ?? []),
-    pageAccess: computed<PagePermission[]>(() => state.data?.page_access ?? []),
+    pageAccess: computed<string[]>(() => state.data?.page_access ?? []),
     pageAccessDataList: usePageAccessDefinitionTableData(computed(() => state.pageAccess ?? [])),
 });
 
@@ -79,17 +76,18 @@ const getRoleDetailData = async (roleId) => {
         state.loading = false;
     }
 };
-// TODO: will be changed after API is ready
-const convertPagePermissionLabel = (data) => {
-    switch (data) {
-    case PAGE_PERMISSION_TYPE.MANAGE:
-        return i18n.t('IAM.ROLE.FORM.MANAGE');
-    case PAGE_PERMISSION_TYPE.VIEW:
-        return i18n.t('IAM.ROLE.FORM.VIEW');
-    default:
-        return '--';
-    }
-};
+// TODO: need to refacotor with new design
+// const convertPagePermissionLabel = (data) => {
+//     switch (data) {
+//     case PAGE_PERMISSION_TYPE.MANAGE:
+//         return i18n.t('IAM.ROLE.FORM.MANAGE');
+//     case PAGE_PERMISSION_TYPE.VIEW:
+//         return i18n.t('IAM.ROLE.FORM.VIEW');
+//     default:
+//         return '--';
+//     }
+// };
+const convertPagePermissionLabel = (accessible) => accessible;
 
 /* Watcher */
 watch(() => state.selectedRole.role_id, async (roleId) => {

@@ -8,8 +8,6 @@ import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/upda
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { Policy, RoleType } from '@/schema/identity/role/type';
 
-import type { PagePermission } from '@/lib/access-control/config';
-
 import RoleUpdateFormBaseInformation from '@/services/administration/components/RoleUpdateFormBaseInformation.vue';
 import RoleUpdateFormPermissionForm from '@/services/administration/components/RoleUpdateFormPermissionForm.vue';
 import RoleUpdateFormRoleType from '@/services/administration/components/RoleUpdateFormRoleType.vue';
@@ -33,7 +31,7 @@ const state = reactive({
     isBaseInformationValid: false,
     baseInfoFormData: '' as string,
     roleTypeData: '' as RoleType,
-    pageAccessFormData: [] as PagePermission[],
+    pageAccessFormData: [] as string[],
     initialSelectedPolicyList: [] as Policy[],
     isAllValid: computed<boolean>(() => state.isBaseInformationValid),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
@@ -41,7 +39,7 @@ const state = reactive({
             name: state.baseInfoFormData.trim(),
             // TODO: will be check after api is merged
             api_permissions: [],
-            page_permissions: state.pageAccessFormData,
+            page_access: state.pageAccessFormData,
         };
         return props.formType === FORM_TYPE.CREATE
             ? {
@@ -96,9 +94,9 @@ watch(() => props.initialRoleData, (initialRoleData) => {
     if (isObjectEmpty) return;
     state.baseInfoFormData = initialRoleData?.name;
     state.roleTypeData = initialRoleData?.role_type;
-    state.pageAccessFormData = props.initialRoleData?.permission_scopes;
-    if (initialRoleData?.permission_scopes?.length) {
-        state.initialSelectedPolicyList = initialRoleData.permission_scopes;
+    state.pageAccessFormData = props.initialRoleData?.page_access;
+    if (initialRoleData?.permissions?.length) {
+        state.initialSelectedPolicyList = initialRoleData.permissions;
         // setForm('selectedApiPermissionList', initialRoleData.permission_scopes);
     }
 });

@@ -1,11 +1,9 @@
 import type { Tags } from '@/schema/_common/model';
 
-import type { PagePermission } from '@/lib/access-control/config';
-
 export interface RoleUpdateParameters {
     role_id: string;
     name?: string;
-    permission_scopes?: string[];
-    page_access?: PagePermission[];
+    permission?: string[];
+    page_access?: string[];
     tags?: Tags;
 }
