@@ -1,32 +1,26 @@
 import type { Action } from 'vuex';
 
-import type { JwtPayload } from 'jwt-decode';
-import jwtDecode from 'jwt-decode';
-
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { MANAGED_ROLE_TYPE, ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
-import type { TokenTokenParameters } from '@/schema/identity/token/api-verbs/token';
+import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
+import type { TokenGrantModel, TokenIssueModel } from '@/schema/identity/token/model';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
-import type { PagePermission } from '@/lib/access-control/config';
+import { MENU_ID } from '@/lib/menu/config';
 
 import type {
-    UserState, SignInRequest, UpdateUserRequest, UserRole, RoleInfo,
+    UserState, SignInRequest, UpdateUserRequest, RoleInfo,
 } from './type';
 
 
-const getUserInfo = async (userId: string, domainId: string): Promise<Partial<UserState>> => {
-    const response = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
-        user_id: userId,
-        domain_id: domainId,
-    });
+const getUserInfo = async (): Promise<Partial<UserState>> => {
+    const response = await SpaceConnector.clientV2.identity.userProfile.get<UserGetParameters, UserModel>();
     // TODO: refactor below code with new response
     return {
         userId: response.user_id,
@@ -57,55 +51,17 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     await SpaceConnector.clientV2.identity.user.update(request);
 };
 
-interface JWTPayload extends JwtPayload {
-    user_type: string
-}
-const getUserInfoFromToken = (token: string): string[] => {
-    const decodedToken = jwtDecode<JWTPayload>(token);
-    return [decodedToken.user_type, decodedToken.aud as string];
-};
-
-// TODO: will be deprecated with grant API
-const getUserRoles = async (domainId: string): Promise<Array<UserRole>> => {
-    try {
-        const userRoles: Record<string, UserRole> = {};
-        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters>({
-            domain_id: domainId, // TODO: delete after backend is ready
-        });
-
-        if (!results) return [];
-
-        // TODO: refactor below logic with new response
-        results.forEach((role) => {
-            const roleId = role.role_id;
-            const isManagedRole = roleId.startsWith('managed-');
-            if (!userRoles[roleId]) {
-                userRoles[roleId] = {
-                    roleId,
-                    name: role.name,
-                    roleType: role.role_type,
-                    pagePermissions: isManagedRole ? generatePagePermissionsForManagedRole(roleId) : role.page_permissions,
-                };
-            }
-        });
-
-        return Object.values(userRoles);
-    } catch (e) {
-        console.error(`RoleBinding Load Error: ${e}`);
-        return [];
-    }
-};
-
-const getUserRole = async (roleId: string): Promise<RoleInfo|undefined> => {
+const getGrantedRole = async (roleId: string): Promise<RoleInfo|undefined> => {
     try {
         const response = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
             role_id: roleId,
         });
 
+        const isManagedRole = roleId.startsWith('managed-');
         return {
             roleType: response.role_type,
             roleId: response.role_id,
-            pageAccess: response.page_access,
+            pageAccess: isManagedRole ? generatePageAccessForManagedRole(roleId) : response.page_access,
         };
     } catch (e) {
         console.error(`Role Load Error: ${e}`);
@@ -113,20 +69,41 @@ const getUserRole = async (roleId: string): Promise<RoleInfo|undefined> => {
     }
 };
 
-// TODO: need to implementation with default permissino of managed role
-const generatePagePermissionsForManagedRole = (roleId: string): PagePermission[] => {
+const generatePageAccessForManagedRole = (roleId: string): string[] => {
     if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.DOMAIN_ADMIN]) {
-        return [{ page: '*', permission: 'MANAGE' }];
+        return ['*'];
     } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_OWNER]) {
-        return [{ page: '*', permission: 'MANAGE' }];
+        return [
+            MENU_ID.HOME_DASHBOARD,
+            `${MENU_ID.DASHBOARDS}.*`,
+            `${MENU_ID.PROJECT}.*`,
+            `${MENU_ID.ASSET_INVENTORY}.*`,
+            `${MENU_ID.COST_EXPLORER}.*`,
+            `${MENU_ID.ALERT_MANAGER}.*`,
+            `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.USER}`,
+            `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.APP}`,
+            `${MENU_ID.MY_PAGE}.*`,
+            `${MENU_ID.INFO}.*`,
+        ];
     } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_MEMBER]) {
-        return [{ page: '*', permission: 'VIEW' }];
+        return [
+            MENU_ID.HOME_DASHBOARD,
+            `${MENU_ID.DASHBOARDS}.*`,
+            `${MENU_ID.PROJECT}.*`,
+            `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}`,
+            `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
+            `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}`,
+            `${MENU_ID.COST_EXPLORER}.*`,
+            `${MENU_ID.ALERT_MANAGER}.*`,
+            `${MENU_ID.MY_PAGE}.*`,
+            `${MENU_ID.INFO}.*`,
+        ];
     } return [];
 };
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
-    const response = await SpaceConnector.clientV2.identity.token.issue<TokenTokenParameters>({
+    const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
         domain_id: domainId,
         auth_type: signInRequest.authType,
         credentials: signInRequest.credentials,
@@ -135,14 +112,8 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 
     SpaceConnector.setToken(response.access_token, response.refresh_token);
 
-    const [, userId] = getUserInfoFromToken(response.access_token);
-
-    const userInfo = await getUserInfo(userId, domainId);
+    const userInfo = await getUserInfo();
     commit('setUser', userInfo);
-
-    // TODO: refactor with role grant API
-    const userRoles = await getUserRoles(domainId);
-    commit('setRoles', userRoles);
 
     commit('setIsSessionExpired', false);
 };
@@ -153,7 +124,7 @@ export const signOut = (): void => {
 
 export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
     try {
-        const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters>({
+        const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>({
             grant_type: 'API_KEY',
             scope: grantRequest.scope,
             token: grantRequest.token,
@@ -161,10 +132,8 @@ export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest
         }, { skipAuthRefresh: true });
 
         SpaceConnector.setToken(response.access_token);
-        const [, userId] = getUserInfoFromToken(response.access_token);
 
-
-        const roleInfo = await getUserRole(userId);
+        const roleInfo = await getGrantedRole(response.role_id);
         commit('setCurrentRoleInfo', roleInfo);
     } catch (e) {
         throw new Error(`Role Grant Error: ${e}`);
