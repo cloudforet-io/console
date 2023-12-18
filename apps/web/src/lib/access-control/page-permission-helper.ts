@@ -5,12 +5,10 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 import type {
     PagePermissionMap,
-    PagePermissionTuple, PagePermissionType,
 } from '@/lib/access-control/config';
 import {
     DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
     NO_ROLE_USER_DEFAULT_PERMISSIONS,
-    PAGE_PERMISSION_TYPE,
     SYSTEM_USER_DEFAULT_PERMISSIONS, WORKSPACE_MEMBER_DEFAULT_PERMISSIONS, WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
 } from '@/lib/access-control/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
@@ -26,11 +24,6 @@ export const getDefaultPagePermissionList = (roleType?: RoleType): MenuId[] => {
     if (roleType === 'WORKSPACE_OWNER') return WORKSPACE_OWNER_DEFAULT_PERMISSIONS;
     if (roleType === 'WORKSPACE_MEMBER') return WORKSPACE_MEMBER_DEFAULT_PERMISSIONS;
     return NO_ROLE_USER_DEFAULT_PERMISSIONS;
-};
-
-export const getProperPermissionType = (accessibleA: boolean, accessibleB: boolean): boolean => {
-    if (accessibleA && accessibleB) return true;
-    return false;
 };
 
 export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu) => [
@@ -75,40 +68,21 @@ export const getPagePermissionMapFromRaw = (pagePermissions: string[], menuList:
     return result;
 };
 
-const hasPermissionToLNBItem = (lnbItem: LNBItem, pagePermissionList: PagePermissionTuple[]): boolean => {
+const hasAccessPermissionToLNBItem = (lnbItem: LNBItem, pageAccessList: MenuId[]): boolean => {
     const { id } = lnbItem;
-    return pagePermissionList.some(([permissionMenuId]) => permissionMenuId === id);
+    return pageAccessList.some((menuId) => menuId === id);
 };
-export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList: PagePermissionTuple[]): LNBMenu[] => menuSet.reduce((results, menuData) => {
+export const filterLNBMenuByPermission = (menuSet: LNBMenu[], pagePermissionList: MenuId[]): LNBMenu[] => menuSet.reduce((results, menuData) => {
     if (Array.isArray(menuData)) {
-        const filteredMenuData = menuData.filter((lnbItem) => hasPermissionToLNBItem(lnbItem, pagePermissionList));
+        const filteredMenuData = menuData.filter((lnbItem) => hasAccessPermissionToLNBItem(lnbItem, pagePermissionList));
         if (filteredMenuData.length) {
             results.push(filteredMenuData);
         }
-    } else if (hasPermissionToLNBItem(menuData, pagePermissionList)) {
+    } else if (hasAccessPermissionToLNBItem(menuData, pagePermissionList)) {
         results.push(menuData);
     }
 
     return results;
 }, [] as LNBMenu[]);
 
-export const getPermissionOfMenu = (menuId: MenuId, pagePermissions: PagePermissionTuple[], menuList: Menu[]): PagePermissionType|undefined => {
-    let result: PagePermissionType|undefined;
-    const filterdMenuListByRequiredPermission = filterMenuByPermission(menuList);
-
-    pagePermissions.some(([id, permission]) => {
-        if (id === menuId) {
-            result = permission;
-            return true;
-        }
-
-        // return VIEW permission if user has permission to children menu
-        const foundServiceMenuById = filterdMenuListByRequiredPermission.find((menu) => menu.id === menuId);
-        if (foundServiceMenuById) {
-            result = PAGE_PERMISSION_TYPE.VIEW;
-            return true;
-        }
-        return false;
-    });
-    return result;
-};
+export const getPermissionOfMenu = (menuId: MenuId, pagePermissions: MenuId[]): boolean => pagePermissions.some((id) => id === menuId);
