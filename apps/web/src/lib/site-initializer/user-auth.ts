@@ -1,5 +1,7 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { UserModel } from '@/schema/identity/user/model';
+
 export const initUserAndAuth = async (store, config) => {
     let userId = store.state.user.userId;
     const isTokenAlive = SpaceConnector.isTokenAlive;
@@ -8,8 +10,8 @@ export const initUserAndAuth = async (store, config) => {
     if (devMode && authEnabled) userId = config.get('DEV.AUTH.USER_ID');
 
     if (userId && isTokenAlive) {
-        const response = await SpaceConnector.clientV2.identity.userProfile.get();
-        store.dispatch('user/setUser', {
+        const response = await SpaceConnector.clientV2.identity.userProfile.get<undefined, UserModel>();
+        store.commit('user/setUser', {
             userId: response.user_id,
             roleType: response.role_type,
             authType: response.auth_type,
