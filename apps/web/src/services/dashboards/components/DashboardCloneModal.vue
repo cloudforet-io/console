@@ -133,9 +133,8 @@ const handleConfirm = async () => {
     if (!isAllValid) return;
     const clonedDashboardId = await createDashboard();
     if (clonedDashboardId) {
-        const routeName = state.projectId ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
         await SpaceRouter.router.push({
-            name: routeName,
+            name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: { dashboardId: clonedDashboardId },
         });
     }

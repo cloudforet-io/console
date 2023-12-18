@@ -81,7 +81,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
-import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -216,14 +215,6 @@ export default {
             projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
             projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
             costQuerySets: [] as CostQuerySetModel[],
-            workspaceDashboardItems: computed<DashboardModel[]>(() => {
-                const isUserAccessibleToWorkspaceDashboards = isUserAccessibleToMenu(MENU_ID.WORKSPACE_DASHBOARDS, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToWorkspaceDashboards ? dashboardGetters.workspaceItems : [];
-            }),
-            projectDashboardItems: computed<DashboardModel[]>(() => {
-                const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.PROJECT_DASHBOARDS, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToProjectDashboards ? dashboardGetters.projectItems : [];
-            }),
             //
             favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
                 store.state.favorite.menuItems,
@@ -238,7 +229,7 @@ export default {
                 if (!isUserAccessibleToDashboards) return [];
                 return convertDashboardConfigToReferenceData(
                     store.state.favorite.dashboardItems,
-                    [...state.workspaceDashboardItems, ...state.projectDashboardItems],
+                    [...dashboardGetters.workspaceItems, ...dashboardGetters.projectItems],
                 );
             }),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
@@ -302,9 +293,8 @@ export default {
                     SpaceRouter.router.push({ name: itemName }).catch(() => {});
                 }
             } else if (item.itemType === SUGGESTION_TYPE.DASHBOARD) {
-                const dashboardRouteName = item.name?.startsWith('workspace') ? DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME : DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME;
                 SpaceRouter.router.push({
-                    name: dashboardRouteName,
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: {
                         dashboardId: itemName,
                     },

@@ -9,10 +9,6 @@ export const MENU_LIST: Menu[] = [
     {
         id: MENU_ID.DASHBOARDS,
         needPermissionByRole: true,
-        subMenuList: [
-            { id: MENU_ID.WORKSPACE_DASHBOARDS, needPermissionByRole: true },
-            { id: MENU_ID.PROJECT_DASHBOARDS, needPermissionByRole: true },
-        ],
     },
     { id: MENU_ID.PROJECT, needPermissionByRole: true },
     {
@@ -88,10 +84,6 @@ export const ADMIN_MENU_LIST: Menu[] = [
     },
     {
         id: MENU_ID.DASHBOARDS,
-        subMenuList: [
-            { id: MENU_ID.WORKSPACE_DASHBOARDS },
-            { id: MENU_ID.PROJECT_DASHBOARDS },
-        ],
     },
     {
         id: MENU_ID.ASSET_INVENTORY,

@@ -5,23 +5,11 @@ export const DASHBOARDS_ROUTE = Object.freeze({
     ALL: {
         _NAME: `${MENU_ID.DASHBOARDS}.all`,
     },
-    PROJECT: {
-        _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.PROJECT_DASHBOARDS}`,
-        DETAIL: {
-            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.PROJECT_DASHBOARDS}.detail`,
-        },
-        CUSTOMIZE: {
-            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.PROJECT_DASHBOARDS}.customize`,
-        },
+    DETAIL: {
+        _NAME: `${MENU_ID.DASHBOARDS}.detail`,
     },
-    WORKSPACE: {
-        _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.WORKSPACE_DASHBOARDS}`,
-        DETAIL: {
-            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.WORKSPACE_DASHBOARDS}.detail`,
-        },
-        CUSTOMIZE: {
-            _NAME: `${MENU_ID.DASHBOARDS}.${MENU_ID.WORKSPACE_DASHBOARDS}.customize`,
-        },
+    CUSTOMIZE: {
+        _NAME: `${MENU_ID.DASHBOARDS}.customize`,
     },
     CREATE: {
         _NAME: `${MENU_ID.DASHBOARDS}.create`,

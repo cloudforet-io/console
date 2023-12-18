@@ -15,11 +15,9 @@ import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/qu
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
-import { MENU_ID } from '@/lib/menu/config';
 import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
 
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
@@ -31,17 +29,14 @@ const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const state = reactive({
-    // viewersStatus: computed(() => dashboardState.dashboardType),
     loading: computed(() => dashboardState.loading),
     workspaceDashboardList: computed(() => {
-        if (!state.pagePermission[MENU_ID.WORKSPACE_DASHBOARDS]) return [];
         let target = dashboardGetters.workspaceItems;
         if (dashboardState.dashboardType) target = target.filter((d) => d.dashboard_type === dashboardState.dashboardType);
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
         return target;
     }),
     projectDashboardList: computed(() => {
-        if (!state.pagePermission[MENU_ID.PROJECT_DASHBOARDS]) return [];
         let target = dashboardGetters.projectItems;
         if (dashboardState.dashboardType) target = target.filter((d) => d.dashboard_type === dashboardState.dashboardType);
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
@@ -61,7 +56,6 @@ const state = reactive({
         }
         return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
     }),
-    pagePermission: computed(() => store.getters['user/pagePermissionMap']),
 });
 
 const searchQueryHelper = new QueryHelper();

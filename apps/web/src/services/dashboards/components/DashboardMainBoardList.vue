@@ -20,11 +20,9 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { MENU_ID } from '@/lib/menu/config';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
@@ -54,16 +52,12 @@ const state = reactive({
     thisPage: 1,
     dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
     projectItems: computed(() => store.getters['reference/projectItems']),
-    hasManagePermission: computed(() => {
-        const routeName = props.scopeType === 'WORKSPACE' ? MENU_ID.WORKSPACE_DASHBOARDS : MENU_ID.PROJECT_DASHBOARDS;
-        return useManagePermissionState(routeName).value;
-    }),
     dashboardListByBoardSets: computed<DashboardBoardSet[]>(() => props.dashboardList
         .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
         .map((d) => {
             const dashboardWithBoardSet = {
                 ...d,
-                iconButtonSets: state.hasManagePermission ? convertBoardItemButtonSet(d) : [],
+                iconButtonSets: convertBoardItemButtonSet(d),
             };
             if (d.project_id) {
                 return (
@@ -94,9 +88,8 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
         iconName: 'ic_edit',
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_EDIT'),
         eventAction: () => {
-            const routeName = props.scopeType ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
             router.push({
-                name: routeName,
+                name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                 params: {
                     dashboardId: dashboardItem.dashboard_id,
                 },
@@ -121,9 +114,8 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
 
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
-    const routeName = props.scopeType === 'PROJECT' ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
     router.push({
-        name: routeName,
+        name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: item.dashboard_id,
         },
