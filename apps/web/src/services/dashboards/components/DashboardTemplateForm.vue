@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, nextTick, reactive, ref,
+    computed, reactive, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -104,8 +104,6 @@ const handleInputSearch = () => {
 };
 
 (async () => {
-    await dashboardStore.load();
-    await nextTick();
     handleSelectTemplate(defaultTemplateState.boardSets[0]);
 })();
 </script>

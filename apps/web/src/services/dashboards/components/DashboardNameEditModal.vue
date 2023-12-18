@@ -73,7 +73,6 @@ const updateDashboard = async () => {
 
 const handleConfirm = async () => {
     await updateDashboard();
-    await dashboardStore.load();
     state.proxyVisible = false;
     emit('confirm', _name.value);
 };

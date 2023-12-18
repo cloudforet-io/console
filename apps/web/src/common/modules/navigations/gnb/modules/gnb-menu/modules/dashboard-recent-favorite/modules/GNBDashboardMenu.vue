@@ -18,8 +18,7 @@
             <template #footer>
                 <div class="footer-wrapper">
                     <template v-for="(subMenu, index) in subMenuList">
-                        <div v-if="subMenu.show"
-                             :key="`footer-${subMenu.label}-${index}`"
+                        <div :key="`footer-${subMenu.label}-${index}`"
                              class="sub-menu"
                         >
                             <g-n-b-sub-menu :label="subMenu.label"
@@ -90,7 +89,6 @@ export default defineComponent({
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
                     to: { name: DASHBOARDS_ROUTE.ALL._NAME },
-                    show: true,
                 },
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),

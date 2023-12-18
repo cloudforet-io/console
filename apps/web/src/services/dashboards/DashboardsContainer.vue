@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import CenteredPageLayout from '@/common/modules/page-layouts/CenteredPageLayout.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -6,7 +8,13 @@ import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout
 
 import DashboardsLNB from '@/services/dashboards/DashboardsLNB.vue';
 
+
+const dashboardStore = useDashboardStore();
 const { breadcrumbs } = useBreadcrumbs();
+
+(async () => {
+    await dashboardStore.load();
+})();
 </script>
 
 <template>
