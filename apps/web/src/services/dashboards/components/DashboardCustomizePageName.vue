@@ -81,10 +81,6 @@ onMounted(() => {
     if (nameInput.value?.length) dashboardDetailStore.$patch({ isNameValid: true });
     else dashboardDetailStore.$patch({ isNameValid: false });
 });
-
-(async () => {
-    await dashboardStore.load();
-})();
 </script>
 
 <template>

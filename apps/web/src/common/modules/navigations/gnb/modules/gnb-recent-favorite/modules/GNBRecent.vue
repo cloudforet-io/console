@@ -207,7 +207,10 @@ export default defineComponent({
         watch(() => props.visible, async (visible) => {
             if (visible) {
                 state.loading = true;
-                await store.dispatch('recent/load', { limit: RECENT_LIMIT });
+                await Promise.allSettled([
+                    store.dispatch('recent/load', { limit: RECENT_LIMIT }),
+                    dashboardStore.load(),
+                ]);
                 await getAllCostQuerySetList();
                 state.loading = false;
             }

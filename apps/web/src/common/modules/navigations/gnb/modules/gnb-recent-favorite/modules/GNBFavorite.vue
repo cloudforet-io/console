@@ -356,6 +356,7 @@ export default {
                 store.dispatch('favorite/load', FAVORITE_TYPE.CLOUD_SERVICE),
                 store.dispatch('favorite/load', FAVORITE_TYPE.DASHBOARD),
                 store.dispatch('favorite/load', FAVORITE_TYPE.COST_ANALYSIS),
+                dashboardStore.load(),
                 getAllCostQuerySetList(),
                 // TODO: If GNBDashboardMenu is deprecated, you need to add a request to receive a dashboard list here.
             ]);
