@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    onUnmounted, reactive, ref, watch,
+    onUnmounted, ref, watch,
 } from 'vue';
 
 import {
@@ -12,7 +12,6 @@ import { SpaceRouter } from '@/router';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
 import DashboardLabels from '@/services/dashboards/components/DashboardLabels.vue';
@@ -32,13 +31,6 @@ const props = defineProps<Props>();
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.$state;
-
-const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-    nameEditModalVisible: false,
-    deleteModalVisible: false,
-    cloneModalVisible: false,
-});
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
@@ -93,15 +85,12 @@ onUnmounted(() => {
     <div class="dashboard-detail-page">
         <dashboard-detail-header dashboard-id="props.dashboardId" />
         <div class="filter-box">
-            <dashboard-labels :editable="state.hasManagePermission"
-                              @update-labels="handleUpdateLabels"
-            />
+            <dashboard-labels @update-labels="handleUpdateLabels" />
             <dashboard-toolset />
         </div>
         <p-divider class="divider" />
         <div class="dashboard-selectors">
             <dashboard-variables class="variable-selector-wrapper"
-                                 :is-manageable="state.hasManagePermission"
                                  :dashboard-id="props.dashboardId"
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
