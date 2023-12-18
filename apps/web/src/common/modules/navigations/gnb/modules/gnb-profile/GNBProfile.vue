@@ -45,6 +45,7 @@ const state = reactive({
     userIcon: computed(() => 'img_avatar_user'),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
+    // TODO: to be refactored by new planning
     role: computed(() => {
         const roleArray = store.getters['user/roleNames'];
         return roleArray.join(', ');

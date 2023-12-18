@@ -37,7 +37,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            hasDomainRoleUser: computed(() => store.getters['user/hasDomainRole']),
+            hasDomainRoleUser: computed(() => store.getters['user/isDomainAdmin']),
             hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
         });
         const handleCreateNotice = () => {

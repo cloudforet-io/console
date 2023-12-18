@@ -43,7 +43,7 @@ export default {
             // Domain can access to only their update page
             if (
                 notice.scope === 'PUBLIC'
-                || !(notice.scope === 'DOMAIN' && store.getters['user/hasDomainRole'])
+                || !(notice.scope === 'DOMAIN' && store.getters['user/isDomainAdmin'])
             ) SpaceRouter.router.back();
         });
 

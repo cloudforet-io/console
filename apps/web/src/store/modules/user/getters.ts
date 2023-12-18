@@ -1,5 +1,7 @@
 import type { Getter } from 'vuex';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+
 import { languages } from '@/store/modules/user/config';
 
 import {
@@ -10,11 +12,11 @@ import type { MenuId } from '@/lib/menu/config';
 
 import type { UserState } from './type';
 
-
 // TODO: temporary defence
-// export const isDomainOwner = (state: UserState): boolean => state.roleType === 'DOMAIN_ADMIN';
-export const isDomainAdmin = (): boolean => true;
+export const isDomainAdmin = (state: UserState): boolean => state.roleType === ROLE_TYPE.DOMAIN_ADMIN;
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
+
+// TODO: to be refactored by new planning
 export const roleNames = (state: UserState): Array<string> => {
     const systemRoleNames: Array<string> = [];
     const domainRoleNames: Array<string> = [];
@@ -49,22 +51,11 @@ export const roleNames = (state: UserState): Array<string> => {
     }
     return ['No Role'];
 };
-export const isNoRoleUser = (state: UserState): boolean => !state.currentRoleInfo?.roleId;
+export const isNoRoleUser = (state: UserState): boolean => !state.currentRoleInfo;
 
-// TODO: refactor hasDomainRole need more exact planning roleType and grant roleType
-// export const hasDomainRole = (state: UserState): boolean => {
-//     if (state.roles) {
-//         return state.roleType === 'DOMAIN_ADMIN';
-//     }
-//
-//     return false;
-export const hasDomainRole = (): boolean => true;
+export const hasSystemRole = (state: UserState): boolean => state.roleType === 'SYSTEM_ADMIN';
 
-export const hasSystemRole = (state: UserState): boolean => state.currentRoleInfo?.roleType === 'SYSTEM_ADMIN';
-
-// TODO: you must recover this after new role rebuild
-// export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
-export const hasPermission = (): boolean => true;
+export const hasPermission = (state: UserState): boolean => !!state.currentRoleInfo;
 
 export const getCurrentRoleInfo = (state: UserState): any => state.currentRoleInfo;
 

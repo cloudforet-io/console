@@ -48,7 +48,7 @@ const noticeDetailState = noticeDetailStore.state;
 
 const state = reactive({
     hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
-    hasDomainRole: computed<boolean>(() => store.getters['user/hasDomainRole']),
+    hasDomainRole: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
