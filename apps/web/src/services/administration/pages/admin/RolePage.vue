@@ -6,6 +6,8 @@ import {
     PHorizontalLayout, PHeading, PButton,
 } from '@spaceone/design-system';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import RoleManagementTab from '@/services/administration/components/RoleManagementTab.vue';
 import RoleManagementTable from '@/services/administration/components/RoleManagementTable.vue';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
@@ -18,7 +20,7 @@ const router = useRouter();
 
 /* Component */
 const handleCreateRole = () => {
-    router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME });
+    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME) });
 };
 
 onUnmounted(() => {
