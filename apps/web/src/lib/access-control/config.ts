@@ -16,7 +16,7 @@ export interface AccessInfo {
 
 // refined page permission types. page NEVER includes wildcard.
 // export type PagePermissionMap = Record<string, PagePermissionType>;
-export type PagePermissionMap = Record<string, boolean>;
+export type PageAccessPermissionMap = Record<string, boolean>;
 
 // export const BASIC_USER_DEFAULT_PERMISSIONS: MenuId[] = [
 //     MENU_ID.HOME_DASHBOARD,
@@ -30,14 +30,12 @@ export type PagePermissionMap = Record<string, boolean>;
 // ];
 
 export const DOMAIN_ADMIN_DEFAULT_PERMISSIONS: MenuId[] = [
-    ...Object.values(MENU_ID),
+    ...Object.values(MENU_ID).filter((menuId) => menuId !== MENU_ID.PROJECT),
 ];
 
 export const WORKSPACE_OWNER_DEFAULT_PERMISSIONS: MenuId[] = [
     MENU_ID.HOME_DASHBOARD,
     MENU_ID.DASHBOARDS,
-    MENU_ID.WORKSPACE_DASHBOARDS,
-    MENU_ID.PROJECT_DASHBOARDS,
     MENU_ID.PROJECT,
     MENU_ID.ASSET_INVENTORY,
     MENU_ID.CLOUD_SERVICE,
@@ -61,8 +59,6 @@ export const WORKSPACE_OWNER_DEFAULT_PERMISSIONS: MenuId[] = [
 export const WORKSPACE_MEMBER_DEFAULT_PERMISSIONS: MenuId[] = [
     MENU_ID.HOME_DASHBOARD,
     MENU_ID.DASHBOARDS,
-    MENU_ID.WORKSPACE_DASHBOARDS,
-    MENU_ID.PROJECT_DASHBOARDS,
     MENU_ID.PROJECT,
     MENU_ID.ASSET_INVENTORY,
     MENU_ID.SERVICE_ACCOUNT,

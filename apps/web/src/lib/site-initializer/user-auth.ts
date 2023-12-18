@@ -8,21 +8,18 @@ export const initUserAndAuth = async (store, config) => {
     if (devMode && authEnabled) userId = config.get('DEV.AUTH.USER_ID');
 
     if (userId && isTokenAlive) {
-        const reponse = await SpaceConnector.clientV2.identity.user.get({
-            user_id: userId,
-            domain_id: store.state.domain.domainId,
-        });
+        const response = await SpaceConnector.clientV2.identity.userProfile.get();
         store.dispatch('user/setUser', {
-            userId: reponse.user_id,
-            roleType: reponse.role_type,
-            authType: reponse.auth_type,
-            name: reponse.name,
-            email: reponse.email,
-            language: reponse.language,
-            timezone: reponse.timezone,
-            requiredActions: reponse.required_actions,
-            emailVerified: !!reponse.email_verified,
-            mfa: reponse.mfa,
+            userId: response.user_id,
+            roleType: response.role_type,
+            authType: response.auth_type,
+            name: response.name,
+            email: response.email,
+            language: response.language,
+            timezone: response.timezone,
+            requiredActions: response.required_actions,
+            emailVerified: !!response.email_verified,
+            mfa: response.mfa,
         });
 
         return userId;

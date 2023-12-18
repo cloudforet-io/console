@@ -22,13 +22,13 @@ export const useManagePermissionState = (menuId?: MenuId): ComputedRef<boolean> 
     if (menuId) {
         const _route = { ...route, meta: { ...route.meta, menuId } };
         return computed<boolean>(() => {
-            const userAccessLevel = getUserAccessLevel(_route, isDomainAdmin, vm.$store.getters['user/pagePermissionList'], SpaceConnector.isTokenAlive);
+            const userAccessLevel = getUserAccessLevel(_route, isDomainAdmin, vm.$store.getters['user/pageAccessPermissionList'], SpaceConnector.isTokenAlive);
             return userAccessLevel >= ACCESS_LEVEL.WORKSPACE_PERMISSION;
         });
     }
 
     return computed<boolean>(() => {
-        const userAccessLevel = getUserAccessLevel(route, isDomainAdmin, vm.$store.getters['user/pagePermissionList'], SpaceConnector.isTokenAlive);
+        const userAccessLevel = getUserAccessLevel(route, isDomainAdmin, vm.$store.getters['user/pageAccessPermissionList'], SpaceConnector.isTokenAlive);
         return userAccessLevel >= ACCESS_LEVEL.WORKSPACE_PERMISSION;
     });
 };

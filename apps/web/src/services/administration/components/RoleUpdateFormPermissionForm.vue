@@ -10,9 +10,8 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 
 import {
-    getPagePermissionMapFromRaw,
-} from '@/lib/access-control/page-permission-helper';
-import { MENU_LIST } from '@/lib/menu/menu-architecture';
+    getPageAccessPermissionMapFromRawData,
+} from '@/lib/access-control/page-access-permission-helper';
 
 import RoleUpdateFormAccess from '@/services/administration/components/RoleUpdateFormAccess.vue';
 import RoleUpdateFormPolicy from '@/services/administration/components/RoleUpdateFormPolicy.vue';
@@ -102,7 +101,7 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessP
 });
 watch(() => props.initialPagePermissions, (initialPagePermissions) => {
     // init formState.menuItems
-    const pageAccessPermissionMap = getPagePermissionMapFromRaw(initialPagePermissions, MENU_LIST);
+    const pageAccessPermissionMap = getPageAccessPermissionMapFromRawData(initialPagePermissions);
     // eslint-disable-next-line no-restricted-syntax
     for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
         handleUpdate({ id: itemId, val: accessible });

@@ -21,7 +21,9 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import {
+    filterLNBMenuByAccessPermission,
+} from '@/lib/access-control/page-access-permission-helper';
 import {
     getCompoundKeyWithManagedCostQuerySetFavoriteKey,
 } from '@/lib/helper/config-data-helper';
@@ -66,14 +68,14 @@ const state = reactive({
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
     menuSet: computed<LNBMenu[]>(() => [
         ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
-        ...filterLNBMenuByPermission([
+        ...filterLNBMenuByAccessPermission([
             {
                 type: 'item',
                 id: MENU_ID.BUDGET,
                 label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
                 to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
             },
-        ], store.getters['user/pagePermissionList']),
+        ], store.getters['user/pageAccessPermissionList']),
     ]),
     costAnalysisMenuSet: computed<LNBMenu[]>(() => [
         { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
@@ -212,7 +214,7 @@ const getCurrentCurrencySet = (dataSourceKey: string): string => {
 };
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
-    const pagePermission = store.getters['user/pagePermissionMap'];
+    const pagePermission = store.getters['user/pageAccessPermissionMap'];
     const routeName = MENU_ID.COST_ANALYSIS;
 
     if (pagePermission[routeName]) return [...menuSet];

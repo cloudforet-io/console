@@ -59,7 +59,7 @@ export class SpaceRouter {
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
             // CAUTION: you must recover this after new role rebuild
-            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
+            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
             const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
 
@@ -69,7 +69,7 @@ export class SpaceRouter {
             let nextLocation;
 
 
-            // Grant API Key
+            // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
             const isDuplicatedRoute = to.name === from.name;
             if (refreshToken && isTokenAlive && !isDuplicatedRoute) {
@@ -79,6 +79,7 @@ export class SpaceRouter {
                 } else if (to.params.workspaceId) {
                     scope = 'WORKSPACE';
                 } else scope = 'USER';
+
                 const grantRequest = {
                     scope,
                     workspace_id: to.params.workspaceId,

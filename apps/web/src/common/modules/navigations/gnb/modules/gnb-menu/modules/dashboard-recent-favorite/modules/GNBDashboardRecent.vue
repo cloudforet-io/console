@@ -94,7 +94,7 @@ export default defineComponent<Props>({
             loading: false,
             recents: computed<RecentConfig[]>(() => store.state.recent.dashboardItems),
             recentDashboardItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
                 const recentItemList = [] as RecentItem[];
                 state.recents.forEach((recent) => {
                     props.dashboardList.forEach((dashboard) => {

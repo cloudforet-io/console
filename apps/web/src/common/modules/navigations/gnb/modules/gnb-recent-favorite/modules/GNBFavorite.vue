@@ -221,11 +221,11 @@ export default {
                 store.getters['display/allMenuList'],
             )),
             favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertCostAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets, state.dataSourceMap) : [];
             }),
             favoriteDashboardItems: computed<FavoriteItem[]>(() => {
-                const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
+                const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
                 if (!isUserAccessibleToDashboards) return [];
                 return convertDashboardConfigToReferenceData(
                     store.state.favorite.dashboardItems,
@@ -233,14 +233,14 @@ export default {
                 );
             }),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(
                     store.state.favorite.cloudServiceItems,
                     state.cloudServiceTypes,
                 ) : [];
             }),
             favoriteProjects: computed<FavoriteItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
                 if (!isUserAccessible) return [];
                 const favoriteProjectItems = convertProjectConfigToReferenceData(store.state.favorite.projectItems, state.projects);
                 const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(store.state.favorite.projectGroupItems, state.projectGroups);

@@ -21,7 +21,7 @@ const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
     meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: DashboardsContainer,
     children: [
         {

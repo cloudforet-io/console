@@ -4,7 +4,7 @@ import type { RoleType } from '@/schema/identity/role/type';
 export interface RoleCreateParameters {
     name: string;
     role_type: RoleType;
-    permission?: string[];
+    permissions?: string[];
     page_access?: string[];
     tags?: Tags;
 }

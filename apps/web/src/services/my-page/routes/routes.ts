@@ -22,14 +22,14 @@ const myPageRoutes: RouteConfig = {
     path: '/my-page',
     name: MY_PAGE_ROUTE._NAME,
     meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: MyPageContainer,
     children: [
         {
             path: 'account',
             name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
             meta: { menuId: MENU_ID.ACCOUNT },
-            redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pagePermissionMap']),
+            redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
             component: { template: '<router-view />' },
             children: [
                 {
