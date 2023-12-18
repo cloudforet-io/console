@@ -9,11 +9,11 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ReferenceLoadOptions, ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
-
 
 
 type PickedWorkspaceModel = Pick<WorkspaceModel, 'state'>;
@@ -24,6 +24,10 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useWorkspaceReferenceStore = defineStore('workspace-reference', () => {
+    const appContextStore = useAppContextStore();
+    const _state = reactive({
+        isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    });
     const state = reactive({
         items: null as WorkspaceReferenceMap | null,
     });
@@ -40,6 +44,8 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
     });
 
     const load = async (options?: ReferenceLoadOptions) => {
+        if (!_state.isAdminMode) return;
+
         const currentTime = new Date().getTime();
 
         if (
@@ -73,6 +79,7 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
     };
 
     const sync = async (workspace: WorkspaceModel) => {
+        if (!_state.isAdminMode) return;
         state.items = {
             ...state.items,
             [workspace.workspace_id]: {
