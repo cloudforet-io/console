@@ -30,7 +30,11 @@ import {
     appStateFormatter,
     calculateTime,
 } from '@/services/administration/composables/refined-table-data';
-import { APP_DROPDOWN_MODAL_TYPE, APP_TABLE_FIELDS } from '@/services/administration/constants/app-constant';
+import {
+    APP_DROPDOWN_MODAL_TYPE,
+    APP_SEARCH_HANDLERS,
+    APP_TABLE_FIELDS,
+} from '@/services/administration/constants/app-constant';
 import {
     ROLE_SEARCH_HANDLERS,
 } from '@/services/administration/constants/role-constant';
@@ -219,6 +223,8 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
                          :fields="APP_TABLE_FIELDS"
                          sort-by="name"
                          :select-index="appPageState.selectedIndex"
+                         :key-item-sets="APP_SEARCH_HANDLERS.keyItemSets"
+                         :value-handler-map="APP_SEARCH_HANDLERS.valueHandlerMap"
                          :sort-desc="true"
                          :total-count="appPageState.totalCount"
                          :query-tags="state.tags"
