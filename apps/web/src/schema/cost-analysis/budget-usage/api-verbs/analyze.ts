@@ -14,7 +14,7 @@ export interface BudgetUsageAnalyzeResult {
         state?: string;
         providers?: string[];
     };
-    permission_group: Extract<ResourceGroup, 'WORKSPACE' | 'DOMAIN'>;
+    resource_group: Extract<ResourceGroup, 'WORKSPACE' | 'PROJECT'>;
 }
 
 export interface BudgetUsageAnalyzeResponse {

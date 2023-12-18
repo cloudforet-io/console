@@ -8,7 +8,7 @@ export interface SecretCreateParameters {
     schema_id?: string,
     service_account_id?: string,
     trusted_secret_id?: string,
-    permission_group: ResourceGroup,
+    resource_group: ResourceGroup,
     project_id?: string,
     workspace_id?: string,
 }

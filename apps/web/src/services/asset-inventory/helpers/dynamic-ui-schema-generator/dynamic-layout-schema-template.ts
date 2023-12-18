@@ -28,7 +28,7 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
                         },
                     },
                     ...((isTrustedAccount && [{
-                        key: 'permission_group',
+                        key: 'resource_group',
                         name: 'Account Type',
                         type: 'enum',
                         options: {
@@ -114,7 +114,7 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
                 type: 'text',
             },
             ...((isTrustedAccount && [{
-                key: 'permission_group',
+                key: 'resource_group',
                 name: 'Account Type',
                 type: 'enum',
                 options: {
@@ -181,7 +181,7 @@ export const getDefaultSearchSchema = (fields: DynamicField[], isTrustedAccount:
                     name: 'Name',
                 },
                 ...((isTrustedAccount && [{
-                    key: 'permission_group',
+                    key: 'resource_group',
                     name: 'Account Type',
                     enums: {
                         WORKSPACE: {

@@ -10,7 +10,6 @@ export interface PostListParameters {
     writer?: string;
     is_pinned?: boolean;
     is_popup?: boolean;
-    permission_group?: 'GLOBAL'|'DOMAIN';
     user_id?: string;
     domain_id?: string|null;
     query?: Query;

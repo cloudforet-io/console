@@ -27,7 +27,7 @@ export const load: Action<TrustedAccountReferenceState, any> = async ({ state, c
         const response = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
             workspace_id: undefined,
             query: {
-                only: ['trusted_account_id', 'name', 'permission_group'],
+                only: ['trusted_account_id', 'name', 'resource_group'],
             },
         }, { timeout: 3000 });
         const trustedAccounts: TrustedAccountReferenceMap = {};
