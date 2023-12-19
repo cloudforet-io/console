@@ -142,7 +142,7 @@ const disableUser = async (userId: string): Promise<boolean> => {
         </template>
         <template #col-role_type-format="{ value }">
             <span>
-                {{ value === ROLE_TYPE.WORKSPACE_OWNER ? $t('IDENTITY.USER.FORM.OWNER') : $t('IDENTITY.USER.FORM.MEMBER') }}
+                {{ value === ROLE_TYPE.WORKSPACE_OWNER ? $t('IAM.USER.FORM.OWNER') : $t('IAM.USER.FORM.MEMBER') }}
             </span>
         </template>
     </p-table-check-modal>

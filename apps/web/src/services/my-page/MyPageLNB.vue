@@ -60,8 +60,8 @@ export default defineComponent({
                 return 'img_avatar_user';
             }),
             memberType: computed(() => {
-                if (state.isDomainOwner) return i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT');
-                return i18n.t('IDENTITY.USER.MAIN.SPACEONE_USER');
+                if (state.isDomainOwner) return i18n.t('MY_PAGE.ROOT_ACCOUNT');
+                return i18n.t('MY_PAGE.SPACEONE_USER');
             }),
             header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId)),
             menuSet: computed<LNBMenu[]>(() => {

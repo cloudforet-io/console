@@ -48,7 +48,7 @@ const {
 } = useFormValidator({
     email: '',
 }, {
-    email(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
+    email(value: string) { return !emailValidator(value) ? '' : i18n.t('MY_PAGE.NOTIFICATION_EMAIL.EMAIL_INVALID'); },
 });
 
 const handleClickSendCodeButton = async () => {

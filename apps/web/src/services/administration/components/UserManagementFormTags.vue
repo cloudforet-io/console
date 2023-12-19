@@ -48,12 +48,12 @@ const handleUpdateTags = (tags: Tag) => {
 
 <template>
     <div class="tags-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')"
+        <p-field-group :label="$t('IAM.USER.FORM.TAGS')"
                        class="title"
         >
             <div class="tag-help-msg">
-                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT1') }} <br>
-                {{ $t('IDENTITY.USER.FORM.TAGS_HELP_TEXT2') }}
+                {{ $t('IAN.USER.FORM.TAGS_HELP_TEXT1') }} <br>
+                {{ $t('IAN.USER.FORM.TAGS_HELP_TEXT2') }}
             </div>
         </p-field-group>
 

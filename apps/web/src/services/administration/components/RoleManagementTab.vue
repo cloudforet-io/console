@@ -69,7 +69,7 @@ const multiItemTabState = reactive({
         <div v-else
              id="empty-space"
         >
-            <p-empty>{{ $t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
+            <p-empty>{{ $t('IAM.USER.MAIN.NO_SELECTED') }}</p-empty>
         </div>
     </section>
 </template>
