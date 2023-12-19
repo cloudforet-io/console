@@ -201,7 +201,7 @@ export default {
                 display: block;
                 line-height: 2rem;
                 padding-left: 1.5rem;
-                margin-top: 1.5rem;
+                margin-top: 1rem;
                 .p-i-icon {
                     @apply text-primary-dark;
                     margin-right: 0.25rem;
