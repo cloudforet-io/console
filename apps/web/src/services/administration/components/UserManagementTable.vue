@@ -7,6 +7,7 @@ import { useRoute } from 'vue-router/composables';
 import {
     PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
+import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
@@ -30,9 +31,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
-    calculateTime, userStateFormatter, useRoleFormatter,
+    calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
 } from '@/services/administration/composables/refined-table-data';
-import { USER_SEARCH_HANDLERS, USER_TABLE_FIELDS } from '@/services/administration/constants/user-constant';
+import { USER_SEARCH_HANDLERS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
@@ -66,12 +67,32 @@ const state = reactive({
     tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
 const tableState = reactive({
-    userTableFields: computed(() => (userPageStore.isWorkspaceOwner
-        ? [
-            ...USER_TABLE_FIELDS,
-            { name: 'role_binding_info', label: ' ', sortable: false },
-        ]
-        : USER_TABLE_FIELDS)),
+    userTableFields: computed(() => {
+        const additionalFields: DefinitionField[] = [];
+        if (userPageState.isAdminMode) {
+            additionalFields.push(
+                { name: 'mfa', label: 'Multi-factor Auth', sortable: false },
+                { name: 'api_key_count', label: 'API Key', sortable: false },
+            );
+        }
+        const baseFields = [
+            { name: 'user_id', label: 'User ID', sortable: false },
+            { name: 'name', label: 'Name', sortable: false },
+            { name: 'state', label: 'State', sortable: false },
+            ...additionalFields,
+            { name: 'role_type', label: userPageState.isAdminMode ? 'Role Type' : 'Role', sortable: false },
+            { name: 'tags', label: 'Tags' },
+            { name: 'auth_type', label: 'Auth Type', sortable: false },
+            { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
+            { name: 'timezone', label: 'Timezone', sortable: false },
+        ];
+        return userPageStore.isWorkspaceOwner
+            ? [
+                ...baseFields,
+                { name: 'role_binding_info', label: ' ', sortable: false },
+            ]
+            : baseFields;
+    }),
 });
 const dropdownState = reactive({
     loading: false,
@@ -203,7 +224,7 @@ const fetchListRoles = async (inputText: string) => {
                              class="role-type-icon"
                         >
                     </p-tooltip>
-                    <span>{{ useRoleFormatter(value, true).name }}</span>
+                    <span>{{ useRoleFormatter(value, !userPageState.isAdminMode).name }}</span>
                     <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && value !== ROLE_TYPE.DOMAIN_ADMIN"
                                        is-filterable
                                        use-fixed-menu-style
@@ -231,6 +252,11 @@ const fetchListRoles = async (inputText: string) => {
                         </template>
                     </p-select-dropdown>
                 </div>
+            </template>
+            <template #col-mfa-format="{value}">
+                <p-status v-bind="userMfaFormatter(value)"
+                          class="capitalize"
+                />
             </template>
             <template #col-last_accessed_at-format="{ value }">
                 <span v-if="value === -1">

@@ -97,7 +97,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         label: i18n.t('IAM.APP.ENABLE'),
         disabled: isEmpty(appPageStore.selectedApp)
             || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
-            || appPageStore.selectedApp?.state === APP_STATUS_TYPE.ENABLED)
+                || appPageStore.selectedApp?.state === APP_STATUS_TYPE.ENABLED)
         ,
     },
     {
@@ -106,7 +106,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         label: i18n.t('IAM.APP.DISABLE'),
         disabled: isEmpty(appPageStore.selectedApp)
             || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
-            || appPageStore.selectedApp?.state === APP_STATUS_TYPE.DISABLED)
+                || appPageStore.selectedApp?.state === APP_STATUS_TYPE.DISABLED)
         ,
     },
 ]));

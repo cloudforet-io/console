@@ -9,7 +9,7 @@ import { i18n } from '@/translations';
 
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
+import { USER_MODAL_TYPE, USER_STATE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import type { ModalSettingState } from '@/services/administration/types/user-type';
 
@@ -23,7 +23,7 @@ const state = reactive({
         {
             type: 'item',
             name: USER_MODAL_TYPE.UPDATE,
-            label: i18n.t('IAM.USER.MAIN.UPDATE'),
+            label: i18n.t('IAM.USER.MAIN.EDIT'),
             disabled: userPageState.selectedIndices.length > 1 || !state.isSelected,
         },
         {
@@ -31,10 +31,16 @@ const state = reactive({
         },
         { type: 'divider' },
         {
-            type: 'item', name: USER_MODAL_TYPE.ENABLE, label: i18n.t('IAM.USER.MAIN.ENABLE'), disabled: !state.isSelected,
+            type: 'item',
+            name: USER_MODAL_TYPE.ENABLE,
+            label: i18n.t('IAM.USER.MAIN.ENABLE'),
+            disabled: !state.isSelected || userPageStore.selectedUsers[0].state === USER_STATE.ENABLE,
         },
         {
-            type: 'item', name: USER_MODAL_TYPE.DISABLE, label: i18n.t('IAM.USER.MAIN.DISABLE'), disabled: !state.isSelected,
+            type: 'item',
+            name: USER_MODAL_TYPE.DISABLE,
+            label: i18n.t('IAM.USER.MAIN.DISABLE'),
+            disabled: !state.isSelected || userPageStore.selectedUsers[0].state === USER_STATE.DISABLE,
         },
     ])),
 });
