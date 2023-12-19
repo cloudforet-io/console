@@ -1,8 +1,11 @@
 import type { Action } from 'vuex';
 
+import jwtDecode from 'jwt-decode';
+
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
@@ -18,6 +21,9 @@ import type {
     UserState, SignInRequest, UpdateUserRequest, RoleInfo,
 } from './type';
 
+interface JWTPayload {
+    rol: RoleType;
+}
 
 const getUserInfo = async (): Promise<Partial<UserState>> => {
     const response = await SpaceConnector.clientV2.identity.userProfile.get<UserGetParameters, UserModel>();
@@ -53,7 +59,17 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
 
 const getRoleTypeByManagedRoleId = (roleId: string): RoleType => MANAGED_ROLES[roleId];
 
-const getGrantedRole = async (roleId: string): Promise<RoleInfo|undefined> => {
+const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRoleType: RoleType): Promise<RoleInfo|undefined> => {
+    // DOMAIN_ADMIN -> enter workspace case
+    if (baseRoleType === ROLE_TYPE.DOMAIN_ADMIN && currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
+        return {
+            roleType: ROLE_TYPE.WORKSPACE_OWNER,
+            roleId: 'managed-workspace-owner',
+            pageAccess: ['*'],
+        };
+    }
+
+    // MANAGED_ROLE case
     const MANAGED_ROLE_IDS: string[] = Object.keys(MANAGED_ROLES);
     const isManagedRole = MANAGED_ROLE_IDS.includes(roleId);
     if (isManagedRole) {
@@ -63,6 +79,8 @@ const getGrantedRole = async (roleId: string): Promise<RoleInfo|undefined> => {
             pageAccess: ['*'],
         };
     }
+
+    // normal case
     try {
         const response = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
             role_id: roleId,
@@ -131,7 +149,10 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 export const signOut = (): void => {
     SpaceConnector.flushToken();
 };
-
+const getRoleTypeFromToken = (token: string): RoleType => {
+    const decodedToken = jwtDecode<JWTPayload>(token);
+    return decodedToken.rol;
+};
 export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
     try {
         const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>({
@@ -142,8 +163,9 @@ export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest
         }, { skipAuthRefresh: true });
 
         SpaceConnector.setToken(response.access_token);
+        const currentRoleType = getRoleTypeFromToken(response.access_token);
 
-        const roleInfo = await getGrantedRole(response.role_id);
+        const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
         commit('setCurrentRoleInfo', roleInfo);
     } catch (e) {
         throw new Error(`Role Grant Error: ${e}`);
