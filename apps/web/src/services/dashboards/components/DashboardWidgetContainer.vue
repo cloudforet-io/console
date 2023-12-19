@@ -37,7 +37,8 @@ const props = withDefaults(defineProps<{
 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const allReferenceStore = useAllReferenceStore();
 
@@ -60,7 +61,7 @@ const { reformedWidgetInfoList } = useReformedWidgetInfoList({
 
 /* widget loading */
 const getWidgetLoading = (widgetKey: string) => {
-    if (!dashboardDetailStore.isAllVariablesInitialized) return true;
+    if (!dashboardDetailGetters.isAllVariablesInitialized) return true;
     if (!state.isAllWidgetsMounted) return true;
     if (!state.intersectedWidgetMap[widgetKey]) return true;
     if (widgetViewState.targetWidget?.widget_key === widgetKey) return true;
@@ -151,7 +152,7 @@ onBeforeUnmount(() => {
 
 /* refresh widgets */
 const refreshAllWidget = debounce(async () => {
-    dashboardDetailStore.$patch({ loadingWidgets: true });
+    dashboardDetailStore.setLoadingWidgets(true);
     const refreshWidgetPromises: WidgetExpose['refreshWidget'][] = [];
 
     widgetRef.value.forEach((comp) => {
@@ -163,7 +164,7 @@ const refreshAllWidget = debounce(async () => {
 
     await Promise.allSettled(refreshWidgetPromises);
 
-    dashboardDetailStore.$patch({ loadingWidgets: false });
+    dashboardDetailStore.setLoadingWidgets(false);
 }, 150);
 defineExpose({
     refreshAllWidget,

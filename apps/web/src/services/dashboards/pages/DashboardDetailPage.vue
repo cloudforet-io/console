@@ -30,7 +30,7 @@ const props = defineProps<Props>();
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const widgetContainerRef = ref<typeof DashboardWidgetContainer|null>(null);
 
@@ -70,7 +70,7 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
     * But in case of the same type of dashboard, the dashboard store must be reused to smoothly update the dashboard data without blinking.
      */
     if (dashboardId && !prevDashboardId) { // this includes all three cases
-        dashboardDetailStore.$reset();
+        dashboardDetailStore.reset();
     }
     await getDashboardData(dashboardId);
 }, { immediate: true });

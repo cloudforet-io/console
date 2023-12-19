@@ -38,7 +38,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const route = useRoute();
 
@@ -74,13 +74,16 @@ const deleteModalState = reactive({
 
 /* Helper */
 const deleteVariable = () => {
+    // variables schema
     const properties = cloneDeep(state.variableSchema.properties) as DashboardVariablesSchema['properties'];
     delete properties[state.selectedVariable];
     const order = state.variableSchema.order.filter((d) => d !== state.selectedVariable);
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = { properties, order };
-        delete _state.variables[state.selectedVariable];
-    });
+    dashboardDetailStore.setVariablesSchema({ properties, order });
+
+    // variables
+    const _variables = cloneDeep(dashboardDetailState.variables);
+    delete _variables[state.selectedVariable];
+    dashboardDetailStore.setVariables(_variables);
 };
 const resetDeleteModalState = () => {
     deleteModalState.visible = false;
@@ -118,16 +121,22 @@ const handleSaveVariable = (variable: DashboardVariableSchemaProperty) => {
     if (state.contentType === 'ADD' || state.contentType === 'CLONE') {
         const variableKey = getRandomId();
         properties[variableKey] = variable;
-        dashboardDetailStore.$patch((_state) => {
-            _state.variablesSchema = { properties, order: [...state.variableSchema.order, variableKey] };
+        dashboardDetailStore.setVariablesSchema({
+            properties,
+            order: [...state.variableSchema.order, variableKey],
         });
     } else {
         const selectedProperty = state.selectedVariable;
         properties[selectedProperty] = variable;
-        dashboardDetailStore.$patch((_state) => {
-            _state.variablesSchema = { ...dashboardDetailState.variablesSchema, properties };
-            delete _state.variables[selectedProperty];
+        dashboardDetailStore.setVariablesSchema({
+            ...dashboardDetailState.variablesSchema,
+            properties,
         });
+
+        // variables
+        const _variables = cloneDeep(dashboardDetailState.variables);
+        delete _variables[selectedProperty];
+        dashboardDetailStore.setVariables(_variables);
     }
     state.selectedVariable = '';
     state.contentType = 'LIST';

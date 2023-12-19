@@ -51,7 +51,8 @@ interface Step {
 }
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardDetailState = dashboardDetailStore.state;
 const {
     forms: { dashboardTemplate },
     setForm,
@@ -89,10 +90,8 @@ const saveCurrentStateToStore = () => {
     };
 
     dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
-    dashboardDetailStore.$patch({
-        dashboardId: undefined,
-        placeholder: dashboardTemplate.value.name,
-    });
+    dashboardDetailStore.setDashboardId(undefined);
+    dashboardDetailStore.setPlaceholder(dashboardTemplate.value.name);
 };
 
 const createDashboard = async () => {
@@ -107,7 +106,7 @@ const createDashboard = async () => {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
             tags: { created_by: store.state.user.userId },
-            dashboard_type: dashboardDetailStore.dashboardType,
+            dashboard_type: dashboardDetailGetters.dashboardType,
             resource_group: RESOURCE_GROUP.DOMAIN,
         };
 

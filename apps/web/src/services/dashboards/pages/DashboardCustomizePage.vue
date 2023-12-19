@@ -22,7 +22,7 @@ const props = defineProps<Props>();
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     loading: false,

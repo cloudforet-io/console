@@ -6,6 +6,7 @@ import {
 import {
     PBadge, PDataTable, PSelectStatus, PToggleButton, PCollapsiblePanel, PIconButton,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
@@ -29,7 +30,7 @@ interface EmitFn {
 const emit = defineEmits<EmitFn>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     orderedVariables: [] as VariablesPropertiesForManage[],
@@ -77,9 +78,9 @@ const handleToggleUse = (propertyName: string, value: boolean) => {
     state.orderedVariables[selectedIndex].use = !value;
 
     // change use in store
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema.properties[propertyName].use = !value;
-    });
+    const _variablesSchema = cloneDeep(dashboardDetailState.variablesSchema);
+    _variablesSchema.properties[propertyName].use = !value;
+    dashboardDetailStore.setVariablesSchema(_variablesSchema);
 };
 
 /* Helper */

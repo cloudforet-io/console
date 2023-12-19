@@ -38,7 +38,7 @@ const emit = defineEmits<{(e: 'close', save: boolean): void;
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;

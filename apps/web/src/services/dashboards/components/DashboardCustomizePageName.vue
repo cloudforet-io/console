@@ -25,7 +25,7 @@ const emit = defineEmits<{(e: 'update:name', value?: string): void,
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     loading: computed<boolean>(() => {
@@ -74,12 +74,12 @@ watch(() => props.name, (d) => {
 }, { immediate: true });
 
 watch(() => invalidState.nameInput, (invalid) => {
-    dashboardDetailStore.$patch({ isNameValid: !invalid });
+    dashboardDetailStore.setIsNameValid(!invalid);
 });
 
 onMounted(() => {
-    if (nameInput.value?.length) dashboardDetailStore.$patch({ isNameValid: true });
-    else dashboardDetailStore.$patch({ isNameValid: false });
+    if (nameInput.value?.length) dashboardDetailStore.setIsNameValid(true);
+    else dashboardDetailStore.setIsNameValid(false);
 });
 </script>
 

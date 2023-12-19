@@ -5,6 +5,8 @@ import { computed, getCurrentInstance, reactive } from 'vue';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
 
+import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
+
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
@@ -21,7 +23,7 @@ import type { DashboardVariables, DashboardVariablesSchema } from '@/services/da
 
 
 interface Props {
-    isManageable: boolean;
+    isManageable?: boolean;
     disableSaveButton?: boolean;
     originVariables?: DashboardVariables;
     originVariablesSchema?: DashboardVariablesSchema;
@@ -33,7 +35,7 @@ const props = defineProps<Props>();
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const allReferenceStore = useAllReferenceStore();
 
@@ -70,11 +72,10 @@ const updateDashboardVariables = async () => {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
         });
-        dashboardDetailStore.$patch((_state) => {
-            if (_state.dashboardInfo) {
-                _state.dashboardInfo.variables = dashboardDetailState.variables;
-                _state.dashboardInfo.variables_schema = dashboardDetailState.variablesSchema;
-            }
+        dashboardDetailStore.setDashboardInfoState({
+            ...dashboardDetailState.dashboardInfo as DashboardModel,
+            variables: dashboardDetailState.variables,
+            variables_schema: dashboardDetailState.variablesSchema,
         });
     } catch (e) {
         ErrorHandler.handleError(e);

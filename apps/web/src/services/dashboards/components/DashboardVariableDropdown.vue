@@ -37,7 +37,8 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     targetRef: null as HTMLElement | null,
@@ -108,9 +109,7 @@ const changeVariables = (changedSelected: MenuItem[]) => {
     } else {
         variables[props.propertyName] = reconvertedSelected;
     }
-    dashboardDetailStore.$patch((_state) => {
-        _state.variables = variables;
-    });
+    dashboardDetailStore.setVariables(variables);
 };
 
 const handleUpdateSearchText = debounce((text: string) => {
@@ -160,8 +159,9 @@ watch(visibleMenu, (_visibleMenu) => {
 }, { immediate: true });
 
 watch(() => state.variableProperty, async (property) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: false };
+    dashboardDetailStore.setVariablesInitMap({
+        ...dashboardDetailState.variablesInitMap,
+        [props.propertyName]: false,
     });
 
     const value = dashboardDetailState.variables[props.propertyName];
@@ -173,8 +173,9 @@ watch(() => state.variableProperty, async (property) => {
         state.selected = [];
     }
 
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesInitMap = { ..._state.variablesInitMap, [props.propertyName]: true };
+    dashboardDetailStore.setVariablesInitMap({
+        ...dashboardDetailState.variablesInitMap,
+        [props.propertyName]: true,
     });
 }, { immediate: true });
 
@@ -196,7 +197,7 @@ const {
         <button ref="targetRef"
                 class="dropdown-box"
                 :class="{ 'is-visible': visibleMenu, 'filled-value': state.selected.length,
-                          invalid: dashboardDetailStore.isAllVariablesInitialized && state.variableProperty?.required && !state.selected.length }"
+                          invalid: dashboardDetailGetters.isAllVariablesInitialized && state.variableProperty?.required && !state.selected.length }"
                 :disabled="state.variableProperty?.readonly || props.disabled"
                 @click="toggleMenu"
         >

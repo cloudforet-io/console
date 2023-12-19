@@ -53,7 +53,7 @@ const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormGetters = widgetFormStore.getters;
 const allReferenceStore = useAllReferenceStore();
@@ -83,11 +83,9 @@ const initSnapshot = () => {
 };
 
 const handleCloseModal = () => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.variables = state.variablesSnapshot;
-        _state.variablesSchema = state.variableSchemaSnapshot;
-        _state.settings = state.settingsSnapshot;
-    });
+    dashboardDetailStore.setVariables(state.variablesSnapshot);
+    dashboardDetailStore.setVariablesSchema(state.variableSchemaSnapshot);
+    dashboardDetailStore.setSettings(state.settingsSnapshot);
     emit('update:visible', false);
 };
 const handleClickEditOption = () => {

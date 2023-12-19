@@ -29,7 +29,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const route = useRoute();
 const router = useRouter();
@@ -104,9 +104,7 @@ const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string
 const updateVariablesUse = (property: string, isChecked: boolean) => {
     const _variablesSchema = cloneDeep(state.variableSchema);
     _variablesSchema.properties[property].use = isChecked;
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = _variablesSchema;
-    });
+    dashboardDetailStore.setVariablesSchema(_variablesSchema);
 };
 const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
     /*
@@ -213,9 +211,7 @@ const handleConfirmUncheckModal = () => {
 };
 const handleCancelUncheckModal = () => {
     /* This $patch() is for initiating context menu items (state.selected) */
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = { ..._state.variablesSchema };
-    });
+    dashboardDetailStore.setVariablesSchema(cloneDeep(dashboardDetailState.variablesSchema));
     state.isClearSelectionCaseWithCustomVariableAffectingWidgets = false;
     state.uncheckConfirmModalVisible = false;
 };
