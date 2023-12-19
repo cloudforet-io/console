@@ -25,7 +25,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import UserAPIKeyModal from '@/common/components/modals/UserAPIKeyModal.vue';
 
 import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
-import SingleSelectStatusModal from '@/services/administration/components/SingleSelectStatusModal.vue';
+import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
 import {
     appStateFormatter,
     calculateTime,
@@ -39,7 +39,6 @@ import {
     ROLE_SEARCH_HANDLERS,
 } from '@/services/administration/constants/role-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
-import type { SingleSelectedData } from '@/services/administration/types/modal-type';
 
 
 const DEFAULT_PAGE_LIMIT = 15;
@@ -98,7 +97,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         label: i18n.t('IAM.APP.ENABLE'),
         disabled: isEmpty(appPageStore.selectedApp)
             || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
-            || appPageStore.selectedApp?.state === APP_STATUS_TYPE.ENABLED)
+                || appPageStore.selectedApp?.state === APP_STATUS_TYPE.ENABLED)
         ,
     },
     {
@@ -107,7 +106,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         label: i18n.t('IAM.APP.DISABLE'),
         disabled: isEmpty(appPageStore.selectedApp)
             || (appPageStore.selectedApp?.state === APP_STATUS_TYPE.EXPIRED
-            || appPageStore.selectedApp?.state === APP_STATUS_TYPE.DISABLED)
+                || appPageStore.selectedApp?.state === APP_STATUS_TYPE.DISABLED)
         ,
     },
 ]));
@@ -180,27 +179,15 @@ const handleChangeModalVisible = (value) => {
         _state.modal = cloneDeep(_state.modal);
     });
 };
-const handleConfirmButton = (value: string, isStatus?:boolean) => {
+const handleConfirmButton = (value: string) => {
     if (value) {
         modalState.item.api_key_id = value;
         return;
     }
-    getListApps();
-
-    if (isStatus) {
-        appPageStore.$patch((_state) => {
-            _state.modal.visible.apiKey = true;
-            _state.modal = cloneDeep(_state.modal);
-        });
-    }
+    handleClickModalConfirm();
 };
-const handleCloseStatusModal = () => {
-    getListApps();
-    appPageStore.$patch((_state) => {
-        _state.modal.type = '';
-        _state.modal.visible.status = false;
-        _state.modal = cloneDeep(_state.modal);
-    });
+const handleClickModalConfirm = async () => {
+    await getListApps();
 };
 
 /* API */
@@ -304,19 +291,11 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
         <user-a-p-i-key-modal v-if="modalState.apiKeyModalVisible"
                               :visible="modalState.apiKeyModalVisible"
                               :api-key-item="modalState.item"
-                              @clickButton="getListApps"
+                              @clickButton="handleClickModalConfirm"
                               @update:visible="handleChangeModalVisible"
         />
         <app-management-form-modal @confirm="handleConfirmButton" />
-        <single-select-status-modal :type="appPageState.modal.type"
-                                    :visible="appPageState.modal.visible.status"
-                                    :theme-color="appPageState.modal.themeColor"
-                                    :title="appPageState.modal.title"
-                                    :loading="appPageState.modal.loading"
-                                    :data="appPageStore.selectedApp as SingleSelectedData"
-                                    @confirm="handleConfirmButton($event, true)"
-                                    @close="handleCloseStatusModal"
-        />
+        <app-management-status-modal @confirm="handleConfirmButton" />
     </section>
 </template>
 

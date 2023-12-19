@@ -10,7 +10,6 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 
 import { i18n } from '@/translations';
 
-import UserManagementTabApiKey from '@/services/administration/components/UserManagementTabApiKey.vue';
 import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
 import UserManagementTabProjects from '@/services/administration/components/UserManagementTabProjects.vue';
 import UserManagementTabTag from '@/services/administration/components/UserManagementTabTag.vue';
@@ -32,7 +31,6 @@ const singleItemTabState = reactive({
         { label: i18n.t('IAM.USER.MAIN.DETAILS'), name: USER_TABS.DETAIL },
         { label: i18n.t('IAM.USER.MAIN.WORKSPACE'), name: USER_TABS.WORKSPACE },
         { label: i18n.t('IAM.USER.MAIN.TAG'), name: USER_TABS.TAG },
-        { label: i18n.t('IAM.USER.MAIN.API_KEY'), name: USER_TABS.API_KEY },
     ])),
     activeTab: USER_TABS.DETAIL,
 });
@@ -61,9 +59,6 @@ const multiItemTabState = reactive({
             </template>
             <template #tag>
                 <user-management-tab-tag :active-tab="singleItemTabState.activeTab" />
-            </template>
-            <template #api_key>
-                <user-management-tab-api-key :active-tab="singleItemTabState.activeTab" />
             </template>
         </p-tab>
         <p-tab v-else-if="userPageState.selectedIndices.length > 1"
