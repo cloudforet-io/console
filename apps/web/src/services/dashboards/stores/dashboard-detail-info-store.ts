@@ -157,6 +157,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardId = (dashboardId?: string) => {
         state.dashboardId = dashboardId;
     };
+    const setProjectId = (projectId: string) => {
+        state.projectId = projectId;
+    };
 
     /* Actions */
     const reset = () => {
@@ -198,6 +201,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.name = _dashboardInfo.name;
         if (_dashboardInfo.resource_group === RESOURCE_GROUP.PROJECT) {
             state.projectId = _dashboardInfo.project_id;
+        } else {
+            state.projectId = '';
         }
         state.settings = {
             date_range: {
@@ -330,6 +335,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setLoadingWidgets,
         setPlaceholder,
         setDashboardId,
+        setProjectId,
     };
     const actions = {
         reset,
