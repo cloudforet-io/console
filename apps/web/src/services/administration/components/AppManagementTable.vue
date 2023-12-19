@@ -272,13 +272,13 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
                     No Activity
                 </span>
                 <span v-else-if="value === 0">
-                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                    {{ $t('IAM.USER.MAIN.TODAY') }}
                 </span>
                 <span v-else-if="value === 1">
-                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                    {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                    {{ value }} {{ $t('IAM.USER.MAIN.DAYS') }}
                 </span>
             </template>
             <template #col-expired_at-format="{value}">

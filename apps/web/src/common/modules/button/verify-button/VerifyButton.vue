@@ -43,7 +43,7 @@ const handleClickVerifiedEmail = (type: string) => {
                      color="inherit"
                      class="icon-edit"
                 />
-                {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}
+                {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.CHANGE') }}
             </p-button>
             <p-button v-else
                       style-type="primary"
@@ -52,7 +52,7 @@ const handleClickVerifiedEmail = (type: string) => {
                       :size="props.isAdministration ? 'sm' : 'md'"
                       @click.prevent="handleClickVerifiedEmail(MODAL_TYPE.VERIFY)"
             >
-                {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SEND_MAIL') }}
+                {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.SEND_MAIL') }}
             </p-button>
         </div>
         <slot />

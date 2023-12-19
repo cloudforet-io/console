@@ -95,7 +95,7 @@
                 </div>
             </div>
             <p v-if="isSecretData">
-                <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_TOKEN')" />
+                <info-message :message="$t('MY_PAGE.NOTIFICATION.CANNOT_EDIT_TOKEN')" />
             </p>
             <button v-else
                     class="edit-button"

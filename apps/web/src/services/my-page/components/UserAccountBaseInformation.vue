@@ -42,7 +42,7 @@ const formState = reactive({
 });
 const validationState = reactive({
     timezoneInvalidText: computed(() => {
-        if (!formState.timezone.length) return i18n.t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
+        if (!formState.timezone.length) return i18n.t('MY_PAGE.ACCOUNT.TIMEZONE_INVALID');
         return '';
     }),
     showValidation: false,
@@ -93,7 +93,7 @@ watch(() => store.state.user.language, (language) => {
 
 <template>
     <user-account-module-container
-        :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
+        :title="$t('MY_PAGE.ACCOUNT.BASE_INFORMATION')"
         class="base-information-wrapper"
     >
         <p-field-group required
@@ -153,7 +153,7 @@ watch(() => store.state.user.language, (language) => {
             <p-button style-type="primary"
                       @click="handleClickProfileConfirm"
             >
-                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
+                {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
             </p-button>
         </div>
     </user-account-module-container>

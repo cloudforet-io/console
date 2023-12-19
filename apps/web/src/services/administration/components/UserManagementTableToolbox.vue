@@ -94,7 +94,7 @@ const updateModalSettings = ({
 <template>
     <p-select-dropdown class="left-toolbox-item"
                        :menu="state.dropdownMenu"
-                       :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
+                       :placeholder="$t('IAM.USER.MAIN.ACTION')"
                        :disabled="!state.hasManagePermission"
                        @select="handleSelectDropdown"
     />
