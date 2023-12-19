@@ -14,6 +14,11 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
+import { postValidationEmail } from '@/lib/helper/verify-email-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 
 import {
     calculateTime,
@@ -22,7 +27,11 @@ import {
 } from '@/services/administration/composables/refined-table-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
+
+
 const userPageStore = useUserPageStore();
+
+const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const storeState = reactive({
     userInfo: computed(() => store.state.user),
@@ -41,9 +50,9 @@ const tableState = reactive({
         const additionalFields: DefinitionField[] = [];
         const additionalRoleFields: DefinitionField[] = [];
         if (userPageStore.isAdminMode) {
-            if (storeState.smtpEnabled) {
+            if (!storeState.smtpEnabled) {
                 additionalFields.push(
-                    { name: 'email', label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL') },
+                    { name: 'email', label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL'), block: true },
                 );
             }
             additionalFields.push(
@@ -71,6 +80,31 @@ const tableState = reactive({
         ];
     }),
 });
+const modalState = reactive({
+    verifyEmailLoading: false,
+    isModalVisible: false,
+    modalType: '',
+});
+
+/* API */
+const handleClickVerifyButton = async (type: string) => {
+    modalState.verifyEmailLoading = true;
+    try {
+        if (tableState.refinedUserItems.email_verified) return;
+        await postValidationEmail({
+            user_id: tableState.refinedUserItems.user_id,
+            domain_id: tableState.refinedUserItems.domain_id,
+            email: tableState.refinedUserItems.email,
+        });
+        await store.dispatch('user/setUser', { email: tableState.refinedUserItems.email });
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+    } finally {
+        modalState.isModalVisible = true;
+        modalState.verifyEmailLoading = false;
+        modalState.modalType = type;
+    }
+};
 </script>
 
 <template>
@@ -105,15 +139,6 @@ const tableState = reactive({
             <template #data-role_binding_info="{value}">
                 {{ useRoleFormatter(value.role_type).name }}
             </template>
-            <template #data-email="{data}">
-                <span class="notification-email-wrapper">
-                    <span class="notification-email"
-                          :class="tableState.refinedUserItems.email_verified && 'verified-text'"
-                    >
-                        {{ data }}
-                    </span>
-                </span>
-            </template>
             <template #data-last_accessed_at="{data}">
                 <span v-if="data === -1">
                     No Activity
@@ -131,11 +156,9 @@ const tableState = reactive({
             <template #data-created_at="{data}">
                 {{ iso8601Formatter(data, userPageStore.timezone) }}
             </template>
-            <template #extra="{label}">
-                <span v-if="userPageStore.isAdminMode
-                    && tableState.refinedUserItems.email
-                    && label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')"
-                >
+            <template #data-email="{data}">
+                <div v-if="data && data !== ''">
+                    <span :class="tableState.refinedUserItems.email_verified && 'verified-text'">{{ data }}</span>
                     <span v-if="tableState.refinedUserItems.email_verified">
                         <p-i name="ic_verified"
                              height="1rem"
@@ -149,7 +172,28 @@ const tableState = reactive({
                     >
                         {{ $t('IAM.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
                     </span>
-                </span>
+                </div>
+            </template>
+            <template #extra="{label}">
+                <verify-button
+                    v-if="label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')
+                        && tableState.refinedUserItems.email
+                        && tableState.refinedUserItems.email !== ''"
+                    :loading="modalState.verifyEmailLoading"
+                    :email="tableState.refinedUserItems.email || ''"
+                    :verified="tableState.refinedUserItems.email_verified"
+                    is-administration
+                    @click-button="handleClickVerifyButton"
+                >
+                    <notification-email-modal
+                        :domain-id="tableState.refinedUserItems.domain_id"
+                        :user-id="tableState.refinedUserItems.user_id"
+                        :email="tableState.refinedUserItems.email"
+                        :modal-type="modalState.modalType"
+                        :visible.sync="modalState.isModalVisible"
+                        @refresh-user="emit('confirm')"
+                    />
+                </verify-button>
             </template>
         </p-definition-table>
     </div>
@@ -160,7 +204,15 @@ const tableState = reactive({
 :deep(.p-definition) {
     height: 2.25rem;
     .value-wrapper {
+        @apply items-center;
         padding: 0 1rem;
+        .extra {
+            @apply flex items-center;
+            max-height: 100%;
+            .verify-button-wrapper {
+                height: 1.5rem;
+            }
+        }
         .p-copy-button {
             @apply flex items-center;
             gap: 0.25rem;
@@ -171,12 +223,6 @@ const tableState = reactive({
     }
 }
 .user-definition-table {
-    .notification-email-wrapper {
-        @apply flex items-center;
-        .notification-email {
-            @apply flex items-center;
-        }
-    }
     .not-verified {
         @apply bg-yellow-200 text-label-sm;
         height: 1.25rem;

@@ -11,7 +11,6 @@ import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { i18n } from '@/translations';
 
-import { USER_TABS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface TableItem {
@@ -22,12 +21,10 @@ interface TableItem {
     value?: string;
 }
 interface Props {
-    type: string;
     activeTab: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    type: '',
     activeTab: '',
 });
 
@@ -35,27 +32,18 @@ const userPageStore = useUserPageStore();
 
 const state = reactive({
     loading: false,
-    tags: {},
-    title: computed(() => (props.type === USER_TABS.PROJECTS
-        ? i18n.t('IAM.USER.MAIN.ASSOCIATED_PROJECTS')
-        : i18n.t('IAM.USER.MAIN.TAG'))),
     items: [] as TableItem[],
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
-    fields: computed(() => (props.type === USER_TABS.PROJECTS
-        ? [
-            { name: 'name', label: i18n.t('IAM.USER.MAIN.PROJECT'), type: 'link' },
-            { name: 'date', label: i18n.t('IAM.USER.MAIN.INVITED') },
-        ]
-        : [
-            { name: 'key', label: i18n.t('COMMON.TAGS.KEY') },
-            { name: 'value', label: i18n.t('COMMON.TAGS.VALUE') },
-        ])),
+    fields: computed(() => [
+        { name: 'name', label: i18n.t('IAM.USER.MAIN.PROJECT') as string },
+        { name: 'date', label: i18n.t('IAM.USER.MAIN.INVITED') as string },
+    ]),
 });
 
 /* API */
-const getProjectItems = async () => {
+const getProjectList = async () => {
     state.loading = true;
     try {
         const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ListResponse<ProjectModel>>({
@@ -79,38 +67,28 @@ const getProjectItems = async () => {
 
 /* Watcher */
 watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
-    if (props.type === USER_TABS.PROJECTS) {
-        await getProjectItems();
-    } else {
-        state.items = Object.entries(state.selectedUser.tags || {}).map(([k, v]) => ({
-            key: k,
-            value: v,
-        }));
-    }
+    await getProjectList();
 }, { immediate: true });
 </script>
 
 <template>
-    <div class="user-management-tab-panels">
+    <div class="user-management-tab-project">
         <p-heading heading-type="sub"
                    :use-total-count="true"
                    :total-count="state.items.length"
-                   :title="state.title"
+                   :title="$t('IAM.USER.MAIN.ASSOCIATED_PROJECTS')"
         />
         <p-data-table :fields="tableState.fields"
                       :items="state.items"
                       :loading="state.loading"
-                      :col-copy="props.type === USER_TABS.TAG"
                       sort-by="name"
-                      :sortable="props.type === USER_TABS.TAG"
-                      :sort-desc="props.type === USER_TABS.TAG"
                       beautify-text
         />
     </div>
 </template>
 
 <style scoped lang="postcss">
-.user-management-tab-panels {
+.user-management-tab-project {
     @apply flex flex-col;
 }
 </style>

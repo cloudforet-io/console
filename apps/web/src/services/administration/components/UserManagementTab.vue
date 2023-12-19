@@ -10,8 +10,11 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 
 import { i18n } from '@/translations';
 
+import UserManagementTabApiKey from '@/services/administration/components/UserManagementTabApiKey.vue';
 import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
-import UserManagementTabPanels from '@/services/administration/components/UserManagementTabPanels.vue';
+import UserManagementTabProjects from '@/services/administration/components/UserManagementTabProjects.vue';
+import UserManagementTabTag from '@/services/administration/components/UserManagementTabTag.vue';
+import UserManagementTabWorkspace from '@/services/administration/components/UserManagementTabWorkspace.vue';
 import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import { USER_TAB_TABLE_FIELDS, USER_TABS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
@@ -20,10 +23,16 @@ const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
 const singleItemTabState = reactive({
-    tabs: computed<TabItem[]>(() => ([
+    userTabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.USER.MAIN.DETAILS'), name: USER_TABS.DETAIL },
         { label: i18n.t('IAM.USER.MAIN.PROJECTS'), name: USER_TABS.PROJECTS },
         { label: i18n.t('IAM.USER.MAIN.TAG'), name: USER_TABS.TAG },
+    ])),
+    adminTabs: computed<TabItem[]>(() => ([
+        { label: i18n.t('IAM.USER.MAIN.DETAILS'), name: USER_TABS.DETAIL },
+        { label: i18n.t('IAM.USER.MAIN.WORKSPACE'), name: USER_TABS.WORKSPACE },
+        { label: i18n.t('IAM.USER.MAIN.TAG'), name: USER_TABS.TAG },
+        { label: i18n.t('IAM.USER.MAIN.API_KEY'), name: USER_TABS.API_KEY },
     ])),
     activeTab: USER_TABS.DETAIL,
 });
@@ -38,21 +47,23 @@ const multiItemTabState = reactive({
 <template>
     <section>
         <p-tab v-if="userPageState.selectedIndices.length === 1"
-               :tabs="singleItemTabState.tabs"
+               :tabs="userPageState.isAdminMode ? singleItemTabState.adminTabs : singleItemTabState.userTabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
                 <user-management-tab-detail />
             </template>
+            <template #workspace>
+                <user-management-tab-workspace :active-tab="singleItemTabState.activeTab" />
+            </template>
             <template #projects>
-                <user-management-tab-panels :type="USER_TABS.PROJECTS"
-                                            :active-tab="singleItemTabState.activeTab"
-                />
+                <user-management-tab-projects :active-tab="singleItemTabState.activeTab" />
             </template>
             <template #tag>
-                <user-management-tab-panels :type="USER_TABS.TAG"
-                                            :active-tab="singleItemTabState.activeTab"
-                />
+                <user-management-tab-tag :active-tab="singleItemTabState.activeTab" />
+            </template>
+            <template #api_key>
+                <user-management-tab-api-key :active-tab="singleItemTabState.activeTab" />
             </template>
         </p-tab>
         <p-tab v-else-if="userPageState.selectedIndices.length > 1"
