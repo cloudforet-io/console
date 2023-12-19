@@ -71,7 +71,6 @@ const getAccount = async (serviceAccountId: string) => {
         if (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED) {
             state.item = await SpaceConnector.clientV2.identity.trustedAccount.get<TrustedAccountGetParameters, TrustedAccountModel>({
                 trusted_account_id: serviceAccountId,
-                workspace_id: undefined,
             });
         } else {
             state.item = await SpaceConnector.clientV2.identity.serviceAccount.get<ServiceAccountGetParameters, ServiceAccountModel>({

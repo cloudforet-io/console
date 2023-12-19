@@ -1,7 +1,7 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
-import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { TimeStamp } from '@/schema/_common/model';
 import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/model';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
@@ -67,16 +67,3 @@ export interface AlertStateUpdateParams {
 }
 
 export type AlertListPageUrlQuery = Partial<Record<'state' | 'urgency' | 'assigned' | 'filters', RouteQueryString>>;
-
-export interface ProjectMember {
-    created_at: TimeStamp;
-    domain_id?: string;
-    labels: string[];
-    project_group_info: any;
-    project_info?: any;
-    resource_id: string;
-    resource_type: string;
-    role_binding_id?: string;
-    role_info?: any;
-    tags: Tags;
-}
