@@ -336,6 +336,9 @@ const handlePeriodUpdate = (period?: Period) => {
     overviewState.period = period;
     replaceUrlQuery('period', objectToQueryString(period));
 };
+const handleCustomFieldModalVisibleUpdate = (visible) => {
+    tableState.visibleCustomFieldModal = visible;
+};
 
 const checkIsEmpty = (data) => isEmpty(data);
 
@@ -445,10 +448,11 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                                    :selected-index="typeOptionState.selectIndex.length ?? 0"
                                    :timezone="typeOptionState.timezone ?? 'UTC'"
         />
-        <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+        <custom-field-modal :visible="tableState.visibleCustomFieldModal"
                             resource-type="inventory.CloudService"
                             :options="{provider: props.provider, cloudServiceGroup: props.group, cloudServiceType: props.name}"
                             :is-server-page="props.isServerPage"
+                            @update:visible="handleCustomFieldModalVisibleUpdate"
                             @complete="reloadTable"
         />
         <excel-export-option-modal :visible="excelState.visible"

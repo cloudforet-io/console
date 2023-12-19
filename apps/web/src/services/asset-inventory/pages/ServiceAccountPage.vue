@@ -228,6 +228,9 @@ const handleDynamicLayoutFetch = (changed) => {
     if (tableState.schema === null || !isAllLoaded.value) return;
     fetchTableData(changed);
 };
+const handleVisibleCustomFieldModal = (visible) => {
+    tableState.visibleCustomFieldModal = visible;
+};
 /** ******* Page Init ******* */
 
 const reloadTable = async () => {
@@ -333,9 +336,10 @@ watch(() => tableState.selectedAccountType, () => {
                               @click-row="handleClickRow"
             />
         </component>
-        <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+        <custom-field-modal :visible="tableState.visibleCustomFieldModal"
                             resource-type="identity.ServiceAccount"
                             :options="{provider: state.selectedProvider}"
+                            @update:visible="handleVisibleCustomFieldModal"
                             @complete="reloadTable"
         />
     </section>

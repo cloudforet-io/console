@@ -18,9 +18,8 @@ const getCustomSchema = async ({ userType, userId }, provider, schemaType?:Schem
     const userConfigName = `console:${userType}:${userId}:page-schema:${schemaType}?provider=${provider}:table`;
     let userConfig:UserConfigModel<DynamicLayout>|undefined;
     try {
-        userConfig = await SpaceConnector.client.config.userConfig.get<GetUserConfigParameters, UserConfigModel<DynamicLayout>>({
+        userConfig = await SpaceConnector.clientV2.config.userConfig.get<GetUserConfigParameters, UserConfigModel<DynamicLayout>>({
             name: userConfigName,
-            workspace_id: undefined,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
