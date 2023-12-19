@@ -58,21 +58,11 @@ export class SpaceRouter {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
 
-            // CAUTION: you must recover this after new role rebuild
-            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
-            const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
-
-
-            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
-            const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
-            let nextLocation;
-
-
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
             const isDuplicatedRoute = to.name === from.name;
-            if (refreshToken && isTokenAlive && !isDuplicatedRoute) {
+            const isDuplicateWorkspace = to.params.workspaceId === from.params.workspaceId;
+            if (refreshToken && isTokenAlive && (!isDuplicatedRoute || !isDuplicateWorkspace)) {
                 let scope: string;
                 if (to.name?.startsWith('admin.')) {
                     scope = 'DOMAIN';
@@ -88,6 +78,14 @@ export class SpaceRouter {
 
                 await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
             }
+
+            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
+            const routeAccessLevel = getRouteAccessLevel(to);
+            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+
+            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
+            const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
+            let nextLocation;
 
             /* Redirect Logic for Workspace and Admin Modes
             * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent

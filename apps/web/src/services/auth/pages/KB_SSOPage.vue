@@ -11,6 +11,8 @@ import {
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
 import { loadAuth } from '@/services/auth/authenticator/loader';
@@ -41,9 +43,12 @@ export default defineComponent({
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const workspaceStore = useWorkspaceStore();
+
 
         const onSignIn = async () => {
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
+            const hasBoundWorkspace = workspaceStore.getters.workspaceList.length > 0;
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
 
             if (!props.nextPath) {
                 await vm.$router.push(defaultRoute);
