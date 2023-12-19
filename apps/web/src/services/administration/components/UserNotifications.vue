@@ -8,7 +8,7 @@
                     <p-button style-type="primary"
                               :disabled="manageDisabled"
                     >
-                        {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
+                        {{ $t('IAM.USER.NOTIFICATION.MANAGE') }}
                     </p-button>
                 </router-link>
             </template>
@@ -109,12 +109,12 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            title: i18n.t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL'),
+            title: i18n.t('IAM.USER.NOTIFICATION.NOTIFICATION_CHANNEL'),
             loading: true,
             fields: computed(() => [
-                { name: 'protocol_type', label: i18n.t('IDENTITY.USER.NOTIFICATION.TYPE') },
-                { name: 'name', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_NAME') },
-                { name: 'data', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_INFO') },
+                { name: 'protocol_type', label: i18n.t('IAM.USER.NOTIFICATION.TYPE') },
+                { name: 'name', label: i18n.t('IAM.USER.NOTIFICATION.CHANNEL_NAME') },
+                { name: 'data', label: i18n.t('IAM.USER.NOTIFICATION.CHANNEL_INFO') },
                 { name: 'schedule', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') },
                 { name: 'subscriptions', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') },
             ]),

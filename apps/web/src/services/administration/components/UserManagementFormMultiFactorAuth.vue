@@ -36,7 +36,7 @@ watch(() => props.state, (value) => {
 
 <template>
     <div class="multi-factor-auth-wrapper">
-        <p-field-title :label="$t('IDENTITY.USER.MAIN.MFA')">
+        <p-field-title :label="$t('IAM.USER.MAIN.MFA')">
             <template #left>
                 <p-toggle-button
                     :value="state.isToggleActive"
@@ -47,7 +47,7 @@ watch(() => props.state, (value) => {
             </template>
         </p-field-title>
         <p-tooltip
-            :contents="$t('IDENTITY.USER.MAIN.MFA_DESC')"
+            :contents="$t('IAM.USER.MAIN.MFA_DESC')"
             position="top"
             class="mfa-tooltip"
         >

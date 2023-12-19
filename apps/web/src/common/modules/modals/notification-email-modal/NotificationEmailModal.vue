@@ -13,9 +13,9 @@
         <template #body>
             <div class="modal-content-wrapper">
                 <p class="help-text">
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.HELP_TEXT') }}
+                    {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.HELP_TEXT') }}
                 </p>
-                <p-field-group :label="$t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.TITLE')"
+                <p-field-group :label="$t('IDENTITY.USER.NOTIFICATION_EMAIL.TITLE')"
                                :invalid="validationState.isEmailValid"
                                required
                 >
@@ -31,7 +31,7 @@
             </div>
         </template>
         <template #confirm-button>
-            {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SEND_MAIL') }}
+            {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.SEND_MAIL') }}
         </template>
     </p-button-modal>
     <p-button-modal

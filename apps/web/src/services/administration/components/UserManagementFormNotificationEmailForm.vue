@@ -50,7 +50,7 @@ const {
 } = useFormValidator({
     email: '' || props.email,
 }, {
-    email(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
+    email(value: string) { return !emailValidator(value) ? '' : i18n.t('IAM.USER.FORM.EMAIL_INVALID'); },
 });
 const { email } = forms;
 
@@ -117,7 +117,7 @@ watch(() => props.isValidEmail, (value) => {
 
 <template>
     <div class="notification-email-form-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
+        <p-field-group :label="$t('IAM.USER.FORM.NOTIFICATION_EMAIL')"
                        :invalid="invalidState.email"
                        :invalid-text="invalidTexts.email"
                        class="input-form-view"
@@ -142,8 +142,8 @@ watch(() => props.isValidEmail, (value) => {
                                      :style-type="isValidEmail ? 'green200' : 'yellow200'"
                             >
                                 {{ isValidEmail
-                                    ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
-                                    : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED')
+                                    ? $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFY')
+                                    : $t('IDENTITY.USER.NOTIFICATION_EMAIL.NOT_VERIFIED')
                                 }}
                             </p-badge>
                         </div>
@@ -159,7 +159,7 @@ watch(() => props.isValidEmail, (value) => {
                                  class="edit-icon"
                                  color="inherit transparent"
                             />
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
+                            <span>{{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.CHANGE') }}</span>
                         </p-button>
                         <p-button v-else
                                   style-type="tertiary"
@@ -168,7 +168,7 @@ watch(() => props.isValidEmail, (value) => {
                                   :loading="state.loading"
                                   @click="handleClickSend"
                         >
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}</span>
+                            <span>{{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFY') }}</span>
                         </p-button>
                     </div>
                 </div>
@@ -176,7 +176,7 @@ watch(() => props.isValidEmail, (value) => {
             <template #label-extra>
                 <p-tooltip
                     position="bottom"
-                    :contents="$t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
+                    :contents="$t('IAM.USER.FORM.NOTIFICATION_TOOLTIP')"
                     class="tooltip"
                 >
                     <p-i name="ic_question-mark-circle-filled"

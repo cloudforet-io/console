@@ -22,7 +22,7 @@ endpointStore.listEndpoints();
         class="sub-table-wrapper"
     >
         <div class="sub-table-header">
-            gRPC {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
+            gRPC {{ $t('IDENTITY.USER.API_KEY.ENDPOINTS') }}
         </div>
         <p-data-table
             :items="endpointState.endpoints"

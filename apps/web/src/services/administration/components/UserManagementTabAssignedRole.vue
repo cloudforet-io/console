@@ -45,7 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 const router = useRouter();
 
 const state = reactive({
-    title: computed(() => i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES')),
+    title: computed(() => i18n.t('IAM.USER.MAIN.ASSIGNED_ROLES')),
     loading: true,
     fields: computed(() => [
         { name: 'role_info.name', label: 'Role Name' },

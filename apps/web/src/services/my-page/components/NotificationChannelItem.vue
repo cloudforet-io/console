@@ -146,7 +146,7 @@ export default {
         });
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE'),
+            headerTitle: i18n.t('MY_PAGE.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE'),
         });
 
         const enableProjectChannel = async () => {
@@ -155,9 +155,9 @@ export default {
                     project_channel_id: state.projectChannelId,
                 });
                 state.isActivated = true;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_PROJECT_CHANNEL'), '');
+                showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_ENABLE_PROJECT_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'));
             }
         };
 
@@ -167,9 +167,9 @@ export default {
                     user_channel_id: state.userChannelId,
                 });
                 state.isActivated = true;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '');
+                showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'));
             }
         };
 
@@ -184,9 +184,9 @@ export default {
                     project_channel_id: state.projectChannelId,
                 });
                 state.isActivated = false;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '');
+                showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'));
             }
         };
 
@@ -196,9 +196,9 @@ export default {
                     user_channel_id: state.userChannelId,
                 });
                 state.isActivated = false;
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
+                showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
             }
         };
 
@@ -225,9 +225,9 @@ export default {
                 await SpaceConnector.client.notification.projectChannel.delete({
                     project_channel_id: state.projectChannelId,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '');
+                showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'));
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');
@@ -239,9 +239,9 @@ export default {
                 await SpaceConnector.client.notification.userChannel.delete({
                     user_channel_id: state.userChannelId,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
+                showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
             } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
+                ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'));
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');

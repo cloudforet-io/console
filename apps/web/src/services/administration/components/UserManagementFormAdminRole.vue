@@ -100,7 +100,7 @@ const getRoleList = async () => {
 
 <template>
     <div class="admin-role-wrapper">
-        <p-field-title :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')">
+        <p-field-title :label="$t('IAM.USER.FORM.ASSIGN_DOMAIN_ROLE')">
             <template #left>
                 <p-toggle-button
                     :value="state.isToggled"

@@ -110,7 +110,7 @@ const handleClickVerifyButton = async (type: string) => {
 <template>
     <div>
         <p-heading heading-type="sub"
-                   :title="$t('IAM.USER.ACCOUNT.BASE_INFORMATION')"
+                   :title="$t('IAM.USER.MAIN.BASE_INFORMATION')"
         />
         <p-definition-table :fields="tableState.fields"
                             :data="tableState.refinedUserItems"
@@ -170,7 +170,7 @@ const handleClickVerifyButton = async (type: string) => {
                     <span v-else
                           class="not-verified"
                     >
-                        {{ $t('IAM.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
+                        {{ $t('IAM.USER.MAIN.NOT_VERIFIED') }}
                     </span>
                 </div>
             </template>

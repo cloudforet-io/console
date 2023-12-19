@@ -66,19 +66,19 @@ const state = reactive({
         {
             type: 'item',
             name: 'enable',
-            label: i18n.t('IDENTITY.USER.MAIN.ENABLE'),
+            label: i18n.t('IDENTITY.USER.API_KEY.ENABLE'),
             disabled: state.selectedIndex.length !== 1 || state.selectedItems[0].state === 'ENABLED',
         },
         { type: 'divider' },
         {
             type: 'item',
             name: 'disable',
-            label: i18n.t('IDENTITY.USER.MAIN.DISABLE'),
+            label: i18n.t('IDENTITY.USER.API_KEY.DISABLE'),
             disabled: state.selectedIndex.length !== 1 || state.selectedItems[0].state === 'DISABLED',
         },
         { type: 'divider' },
         {
-            type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.MAIN.DELETE'), disabled: state.selectedIndex.length !== 1,
+            type: 'item', name: 'delete', label: i18n.t('IDENTITY.USER.API_KEY.DELETE'), disabled: state.selectedIndex.length !== 1,
         },
     ])),
     visible: false,
@@ -184,7 +184,7 @@ const disableAPIKey = async (item: ApiKeyModel) => {
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_DISABLE_API_KEY'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'));
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.API_KEY.ALT_E_DISABLE_API_KEY'));
     } finally {
         await listAPIKey(state.user);
         checkModalState.visible = false;
@@ -197,7 +197,7 @@ const deleteAPIKey = async (item: ApiKeyModel) => {
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_DELETE_API_KEY'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'));
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.API_KEY.ALT_E_DELETE_API_KEY'));
     } finally {
         state.selectedIndex = [];
         await listAPIKey(state.user);
@@ -270,7 +270,7 @@ watch(() => props.userId, async (userId) => {
                               @click="openAPIKeyConfirmModal"
                               @confirm="confirm"
                     >
-                        {{ $t('IDENTITY.USER.MAIN.CREATE_API_KEY') }}
+                        {{ $t('IDENTITY.USER.API_KEY.CREATE_API_KEY') }}
                     </p-button>
                     <p-select-dropdown class="dropdown-btn"
                                        :menu="state.dropdownMenu"
@@ -280,7 +280,7 @@ watch(() => props.userId, async (userId) => {
                     />
                 </div>
                 <div class="table-desc">
-                    {{ $t('IDENTITY.USER.MAIN.API_TABLE_DESC') }}
+                    {{ $t('IDENTITY.USER.API_KEY.API_TABLE_DESC') }}
                 </div>
             </article>
             <p-data-table

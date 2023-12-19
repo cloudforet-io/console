@@ -22,7 +22,7 @@ export const checkRequiredField = async (valueForCheck: string) => {
     };
     if (!valueForCheck || valueForCheck?.length === 0) {
         validation.isValid = false;
-        validation.invalidText = i18n.t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+        validation.invalidText = i18n.t('IAM.USER.FORM.REQUIRED_FIELD');
     }
     return validation;
 };
@@ -37,7 +37,7 @@ export const checkDuplicateID = async (userID: string) => {
     });
     if (total_count && total_count > 0) {
         validation.isValid = false;
-        validation.invalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
+        validation.invalidText = i18n.t('IAM.USER.FORM.USER_ID_DUPLICATED');
     }
     return validation;
 };
@@ -50,7 +50,7 @@ export const checkEmailFormat = (userID: string) => {
     const emailCheckRegex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
     if (!emailCheckRegex.test(userID)) {
         validation.isValid = false;
-        validation.invalidText = i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID');
+        validation.invalidText = i18n.t('IAM.USER.FORM.EMAIL_INVALID');
     }
     return validation;
 };

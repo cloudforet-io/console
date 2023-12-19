@@ -27,7 +27,7 @@ const state = reactive({
 
 <template>
     <section class="api-key-wrapper">
-        <p-heading :title="$t('IDENTITY.USER.MAIN.API_KEY')"
+        <p-heading :title="$t('IDENTITY.USER.API_KEY.API_KEY')"
                    :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')"
                    class="page-title"
         />

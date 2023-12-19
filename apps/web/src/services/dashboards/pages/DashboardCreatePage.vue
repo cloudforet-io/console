@@ -110,6 +110,7 @@ const saveCurrentStateToStore = () => {
 
     dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
     dashboardDetailStore.setDashboardId(undefined);
+    dashboardDetailStore.setProjectId(dashboardProject.value?.id ?? '');
     dashboardDetailStore.setPlaceholder(dashboardTemplate.value.name);
 };
 

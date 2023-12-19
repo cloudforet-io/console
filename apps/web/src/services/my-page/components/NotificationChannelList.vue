@@ -2,7 +2,7 @@
     <section class="notification-wrapper">
         <p-pane-layout class="noti-channel-wrapper">
             <h3 class="sub-title">
-                {{ $t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL') }}
+                {{ $t('MY_PAGE.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
             <p-data-loader :data="protocolList"
                            :loading="loading"
@@ -48,11 +48,11 @@
                          width="1.125rem"
                          class="mr-2"
                     />
-                    <b>SpaceOne User:</b> {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
+                    <b>SpaceOne User:</b> {{ $t('MY_PAGE.NOTIFICATION.SPACEONE_USER_DESC') }}
                 </p>
                 <template #no-data>
                     <p-empty class="empty-msg protocol">
-                        {{ $t('IDENTITY.USER.NOTIFICATION.NO_PROTOCOL') }}
+                        {{ $t('MY_PAGE.NOTIFICATION.NO_PROTOCOL') }}
                     </p-empty>
                 </template>
             </p-data-loader>
@@ -77,7 +77,7 @@
                 </div>
                 <template #no-data>
                     <p-empty class="empty-msg">
-                        {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}
+                        {{ $t('MY_PAGE.NOTIFICATION.NO_NOTI_CHANNEL') }}
                     </p-empty>
                 </template>
             </p-data-loader>

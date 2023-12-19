@@ -1,6 +1,6 @@
 <template>
     <section class="user-account-page">
-        <p-heading :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
+        <p-heading :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <user-account-base-information />
         <user-account-notification-email v-if="state.smtpEnabled && (state.userType === 'LOCAL' || state.userType === 'EXTERNAL')" />
         <user-account-multi-factor-auth />

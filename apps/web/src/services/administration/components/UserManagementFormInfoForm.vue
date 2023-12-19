@@ -90,7 +90,7 @@ const handleClickCheckId = async () => {
     const invalidObj = validation.find((item) => item.invalidText.length > 0);
     if (!invalidObj) {
         validationState.proxyIsUserIdValid = true;
-        validationState.userIdValidText = i18n.t('IDENTITY.USER.FORM.NAME_VALID');
+        validationState.userIdValidText = i18n.t('IAM.USER.FORM.NAME_VALID');
         emit('change-input', { ...formState, userId: formState.userId });
     } else {
         validationState.proxyIsUserIdValid = invalidObj.isValid;
@@ -120,7 +120,7 @@ watch(() => props.activeTab, (after) => {
 
 <template>
     <div class="user-info-form-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
+        <p-field-group :label="$t('IAM.USER.FORM.USER_ID')"
                        :required="true"
                        :invalid="validationState.proxyIsUserIdValid === false"
                        :invalid-text="validationState.userIdInvalidText"
@@ -133,7 +133,7 @@ watch(() => props.activeTab, (after) => {
                       #help
             >
                 <div class="external-items-help-text">
-                    <span>{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
+                    <span>{{ $t('IAM.USER.FORM.TOO_MANY_RESULTS') }}</span>
                 </div>
             </template>
             <template #default="{invalid}">
@@ -169,12 +169,12 @@ watch(() => props.activeTab, (after) => {
                               class="user-id-check-button"
                               @click="handleClickCheckId"
                     >
-                        {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
+                        {{ $t('IAM.USER.FORM.CHECK_USER_ID') }}
                     </p-button>
                 </div>
             </template>
         </p-field-group>
-        <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')"
+        <p-field-group :label="$t('IAM.USER.FORM.NAME')"
                        class="input-form"
         >
             <p-text-input v-model="formState.name"

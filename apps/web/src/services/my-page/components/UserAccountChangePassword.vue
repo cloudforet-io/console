@@ -175,7 +175,7 @@ const updateUser = async (userParam: UpdateUserRequest) => {
                       :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
                       @click="handleClickPasswordConfirm"
             >
-                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
+                {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
             </p-button>
         </div>
     </user-account-module-container>

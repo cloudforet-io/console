@@ -16,19 +16,19 @@ const handleClickButton = (type: string) => {
     switch (type) {
     case USER_MODAL_TYPE.REMOVE: updateModalSettings({
         type,
-        title: i18n.t('IDENTITY.USER.MAIN.MODAL.REMOVE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.REMOVE_TITLE') as string,
         themeColor: 'alert',
         statusVisible: true,
     }); break;
     case USER_MODAL_TYPE.INVITE: updateModalSettings({
         type,
-        title: i18n.t('IDENTITY.USER.MAIN.MODAL.INVITE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.INVITE_TITLE') as string,
         themeColor: 'primary',
         addVisible: true,
     }); break;
     case USER_MODAL_TYPE.ADD: updateModalSettings({
         type,
-        title: i18n.t('IDENTITY.USER.MAIN.MODAL.CREATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string,
         themeColor: 'primary',
         addVisible: true,
     }); break;

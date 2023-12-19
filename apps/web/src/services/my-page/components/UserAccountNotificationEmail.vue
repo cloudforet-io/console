@@ -38,7 +38,7 @@ const {
 } = useFormValidator({
     notificationEmail: '',
 }, {
-    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
+    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('MY_PAGE.NOTIFICATION_EMAIL.EMAIL_INVALID'); },
 });
 
 const handleClickVerifyButton = async (type: string) => {
@@ -81,7 +81,7 @@ watch(() => store.state.user.email, (value) => {
         <template #headline>
             <div class="headline-wrapper">
                 <p class="form-title">
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.TITLE') }}
+                    {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.TITLE') }}
                 </p>
                 <div class="verify-status-wrapper">
                     <div v-if="state.verified"
@@ -94,19 +94,19 @@ watch(() => store.state.user.email, (value) => {
                              color="#60B731"
                         />
                         <span>
-                            {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFIED') }}
+                            {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFIED') }}
                         </span>
                     </div>
                     <span v-else
                           class="not-verified"
                     >
-                        {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
+                        {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
                     </span>
                 </div>
             </div>
         </template>
         <span class="help-text">
-            {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.HELP_TEXT') }}
+            {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.HELP_TEXT') }}
         </span>
         <form class="form"
               onsubmit="return false"
