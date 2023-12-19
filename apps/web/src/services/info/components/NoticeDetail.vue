@@ -66,7 +66,7 @@ const state = reactive({
     }),
     domainName: computed<string>(() => store.state.domain.name ?? ''),
     postDomainName: '',
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
+    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
     noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(state.noticePostData?.post_type)),
 });

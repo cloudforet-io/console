@@ -29,7 +29,7 @@ const noticeDetailState = noticeDetailStore.state;
 const noticeDetailGetters = noticeDetailStore.getters;
 
 const state = reactive({
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
+    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
     hasPermissionToEditOrDelete: computed<boolean>(() => {
         if (state.postType === NOTICE_POST_TYPE.SYSTEM) return state.hasSystemRoleUser;

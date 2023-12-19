@@ -116,7 +116,7 @@ export default defineComponent<Props>({
     setup(props) {
         const state = reactive({
             noticeTypeBadge: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.post?.post_type)),
-            hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
+            hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
             hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
             postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
