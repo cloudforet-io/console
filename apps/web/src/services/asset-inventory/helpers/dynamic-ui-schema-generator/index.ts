@@ -44,11 +44,12 @@ export const updateCustomTableSchema = async (userData:{userType:string, userId:
                 name: getCustomTableSchemaKey(userData, resourceType, provider),
                 data,
             });
+        } else {
+            await client.userConfig.create<CreateUserConfigParameters, UserConfigModel>({
+                name: getCustomTableSchemaKey(userData, resourceType, provider),
+                data,
+            });
         }
-        await client.userConfig.create<CreateUserConfigParameters, UserConfigModel>({
-            name: getCustomTableSchemaKey(userData, resourceType, provider),
-            data,
-        });
     } catch (e) {
         ErrorHandler.handleError(e);
     }
