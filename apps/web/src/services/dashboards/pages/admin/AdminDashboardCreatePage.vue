@@ -76,11 +76,10 @@ const state = reactive({
 });
 
 const goStep = (direction: 'prev'|'next') => {
-    if (state.currentStep === 2 && direction === 'next') {
+    if (direction === 'next') {
         saveCurrentStateToStore();
-    }
-    if (direction === 'prev') state.currentStep--;
-    else state.currentStep++;
+        state.currentStep++;
+    } else state.currentStep--;
 };
 
 const saveCurrentStateToStore = () => {
@@ -156,7 +155,7 @@ defineExpose({ setPathFrom });
                     style-type="transparent"
                     size="lg"
                     icon-left="ic_arrow-left"
-                    @click="goStep('prev')"
+                    @click="handleClickBackButton"
                 >
                     {{ $t('DASHBOARDS.CREATE.GO_BACK') }}
                 </p-button>
@@ -193,13 +192,13 @@ defineExpose({ setPathFrom });
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
-    &.step-2 {
+    &.step-1 {
         @apply absolute;
         top: 2rem;
         width: 100%;
         max-width: 1000px;
     }
-    &.step-3 {
+    &.step-2 {
         width: 100%;
         height: 100%;
         min-height: calc(100vh - 8rem);
