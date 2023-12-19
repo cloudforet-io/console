@@ -26,6 +26,7 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { CreateDashboardParameters } from '@/schema/dashboard/dashboard/api-verbs/create';
 import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
@@ -107,11 +108,8 @@ const createDashboard = async () => {
             variables_schema: dashboardDetailState.variablesSchema,
             tags: { created_by: store.state.user.userId },
             dashboard_type: dashboardDetailStore.dashboardType,
-            resource_group: dashboardDetailStore.isProjectDashboard ? 'PROJECT' : 'WORKSPACE',
+            resource_group: RESOURCE_GROUP.DOMAIN,
         };
-        if (dashboardDetailStore.isProjectDashboard) {
-            apiParam.project_id = dashboardDetailState.projectId;
-        }
 
         const createdDashboard = await dashboardStore.createDashboard(apiParam);
         await SpaceRouter.router.push({

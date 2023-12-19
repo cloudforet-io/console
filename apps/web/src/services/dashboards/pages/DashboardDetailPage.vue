@@ -83,7 +83,7 @@ onUnmounted(() => {
 
 <template>
     <div class="dashboard-detail-page">
-        <dashboard-detail-header dashboard-id="props.dashboardId" />
+        <dashboard-detail-header :dashboard-id="props.dashboardId" />
         <div class="filter-box">
             <dashboard-labels @update-labels="handleUpdateLabels" />
             <dashboard-toolset />

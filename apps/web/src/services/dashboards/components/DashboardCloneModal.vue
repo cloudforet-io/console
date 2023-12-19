@@ -15,6 +15,7 @@ import type { CreateDashboardParameters } from '@/schema/dashboard/dashboard/api
 import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -43,6 +44,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
@@ -72,6 +74,7 @@ const {
 });
 const currentRouteName = SpaceRouter.router.currentRoute.name;
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     proxyVisible: useProxyValue('visible', props, emit),
     filteredVisibilityList: computed(() => [
         { name: 'PRIVATE', label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'), icon: 'ic_lock-filled' },
@@ -83,6 +86,7 @@ const state = reactive({
         return '';
     }),
     dashboardNameList: computed<string[]>(() => {
+        if (state.isAdminMode) return dashboardGetters.domainItems.map((item) => item.name);
         if (state.projectId) {
             return dashboardGetters.projectItems
                 .filter((item) => (

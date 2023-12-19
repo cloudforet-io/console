@@ -12,6 +12,7 @@ import type { DashboardScope, DashboardTemplate } from '@/schema/dashboard/_type
 import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
@@ -33,8 +34,12 @@ const props = defineProps<Props>();
 
 const templateContainerRef = ref<HTMLElement | null>(null);
 
+const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
     searchValue: '',
@@ -72,8 +77,9 @@ const existingTemplateState = reactive({
         return '';
     }),
     dashboards: computed<DashboardModel[]>(() => {
-        let dashboardItems;
-        if (props.dashboardScope === 'WORKSPACE') dashboardItems = dashboardGetters.workspaceItems;
+        let dashboardItems: DashboardModel[];
+        if (storeState.isAdminMode) dashboardItems = dashboardGetters.domainItems;
+        else if (props.dashboardScope === 'WORKSPACE') dashboardItems = dashboardGetters.workspaceItems;
         else dashboardItems = dashboardGetters.projectItems;
 
         return dashboardItems.filter((d) => d.name.includes(state.searchValue));
