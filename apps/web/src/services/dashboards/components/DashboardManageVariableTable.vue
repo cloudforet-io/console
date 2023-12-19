@@ -61,7 +61,7 @@ const state = reactive({
 const handleSelectType = (selected) => {
     state.selectedVariableType = selected;
 };
-const handleClonrVariable = (propertyName: string) => {
+const handleCloneVariable = (propertyName: string) => {
     emit('clone', propertyName);
 };
 const handleEditVariable = (propertyName: string) => {
@@ -169,7 +169,7 @@ const {
                      class="button-wrapper"
                 >
                     <p-icon-button name="ic_duplicate"
-                                   @click="handleClonrVariable(value)"
+                                   @click="handleCloneVariable(value)"
                     />
                     <p-icon-button name="ic_edit"
                                    @click="handleEditVariable(value)"
