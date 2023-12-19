@@ -128,10 +128,7 @@ const getQuery = (type: AccountType) => {
     const fields = tableState.schema?.options?.fields;
     if (fields) {
         apiQuery.setOnly(
-            ...fields.map((d) => d.key).filter((d) => {
-                if (isTrustedAccount && !(d === 'project_id')) return false;
-                return !d.startsWith('tags.');
-            }),
+            ...fields.map((d) => d.key),
             isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
             'tags',
         );

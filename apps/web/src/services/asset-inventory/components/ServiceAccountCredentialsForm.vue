@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComputedRef } from 'vue';
 import {
     computed, reactive, watch, onMounted,
 } from 'vue';
@@ -53,6 +54,17 @@ const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 const workspaceStore = useWorkspaceStore();
 
+interface State {
+    showTrustedAccount: ComputedRef<boolean>;
+    trustedAccounts: TrustedAccountModel[];
+    trustedAccountMenuItems: ComputedRef<SelectDropdownMenuItem[]>;
+    selectedTrustedAccountDataList: ComputedRef<Array<{ key: string|undefined; value: string }>>;
+    secretTypes: SchemaModel[];
+    credentialSchema: ComputedRef<JsonSchema>;
+    trustedAccountInfoLink: ComputedRef<string>;
+    baseInformationSchema: ComputedRef<JsonSchema|undefined>;
+}
+
 const storeState = reactive({
     language: computed(() => store.state.user.language),
     currentProviderSchemaList: computed<SchemaModel[]>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList),
@@ -62,14 +74,14 @@ const storeState = reactive({
     secretSchema: computed<SchemaModel|undefined>(() => serviceAccountSchemaStore.getters.secretSchema),
     providerName: computed(() => serviceAccountSchemaStore.getters.currentProviderData?.name ?? ''),
 });
-const state = reactive({
+const state = reactive<State>({
     showTrustedAccount: computed<boolean>(() => !!storeState.trustingSecretSchema),
-    trustedAccounts: [] as TrustedAccountModel[],
+    trustedAccounts: [],
     trustedAccountMenuItems: computed<SelectDropdownMenuItem[]>(() => state.trustedAccounts.map((d) => ({
         name: d.trusted_account_id,
         label: d.name,
     }))),
-    selectedTrustedAccountDataList: computed(() => {
+    selectedTrustedAccountDataList: computed<Array<{ key: string|undefined; value: string }>>(() => {
         const selectedTrustedAccount = state.trustedAccounts.find((d) => d.trusted_account_id === formState.attachedTrustedAccountId);
         if (!selectedTrustedAccount) return [];
         const baseInfoProperties: Record<string, JsonSchema> = state.baseInformationSchema?.properties;
@@ -80,7 +92,7 @@ const state = reactive({
             value: selectedTrustedAccount.data[k],
         }));
     }),
-    secretTypes: [] as SchemaModel[],
+    secretTypes: [],
     credentialSchema: computed<JsonSchema>(() => formState.selectedSecretType?.schema ?? null),
     trustedAccountInfoLink: computed<string>(() => {
         const lang = storeState.language === 'en' ? '' : `${storeState.language}/`;
@@ -157,7 +169,7 @@ const listTrustAccounts = async () => {
             query: getQuery().data,
             workspace_id: undefined,
         });
-        state.trustedAccounts = results;
+        state.trustedAccounts = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.trustedAccounts = [];
@@ -233,9 +245,8 @@ const getSecretSchema = async (isTrustingSchema:boolean) => {
     try {
         const result = await SpaceConnector.clientV2.identity.schema.list<SchemaListParameters, ListResponse<SchemaModel>>({
             query: schemaApiQueryHelper.data,
-            workspace_id: undefined,
         });
-        state.secretTypes = result.results;
+        state.secretTypes = result.results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.secretTypes = [];
