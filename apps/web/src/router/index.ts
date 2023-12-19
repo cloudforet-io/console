@@ -76,6 +76,7 @@ export class SpaceRouter {
                     token: refreshToken,
                 };
 
+                // TODO: add error handling by routing 403
                 await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
             }
 
