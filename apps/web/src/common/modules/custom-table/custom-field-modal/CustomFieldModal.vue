@@ -1,111 +1,6 @@
-<template>
-    <p-button-modal :visible.sync="proxyVisible"
-                    :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
-                    :loading="loading"
-                    :disabled="!isValid"
-                    @confirm="updatePageSchema"
-    >
-        <template #body>
-            <p-data-loader :loading="loading"
-                           :min-loading-time="500"
-            >
-                <div class="contents-wrapper">
-                    <section class="attribute-column-section">
-                        <h3 class="section-title">
-                            <template v-if="isValid">
-                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
-                            </template>
-                            <span v-else
-                                  class="invalid-text"
-                            >{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
-                            <p-button style-type="secondary"
-                                      size="sm"
-                                      @click="setColumnsDefault"
-                            >
-                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
-                            </p-button>
-                        </h3>
-                        <p-search v-model="search"
-                                  :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')"
-                        />
-                        <div class="sort-wrapper">
-                            <label>{{ $t('COMMON.CUSTOM_FIELD_MODAL.SORT_BY') }}</label>
-                            <p-button style-type="tertiary"
-                                      size="sm"
-                                      @click="sortByRecommendation"
-                            >
-                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.RECOMMEND_SORT') }}
-                            </p-button>
-                            <p-button style-type="tertiary"
-                                      size="sm"
-                                      @click="sortByAlphabet"
-                            >
-                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.ALPHABETICAL_SORT') }}
-                            </p-button>
-                        </div>
+<script setup lang="ts">
 
-                        <header>
-                            <p-checkbox :selected="isAllSelected"
-                                        :value="true"
-                                        @change="onChangeAllSelect"
-                            />
-                            <span class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_NAME') }}</span>
-                        </header>
-
-                        <div class="column-items-wrapper">
-                            <draggable v-model="allColumns"
-                                       draggable=".draggable-item"
-                                       ghost-class="ghost"
-                            >
-                                <column-item v-for="(column, idx) in allColumns"
-                                             :key="`${column.key}-${idx}`"
-                                             :selected-keys="selectedAllColumnKeys"
-                                             :item="column"
-                                             :search-text="search"
-                                             @update:selectedKeys="handleUpdateSelectedKeys"
-                                />
-                            </draggable>
-                        </div>
-                    </section>
-
-                    <section>
-                        <h3 class="section-title">
-                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
-                            <p-button style-type="secondary"
-                                      size="sm"
-                                      @click="clearSelectedTags"
-                            >
-                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
-                            </p-button>
-                        </h3>
-                        <keep-alive>
-                            <select-cloud-service-tag-columns v-if="isResourceTypeCloudService"
-                                                              :options="options"
-                                                              :is-server-page="isServerPage"
-                                                              :selected-tag-keys="selectedTagKeys"
-                                                              @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
-                            />
-                            <select-tag-columns v-else
-                                                :resource-type="resourceType"
-                                                :options="options"
-                                                :is-server-page="isServerPage"
-                                                :selected-tag-keys="selectedTagKeys"
-                                                @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
-                            />
-                        </keep-alive>
-                    </section>
-                </div>
-            </p-data-loader>
-        </template>
-    </p-button-modal>
-</template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from 'vue';
+import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
 import {
@@ -128,14 +23,14 @@ const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table
 const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
 
 interface Props {
-    visible: boolean;
+    visible?: boolean;
     resourceType: string;
-    options: {
+    options?: {
         provider?: string;
         cloudServiceGroup?: string;
         cloudServiceType?: string;
     };
-    isServerPage: boolean;
+    isServerPage?: boolean;
 }
 
 type SelectedColumnMap = Record<string, DynamicField>;
@@ -154,237 +49,301 @@ const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicF
     return allColumns;
 };
 
-export default defineComponent<Props>({
-    name: 'CustomFieldModal',
-    components: {
-        SelectCloudServiceTagColumns,
-        ColumnItem,
-        SelectTagColumns,
-        PButtonModal,
-        PSearch,
-        PButton,
-        PCheckbox,
-        PDataLoader,
-        draggable,
-    },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        resourceType: {
-            type: String,
-            default: '',
-            required: true,
-        },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        isServerPage: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        let schema: any = {};
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    resourceType: '',
+    options: () => ({}),
+    isServerPage: false,
+});
 
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            search: '',
-            isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
-            loading: true,
-            availableColumns: [] as DynamicField[], // all default fields including optional fields.
-            currentColumns: [] as DynamicField[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
-            allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
-            selectedColumnMap: {} as SelectedColumnMap,
-            selectedColumns: computed<DynamicField[]>({
-                get: () => state.allColumns.filter((d) => !!state.selectedColumnMap[d.key]),
-                set: (val: DynamicField[]) => {
-                    const selectedMap: SelectedColumnMap = {};
-                    const tagColumns: DynamicField[] = [];
-                    val.forEach((d) => {
-                        selectedMap[d.key] = d;
-                        if (d.key.startsWith(TAGS_PREFIX)) tagColumns.push(d);
-                    });
+const emit = defineEmits<{(e: 'complete'): void;
+    (e: 'update:selected-tag-keys', tagKeys: string[]): void;
+}>();
 
-                    state.allColumns = mergeFields(state.allColumns, tagColumns)
-                        .filter((d) => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
-                    state.selectedColumnMap = selectedMap;
-                },
-            }),
-            selectedAllColumnKeys: computed<string[]>(() => state.selectedColumns.map((d) => d.key)),
-            selectedNonTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => !key.startsWith(TAGS_PREFIX))),
-            selectedTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => key.startsWith(TAGS_PREFIX))),
-            recommendedSequenceMap: computed<Record<string, number>>(() => {
-                const orderMap: Record<string, number> = {};
-                state.availableColumns.forEach((d, i) => {
-                    orderMap[d.key] = i;
-                });
-                return orderMap;
-            }),
-            isValid: computed(() => state.loading || state.selectedColumns.length > 0),
-            isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
+
+let schema: any = {};
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    search: '',
+    isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
+    loading: true,
+    availableColumns: [] as DynamicField[], // all default fields including optional fields.
+    currentColumns: [] as DynamicField[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
+    allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
+    selectedColumnMap: {} as SelectedColumnMap,
+    selectedColumns: computed<DynamicField[]>({
+        get: () => state.allColumns.filter((d) => !!state.selectedColumnMap[d.key]),
+        set: (val: DynamicField[]) => {
+            const selectedMap: SelectedColumnMap = {};
+            const tagColumns: DynamicField[] = [];
+            val.forEach((d) => {
+                selectedMap[d.key] = d;
+                if (d.key.startsWith(TAGS_PREFIX)) tagColumns.push(d);
+            });
+
+            state.allColumns = mergeFields(state.allColumns, tagColumns)
+                .filter((d) => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
+            state.selectedColumnMap = selectedMap;
+        },
+    }),
+    selectedAllColumnKeys: computed<string[]>(() => state.selectedColumns.map((d) => d.key)),
+    selectedNonTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => !key.startsWith(TAGS_PREFIX))),
+    selectedTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => key.startsWith(TAGS_PREFIX))),
+    recommendedSequenceMap: computed<Record<string, number>>(() => {
+        const orderMap: Record<string, number> = {};
+        state.availableColumns.forEach((d, i) => {
+            orderMap[d.key] = i;
+        });
+        return orderMap;
+    }),
+    isValid: computed(() => state.loading || state.selectedColumns.length > 0),
+    isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
+});
+
+const sortByRecommendation = () => {
+    state.allColumns = state.allColumns.sort((a, b) => {
+        if (!state.selectedColumnMap[a.key]) return 1;
+        if (!state.selectedColumnMap[b.key]) return -1;
+        if (state.recommendedSequenceMap[a.key] === undefined) return 1;
+        if (state.recommendedSequenceMap[b.key] === undefined) return -1;
+        return state.recommendedSequenceMap[a.key] - (state.recommendedSequenceMap[b.key]);
+    });
+};
+
+const sortByAlphabet = () => {
+    state.allColumns = state.allColumns.sort((a, b) => {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+        if (!state.selectedColumnMap[a.key]) return 1;
+        if (!state.selectedColumnMap[b.key]) return -1;
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+    });
+};
+
+const onChangeAllSelect = (val) => {
+    if (val) {
+        state.selectedColumns = [...state.allColumns];
+    } else {
+        state.selectedColumns = [];
+    }
+};
+
+const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
+    try {
+        const options: any = {
+            include_optional_fields: includeOptionalFields,
+        };
+        const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+        if (provider)options.provider = provider;
+        if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
+        if (cloudServiceType) options.cloud_service_type = cloudServiceType;
+
+        const res = await SpaceConnector.client.addOns.pageSchema.get({
+            resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
+            schema: 'table',
+            options,
         });
 
-        const sortByRecommendation = () => {
-            state.allColumns = state.allColumns.sort((a, b) => {
-                if (!state.selectedColumnMap[a.key]) return 1;
-                if (!state.selectedColumnMap[b.key]) return -1;
-                if (state.recommendedSequenceMap[a.key] === undefined) return 1;
-                if (state.recommendedSequenceMap[b.key] === undefined) return -1;
-                return state.recommendedSequenceMap[a.key] - (state.recommendedSequenceMap[b.key]);
-            });
-        };
+        schema = res;
+        delete schema.options?.search;
+        return res.options?.fields || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        schema = {};
+        return [];
+    }
+};
 
-        const sortByAlphabet = () => {
-            state.allColumns = state.allColumns.sort((a, b) => {
-                const nameA = a.name.toUpperCase();
-                const nameB = b.name.toUpperCase();
-                if (!state.selectedColumnMap[a.key]) return 1;
-                if (!state.selectedColumnMap[b.key]) return -1;
-                if (nameA < nameB) return -1;
-                if (nameA > nameB) return 1;
-                return 0;
-            });
-        };
+const setColumnsDefault = async () => {
+    state.allColumns = state.availableColumns;
+    state.selectedColumns = state.availableColumns.filter((d) => !d.options?.is_optional);
+    sortByRecommendation();
+};
 
-        const onChangeAllSelect = (val) => {
-            if (val) {
-                state.selectedColumns = [...state.allColumns];
-            } else {
-                state.selectedColumns = [];
-            }
-        };
+const updatePageSchema = async () => {
+    state.loading = true;
 
-        const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
-            try {
-                const options: any = {
-                    include_optional_fields: includeOptionalFields,
-                };
-                const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-                if (provider)options.provider = provider;
-                if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
-                if (cloudServiceType) options.cloud_service_type = cloudServiceType;
+    const data = { ...schema };
+    if (!data.options) data.options = {};
+    data.options.fields = state.selectedColumns;
 
-                const res = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-                    schema: 'table',
-                    options,
-                });
+    const options: any = {};
+    const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+    if (provider) options.provider = provider;
+    if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
+    if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 
-                schema = res;
-                delete schema.options?.search;
-                return res.options?.fields || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                schema = {};
-                return [];
-            }
-        };
+    try {
+        await SpaceConnector.client.addOns.pageSchema.update({
+            resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
+            schema: 'table',
+            data,
+            options,
+        });
 
-        const setColumnsDefault = async () => {
-            state.allColumns = state.availableColumns;
-            state.selectedColumns = state.availableColumns.filter((d) => !d.options?.is_optional);
-            sortByRecommendation();
-        };
-
-        const updatePageSchema = async () => {
-            state.loading = true;
-
-            const data = { ...schema };
-            if (!data.options) data.options = {};
-            data.options.fields = state.selectedColumns;
-
-            const options: any = {};
-            const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-            if (provider) options.provider = provider;
-            if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
-            if (cloudServiceType) options.cloud_service_type = cloudServiceType;
-
-            try {
-                await SpaceConnector.client.addOns.pageSchema.update({
-                    resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-                    schema: 'table',
-                    data,
-                    options,
-                });
-
-                showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
-                emit('complete');
-                state.proxyVisible = false;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'));
-            } finally {
-                state.loading = false;
-            }
-        };
+        showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
+        emit('complete');
+        state.proxyVisible = false;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'));
+    } finally {
+        state.loading = false;
+    }
+};
 
 
-        const updateSelectedKeys = (keys: string[]) => {
-            state.selectedColumns = keys.map((key) => {
-                if (key.startsWith(TAGS_PREFIX)) {
-                    const name = key.slice(TAGS_PREFIX.length);
-                    return {
-                        key,
-                        name,
-                        options: {
-                            ...TAGS_OPTIONS,
-                            ...(!state.isResourceTypeCloudService && { key_depth: 1 }),
-                        },
-                    } as DynamicField;
-                }
-                return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
-            });
-        };
+const updateSelectedKeys = (keys: string[]) => {
+    state.selectedColumns = keys.map((key) => {
+        if (key.startsWith(TAGS_PREFIX)) {
+            const name = key.slice(TAGS_PREFIX.length);
+            return {
+                key,
+                name,
+                options: {
+                    ...TAGS_OPTIONS,
+                    ...(!state.isResourceTypeCloudService && { key_depth: 1 }),
+                },
+            } as DynamicField;
+        }
+        return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
+    });
+};
 
-        const handleUpdateSelectedKeys = (keys: string[]) => {
-            updateSelectedKeys(keys);
-        };
+const handleUpdateSelectedKeys = (keys: string[]) => {
+    updateSelectedKeys(keys);
+};
 
-        /* Tags */
-        const clearSelectedTags = () => {
-            const tagKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
-            updateSelectedKeys(tagKeys);
-        };
-        const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
-            updateSelectedKeys(tagKeys.concat(state.selectedNonTagKeys));
-        };
+/* Tags */
+const clearSelectedTags = () => {
+    const tagKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
+    updateSelectedKeys(tagKeys);
+};
+const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
+    updateSelectedKeys(tagKeys.concat(state.selectedNonTagKeys));
+};
 
-        /* Init */
-        const initColumns = async () => {
-            state.loading = true;
-            const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
-            state.availableColumns = availableColumnRes.status === 'fulfilled' ? availableColumnRes.value : [];
-            state.currentColumns = currentColumnRes.status === 'fulfilled' ? currentColumnRes.value : [];
-            state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
-            state.selectedColumns = [...state.currentColumns];
-            state.loading = false;
-        };
-        watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
-            if (visible && resourceType) {
-                initColumns();
-            }
-        }, { immediate: true });
-        return {
-            ...toRefs(state),
-            sortByRecommendation,
-            sortByAlphabet,
-            onChangeAllSelect,
-            setColumnsDefault,
-            clearSelectedTags,
-            updatePageSchema,
-            TAGS_PREFIX,
-            handleUpdateSelectedKeys,
-            handleUpdatedSelectedTagKeys,
-        };
-    },
-});
+/* Init */
+const initColumns = async () => {
+    state.loading = true;
+    const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
+    state.availableColumns = availableColumnRes.status === 'fulfilled' ? availableColumnRes.value : [];
+    state.currentColumns = currentColumnRes.status === 'fulfilled' ? currentColumnRes.value : [];
+    state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
+    state.selectedColumns = [...state.currentColumns];
+    state.loading = false;
+};
+watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
+    if (visible && resourceType) {
+        initColumns();
+    }
+}, { immediate: true });
+
 </script>
+
+<template>
+    <p-button-modal :visible.sync="state.proxyVisible"
+                    :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
+                    :loading="state.loading"
+                    :disabled="!state.isValid"
+                    @confirm="updatePageSchema"
+    >
+        <template #body>
+            <p-data-loader :loading="state.loading"
+                           :min-loading-time="500"
+            >
+                <div class="contents-wrapper">
+                    <section class="attribute-column-section">
+                        <h3 class="section-title">
+                            <template v-if="state.isValid">
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
+                            </template>
+                            <span v-else
+                                  class="invalid-text"
+                            >{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
+                            <p-button style-type="secondary"
+                                      size="sm"
+                                      @click="setColumnsDefault"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
+                            </p-button>
+                        </h3>
+                        <p-search v-model="state.search"
+                                  :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')"
+                        />
+                        <div class="sort-wrapper">
+                            <label>{{ $t('COMMON.CUSTOM_FIELD_MODAL.SORT_BY') }}</label>
+                            <p-button style-type="tertiary"
+                                      size="sm"
+                                      @click="sortByRecommendation"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.RECOMMEND_SORT') }}
+                            </p-button>
+                            <p-button style-type="tertiary"
+                                      size="sm"
+                                      @click="sortByAlphabet"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.ALPHABETICAL_SORT') }}
+                            </p-button>
+                        </div>
+
+                        <header>
+                            <p-checkbox :selected="state.isAllSelected"
+                                        :value="true"
+                                        @change="onChangeAllSelect"
+                            />
+                            <span class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_NAME') }}</span>
+                        </header>
+
+                        <div class="column-items-wrapper">
+                            <draggable v-model="state.allColumns"
+                                       draggable=".draggable-item"
+                                       ghost-class="ghost"
+                            >
+                                <column-item v-for="(column, idx) in state.allColumns"
+                                             :key="`${column.key}-${idx}`"
+                                             :selected-keys="state.selectedAllColumnKeys"
+                                             :item="column"
+                                             :search-text="state.search"
+                                             @update:selectedKeys="handleUpdateSelectedKeys"
+                                />
+                            </draggable>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="section-title">
+                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
+                            <p-button style-type="secondary"
+                                      size="sm"
+                                      @click="clearSelectedTags"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
+                            </p-button>
+                        </h3>
+                        <keep-alive>
+                            <select-cloud-service-tag-columns v-if="state.isResourceTypeCloudService"
+                                                              :options="options"
+                                                              :is-server-page="isServerPage"
+                                                              :selected-tag-keys="state.selectedTagKeys"
+                                                              @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
+                            />
+                            <select-tag-columns v-else
+                                                :resource-type="resourceType"
+                                                :options="options"
+                                                :is-server-page="isServerPage"
+                                                :selected-tag-keys="state.selectedTagKeys"
+                                                @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
+                            />
+                        </keep-alive>
+                    </section>
+                </div>
+            </p-data-loader>
+        </template>
+    </p-button-modal>
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-button-modal */
