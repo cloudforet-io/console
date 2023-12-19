@@ -40,17 +40,12 @@ export const MENU_LIST: Menu[] = [
         ],
     },
     {
-        id: MENU_ID.ADMINISTRATION,
+
+        id: MENU_ID.IAM,
         needPermissionByRole: true,
         subMenuList: [
-            {
-                id: MENU_ID.IAM,
-                needPermissionByRole: true,
-                subMenuList: [
-                    { id: MENU_ID.USER, needPermissionByRole: true },
-                    { id: MENU_ID.APP, needPermissionByRole: true },
-                ],
-            },
+            { id: MENU_ID.USER, needPermissionByRole: true },
+            { id: MENU_ID.APP, needPermissionByRole: true },
         ],
     },
     {
