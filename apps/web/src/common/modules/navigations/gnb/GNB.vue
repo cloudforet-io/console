@@ -138,7 +138,30 @@ export default defineComponent({
                 const selectedMenu = state.invisibleGnbMenuList.find((menu) => getMenuIsSelected(menu.id) && menu.type === 'item');
                 return selectedMenu?.id;
             }),
-            siteMapMenuList: computed<GNBMenuType[]>(() => store.getters['display/siteMapMenuList']),
+            siteMapMenuList: computed<GNBMenuType[]>(() => {
+                const basicSiteMapList: GNBMenuType[] = store.getters['display/siteMapMenuList'];
+                if (!state.isAdminMode) {
+                    const IAMMenu = basicSiteMapList.find((menu) => menu.id === MENU_ID.IAM) as GNBMenuType;
+                    IAMMenu.icon = 'ic_service_administration';
+                    return basicSiteMapList;
+                }
+                const adminSiteMapList: GNBMenuType[] = [];
+                basicSiteMapList.forEach((menu) => {
+                    if (menu.id === MENU_ID.ADMINISTRATION) {
+                        let integralSubMenuList: GNBMenuType[] = [];
+                        (menu.subMenuList ?? []).forEach((subMenu) => {
+                            integralSubMenuList = [...integralSubMenuList, ...(subMenu.subMenuList ?? [])];
+                        });
+                        adminSiteMapList.push({
+                            ...menu,
+                            subMenuList: integralSubMenuList,
+                        });
+                    } else {
+                        adminSiteMapList.push(menu);
+                    }
+                });
+                return adminSiteMapList;
+            }),
             integrationMenu: computed<GNBMenuType | undefined>(() => {
                 const extraMenu = store.getters['domain/domainExtraMenu'];
                 if (extraMenu?.title) {
