@@ -98,6 +98,12 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 v: 'DOMAIN',
                 o: '=',
             });
+        } else {
+            dashboardApiQueryHelper.addFilter({
+                k: 'resource_group',
+                v: ['WORKSPACE', 'PROJECT'],
+                o: '',
+            });
         }
         const _params: ListDashboardParameters = {
             ...params,
