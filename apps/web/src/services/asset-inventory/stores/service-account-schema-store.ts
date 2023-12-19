@@ -21,11 +21,9 @@ import type { UserState } from '@/store/modules/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { getDetailSchema, getTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+import { getDetailSchema, getServiceAccountTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
 
 interface Getters {
-    generalAccountDetailSchema: ComputedRef<{ details: Partial<DynamicLayout>[] }>;
-    trustedAccountDetailSchema: ComputedRef<{ details: Partial<DynamicLayout>[] }>;
     currentProviderSchemaList: ComputedRef<SchemaModel[]>;
     currentProviderData: ComputedRef<ProviderModel|ReferenceItem<undefined>>;
     generalAccountSchema: ComputedRef<Partial<SchemaModel>|undefined>;
@@ -45,11 +43,11 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
         currentProvider: undefined as string|undefined,
         generalAccountTableSchema: undefined as DynamicLayout|undefined,
         trustedAccountTableSchema: undefined as DynamicLayout|undefined,
+        generalAccountDetailSchema: undefined as { details: Partial<DynamicLayout>[] }|undefined,
+        trustedAccountDetailSchema: undefined as { details: Partial<DynamicLayout>[] }|undefined,
     });
 
     const getters = reactive<Getters>({
-        generalAccountDetailSchema: computed(() => getDetailSchema({ accountSchema: getters.generlaAccountSchema, isTrustedAccount: false })),
-        trustedAccountDetailSchema: computed(() => getDetailSchema({ accountSchema: getters.trustedAccountSchema, isTrustedAccount: true })),
         currentProviderSchemaList: computed(() => _providerSchemaMap.value[state.currentProvider ?? ''] ?? []),
         currentProviderData: computed(() => _providerItemMap.value[state.currentProvider ?? '']),
         generalAccountSchema: computed(() => getters.currentProviderSchemaList.find((schema) => schema.schema_type === 'SERVICE_ACCOUNT')),
@@ -64,7 +62,6 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
                 try {
                     const res = await SpaceConnector.clientV2.identity.schema.list<SchemaListParameters, ListResponse<SchemaModel>>({
                         provider,
-                        workspace_id: undefined,
                     });
                     _providerSchemaMap.value[provider] = res?.results ?? [];
                 } catch (e) {
@@ -73,26 +70,46 @@ export const useServiceAccountSchemaStore = defineStore('service-account-schema'
             }
             state.currentProvider = provider;
         },
+        setGeneralAccountTableSchema: async (provider: string) => {
+            state.generalAccountTableSchema = await getServiceAccountTableSchema({
+                resourceType: 'identity.ServiceAccount',
+                options: {
+                    provider,
+                },
+                userData: {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+            });
+        },
+        setTrustedAccountTableSchema: async (provider: string) => {
+            state.trustedAccountTableSchema = await getServiceAccountTableSchema({
+                resourceType: 'identity.TrustedAccount',
+                options: {
+                    provider,
+                },
+                userData: {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+            });
+        },
+        setGeneralAccountDetailSchema: async (provider: string) => {
+            state.generalAccountDetailSchema = await getDetailSchema({ resourceType: 'identity.ServiceAccount', options: { provider } });
+        },
+        setTrustedAccountDetailSchema: async (provider: string) => {
+            state.trustedAccountDetailSchema = await getDetailSchema({ resourceType: 'identity.TrustedAccount', options: { provider } });
+        },
     };
 
     watch(() => state.currentProvider, async (provider) => {
         if (provider) {
-            state.generalAccountTableSchema = await getTableSchema({
-                accountSchema: getters.generalAccountSchema,
-                isTrustedAccount: false,
-                userConfig: {
-                    userType: _userConfigMap.value.userType ?? 'USER',
-                    userId: _userConfigMap.value.userId ?? '',
-                },
-            });
-            state.trustedAccountTableSchema = await getTableSchema({
-                accountSchema: getters.trustedAccountSchema,
-                isTrustedAccount: true,
-                userConfig: {
-                    userType: _userConfigMap.value.userType ?? 'USER',
-                    userId: _userConfigMap.value.userId ?? '',
-                },
-            });
+            await Promise.allSettled([
+                actions.setGeneralAccountTableSchema(provider),
+                actions.setTrustedAccountTableSchema(provider),
+                actions.setGeneralAccountDetailSchema(provider),
+                actions.setTrustedAccountDetailSchema(provider),
+            ]);
         }
     });
 

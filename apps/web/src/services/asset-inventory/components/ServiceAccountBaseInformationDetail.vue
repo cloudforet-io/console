@@ -36,8 +36,8 @@ const fieldHandler = (field) => {
 watch(() => props.provider, (provider) => {
     if (provider) serviceAccountSchemaStore.setProviderSchema(provider);
     const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
-    const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountDetailSchema : serviceAccountSchemaStore.getters.generalAccountDetailSchema;
-    state.detailSchema = detailSchema?.details[0];
+    const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.state.trustedAccountDetailSchema : serviceAccountSchemaStore.state.generalAccountDetailSchema;
+    if (detailSchema?.details[0]) state.detailSchema = detailSchema?.details[0];
 });
 </script>
 

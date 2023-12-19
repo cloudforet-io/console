@@ -10,7 +10,10 @@ import type { DynamicField } from '@spaceone/design-system/types/data-display/dy
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import type { UserState } from '@/store/modules/user/type';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -19,12 +22,18 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
 import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 
+import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+import type {
+    GetSchemaParams,
+    ResourceType,
+} from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
+
 const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
 const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
 
 interface Props {
     visible?: boolean;
-    resourceType: string;
+    resourceType?: ResourceType;
     options?: {
         provider?: string;
         cloudServiceGroup?: string;
@@ -51,7 +60,7 @@ const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicF
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
-    resourceType: '',
+    resourceType: undefined,
     options: () => ({}),
     isServerPage: false,
 });
@@ -62,6 +71,7 @@ const emit = defineEmits<{(e: 'complete'): void;
 
 
 let schema: any = {};
+const _userConfigMap = computed<UserState>(() => store.state.user);
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -99,6 +109,7 @@ const state = reactive({
     }),
     isValid: computed(() => state.loading || state.selectedColumns.length > 0),
     isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
+    isServiceAccountTable: computed(() => ['identity.ServiceAccount', 'identity.TrustedAccount'].includes(props.resourceType)),
 });
 
 const sortByRecommendation = () => {
@@ -133,7 +144,7 @@ const onChangeAllSelect = (val) => {
 
 const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
     try {
-        const options: any = {
+        const options: GetSchemaParams['options'] = {
             include_optional_fields: includeOptionalFields,
         };
         const { provider, cloudServiceGroup, cloudServiceType } = props.options;
@@ -141,11 +152,24 @@ const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]
         if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
         if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 
-        const res = await SpaceConnector.client.addOns.pageSchema.get({
-            resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-            schema: 'table',
-            options,
-        });
+        let res;
+        if (state.isServiceAccountTable) {
+            res = await getServiceAccountTableSchema({
+                userData: {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+                resourceType: props.resourceType,
+                options: props.options,
+            });
+        } else {
+            res = await SpaceConnector.client.addOns.pageSchema.get({
+                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
+                schema: 'table',
+                options,
+            });
+        }
+
 
         schema = res;
         delete schema.options?.search;
@@ -177,13 +201,24 @@ const updatePageSchema = async () => {
     if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 
     try {
-        await SpaceConnector.client.addOns.pageSchema.update({
-            resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-            schema: 'table',
-            data,
-            options,
-        });
-
+        if (state.isServiceAccountTable) {
+            await updateCustomTableSchema(
+                {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+                props.resourceType,
+                props.options.provider ?? '',
+                data,
+            );
+        } else {
+            await SpaceConnector.client.addOns.pageSchema.update({
+                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
+                schema: 'table',
+                data,
+                options,
+            });
+        }
         showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
         emit('complete');
         state.proxyVisible = false;

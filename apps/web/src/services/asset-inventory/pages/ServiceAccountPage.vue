@@ -234,6 +234,11 @@ const handleVisibleCustomFieldModal = (visible) => {
 /** ******* Page Init ******* */
 
 const reloadTable = async () => {
+    if (tableState.isTrustedAccount) {
+        await serviceAccountSchemaStore.setTrustedAccountTableSchema(state.selectedProvider);
+    } else {
+        await serviceAccountSchemaStore.setGeneralAccountTableSchema(state.selectedProvider);
+    }
     await listServiceAccountData();
 };
 
@@ -337,7 +342,7 @@ watch(() => tableState.selectedAccountType, () => {
             />
         </component>
         <custom-field-modal :visible="tableState.visibleCustomFieldModal"
-                            resource-type="identity.ServiceAccount"
+                            :resource-type="tableState.isTrustedAccount ? 'identity.TrustedAccount' : 'identity.ServiceAccount'"
                             :options="{provider: state.selectedProvider}"
                             @update:visible="handleVisibleCustomFieldModal"
                             @complete="reloadTable"
