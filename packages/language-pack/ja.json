@@ -1385,6 +1385,7 @@
 				"DESCRIPTION_PROVIDER": "AWS、Azure、Googleなどのクラウドサービスプロバイダー",
 				"DESCRIPTION_REGION": "各クラウドプロバイダーがデータセンターを建設した地理的な場所",
 				"DESCRIPTION_SERVICE_ACCOUNT": "各クラウドプロバイダーのコンソールから作成され、『サービスアカウント(service account)』ページに追加されたアカウント",
+				"DESCRIPTION_WORKSPACE": "",
 				"EDIT": "編集",
 				"FILTER_ALL": "すべて",
 				"FILTER_CUSTOM": "カスタム",
