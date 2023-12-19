@@ -42,14 +42,14 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             selectedProjects: [] as Array<string>,
-            formData: { selectedProjectId: null } as ProjectForm,
+            formData: { selectedProjectId: undefined } as Partial<ProjectForm>,
             proxyIsValid: useProxyValue('is-valid', props, emit),
         });
 
         /* Event */
         const handleSelectedProject = (selectedProject: string[]) => {
             state.selectedProjects = selectedProject;
-            state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0] : null };
+            state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0] : undefined };
             state.proxyIsValid = !!selectedProject.length;
         };
 
@@ -67,7 +67,7 @@ export default {
                 state.selectedProjects = [projectId];
             }
         }, { immediate: true });
-        watch(() => state.formData, (formData: ProjectForm) => {
+        watch(() => state.formData, (formData: Partial<ProjectForm>) => {
             emit('change', formData);
         });
 

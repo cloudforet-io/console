@@ -106,7 +106,7 @@ const handleAccountValidate = (isValid) => {
 };
 
 const handleChangeProjectForm = (projectForm) => {
-    state.formData.projectForm = projectForm;
+    state.projectForm = projectForm;
 };
 
 /* Init */

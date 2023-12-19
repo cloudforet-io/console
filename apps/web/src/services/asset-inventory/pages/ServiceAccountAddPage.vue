@@ -8,7 +8,6 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { SchemaModel } from '@/schema/identity/schema/model';
 import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
 import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
@@ -18,11 +17,6 @@ import type { AccountType } from '@/schema/identity/service-account/type';
 import type { TrustedAccountCreateParameters } from '@/schema/identity/trusted-account/api-verbs/create';
 import type { TrustedAccountDeleteParameters } from '@/schema/identity/trusted-account/api-verbs/detele';
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
-import type { SecretCreateParameters } from '@/schema/secret/secret/api-verbs/create';
-import type { SecretModel } from '@/schema/secret/secret/model';
-import type { TrustedSecretCreateParameters } from '@/schema/secret/trusted-secret/api-verbs/create';
-import type { TrustedSecretListParameters } from '@/schema/secret/trusted-secret/api-verbs/list';
-import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -86,20 +80,39 @@ const createAccount = async (): Promise<string|undefined> => {
     const data = formState.baseInformationForm.customSchemaForm;
 
     let res: TrustedAccountModel|ServiceAccountModel;
+    if (formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
+        // preprocessing for Google Cloud form
+        if (formState.credentialForm.customSchemaForm?.private_key) {
+            formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
+        }
+    }
+    let secretData;
+    if (formState.credentialForm.activeDataType === 'json') {
+        secretData = JSON.parse(formState.credentialForm.credentialJson);
+    } else if (formState.credentialForm.activeDataType === 'input') {
+        secretData = formState.credentialForm.customSchemaForm;
+    }
+
+    const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
     if (state.isTrustedAccount) {
         res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
             provider: props.provider,
             name: formState.baseInformationForm.accountName,
             data,
+            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
+            secret_data: secretData,
             resource_group: 'WORKSPACE',
+            tags: formState.baseInformationForm.tags,
         });
     } else {
         res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
             provider: props.provider,
             name: formState.baseInformationForm.accountName.trim(),
             data,
+            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
+            secret_data: secretData,
             tags: formState.baseInformationForm.tags,
-            trusted_account_id: formState.credentialForm.attachedTrustedAccountId,
+            trusted_account_id: attachedTrustedAccountId,
             project_id: formState.baseInformationForm.projectForm.selectedProjectId,
         });
     }
@@ -119,47 +132,6 @@ const deleteServiceAccount = async (serviceAccountId: string) => {
     }
 };
 
-const getTrustedSecretId = async (trustedAccountId: string): Promise<string|undefined> => {
-    try {
-        const { results } = await SpaceConnector.clientV2.secret.trustedSecret.list<TrustedSecretListParameters, ListResponse<TrustedSecretModel>>({
-            trusted_account_id: trustedAccountId,
-        });
-        return results ? results[0].trusted_secret_id : undefined;
-    } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-        return undefined;
-    }
-};
-
-const createSecret = async (accountId: string): Promise<void> => {
-    let data;
-    if (formState.credentialForm.activeDataType === 'json') {
-        data = JSON.parse(formState.credentialForm.credentialJson);
-    } else if (formState.credentialForm.activeDataType === 'input') {
-        data = formState.credentialForm.customSchemaForm;
-    }
-
-    const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
-    if (state.isTrustedAccount) {
-        await SpaceConnector.client.secret.trustedSecret.create<TrustedSecretCreateParameters, TrustedSecretModel>({
-            name: formState.baseInformationForm.accountName + accountId,
-            data,
-            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
-            resource_group: 'WORKSPACE',
-            trusted_account_id: attachedTrustedAccountId,
-        });
-    } else {
-        await SpaceConnector.client.secret.secret.create<SecretCreateParameters, SecretModel>({
-            name: formState.baseInformationForm.accountName + accountId,
-            data,
-            resource_group: 'PROJECT',
-            service_account_id: accountId,
-            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
-            trusted_secret_id: attachedTrustedAccountId ? await getTrustedSecretId(attachedTrustedAccountId) : undefined,
-        });
-    }
-};
-
 /* Event */
 const handleSave = async () => {
     if (!formState.isValid) {
@@ -170,13 +142,6 @@ const handleSave = async () => {
     try {
         formState.formLoading = true;
         accountId = await createAccount();
-        if (accountId && formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
-        // preprocessing for Google Cloud form
-            if (formState.credentialForm.customSchemaForm?.private_key) {
-                formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
-            }
-            await createSecret(accountId);
-        }
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
         SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
     } catch (e) {
