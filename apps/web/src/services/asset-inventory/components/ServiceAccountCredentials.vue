@@ -76,7 +76,7 @@ const state = reactive({
 const deleteGeneralSecret = async (): Promise<boolean> => {
     if (state.credentialData && !('secret_id' in state.credentialData)) return false;
     try {
-        await SpaceConnector.client.secret.secret.delete<SecretDeleteParameters>({
+        await SpaceConnector.clientV2.secret.secret.delete<SecretDeleteParameters>({
             secret_id: state.credentialData?.secret_id ?? '',
         });
         return true;
@@ -107,7 +107,7 @@ const createGeneralSecret = async () => {
             data = state.credentialForm.customSchemaForm;
         }
 
-        await SpaceConnector.client.secret.secret.create<SecretCreateParameters, SecretModel>({
+        await SpaceConnector.clientV2.secret.secret.create<SecretCreateParameters, SecretModel>({
             name: (props.serviceAccountData?.name ?? '') + props.serviceAccountId,
             data,
             schema_id: state.credentialForm.selectedSecretSchema.schema_id,
@@ -123,7 +123,7 @@ const createGeneralSecret = async () => {
 };
 const updateTrustedSecret = async (): Promise<boolean> => {
     try {
-        await SpaceConnector.client.secret.trustedSecret.update({
+        await SpaceConnector.clientV2.secret.trustedSecret.update({
             trusted_secret_id: state.credentialData?.trusted_secret_id,
             schema: state.credentialForm.selectedSecretSchema.schema_id,
         });
@@ -143,7 +143,7 @@ const updateDataTrustedSecret = async () => {
             data = state.credentialForm.customSchemaForm;
         }
 
-        await SpaceConnector.client.secret.trustedSecret.updateData<TrustedSecretUpdateDataParameters, TrustedSecretModel>({
+        await SpaceConnector.clientV2.secret.trustedSecret.updateData<TrustedSecretUpdateDataParameters, TrustedSecretModel>({
             trusted_secret_id: state.credentialData.trusted_secret_id,
             schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             data,
@@ -205,11 +205,11 @@ const handleChangeCredentialForm = (credentialForm) => {
 const getSecretSchema = async () => {
     try {
         if (state.credentialData?.trusted_secret_id) {
-            state.credentialForm.customSchemaForm = await SpaceConnector.client.secret.trustedSecret.get<TrustedSecretGetParameters, TrustedSecretModel>({
+            state.credentialForm.customSchemaForm = await SpaceConnector.clientV2.secret.trustedSecret.get<TrustedSecretGetParameters, TrustedSecretModel>({
                 trusted_secret_id: state.credentialData.trusted_secret_id,
             });
         } else if (state.credentialData && 'secret_id' in state.credentialData) {
-            state.credentialForm.customSchemaForm = await SpaceConnector.client.secret.secret.get<SecretListParameters, SecretModel>({
+            state.credentialForm.customSchemaForm = await SpaceConnector.clientV2.secret.secret.get<SecretListParameters, SecretModel>({
                 secret_id: state.credentialData.secret_id,
             });
         }
@@ -222,15 +222,15 @@ const getSecretData = async () => {
     try {
         let response;
         if (state.isTrustedAccount || state.hasTrustedSecret) {
-            response = await SpaceConnector.client.secret.trustedSecret.list<TrustedSecretListParameters, ListResponse<TrustedSecretModel>>({
+            response = await SpaceConnector.clientV2.secret.trustedSecret.list<TrustedSecretListParameters, ListResponse<TrustedSecretModel>>({
                 trusted_account_id: props.serviceAccountData?.trusted_account_id,
             });
         } else if ('service_account_id' in props.serviceAccountData) {
-            response = await SpaceConnector.client.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
+            response = await SpaceConnector.clientV2.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
                 secret_id: props.serviceAccountData.service_account_id,
             });
         }
-        state.credentialData = response.results ? response.results[0] : {};
+        state.credentialData = response?.results ? response.results[0] : {};
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

@@ -9,6 +9,7 @@ export interface TrustedAccountModel {
     },
     provider: string;
     tags: Tags;
+    secret_schema_id: string;
     resource_group: Extract<ResourceGroup, 'DOMAIN' | 'WORKSPACE'>;
     workspace_id?: string;
     created_at?: string;
