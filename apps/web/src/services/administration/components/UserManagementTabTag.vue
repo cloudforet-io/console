@@ -28,6 +28,8 @@ const userPageStore = useUserPageStore();
 const state = reactive({
     items: [] as TableItem[],
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
+    sortBy: 'key',
+    sortDesc: true,
 });
 const tableState = reactive({
     fields: computed(() => [
@@ -35,6 +37,15 @@ const tableState = reactive({
         { name: 'value', label: i18n.t('COMMON.TAGS.VALUE') as string },
     ]),
 });
+
+/* Component */
+// TODO: will be check sorting
+const handleChangeSort = (sortBy, sortDesc) => {
+    state.sortBy = sortBy;
+    state.sortDesc = sortDesc;
+    const multiplier = sortDesc ? -1 : 1;
+    state.items = state.items.slice().sort((a, b) => (a[sortBy] > b[sortBy] ? multiplier : -multiplier));
+};
 
 /* Watcher */
 watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
@@ -55,10 +66,11 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
         <p-data-table :fields="tableState.fields"
                       :items="state.items"
                       col-copy
-                      sort-by="name"
+                      :sort-by="state.sortBy"
+                      :sort-desc="state.sortDesc"
                       sortable
-                      sort-desc
                       beautify-text
+                      @changeSort="handleChangeSort"
         />
     </div>
 </template>
