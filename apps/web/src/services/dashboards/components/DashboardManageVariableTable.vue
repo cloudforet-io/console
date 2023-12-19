@@ -18,7 +18,7 @@ import type {
 
 interface VariablesPropertiesForManage extends DashboardVariableSchemaProperty {
     propertyName: string;
-    managable?: string;
+    manageable?: string;
 }
 interface EmitFn {
     (e: 'delete', value: string): void;
@@ -45,7 +45,7 @@ const state = reactive({
         { name: 'variable_type', label: 'Variable Type' },
         { name: 'use', label: 'Use', width: '90px' },
         { name: 'description', label: 'Description', width: '360px' },
-        { name: 'managable', label: ' ', width: '144px' },
+        { name: 'manageable', label: ' ', width: '144px' },
     ],
     selectionType: computed(() => ({
         SINGLE: i18n.t('DASHBOARDS.CUSTOMIZE.VARIABLES.SINGLE_SELECT'),
@@ -100,7 +100,7 @@ const convertAndUpdateVariablesForTable = (order: string[]) => {
         return {
             ...properties[d],
             propertyName: d,
-            managable: d,
+            manageable: d,
         };
     });
     if (state.selectedVariableType === 'ALL') {
@@ -164,7 +164,7 @@ const {
                     {{ $t(value) }}
                 </p-collapsible-panel>
             </template>
-            <template #col-managable-format="{ value }">
+            <template #col-manageable-format="{ value }">
                 <div v-if="value"
                      class="button-wrapper"
                 >
