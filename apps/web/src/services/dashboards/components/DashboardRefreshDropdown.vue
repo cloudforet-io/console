@@ -32,7 +32,7 @@ const emit = defineEmits<{(e: 'refresh'): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     intervalOptionList: computed<{label: TranslateResult; value: RefreshIntervalOption}[]>(() => [
@@ -80,8 +80,9 @@ const executeRefreshInterval = () => {
 };
 
 const handleSelectRefreshIntervalOption = (option) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.settings.refresh_interval_option = option;
+    dashboardDetailStore.setSettings({
+        ...dashboardDetailState.settings,
+        refresh_interval_option: option,
     });
     if (props.refreshDisabled) return;
     clearRefreshInterval();

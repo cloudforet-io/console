@@ -48,7 +48,7 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const {
     forms: {

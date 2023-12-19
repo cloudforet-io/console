@@ -40,13 +40,13 @@ const {
 });
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     labelList: computed<Array<string>>({
         get: () => dashboardDetailState.labels,
         set(val: Array<string>) {
-            dashboardDetailStore.$patch({ labels: [...val] });
+            dashboardDetailStore.setLabels(val);
         },
     }),
     inputMode: false,
@@ -65,12 +65,12 @@ const handlePushLabel = (e: KeyboardEvent) => {
     if (e.isComposing || !inputText.value || invalidState.inputText) return;
     state.labelList.push(inputText.value);
     setForm('inputText', '');
-    dashboardDetailStore.$patch({ labels: state.labelList });
+    dashboardDetailStore.setLabels(state.labelList);
     emit('update-labels', state.labelList);
 };
 const handleDelete = (index: number) => {
     state.labelList.splice(index, 1);
-    dashboardDetailStore.$patch({ labels: state.labelList });
+    dashboardDetailStore.setLabels(state.labelList);
     emit('update-labels', state.labelList);
 };
 

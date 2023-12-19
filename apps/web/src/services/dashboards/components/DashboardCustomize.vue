@@ -32,7 +32,7 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'go-back'): void,
     (e: 'save'): void}>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     name: dashboardDetailState.name,
@@ -55,7 +55,7 @@ const handleUpdateDashboardName = (name: string) => {
     state.name = name;
 };
 const handleSave = async () => {
-    dashboardDetailStore.$patch({ name: state.name });
+    dashboardDetailStore.setName(state.name);
     emit('save');
 };
 const goBack = () => {

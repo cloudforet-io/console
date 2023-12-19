@@ -26,7 +26,8 @@ const props = defineProps<Props>();
 const PUBLIC_ICON_COLOR = gray[500];
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
+const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     nameEditModalVisible: false,
     deleteModalVisible: false,
@@ -44,7 +45,7 @@ const handleVisibleCloneModal = () => {
     state.cloneModalVisible = true;
 };
 const handleNameUpdate = (name: string) => {
-    dashboardDetailStore.$patch({ name });
+    dashboardDetailStore.setName(name);
     dashboardDetailStore.setOriginDashboardName(name);
 };
 
@@ -57,7 +58,7 @@ const handleNameUpdate = (name: string) => {
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="dashboardDetailState.name && dashboardDetailStore.dashboardType === 'PUBLIC'"
+            <template v-if="dashboardDetailState.name && dashboardDetailGetters.dashboardType === 'PUBLIC'"
                       #title-left-extra
             >
                 <div class="title-left-extra">

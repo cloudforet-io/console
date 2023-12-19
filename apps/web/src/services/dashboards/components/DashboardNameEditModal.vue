@@ -32,7 +32,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 
 const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 const {
     forms: {
         _name,

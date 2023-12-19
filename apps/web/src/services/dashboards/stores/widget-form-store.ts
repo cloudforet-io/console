@@ -62,7 +62,7 @@ interface GlobalOptionInfo {
 }
 export const useWidgetFormStore = defineStore('widget-form', () => {
     const dashboardDetailStore = useDashboardDetailInfoStore();
-    const dashboardDetailState = dashboardDetailStore.$state;
+    const dashboardDetailState = dashboardDetailStore.state;
     const {
         title, resetTitle, updateTitle, isTitleValid, titleInvalidText,
     } = useWidgetTitleInput();
