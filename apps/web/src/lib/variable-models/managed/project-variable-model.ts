@@ -12,12 +12,13 @@ export default class ProjectVariableModel extends ResourceNameVariableModel {
 
     idKey = 'project_id';
 
-    _only = ['project_id', 'name', 'project_group_info'];
+    _only = ['project_id', 'name', 'project_group_id'];
 
-    nameFormatter(data: any): string {
-        if (data.project_group_info?.name) {
-            return `${data.project_group_info.name} > ${data[this.nameKey]}`;
-        }
-        return data[this.nameKey];
-    }
+    // TODO: get refined group name
+    // nameFormatter(data: any): string {
+    //     if (data.project_group_info?.name) {
+    //         return `${data.project_group_info.name} > ${data[this.nameKey]}`;
+    //     }
+    //     return data[this.nameKey];
+    // }
 }

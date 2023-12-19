@@ -164,7 +164,7 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
             const projectInfo = response?.results?.[0];
             if (projectInfo) openItems.unshift(projectInfo.project_id);
 
-            const parentItemId = get(projectInfo, 'project_group_info.project_group_id');
+            const parentItemId = get(projectInfo, 'project_group_id');
             if (parentItemId) await getParentItem(parentItemId, 'PROJECT_GROUP', openItems);
         }
     } else {
