@@ -18,6 +18,7 @@ import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -47,9 +48,11 @@ const getItems = (items: DashboardModel[], filters: ConsoleFilter[], dashboardTy
 
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
+    const workspaceStore = useWorkspaceStore();
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+        currentWorkspace: computed(() => workspaceStore.getters.currentWorkspace),
     });
     const state = reactive({
         items: [] as DashboardModel[],
@@ -91,7 +94,8 @@ export const useDashboardStore = defineStore('dashboard', () => {
             k: 'user_id',
             v: [null, store.state.user.userId || ''],
             o: '=',
-        }]);
+        },
+        ]);
         if (_state.isAdminMode) {
             dashboardApiQueryHelper.addFilter({
                 k: 'resource_group',
@@ -103,6 +107,10 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 k: 'resource_group',
                 v: ['WORKSPACE', 'PROJECT'],
                 o: '',
+            }, {
+                k: 'workspace_id',
+                v: _state.currentWorkspace?.workspace_id || '',
+                o: '=',
             });
         }
         const _params: ListDashboardParameters = {
