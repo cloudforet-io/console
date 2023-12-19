@@ -25,7 +25,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import UserAPIKeyModal from '@/common/components/modals/UserAPIKeyModal.vue';
 
 import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
-import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
+import SingleSelectStatusModal from '@/services/administration/components/SingleSelectStatusModal.vue';
 import {
     appStateFormatter,
     calculateTime,
@@ -39,6 +39,7 @@ import {
     ROLE_SEARCH_HANDLERS,
 } from '@/services/administration/constants/role-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
+import type { SingleSelectedData } from '@/services/administration/types/modal-type';
 
 
 const DEFAULT_PAGE_LIMIT = 15;
@@ -179,15 +180,27 @@ const handleChangeModalVisible = (value) => {
         _state.modal = cloneDeep(_state.modal);
     });
 };
-const handleConfirmButton = (value: string) => {
+const handleConfirmButton = (value: string, isStatus?:boolean) => {
     if (value) {
         modalState.item.api_key_id = value;
         return;
     }
-    handleClickModalConfirm();
+    getListApps();
+
+    if (isStatus) {
+        appPageStore.$patch((_state) => {
+            _state.modal.visible.apiKey = true;
+            _state.modal = cloneDeep(_state.modal);
+        });
+    }
 };
-const handleClickModalConfirm = async () => {
-    await getListApps();
+const handleCloseStatusModal = () => {
+    getListApps();
+    appPageStore.$patch((_state) => {
+        _state.modal.type = '';
+        _state.modal.visible.status = false;
+        _state.modal = cloneDeep(_state.modal);
+    });
 };
 
 /* API */
@@ -291,11 +304,19 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
         <user-a-p-i-key-modal v-if="modalState.apiKeyModalVisible"
                               :visible="modalState.apiKeyModalVisible"
                               :api-key-item="modalState.item"
-                              @clickButton="handleClickModalConfirm"
+                              @clickButton="getListApps"
                               @update:visible="handleChangeModalVisible"
         />
         <app-management-form-modal @confirm="handleConfirmButton" />
-        <app-management-status-modal @confirm="handleConfirmButton" />
+        <single-select-status-modal :type="appPageState.modal.type"
+                                    :visible="appPageState.modal.visible.status"
+                                    :theme-color="appPageState.modal.themeColor"
+                                    :title="appPageState.modal.title"
+                                    :loading="appPageState.modal.loading"
+                                    :data="appPageStore.selectedApp as SingleSelectedData"
+                                    @confirm="handleConfirmButton($event, true)"
+                                    @close="handleCloseStatusModal"
+        />
     </section>
 </template>
 

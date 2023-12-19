@@ -2,14 +2,11 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PButtonModal, PDefinitionTable, PStatus,
 } from '@spaceone/design-system';
-import { cloneDeep } from 'lodash';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
@@ -22,23 +19,36 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { appStateFormatter } from '@/services/administration/composables/refined-table-data';
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import type { SingleSelectedData } from '@/services/administration/types/modal-type';
 
-const DEFAULT_PAGE_LIMIT = 15;
+interface Props {
+    type: string;
+    visible: boolean;
+    title: string;
+    themeColor: string;
+    loading: boolean;
+    selectedData?: SingleSelectedData;
+    isSummary?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    type: '',
+    visible: false,
+    title: '',
+    themeColor: 'primary',
+    loading: false,
+    selectedData: undefined,
+    isSummary: false,
+});
 
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
-const appPageState = appPageStore.$state;
-
-const route = useRoute();
+const userPageStore = useUserPageStore();
 
 const emit = defineEmits<{(e: 'confirm', app_key_id: string): void;
+    (e: 'close'): void;
 }>();
-
-const appListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
-    .setSort('name', true)
-    .setFiltersAsRawQueryString(route.query.filters);
-const appListApiQuery = appListApiQueryHelper.data;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
@@ -47,59 +57,61 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     confirmButton: computed(() => {
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+        if (props.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
             return i18n.t('IAM.APP.DELETE');
         }
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
+        if (props.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
             return i18n.t('IAM.APP.ENABLE');
         }
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
+        if (props.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
             return i18n.t('IAM.APP.DISABLE');
         }
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
+        if (props.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
             return i18n.t('IAM.APP.MODAL.BTN_REGENERATE');
         }
         return '';
     }),
 });
 
-const definitionFields = computed(() => [
+const definitionFields = computed(() => (props.isSummary ? [
+    { label: i18n.t('IAM.USER.MAIN.API_KEY_ID'), name: 'api_key_id' },
+    { label: i18n.t('IAM.APP.MODAL.COL_STATE'), name: 'state' },
+    { label: i18n.t('IAM.APP.MODAL.COL_EXPIRED_AT'), name: 'expired_at' },
+    { label: i18n.t('IAM.USER.MAIN.CREATED_AT'), name: 'created_at' },
+] : [
     { label: i18n.t('IAM.APP.MODAL.COL_NAME'), name: 'name' },
     { label: i18n.t('IAM.APP.MODAL.COL_STATE'), name: 'state' },
     { label: i18n.t('IAM.APP.MODAL.COL_APP_ID'), name: 'app_id' },
     { label: i18n.t('IAM.APP.MODAL.COL_ROLE_ID'), name: 'role_id' },
     { label: i18n.t('IAM.APP.MODAL.COL_LASTED_AT'), name: 'last_accessed_at' },
     { label: i18n.t('IAM.APP.MODAL.COL_EXPIRED_AT'), name: 'expired_at' },
-]);
+]));
 
 /* Component */
 const handleClose = () => {
-    appPageStore.$patch((_state) => {
-        _state.modal.type = '';
-        _state.modal.visible.status = false;
-        _state.modal = cloneDeep(_state.modal);
-    });
-    getListApps();
+    emit('close');
+};
+const handleConfirm = () => {
+    if (props.isSummary) {
+        checkApiKeyConfirm();
+    } else {
+        checkAppConfirm();
+    }
 };
 
 /* API */
-const checkModalConfirm = async () => {
+const checkAppConfirm = async () => {
     state.loading = true;
-
     try {
-        if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
-            await appPageStore.deleteApp({ app_id: appPageStore.selectedApp.app_id });
-        } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
-            await appPageStore.enableApp({ app_id: appPageStore.selectedApp.app_id });
-        } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
-            await appPageStore.disableApp({ app_id: appPageStore.selectedApp.app_id });
-        } else if (appPageState.modal.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
-            const res = await appPageStore.regenerateApp({ app_id: appPageStore.selectedApp.app_id });
+        if (props.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+            await appPageStore.deleteApp({ app_id: props.selectedData.app_id || '' });
+        } else if (props.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
+            await appPageStore.enableApp({ app_id: props.selectedData.app_id || '' });
+        } else if (props.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
+            await appPageStore.disableApp({ app_id: props.selectedData.app_id || '' });
+        } else if (props.type === APP_DROPDOWN_MODAL_TYPE.REGENERATE) {
+            const res = await appPageStore.regenerateApp({ app_id: props.selectedData.app_id || '' });
             emit('confirm', res.api_key_id);
-            appPageStore.$patch((_state) => {
-                _state.modal.visible.apiKey = true;
-                _state.modal = cloneDeep(_state.modal);
-            });
         }
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
@@ -108,28 +120,38 @@ const checkModalConfirm = async () => {
         handleClose();
     }
 };
-const getListApps = async () => {
-    state.loading = true;
+const checkApiKeyConfirm = async () => {
+    state.loading = false;
     try {
-        await appPageStore.listApps({ query: appListApiQuery });
+        if (props.type === APP_DROPDOWN_MODAL_TYPE.DELETE) {
+            await userPageStore.deleteApiKey({ api_key_id: props.selectedData.api_key_id || '' });
+        } else if (props.type === APP_DROPDOWN_MODAL_TYPE.ENABLE) {
+            await userPageStore.enableApiKey({ api_key_id: props.selectedData.api_key_id || '' });
+        } else if (props.type === APP_DROPDOWN_MODAL_TYPE.DISABLE) {
+            await userPageStore.disableApiKey({ api_key_id: props.selectedData.api_key_id || '' });
+        }
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
     } finally {
         state.loading = false;
+        handleClose();
     }
 };
 </script>
 
 <template>
-    <p-button-modal :visible="appPageState.modal.visible.status"
-                    :header-title="appPageState.modal.title"
-                    :theme-color="appPageState.modal.themeColor"
-                    :loading="appPageState.modal.loading"
+    <p-button-modal :visible="props.visible"
+                    :header-title="props.title"
+                    :theme-color="props.themeColor"
+                    :loading="props.loading"
                     modal-size="md"
-                    @confirm="checkModalConfirm"
+                    @confirm="handleConfirm"
+                    @close="handleClose"
                     @cancel="handleClose"
     >
         <template #body>
             <p-definition-table :fields="definitionFields"
-                                :data="appPageStore.selectedApp"
+                                :data="props.selectedData"
                                 :skeleton-rows="6"
                                 block
                                 disable-copy
