@@ -22,11 +22,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const getApiQuery = () => new ApiQueryHelper().setFilters([{
-    k: 'user_id',
-    v: [null, store.state.user.userId || ''],
-    o: '=',
-}]).data;
+const dashboardApiQueryHelper = new ApiQueryHelper();
 const getItems = (items: DashboardModel[], filters: ConsoleFilter[], dashboardType?: DashboardType): DashboardModel[] => {
     let result = items;
     if (dashboardType) {
@@ -91,17 +87,25 @@ export const useDashboardStore = defineStore('dashboard', () => {
 
     /* Actions */
     const load = async (params?: ListDashboardParameters) => {
-        const query = getApiQuery();
+        dashboardApiQueryHelper.setFilters([{
+            k: 'user_id',
+            v: [null, store.state.user.userId || ''],
+            o: '=',
+        }]);
+        if (_state.isAdminMode) {
+            dashboardApiQueryHelper.addFilter({
+                k: 'resource_group',
+                v: 'DOMAIN',
+                o: '=',
+            });
+        }
         const _params: ListDashboardParameters = {
             ...params,
             query: {
                 ...(params?.query || {}),
-                ...query,
+                ...dashboardApiQueryHelper.data,
             },
         };
-        if (_state.isAdminMode) {
-            _params.resource_group = 'DOMAIN';
-        }
         state.loading = true;
         try {
             const res = await SpaceConnector.clientV2.dashboard.dashboard.list<ListDashboardParameters, ListResponse<DashboardModel>>(_params);

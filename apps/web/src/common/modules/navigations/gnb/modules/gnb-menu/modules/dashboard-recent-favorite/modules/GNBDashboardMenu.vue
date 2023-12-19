@@ -77,7 +77,7 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const appContextStore = useAppContextStore();
         const dashboardStore = useDashboardStore();
-        const dashboardGetters = dashboardStore.getters;
+        const dashboardState = dashboardStore.state;
         const state = reactive({
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             tabs: computed(() => ([
@@ -96,7 +96,7 @@ export default defineComponent({
                 },
             ] as DisplayMenu[]),
             isOverflown: false,
-            dashboardList: computed<GNBDashboardMenuItem[]>(() => [...dashboardGetters.workspaceItems, ...dashboardGetters.projectItems].map((item) => ({
+            dashboardList: computed<GNBDashboardMenuItem[]>(() => dashboardState.items.map((item) => ({
                 name: item.name,
                 dashboardId: item.dashboard_id,
             }))),
