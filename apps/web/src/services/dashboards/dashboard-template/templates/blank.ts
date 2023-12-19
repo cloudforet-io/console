@@ -18,7 +18,7 @@ export const blankPreview: DefaultDashboardPreviewTemplate = reactive({
     },
 });
 
-export const blankDashboard: DashboardTemplate = {
+const getDashboardTemplate = (isAdminMode: boolean): DashboardTemplate => ({
     ...blankPreview,
     settings: {
         date_range: {
@@ -26,7 +26,9 @@ export const blankDashboard: DashboardTemplate = {
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.BLANK),
+    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.BLANK, isAdminMode),
     variables: {},
     layouts: [],
-};
+});
+export const blankDashboard: DashboardTemplate = getDashboardTemplate(false);
+export const adminBlankDashboard: DashboardTemplate = getDashboardTemplate(true);

@@ -54,8 +54,14 @@ const COST_VARIABLE_KEYS: string[] = [
     MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
     MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key,
 ];
-export const getDashboardVariablesSchema = (label?: DashboardLabel): DashboardVariablesSchema => {
+export const getDashboardVariablesSchema = (label?: DashboardLabel, isAdminMode = false): DashboardVariablesSchema => {
     const _managedVariablesSchema: DashboardVariablesSchema = cloneDeep(MANAGED_DASH_VAR_SCHEMA);
+
+    if (!isAdminMode) {
+        delete _managedVariablesSchema.properties[MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key];
+        const workspaceIndex = _managedVariablesSchema.order.indexOf(MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key);
+        if (workspaceIndex !== -1) _managedVariablesSchema.order.splice(workspaceIndex, 1);
+    }
 
     if (label === DASHBOARD_LABEL.ASSET) {
         ASSET_VARIABLE_KEYS.forEach((key) => {
