@@ -47,7 +47,7 @@ const state = reactive({
         if (props.attachedTrustedAccountId) return storeState.trustedAccounts[props.attachedTrustedAccountId];
         return undefined;
     }),
-    credentialJsonSchema: computed<JsonSchema>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList.find((schema) => (schema.schema_id === props.credentialData.schema_id))),
+    credentialJsonSchema: computed<JsonSchema>(() => serviceAccountSchemaStore.getters.currentProviderSchemaList.find((schema) => (schema.schema_id === props.credentialData.schema_id))?.schema),
     convertedCredentialData: computed(() => {
         const convertedData = { ...props.credentialData };
         Object.keys(state.credentialJsonSchema?.properties ?? {}).forEach((k) => {
