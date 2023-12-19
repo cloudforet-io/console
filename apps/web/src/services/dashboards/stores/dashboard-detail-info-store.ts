@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import { WIDGET_SIZE } from '@/schema/dashboard/_constants/widget-constant';
 import type {
     DashboardLayoutWidgetInfo,
@@ -108,10 +109,6 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         widgetValidMap: {},
     }),
     getters: {
-        isProjectDashboard: (state) => {
-            if (state.projectId) return true;
-            return !!state.dashboardId?.startsWith('project');
-        },
         dashboardType: (state) => state.dashboardInfo?.dashboard_type ?? 'PRIVATE',
         isWidgetLayoutValid: (state) => Object.values(state.widgetValidMap).every((d) => d === true),
         isAllVariablesInitialized: (state) => {
@@ -151,7 +148,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
             const _dashboardInfo = cloneDeep(dashboardInfo);
             this.name = _dashboardInfo.name;
-            this.projectId = _dashboardInfo.project_id ?? '';
+            if (_dashboardInfo.resource_group === RESOURCE_GROUP.PROJECT) {
+                this.projectId = _dashboardInfo.project_id;
+            }
             this.settings = {
                 date_range: {
                     enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
