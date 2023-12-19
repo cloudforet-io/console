@@ -20,8 +20,10 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import UserManagementAddAdminRole from '@/services/administration/components/UserManagementAddAdminRole.vue';
 import UserManagementAddPassword from '@/services/administration/components/UserManagementAddPassword.vue';
 import UserManagementAddRole from '@/services/administration/components/UserManagementAddRole.vue';
+import UserManagementAddTag from '@/services/administration/components/UserManagementAddTag.vue';
 import UserManagementAddUser from '@/services/administration/components/UserManagementAddUser.vue';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -52,8 +54,9 @@ const state = reactive({
 /* Component */
 const handleChangeList = (items: AddModalMenuItem[]) => {
     state.selectedItems = items;
-    const resetPasswordItem = items.filter((item) => item.isNew);
-    if (resetPasswordItem.length > 0) {
+    const newUserItem = items.filter((item) => item.isNew);
+    const localUserItem = items.filter((item) => item.auth_type === 'LOCAL');
+    if (localUserItem.length > 0 && newUserItem.length > 0) {
         state.resetPasswordVisible = true;
     }
 };
@@ -70,7 +73,7 @@ const handleConfirm = async () => {
     state.loading = true;
     try {
         await Promise.all(state.selectedItems.map(fetchCreateUser));
-        showSuccessMessage(i18n.t('IDENTITY.USER.FORM.ALT_S_SEND_INVITATION_EMAIL'), '');
+        showSuccessMessage(i18n.t('IAM.USER.FORM.ALT_S_SEND_INVITATION_EMAIL'), '');
         emit('confirm');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
@@ -138,11 +141,15 @@ watch([() => state.selectedItems, () => state.role], ([validItems, role]) => {
         <template #body>
             <div class="modal-contents">
                 <user-management-add-user @change-list="handleChangeList" />
-                <user-management-add-password v-if="state.resetPasswordVisible"
+                <user-management-add-password v-if="state.resetPasswordVisible && state.selectedItems.length > 0"
                                               @change-input="handleChangeInput"
                                               @change-toggle="handleChangeToggle"
                 />
-                <user-management-add-role @change-role="handleChangeRole" />
+                <user-management-add-admin-role v-if="userPageState.isAdminMode" />
+                <user-management-add-role v-else
+                                          @change-role="handleChangeRole"
+                />
+                <user-management-add-tag v-if="userPageState.isAdminMode" />
             </div>
         </template>
     </p-button-modal>
