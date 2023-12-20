@@ -1295,6 +1295,7 @@
 			"LABEL_PUBLIC": "공개",
 			"LABEL_SCOPE": "범위",
 			"LABEL_VIWERS": "공개 여부",
+			"PRIVATE": "비공개",
 			"PROJECT": "프로젝트",
 			"SINGLE_PROJECT": "개별 프로젝트",
 			"TOOLTIP_CLONE": "복제",

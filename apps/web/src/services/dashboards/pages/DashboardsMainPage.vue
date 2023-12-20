@@ -31,28 +31,31 @@ const dashboardGetters = dashboardStore.getters;
 const state = reactive({
     loading: computed(() => dashboardState.loading),
     workspaceDashboardList: computed(() => {
+        if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE') return [];
         let target = dashboardGetters.workspaceItems;
-        if (dashboardState.dashboardType) target = target.filter((d) => d.dashboard_type === dashboardState.dashboardType);
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
         return target;
     }),
     projectDashboardList: computed(() => {
+        if (dashboardState.scope && dashboardState.scope !== 'PROJECT') return [];
         let target = dashboardGetters.projectItems;
-        if (dashboardState.dashboardType) target = target.filter((d) => d.dashboard_type === dashboardState.dashboardType);
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
         return target;
     }),
-    dashboardTotalCount: computed(() => {
-        const workspaceDashboardCount = state.workspaceDashboardList.length;
-        const projectDashboardCount = state.projectDashboardList.length;
-        return workspaceDashboardCount + projectDashboardCount;
+    privateDashboardList: computed(() => {
+        if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
+        return dashboardGetters.privateItems;
     }),
+    dashboardTotalCount: computed(() => state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length),
     filteredDashboardStatus: computed(() => {
         if (dashboardState.scope === 'WORKSPACE') {
             return !!(state.workspaceDashboardList.length);
         }
         if (dashboardState.scope === 'PROJECT') {
             return !!(state.projectDashboardList.length);
+        }
+        if (dashboardState.scope === 'PRIVATE') {
+            return !!(state.privateDashboardList.length);
         }
         return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
     }),
@@ -62,7 +65,6 @@ const searchQueryHelper = new QueryHelper();
 const queryState = reactive({
     searchFilters: computed(() => dashboardState.searchFilters),
     urlQueryString: computed(() => ({
-        viewers: dashboardState.dashboardType ? primitiveToQueryString(dashboardState.dashboardType) : null,
         scope: dashboardState.scope ? primitiveToQueryString(dashboardState.scope) : null,
         filters: searchQueryHelper.setFilters(queryState.searchFilters).rawQueryStrings,
     })),
@@ -91,12 +93,10 @@ let urlQueryStringWatcherStop;
 const init = async () => {
     const currentQuery = SpaceRouter.router.currentRoute.query;
     const useQueryValue = {
-        dashboardType: queryStringToString(currentQuery.dashboardType),
         scope: queryStringToString(currentQuery.scope),
         filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
     };
 
-    dashboardStore.setDashboardType(useQueryValue.dashboardType);
     dashboardStore.setScope(useQueryValue.scope);
     dashboardStore.setSearchFilters(useQueryValue.filters);
 
@@ -196,19 +196,26 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <dashboard-main-board-list v-if="(dashboardState.scope !== 'PROJECT') && state.workspaceDashboardList.length"
+            <dashboard-main-board-list v-if="state.workspaceDashboardList.length"
                                        scope-type="WORKSPACE"
                                        class="dashboard-list"
                                        :class="{'full-mode': dashboardState.scope === 'WORKSPACE'}"
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
                                        :dashboard-list="state.workspaceDashboardList"
             />
-            <dashboard-main-board-list v-if="dashboardState.scope !== 'WORKSPACE' && state.projectDashboardList.length"
+            <dashboard-main-board-list v-if="state.projectDashboardList.length"
                                        scope-type="PROJECT"
                                        class="dashboard-list"
                                        :class="{'full-mode': dashboardState.scope === 'PROJECT'}"
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
                                        :dashboard-list="state.projectDashboardList"
+            />
+            <dashboard-main-board-list v-if="state.privateDashboardList.length"
+                                       scope-type="PRIVATE"
+                                       class="dashboard-list"
+                                       :class="{'full-mode': dashboardState.scope === 'PRIVATE'}"
+                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
+                                       :dashboard-list="state.privateDashboardList"
             />
         </p-data-loader>
     </div>

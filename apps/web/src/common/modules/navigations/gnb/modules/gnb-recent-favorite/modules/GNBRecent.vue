@@ -92,7 +92,7 @@ export default defineComponent({
     setup(props, { emit }: SetupContext) {
         const allReferenceStore = useAllReferenceStore();
         const dashboardStore = useDashboardStore();
-        const dashboardState = dashboardStore.state;
+        const dashboardGetters = dashboardStore.getters;
 
         const storeState = reactive({
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
@@ -142,7 +142,7 @@ export default defineComponent({
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertDashboardConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD),
-                    dashboardState.items,
+                    dashboardGetters.allItems,
                 ) : [];
             }),
             recentCostAnalysisItems: computed<RecentItem[]>(() => {

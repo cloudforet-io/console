@@ -5,8 +5,6 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
@@ -20,7 +18,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -36,8 +33,7 @@ const updateDashboardData = async () => {
     try {
         state.loading = true;
 
-        await dashboardStore.updateDashboard({
-            dashboard_id: props.dashboardId as string,
+        await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
             name: dashboardDetailState.name,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,

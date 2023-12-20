@@ -5,9 +5,6 @@ import { computed, getCurrentInstance, reactive } from 'vue';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
 
-import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
-
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -19,6 +16,7 @@ import DashboardVariablesMoreButton
     from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/types/dashboard-model-type';
 
 
@@ -33,7 +31,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -67,8 +64,7 @@ const state = reactive({
 const updateDashboardVariables = async () => {
     state.saveLoading = true;
     try {
-        await dashboardStore.updateDashboard({
-            dashboard_id: props.dashboardId as string,
+        await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
         });

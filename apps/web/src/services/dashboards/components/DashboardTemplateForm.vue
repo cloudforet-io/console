@@ -8,8 +8,7 @@ import {
     PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
 } from '@spaceone/design-system';
 
-import type { DashboardScope, DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
-import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
+import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -18,6 +17,8 @@ import type { ProjectReferenceMap } from '@/store/modules/reference/project/type
 
 import { ADMIN_DASHBOARD_TEMPLATES, DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
 const emit = defineEmits(['set-template']);
@@ -68,7 +69,7 @@ const existingTemplateState = reactive({
         .map((d: DashboardModel) => ({
             ...d,
             // below values are used only for render
-            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${d.dashboard_id}`,
+            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${d.public_dashboard_id || d.private_dashboard_id}`,
             groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
         }))
         .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
@@ -78,10 +79,10 @@ const existingTemplateState = reactive({
         return '';
     }),
     dashboards: computed<DashboardModel[]>(() => {
-        let dashboardItems: DashboardModel[];
+        let dashboardItems: DashboardModel[] = [];
         if (storeState.isAdminMode) dashboardItems = dashboardGetters.domainItems;
         else if (props.dashboardScope === 'WORKSPACE') dashboardItems = dashboardGetters.workspaceItems;
-        else dashboardItems = dashboardGetters.projectItems;
+        else if (props.dashboardScope === 'PROJECT') dashboardItems = dashboardGetters.projectItems;
 
         return dashboardItems.filter((d) => d.name.includes(state.searchValue));
     }),
@@ -91,7 +92,7 @@ const existingTemplateState = reactive({
 const getDashboardLocation = (board: DashboardModel): Location => ({
     name: DASHBOARDS_ROUTE.DETAIL._NAME,
     params: {
-        dashboardId: board.dashboard_id,
+        dashboardId: board.public_dashboard_id || board.private_dashboard_id,
     },
 });
 
