@@ -26,6 +26,7 @@ import NotificationEmailModal from '@/common/modules/modals/notification-email-m
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import GNB from '@/common/modules/navigations/gnb/GNB.vue';
+import MyPageGNB from '@/common/modules/navigations/gnb/MyPageGNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
@@ -35,7 +36,8 @@ import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 const vm = getCurrentInstance()?.proxy as Vue;
 
 const state = reactive({
-    showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
+    showGNB: computed(() => vm.$route.matched[0]?.name === 'root' || state.isMyPage),
+    isMyPage: computed(() => vm.$route.matched[0]?.name === 'my_page'),
     isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
     isRoutingToSignIn: false,
     isEmailVerified: computed(() => store.state.user.emailVerified),
@@ -90,7 +92,12 @@ watch(() => state.userId, (userId) => {
             <p-toast-alert group="toastTopCenter" />
             <top-notification />
             <template v-if="state.showGNB">
-                <g-n-b class="gnb" />
+                <my-page-g-n-b v-if="state.isMyPage"
+                               class="gnb"
+                />
+                <g-n-b v-else
+                       class="gnb"
+                />
                 <div class="app-body"
                      :style="{ height: globalUIGetters.appBodyHeight }"
                 >
