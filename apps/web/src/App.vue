@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core';
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, getCurrentInstance, reactive, watch, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
 import type { Vue } from 'vue/types/vue';
@@ -13,6 +14,7 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { store } from '@/store';
 
+import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import { getRouteAccessLevel } from '@/lib/access-control';
@@ -42,6 +44,15 @@ const state = reactive({
     domainId: computed<string>(() => store.state.domain.domainId),
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+});
+
+const globalUIStore = useGlobalUIStore();
+const globalUIGetters = globalUIStore.getters;
+
+const topNotiRef = ref(null);
+useResizeObserver(topNotiRef, (entries) => {
+    const rect = entries[0].contentRect;
+    globalUIStore.setTopNotificationHeight(rect.height);
 });
 
 const goToSignIn = async () => {
@@ -80,7 +91,9 @@ watch(() => state.userId, (userId) => {
             <top-notification />
             <template v-if="state.showGNB">
                 <g-n-b class="gnb" />
-                <div class="app-body">
+                <div class="app-body"
+                     :style="{ height: globalUIGetters.appBodyHeight }"
+                >
                     <p-sidebar :visible="store.state.display.visibleSidebar"
                                :style-type="store.getters['display/sidebarProps'].styleType"
                                :size="store.getters['display/sidebarProps'].size"
@@ -90,7 +103,8 @@ watch(() => state.userId, (userId) => {
                                @close="store.dispatch('display/hideSidebar')"
                     >
                         <main class="main">
-                            <portal-target name="top-notification"
+                            <portal-target ref="topNotiRef"
+                                           name="top-notification"
                                            :slot-props="{hasDefaultMessage: true}"
                             />
                             <router-view />
@@ -170,7 +184,6 @@ watch(() => state.userId, (userId) => {
         flex-direction: column;
         overflow-y: hidden;
         width: 100%;
-        height: calc(100vh - $(gnb-height));
         margin-top: $gnb-height;
         flex-grow: 1;
         .p-sidebar .non-sidebar-wrapper {
@@ -182,7 +195,7 @@ watch(() => state.userId, (userId) => {
             height: 100%;
             margin: 0;
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: hidden;
         }
     }
 }
