@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -18,10 +18,20 @@ import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-ve
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+
+interface Props {
+    isSetAdminRole: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isSetAdminRole: true,
+});
+
 
 const router = useRouter();
 
@@ -30,20 +40,13 @@ const emit = defineEmits<{(e: 'change-role', role: AddModalMenuItem): void,
 }>();
 
 const state = reactive({
-    toggleStatus: false,
+    proxyIsSetAdminRole: useProxyValue('isSetAdminRole', props, emit),
 });
 const workspaceState = reactive({
     loading: true,
     visible: false,
     menuItems: [] as AddModalMenuItem[],
-    selectedIndices: [] as number[],
-    selectedItems: computed(() => {
-        const workspaces: AddModalMenuItem[] = [];
-        workspaceState.selectedIndices.forEach((d:number) => {
-            workspaces.push(workspaceState.menuItems[d]);
-        });
-        return workspaces ?? [];
-    }),
+    selectedItems: [] as AddModalMenuItem[],
     searchText: '',
 });
 const roleState = reactive({
@@ -75,14 +78,14 @@ const roleMenuHandler: AutocompleteHandler = async (inputText: string) => {
     };
 };
 const handleChangeToggleButton = () => {
-    state.toggleStatus = !state.toggleStatus;
+    state.proxyIsSetAdminRole = !state.proxyIsSetAdminRole;
 };
 
 /* API */
 const fetchListRoles = async (inputText: string) => {
     roleState.loading = true;
 
-    if (state.toggleStatus) {
+    if (state.proxyIsSetAdminRole) {
         roleListApiQueryHelper.setFilters([{
             k: 'role_type',
             v: [ROLE_TYPE.DOMAIN_ADMIN],
@@ -152,11 +155,11 @@ watch(() => workspaceState.selectedItems, (selectedItems) => {
     <div class="user-admin-role-wrapper">
         <div class="title-wrapper">
             <p-field-title :label="$t('IAM.USER.FORM.ASSIGN_DOMAIN_ROLE')" />
-            <p-toggle-button v-model="state.toggleStatus"
+            <p-toggle-button v-model="state.proxyIsSetAdminRole"
                              @change-toggle="handleChangeToggleButton"
             />
         </div>
-        <div v-if="!state.toggleStatus"
+        <div v-if="!state.proxyIsSetAdminRole"
              class="workspace-role-form-view"
         >
             <p-divider />

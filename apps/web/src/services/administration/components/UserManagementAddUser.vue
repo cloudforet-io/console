@@ -78,6 +78,7 @@ const validationState = reactive({
 
 /* Component */
 const hideMenu = () => {
+    emit('change-list', state.selectedItems);
     state.menuVisible = false;
 };
 const handleClickTextInput = async () => {
@@ -89,7 +90,9 @@ const handleChangeTextInput = debounce(async (searchText: string) => {
     formState.searchText = searchText;
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
-    await fetchListUsers();
+    if (!userPageState.isAdminMode) {
+        await fetchListUsers();
+    }
 }, 200);
 const handleEnterTextInput = () => {
     if (formState.searchText === '') return;
@@ -131,6 +134,8 @@ const getUserList = async () => {
             auth_type: userPageState.isAdminMode ? dropdownState.selectedMenuItem : state.authTypeMenuItems[0].name as AuthType,
         });
         formState.searchText = '';
+    } finally {
+        await hideMenu();
     }
 };
 const checkValidation = () => {
@@ -172,7 +177,6 @@ const fetchGetWorkspaceUsers = async (userId: string) => {
     });
     validationState.userIdInvalid = true;
     validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_WORKSPACE', { userId });
-    await hideMenu();
 };
 const fetchGetUsers = async (userId: string) => {
     await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
@@ -180,7 +184,6 @@ const fetchGetUsers = async (userId: string) => {
     });
     validationState.userIdInvalid = true;
     validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
-    await hideMenu();
 };
 
 /* Context Menu */
@@ -190,11 +193,12 @@ watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
         formState.searchText = '';
         state.selectedAuthType = state.authTypeMenuItems[0].name as AuthType;
-        await fetchListUsers();
+        if (!userPageState.isAdminMode) {
+            await fetchListUsers();
+        }
     } else {
         await checkValidation();
         state.menuItems = [];
-        emit('change-list', state.selectedItems);
     }
 });
 </script>
@@ -229,8 +233,8 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     </div>
                     <div class="input-form-wrapper">
                         <p-text-input ref="targetRef"
-                                      :value="formState.searchText"
                                       :invalid="invalid"
+                                      :value="formState.searchText"
                                       class="user-id-input"
                                       @click="handleClickTextInput"
                                       @keyup.enter="handleEnterTextInput"

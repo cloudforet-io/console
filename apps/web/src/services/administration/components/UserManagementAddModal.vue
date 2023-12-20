@@ -8,6 +8,7 @@ import { cloneDeep, isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { Tags } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleType } from '@/schema/identity/role/type';
@@ -44,35 +45,40 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 const state = reactive({
     loading: false,
     disabled: true,
-    selectedItems: [] as AddModalMenuItem[],
+    // user
+    userList: [] as AddModalMenuItem[],
+    // password
     password: '',
-    role: {} as AddModalMenuItem,
     resetPasswordVisible: false,
     isResetPassword: true,
+    // role
+    role: {} as AddModalMenuItem,
+    workspace: [] as AddModalMenuItem[],
+    isSetAdminRole: false,
+    // tag
+    tags: {} as Tags,
 });
 
 /* Component */
 const handleChangeList = (items: AddModalMenuItem[]) => {
-    state.selectedItems = items;
+    state.userList = items;
     const newUserItem = items.filter((item) => item.isNew);
     const localUserItem = items.filter((item) => item.auth_type === 'LOCAL');
     if (localUserItem.length > 0 && newUserItem.length > 0) {
         state.resetPasswordVisible = true;
     }
 };
-const handleChangeInput = (value: string) => {
-    state.password = value;
-};
 const handleChangeRole = (role: AddModalMenuItem) => {
     state.role = role;
 };
-const handleChangeToggle = (value: boolean) => {
-    state.isResetPassword = value;
+const handleChangeWorkspace = (value: AddModalMenuItem[]) => {
+    state.workspace = value;
 };
+
 const handleConfirm = async () => {
     state.loading = true;
     try {
-        await Promise.all(state.selectedItems.map(fetchCreateUser));
+        await Promise.all(state.userList.map(fetchCreateUser));
         showSuccessMessage(i18n.t('IAM.USER.FORM.ALT_S_SEND_INVITATION_EMAIL'), '');
         emit('confirm');
     } catch (e: any) {
@@ -117,8 +123,8 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<any> => {
 };
 
 /* Watcher */
-watch([() => state.selectedItems, () => state.role], ([validItems, role]) => {
-    if (validItems.length > 0 && !isEmpty(role)) {
+watch([() => state.userList, () => state.role], ([userList, role]) => {
+    if (userList.length > 0 && !isEmpty(role)) {
         state.disabled = false;
     }
 });
@@ -141,15 +147,21 @@ watch([() => state.selectedItems, () => state.role], ([validItems, role]) => {
         <template #body>
             <div class="modal-contents">
                 <user-management-add-user @change-list="handleChangeList" />
-                <user-management-add-password v-if="state.resetPasswordVisible && state.selectedItems.length > 0"
-                                              @change-input="handleChangeInput"
-                                              @change-toggle="handleChangeToggle"
+                <user-management-add-password v-if="state.resetPasswordVisible && state.userList.length > 0"
+                                              :is-reset.sync="state.isResetPassword"
+                                              :password.sync="state.password"
                 />
-                <user-management-add-admin-role v-if="userPageState.isAdminMode" />
+                <user-management-add-admin-role v-if="userPageState.isAdminMode"
+                                                :is-set-admin-role.sync="state.isSetAdminRole"
+                                                @change-role="handleChangeRole"
+                                                @change-workspace="handleChangeWorkspace"
+                />
                 <user-management-add-role v-else
                                           @change-role="handleChangeRole"
                 />
-                <user-management-add-tag v-if="userPageState.isAdminMode" />
+                <user-management-add-tag v-if="userPageState.isAdminMode"
+                                         :tags.sync="state.tags"
+                />
             </div>
         </template>
     </p-button-modal>
