@@ -16,3 +16,8 @@ export const DASHBOARD_LABEL = {
     SECURITY: 'Security',
     BLANK: 'Blank',
 } as const;
+
+export const DASHBOARD_TYPE = {
+    PUBLIC: 'PUBLIC',
+    PRIVATE: 'PRIVATE',
+} as const;
