@@ -13,5 +13,4 @@ export interface UserCreateParameters {
     timezone?: string;
     tags?: Tags;
     reset_password?: boolean;
-    role_id?: string;
 }

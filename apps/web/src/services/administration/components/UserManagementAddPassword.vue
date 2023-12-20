@@ -6,19 +6,28 @@ import {
     PTextInput, PFieldGroup, PToggleButton, PDivider, PFieldTitle, PButton, PCopyButton,
 } from '@spaceone/design-system';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
 import { generatePassword } from '@/services/administration/helpers/generate-helper';
 
-const emit = defineEmits<{(e: 'change-input', password: string): void,
-    (e: 'change-toggle', value: boolean): void
+interface Props {
+    isReset: boolean;
+    password: string;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isReset: true,
+    password: '',
+});
+
+const emit = defineEmits<{(e: 'update:password', password: string): void,
 }>();
 
 const state = reactive({
-    passwordStatus: true,
+    proxyIsReset: useProxyValue('isReset', props, emit),
+    proxyPassword: useProxyValue('password', props, emit),
     isGenerate: false,
     copyButtonVisible: true,
-});
-const formState = reactive({
-    password: '',
 });
 const validationState = reactive({
     isPasswordValid: undefined as undefined | boolean,
@@ -27,15 +36,13 @@ const validationState = reactive({
 
 /* Components */
 const handleChangeToggleButton = () => {
-    state.passwordStatus = !state.passwordStatus;
-    emit('change-toggle', state.passwordStatus);
+    state.proxyIsReset = !state.proxyIsReset;
 };
 const handleChangeInput = (value) => {
-    formState.password = value;
-    emit('change-input', formState.password);
+    state.proxyPassword = value;
 };
 const handleClickGenerate = () => {
-    formState.password = generatePassword();
+    state.proxyPassword = generatePassword();
 };
 </script>
 
@@ -43,11 +50,11 @@ const handleClickGenerate = () => {
     <div class="user-management-add-password">
         <div class="title-wrapper">
             <p-field-title :label="$t('IAM.USER.FORM.PASSWORD_SEND_LINK')" />
-            <p-toggle-button v-model="state.passwordStatus"
+            <p-toggle-button v-model="state.proxyIsReset"
                              @change-toggle="handleChangeToggleButton"
             />
         </div>
-        <div v-if="!state.passwordStatus"
+        <div v-if="!state.proxyIsReset"
              class="password-form-view"
         >
             <p-divider />
@@ -64,7 +71,7 @@ const handleClickGenerate = () => {
                     >
                         {{ $t('IAM.USER.FORM.GENERATE') }}
                     </p-button>
-                    <p-text-input :value="formState.password"
+                    <p-text-input :value="state.proxyPassword"
                                   class="password-input"
                                   :placeholder="$t('IAM.USER.FORM.GENERATE_PLACEHOLDER')"
                                   :invalid="validationState.isPasswordValid"
@@ -73,9 +80,9 @@ const handleClickGenerate = () => {
                                   @focusout="() => state.copyButtonVisible = true"
                     >
                         <template #right-extra>
-                            <p-copy-button v-if="state.copyButtonVisible && formState.password !== ''"
+                            <p-copy-button v-if="state.copyButtonVisible && state.proxyPassword !== ''"
                                            class="icon"
-                                           :value="formState.password"
+                                           :value="state.proxyPassword"
                             />
                         </template>
                     </p-text-input>

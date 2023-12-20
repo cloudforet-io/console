@@ -6,12 +6,22 @@ import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-
 
 import type { Tags } from '@/schema/_common/model';
 
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+interface Props {
+    tags: Tags;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    tags: undefined,
+});
+
+const emit = defineEmits<{(e: 'update:tags', role: Tags): void,
+}>();
 
 const state = reactive({
     formVisible: false,
-});
-const formState = reactive({
-    tags: {} as Tags,
+    proxyTags: useProxyValue('tags', props, emit),
 });
 
 /* Component */
@@ -27,7 +37,7 @@ const handleChangeTags = (items: InputItem[]) => {
         return { [item.name]: item.name };
     });
 
-    formState.tags = Object.assign({}, ...refinedTags);
+    state.proxyTags = Object.assign({}, ...refinedTags);
 };
 </script>
 

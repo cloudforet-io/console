@@ -50,25 +50,25 @@ const handleSelectDropdown = (name) => {
     switch (name) {
     case 'enable': updateModalSettings({
         type: name,
-        title: i18n.t('IAN.USER.MAIN.MODAL.ENABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.ENABLE_TITLE') as string,
         themeColor: 'primary',
         statusVisible: true,
     }); break;
     case 'disable': updateModalSettings({
         type: name,
-        title: i18n.t('IAN.USER.MAIN.MODAL.DISABLE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DISABLE_TITLE') as string,
         themeColor: 'alert',
         statusVisible: true,
     }); break;
     case 'delete': updateModalSettings({
         type: name,
-        title: i18n.t('IAN.USER.MAIN.MODAL.DELETE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.DELETE_TITLE') as string,
         themeColor: 'alert',
         statusVisible: true,
     }); break;
     case 'update': updateModalSettings({
         type: name,
-        title: i18n.t('IAN.USER.MAIN.MODAL.UPDATE_TITLE') as string,
+        title: i18n.t('IAM.USER.MAIN.MODAL.UPDATE_TITLE') as string,
         themeColor: 'primary',
         formVisible: true,
     }); break;
