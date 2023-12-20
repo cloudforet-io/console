@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButtonModal, PDataTable, PDoubleCheckModal,
@@ -8,7 +8,11 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountDeleteParameters } from '@/schema/identity/trusted-account/api-verbs/detele';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -21,16 +25,14 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 
 const props = withDefaults(defineProps<{
     visible: boolean;
-    serviceAccountId?: string;
-    serviceAccountName: string;
+    serviceAccountType: AccountType;
+    serviceAccountData: Partial<ServiceAccountModel>|Partial<TrustedAccountModel>|undefined;
     attachedGeneralAccounts: ServiceAccountModel[];
-    providerId: string;
+
 }>(), {
     visible: false,
-    serviceAccountId: undefined,
-    serviceAccountName: '',
-    attachedGeneralAccounts: () => ([]),
-    providerId: '',
+    serviceAccountType: 'GENERAL',
+    serviceAccountData: undefined,
 });
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void;}>();
@@ -41,14 +43,21 @@ const state = reactive({
     fields: [
         { label: 'Service Account Name', name: 'name' },
     ],
+    isGeneralAccount: computed(() => props.serviceAccountType === 'GENERAL'),
 });
 
 /* Api */
 const deleteServiceAccount = async () => {
     try {
-        await SpaceConnector.clientV2.identity.trustedAccount.delete({
-            trusted_account_id: props.serviceAccountId,
-        });
+        if (state.isGeneralAccount && ('service_account_id' in props.serviceAccountData)) {
+            await SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>({
+                service_account_id: props.serviceAccountData?.service_account_id ?? '',
+            });
+        } else {
+            await SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>({
+                trusted_account_id: props.serviceAccountData?.trusted_account_id ?? '',
+            });
+        }
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'));
@@ -69,7 +78,7 @@ const handleConfirmDelete = async () => {
         <p-double-check-modal v-if="state.proxyVisible && !props.attachedGeneralAccounts.length"
                               :visible.sync="state.proxyVisible"
                               :header-title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CHECK_MODAL_DELETE_TITLE')"
-                              :verification-text="props.serviceAccountName"
+                              :verification-text="props.serviceAccountData?.name ?? ''"
                               modal-size="sm"
                               @confirm="handleConfirmDelete"
         />

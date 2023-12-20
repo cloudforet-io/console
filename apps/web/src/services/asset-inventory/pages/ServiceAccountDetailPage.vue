@@ -172,10 +172,9 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
             />
         </div>
         <service-account-delete-modal :visible.sync="state.deleteModalVisible"
-                                      :service-account-id="props.serviceAccountId"
-                                      :service-account-name="state.item.name"
+                                      :service-account-type="state.serviceAccountType"
+                                      :service-account-data="state.item"
                                       :attached-general-accounts="state.attachedGeneralAccounts"
-                                      :provider-id="state.providerId"
         />
     </div>
 </template>
