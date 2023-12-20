@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
@@ -12,6 +12,8 @@ import type { Tags } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleType } from '@/schema/identity/role/type';
+import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
+import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
@@ -26,6 +28,7 @@ import UserManagementAddPassword from '@/services/administration/components/User
 import UserManagementAddRole from '@/services/administration/components/UserManagementAddRole.vue';
 import UserManagementAddTag from '@/services/administration/components/UserManagementAddTag.vue';
 import UserManagementAddUser from '@/services/administration/components/UserManagementAddUser.vue';
+import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 export interface AddModalMenuItem extends MenuItem {
@@ -44,9 +47,23 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const state = reactive({
     loading: false,
-    disabled: true,
+    disabled: computed(() => {
+        if (!state.isSetAdminRole) {
+            const baseCondition = state.userList.length === 0 || (state.workspace.length === 0 || isEmpty(state.role));
+            if (state.localUserItem.length > 0 && !state.isResetPassword) {
+                return state.password === '' || baseCondition;
+            }
+            return baseCondition;
+        }
+        const baseCondition = state.userList.length === 0 || isEmpty(state.role);
+        if (state.localUserItem.length > 0 && !state.isResetPassword) {
+            return state.password === '' || baseCondition;
+        }
+        return baseCondition;
+    }),
     // user
     userList: [] as AddModalMenuItem[],
+    localUserItem: [] as AddModalMenuItem[],
     // password
     password: '',
     resetPasswordVisible: false,
@@ -63,10 +80,8 @@ const state = reactive({
 const handleChangeList = (items: AddModalMenuItem[]) => {
     state.userList = items;
     const newUserItem = items.filter((item) => item.isNew);
-    const localUserItem = items.filter((item) => item.auth_type === 'LOCAL');
-    if (localUserItem.length > 0 && newUserItem.length > 0) {
-        state.resetPasswordVisible = true;
-    }
+    state.localUserItem = items.filter((item) => item.auth_type === 'LOCAL');
+    state.resetPasswordVisible = state.localUserItem.length > 0 && newUserItem.length > 0;
 };
 const handleChangeRole = (role: AddModalMenuItem) => {
     state.role = role;
@@ -79,7 +94,11 @@ const handleConfirm = async () => {
     state.loading = true;
     try {
         await Promise.all(state.userList.map(fetchCreateUser));
-        showSuccessMessage(i18n.t('IAM.USER.FORM.ALT_S_SEND_INVITATION_EMAIL'), '');
+        if (userPageState.modal.type === USER_MODAL_TYPE.INVITE) {
+            showSuccessMessage(i18n.t('IAM.USER.FORM.ALT_S_SEND_INVITATION_EMAIL'), '');
+        } else {
+            showSuccessMessage(i18n.t('IAM.USER.MAIN.MODAL.ALT_S_ADD_USER'), '');
+        }
         emit('confirm');
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
@@ -93,7 +112,6 @@ const handleClose = () => {
     state.role = {};
     state.resetPasswordVisible = false;
     state.isResetPassword = true;
-    state.disabled = true;
     userPageStore.$patch((_state) => {
         _state.modal.visible.add = false;
         _state.modal = cloneDeep(_state.modal);
@@ -102,32 +120,42 @@ const handleClose = () => {
 
 /* API */
 const fetchCreateUser = async (item: AddModalMenuItem): Promise<any> => {
-    const params = {
+    const userInfoParams = {
+        user_id: item.user_id || '',
+        auth_type: item.auth_type || 'LOCAL',
+        password: state.password || '',
+        reset_password: item.auth_type === 'LOCAL' && state.isResetPassword,
+    };
+    const roleBindingParams = {
         user_id: item.user_id || '',
         role_id: state.role.name || '',
+        resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
     };
+
+    if (userPageState.isAdminMode) {
+        // TODO: Reviewing Workspace Role Assignment Feature
+        const adminRoleParams = !state.isSetAdminRole ? {
+            ...roleBindingParams,
+            workspace_id: state.workspace.map((w) => w.name || ''),
+        } : roleBindingParams;
+
+        await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
+            ...userInfoParams,
+            tags: state.tags,
+        });
+        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(adminRoleParams);
+        return;
+    }
 
     if (item.isNew) {
         await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>({
-            ...params,
-            auth_type: item.auth_type || 'LOCAL',
-            password: state.password || '',
-            reset_password: state.isResetPassword,
+            ...userInfoParams,
+            role_id: state.role.name || '',
         });
     } else {
-        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
-            ...params,
-            resource_group: RESOURCE_GROUP.WORKSPACE,
-        });
+        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleBindingParams);
     }
 };
-
-/* Watcher */
-watch([() => state.userList, () => state.role], ([userList, role]) => {
-    if (userList.length > 0 && !isEmpty(role)) {
-        state.disabled = false;
-    }
-});
 </script>
 
 <template>

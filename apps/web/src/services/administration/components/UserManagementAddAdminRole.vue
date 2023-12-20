@@ -149,6 +149,10 @@ watch(() => roleState.selectedItems, (selectedItems) => {
 watch(() => workspaceState.selectedItems, (selectedItems) => {
     emit('change-workspace', selectedItems);
 });
+watch(() => state.proxyIsSetAdminRole, () => {
+    roleState.selectedItems = [];
+    workspaceState.selectedItems = [];
+});
 </script>
 
 <template>
