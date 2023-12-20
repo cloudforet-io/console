@@ -31,7 +31,7 @@ export const setRoles = (state: UserState, roles: Array<UserRole>): void => {
     state.roles = roles;
 };
 
-export const setCurrentRoleInfo = (state: UserState, currentRoleInfo: RoleInfo): void => {
+export const setCurrentRoleInfo = (state: UserState, currentRoleInfo?: RoleInfo): void => {
     state.currentRoleInfo = currentRoleInfo;
 };
 export const setIsSignInLoading: Mutation<UserState> = (state, isSignInLoading: boolean): void => {
