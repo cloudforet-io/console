@@ -60,9 +60,9 @@ export class SpaceRouter {
 
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
-            const isDuplicatedRoute = to.name === from.name;
+            const isDuplicatedRoute = to.name?.startsWith('admin.') && from.name?.startsWith('admin.');
             const isDuplicateWorkspace = to.params.workspaceId === from.params.workspaceId;
-            if (refreshToken && isTokenAlive && (!isDuplicatedRoute || !isDuplicateWorkspace)) {
+            if (refreshToken && isTokenAlive && !isDuplicatedRoute && !isDuplicateWorkspace) {
                 let scope: string;
                 if (to.name?.startsWith('admin.')) {
                     scope = 'DOMAIN';
