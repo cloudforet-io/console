@@ -89,7 +89,7 @@ export default defineComponent<CollapsiblePanelProps>({
     width: 100%;
     padding: 0.625rem;
     font-size: inherit;
-    line-height: inherit;
+    line-height: 1.25;
     font-style: inherit;
     font-weight: inherit;
     .panel-contents {
