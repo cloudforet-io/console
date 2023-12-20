@@ -32,17 +32,17 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
-const filterMenuByPermission = (menuList: Menu[]): Menu[] => menuList.filter((menu) => menu.needPermissionByRole)
-    .map((menu) => ({
-        ...menu,
-        subMenuList: menu.subMenuList ? filterMenuByPermission(menu.subMenuList) : [],
-    }));
+// const filterMenuByPermission = (menuList: Menu[]): Menu[] => menuList.filter((menu) => menu.needPermissionByRole)
+//     .map((menu) => ({
+//         ...menu,
+//         subMenuList: menu.subMenuList ? filterMenuByPermission(menu.subMenuList) : [],
+//     }));
 
 
 export const getPageAccessPermissionMapFromRawData = (pageAccessPermissions: string[]): PageAccessPermissionMap => {
     const result = {} as PageAccessPermissionMap;
-    const filterdMenuListByRequiredPermission = filterMenuByPermission(MENU_LIST);
-    const flattendPermissionRequiredMenuList = flattenMenu(filterdMenuListByRequiredPermission);
+    // const filterdMenuListByRequiredPermission = filterMenuByPermission(MENU_LIST);
+    const flattendPermissionRequiredMenuList = flattenMenu(MENU_LIST);
 
     pageAccessPermissions.forEach((page) => {
         // in case of wildcard
@@ -53,7 +53,7 @@ export const getPageAccessPermissionMapFromRawData = (pageAccessPermissions: str
             // in case of service wildcard
         } else if (page.endsWith('*')) {
             const menuId = page.replace('.*', '');
-            const foundServiceMenuById = filterdMenuListByRequiredPermission.find(({ id }) => id === menuId);
+            const foundServiceMenuById = MENU_LIST.find(({ id }) => id === menuId);
             if (!foundServiceMenuById) return;
             flattenMenu([foundServiceMenuById]).forEach(({ id }) => {
                 result[id] = true;

@@ -41,9 +41,9 @@ const handleToggleAdminMode = () => {
 <style lang="postcss" scoped>
 .g-n-b-admin-toggle-button {
     @apply relative inline-block cursor-pointer;
-    width: 5.375rem;
+    width: 5.625rem;
     height: 1.75rem;
-    padding-left: 0.5rem;
+    padding-left: 0.75rem;
 
     .switch-input {
         opacity: 0;

@@ -931,6 +931,9 @@
 				"MENU": "메뉴",
 				"SHOW_ALL": "모두 보기"
 			},
+			"MY_PAGE": {
+				"BACK_LINK": ""
+			},
 			"NOTICE": {
 				"DETAIL_LINK": "상세 링크:",
 				"NO_NOTICE": "\b아직 등록된 공지사항이 없습니다.",

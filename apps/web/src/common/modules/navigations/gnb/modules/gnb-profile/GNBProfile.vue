@@ -290,7 +290,6 @@ const handleClickSignOut = async () => {
 <style lang="postcss" scoped>
 .gnb-profile {
     position: relative;
-    margin-left: 0.25rem;
     outline: none;
 
     &:first-of-type {

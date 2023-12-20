@@ -931,6 +931,9 @@
 				"MENU": "MENU",
 				"SHOW_ALL": "Show all"
 			},
+			"MY_PAGE": {
+				"BACK_LINK": "Back to Workspace"
+			},
 			"NOTICE": {
 				"DETAIL_LINK": "Detail Link: ",
 				"NO_NOTICE": "No Notice",

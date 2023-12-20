@@ -21,7 +21,7 @@ const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotif
 const myPageRoutes: RouteConfig = {
     path: '/my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.AUTHENTICATED },
     redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: MyPageContainer,
     children: [

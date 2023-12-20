@@ -188,7 +188,6 @@ export default defineComponent<Props>({
         height: 2rem;
         line-height: $gnb-height;
         cursor: pointer;
-        margin-left: 0.25rem;
 
         &:hover {
             @apply text-blue-600 bg-blue-100;
