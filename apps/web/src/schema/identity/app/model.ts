@@ -5,7 +5,7 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 export interface AppModel {
     app_id: string;
-    app_key?: string;
+    api_key?: string;
     name: string;
     state: AppStatusType;
     role_type: RoleType;

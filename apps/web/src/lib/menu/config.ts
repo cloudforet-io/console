@@ -28,7 +28,6 @@ export const MENU_ID = Object.freeze({
     MY_PAGE: 'my_page',
     ACCOUNT: 'account',
     ACCOUNT_PROFILE: 'account_profile',
-    API_KEY: 'api_key',
     NOTIFICATIONS: 'notifications',
     INFO: 'info',
     NOTICE: 'notice',

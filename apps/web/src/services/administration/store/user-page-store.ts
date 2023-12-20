@@ -3,10 +3,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { ApiKeyDeleteParameters } from '@/schema/identity/api-key/api-verbs/delete';
-import type { ApiKeyDisableParameters } from '@/schema/identity/api-key/api-verbs/disable';
-import type { ApiKeyEnableParameters } from '@/schema/identity/api-key/api-verbs/enable';
-import type { ApiKeyModel } from '@/schema/identity/api-key/model';
+import type { AppDeleteParameters } from '@/schema/identity/app/api-verbs/delete';
+import type { AppDisableParameters } from '@/schema/identity/app/api-verbs/disable';
+import type { AppEnableParameters } from '@/schema/identity/app/api-verbs/enable';
+import type { AppModel } from '@/schema/identity/app/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -82,25 +82,25 @@ export const useUserPageStore = defineStore('user-page', {
             }
         },
         // API Key
-        async enableApiKey(params: ApiKeyEnableParameters) {
+        async enableApiKey(params: AppEnableParameters) {
             try {
-                await SpaceConnector.clientV2.identity.apiKey.enable<ApiKeyEnableParameters, ApiKeyModel>(params);
+                await SpaceConnector.clientV2.identity.app.enable<AppEnableParameters, AppModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
             }
         },
-        async disableApiKey(params: ApiKeyDisableParameters) {
+        async disableApiKey(params: AppDisableParameters) {
             try {
-                await SpaceConnector.clientV2.identity.apiKey.disable<ApiKeyDisableParameters, ApiKeyModel>(params);
+                await SpaceConnector.clientV2.identity.app.disable<AppDisableParameters, AppModel>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;
             }
         },
-        async deleteApiKey(params: ApiKeyDeleteParameters) {
+        async deleteApiKey(params: AppDeleteParameters) {
             try {
-                await SpaceConnector.clientV2.identity.apiKey.delete<ApiKeyDeleteParameters>(params);
+                await SpaceConnector.clientV2.identity.app.delete<AppDeleteParameters>(params);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 throw e;

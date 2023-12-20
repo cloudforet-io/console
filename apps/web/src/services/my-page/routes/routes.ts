@@ -11,7 +11,6 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 const MyPageContainer = () => import('@/services/my-page/MyPageContainer.vue');
 
 const UserAccountPage = () => import('@/services/my-page/pages/UserAccountPage.vue');
-const UserAPIKeyPage = () => import('@/services/my-page/pages/UserAPIKeyPage.vue');
 const UserNotificationPage = () => import('@/services/my-page/pages/UserNotificationPage.vue');
 const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotificationAddPage.vue');
 
@@ -39,12 +38,6 @@ const myPageRoutes: RouteConfig = {
                     component: UserAccountPage as any,
                 },
                 {
-                    path: 'api-key',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
-                    meta: { lnbVisible: true, menuId: MENU_ID.API_KEY },
-                    component: UserAPIKeyPage as any,
-                },
-                {
                     path: 'notification',
                     meta: { lnbVisible: true, menuId: MENU_ID.NOTIFICATIONS },
                     component: { template: '<router-view />' },
@@ -55,13 +48,6 @@ const myPageRoutes: RouteConfig = {
                             meta: { lnbVisible: true },
                             component: UserNotificationPage as any,
                         },
-                        // {
-                        //     path: ':userId',
-                        //     name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
-                        //     meta: { label: ({ params }) => params.userId },
-                        //     component: ManageUserNotificationPage as any,
-                        //     props: true,
-                        // },
                         {
                             path: ':protocol/:protocolId/:userId',
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
