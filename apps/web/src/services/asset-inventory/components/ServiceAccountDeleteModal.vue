@@ -46,8 +46,8 @@ const state = reactive({
 /* Api */
 const deleteServiceAccount = async () => {
     try {
-        await SpaceConnector.client.identity.serviceAccount.delete({
-            service_account_id: props.serviceAccountId,
+        await SpaceConnector.clientV2.identity.trustedAccount.delete({
+            trusted_account_id: props.serviceAccountId,
         });
         showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '');
     } catch (e) {

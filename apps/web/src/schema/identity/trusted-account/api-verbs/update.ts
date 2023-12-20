@@ -5,6 +5,4 @@ export interface TrustedAccountUpdateParameters {
     name?: string;
     data?: any;
     tags?: Tags;
-    workspace_id?: string;
-    domain_id?: string;
 }

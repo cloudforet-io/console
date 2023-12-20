@@ -1,5 +1,5 @@
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
+
 export interface ServiceAccountStatParameters {
-    query: any;
-    workspace_id?: string;
-    domain_id?: string;
+    query: Query;
 }

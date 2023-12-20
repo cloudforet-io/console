@@ -33,11 +33,16 @@ const fieldHandler = (field) => {
     return {};
 };
 
-watch(() => props.provider, (provider) => {
-    if (provider) serviceAccountSchemaStore.setProviderSchema(provider);
-    const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
-    const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.state.trustedAccountDetailSchema : serviceAccountSchemaStore.state.generalAccountDetailSchema;
-    if (detailSchema?.details[0]) state.detailSchema = detailSchema?.details[0];
+watch(() => props.provider, async (provider) => {
+    if (provider) {
+        await serviceAccountSchemaStore.setProviderSchema(provider);
+        await serviceAccountSchemaStore.setGeneralAccountDetailSchema(provider);
+        await serviceAccountSchemaStore.setTrustedAccountDetailSchema(provider);
+
+        const isTrustedAccount = props.serviceAccountType === ACCOUNT_TYPE.TRUSTED;
+        const detailSchema = isTrustedAccount ? serviceAccountSchemaStore.state.trustedAccountDetailSchema : serviceAccountSchemaStore.state.generalAccountDetailSchema;
+        if (detailSchema?.details[0]) state.detailSchema = detailSchema?.details[0];
+    }
 });
 </script>
 
@@ -47,7 +52,7 @@ watch(() => props.provider, (provider) => {
                           :options="state.detailSchema?.options"
                           :data="props.serviceAccountData"
                           :type-options="{
-                              loading: !state.detailSchema?.type || loading
+                              loading: !state.detailSchema?.type || props.loading
                           }"
                           :field-handler="fieldHandler"
         />
