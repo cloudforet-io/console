@@ -57,12 +57,13 @@ export class SpaceRouter {
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
+            const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
 
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
             const isDuplicatedRoute = to.name?.startsWith('admin.') && from.name?.startsWith('admin.');
-            const isDuplicateWorkspace = to.params.workspaceId === from.params.workspaceId;
-            if (refreshToken && isTokenAlive && !isDuplicatedRoute && !isDuplicateWorkspace) {
+            const isDuplicateWorkspace = (to.params.workspaceId && from.params.workspaceId) && to.params.workspaceId === from.params.workspaceId;
+            if (refreshToken && isTokenAlive && !isDuplicatedRoute && !isDuplicateWorkspace && isNotErrorRoute) {
                 let scope: string;
                 if (to.name?.startsWith('admin.')) {
                     scope = 'DOMAIN';
@@ -76,7 +77,6 @@ export class SpaceRouter {
                     token: refreshToken,
                 };
 
-                // TODO: add error handling by routing 403
                 await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
             }
 
@@ -92,7 +92,7 @@ export class SpaceRouter {
             * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent
             * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
              */
-            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && isAdminMode && to.name && !to.name?.startsWith('admin.')) {
+            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && isAdminMode && to.name && !to.name?.startsWith('admin.') && isNotErrorRoute) {
                 const adminRouteName = makeAdminRouteName(to.name);
                 const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
                 const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
@@ -110,6 +110,7 @@ export class SpaceRouter {
                     };
                 }
             }
+
 
             // When a user is authenticated
             if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {

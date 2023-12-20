@@ -23,7 +23,7 @@ import { PButton } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+import { ROOT_ROUTE } from '@/router/constant';
 
 interface Props {
     statusCode: string;
@@ -47,7 +47,7 @@ const handleClickBack = () => {
     }
 };
 const handleClickHome = () => {
-    router.push({ name: HOME_DASHBOARD_ROUTE._NAME });
+    router.push({ name: ROOT_ROUTE._NAME });
 };
 </script>
 
