@@ -9,8 +9,6 @@ import {
 
 import { SpaceRouter } from '@/router';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import DashboardDetailHeader from '@/services/dashboards/components/DashboardDetailHeader.vue';
@@ -28,7 +26,6 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
@@ -51,8 +48,7 @@ const handleRefresh = () => {
 };
 const handleUpdateLabels = async (labels: string[]) => {
     try {
-        await dashboardStore.updateDashboard({
-            dashboard_id: props.dashboardId,
+        await dashboardDetailStore.updateDashboard(props.dashboardId, {
             labels,
         });
     } catch (e) {

@@ -54,7 +54,7 @@ const {
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.name, dashboardDetailState.projectId)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType, dashboardDetailState.name, dashboardDetailState.projectId)),
 });
 
 // const _invalid_unique = 'Dashboard name must be unique'; i18n.t('VALIDATION_DASHBOARD_NAME_UNIQUE')
@@ -62,8 +62,7 @@ const state = reactive({
 
 const updateDashboard = async () => {
     try {
-        await dashboardStore.updateDashboard({
-            dashboard_id: props.dashboardId,
+        await dashboardDetailStore.updateDashboard(props.dashboardId, {
             name: _name.value,
         });
     } catch (e) {

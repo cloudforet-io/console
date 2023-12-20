@@ -33,7 +33,7 @@ const state = reactive({
         return !dashboardDetailState.name;
     }),
     placeHolder: dashboardDetailState.placeholder,
-    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.name, dashboardDetailState.projectId)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType, dashboardDetailState.name, dashboardDetailState.projectId)),
 });
 const {
     forms: {

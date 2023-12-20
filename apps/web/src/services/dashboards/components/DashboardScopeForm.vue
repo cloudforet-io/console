@@ -1,48 +1,35 @@
 <script lang="ts" setup>
 import {
-    reactive,
-} from 'vue';
-
-import {
-    PRadio, PRadioGroup, PFieldTitle,
+    PRadio, PRadioGroup, PFieldTitle, PI,
 } from '@spaceone/design-system';
 
-import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
 import { store } from '@/store';
 
-import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
-interface Props {
-    dashboardScope?: DashboardScope;
-}
-const props = withDefaults(defineProps<Props>(), {
-    dashboardScope: undefined,
-});
 const emit = defineEmits<{(event: 'set-project', project: ProjectTreeNodeData): void;
-    (event: 'update:dashboard-scope', scopeType: DashboardScope): void;
 }>();
 
-const state = reactive({
-    isWorkspaceScope: true,
-    dashboardScope: useProxyValue('dashboardScope', props, emit),
-});
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
 
+/* Event */
 const handleSelectScope = (scopeType: DashboardScope) => {
-    updateScope(scopeType);
+    dashboardDetailStore.setDashboardScope(scopeType);
+    if (scopeType === 'PRIVATE') {
+        dashboardDetailStore.setDashboardType('PRIVATE');
+    } else {
+        dashboardDetailStore.setDashboardType('PUBLIC');
+    }
 };
 
 const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
-    // Emit projects as project.
     emit('set-project', projects[0]);
-};
-
-const updateScope = (scopeType: DashboardScope) => {
-    state.isWorkspaceScope = scopeType === 'WORKSPACE';
-    state.dashboardScope = scopeType;
 };
 
 // LOAD REFERENCE STORE
@@ -58,22 +45,38 @@ const updateScope = (scopeType: DashboardScope) => {
             <p-radio-group direction="vertical"
                            class="dashboard-scope-radio-group"
             >
-                <p-radio :selected="state.isWorkspaceScope"
+                <p-radio :selected="dashboardDetailState.dashboardScope"
+                         value="WORKSPACE"
                          @change="handleSelectScope('WORKSPACE')"
                 >
                     {{ $t('DASHBOARDS.CREATE.WORKSPACE') }}
                 </p-radio>
-                <p-radio :selected="!state.isWorkspaceScope"
+                <p-radio :selected="dashboardDetailState.dashboardScope"
+                         value="PROJECT"
                          @change="handleSelectScope('PROJECT')"
                 >
                     {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
                 </p-radio>
+                <project-select-dropdown :disabled="dashboardDetailState.dashboardScope !== 'PROJECT'"
+                                         project-selectable
+                                         :project-group-selectable="false"
+                                         @select="handleSelectProjects"
+                />
+                <p-radio :selected="dashboardDetailState.dashboardScope"
+                         value="PRIVATE"
+                         @change="handleSelectScope('PRIVATE')"
+                >
+                    <p-i name="ic_lock-filled"
+                         width="0.875rem"
+                         height="0.875rem"
+                         class="mr-1 mb-1 ml-1 gray-500"
+                    />
+                    <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
+                </p-radio>
+                <p class="viewer-description">
+                    {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
+                </p>
             </p-radio-group>
-            <project-select-dropdown v-show="!state.isWorkspaceScope"
-                                     project-selectable
-                                     :project-group-selectable="false"
-                                     @select="handleSelectProjects"
-            />
         </div>
     </section>
 </template>
@@ -87,8 +90,13 @@ const updateScope = (scopeType: DashboardScope) => {
             @apply flex flex-col;
             gap: 0.5rem;
         }
+        .viewer-description {
+            @apply text-xs text-gray-500;
+            font-weight: 400;
+            margin-left: 1.5rem;
+        }
         .project-select-dropdown {
-            @apply mt-1 ml-6;
+            @apply ml-6;
         }
 
         @screen tablet {

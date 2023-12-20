@@ -11,8 +11,6 @@ import type { BoardSet } from '@spaceone/design-system/types/data-display/board/
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
-import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -25,10 +23,12 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardDeleteModal from '@/services/dashboards/components/DashboardDeleteModal.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
 
 const PAGE_SIZE = 10;
-const DOMAIN_SCOPE_NAME = 'Workspace';
+const WORKSPACE_SCOPE_NAME = 'Workspace';
 
 interface Props {
     scopeType?: DashboardScope;
@@ -91,7 +91,7 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
             router.push({
                 name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
                 params: {
-                    dashboardId: dashboardItem.dashboard_id,
+                    dashboardId: dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || '',
                 },
             });
         },
@@ -107,7 +107,7 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
     {
         iconName: 'ic_delete',
         tooltipText: i18n.t('DASHBOARDS.ALL_DASHBOARDS.TOOLTIP_DELETE'),
-        eventAction: () => handleClickDeleteDashboard(dashboardItem.dashboard_id),
+        eventAction: () => handleClickDeleteDashboard(dashboardItem.public_dashboard_id || dashboardItem.private_dashboard_id || ''),
     },
 ];
 
@@ -116,7 +116,7 @@ const handleClickBoardItem = (item: DashboardModel) => {
     router.push({
         name: DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
-            dashboardId: item.dashboard_id,
+            dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
         },
     });
 };
@@ -163,7 +163,7 @@ watch(() => props.dashboardList, () => {
             <template #item-content="{board}">
                 <div class="board-item-title-wrapper">
                     <div class="favorite-button-wrapper">
-                        <favorite-button :item-id="board.dashboard_id"
+                        <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
                                          :favorite-type="FAVORITE_TYPE.DASHBOARD"
                                          scale="0.666"
                         />
@@ -181,15 +181,15 @@ watch(() => props.dashboardList, () => {
                              width="0.125rem"
                              height="0.125rem"
                         />
-                        <span v-if="props.scopeType === 'WORKSPACE'">{{ DOMAIN_SCOPE_NAME }}</span>
+                        <span v-if="props.scopeType === 'WORKSPACE'">{{ WORKSPACE_SCOPE_NAME }}</span>
                         <span v-else>{{ board.label }}</span>
                     </template>
                 </div>
                 <div class="label-wrapper">
                     <p-label v-if="!storeState.isAdminMode"
-                             :class="{'item-label': true, 'viewers-label': true, 'private-label': board.dashboard_type === 'PRIVATE'}"
-                             :text="board.dashboard_type === 'PUBLIC' ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE')"
-                             :left-icon="board.dashboard_type === 'PUBLIC' ? 'ic_globe-filled' : 'ic_lock-filled'"
+                             :class="{'item-label': true, 'viewers-label': true, 'private-label': !!board.private_dashboard_id}"
+                             :text="!!board.private_dashboard_id ? $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PRIVATE') : $t('DASHBOARDS.ALL_DASHBOARDS.LABEL_PUBLIC')"
+                             :left-icon="!!board.private_dashboard_id ? 'ic_lock-filled' : 'ic_globe-filled'"
                     />
                     <p-label v-for="(label, idx) in board.labels"
                              :key="`${board.name}-label-${idx}`"

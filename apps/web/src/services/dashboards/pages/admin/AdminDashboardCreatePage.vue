@@ -27,12 +27,10 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { CreateDashboardParameters } from '@/schema/dashboard/dashboard/api-verbs/create';
-import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
+import type { CreatePublicDashboardParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -49,18 +47,16 @@ interface Step {
     step: number;
     description?: string;
 }
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const {
     forms: { dashboardTemplate },
     setForm,
     isAllValid,
 } = useFormValidator({
-    dashboardTemplate: {} as DashboardModel,
+    dashboardTemplate: {} as PublicDashboardModel,
 }, {
-    dashboardTemplate(value: DashboardModel) {
+    dashboardTemplate(value: PublicDashboardModel) {
         return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
     },
 });
@@ -83,7 +79,7 @@ const goStep = (direction: 'prev'|'next') => {
 };
 
 const saveCurrentStateToStore = () => {
-    const _dashboardTemplate: DashboardModel = {
+    const _dashboardTemplate: PublicDashboardModel = {
         ...dashboardTemplate.value,
         name: '',
     };
@@ -97,7 +93,7 @@ const createDashboard = async () => {
     try {
         state.loading = true;
 
-        const apiParam: CreateDashboardParameters = {
+        const apiParam: CreatePublicDashboardParameters = {
             name: dashboardDetailState.name,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
@@ -105,15 +101,14 @@ const createDashboard = async () => {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
             tags: { created_by: store.state.user.userId },
-            dashboard_type: dashboardDetailGetters.dashboardType,
             resource_group: RESOURCE_GROUP.DOMAIN,
         };
 
-        const createdDashboard = await dashboardStore.createDashboard(apiParam);
+        const createdDashboard: PublicDashboardModel = await dashboardDetailStore.createDashboard(apiParam);
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: createdDashboard.dashboard_id as string,
+                dashboardId: createdDashboard.public_dashboard_id as string,
             },
         });
     } catch (e) {

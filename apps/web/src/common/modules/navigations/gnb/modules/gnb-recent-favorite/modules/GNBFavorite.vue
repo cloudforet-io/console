@@ -136,7 +136,7 @@ export default {
     setup(props, { emit }: SetupContext) {
         const allReferenceStore = useAllReferenceStore();
         const dashboardStore = useDashboardStore();
-        const dashboardState = dashboardStore.state;
+        const dashboardGetters = dashboardStore.getters;
 
         const state = reactive({
             loading: true,
@@ -229,7 +229,7 @@ export default {
                 if (!isUserAccessibleToDashboards) return [];
                 return convertDashboardConfigToReferenceData(
                     store.state.favorite.dashboardItems,
-                    dashboardState.items,
+                    dashboardGetters.allItems,
                 );
             }),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {

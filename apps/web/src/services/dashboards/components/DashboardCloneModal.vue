@@ -11,8 +11,7 @@ import { SpaceRouter } from '@/router';
 import type {
     DashboardLayoutWidgetInfo, DashboardVariablesSchema, DashboardType,
 } from '@/schema/dashboard/_types/dashboard-type';
-import type { CreateDashboardParameters } from '@/schema/dashboard/dashboard/api-verbs/create';
-import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
+import type { CreatePublicDashboardParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -27,6 +26,7 @@ import { gray } from '@/styles/colors';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardDetailInfoStoreState } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 interface Props {
@@ -114,9 +114,8 @@ const handleUpdateVisible = (visible) => {
 
 const createDashboard = async () => {
     try {
-        const params: CreateDashboardParameters = {
+        const params: CreatePublicDashboardParameters = {
             name: name.value,
-            dashboard_type: viewers.value,
             layouts: state.layouts,
             labels: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.labels : dashboardDetailState.dashboardInfo?.labels,
             settings: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.settings : dashboardDetailState.dashboardInfo?.settings,
@@ -125,7 +124,7 @@ const createDashboard = async () => {
             resource_group: 'WORKSPACE',
             project_id: state.projectId,
         };
-        const res = await dashboardStore.createDashboard(params);
+        const res = await dashboardDetailStore.createDashboard(params);
         return res.dashboard_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));

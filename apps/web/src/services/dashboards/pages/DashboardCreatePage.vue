@@ -26,14 +26,9 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { DashboardScope, DashboardType } from '@/schema/dashboard/_types/dashboard-type';
-import type { CreateDashboardParameters } from '@/schema/dashboard/dashboard/api-verbs/create';
-import type { DashboardModel } from '@/schema/dashboard/dashboard/model';
+import type { CreatePublicDashboardParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import ConfirmBackModal from '@/common/components/modals/ConfirmBackModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -43,9 +38,9 @@ import { useGoBack } from '@/common/composables/go-back';
 import DashboardCustomize from '@/services/dashboards/components/DashboardCustomize.vue';
 import DashboardScopeForm from '@/services/dashboards/components/DashboardScopeForm.vue';
 import DashboardTemplateForm from '@/services/dashboards/components/DashboardTemplateForm.vue';
-import DashboardViewerForm from '@/services/dashboards/components/DashboardViewerForm.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
 
 
@@ -53,9 +48,7 @@ interface Step {
     step: number;
     description?: string;
 }
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const {
     forms: { dashboardTemplate, dashboardProject },
@@ -69,15 +62,13 @@ const {
         return !Object.keys(value).length ? i18n.t('DASHBOARDS.CREATE.VALIDATION_TEMPLATE') : '';
     },
     dashboardProject(value: ProjectTreeNodeData|undefined) {
-        return !value && state.dashboardScope === 'PROJECT'
+        return !value && dashboardDetailState.dashboardScope === 'PROJECT'
             ? i18n.t('DASHBOARDS.CREATE.VALIDATION_PROJECT') : '';
     },
 });
 
 const state = reactive({
     loading: false,
-    dashboardScope: 'WORKSPACE' as DashboardScope,
-    dashboardType: 'PUBLIC' as DashboardType,
     steps: computed<Step[]>(() => [
         { step: 1, description: i18n.t('DASHBOARDS.CREATE.STEP1_DESC') as string },
         { step: 2, description: i18n.t('DASHBOARDS.CREATE.STEP2_DESC') as string },
@@ -85,9 +76,8 @@ const state = reactive({
     ]),
     currentStep: 1,
     isValid: computed(() => {
-        if (state.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
-        if (state.dashboardScope === 'WORKSPACE') return true;
-        return false;
+        if (dashboardDetailState.dashboardScope === 'PROJECT') return !!dashboardProject.value?.id;
+        return true;
     }),
     closeConfirmModalVisible: false,
 });
@@ -103,14 +93,12 @@ const goStep = (direction: 'prev'|'next') => {
 const saveCurrentStateToStore = () => {
     const _dashboardTemplate: DashboardModel = {
         ...dashboardTemplate.value,
-        project_id: dashboardProject.value?.id ?? '',
+        project_id: dashboardDetailState.dashboardScope === 'PROJECT' ? dashboardProject.value?.id : undefined,
         name: '',
-        dashboard_type: state.dashboardType,
     };
 
     dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
     dashboardDetailStore.setDashboardId(undefined);
-    dashboardDetailStore.setProjectId(dashboardProject.value?.id ?? '');
     dashboardDetailStore.setPlaceholder(dashboardTemplate.value.name);
 };
 
@@ -126,18 +114,20 @@ const createDashboard = async () => {
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
             tags: { created_by: store.state.user.userId },
-            dashboard_type: dashboardDetailGetters.dashboardType,
-            resource_group: state.dashboardScope,
         };
-        if (state.dashboardScope === RESOURCE_GROUP.PROJECT) {
-            apiParam.project_id = dashboardDetailState.projectId;
+        if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
+            (apiParam as CreatePublicDashboardParameters).resource_group = dashboardDetailState.dashboardScope;
+        }
+        if (dashboardDetailState.dashboardScope === 'PROJECT') {
+            (apiParam as CreatePublicDashboardParameters).project_id = dashboardDetailState.projectId;
         }
 
-        const createdDashboard = await dashboardStore.createDashboard(apiParam);
+        const createdDashboard = await dashboardDetailStore.createDashboard(apiParam);
+        const dashboardId = createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id;
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId: createdDashboard.dashboard_id as string,
+                dashboardId,
             },
         });
     } catch (e) {
@@ -171,10 +161,7 @@ defineExpose({ setPathFrom });
                                       show-close-button
                                       @close="handleClickClose"
             />
-            <dashboard-scope-form :dashboard-scope.sync="state.dashboardScope"
-                                  @set-project="setForm('dashboardProject', $event)"
-            />
-            <dashboard-viewer-form :dashboard-type.sync="state.dashboardType" />
+            <dashboard-scope-form @set-project="setForm('dashboardProject', $event)" />
             <div class="button-area">
                 <p-button
                     style-type="transparent"
@@ -203,7 +190,7 @@ defineExpose({ setPathFrom });
                                       @close="handleClickClose"
             />
             <dashboard-template-form
-                :dashboard-scope="state.dashboardScope"
+                :dashboard-scope="dashboardDetailState.dashboardScope"
                 @set-template="setForm('dashboardTemplate', $event)"
             />
             <div class="button-area">
@@ -248,6 +235,7 @@ defineExpose({ setPathFrom });
 
 <style lang="postcss" scoped>
 .dashboard-create-page {
+    min-width: 25rem;
     &.step-2 {
         @apply absolute;
         top: 2rem;

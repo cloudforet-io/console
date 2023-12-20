@@ -7,8 +7,6 @@ import {
     PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
 
-import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -36,7 +34,6 @@ const emit = defineEmits<{(e: 'close', save: boolean): void;
     (e: 'update:has-non-inherited-widget-options', value: boolean): void;
 }>();
 
-const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 const widgetFormStore = useWidgetFormStore();
@@ -65,8 +62,7 @@ const updateDashboardWidgetStore = () => {
 /* Api */
 const updateWidgetInfo = async () => {
     try {
-        await dashboardStore.updateDashboard({
-            dashboard_id: dashboardDetailState.dashboardId as string,
+        await dashboardDetailStore.updateDashboard(dashboardDetailState.dashboardId as string, {
             layouts: [dashboardDetailState.dashboardWidgetInfoList],
         });
     } catch (e) {
