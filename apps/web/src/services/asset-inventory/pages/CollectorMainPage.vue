@@ -12,6 +12,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -90,10 +93,10 @@ const handleSelectedProvider = (providerName: string) => {
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
 const fetchCollectorCount = async () => {
     try {
-        const { total_count } = await SpaceConnector.clientV2.inventory.collector.list({
+        const { total_count } = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
             query: collectorCountApiQueryHelper.data,
         });
-        state.hasCollectorList = total_count > 0;
+        state.hasCollectorList = (total_count ?? 0) > 0;
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

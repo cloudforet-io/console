@@ -54,7 +54,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CloudServiceTypeInfo } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -65,7 +65,7 @@ import CloudServiceUsageOverviewSummary
 import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Props {
-    cloudServiceTypeInfo: CloudServiceTypeInfo;
+    cloudServiceTypeInfo: CloudServiceTypeModel;
     filters?: ConsoleFilter[];
     period?: Period;
     hiddenFilters?: ConsoleFilter[];
@@ -86,7 +86,7 @@ export default defineComponent<Props>({
     },
     props: {
         cloudServiceTypeInfo: {
-            type: Object as () => CloudServiceTypeInfo,
+            type: Object as () => CloudServiceTypeModel,
             default: () => ({}),
         },
         filters: {
@@ -141,7 +141,7 @@ export default defineComponent<Props>({
 
         const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
             try {
-                const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
+                const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeModel;
                 const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: 'inventory.CloudService',
                     schema: 'widget',
