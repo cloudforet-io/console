@@ -51,7 +51,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         }),
         isWorkspaceOwner: computed<boolean>(() => {
             if (!state.workspaceUser) return false;
-            return state.workspaceUser.role_type === 'WORKSPACE_OWNER';
+            return state.workspaceUser.role_binding_info.role_type === 'WORKSPACE_OWNER';
         }),
     });
 
