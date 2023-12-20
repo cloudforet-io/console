@@ -229,6 +229,7 @@ export default defineComponent<Props>({
     right: 0;
     margin-top: 0.25rem;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
+    z-index: 1000;
 
     /* custom design-system component - p-data-loader */
     :deep(.p-data-loader) {

@@ -60,7 +60,7 @@ const getMenuAccessLevel = (id: MenuId): AccessLevel => {
 };
 
 export const isUserAccessibleToMenu = (menuId: MenuId, pageAccessList: MenuId[]): boolean => {
-    const isAccessible = pageAccessList.some(([id]) => id === menuId);
+    const isAccessible = pageAccessList.some((id) => id === menuId);
     if (!isAccessible) return false;
     return getAccessTypeFromPermission(isAccessible) >= getMenuAccessLevel(menuId);
 };

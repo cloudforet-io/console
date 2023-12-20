@@ -249,7 +249,7 @@ export default defineComponent<Props>({
             @apply absolute bg-violet-500 rounded-t-xs;
             right: 0.5rem;
             bottom: -0.625rem;
-            z-index: 1;
+            z-index: 999;
             width: calc(100% - 1rem);
             height: 0.1875rem;
             &.is-admin {
