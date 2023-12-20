@@ -49,7 +49,6 @@ export const integralRoutes: RouteConfig[] = [
                 path: '/:workspaceId',
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 redirect: (to) => {
-                    console.debug('router.beforeEach', to);
                     const workspaceStore = useWorkspaceStore();
                     const workspaceList = workspaceStore.getters.workspaceList;
                     const currentWorkspaceId = workspaceStore.getters.currentWorkspaceId;
