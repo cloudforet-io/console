@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { cloneDeep, get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Query, Sort } from '@cloudforet/core-lib/space-connector/type';
@@ -88,9 +88,9 @@ const getChildMap = async (groups: ProjectGroupModel[], excludeType: ProjectTree
 
     return res;
 };
-const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
+const fetchProjectGroups = async (params: ProjectTreeOptions): Promise<ProjectTreeNodeData[]> => {
     const requestParams: ProjectGroupListParameters = {
-        query: params.query ?? {},
+        query: cloneDeep(params.query) ?? {},
     };
 
     if (params.item_type === 'ROOT') {
@@ -129,15 +129,24 @@ const fetchProjectGroups = async (params): Promise<ProjectTreeNodeData[]> => {
         return item;
     });
 };
-const fetchProjects = async (params): Promise<ProjectTreeNodeData[]> => {
+const fetchProjects = async (params: ProjectTreeOptions): Promise<ProjectTreeNodeData[]> => {
+    const requestParams: ProjectListParameters = {
+        query: cloneDeep(params.query) ?? {},
+    };
     if (params.item_type === 'ROOT') {
-        return [];
+        (requestParams as Required<ListRequestParams>).query.filter = [
+            ...requestParams.query?.filter ?? [],
+            {
+                k: 'project_group_id',
+                v: null,
+                o: 'eq',
+            },
+        ];
+    } else {
+        requestParams.project_group_id = params.item_id;
     }
 
-    const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ProjectListResponse>({
-        query: params.query,
-        project_group_id: params.item_id || null,
-    });
+    const { results } = await SpaceConnector.clientV2.identity.project.list<ProjectListParameters, ProjectListResponse>(requestParams);
     if (!results?.length) return [];
 
     const items: ProjectTreeNodeData[] = [];
@@ -185,6 +194,8 @@ const getParentItem = async (itemId: string, itemType: ProjectTreeItemType, open
 
 
 const getProjectTree = async (options: ProjectTreeOptions): Promise<ProjectTreeNodeData[]> => {
+    const _options = cloneDeep(options);
+
     if (!options.item_type) {
         throw new Error('Required Parameter. (key = item_type)');
     }
@@ -194,26 +205,28 @@ const getProjectTree = async (options: ProjectTreeOptions): Promise<ProjectTreeN
     }
 
     if (!options.query) {
-        options.query = {};
+        _options.query = {};
     }
-    options.query.minimal = true;
+    _options.query = { ..._options.query, minimal: true };
 
     if (options.sort) {
-        options.query.sort = options.sort;
+        _options.query = { ..._options.query, sort: options.sort };
     }
 
     const treeItems: ProjectTreeNodeData[] = [];
 
     if (options.exclude_type !== 'PROJECT_GROUP') {
-        Array.prototype.push.apply(treeItems, await fetchProjectGroups(options));
+        Array.prototype.push.apply(treeItems, await fetchProjectGroups(_options));
     }
     if (options.exclude_type !== 'PROJECT') {
-        Array.prototype.push.apply(treeItems, await fetchProjects(options));
+        Array.prototype.push.apply(treeItems, await fetchProjects(_options));
     }
 
     return treeItems;
 };
 const getProjectTreeSearchPath = async (options: ProjectTreeSearchOptions): Promise<ProjectTreeSearchResponse> => {
+    const _options = cloneDeep(options);
+
     if (!options.item_type) {
         throw new Error('Required Parameter. (key = item_type)');
     }
@@ -227,12 +240,12 @@ const getProjectTreeSearchPath = async (options: ProjectTreeSearchOptions): Prom
     }
 
     if (!options.query) {
-        options.query = {};
+        _options.query = {};
     }
-    options.query.minimal = true;
+    _options.query = { ..._options.query, minimal: true };
 
     if (options.sort) {
-        options.query.sort = options.sort;
+        _options.query = { ..._options.query, sort: options.sort };
     }
 
     const response: ProjectTreeSearchResponse = {
@@ -240,8 +253,8 @@ const getProjectTreeSearchPath = async (options: ProjectTreeSearchOptions): Prom
     };
 
     response.open_path = await getParentItem(
-        options.item_id as string,
-        options.item_type,
+        _options.item_id as string,
+        _options.item_type,
     );
 
     return response;
