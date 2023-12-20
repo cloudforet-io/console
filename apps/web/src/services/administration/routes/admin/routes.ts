@@ -8,7 +8,7 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
 
 const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 
-const UserPage = () => import('@/services/administration/pages/UserPage.vue');
+const UserMainPage = () => import('@/services/administration/pages/UserMainPage.vue');
 const AppMainPage = () => import('@/services/administration/pages/AppMainPage.vue');
 const RolePage = () => import('@/services/administration/pages/admin/RolePage.vue');
 const RoleCreatePage = () => import('@/services/administration/pages/admin/RoleCreatePage.vue');
@@ -38,7 +38,7 @@ const adminAdministrationRoutes: RouteConfig = {
                     path: 'user',
                     name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.USER._NAME),
                     meta: { lnbVisible: true, menuId: MENU_ID.USER },
-                    component: UserPage as any,
+                    component: UserMainPage as any,
                 },
                 {
                     path: 'app',
