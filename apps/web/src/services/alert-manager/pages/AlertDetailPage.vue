@@ -17,8 +17,6 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import AlertDetailInfoTable from '@/services/alert-manager/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote.vue';
-import AlertDetailProjectDependency
-    from '@/services/alert-manager/components/AlertDetailProjectDependency.vue';
 import AlertResponder from '@/services/alert-manager/components/AlertDetailResponder.vue';
 import AlertDetailSummary from '@/services/alert-manager/components/AlertDetailSummary.vue';
 import AlertDetailTabs from '@/services/alert-manager/components/AlertDetailTabs.vue';
@@ -142,9 +140,6 @@ const alertTitleEditConfirm = async () => {
                         :id="props.id"
                         :manage-disabled="!state.hasManagePermission"
                         class="note"
-                    />
-                    <alert-detail-project-dependency :id="props.id"
-                                                     class="project-dependency"
                     />
                 </div>
             </div>
