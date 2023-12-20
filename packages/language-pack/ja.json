@@ -1295,6 +1295,7 @@
 			"LABEL_PUBLIC": "公開",
 			"LABEL_SCOPE": "スコープ",
 			"LABEL_VIWERS": "公開可否",
+			"PRIVATE": "非公開",
 			"PROJECT": "プロジェクト",
 			"SINGLE_PROJECT": "個別プロジェクト",
 			"TOOLTIP_CLONE": "複製",

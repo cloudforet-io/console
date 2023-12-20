@@ -1295,6 +1295,7 @@
 			"LABEL_PUBLIC": "Public",
 			"LABEL_SCOPE": "Scope",
 			"LABEL_VIWERS": "Viewers",
+			"PRIVATE": "Private",
 			"PROJECT": "Project",
 			"SINGLE_PROJECT": "Single Project",
 			"TOOLTIP_CLONE": "Clone",
