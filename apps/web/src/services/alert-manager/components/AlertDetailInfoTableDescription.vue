@@ -97,6 +97,10 @@ export default {
 
 <style lang="postcss" scoped>
 @import './styles/alertInfoItem.pcss';
+.p-collapsible-panel {
+    padding: 0;
+    margin-right: 0.5rem;
+}
 .description {
     white-space: pre-line;
 }
