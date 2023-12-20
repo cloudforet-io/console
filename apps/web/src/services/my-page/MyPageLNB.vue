@@ -63,7 +63,7 @@ export default defineComponent({
                 if (state.isDomainOwner) return i18n.t('MY_PAGE.ROOT_ACCOUNT');
                 return i18n.t('MY_PAGE.SPACEONE_USER');
             }),
-            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId)),
+            header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId) as string),
             menuSet: computed<LNBMenu[]>(() => {
                 const allLnbMenu: LNBMenu[] = [
                     {
@@ -77,12 +77,6 @@ export default defineComponent({
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId),
                         id: MENU_ID.ACCOUNT_PROFILE,
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT_PROFILE._NAME },
-                    },
-                    {
-                        type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.API_KEY].translationId),
-                        id: MENU_ID.API_KEY,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
                     },
                     {
                         type: 'item',

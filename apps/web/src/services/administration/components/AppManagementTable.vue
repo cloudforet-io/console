@@ -13,8 +13,8 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { ApiKeyModel } from '@/schema/identity/api-key/model';
 import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';
+import type { AppModel } from '@/schema/identity/app/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -77,7 +77,7 @@ const state = reactive({
 });
 const modalState = reactive({
     apiKeyModalVisible: false,
-    item: {} as ApiKeyModel,
+    item: {} as AppModel,
 });
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {

@@ -150,11 +150,6 @@ export const MENU_INFO_MAP: Record<MenuId, MenuInfo> = Object.freeze({
         routeName: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT_PROFILE._NAME,
         translationId: 'MENU.MY_PAGE_ACCOUNT_PROFILE',
     },
-    [MENU_ID.API_KEY]: {
-        menuId: MENU_ID.API_KEY,
-        routeName: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
-        translationId: 'MENU.MY_PAGE_API_KEY',
-    },
     [MENU_ID.NOTIFICATIONS]: {
         menuId: MENU_ID.NOTIFICATIONS,
         routeName: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME,

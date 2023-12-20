@@ -8,7 +8,8 @@ import {
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import yaml from 'js-yaml';
 
-import type { ApiKeyModel } from '@/schema/identity/api-key/model';
+
+import type { AppModel } from '@/schema/identity/app/model';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -21,7 +22,7 @@ enum FileType {
 
 const props = defineProps<{
     visible: boolean;
-    apiKeyItem?: ApiKeyModel;
+    apiKeyItem?: AppModel;
 }>();
 const emit = defineEmits<{(event: 'visible', visible: boolean): void;
     (event: 'clickButton'): void;

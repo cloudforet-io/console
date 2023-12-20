@@ -10,8 +10,8 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
 
 const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 
-const UserPage = () => import('@/services/administration/pages/UserPage.vue');
-const AppPage = () => import('@/services/administration/pages/AppPage.vue');
+const UserMainPage = () => import('@/services/administration/pages/UserMainPage.vue');
+const AppMainPage = () => import('@/services/administration/pages/AppMainPage.vue');
 
 const administrationRoutes: RouteConfig = {
     path: 'iam',
@@ -24,13 +24,13 @@ const administrationRoutes: RouteConfig = {
             path: 'user',
             name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
             meta: { lnbVisible: true, menuId: MENU_ID.USER },
-            component: UserPage as any,
+            component: UserMainPage as any,
         },
         {
             path: 'app',
             name: ADMINISTRATION_ROUTE.IAM.APP._NAME,
             meta: { lnbVisible: true, menuId: MENU_ID.APP },
-            component: AppPage as any,
+            component: AppMainPage as any,
         },
     ],
 };

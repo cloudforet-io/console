@@ -57,7 +57,6 @@ export const MENU_LIST: Menu[] = [
                 id: MENU_ID.ACCOUNT,
                 subMenuList: [
                     { id: MENU_ID.ACCOUNT_PROFILE },
-                    { id: MENU_ID.API_KEY },
                     { id: MENU_ID.NOTIFICATIONS },
                 ],
             },

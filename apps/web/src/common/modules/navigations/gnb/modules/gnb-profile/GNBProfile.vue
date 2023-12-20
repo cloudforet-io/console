@@ -246,17 +246,6 @@ const handleClickSignOut = async () => {
                     </router-link>
                 </div>
             </template>
-            <template v-if="state.hasPermission">
-                <p-divider />
-                <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu"
-                                 :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}"
-                                 @click.native="hideProfileMenu"
-                    >
-                        {{ $t('MENU.MY_PAGE_API_KEY') }}
-                    </router-link>
-                </div>
-            </template>
             <p-divider />
             <div class="sub-menu-wrapper">
                 <a v-for="{ link, label } in state.supportedMenu"
