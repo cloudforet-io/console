@@ -53,8 +53,8 @@ const state = reactive({
         Object.keys(state.credentialJsonSchema?.properties ?? {}).forEach((k) => {
             convertedData[k] = '••••••••••••••••••••';
         });
-        if (props.attachedTrustedAccountId && 'trusted_account_id' in convertedData) {
-            convertedData.trusted_account_id = state.attachedTrustedAccount?.label ?? props.attachedTrustedAccountId;
+        if (props.attachedTrustedAccountId && 'trusted_secret_id' in convertedData) {
+            convertedData.trusted_secret_id = state.attachedTrustedAccount?.label ?? props.attachedTrustedAccountId;
         }
         return convertedData;
     }),
@@ -65,7 +65,7 @@ const state = reactive({
         if (props.attachedTrustedAccountId) {
             const link = SpaceRouter.router.resolve(referenceRouter(props.attachedTrustedAccountId, { resource_type: 'identity.ServiceAccount' })).href;
             fields.push({
-                key: 'trusted_account_id',
+                key: 'trusted_secret_id',
                 name: 'Trusted Account',
                 type: 'text',
                 options: { link, disable_copy: true },

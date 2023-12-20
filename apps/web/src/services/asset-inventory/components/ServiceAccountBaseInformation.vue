@@ -77,6 +77,7 @@ const state = reactive<State>({
         ...((state.isTrustedAccount && ('project_id' in props.serviceAccountData)) && {
             selectedProjectId: props.serviceAccountData?.project_id ?? '',
         }),
+        projectForm: { selectedProjectId: props.serviceAccountData?.project_id ?? '' },
     })),
 });
 
@@ -108,6 +109,7 @@ const updateServiceAccount = async () => {
                 name: state.baseInformationForm.accountName,
                 data: state.baseInformationForm.customSchemaForm,
                 tags: state.baseInformationForm.tags,
+                project_id: state.baseInformationForm?.projectForm?.selectedProjectId,
             });
         }
         showSuccessMessage(i18n.t('INVENTORY.SERVICE_ACCOUNT.DETAIL.ALT_S_UPDATE_BASE_INFO'), '');

@@ -33,7 +33,6 @@ import type { TrustedAccountListParameters } from '@/schema/identity/trusted-acc
 import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
 import { store } from '@/store';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -60,7 +59,6 @@ const vm = getCurrentInstance()?.proxy as Vue;
 const { query } = SpaceRouter.router.currentRoute;
 const queryHelper = new QueryHelper().setFiltersAsRawQueryString(query.filters);
 
-const workspaceStore = useWorkspaceStore();
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
 
 const state = reactive({
@@ -116,20 +114,18 @@ const { keyItemSets, valueHandlerMap, isAllLoaded } = useQuerySearchPropsWithSea
     /** Handling API with SpaceConnector * */
 
 const apiQuery = new ApiQueryHelper();
-const getQuery = (type: AccountType) => {
-    const isTrustedAccount = type === ACCOUNT_TYPE.TRUSTED;
+const getQuery = () => {
     apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
         .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
         .setFilters([
             { k: 'provider', v: state.selectedProvider, o: '=' },
-            ...(tableState.isTrustedAccount ? [{ k: 'workspace_id', v: [workspaceStore.getters.currentWorkspaceId, null], o: '=' }] : []),
             ...tableState.searchFilters,
         ]);
     const fields = tableState.schema?.options?.fields;
     if (fields) {
         apiQuery.setOnly(
             ...fields.map((d) => d.key),
-            isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
+            tableState.isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
             'tags',
         );
     }
@@ -142,16 +138,13 @@ const listServiceAccountData = async () => {
         let res: ListResponse<TrustedAccountModel> | ListResponse<ServiceAccountModel>;
         if (tableState.isTrustedAccount) {
             res = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
-                query: getQuery(ACCOUNT_TYPE.TRUSTED),
-                workspace_id: undefined,
+                query: getQuery(),
             });
         } else {
             res = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
-                query: getQuery(ACCOUNT_TYPE.GENERAL),
+                query: getQuery(),
             });
         }
-
-
         tableState.items = res.results || [];
         typeOptionState.totalCount = res.total_count ?? 0;
     } catch (e) {
@@ -185,7 +178,7 @@ const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
 const exportServiceAccountData = async () => {
     await downloadExcel({
         url: '/identity/service-account/list',
-        param: { query: getQuery(tableState.selectedAccountType) },
+        param: { query: getQuery() },
         fields: dynamicFieldsToExcelDataFields(tableState.schema?.options?.fields ?? []),
         file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
         timezone: state.timezone,

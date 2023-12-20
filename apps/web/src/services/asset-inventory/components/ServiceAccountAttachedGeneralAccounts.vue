@@ -51,7 +51,6 @@ const getAttachedGeneralAccountList = async () => {
         const { results } = await SpaceConnector.clientV2.identity.serviceAccount.list<ServiceAccountListParameters, ListResponse<ServiceAccountModel>>({
             query: apiQueryHelper.setSort(state.sortBy, state.sortDesc).setFilters([
                 { k: 'trusted_account_id', v: props.serviceAccountId, o: '=' }]).data,
-            domain_id: state.domainId,
         });
         state.items = results;
         if (results) emit('update:attached-general-accounts', results);
