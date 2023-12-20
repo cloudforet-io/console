@@ -10,6 +10,7 @@ import utc from 'dayjs/plugin/utc';
 import type { DatetimeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/datetime/type';
 import type { DatetimeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/inputs/link/PLink.vue';
+import { ACTION_ICON } from '@/inputs/link/type';
 
 
 dayjs.extend(utc);
@@ -75,7 +76,7 @@ export default {
         if (options.link) {
             datetimeEl = h(PLink, {
                 ...attrs,
-                attrs: { href: props.options.link, newTab: true },
+                attrs: { href: props.options.link, actionIcon: value ? ACTION_ICON.INTERNAL_LINK : ACTION_ICON.NONE, newTab: true },
             }, [datetimeEl]);
         }
 

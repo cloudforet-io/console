@@ -34,14 +34,14 @@ Dynamic fields provide several types to display data.
 
 The types that can be displayed as dynamic fields are as follows.
 
-- text
-- badge
-- datetime
-- dict
-- state
-- enum
-- size
-- more
+- [text](#text-type)
+- [badge](#badge-type)
+- [datetime](#datetime-type)
+- [dict](#dict-type)
+- [state](#state-type)
+- [enum](#enum-type)
+- [size](#size-type)
+- [more](#more-type)
 - list (deprecated)
 
 <br/>
@@ -256,7 +256,7 @@ interface BadgeOptions extends CommonOptions {
             <div>
                 <p-dynamic-field type="badge" :options="{}" data="Basic badge type"></p-dynamic-field>
                 <br/><br/>
-                <p-dynamic-field type="badge" :options="{link: 'https://www.google.com'}" data="Basic badge type with link"></p-dynamic-field>
+                <p-dynamic-field type="badge" :options="{link: 'https://github.com/cloudforet-io'}" data="Basic badge type with link"></p-dynamic-field>
                 <br/><br/>
                 <p-dynamic-field type="list" :options="{
                     sub_key: 'data',
@@ -313,7 +313,7 @@ interface DatetimeOptions extends CommonOptions {
                 <p-dynamic-field type="datetime" :options="{source_type: 'iso8601'}" :data="new Date().toISOString()"></p-dynamic-field>
                 <br/><br/>
                 <span>with different display_format: </span>
-                <p-dynamic-field type="datetime" :options="{source_type: 'iso8601', display_format: 'YY.MM.DD hh:mm:ss'}" :data="new Date().toISOString()"></p-dynamic-field>
+                <p-dynamic-field type="datetime" :options="{link: 'https://github.com/cloudforet-io', source_type: 'iso8601', display_format: 'YY.MM.DD hh:mm:ss'}" :data="new Date().toISOString()"></p-dynamic-field>
                 <br/><br/>
                 <p class="font-bold text-lg">with 'timestamp' source_type, 'seconds' source_format</p><br/>
                 <p-dynamic-field type="datetime" :options="{source_type: 'timestamp', source_format: 'seconds'}" :data="{seconds: '1616034252', nanos: 345000000}"></p-dynamic-field>
@@ -380,7 +380,7 @@ interface StateOptions extends CommonOptions {
             template: `
             <div>
                 <p class="font-bold text-lg">basic</p><br/>
-                <p-dynamic-field type="state" :options="{}" data="RUNNING"></p-dynamic-field>
+                <p-dynamic-field type="state" :options="{link: 'https://github.com/cloudforet-io'}" data="RUNNING"></p-dynamic-field>
                 <br/><br/>
                 <p class="font-bold text-lg">with text color</p><br/>
                 <p-dynamic-field type="state" :options="{text_color: 'green.400'}" data="RUNNING"></p-dynamic-field>
@@ -456,7 +456,7 @@ interface EnumOptions {
                         RUNNING: {
                             name: 'Running',
                             type: 'state',
-                            options: { icon: { color: 'green.500' } }
+                            options: { icon: { color: 'green.500' }, link: 'https://github.com/cloudforet-io' }
                         },
                         TERMINATED: {
                             name: 'Terminated',
@@ -498,7 +498,7 @@ interface SizeOptions extends CommonOptions {
             template: `
             <div>
                 <p class="font-bold text-lg">auto case</p><br/>
-                <p-dynamic-field type="size" :options="{}" :data="123456789"></p-dynamic-field><br/>
+                <p-dynamic-field type="size" :options="{link: 'https://github.com/cloudforet-io'}" :data="123456789"></p-dynamic-field><br/>
                 <br/>
                 <p class="font-bold text-lg">from bytes to bytes, mb, gb, tb, pb</p><br/>
                 <p-dynamic-field type="size" :options="{display_unit: 'BYTES'}" :data="123456789"></p-dynamic-field><br/>

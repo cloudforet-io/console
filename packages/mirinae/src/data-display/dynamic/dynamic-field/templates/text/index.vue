@@ -16,6 +16,7 @@ import type { TranslateResult } from 'vue-i18n';
 import type { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
 import type { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/inputs/link/PLink.vue';
+import { ACTION_ICON } from '@/inputs/link/type';
 import { commaFormatter } from '@/utils/helpers';
 
 export default defineComponent<TextDynamicFieldProps>({
@@ -61,7 +62,7 @@ export default defineComponent<TextDynamicFieldProps>({
                 return {
                     href: props.options?.link,
                     text: text.value,
-                    showIcon: !!text.value,
+                    actionIcon: text.value ? ACTION_ICON.INTERNAL_LINK : ACTION_ICON.NONE,
                     newTab: true,
                 };
             }
