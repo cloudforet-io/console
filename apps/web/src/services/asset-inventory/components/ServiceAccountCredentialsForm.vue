@@ -26,8 +26,6 @@ import type { TrustedAccountModel } from '@/schema/identity/trusted-account/mode
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
@@ -52,7 +50,6 @@ const emit = defineEmits<{(e: 'update:isValid', isValid: boolean): void;
 }>();
 
 const serviceAccountSchemaStore = useServiceAccountSchemaStore();
-const workspaceStore = useWorkspaceStore();
 
 interface State {
     showTrustedAccount: ComputedRef<boolean>;
@@ -160,15 +157,9 @@ const checkJsonStringAvailable = (str: string): boolean => {
 };
 
 /* Api */
-const apiQueryHelper = new ApiQueryHelper();
 const listTrustAccounts = async () => {
     try {
-        const getQuery = () => apiQueryHelper
-            .setFilters([{ k: 'workspace_id', v: [workspaceStore.getters.currentWorkspaceId ?? '', null], o: '=' }]);
-        const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>({
-            query: getQuery().data,
-            workspace_id: undefined,
-        });
+        const { results } = await SpaceConnector.clientV2.identity.trustedAccount.list<TrustedAccountListParameters, ListResponse<TrustedAccountModel>>();
         state.trustedAccounts = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);

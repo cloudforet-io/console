@@ -85,6 +85,7 @@ const initFormData = (originForm: Partial<BaseInformationForm>) => {
     state.tags = originForm?.tags ?? {};
     // init validation
     state.isCustomSchemaFormValid = true;
+    state.projectForm.selectedProjectId = originForm?.projectForm?.selectedProjectId;
 };
 
 /* Api */
@@ -156,6 +157,7 @@ watch(() => props.originForm, (originForm) => {
                        class="account-tags"
         >
             <service-account-project-form :is-valid.sync="state.isProjectFormValid"
+                                          :project-id="props.originForm?.projectForm?.selectedProjectId"
                                           @change="handleChangeProjectForm"
             />
         </p-field-group>
