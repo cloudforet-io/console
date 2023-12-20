@@ -931,6 +931,9 @@
 				"MENU": "メニュー",
 				"SHOW_ALL": "すべて表示"
 			},
+			"MY_PAGE": {
+				"BACK_LINK": ""
+			},
 			"NOTICE": {
 				"DETAIL_LINK": "詳細リンク",
 				"NO_NOTICE": "まだ登録されたお知らせがありません。",
