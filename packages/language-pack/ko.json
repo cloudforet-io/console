@@ -1385,6 +1385,7 @@
 				"DESCRIPTION_PROVIDER": "AWS, Azure, Google과 같은 클라우드 서비스 프로바이더 리스트 ",
 				"DESCRIPTION_REGION": "각 클라우드 서비스 프로바이더가 데이터 센터를 구축한 지리적 위치",
 				"DESCRIPTION_SERVICE_ACCOUNT": "클라우드 서비스 프로바이더 콘솔에서 생성되어 '서비스 계정(service account)' 페이지에 등록된 계정 리스트",
+				"DESCRIPTION_WORKSPACE": "",
 				"EDIT": "편집",
 				"FILTER_ALL": "전체",
 				"FILTER_CUSTOM": "Custom",

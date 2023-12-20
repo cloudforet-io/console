@@ -16,7 +16,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import { ADMIN_DASHBOARD_TEMPLATES, DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 
 
@@ -50,7 +50,8 @@ const defaultTemplateState = reactive({
     allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
     boardSets: computed<DashboardTemplateBoardSet[]>(() => {
         const regex = getTextHighlightRegex(state.searchValue);
-        return Object.values(DASHBOARD_TEMPLATES)
+        const templates = storeState.isAdminMode ? ADMIN_DASHBOARD_TEMPLATES : DASHBOARD_TEMPLATES;
+        return Object.values(templates)
             .map((d: DashboardTemplate) => ({
                 ...d,
                 // below values are used only for render

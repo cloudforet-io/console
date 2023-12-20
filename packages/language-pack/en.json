@@ -1385,6 +1385,7 @@
 				"DESCRIPTION_PROVIDER": "The cloud service providers such as AWS, Azure, Google",
 				"DESCRIPTION_REGION": "The geographic locations where each cloud provider has built data centers",
 				"DESCRIPTION_SERVICE_ACCOUNT": "The accounts created from each cloud provider and added in the ‘service account’ page",
+				"DESCRIPTION_WORKSPACE": "",
 				"EDIT": "Edit",
 				"FILTER_ALL": "All",
 				"FILTER_CUSTOM": "Custom",
