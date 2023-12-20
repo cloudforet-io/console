@@ -49,12 +49,19 @@ export const integralRoutes: RouteConfig[] = [
                 path: '/:workspaceId',
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 redirect: (to) => {
+                    console.debug('router.beforeEach', to);
                     const workspaceStore = useWorkspaceStore();
                     const workspaceList = workspaceStore.getters.workspaceList;
-                    const isValidWorkspace = workspaceList.some((workspace) => workspace.workspace_id === to.params.workspaceId);
-                    if (isValidWorkspace) {
-                        workspaceStore.setCurrentWorkspace(to.params.workspaceId);
-                        return ({ name: HOME_DASHBOARD_ROUTE._NAME });
+                    const currentWorkspaceId = workspaceStore.getters.currentWorkspaceId;
+                    const isValidWorkspace = workspaceList.some((workspace) => workspace.workspace_id === currentWorkspaceId);
+                    if (currentWorkspaceId && isValidWorkspace) {
+                        return ({
+                            name: HOME_DASHBOARD_ROUTE._NAME,
+                            params: {
+                                ...to.params,
+                                workspaceId: currentWorkspaceId,
+                            },
+                        });
                     } if (workspaceList.length) {
                         const defaultWorkspaceId = workspaceList[0].workspace_id;
                         workspaceStore.setCurrentWorkspace(defaultWorkspaceId);
