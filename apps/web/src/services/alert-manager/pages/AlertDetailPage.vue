@@ -20,8 +20,6 @@ import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote
 import AlertDetailProjectDependency
     from '@/services/alert-manager/components/AlertDetailProjectDependency.vue';
 import AlertResponder from '@/services/alert-manager/components/AlertDetailResponder.vue';
-import AlertDetailStatusUpdate
-    from '@/services/alert-manager/components/AlertDetailStatusUpdate.vue';
 import AlertDetailSummary from '@/services/alert-manager/components/AlertDetailSummary.vue';
 import AlertDetailTabs from '@/services/alert-manager/components/AlertDetailTabs.vue';
 import AlertDetailTitleEditModal from '@/services/alert-manager/components/AlertDetailTitleEditModal.vue';
@@ -126,11 +124,6 @@ const alertTitleEditConfirm = async () => {
                         :id="props.id"
                         class="info"
                         :manage-disabled="!state.hasManagePermission"
-                    />
-                    <alert-detail-status-update
-                        :id="props.id"
-                        :manage-disabled="!state.hasManagePermission"
-                        class="status-update"
                     />
                     <alert-detail-tabs
                         :id="props.id"
