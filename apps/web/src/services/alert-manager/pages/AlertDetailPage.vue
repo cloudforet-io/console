@@ -17,11 +17,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import AlertDetailInfoTable from '@/services/alert-manager/components/AlertDetailInfoTable.vue';
 import AlertDetailNote from '@/services/alert-manager/components/AlertDetailNote.vue';
-import AlertDetailProjectDependency
-    from '@/services/alert-manager/components/AlertDetailProjectDependency.vue';
 import AlertResponder from '@/services/alert-manager/components/AlertDetailResponder.vue';
-import AlertDetailStatusUpdate
-    from '@/services/alert-manager/components/AlertDetailStatusUpdate.vue';
 import AlertDetailSummary from '@/services/alert-manager/components/AlertDetailSummary.vue';
 import AlertDetailTabs from '@/services/alert-manager/components/AlertDetailTabs.vue';
 import AlertDetailTitleEditModal from '@/services/alert-manager/components/AlertDetailTitleEditModal.vue';
@@ -127,11 +123,6 @@ const alertTitleEditConfirm = async () => {
                         class="info"
                         :manage-disabled="!state.hasManagePermission"
                     />
-                    <alert-detail-status-update
-                        :id="props.id"
-                        :manage-disabled="!state.hasManagePermission"
-                        class="status-update"
-                    />
                     <alert-detail-tabs
                         :id="props.id"
                         class="timeline-and-event"
@@ -149,9 +140,6 @@ const alertTitleEditConfirm = async () => {
                         :id="props.id"
                         :manage-disabled="!state.hasManagePermission"
                         class="note"
-                    />
-                    <alert-detail-project-dependency :id="props.id"
-                                                     class="project-dependency"
                     />
                 </div>
             </div>
@@ -176,9 +164,6 @@ const alertTitleEditConfirm = async () => {
 </template>
 
 <style lang="postcss" scoped>
-.alert-detail-note {
-    @apply bg-gray-100;
-}
 .alert-number {
     @apply text-gray-700;
     font-weight: 400;

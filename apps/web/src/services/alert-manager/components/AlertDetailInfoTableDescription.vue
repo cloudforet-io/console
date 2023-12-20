@@ -7,12 +7,13 @@
                                :value="alertData.description"
             />&zwnj;
         </p-collapsible-panel>
-        <button class="edit-btn"
-                :class="{'disabled': manageDisabled}"
-                @click="startEdit(alertData.description)"
+        <p-button style-type="tertiary"
+                  size="sm"
+                  :disabled="manageDisabled"
+                  @click="startEdit(alertData.description)"
         >
             {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
-        </button>
+        </p-button>
     </p>
     <div v-else
          class="content-wrapper"
@@ -22,7 +23,7 @@
         />
         <div class="button-group">
             <p-button style-type="secondary"
-                      class="text-button"
+                      class="text-button mr-2"
                       size="sm"
                       @click="cancelEdit(alertData.description)"
             >
@@ -96,18 +97,14 @@ export default {
 
 <style lang="postcss" scoped>
 @import './styles/alertInfoItem.pcss';
+.p-collapsible-panel {
+    padding: 0;
+    margin-right: 0.5rem;
+}
 .description {
     white-space: pre-line;
 }
 .textarea {
     min-height: 15rem;
-}
-.edit-btn {
-    &.disabled {
-        @apply cursor-not-allowed text-gray-400;
-    }
-    &.disabled:active {
-        pointer-events: none;
-    }
 }
 </style>

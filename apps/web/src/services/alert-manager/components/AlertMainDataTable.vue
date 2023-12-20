@@ -68,6 +68,16 @@
                         </p-link>
                     </template>
                 </template>
+                <template #col-alert_number-format="{ value, item }">
+                    <p-link highlight
+                            :to="{
+                                name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                params: { id: item.alert_id }
+                            }"
+                    >
+                        {{ value }}
+                    </p-link>
+                </template>
                 <template #col-state-format="{ value }">
                     <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
                              :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
@@ -98,7 +108,7 @@
                     </template>
                 </template>
                 <template #col-created_at-format="{value, field}">
-                    <template v-if="field.label === 'Created'">
+                    <template v-if="field.label === 'Created Time'">
                         {{ iso8601Formatter(value, storeState.timezone) }}
                     </template>
                     <template v-else>
@@ -115,6 +125,12 @@
                                         :user-reference="storeState.users[value]"
                                         disable-link
                     />
+                </template>
+                <template #col-acknowledged_at-format="{ value }">
+                    {{ iso8601Formatter(value, storeState.timezone) }}
+                </template>
+                <template #col-resolved_at-format="{ value }">
+                    {{ iso8601Formatter(value, storeState.timezone) }}
                 </template>
             </p-toolbox-table>
         </div>
@@ -134,10 +150,10 @@ import {
     PToolboxTable, PButton, PHeading, PBadge, PI, PLink,
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import dayjs from 'dayjs';
 
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -245,6 +261,7 @@ export default {
                         name: 'project_id', label: 'Project', reference: 'identity.Project', valueSet: storeState.projects,
                     },
                     { name: 'created_at', label: 'Created Time', dataType: 'datetime' },
+                    { name: 'acknowledged_at', label: 'Acknowledged Time', dataType: 'datetime' },
                     { name: 'resolved_at', label: 'Resolved Time', dataType: 'datetime' },
                     {
                         name: 'webhook_id', label: 'Webhook', reference: 'monitoring.Webhook', valueSet: storeState.webhooks,
@@ -262,6 +279,7 @@ export default {
                         assignee: makeDistinctValueHandler('monitoring.Alert', 'assignee', undefined, valueHandlerFilters),
                         'resource.resource_type': makeDistinctValueHandler('monitoring.Alert', 'resource.resource_type', undefined, valueHandlerFilters),
                         created_at: makeDistinctValueHandler('monitoring.Alert', 'created_at', 'datetime', valueHandlerFilters),
+                        acknowledged_at: makeDistinctValueHandler('monitoring.Alert', 'acknowledged_at', 'datetime', valueHandlerFilters),
                         resolved_at: makeDistinctValueHandler('monitoring.Alert', 'resolved_at', 'datetime', valueHandlerFilters),
                         webhook_id: makeReferenceValueHandler('monitoring.Webhook'),
                     };
@@ -273,6 +291,7 @@ export default {
                     'resource.resource_type': makeDistinctValueHandler('monitoring.Alert', 'resource.resource_type'),
                     project_id: makeReferenceValueHandler('identity.Project'),
                     created_at: makeDistinctValueHandler('monitoring.Alert', 'created_at', 'datetime'),
+                    acknowledged_at: makeDistinctValueHandler('monitoring.Alert', 'acknowledged_at', 'datetime', valueHandlerFilters),
                     resolved_at: makeDistinctValueHandler('monitoring.Alert', 'resolved_at', 'datetime'),
                     webhook_id: makeReferenceValueHandler('monitoring.Webhook'),
                 };
@@ -289,13 +308,14 @@ export default {
                     { name: 'title', label: 'Title', width: '437px' },
                     { name: 'state', label: 'State' },
                     { name: 'urgency', label: 'Urgency' },
-                    { name: 'status_message', label: 'Status Updates' },
                     { name: 'resource', label: 'Resource' },
                     { name: 'project_id', label: 'Project', sortable: false },
-                    { name: 'created_at', label: 'Created' },
                     { name: 'created_at', label: 'Duration', sortable: false },
                     { name: 'assignee', label: 'Assigned to' },
                     { name: 'triggered_by', label: 'Triggered by' },
+                    { name: 'created_at', label: 'Created Time' },
+                    { name: 'acknowledged_at', label: 'Acknowledged Time' },
+                    { name: 'resolved_at', label: 'Resolved Time' },
                 ];
 
                 if (state.totalCount === 0) { fields[1].width = 'auto'; }
@@ -307,7 +327,6 @@ export default {
                     { key: 'title', name: 'Title' },
                     { key: 'state', name: 'State' },
                     { key: 'urgency', name: 'Urgency' },
-                    { key: 'status_message', name: 'Status Details' },
                     { key: 'resource', name: 'Resource' },
                     { key: 'project_id', name: 'Project' },
                     { key: 'created_at', name: 'Created', type: 'datetime' },

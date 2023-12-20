@@ -88,10 +88,12 @@ export default defineComponent<CollapsiblePanelProps>({
 .p-collapsible-panel {
     width: 100%;
     padding: 0.625rem;
+    font-size: inherit;
+    line-height: 1.25;
+    font-style: inherit;
+    font-weight: inherit;
     .panel-contents {
         position: relative;
-        font-size: 0.75rem;
-        line-height: 1.5;
         word-break: break-word;
         .text {
             &.collapsed, &.fake {
