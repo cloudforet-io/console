@@ -61,7 +61,8 @@ export const integralRoutes: RouteConfig[] = [
                                 workspaceId: currentWorkspaceId,
                             },
                         });
-                    } if (workspaceList.length) {
+                    }
+                    if (workspaceList.length) {
                         const defaultWorkspaceId = workspaceList[0].workspace_id;
                         workspaceStore.setCurrentWorkspace(defaultWorkspaceId);
                         return ({
