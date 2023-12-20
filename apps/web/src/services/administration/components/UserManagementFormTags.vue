@@ -52,8 +52,8 @@ const handleUpdateTags = (tags: Tag) => {
                        class="title"
         >
             <div class="tag-help-msg">
-                {{ $t('IAN.USER.FORM.TAGS_HELP_TEXT1') }} <br>
-                {{ $t('IAN.USER.FORM.TAGS_HELP_TEXT2') }}
+                {{ $t('IAM.USER.FORM.TAGS_HELP_TEXT1') }} <br>
+                {{ $t('IAM.USER.FORM.TAGS_HELP_TEXT2') }}
             </div>
         </p-field-group>
 

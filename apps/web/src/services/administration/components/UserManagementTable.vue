@@ -50,11 +50,12 @@ const userPageState = userPageStore.$state;
 const route = useRoute();
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
+const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
+    .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
     .setSort('name', true)
     .setFiltersAsRawQueryString(route.query.filters);
-const roleListApiQueryHelper = new ApiQueryHelper();
+let userListApiQuery = userListApiQueryHelper.data;
 
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
@@ -127,12 +128,13 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
 };
 
 /* API */
-let userListApiQuery = userListApiQueryHelper.data;
 const handleChange = async (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
     }
+    if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
+    if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
     if (userPageState.isAdminMode) {
         await userPageStore.listUsers({ query: userListApiQuery });
     } else {

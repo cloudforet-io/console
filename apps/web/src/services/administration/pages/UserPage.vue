@@ -18,18 +18,19 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 
 const appContextStore = useAppContextStore();
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const userListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(15)
     .setSort('name', true);
 
 /* API */
 const refreshUserList = () => {
     userPageStore.$patch({ loading: true });
+    userListApiQueryHelper.setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit);
     try {
         if (storeState.isAdminMode) {
             userPageStore.listUsers({ query: userListApiQueryHelper.data });

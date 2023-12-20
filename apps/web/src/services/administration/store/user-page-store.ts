@@ -25,6 +25,8 @@ export const useUserPageStore = defineStore('user-page', {
         users: [] as UserListItemType[],
         totalCount: 0,
         selectedIndices: [],
+        pageStart: 1,
+        pageLimit: 15,
         modal: {
             type: '',
             title: '',
