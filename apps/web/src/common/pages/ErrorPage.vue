@@ -25,6 +25,8 @@ import { store } from '@/store';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 interface Props {
     statusCode: string;
 }
@@ -32,6 +34,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     statusCode: '404',
 });
+const appContextStore = useAppContextStore();
 
 const domainName = computed(() => store.state.domain.name);
 
@@ -47,6 +50,7 @@ const handleClickBack = () => {
     }
 };
 const handleClickHome = () => {
+    if (props.statusCode === '403') appContextStore.switchToWorkspaceMode();
     router.push({ name: ROOT_ROUTE._NAME });
 };
 </script>
