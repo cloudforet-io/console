@@ -19,12 +19,14 @@
                     {{ channel.state === CHANNEL_STATE.ENABLED ? 'ON' : 'OFF' }}
                 </span>
             </p>
-            <p v-for="(user, uIdx) in channel.data.users"
-               :key="`user-${uIdx}`"
-               class="info"
-            >
-                {{ user }}
-            </p>
+            <template v-if="Array.isArray(channel.data)">
+                <p v-for="(user, uIdx) in channel.data.users"
+                   :key="`user-${uIdx}`"
+                   class="info"
+                >
+                    {{ user }}
+                </p>
+            </template>
         </div>
     </div>
 </template>
@@ -64,7 +66,7 @@ export default {
             protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
         });
 
-        const channelFormatter = (level) => {
+        const channelFormatter = (level?: string) => {
             if (level === 'ALL') {
                 return props.projectChannels;
             }

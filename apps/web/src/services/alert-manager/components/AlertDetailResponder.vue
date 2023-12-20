@@ -7,19 +7,13 @@ import VueI18n from 'vue-i18n';
 import {
     PBadge, PCollapsibleList, PPaneLayout, PHeading,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
-import type { UserModel } from '@/schema/identity/user/model';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -56,23 +50,6 @@ const state = reactive({
     projectChannels: [],
 });
 
-const responderState = reactive({
-    loading: true,
-    allMember: [] as UserModel[],
-    allMemberItems: computed(() => responderState.allMember.map((d) => {
-        const userName = responderState.users[d.user_id]?.name;
-        return {
-            name: d.user_id,
-            label: userName ? `${d.user_id} (${userName})` : d.user_id,
-            type: 'item',
-        };
-    })),
-    prevSelectedMemberItems: props.alertData?.responders?.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[] ?? [],
-    selectedMemberItems: props.alertData?.responders?.map((d) => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[] ?? [],
-    selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map((d) => d.name)),
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-});
-
 const apiQuery = new ApiQueryHelper();
 const getQuery = () => {
     apiQuery
@@ -89,18 +66,6 @@ const listProjectChannel = async () => {
     }
 };
 
-const listMember = async () => {
-    responderState.loading = true;
-    try {
-        const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>();
-        responderState.allMember = res.results;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        responderState.allMember = [];
-    } finally {
-        responderState.loading = false;
-    }
-};
 
 
 const listEscalationPolicy = async () => {
@@ -118,10 +83,9 @@ const listEscalationPolicy = async () => {
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/protocol/load'),
-        store.dispatch('reference/user/load'),
     ]);
     await Promise.allSettled([
-        listProjectChannel(), listMember(), listEscalationPolicy(),
+        listProjectChannel(), listEscalationPolicy(),
     ]);
 })();
 </script>
