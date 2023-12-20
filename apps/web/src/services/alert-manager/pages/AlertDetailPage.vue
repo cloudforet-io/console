@@ -164,9 +164,6 @@ const alertTitleEditConfirm = async () => {
 </template>
 
 <style lang="postcss" scoped>
-.alert-detail-note {
-    @apply bg-gray-100;
-}
 .alert-number {
     @apply text-gray-700;
     font-weight: 400;
