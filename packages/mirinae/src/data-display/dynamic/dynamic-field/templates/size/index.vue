@@ -7,6 +7,7 @@ import bytes from 'bytes';
 import type { SizeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/size/type';
 import type { SizeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/inputs/link/PLink.vue';
+import { ACTION_ICON } from '@/inputs/link/type';
 
 const unitMap: Record<string, bytes.Unit> = {
     BYTES: 'B',
@@ -76,7 +77,7 @@ export default {
 
         if (props.options.link) {
             sizeEl = h(PLink, {
-                attrs: { href: (props.options as SizeOptions).link, newTab: true },
+                attrs: { href: (props.options as SizeOptions).link, actionIcon: props.data ? ACTION_ICON.INTERNAL_LINK : ACTION_ICON.NONE, newTab: true },
                 props: { value, showIcon: !!formattedValue },
             }, [sizeEl]);
         }

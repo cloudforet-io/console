@@ -7,6 +7,7 @@ import { BADGE_SHAPE } from '@/data-display/badge/type';
 import type { BadgeDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/badge/type';
 import type { BadgeOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import PLink from '@/inputs/link/PLink.vue';
+import { ACTION_ICON } from '@/inputs/link/type';
 import { commaFormatter, getColor } from '@/utils/helpers';
 
 export default {
@@ -58,7 +59,7 @@ export default {
 
         if (options.link) {
             badgeEl = [h(PLink, {
-                attrs: { href: options.link, newTab: true },
+                attrs: { href: options.link, actionIcon: props.data ? ACTION_ICON.INTERNAL_LINK : ACTION_ICON.NONE, newTab: true },
             }, badgeEl)];
         }
 
