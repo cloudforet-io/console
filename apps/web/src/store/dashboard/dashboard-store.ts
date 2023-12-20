@@ -21,6 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import type {
     CreateDashboardParameters, DashboardModel, ListDashboardParameters, UpdateDashboardParameters,
+    DeleteDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
@@ -189,11 +190,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const deleteDashboard = async (dashboardType: DashboardType, dashboardId: string) => {
-        const fetcher = dashboardType === 'PRIVATE'
+        const isPrivate = dashboardType === 'PRIVATE';
+        const fetcher = isPrivate
             ? SpaceConnector.clientV2.dashboard.privateDashboard.delete
             : SpaceConnector.clientV2.dashboard.publicDashboard.delete;
+        const params: DeleteDashboardParameters = isPrivate ? { private_dashboard_id: dashboardId } : { public_dashboard_id: dashboardId };
         try {
-            await fetcher({ dashboard_id: dashboardId });
+            await fetcher<DeleteDashboardParameters>(params);
             if (dashboardType === 'PRIVATE') {
                 const targetIndex = state.privateDashboardItems.findIndex((item) => item.private_dashboard_id === dashboardId);
                 if (targetIndex !== -1) state.privateDashboardItems.splice(targetIndex, 1);

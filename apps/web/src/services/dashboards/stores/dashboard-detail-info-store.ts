@@ -227,7 +227,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         let _variables = _dashboardInfo.variables ?? {};
         if (_dashboardInfo.project_id) {
             _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _dashboardInfo.labels);
-            _variables = refineProjectDashboardVariables(_variables, state.projectId);
+            _variables = refineProjectDashboardVariables(_variables, _dashboardInfo.project_id);
         }
         const _variablesInitMap = {};
         Object.entries<DashboardVariableSchemaProperty>(_variablesSchema.properties).forEach(([propertyName, property]) => {

@@ -125,7 +125,7 @@ const createDashboard = async () => {
             project_id: state.projectId,
         };
         const res = await dashboardDetailStore.createDashboard(params);
-        return res.dashboard_id;
+        return res.public_dashboard_id || res.private_dashboard_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
     }
