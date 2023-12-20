@@ -1,14 +1,12 @@
 import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
-    DashboardLayoutWidgetInfo, DashboardSettings, DashboardType, DashboardVariables, DashboardVariablesSchema,
+    DashboardLayoutWidgetInfo, DashboardSettings, DashboardVariables, DashboardVariablesSchema,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
-export interface CreateDashboardParameters {
+export interface CreatePublicDashboardParameters {
     name: string;
-    // viewers: DashboardViewer; // deleted
-    dashboard_type: DashboardType;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
     variables_schema?: DashboardVariablesSchema;

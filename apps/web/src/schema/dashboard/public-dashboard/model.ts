@@ -1,13 +1,11 @@
 import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroupType } from '@/schema/_common/type';
-import type { DashboardTemplate, DashboardType } from '@/schema/dashboard/_types/dashboard-type';
+import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
 
 
-export interface DashboardModel extends DashboardTemplate {
-    dashboard_id: string;
-    dashboard_type: DashboardType;
+export interface PublicDashboardModel extends DashboardTemplate {
+    public_dashboard_id: string;
     tags: Tags;
-    user_id: string;
     resource_group: ResourceGroupType;
     project_id: string;
     workspace_id: string;
