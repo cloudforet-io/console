@@ -68,6 +68,16 @@
                         </p-link>
                     </template>
                 </template>
+                <template #col-alert_number-format="{ value, item }">
+                    <p-link highlight
+                            :to="{
+                                name: ALERT_MANAGER_ROUTE.ALERT.DETAIL._NAME,
+                                params: { id: item.alert_id }
+                            }"
+                    >
+                        {{ value }}
+                    </p-link>
+                </template>
                 <template #col-state-format="{ value }">
                     <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)"
                              :badge-type="value === ALERT_STATE.ERROR ? 'solid-outline' : 'subtle'"
