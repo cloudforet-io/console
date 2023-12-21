@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PI, PTooltip, PFieldTitle, PToggleButton,
@@ -7,19 +7,23 @@ import {
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import type { UserListItemType } from '@/services/administration/types/user-type';
+
 interface Props {
-    state?: string
     isChangedToggle?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    state: undefined,
     isChangedToggle: false,
 });
+
+const userPageStore = useUserPageStore();
 
 const emit = defineEmits<{(e: 'update:isChangedToggle', type: string): void }>();
 
 const state = reactive({
+    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
     isToggleActive: false,
     proxyIsChangedToggle: useProxyValue('isChangedToggle', props, emit),
 });
@@ -29,43 +33,45 @@ const handleUpdateToggle = async () => {
     state.proxyIsChangedToggle = true;
 };
 
-watch(() => props.state, (value) => {
+watch(() => state.data.mfa?.state, (value) => {
     state.isToggleActive = value === 'ENABLED';
 });
 </script>
 
 <template>
     <div class="multi-factor-auth-wrapper">
-        <p-field-title :label="$t('IAM.USER.MAIN.MFA')">
-            <template #left>
-                <p-toggle-button
-                    :value="state.isToggleActive"
-                    :disabled="!state.isToggleActive"
-                    class="toggle-button"
-                    @change-toggle="handleUpdateToggle"
+        <div class="title-wrapper">
+            <p-field-title :label="$t('IAM.USER.MAIN.MFA')" />
+            <p-tooltip
+                :contents="$t('IAM.USER.MAIN.MFA_DESC')"
+                position="top"
+                class="mfa-tooltip"
+            >
+                <p-i name="ic_info-circle"
+                     class="icon-info"
+                     height="1rem"
+                     width="1rem"
+                     color="inherit"
                 />
-            </template>
-        </p-field-title>
-        <p-tooltip
-            :contents="$t('IAM.USER.MAIN.MFA_DESC')"
-            position="top"
-            class="mfa-tooltip"
-        >
-            <p-i name="ic_info-circle"
-                 class="icon-info"
-                 height="1rem"
-                 width="1rem"
-                 color="inherit"
-            />
-        </p-tooltip>
+            </p-tooltip>
+        </div>
+        <p-toggle-button
+            :value="state.isToggleActive"
+            :disabled="!state.isToggleActive"
+            class="toggle-button"
+            @change-toggle="handleUpdateToggle"
+        />
     </div>
 </template>
 
 <style scoped lang="postcss">
 .multi-factor-auth-wrapper {
-    @apply flex items-center bg-white rounded-lg;
+    @apply flex items-center justify-between bg-white rounded-lg;
     padding: 0.75rem;
-    gap: 0.25rem;
+    .title-wrapper {
+        @apply flex items-center;
+        gap: 0.25rem;
+    }
     .toggle-button {
         margin-right: 0.25rem;
     }
