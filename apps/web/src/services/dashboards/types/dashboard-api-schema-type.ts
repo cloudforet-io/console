@@ -1,3 +1,4 @@
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type { CreatePrivateDashboardParameters } from '@/schema/dashboard/private-dashboard/api-verbs/create';
 import type { DeletePrivateDashboardParameters } from '@/schema/dashboard/private-dashboard/api-verbs/delete';
 import type { GetPrivateDashboardParameters } from '@/schema/dashboard/private-dashboard/api-verbs/get';
@@ -18,8 +19,23 @@ export interface DashboardModel extends PublicDashboardModel, PrivateDashboardMo
     project_id?: string;
     workspace_id?: string;
 }
-export type GetDashboardParameters = GetPublicDashboardParameters | GetPrivateDashboardParameters;
-export type ListDashboardParameters = ListPublicDashboardParameters | ListPrivateDashboardParameters;
-export type CreateDashboardParameters = CreatePublicDashboardParameters | CreatePrivateDashboardParameters;
-export type UpdateDashboardParameters = UpdatePublicDashboardParameters | UpdatePrivateDashboardParameters;
-export type DeleteDashboardParameters = DeletePublicDashboardParameters | DeletePrivateDashboardParameters;
+export interface GetDashboardParameters extends GetPublicDashboardParameters, GetPrivateDashboardParameters {
+    public_dashboard_id?: string;
+    private_dashboard_id?: string;
+}
+export interface ListDashboardParameters extends ListPublicDashboardParameters, ListPrivateDashboardParameters {
+    public_dashboard_id?: string;
+    private_dashboard_id?: string;
+}
+export interface CreateDashboardParameters extends CreatePublicDashboardParameters, CreatePrivateDashboardParameters {
+    resource_group?: ResourceGroupType;
+    project_id?: string;
+}
+export interface UpdateDashboardParameters extends UpdatePublicDashboardParameters, UpdatePrivateDashboardParameters {
+    public_dashboard_id?: string;
+    private_dashboard_id?: string;
+}
+export interface DeleteDashboardParameters extends DeletePublicDashboardParameters, DeletePrivateDashboardParameters {
+    public_dashboard_id?: string;
+    private_dashboard_id?: string;
+}

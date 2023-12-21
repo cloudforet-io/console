@@ -13,6 +13,7 @@ import type {
     DashboardSettings, DashboardType,
     DashboardVariables, DashboardVariableSchemaProperty,
     DashboardVariablesSchema,
+    DashboardTemplate,
 } from '@/schema/dashboard/_types/dashboard-type';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -32,25 +33,6 @@ interface WidgetValidMap {
     [widgetKey: string]: boolean;
 }
 
-export interface DashboardDetailInfoStoreState {
-    dashboardInfo: DashboardModel|null;
-    loadingDashboard: boolean;
-    dashboardId: string | undefined;
-    projectId?: string;
-    name: string;
-    placeholder: string;
-    settings: DashboardSettings;
-    variables: DashboardVariables;
-    variablesSchema: DashboardVariablesSchema;
-    variablesInitMap: Record<string, boolean>;
-    labels: string[];
-    // widget info states
-    dashboardWidgetInfoList: DashboardLayoutWidgetInfo[];
-    loadingWidgets: boolean;
-    // validation
-    isNameValid?: boolean;
-    widgetValidMap: WidgetValidMap;
-}
 const DEFAULT_REFRESH_INTERVAL = '5m';
 export const DASHBOARD_DEFAULT = Object.freeze<{ settings: DashboardSettings }>({
     settings: {
@@ -152,17 +134,11 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setVariablesInitMap = (variablesInitMap: Record<string, boolean>) => {
         state.variablesInitMap = variablesInitMap;
     };
-    const setDashboardInfoState = (dashboardInfo: DashboardModel) => {
+    const setDashboardInfo = (dashboardInfo: DashboardModel) => {
         state.dashboardInfo = dashboardInfo;
     };
     const setLoadingWidgets = (loading: boolean) => {
         state.loadingWidgets = loading;
-    };
-    const setPlaceholder = (placeholder: string) => {
-        state.placeholder = placeholder;
-    };
-    const setDashboardId = (dashboardId?: string) => {
-        state.dashboardId = dashboardId;
     };
     const setDashboardType = (dashboardType: DashboardType) => {
         state.dashboardType = dashboardType;
@@ -170,6 +146,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setDashboardScope = (dashboardScope: DashboardScope) => {
         state.dashboardScope = dashboardScope;
     };
+    const setProjectId = (projectId?: string) => { state.projectId = projectId; };
 
     /* Actions */
     const reset = () => {
@@ -185,6 +162,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.variablesSchema = { properties: {}, order: [] };
         state.variablesInitMap = {};
         state.labels = [];
+        state.dashboardType = 'PUBLIC';
         state.dashboardScope = 'WORKSPACE';
         //
         state.dashboardWidgetInfoList = [];
@@ -196,21 +174,45 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
     const setOriginDashboardName = (name: string) => {
         if (state.dashboardInfo) state.dashboardInfo.name = name;
     };
-    const revertDashboardData = () => {
-        if (!state.dashboardInfo) return;
-        setDashboardInfo(state.dashboardInfo);
+    const setDashboardTemplate = (dashboardTemplate: DashboardTemplate) => {
+        const _template = cloneDeep(dashboardTemplate);
+        state.dashboardId = undefined;
+        state.name = '';
+        state.placeholder = _template.name;
+        state.labels = _template.labels;
+        state.settings = _template.settings;
+        let _variablesSchema = _template.variables_schema ?? { properties: {}, order: [] };
+        let _variables = _template.variables ?? {};
+        if (state.projectId) {
+            _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _template.labels);
+            _variables = refineProjectDashboardVariables(_variables, state.projectId);
+        }
+        state.variablesSchema = _variablesSchema;
+        state.variables = _variables;
+
+        const _variablesInitMap = {};
+        Object.entries<DashboardVariableSchemaProperty>(_variablesSchema.properties).forEach(([propertyName, property]) => {
+            if (property.use) _variablesInitMap[propertyName] = false;
+        });
+        state.variablesInitMap = _variablesInitMap;
+
+        state.dashboardWidgetInfoList = _template?.layouts?.flat()?.map((info) => ({
+            ...info,
+            widget_key: info.widget_key ?? getRandomId(),
+        })) ?? [];
     };
-    const setDashboardInfo = (dashboardInfo?: DashboardModel) => {
+    const _setDashboardInfoStoreState = (dashboardInfo?: DashboardModel) => {
         if (!dashboardInfo || isEmpty(dashboardInfo)) {
             console.error('setDashboardInfo failed', dashboardInfo);
             return;
         }
 
-        state.dashboardInfo = dashboardInfo;
-
         const _dashboardInfo = cloneDeep(dashboardInfo);
+
+        state.dashboardInfo = _dashboardInfo;
+        state.dashboardId = _dashboardInfo.public_dashboard_id ?? _dashboardInfo.private_dashboard_id;
         state.name = _dashboardInfo.name;
-        state.projectId = _dashboardInfo.project_id;
+        state.labels = _dashboardInfo.labels;
         state.settings = {
             date_range: {
                 enabled: _dashboardInfo.settings?.date_range?.enabled ?? false,
@@ -220,14 +222,19 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             refresh_interval_option: _dashboardInfo.settings?.refresh_interval_option ?? DEFAULT_REFRESH_INTERVAL,
         };
 
+        // project_id
+        const _projectId = _dashboardInfo.project_id === '*' ? undefined : _dashboardInfo.project_id;
+        state.projectId = _projectId;
+
+        // variables, variables schema
         let _variablesSchema = {
             properties: _dashboardInfo.variables_schema?.properties ?? {},
             order: _dashboardInfo.variables_schema?.order,
         };
         let _variables = _dashboardInfo.variables ?? {};
-        if (_dashboardInfo.project_id) {
+        if (_projectId) {
             _variablesSchema = refineProjectDashboardVariablesSchema(_variablesSchema, _dashboardInfo.labels);
-            _variables = refineProjectDashboardVariables(_variables, _dashboardInfo.project_id);
+            _variables = refineProjectDashboardVariables(_variables, _projectId);
         }
         const _variablesInitMap = {};
         Object.entries<DashboardVariableSchemaProperty>(_variablesSchema.properties).forEach(([propertyName, property]) => {
@@ -237,7 +244,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.variables = _variables;
         state.variablesInitMap = _variablesInitMap;
 
-        state.labels = _dashboardInfo.labels;
+        // widget info states
         state.dashboardWidgetInfoList = _dashboardInfo?.layouts?.flat()?.map((info) => ({
             ...info,
             widget_key: info.widget_key ?? getRandomId(),
@@ -248,7 +255,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
         const targetDashboards = dashboardGetters.allItems.filter((dashboard) => dashboard.public_dashboard_id === dashboardId || dashboard.private_dashboard_id === dashboardId);
         if (targetDashboards.length > 0) {
-            setDashboardInfo(targetDashboards[0]);
+            _setDashboardInfoStoreState(targetDashboards[0] as DashboardModel);
             return;
         }
 
@@ -264,7 +271,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
                 ? { private_dashboard_id: dashboardId as string }
                 : { public_dashboard_id: dashboardId as string };
             const result = await fetcher<GetDashboardParameters, DashboardModel>(params);
-            setDashboardInfo(result);
+            _setDashboardInfoStoreState(result);
         } catch (e) {
             reset();
             throw e;
@@ -340,8 +347,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetValidMap[widgetKey] = isValid;
     };
     //
-    const createDashboard = async (params: CreateDashboardParameters): Promise<DashboardModel> => {
-        const res = await dashboardStore.createDashboard(state.dashboardType ?? 'WORKSPACE', params);
+    const createDashboard = async (params: CreateDashboardParameters, dashboardType?: DashboardType): Promise<DashboardModel> => {
+        const _dashboardType = dashboardType ?? state.dashboardType ?? 'WORKSPACE';
+        const res = await dashboardStore.createDashboard(_dashboardType, params);
         return res;
     };
     const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {
@@ -349,7 +357,8 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
             ...params,
             [state.dashboardType === 'PRIVATE' ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
         };
-        await dashboardStore.updateDashboard(state.dashboardType, _params);
+        const res = await dashboardStore.updateDashboard(state.dashboardType, _params);
+        _setDashboardInfoStoreState(res);
     };
     const deleteDashboard = async (dashboardId: string) => {
         await dashboardStore.deleteDashboard(state.dashboardType, dashboardId);
@@ -364,18 +373,16 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         setVariablesSchema,
         setVariables,
         setVariablesInitMap,
-        setDashboardInfoState,
+        setDashboardInfo,
         setLoadingWidgets,
-        setPlaceholder,
-        setDashboardId,
         setDashboardType,
         setDashboardScope,
+        setProjectId,
     };
     const actions = {
         reset,
         getDashboardInfo,
         setDashboardInfo,
-        revertDashboardData,
         setOriginDashboardName,
         toggleWidgetSize,
         updateWidgetInfo,
@@ -385,6 +392,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         createDashboard,
         updateDashboard,
         deleteDashboard,
+        setDashboardTemplate,
     };
 
     return {

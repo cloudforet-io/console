@@ -16,7 +16,6 @@ import DashboardVariablesMoreButton
     from '@/services/dashboards/components/DashboardVariablesMoreButton.vue';
 import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/manage-variable-overlay-constant';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/types/dashboard-model-type';
 
 
@@ -65,11 +64,6 @@ const updateDashboardVariables = async () => {
     state.saveLoading = true;
     try {
         await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
-            variables: dashboardDetailState.variables,
-            variables_schema: dashboardDetailState.variablesSchema,
-        });
-        dashboardDetailStore.setDashboardInfoState({
-            ...dashboardDetailState.dashboardInfo as DashboardModel,
             variables: dashboardDetailState.variables,
             variables_schema: dashboardDetailState.variablesSchema,
         });

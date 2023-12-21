@@ -169,7 +169,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             throw e;
         }
     };
-    const updateDashboard = async (dashboardType: DashboardType, params: UpdateDashboardParameters) => {
+    const updateDashboard = async (dashboardType: DashboardType, params: UpdateDashboardParameters): Promise<DashboardModel> => {
         const fetcher = dashboardType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateDashboard.update
             : SpaceConnector.clientV2.dashboard.publicDashboard.update;
@@ -184,6 +184,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
                 if (targetIndex !== -1) state.publicDashboardItems.splice(targetIndex, 1, result as PublicDashboardModel);
                 state.publicDashboardItems = cloneDeep(state.publicDashboardItems);
             }
+            return result;
         } catch (e) {
             ErrorHandler.handleError(e);
             throw e;

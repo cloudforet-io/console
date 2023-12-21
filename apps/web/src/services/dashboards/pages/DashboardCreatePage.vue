@@ -91,15 +91,8 @@ const goStep = (direction: 'prev'|'next') => {
 };
 
 const saveCurrentStateToStore = () => {
-    const _dashboardTemplate: DashboardModel = {
-        ...dashboardTemplate.value,
-        project_id: dashboardDetailState.dashboardScope === 'PROJECT' ? dashboardProject.value?.id : undefined,
-        name: '',
-    };
-
-    dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
-    dashboardDetailStore.setDashboardId(undefined);
-    dashboardDetailStore.setPlaceholder(dashboardTemplate.value.name);
+    dashboardDetailStore.setProjectId(dashboardDetailState.dashboardScope === 'PROJECT' ? dashboardProject.value?.id : undefined);
+    dashboardDetailStore.setDashboardTemplate(dashboardTemplate.value);
 };
 
 const createDashboard = async () => {
@@ -123,11 +116,10 @@ const createDashboard = async () => {
         }
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam);
-        const dashboardId = createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id;
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
-                dashboardId,
+                dashboardId: createdDashboard.public_dashboard_id || createdDashboard.private_dashboard_id || '',
             },
         });
     } catch (e) {
