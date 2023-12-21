@@ -1,92 +1,6 @@
-<template>
-    <p-pane-layout class="border-none">
-        <p-definition-table :fields="fields"
-                            :data="data"
-                            :skeleton-rows="10"
-                            custom-key-width="10rem"
-                            style-type="white"
-                            block
-        >
-            <template #data-description>
-                <alert-detail-info-table-description
-                    :id="id"
-                    :alert-data="data"
-                    :manage-disabled="manageDisabled"
-                    @update="$emit('update')"
-                />
-            </template>
-            <template #data-rule="{value}">
-                <span v-if="Object.keys(value).length === 0">
-                    --
-                </span>
-            </template>
-            <template #data-severity="{value}">
-                <p-badge background-color="white"
-                         :text-color="ALERT_SEVERITY_COLORS[value]"
-                         :outline-color="ALERT_SEVERITY_COLORS[value]"
-                >
-                    {{ ALERT_SEVERITY[value] || value }}
-                </p-badge>
-            </template>
-            <template #data-escalation_policy_id>
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                        new-tab
-                        :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
-                        highlight
-                >
-                    {{ escalationPolicyName }}
-                </p-link>
-            </template>
-            <template #data-project_id>
-                <alert-detail-info-table-project
-                    :id="id"
-                    :alert-data="data"
-                    :manage-disabled="manageDisabled"
-                    @update="$emit('update')"
-                />
-            </template>
-            <template #data-triggered_by="{ value }">
-                <alert-triggered-by :value="value"
-                                    :project-id="data.project_id"
-                                    :webhook-reference="webhooks[value]"
-                                    :user-reference="users[value]"
-                                    disable-link
-                />
-            </template>
-            <template #data-account="{ value }">
-                {{ value }}
-            </template>
-            <template #data-created_at>
-                {{ iso8601Formatter(data.created_at, timezone) }}
-            </template>
-            <template #data-acknowledged_at>
-                <span v-if="data.acknowledged_at"> {{ iso8601Formatter(data.acknowledged_at, timezone) }}</span>
-                <span v-else>--</span>
-            </template>
-            <template #data-resolved_at>
-                <span v-if="data.resolved_at"> {{ iso8601Formatter(data.resolved_at, timezone) }}</span>
-                <span v-else>--</span>
-            </template>
-            <template #data-additional_info="{value}">
-                <span v-if="Object.keys(value).length === 0">
-                    --
-                </span>
-                <template v-else>
-                    <p v-for="([k, v]) in Object.entries(value)"
-                       :key="k"
-                       class="additional-info"
-                    >
-                        <b>{{ k }}</b>: {{ v }}
-                    </p>
-                </template>
-            </template>
-        </p-definition-table>
-    </p-pane-layout>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -102,8 +16,6 @@ import { i18n } from '@/translations';
 
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -129,95 +41,151 @@ const ALERT_SEVERITY_COLORS: Record<keyof typeof ALERT_SEVERITY, string> = {
     NONE: gray[500],
 };
 
-export default {
-    name: 'AlertDetailInfoTable',
-    components: {
-        AlertTriggeredBy,
-        AlertDetailInfoTableDescription,
-        AlertDetailInfoTableProject,
-        PPaneLayout,
-        PDefinitionTable,
-        PLink,
-        PBadge,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const alertPageStore = useAlertPageStore();
-        const alertPageState = alertPageStore.$state;
+const props = defineProps<{
+    id?: string;
+    manageDisabled?: boolean;
+}>();
 
-        const state = reactive({
-            fields: computed(() => [
-                { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
-                { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
-                { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
-                {
-                    name: 'escalation_policy_id',
-                    label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY'),
-                    copyValueFormatter: () => state.data.escalation_policy_id,
-                },
-                { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
-                {
-                    name: 'triggered_by',
-                    label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
-                    copyValueFormatter: () => state.data.triggered_by,
-                },
-                { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
-                { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
-                { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED'), disableCopy: true },
-                { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
-                { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
-            ]),
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
-            data: computed(() => alertPageState.alertData ?? {}),
-            escalationPolicyName: '',
-            loading: true,
-            timezone: computed(() => store.state.user.timezone),
+const alertPageStore = useAlertPageStore();
+const alertPageState = alertPageStore.$state;
+
+const state = reactive({
+    fields: computed(() => [
+        { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
+        { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
+        { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
+        {
+            name: 'escalation_policy_id',
+            label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY'),
+            copyValueFormatter: () => state.data.escalation_policy_id,
+        },
+        { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
+        {
+            name: 'triggered_by',
+            label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
+            copyValueFormatter: () => state.data.triggered_by,
+        },
+        { name: 'account', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACCOUNT_ID'), copyValueFormatter: () => state.data.account },
+        { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
+        { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED'), disableCopy: true },
+        { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
+        { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
+    ]),
+    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
+    data: computed(() => alertPageState.alertData ?? {}),
+    escalationPolicyName: '',
+    timezone: computed(() => store.state.user.timezone),
+});
+
+const getEscalationPolicy = async () => {
+    try {
+        const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
+            escalation_policy_id: state.data.escalation_policy_id,
         });
-
-        const getEscalationPolicy = async () => {
-            try {
-                const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
-                    escalation_policy_id: state.data.escalation_policy_id,
-                });
-                state.escalationPolicyName = res.name;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.escalationPolicyName = '';
-            }
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await Promise.allSettled([
-                getEscalationPolicy(),
-                store.dispatch('reference/webhook/load'),
-                store.dispatch('reference/user/load'),
-            ]);
-        })();
-
-        return {
-            ...toRefs(state),
-            iso8601Formatter,
-            referenceRouter,
-            ALERT_MANAGER_ROUTE,
-            ALERT_SEVERITY,
-            ALERT_SEVERITY_COLORS,
-            ACTION_ICON,
-        };
-    },
+        state.escalationPolicyName = res.name;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.escalationPolicyName = '';
+    }
 };
 
+// LOAD REFERENCE STORE
+(async () => {
+    await Promise.allSettled([
+        getEscalationPolicy(),
+        store.dispatch('reference/webhook/load'),
+        store.dispatch('reference/user/load'),
+    ]);
+})();
+
 </script>
+
+<template>
+    <p-pane-layout class="border-none">
+        <p-definition-table :fields="state.fields"
+                            :data="state.data"
+                            :skeleton-rows="10"
+                            custom-key-width="10rem"
+                            style-type="white"
+                            block
+        >
+            <template #data-description>
+                <alert-detail-info-table-description
+                    :id="props.id"
+                    :alert-data="state.data"
+                    :manage-disabled="props.manageDisabled"
+                    @update="$emit('update')"
+                />
+            </template>
+            <template #data-rule="{value}">
+                <span v-if="Object.keys(value).length === 0">
+                    --
+                </span>
+            </template>
+            <template #data-severity="{value}">
+                <p-badge background-color="white"
+                         :text-color="ALERT_SEVERITY_COLORS[value]"
+                         :outline-color="ALERT_SEVERITY_COLORS[value]"
+                >
+                    {{ ALERT_SEVERITY[value] || value }}
+                </p-badge>
+            </template>
+            <template #data-escalation_policy_id>
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                        new-tab
+                        :to="{ name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME }"
+                        highlight
+                >
+                    {{ state.escalationPolicyName }}
+                </p-link>
+            </template>
+            <template #data-project_id>
+                <alert-detail-info-table-project
+                    :id="props.id"
+                    :alert-data="state.data"
+                    :manage-disabled="props.manageDisabled"
+                    @update="$emit('update')"
+                />
+            </template>
+            <template #data-triggered_by="{ value }">
+                <alert-triggered-by :value="value"
+                                    :project-id="state.data.project_id"
+                                    :webhook-reference="state.webhooks[value]"
+                                    :user-reference="state.users[value]"
+                                    disable-link
+                />
+            </template>
+            <template #data-account="{ value }">
+                {{ value }}
+            </template>
+            <template #data-created_at>
+                {{ iso8601Formatter(state.data.created_at, state.timezone) }}
+            </template>
+            <template #data-acknowledged_at>
+                <span v-if="state.data.acknowledged_at"> {{ iso8601Formatter(state.data.acknowledged_at, state.timezone) }}</span>
+                <span v-else>--</span>
+            </template>
+            <template #data-resolved_at>
+                <span v-if="state.data.resolved_at"> {{ iso8601Formatter(state.data.resolved_at, state.timezone) }}</span>
+                <span v-else>--</span>
+            </template>
+            <template #data-additional_info="{value}">
+                <span v-if="Object.keys(value).length === 0">
+                    --
+                </span>
+                <template v-else>
+                    <p v-for="([k, v]) in Object.entries(value)"
+                       :key="k"
+                       class="additional-info"
+                    >
+                        <b>{{ k }}</b>: {{ v }}
+                    </p>
+                </template>
+            </template>
+        </p-definition-table>
+    </p-pane-layout>
+</template>
 
 <style lang="postcss" scoped>
 .additional-info {
