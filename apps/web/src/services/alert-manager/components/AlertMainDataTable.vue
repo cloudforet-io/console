@@ -181,7 +181,7 @@ import AlertTriggeredBy from '@/services/alert-manager/components/AlertMainDataT
 import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-state-i18n';
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
 import {
-    ALERT_STATE_FILTER, ASSIGNED_STATE,
+    ALERT_STATE_FILTER, ASSIGNED_STATE, EXTENDED_ALERT_URGENCY,
 } from '@/services/alert-manager/constants/alert-constant';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
@@ -217,7 +217,7 @@ export default {
         },
         urgency: {
             type: String,
-            default: ALERT_URGENCY.ALL,
+            default: EXTENDED_ALERT_URGENCY.ALL,
         },
         assigned: {
             type: String,
@@ -364,7 +364,7 @@ export default {
                 bottomFilterQueryHelper.addFilter({ k: 'state', v: filters.state, o: '=' });
             }
 
-            if (filters.urgency !== ALERT_URGENCY.ALL) {
+            if (filters.urgency !== EXTENDED_ALERT_URGENCY.ALL) {
                 bottomFilterQueryHelper.addFilter({ k: 'urgency', v: filters.urgency, o: '=' });
             }
 
@@ -387,7 +387,7 @@ export default {
                 if (props.projectId) alertApiQueryHelper.addFilter({ k: 'project_id', v: props.projectId, o: '=' });
                 alertApiQuery = alertApiQueryHelper.data;
 
-                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+                const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list({
                     query: alertApiQuery,
                 });
 

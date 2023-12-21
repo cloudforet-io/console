@@ -2,14 +2,16 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
 import type { TimeStamp } from '@/schema/_common/model';
-import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/model';
+import type { AlertState } from '@/schema/monitoring/alert/model';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
     FINISH_CONDITION, ALERT_STATE_FILTER, ASSIGNED_STATE, SCOPE,
+    EXTENDED_ALERT_URGENCY,
 } from '@/services/alert-manager/constants/alert-constant';
 
+export type ExtendedAlertUrgency = typeof EXTENDED_ALERT_URGENCY[keyof typeof EXTENDED_ALERT_URGENCY];
 
 export interface Rule {
     notification_level: string;
@@ -51,7 +53,7 @@ type AlertStateFilter = typeof ALERT_STATE_FILTER[keyof typeof ALERT_STATE_FILTE
 type AssignedState = typeof ASSIGNED_STATE[keyof typeof ASSIGNED_STATE];
 export interface AlertBottomFilters {
     state: AlertStateFilter;
-    urgency: AlertUrgency;
+    urgency: ExtendedAlertUrgency;
     assigned: AssignedState;
 }
 

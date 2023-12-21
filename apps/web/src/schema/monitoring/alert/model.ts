@@ -1,5 +1,5 @@
 import type { TimeStamp } from '@/schema/_common/model';
-import type { ALERT_SEVERITY, ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
+import type { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 
 
 type Responder = {
@@ -14,7 +14,7 @@ interface Resource {
     ip_address?: string;
 }
 
-export type AlertSeverity = typeof ALERT_SEVERITY[keyof typeof ALERT_SEVERITY];
+export type AlertSeverity = 'CRITICAL' | 'ERROR' | 'WARNING' | 'INFO' | 'NOT_AVAILABLE' | 'NONE';
 export type AlertState = typeof ALERT_STATE[keyof typeof ALERT_STATE];
 export type AlertUrgency = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];
 
@@ -31,8 +31,6 @@ export interface AlertModel {
     rule: string;
     resource: Resource;
     additional_info: any;
-    is_snoozed: true;
-    snoozed_end_time: TimeStamp;
     escalation_step: number;
     escalation_ttl: number;
     responders: Responder[];

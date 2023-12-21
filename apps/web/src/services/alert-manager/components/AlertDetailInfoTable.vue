@@ -97,7 +97,6 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { ALERT_SEVERITY } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -116,6 +115,7 @@ import AlertDetailInfoTableDescription
     from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import AlertDetailInfoTableProject from '@/services/alert-manager/components/AlertDetailInfoTableProject.vue';
 import AlertTriggeredBy from '@/services/alert-manager/components/AlertMainDataTableTriggeredByField.vue';
+import { ALERT_SEVERITY } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 

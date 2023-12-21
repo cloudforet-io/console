@@ -8,7 +8,6 @@ import { PHeading } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
 import { queryStringToString } from '@/lib/router-query-string';
@@ -16,7 +15,9 @@ import { queryStringToString } from '@/lib/router-query-string';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
-import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
+import {
+    ALERT_STATE_FILTER, ASSIGNED_STATE, EXTENDED_ALERT_URGENCY,
+} from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertListPageUrlQuery, AlertListTableFilters,
 } from '@/services/alert-manager/types/alert-type';
@@ -27,7 +28,7 @@ const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(router.curre
 const state = reactive({
     pageTitle: computed(() => i18n.t('MONITORING.ALERT.ALERT_LIST.ALERT')),
     alertState: queryStringToString(router.currentRoute.query.state) ?? ALERT_STATE_FILTER.OPEN,
-    urgency: queryStringToString(router.currentRoute.query.urgency) ?? ALERT_URGENCY.ALL,
+    urgency: queryStringToString(router.currentRoute.query.urgency) ?? EXTENDED_ALERT_URGENCY.ALL,
     assigned: queryStringToString(router.currentRoute.query.assigned) ?? ASSIGNED_STATE.ALL,
     filters: tagQueryHelper.filters,
     hasManagePermission: useManagePermissionState(),

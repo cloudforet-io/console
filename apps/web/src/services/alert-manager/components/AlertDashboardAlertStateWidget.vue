@@ -135,6 +135,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red } from '@/styles/colors';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
+import { ASSIGNED_STATE, EXTENDED_ALERT_URGENCY } from '@/services/alert-manager/constants/alert-constant';
 
 
 const TAB_STATE = Object.freeze({
@@ -143,16 +144,6 @@ const TAB_STATE = Object.freeze({
     ALL: 'ALL',
 });
 
-const ALERT_URGENCY = Object.freeze({
-    ALL: 'ALL',
-    HIGH: 'HIGH',
-    LOW: 'LOW',
-});
-
-const ASSIGNED_STATE = Object.freeze({
-    ALL: 'ALL',
-    ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
-});
 
 export default {
     name: 'AlertDashboardAlertStateWidget',
@@ -211,16 +202,16 @@ export default {
             projects: computed(() => store.getters['reference/projectItems']),
             urgencyList: computed(() => ([
                 {
-                    name: ALERT_URGENCY.ALL,
+                    name: EXTENDED_ALERT_URGENCY.ALL,
                     label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL_URGENCY'),
                 },
                 {
-                    name: ALERT_URGENCY.HIGH,
+                    name: EXTENDED_ALERT_URGENCY.HIGH,
                     label: i18n.t('MONITORING.ALERT.DASHBOARD.HIGH'),
                     icon: 'ic_error-filled',
                 },
                 {
-                    name: ALERT_URGENCY.LOW,
+                    name: EXTENDED_ALERT_URGENCY.LOW,
                     label: i18n.t('MONITORING.ALERT.DASHBOARD.LOW'),
                     icon: 'ic_warning-filled',
                 },
@@ -236,7 +227,7 @@ export default {
                 },
             ]),
             //
-            selectedUrgency: ALERT_URGENCY.ALL,
+            selectedUrgency: EXTENDED_ALERT_URGENCY.ALL,
             selectedAssignedState: ASSIGNED_STATE.ALL,
             isAssignedToMe: false,
             items: [],
@@ -254,7 +245,7 @@ export default {
 
             const filters: ConsoleFilter[] = [];
             filters.push({ k: 'project_id', v: props.activatedProjects, o: '' });
-            if (state.selectedUrgency !== ALERT_URGENCY.ALL) {
+            if (state.selectedUrgency !== EXTENDED_ALERT_URGENCY.ALL) {
                 filters.push({ k: 'urgency', v: state.selectedUrgency, o: '=' });
             }
             if (tabState.activeTab === TAB_STATE.OPEN) {
@@ -340,7 +331,7 @@ export default {
             listAlerts,
             numberFormatter,
             red,
-            ALERT_URGENCY,
+            EXTENDED_ALERT_URGENCY,
         };
     },
 };
