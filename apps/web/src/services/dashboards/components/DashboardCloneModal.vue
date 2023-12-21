@@ -67,8 +67,10 @@ const {
     },
     dashboardType(value: DashboardType) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
 });
-const state = reactive({
+const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+});
+const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     filteredVisibilityList: computed(() => [
         { name: 'PRIVATE', label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'), icon: 'ic_lock-filled' },
@@ -79,15 +81,8 @@ const state = reactive({
         return '';
     }),
     dashboardNameList: computed<string[]>(() => {
-        if (state.isAdminMode) return dashboardGetters.domainItems.map((item) => item.name);
-        if (state.projectId) {
-            return dashboardGetters.projectItems
-                .filter((item) => (
-                    item.project_id === state.projectId)
-                            && item.name !== props.dashboard?.name)
-                .map((_item) => _item.name);
-        }
-        return dashboardGetters.workspaceItems.map((item) => item.name);
+        if (storeState.isAdminMode) return dashboardGetters.domainItems.map((item) => item.name);
+        return dashboardStore.getDashboardNameList(state.dashboardType);
     }),
 });
 

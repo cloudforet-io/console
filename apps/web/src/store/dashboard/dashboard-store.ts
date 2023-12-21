@@ -1,6 +1,5 @@
 import { computed, reactive } from 'vue';
 
-import { getTextHighlightRegex } from '@spaceone/design-system';
 import { cloneDeep, get } from 'lodash';
 import { defineStore } from 'pinia';
 
@@ -27,24 +26,24 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 
 
-const getItems = (items: DashboardModel[], filters: ConsoleFilter[]): DashboardModel[] => {
-    let result = items;
-    filters.forEach((d) => {
-        if (d.k === 'label' && Array.isArray(d.v)) {
-            d.v.forEach((value) => {
-                if (typeof value === 'string') {
-                    result = result.filter((item) => item.labels.includes(value));
-                }
-            });
-        } else if (!d.k && d.v) {
-            if (typeof d.v === 'string') {
-                const regex = getTextHighlightRegex(d.v);
-                result = result.filter((item) => regex.test(item.name));
-            }
-        }
-    });
-    return result;
-};
+// const getItems = (items: DashboardModel[], filters: ConsoleFilter[]): DashboardModel[] => {
+//     let result = items;
+//     filters.forEach((d) => {
+//         if (d.k === 'label' && Array.isArray(d.v)) {
+//             d.v.forEach((value) => {
+//                 if (typeof value === 'string') {
+//                     result = result.filter((item) => item.labels.includes(value));
+//                 }
+//             });
+//         } else if (!d.k && d.v) {
+//             if (typeof d.v === 'string') {
+//                 const regex = getTextHighlightRegex(d.v);
+//                 result = result.filter((item) => regex.test(item.name));
+//             }
+//         }
+//     });
+//     return result;
+// };
 
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
@@ -213,17 +212,9 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     //
-    const getDashboardNameList = (dashboardType: DashboardType, dashboardName: string, projectId?: string) => {
-        const _items: DashboardModel[] = dashboardType === 'PRIVATE' ? state.privateDashboardItems : state.publicDashboardItems;
-        if (projectId) {
-            return (_items as PublicDashboardModel[])
-                .filter((item) => (item.project_id === projectId) && item.name !== dashboardName)
-                .map((_item) => _item.name);
-        }
-        return getItems(_items, state.searchFilters).map((item) => {
-            if (item.name !== dashboardName) return item.name;
-            return '';
-        });
+    const getDashboardNameList = (dashboardType: DashboardType) => {
+        if (dashboardType === 'PRIVATE') return state.privateDashboardItems.map((item) => item.name);
+        return state.publicDashboardItems.map((item) => item.name);
     };
 
 
