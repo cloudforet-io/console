@@ -26,9 +26,9 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 import {
     useCostDataSourceReferenceStore,
 } from '@/store/reference/cost-data-source-reference-store';
-import { useProjectGroupStore } from '@/store/reference/project-group-store';
-import { useProjectStore } from '@/store/reference/project-store';
-import { useWorkspaceReferenceStore } from '@/store/reference/workspace-store';
+import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
+import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
@@ -46,8 +46,8 @@ export type AllReferenceTypeInfo = Record<ReferenceType, ReferenceTypeInfo>;
 export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const costDataSourceReferenceStore = useCostDataSourceReferenceStore();
     const cloudServiceQuerySetReferenceStore = useCloudServiceQuerySetReferenceStore();
-    const projectReferenceStore = useProjectStore();
-    const projectGroupReferenceStore = useProjectGroupStore();
+    const projectReferenceStore = useProjectReferenceStore();
+    const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
 
     const getters = reactive({

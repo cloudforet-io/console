@@ -16,7 +16,7 @@ import { store } from '@/store';
 import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

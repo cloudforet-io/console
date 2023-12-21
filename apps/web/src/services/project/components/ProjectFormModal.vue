@@ -16,7 +16,7 @@ import type { ProjectType } from '@/schema/identity/project/type';
 import { i18n } from '@/translations';
 
 import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
-import { useProjectStore } from '@/store/reference/project-store';
+import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -42,7 +42,7 @@ const emit = defineEmits<{(e: 'confirm', project?: ProjectModel): void;
 }>();
 
 const router = useRouter();
-const projectStore = useProjectStore();
+const projectStore = useProjectReferenceStore();
 const projectPageStore = useProjectPageStore();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
