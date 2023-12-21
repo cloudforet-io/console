@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import {
+    reactive, ref, watch,
+} from 'vue';
 
 import { PFieldGroup, PTextButton, PTextInput } from '@spaceone/design-system';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
@@ -10,11 +12,13 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     tags: Tags;
+    isEdit?: boolean;
     isFormVisible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     tags: undefined,
+    isEdit: false,
     isFormVisible: false,
 });
 
@@ -30,7 +34,13 @@ const state = reactive({
 const handleClickButton = () => {
     state.formVisible = true;
 };
-const handleChangeTags = (items: InputItem[]) => {
+const getInputItemsFromTagKeys = (keys: Tags): InputItem[] => Object.keys(keys).map((key) => ({
+    label: `${key}: ${props.tags[key]}`,
+    name: `${key}: ${props.tags[key]}`,
+}));
+const selected = ref<InputItem[]>(getInputItemsFromTagKeys(props.tags));
+const handleUpdateSelected = (items: InputItem[]) => {
+    selected.value = items;
     const refinedTags = items.map((item) => {
         if (item.name.includes(':')) {
             const tags = item.name.split(':').map((tag) => tag.trim());
@@ -66,9 +76,10 @@ watch(() => props.isFormVisible, (value) => {
             >
                 <p-text-input class="text-input"
                               multi-input
+                              :selected="selected"
                               appearance-type="stack"
                               block
-                              @update:selected="handleChangeTags"
+                              @update:selected="handleUpdateSelected"
                 />
             </p-field-group>
         </div>
