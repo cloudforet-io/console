@@ -33,7 +33,7 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-store';
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 
-export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cost_data_source'|'cloudServiceQuerySet'|'cloud_service_query_set'|'workspace';
+export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cloudServiceQuerySet'|'workspace';
 
 export interface ReferenceTypeInfo {
     type: ReferenceType;
@@ -120,8 +120,6 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             },
             //
             costDataSource: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
-            cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
-            cloud_service_query_set: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
             cloudServiceQuerySet: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
             workspace: workspaceReferenceStore.getters.workspaceTypeInfo,
         })),
