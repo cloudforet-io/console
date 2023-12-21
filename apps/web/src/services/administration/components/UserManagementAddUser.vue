@@ -25,10 +25,10 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { checkEmailFormat } from '@/services/administration/helpers/user-management-form-validations';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
+import type { AddModalMenuItem } from '@/services/administration/types/user-type';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;

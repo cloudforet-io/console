@@ -1904,7 +1904,8 @@
 					"ENABLE_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",
 					"ENABLE_TITLE": "ユーザー有効化",
 					"INVITE_TITLE": "",
-					"REMOVE_TITLE": ""
+					"REMOVE_TITLE": "",
+					"UPDATE_TITLE": ""
 				},
 				"NAME": "名前",
 				"NOTIFICATION": "アラート",

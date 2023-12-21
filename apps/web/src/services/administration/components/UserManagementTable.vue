@@ -28,7 +28,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
     calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
@@ -176,7 +175,7 @@ const fetchListRoles = async (inputText: string) => {
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
-        })) as AddModalMenuItem[];
+        })) as SelectDropdownMenuItem[];
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

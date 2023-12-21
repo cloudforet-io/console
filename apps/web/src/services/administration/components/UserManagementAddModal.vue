@@ -2,7 +2,6 @@
 import { computed, reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { cloneDeep, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -11,10 +10,8 @@ import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { RoleType } from '@/schema/identity/role/type';
 import type { UserCreateParameters } from '@/schema/identity/user/api-verbs/create';
 import type { UserModel } from '@/schema/identity/user/model';
-import type { AuthType } from '@/schema/identity/user/type';
 import type { WorkspaceUserCreateParameters } from '@/schema/identity/workspace-user/api-verbs/create';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
@@ -30,15 +27,7 @@ import UserManagementAddTag from '@/services/administration/components/UserManag
 import UserManagementAddUser from '@/services/administration/components/UserManagementAddUser.vue';
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-
-export interface AddModalMenuItem extends MenuItem {
-    label?: string;
-    name?: string;
-    user_id?: string;
-    role_type?: RoleType;
-    auth_type?: AuthType;
-    isNew?: boolean;
-}
+import type { AddModalMenuItem } from '@/services/administration/types/user-type';
 
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;

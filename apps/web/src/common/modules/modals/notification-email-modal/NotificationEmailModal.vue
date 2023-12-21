@@ -178,7 +178,6 @@ const handleClickSendEmailButton = async () => {
     try {
         await postValidationEmail({
             user_id: props.userId,
-            domain_id: props.domainId,
             email: formState.newNotificationEmail,
         });
         if (state.loginUserId === props.userId) {

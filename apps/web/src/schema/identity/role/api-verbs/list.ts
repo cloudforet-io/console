@@ -7,4 +7,5 @@ export interface RoleListParameters {
     role_id?: string;
     name?: string;
     role_type?: RoleType;
+    user_id?: string;
 }

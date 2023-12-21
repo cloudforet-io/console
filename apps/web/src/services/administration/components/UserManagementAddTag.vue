@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 
 import { PFieldGroup, PTextButton, PTextInput } from '@spaceone/design-system';
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
@@ -10,10 +10,12 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     tags: Tags;
+    isFormVisible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     tags: undefined,
+    isFormVisible: false,
 });
 
 const emit = defineEmits<{(e: 'update:tags', role: Tags): void,
@@ -39,6 +41,11 @@ const handleChangeTags = (items: InputItem[]) => {
 
     state.proxyTags = Object.assign({}, ...refinedTags);
 };
+
+/* Watcher */
+watch(() => props.isFormVisible, (value) => {
+    if (value) state.formVisible = true;
+}, { immediate: true });
 </script>
 
 <template>
