@@ -3,7 +3,7 @@ import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 import type {
     CollectorMetadata, CollectorOptions, Schedule, SecretFilter, UpgradeMode,
 } from '@/schema/inventory/collector/type';
-import type { Capability } from '@/schema/repository/plugin/model';
+import type { Capability } from '@/schema/repository/plugin/type';
 
 
 export interface CollectorPluginModel {
