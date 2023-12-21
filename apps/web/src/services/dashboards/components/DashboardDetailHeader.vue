@@ -90,7 +90,7 @@ const handleNameUpdate = (name: string) => {
                                 :dashboard-id="props.dashboardId"
         />
         <dashboard-clone-modal :visible.sync="state.cloneModalVisible"
-                               :dashboard-detail-info="dashboardDetailState"
+                               :dashboard="dashboardDetailState.dashboardInfo"
         />
     </div>
 </template>

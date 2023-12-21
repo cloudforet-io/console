@@ -347,8 +347,9 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         state.widgetValidMap[widgetKey] = isValid;
     };
     //
-    const createDashboard = async (params: CreateDashboardParameters): Promise<DashboardModel> => {
-        const res = await dashboardStore.createDashboard(state.dashboardType ?? 'WORKSPACE', params);
+    const createDashboard = async (params: CreateDashboardParameters, dashboardType?: DashboardType): Promise<DashboardModel> => {
+        const _dashboardType = dashboardType ?? state.dashboardType ?? 'WORKSPACE';
+        const res = await dashboardStore.createDashboard(_dashboardType, params);
         return res;
     };
     const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {

@@ -9,9 +9,8 @@ import {
 
 import { SpaceRouter } from '@/router';
 import type {
-    DashboardLayoutWidgetInfo, DashboardVariablesSchema, DashboardType,
+    DashboardType,
 } from '@/schema/dashboard/_types/dashboard-type';
-import type { CreatePublicDashboardParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -24,21 +23,18 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 import { gray } from '@/styles/colors';
 
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type { DashboardDetailInfoStoreState } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+import type { CreateDashboardParameters, DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 interface Props {
     visible?: boolean;
     dashboard?: DashboardModel;
-    dashboardDetailInfo?: DashboardDetailInfoStoreState;
     manageDisabled?: boolean;
 }
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
     dashboard: () => ({}),
-    dashboardDetailInfo: () => ({}),
     manageDisabled: false,
 });
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
@@ -48,12 +44,11 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.state;
 
 const {
     forms: {
         name,
-        viewers,
+        dashboardType,
     },
     setForm,
     initForm,
@@ -62,7 +57,7 @@ const {
     isAllValid,
 } = useFormValidator({
     name: '',
-    viewers: 'PRIVATE' as DashboardType,
+    dashboardType: 'PRIVATE' as DashboardType,
 }, {
     name(value: string) {
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
@@ -70,9 +65,8 @@ const {
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
         return '';
     },
-    viewers(value: DashboardType) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
+    dashboardType(value: DashboardType) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
 });
-const currentRouteName = SpaceRouter.router.currentRoute.name;
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     proxyVisible: useProxyValue('visible', props, emit),
@@ -82,7 +76,6 @@ const state = reactive({
     ]),
     projectId: computed(() => {
         if (props.dashboard?.project_id?.length) return props.dashboard.project_id;
-        if (props.dashboardDetailInfo?.projectId?.length) return props.dashboardDetailInfo.projectId;
         return '';
     }),
     dashboardNameList: computed<string[]>(() => {
@@ -96,16 +89,6 @@ const state = reactive({
         }
         return dashboardGetters.workspaceItems.map((item) => item.name);
     }),
-    layouts: computed<DashboardLayoutWidgetInfo[][]>(() => {
-        if (props.dashboard?.layouts) return props.dashboard?.layouts;
-        if (props.dashboardDetailInfo?.dashboardWidgetInfoList) return props.dashboardDetailInfo?.dashboardWidgetInfoList;
-        return [];
-    }),
-    variablesSchema: computed<DashboardVariablesSchema>(() => {
-        if (props.dashboard?.variables_schema) return props.dashboard?.variables_schema;
-        if (props.dashboardDetailInfo?.variablesSchema) return props.dashboardDetailInfo?.variablesSchema;
-        return { properties: {}, order: [] };
-    }),
 });
 
 const handleUpdateVisible = (visible) => {
@@ -114,17 +97,21 @@ const handleUpdateVisible = (visible) => {
 
 const createDashboard = async () => {
     try {
-        const params: CreatePublicDashboardParameters = {
+        const params: CreateDashboardParameters = {
             name: name.value,
-            layouts: state.layouts,
-            labels: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.labels : dashboardDetailState.dashboardInfo?.labels,
-            settings: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.settings : dashboardDetailState.dashboardInfo?.settings,
-            variables: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? props.dashboard?.variables : dashboardDetailState.dashboardInfo?.variables,
-            variables_schema: (currentRouteName === DASHBOARDS_ROUTE.ALL._NAME) ? state.variablesSchema : dashboardDetailState.dashboardInfo?.variables_schema,
-            resource_group: 'WORKSPACE',
-            project_id: state.projectId,
+            layouts: props.dashboard?.layouts,
+            labels: props.dashboard?.labels,
+            settings: props.dashboard?.settings,
+            variables: props.dashboard?.variables,
+            variables_schema: props.dashboard?.variables_schema,
         };
-        const res = await dashboardDetailStore.createDashboard(params);
+        if (dashboardType.value !== 'PRIVATE') {
+            params.resource_group = props.dashboard?.resource_group; // workspace, project
+            if (props.dashboard?.project_id && props.dashboard?.project_id !== '*') {
+                params.project_id = props.dashboard?.project_id;
+            }
+        }
+        const res = await dashboardDetailStore.createDashboard(params, dashboardType.value);
         return res.public_dashboard_id || res.private_dashboard_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
@@ -177,17 +164,17 @@ watch(() => props.visible, (visible) => {
                 </template>
             </p-field-group>
             <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_VIEWERS')"
-                           :invalid="invalidState.viewers"
-                           :invalid-text="invalidTexts.viewers"
+                           :invalid="invalidState.dashboardType"
+                           :invalid-text="invalidTexts.dashboardType"
                            required
                            class="mt-6"
             >
                 <p-radio v-for="{ name: visibilityName, label, icon } in state.filteredVisibilityList"
                          :key="visibilityName"
                          :value="visibilityName"
-                         :selected="viewers"
+                         :selected="dashboardType"
                          class="radio-group"
-                         @change="setForm('viewers', $event)"
+                         @change="setForm('dashboardType', $event)"
                 >
                     <p-i v-if="icon"
                          :name="icon"
