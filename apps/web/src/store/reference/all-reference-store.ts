@@ -1,6 +1,7 @@
 import { asyncComputed } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
+import { camelCase } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { store } from '@/store';
@@ -8,8 +9,6 @@ import { store } from '@/store';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
 import type { CollectorReferenceMap } from '@/store/modules/reference/collector/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
@@ -17,23 +16,28 @@ import type { SecretReferenceMap } from '@/store/modules/reference/secret/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
 import type {
+    ReferenceLoadOptions,
     ReferenceMap,
     VuexStoreReferenceType,
 } from '@/store/modules/reference/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 import {
     useCostDataSourceReferenceStore,
 } from '@/store/reference/cost-data-source-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+import { useUserReferenceStore } from '@/store/reference/user-reference-store';
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 
-export type ReferenceType = VuexStoreReferenceType|'costDataSource'|'cloudServiceQuerySet'|'workspace';
+export type ReferenceType = VuexStoreReferenceType|'project'|'projectGroup'|'user'|'costDataSource'|'cloudServiceQuerySet'|'workspace';
 
 export interface ReferenceTypeInfo {
     type: ReferenceType;
@@ -49,12 +53,11 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const projectReferenceStore = useProjectReferenceStore();
     const projectGroupReferenceStore = useProjectGroupReferenceStore();
     const workspaceReferenceStore = useWorkspaceReferenceStore();
+    const userReferenceStore = useUserReferenceStore();
 
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
             projectGroup: projectGroupReferenceStore.getters.projectGroupTypeInfo,
-            project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
-            //
             project: projectReferenceStore.getters.projectTypeInfo,
             //
             protocol: {
@@ -108,11 +111,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
                 ...REFERENCE_TYPE_INFO.service_account,
                 referenceMap: getters.serviceAccount,
             },
-            //
-            user: {
-                ...REFERENCE_TYPE_INFO.user,
-                referenceMap: getters.user,
-            },
+            user: userReferenceStore.getters.userTypeInfo,
             //
             webhook: {
                 ...REFERENCE_TYPE_INFO.webhook,
@@ -124,7 +123,6 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             workspace: workspaceReferenceStore.getters.workspaceTypeInfo,
         })),
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
-        project_group: asyncComputed<ProjectGroupReferenceMap>(async () => projectGroupReferenceStore.getters.projectGroupItems),
         project: asyncComputed<ProjectReferenceMap>(async () => projectReferenceStore.getters.projectItems),
         protocol: asyncComputed<ProtocolReferenceMap>(async () => {
             await store.dispatch('reference/protocol/load');
@@ -170,11 +168,8 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             await store.dispatch('reference/serviceAccount/load');
             return store.getters['reference/serviceAccountItems'];
         }, {}, { lazy: true }),
-        user: asyncComputed<UserReferenceMap>(async () => {
-            await store.dispatch('reference/user/load');
-            return store.getters['reference/userItems'];
-        }, {}, { lazy: true }),
-        webhook: asyncComputed<UserReferenceMap>(async () => {
+        user: computed<UserReferenceMap>(() => userReferenceStore.getters.userItems),
+        webhook: asyncComputed<WebhookReferenceMap>(async () => {
             await store.dispatch('reference/webhook/load');
             return store.getters['reference/webhookItems'];
         }, {}, { lazy: true }),
@@ -184,12 +179,43 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     });
 
     const actions = {
+        async sync(type: ReferenceType, data?: any) {
+            if (type === 'project') {
+                await projectReferenceStore.sync(data);
+            } else if (type === 'projectGroup') {
+                await projectGroupReferenceStore.sync(data);
+            } else if (type === 'workspace') {
+                await workspaceReferenceStore.sync(data);
+            } else if (type === 'user') {
+                await userReferenceStore.sync(data);
+            } else {
+                await store.dispatch(`reference/${camelCase(type)}/sync`, data);
+            }
+        },
+        async load(type: ReferenceType, options?: ReferenceLoadOptions) {
+            if (type === 'costDataSource') {
+                await costDataSourceReferenceStore.load(options);
+            } else if (type === 'cloudServiceQuerySet') {
+                await cloudServiceQuerySetReferenceStore.load(options);
+            } else if (type === 'project') {
+                await projectReferenceStore.load(options);
+            } else if (type === 'projectGroup') {
+                await projectGroupReferenceStore.load(options);
+            } else if (type === 'workspace') {
+                await workspaceReferenceStore.load(options);
+            } else if (type === 'user') {
+                await userReferenceStore.load(options);
+            } else {
+                await store.dispatch(`reference/${camelCase(type)}/load`, options);
+            }
+        },
         flush() {
             costDataSourceReferenceStore.flush();
             cloudServiceQuerySetReferenceStore.flush();
             projectReferenceStore.flush();
             projectGroupReferenceStore.flush();
             workspaceReferenceStore.flush();
+            userReferenceStore.flush();
         },
     };
 
