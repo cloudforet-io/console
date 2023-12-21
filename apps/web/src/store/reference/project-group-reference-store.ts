@@ -11,14 +11,23 @@ import type { ProjectGroupGetParameters } from '@/schema/identity/project-group/
 import type { ProjectGroupListParameters } from '@/schema/identity/project-group/api-verbs/list';
 import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
+import type { ReferenceLoadOptions, ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+
+
+interface ProjectGroupResourceItemData {
+    parentGroupInfo?: {
+        id: string;
+        name: string;
+    };
+}
+export type ProjectGroupReferenceItem = Required<Pick<ReferenceItem<ProjectGroupResourceItemData>, 'key'|'label'|'name'|'data'>>;
+export type ProjectGroupReferenceMap = ReferenceMap<ProjectGroupReferenceItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
