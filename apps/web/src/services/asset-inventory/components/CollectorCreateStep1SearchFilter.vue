@@ -121,7 +121,7 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { RepositoryInfo } from '@/schema/repository/plugin/model';
+import type { RepositoryInfo } from '@/schema/repository/repository/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
