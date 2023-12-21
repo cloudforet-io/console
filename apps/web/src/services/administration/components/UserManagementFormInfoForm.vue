@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PFieldGroup, PTextInput,
@@ -35,9 +35,9 @@ const setForm = () => {
 };
 
 /* Init */
-(() => {
+onMounted(() => {
     setForm();
-})();
+});
 </script>
 
 <template>

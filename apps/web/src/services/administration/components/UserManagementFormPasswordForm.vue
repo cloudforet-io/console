@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PTextInput, PFieldGroup, PRadio, PDivider, PRadioGroup, PI,
@@ -105,10 +105,10 @@ const resetForm = () => {
 };
 
 /* Init */
-(async () => {
+onMounted(() => {
     state.passwordType = state.passwordTypeArr[0].name;
     emit('change-input', { password: '', passwordType: state.passwordType });
-})();
+});
 </script>
 
 <template>
