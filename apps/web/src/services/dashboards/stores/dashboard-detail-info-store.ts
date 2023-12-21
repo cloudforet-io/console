@@ -353,15 +353,16 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
         return res;
     };
     const updateDashboard = async (dashboardId: string, params: Partial<UpdateDashboardParameters>) => {
+        const isPrivate = dashboardId?.startsWith('private');
         const _params: UpdateDashboardParameters = {
             ...params,
-            [state.dashboardType === 'PRIVATE' ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
+            [isPrivate ? 'private_dashboard_id' : 'public_dashboard_id']: dashboardId,
         };
-        const res = await dashboardStore.updateDashboard(state.dashboardType, _params);
+        const res = await dashboardStore.updateDashboard(dashboardId, _params);
         _setDashboardInfoStoreState(res);
     };
     const deleteDashboard = async (dashboardId: string) => {
-        await dashboardStore.deleteDashboard(state.dashboardType, dashboardId);
+        await dashboardStore.deleteDashboard(dashboardId);
     };
 
     const mutations = {
