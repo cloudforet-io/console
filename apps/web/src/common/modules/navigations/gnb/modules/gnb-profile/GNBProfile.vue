@@ -12,6 +12,7 @@ import {
 } from '@spaceone/design-system';
 import ejs from 'ejs';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -42,7 +43,14 @@ const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
-    userIcon: computed(() => 'img_avatar_user'),
+    userIcon: computed<string>(() => {
+        if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
+        if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
+        const currentRoleType = store.getters['user/getCurrentRoleInfo'].roleType;
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'img_avatar_workspace-owner';
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'img_avatar_workspace-member';
+        return 'img_avatar_no-role';
+    }),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
     // TODO: to be refactored by new planning
