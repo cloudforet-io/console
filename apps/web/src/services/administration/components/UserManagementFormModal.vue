@@ -112,7 +112,6 @@ const buildRoleParams = (item?: AddModalMenuItem): any => {
     const baseRoleParams = {
         role_id: formState.role.name || '',
     };
-    console.log(isEmpty(formState.role));
     if (isEmpty(formState.role)) {
         return baseRoleParams;
     }
@@ -124,7 +123,6 @@ const buildRoleParams = (item?: AddModalMenuItem): any => {
 
 /* API */
 const handleConfirm = async () => {
-    console.log('confirm!');
     state.loading = true;
 
     try {
@@ -135,7 +133,6 @@ const handleConfirm = async () => {
         if (state.isSetAdminRole) {
             await fetchRoleBinding();
         } else {
-            console.log('all');
             await Promise.all(formState.workspace.map(fetchRoleBinding));
         }
 
