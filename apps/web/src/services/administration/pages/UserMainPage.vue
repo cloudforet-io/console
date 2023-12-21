@@ -10,6 +10,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
+import UserManagementFormModal from '@/services/administration/components/UserManagementFormModal.vue';
 import UserManagementHeader from '@/services/administration/components/UserManagementHeader.vue';
 import UserManagementStatusModal from '@/services/administration/components/UserManagementStatusModal.vue';
 import UserManagementTab from '@/services/administration/components/UserManagementTab.vue';
@@ -72,6 +73,7 @@ onUnmounted(() => {
         <user-management-tab />
         <user-management-add-modal @confirm="refreshUserList" />
         <user-management-status-modal @confirm="refreshUserList" />
+        <user-management-form-modal @confirm="refreshUserList" />
     </section>
 </template>
 
