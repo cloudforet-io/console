@@ -2887,7 +2887,6 @@
 					"ESCALATION_RULES_HELP_TEXT": "최소 1개 이상의 규칙이 있어야 합니다. (5개 까지)",
 					"ESCALATION_RULES_LABEL": "에스컬레이션 규칙",
 					"FINISH_CONDITION_LABEL": "종료 조건(상태)",
-					"GLOBAL": "글로벌",
 					"GO_CREATE_PROJECT": "프로젝트 생성하러 가기",
 					"MIN": "분",
 					"NAME_INVALID_TEXT": "40글자 미만으로 입력해주세요.",
@@ -2907,7 +2906,8 @@
 					"RULE": "규칙",
 					"SCOPE_LABEL": "범위",
 					"STEP": "단계",
-					"TIME": "번"
+					"TIME": "번",
+					"WORKSPACE": "워크스페이스"
 				},
 				"GLOBAL": "글로벌",
 				"PROJECT": "프로젝트",

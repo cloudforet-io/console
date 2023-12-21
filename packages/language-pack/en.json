@@ -2887,7 +2887,6 @@
 					"ESCALATION_RULES_HELP_TEXT": "At least one rule must be set. (Up to 5)",
 					"ESCALATION_RULES_LABEL": "Escalation Rules",
 					"FINISH_CONDITION_LABEL": "Finish Condition",
-					"GLOBAL": "Global",
 					"GO_CREATE_PROJECT": "Go create project",
 					"MIN": "min.",
 					"NAME_INVALID_TEXT": "The maximum length of a name is 40 characters.",
@@ -2907,7 +2906,8 @@
 					"RULE": "Rule",
 					"SCOPE_LABEL": "Scope",
 					"STEP": "Step",
-					"TIME": "time(s)"
+					"TIME": "time(s)",
+					"WORKSPACE": "Workspace"
 				},
 				"GLOBAL": "Global",
 				"PROJECT": "Project",

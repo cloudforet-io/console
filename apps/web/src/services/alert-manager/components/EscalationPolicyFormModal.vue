@@ -23,7 +23,7 @@ import type { ActionMode } from '@/services/alert-manager/types/alert-type';
 const props = defineProps<{
     visible: boolean;
     mode: ActionMode;
-    escalationPolicy: EscalationPolicyModel;
+    escalationPolicy?: EscalationPolicyModel;
 }>();
 
 const emit = defineEmits<{(event: 'update:visible', value: boolean): void;

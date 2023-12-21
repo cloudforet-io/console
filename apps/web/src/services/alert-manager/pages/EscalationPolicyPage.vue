@@ -7,11 +7,11 @@ import {
     PHeading, PButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
@@ -114,11 +114,11 @@ const state = reactive({
 });
 
 /* api */
-let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
+const escalationPolicyApiQuery = escalationPolicyApiQueryHelper.dataV2;
 const listEscalationPolicies = async () => {
     try {
         tableState.loading = true;
-        const res = await SpaceConnector.client.monitoring.escalationPolicy.list<EscalationPolicyListParameters, EscalationPolicyListResponse>({
+        const res = await SpaceConnector.clientV2.monitoring.escalationPolicy.list<EscalationPolicyListParameters, EscalationPolicyListResponse>({
             query: escalationPolicyApiQuery,
         });
         state.escalationPolicies = res.results;
@@ -165,7 +165,7 @@ const deleteEscalationPolicy = async () => {
 };
 
 /* event */
-const onSelectAction = (action: ActionMode) => {
+const handleSelectAction = (action: ActionMode) => {
     state.formMode = action;
     if (action === ACTION.create) {
         state.formModalVisible = true;
@@ -177,8 +177,17 @@ const onSelectAction = (action: ActionMode) => {
         setDefaultEscalationPolicy();
     }
 };
-const onChange = async (options: any = {}) => {
-    escalationPolicyApiQuery = getApiQueryWithToolboxOptions(escalationPolicyApiQueryHelper, options) ?? escalationPolicyApiQuery;
+const onChange = async (options: ToolboxOptions = {}) => {
+    if (options.pageStart !== undefined) escalationPolicyApiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined) escalationPolicyApiQueryHelper.setPageLimit(options.pageLimit);
+    if (options.sortBy !== undefined) escalationPolicyApiQueryHelper.setSort(options.sortBy);
+    if (options.sortDesc !== undefined) escalationPolicyApiQueryHelper.setSortDesc(options.sortDesc);
+    if (options.queryTags !== undefined) {
+        escalationPolicyApiQueryHelper.setFiltersAsQueryTag(options.queryTags);
+    } else if (options.searchText !== undefined) {
+        escalationPolicyApiQueryHelper.setFilters([{ v: options.searchText || '' }]);
+    }
+
     if (options.queryTags !== undefined) {
         await replaceUrlQuery('filters', escalationPolicyApiQueryHelper.rawQueryStrings);
     }
@@ -217,7 +226,7 @@ const onChange = async (options: any = {}) => {
                               style-type="primary"
                               icon-left="ic_plus_bold"
                               :disabled="!state.hasManagePermission"
-                              @click="onSelectAction(ACTION.create)"
+                              @click="handleSelectAction(ACTION.create)"
                     >
                         {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
                     </p-button>
@@ -227,7 +236,7 @@ const onChange = async (options: any = {}) => {
                         :menu="state.actionItems"
                         :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                         :disabled="!state.selectedItem || !state.hasManagePermission"
-                        @select="onSelectAction"
+                        @select="handleSelectAction"
                     />
                 </template>
             </p-toolbox>
@@ -239,8 +248,7 @@ const onChange = async (options: any = {}) => {
             />
         </div>
         <!--modal-->
-        <escalation-policy-form-modal v-if="state.selectedItem"
-                                      :visible.sync="state.formModalVisible"
+        <escalation-policy-form-modal :visible.sync="state.formModalVisible"
                                       :mode="state.formMode"
                                       :escalation-policy="state.selectedItem"
                                       @confirm="listEscalationPolicies"
