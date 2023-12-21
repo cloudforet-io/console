@@ -90,7 +90,6 @@ const setForm = () => {
     formState.email = state.data.email || '';
     formState.tags = state.data.tags || {};
 };
-
 const handleChangeInputs = (value) => {
     if (value.email) formState.email = value.email;
     if (value.password) formState.password = value.password || '';
@@ -98,32 +97,48 @@ const handleChangeInputs = (value) => {
     if (value.role) formState.role = value.role;
     if (value.workspace) formState.workspace = value.workspace;
 };
-
 const handleChangeVerify = (status) => {
     state.data.email_verified = status;
+};
+const buildUserInfoParams = (): UserManagementData => ({
+    user_id: state.data.user_id || '',
+    name: formState.name,
+    email: formState.email || '',
+    tags: formState.tags || {},
+    password: formState.password || '',
+    reset_password: state.data.auth_type === 'LOCAL' && formState.passwordType === PASSWORD_TYPE.RESET,
+});
+const buildRoleParams = (item?: AddModalMenuItem): any => {
+    const baseRoleParams = {
+        role_id: formState.role.name || '',
+    };
+    if (isEmpty(formState.role)) {
+        return baseRoleParams;
+    }
+    return {
+        ...baseRoleParams,
+        workspace_id: item?.name || '',
+    };
 };
 
 /* API */
 const handleConfirm = async () => {
-    const userInfoParams: UserManagementData = {
-        user_id: state.data.user_id || '',
-        name: formState.name,
-        email: formState.email || '',
-        tags: formState.tags || {},
-        password: formState.password || '',
-    };
-    if (state.data.auth_type === 'LOCAL') {
-        userInfoParams.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
-    }
-
-    if (state.isChangedToggle) {
-        await fetchPostDisableMfa();
-    }
-
     state.loading = true;
+
     try {
-        await fetchRoleBinding();
+        if (state.isChangedToggle) {
+            await fetchPostDisableMfa();
+        }
+
+        if (state.isSetAdminRole) {
+            await fetchRoleBinding();
+        } else {
+            await Promise.all(formState.workspace.map(fetchRoleBinding));
+        }
+
+        const userInfoParams = buildUserInfoParams();
         await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>(userInfoParams);
+
         showSuccessMessage(i18n.t('IAM.USER.MAIN.MODAL.ALT_S_UPDATE_USER'), '');
         handleClose();
         emit('confirm');
@@ -133,26 +148,26 @@ const handleConfirm = async () => {
         state.loading = false;
     }
 };
-const fetchRoleBinding = async () => {
+const fetchRoleBinding = async (item?: AddModalMenuItem) => {
     if (isEmpty(formState.role)) return;
-    const baseRoleParams = {
-        role_id: formState.role.name || '',
-    };
-    const roleParams = state.isSetAdminRole ? baseRoleParams : {
-        ...baseRoleParams,
-        workspace_id: formState.workspace.map((w) => w.name || ''),
-    };
-    if (formState.roleBindingId) {
-        await SpaceConnector.clientV2.identity.roleBinding.update<RoleUpdateParameters, RoleBindingModel>({
-            ...roleParams,
-            role_binding_id: formState.roleBindingId,
-        });
-    } else {
-        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
-            ...roleParams,
-            user_id: state.data.user_id || '',
-            resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
-        });
+
+    const roleParams = buildRoleParams(item);
+
+    try {
+        if (formState.roleBindingId) {
+            await SpaceConnector.clientV2.identity.roleBinding.update<RoleUpdateParameters, RoleBindingModel>({
+                ...roleParams,
+                role_binding_id: formState.roleBindingId,
+            });
+        } else {
+            await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
+                ...roleParams,
+                user_id: state.data.user_id || '',
+                resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+            });
+        }
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
     }
 };
 const fetchPostDisableMfa = async () => {
@@ -222,6 +237,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
                                          :tags.sync="formState.tags"
+                                         is-edit
                                          is-form-visible
                 />
             </div>
