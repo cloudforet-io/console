@@ -3,6 +3,9 @@ import dayjs from 'dayjs';
 
 import { store } from '@/store';
 
+import { pinia } from '@/store/pinia';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { GRANULARITY, GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-constant';
 import { getPeriodByGranularity } from '@/services/cost-explorer/helpers/cost-explorer-period-helper';
 import type { ChartData, Legend, XYChartData } from '@/services/cost-explorer/types/cost-explorer-chart-type';
@@ -10,6 +13,9 @@ import type {
     Period, Granularity, GroupBy, CostAnalyzeResponse,
 } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
+
+useAllReferenceStore(pinia);
+const allReferenceStore = useAllReferenceStore();
 
 const DATE_FORMAT = Object.freeze({
     day: 'YYYY-MM-DD',
@@ -53,8 +59,7 @@ export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<Cost
         }
         const _providers = store.getters['reference/providerItems'];
         const _serviceAccounts = store.getters['reference/serviceAccountItems'];
-        const _projects = store.getters['reference/projectItems'];
-        const _projectGroups = store.getters['reference/projectGroupItems'];
+        const _projects = allReferenceStore.getters.project;
         const _regions = store.getters['reference/regionItems'];
 
         const legends: Legend[] = [];
@@ -63,9 +68,7 @@ export const getLegends = <CostAnalyzeRawData>(rawData: CostAnalyzeResponse<Cost
                 let _name = d[_groupBy];
                 let _label = d[_groupBy];
                 let _color;
-                if (_groupBy === GROUP_BY.PROJECT_GROUP) {
-                    _label = _projectGroups[_name]?.label || _name;
-                } else if (_groupBy === GROUP_BY.PROJECT) {
+                if (_groupBy === GROUP_BY.PROJECT) {
                     _label = _projects[_name]?.label || _name;
                 } else if (_groupBy === GROUP_BY.SERVICE_ACCOUNT) {
                     _label = _serviceAccounts[_name]?.label || _name;

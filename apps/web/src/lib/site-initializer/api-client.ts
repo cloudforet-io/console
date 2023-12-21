@@ -2,6 +2,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import TokenAPI from '@cloudforet/core-lib/space-connector/token-api';
 import type { DevConfig, MockConfig, AuthConfig } from '@cloudforet/core-lib/space-connector/type';
 
+import { pinia } from '@/store/pinia';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 
 const getAfterCallApiMap = (store) => ({
     '/inventory/cloud-service-type/create': (data) => { store.dispatch('reference/cloudServiceType/sync', data); },
@@ -10,10 +13,31 @@ const getAfterCallApiMap = (store) => ({
     '/inventory/collector/update': (data) => { store.dispatch('reference/collector/sync', data); },
     '/repository/plugin/create': (data) => { store.dispatch('reference/plugin/sync', data); },
     '/repository/plugin/update': (data) => { store.dispatch('reference/plugin/sync', data); },
-    '/identity/project/create': (data) => { store.dispatch('reference/project/sync', data); },
-    '/identity/project/update': (data) => { store.dispatch('reference/project/sync', data); },
-    '/identity/project-group/create': (data) => { store.dispatch('reference/projectGroup/sync', data); },
-    '/identity/project-group/update': (data) => { store.dispatch('reference/projectGroup/sync', data); },
+    '/identity/project/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project', data);
+    },
+    '/identity/project/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('project', data);
+    },
+    '/identity/project/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('project', { force: true });
+    },
+    '/identity/project-group/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('projectGroup', data);
+    },
+    '/identity/project-group/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('projectGroup', data);
+    },
     '/notification/protocol/create': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/identity/provider/create': (data) => { store.dispatch('reference/provider/sync', data); },
@@ -24,8 +48,16 @@ const getAfterCallApiMap = (store) => ({
     '/secret/secret/update': (data) => { store.dispatch('reference/secret/sync', data); },
     '/identity/service-account/create': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
     '/identity/service-account/update': (data) => { store.dispatch('reference/serviceAccount/sync', data); },
-    '/identity/user/create': (data) => { store.dispatch('reference/user/sync', data); },
-    '/identity/user/update': (data) => { store.dispatch('reference/user/sync', data); },
+    '/identity/user/create': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('user', data);
+    },
+    '/identity/user/update': (data) => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.sync('user', data);
+    },
     '/monitoring/webhook/create': (data) => { store.dispatch('reference/webhook/sync', data); },
     '/monitoring/webhook/update': (data) => { store.dispatch('reference/webhook/sync', data); },
 });
