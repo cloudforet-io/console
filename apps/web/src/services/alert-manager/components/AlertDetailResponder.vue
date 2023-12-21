@@ -12,6 +12,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { AlertModel } from '@/schema/monitoring/alert/model';
+import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -21,16 +24,14 @@ import ProjectChannelList from '@/services/alert-manager/components/ProjectChann
 
 import TranslateResult = VueI18n.TranslateResult;
 
-
-
 interface Props {
     id?: string;
     alertData?: Partial<AlertModel>;
     manageDisabled?: boolean;
 }
-interface Rule {
+interface RuleItem {
     title: TranslateResult;
-    data: Record<string, string | number>;
+    data: EscalationPolicyRule;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -45,7 +46,7 @@ const state = reactive({
         { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
         { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
     ]),
-    escalationRuleItems: [] as Rule[],
+    escalationRuleItems: [] as RuleItem[],
     loading: true,
     projectChannels: [],
 });
@@ -69,12 +70,12 @@ const listProjectChannel = async () => {
 
 
 const listEscalationPolicy = async () => {
-    const { rules } = await SpaceConnector.client.monitoring.escalationPolicy.get({
-        // eslint-disable-next-line camelcase
+    if (!props.alertData.escalation_policy_id) throw new Error('escalation_policy_id is required');
+    const { rules } = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
         escalation_policy_id: props.alertData.escalation_policy_id,
     });
     state.escalationRuleItems = rules.map((d) => ({
-        title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'),
+        title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL') as string,
         data: d,
     }));
 };

@@ -11,6 +11,8 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -82,7 +84,7 @@ const state = reactive({
 
 const getEscalationPolicy = async () => {
     try {
-        const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
+        const res = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
             escalation_policy_id: state.data.escalation_policy_id,
         });
         state.escalationPolicyName = res.name;

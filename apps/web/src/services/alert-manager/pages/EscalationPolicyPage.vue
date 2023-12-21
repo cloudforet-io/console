@@ -77,6 +77,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
+import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -91,7 +92,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 
 import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
 import EscalationPolicyFormModal from '@/services/alert-manager/components/EscalationPolicyFormModal.vue';
-import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
+import { ACTION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
 
 
 export default {
@@ -130,7 +131,7 @@ export default {
             valueHandlerMap: {
                 escalation_policy_id: makeDistinctValueHandler('monitoring.EscalationPolicy', 'escalation_policy_id'),
                 name: makeDistinctValueHandler('monitoring.EscalationPolicy', 'name'),
-                finish_condition: makeEnumValueHandler(FINISH_CONDITION),
+                finish_condition: makeEnumValueHandler(ESCALATION_POLICY_FINISH_CONDITION),
                 scope: makeEnumValueHandler(SCOPE),
                 project_id: makeReferenceValueHandler('identity.Project'),
             },

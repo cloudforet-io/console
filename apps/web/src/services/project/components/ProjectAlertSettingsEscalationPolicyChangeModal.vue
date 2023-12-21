@@ -22,7 +22,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/alert-manager/components/EscalationPolicyForm.vue';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form-store';
 
 
 interface Props {

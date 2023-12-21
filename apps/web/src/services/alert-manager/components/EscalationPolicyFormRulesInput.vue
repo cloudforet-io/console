@@ -12,13 +12,14 @@ import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
 import { SCOPE } from '@/services/alert-manager/constants/alert-constant';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
-import type { Rule } from '@/services/alert-manager/types/alert-type';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
@@ -57,14 +58,14 @@ const {
     isAllValid,
 } = useFormValidator({
     repeatCount: 0,
-    rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }] as Rule[],
+    rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }] as EscalationPolicyRule[],
 }, {
     repeatCount(value) {
         if (Number.isNaN(value) || typeof value !== 'number') return 'Only numbers are allowed.';
         if (value < 0) return 'Must be 0 or greater.';
         return true;
     },
-    rules(value: Rule[]) {
+    rules(value: EscalationPolicyRule[]) {
         let result = '';
         value.forEach((d, idx) => {
             if (!repeatCount.value && idx === value.length - 1) return;

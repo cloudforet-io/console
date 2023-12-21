@@ -5,6 +5,9 @@ import { PButtonModal } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { EscalationPolicyCreateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/create';
+import type { EscalationPolicyUpdateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/update';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -14,13 +17,13 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyForm from '@/services/alert-manager/components/EscalationPolicyForm.vue';
 import { ACTION } from '@/services/alert-manager/constants/alert-constant';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
-import type { EscalationPolicyDataModel } from '@/services/alert-manager/types/alert-type';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form-store';
+import type { ActionMode } from '@/services/alert-manager/types/alert-type';
 
 const props = defineProps<{
     visible: boolean;
-    mode: string;
-    escalationPolicy: EscalationPolicyDataModel;
+    mode: ActionMode;
+    escalationPolicy: EscalationPolicyModel;
 }>();
 
 const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
@@ -36,10 +39,11 @@ const state = reactive({
 /* api */
 const createEscalationPolicy = async () => {
     try {
-        await SpaceConnector.client.monitoring.escalationPolicy.create({
+        if (!escalationPolicyFormState.name) throw new Error('name is required');
+        await SpaceConnector.clientV2.monitoring.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>({
             name: escalationPolicyFormState.name,
             rules: escalationPolicyFormState.rules,
-            scope: escalationPolicyFormState.scope,
+            resource_group: escalationPolicyFormState.resource_group,
             finish_condition: escalationPolicyFormState.finishCondition,
             repeat_count: escalationPolicyFormState.repeatCount,
             project_id: escalationPolicyFormState.projectId,
@@ -53,8 +57,10 @@ const createEscalationPolicy = async () => {
 };
 const updateEscalationPolicy = async () => {
     try {
-        await SpaceConnector.client.monitoring.escalationPolicy.update({
-            escalation_policy_id: escalationPolicyFormState?.escalationPolicyData?.escalation_policy_id,
+        const escalationPolicyId = escalationPolicyFormState?.escalationPolicyData?.escalation_policy_id;
+        if (!escalationPolicyId) throw new Error('escalationPolicyId is required');
+        await SpaceConnector.clientV2.monitoring.escalationPolicy.update<EscalationPolicyUpdateParameters, EscalationPolicyModel>({
+            escalation_policy_id: escalationPolicyId,
             name: escalationPolicyFormState.name,
             rules: escalationPolicyFormState.rules,
             repeat_count: escalationPolicyFormState.repeatCount,
