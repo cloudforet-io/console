@@ -6,10 +6,10 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
-import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
+import {
+    ALERT_STATE_FILTER, ASSIGNED_STATE, EXTENDED_ALERT_URGENCY,
+} from '@/services/alert-manager/constants/alert-constant';
 import type { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/types/alert-type';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 
@@ -25,7 +25,7 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(route.query.filters);
 const state = reactive({
     alertState: route.query.state ?? ALERT_STATE_FILTER.OPEN,
-    urgency: route.query.urgency ?? ALERT_URGENCY.ALL,
+    urgency: route.query.urgency ?? EXTENDED_ALERT_URGENCY.ALL,
     assigned: route.query.assigned ?? ASSIGNED_STATE.ALL,
     filters: tagQueryHelper.filters,
 });
@@ -66,7 +66,7 @@ const onChangeList = () => {
 
 onActivated(() => {
     state.alertState = route.query.state ?? ALERT_STATE_FILTER.OPEN;
-    state.urgency = route.query.urgency ?? ALERT_URGENCY.ALL;
+    state.urgency = route.query.urgency ?? EXTENDED_ALERT_URGENCY.ALL;
     state.assigned = route.query.assigned ?? ASSIGNED_STATE.ALL;
     state.filters = tagQueryHelper.setFiltersAsRawQueryString(route.query.filters).filters;
 });

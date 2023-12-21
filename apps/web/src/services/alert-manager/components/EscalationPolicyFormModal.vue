@@ -1,30 +1,5 @@
-<template>
-    <p-button-modal
-        class="escalation-policy-form-modal"
-        :header-title="mode === ACTION.create ? $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE_MODAL_TITLE') : $t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE_MODAL_TITLE')"
-        size="md"
-        :fade="true"
-        :backdrop="true"
-        :visible.sync="proxyVisible"
-        :disabled="!escalationPolicyFormStore.isAllValid"
-        @confirm="handleConfirm"
-    >
-        <template #body>
-            <escalation-policy-form :escalation-policy-data="escalationPolicy"
-                                    :mode="mode"
-            />
-        </template>
-        <template #confirm-button>
-            {{ mode === ACTION.create ? $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') : $t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE') }}
-        </template>
-    </p-button-modal>
-</template>
-
-<script lang="ts">
-import type { PropType, SetupContext } from 'vue';
-import {
-    computed, reactive, toRefs,
-} from 'vue';
+<script setup lang="ts">
+import { reactive } from 'vue';
 
 import { PButtonModal } from '@spaceone/design-system';
 
@@ -42,93 +17,86 @@ import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
 import type { EscalationPolicyDataModel } from '@/services/alert-manager/types/alert-type';
 
+const props = defineProps<{
+    visible: boolean;
+    mode: string;
+    escalationPolicy: EscalationPolicyDataModel;
+}>();
 
-export default {
-    name: 'EscalationPolicyFormModal',
-    components: {
-        EscalationPolicyForm,
-        PButtonModal,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        mode: {
-            type: String,
-            default: '',
-        },
-        escalationPolicy: {
-            type: Object as PropType<EscalationPolicyDataModel>,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const escalationPolicyFormStore = useEscalationPolicyFormStore();
-        const escalationPolicyFormState = escalationPolicyFormStore.$state;
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            inputModel: computed<Partial<EscalationPolicyDataModel>>(() => ({
-                name: escalationPolicyFormState.name,
-                rules: escalationPolicyFormState.rules,
-                scope: escalationPolicyFormState.scope,
-                finish_condition: escalationPolicyFormState.finishCondition,
-                repeat_count: escalationPolicyFormState.repeatCount,
-                project_id: escalationPolicyFormState.projectId,
-            })),
+const emit = defineEmits<{(event: 'update:visible', value: boolean): void;
+    (event: 'confirm'): void;
+}>();
+
+const escalationPolicyFormStore = useEscalationPolicyFormStore();
+const escalationPolicyFormState = escalationPolicyFormStore.$state;
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+});
+
+/* api */
+const createEscalationPolicy = async () => {
+    try {
+        await SpaceConnector.client.monitoring.escalationPolicy.create({
+            name: escalationPolicyFormState.name,
+            rules: escalationPolicyFormState.rules,
+            scope: escalationPolicyFormState.scope,
+            finish_condition: escalationPolicyFormState.finishCondition,
+            repeat_count: escalationPolicyFormState.repeatCount,
+            project_id: escalationPolicyFormState.projectId,
         });
-
-        /* api */
-        const createEscalationPolicy = async () => {
-            try {
-                await SpaceConnector.client.monitoring.escalationPolicy.create({
-                    name: escalationPolicyFormState.name,
-                    rules: escalationPolicyFormState.rules,
-                    scope: escalationPolicyFormState.scope,
-                    finish_condition: escalationPolicyFormState.finishCondition,
-                    repeat_count: escalationPolicyFormState.repeatCount,
-                    project_id: escalationPolicyFormState.projectId,
-                });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'));
-            } finally {
-                state.proxyVisible = false;
-            }
-        };
-        const updateEscalationPolicy = async () => {
-            try {
-                await SpaceConnector.client.monitoring.escalationPolicy.update({
-                    escalation_policy_id: escalationPolicyFormState?.escalationPolicyData?.escalation_policy_id,
-                    name: escalationPolicyFormState.name,
-                    rules: escalationPolicyFormState.rules,
-                    repeat_count: escalationPolicyFormState.repeatCount,
-                    finish_condition: escalationPolicyFormState.finishCondition,
-                });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'));
-            } finally {
-                state.proxyVisible = false;
-            }
-        };
-
-        /* event */
-        const handleConfirm = async () => {
-            if (!escalationPolicyFormStore.isAllValid) return;
-
-            if (props.mode === ACTION.create) await createEscalationPolicy();
-            else if (props.mode === ACTION.update) await updateEscalationPolicy();
-            emit('confirm');
-        };
-
-        return {
-            ...toRefs(state),
-            escalationPolicyFormStore,
-            ACTION,
-            handleConfirm,
-            createEscalationPolicy,
-        };
-    },
+        showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'));
+    } finally {
+        state.proxyVisible = false;
+    }
 };
+const updateEscalationPolicy = async () => {
+    try {
+        await SpaceConnector.client.monitoring.escalationPolicy.update({
+            escalation_policy_id: escalationPolicyFormState?.escalationPolicyData?.escalation_policy_id,
+            name: escalationPolicyFormState.name,
+            rules: escalationPolicyFormState.rules,
+            repeat_count: escalationPolicyFormState.repeatCount,
+            finish_condition: escalationPolicyFormState.finishCondition,
+        });
+        showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'));
+    } finally {
+        state.proxyVisible = false;
+    }
+};
+
+/* event */
+const handleConfirm = async () => {
+    if (!escalationPolicyFormStore.isAllValid) return;
+
+    if (props.mode === ACTION.create) await createEscalationPolicy();
+    else if (props.mode === ACTION.update) await updateEscalationPolicy();
+    emit('confirm');
+};
+
 </script>
+
+<template>
+    <p-button-modal
+        class="escalation-policy-form-modal"
+        :header-title="props.mode === ACTION.create ? $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE_MODAL_TITLE') : $t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE_MODAL_TITLE')"
+        size="md"
+        :fade="true"
+        :backdrop="true"
+        :visible.sync="state.proxyVisible"
+        :disabled="!escalationPolicyFormStore.isAllValid"
+        @confirm="handleConfirm"
+    >
+        <template #body>
+            <escalation-policy-form :escalation-policy-data="props.escalationPolicy"
+                                    :mode="props.mode"
+            />
+        </template>
+        <template #confirm-button>
+            {{ props.mode === ACTION.create ? $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') : $t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE') }}
+        </template>
+    </p-button-modal>
+</template>

@@ -50,10 +50,11 @@ import {
 
 import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system';
 
-import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { i18n } from '@/translations';
 
-import { ALERT_STATE_FILTER, ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
+import {
+    ALERT_STATE_FILTER, ASSIGNED_STATE, EXTENDED_ALERT_URGENCY,
+} from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertBottomFilters,
 } from '@/services/alert-manager/types/alert-type';
@@ -73,7 +74,7 @@ export default {
         },
         urgency: {
             type: String,
-            default: ALERT_URGENCY.ALL,
+            default: EXTENDED_ALERT_URGENCY.ALL,
         },
         assigned: {
             type: String,
@@ -94,9 +95,9 @@ export default {
                 { name: ALERT_STATE_FILTER.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
             ]),
             urgencyList: computed(() => [
-                { name: ALERT_URGENCY.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
-                { name: ALERT_URGENCY.HIGH, label: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH') },
-                { name: ALERT_URGENCY.LOW, label: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW') },
+                { name: EXTENDED_ALERT_URGENCY.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
+                { name: EXTENDED_ALERT_URGENCY.HIGH, label: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH') },
+                { name: EXTENDED_ALERT_URGENCY.LOW, label: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW') },
             ]),
             assignedStateList: computed(() => [
                 { name: ASSIGNED_STATE.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },

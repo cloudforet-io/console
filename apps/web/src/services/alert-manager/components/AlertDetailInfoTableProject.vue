@@ -1,26 +1,78 @@
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+
+import {
+    PButton, PLink, PButtonModal, PCopyButton,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
+import { store } from '@/store';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
+import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
+
+const props = defineProps<{
+    id?: string;
+    alertData?: Record<string, any>;
+    manageDisabled?: boolean;
+}>();
+const {
+    state: alertDetailItemState,
+    cancelEdit,
+    startEdit,
+    onClickSave,
+} = useAlertInfoItem({
+    alertId: props.id ?? '',
+    isEditMode: false,
+    dataForUpdate: props.alertData?.project_id,
+});
+
+const state = reactive({
+    projects: computed(() => store.getters['reference/projectItems']),
+    modalVisible: false,
+});
+
+const openModal = () => {
+    state.modalVisible = true;
+};
+
+const onSelectProject = (selected) => {
+    alertDetailItemState.dataForUpdate = selected[0]?.id;
+};
+
+// LOAD REFERENCE STORE
+(async () => {
+    await store.dispatch('reference/project/load');
+})();
+</script>
+
 <template>
     <fragment>
         <p v-if="!isEditMode"
            class="content-wrapper"
         >
             <span class="project">
-                <p-copy-button :value="alertData.project_id">
+                <p-copy-button :value="props.alertData.project_id">
                     <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                             new-tab
                             :to="referenceRouter(
-                                alertData.project_id,
+                                props.alertData.project_id,
                                 { resource_type: 'identity.Project' })"
                             highlight
                     >
-                        {{ projects[alertData.project_id] ? projects[alertData.project_id].label : alertData.project_id }}
+                        {{ state.projects[props.alertData.project_id] ? state.projects[props.alertData.project_id].label : props.alertData.project_id }}
                     </p-link>
                 </p-copy-button>
             </span>
             <p-button style-type="tertiary"
                       size="sm"
                       class="add-button ml-2"
-                      :disabled="manageDisabled"
-                      @click="startEdit(alertData.project_id)"
+                      :disabled="props.manageDisabled"
+                      @click="startEdit(props.alertData.project_id)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
             </p-button>
@@ -28,7 +80,7 @@
         <div v-else
              class="content-wrapper"
         >
-            <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
+            <project-select-dropdown :selected-project-ids="alertDetailItemState.dataForUpdate ? [alertDetailItemState.dataForUpdate] : []"
                                      project-selectable
                                      @select="onSelectProject"
             />
@@ -36,7 +88,7 @@
                 <p-button style-type="secondary"
                           size="sm"
                           class="cancel-button"
-                          @click="cancelEdit(alertData.project_id)"
+                          @click="cancelEdit(props.alertData.project_id)"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
@@ -55,7 +107,7 @@
             fade
             backdrop
             theme-color="alert"
-            :visible.sync="modalVisible"
+            :visible.sync="state.modalVisible"
             @confirm="onClickSave(EDIT_MODE.PROJECT)"
         >
             <template #body>
@@ -66,93 +118,6 @@
         </p-button-modal>
     </fragment>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import {
-    PButton, PLink, PButtonModal, PCopyButton,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { store } from '@/store';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-
-import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
-import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
-
-export default {
-    name: 'AlertDetailInfoTableProject',
-    components: {
-        ProjectSelectDropdown,
-        PLink,
-        PButton,
-        PButtonModal,
-        PCopyButton,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        alertData: {
-            type: Object,
-            default: () => ({}),
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const {
-            state: alertDetailItemState,
-            cancelEdit,
-            startEdit,
-            onClickSave,
-        } = useAlertInfoItem({
-            alertId: props.id,
-            isEditMode: false,
-            dataForUpdate: props.alertData?.project_id,
-        });
-
-        const state = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
-            isModalLoading: true,
-            modalVisible: false,
-        });
-
-        const openModal = () => {
-            state.modalVisible = true;
-        };
-
-        const onSelectProject = (selected) => {
-            alertDetailItemState.dataForUpdate = selected[0]?.id;
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
-
-        return {
-            EDIT_MODE,
-            ACTION_ICON,
-            ...toRefs(alertDetailItemState),
-            ...toRefs(state),
-            referenceRouter,
-            cancelEdit,
-            startEdit,
-            onClickSave,
-            onSelectProject,
-            openModal,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 @import './styles/alertInfoItem.pcss';

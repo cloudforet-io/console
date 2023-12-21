@@ -1,3 +1,5 @@
+import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
+
 export enum ACTION {
     create = 'create',
     delete = 'delete',
@@ -32,4 +34,18 @@ export const ALERT_STATE_FILTER = {
 export const ASSIGNED_STATE = {
     ALL: 'ALL',
     ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
+} as const;
+
+export const EXTENDED_ALERT_URGENCY = {
+    ...ALERT_URGENCY,
+    ALL: 'ALL',
+} as const;
+
+export const ALERT_SEVERITY = {
+    CRITICAL: 'Critical',
+    ERROR: 'Error',
+    WARNING: 'Warning',
+    INFO: 'Info',
+    NOT_AVAILABLE: 'Not Available',
+    NONE: 'None',
 } as const;

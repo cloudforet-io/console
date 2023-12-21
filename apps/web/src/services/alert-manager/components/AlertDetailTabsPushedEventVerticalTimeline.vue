@@ -1,11 +1,24 @@
+<script setup lang="ts">
+import { PCollapsiblePanel } from '@spaceone/design-system';
+
+import { iso8601Formatter } from '@cloudforet/utils';
+
+const props = defineProps<{
+    item?: Record<string, any>;
+    timezone?: string;
+    eventType?: string;
+    isLastItem?: boolean;
+}>();
+</script>
+
 <template>
     <div class="timeline-wrapper">
         <ul class="timeline-list">
             <li class="timeline-item"
-                :class="[eventType, {'no-border': isLastItem}]"
+                :class="[props.eventType, {'no-border': props.isLastItem}]"
             >
                 <div class="timestamp">
-                    {{ item.created_at ? iso8601Formatter(item.created_at, timezone) : '' }}
+                    {{ props.item.created_at ? iso8601Formatter(props.item.created_at, props.timezone) : '' }}
                 </div>
                 <p-collapsible-panel class="item-detail"
                                      :line-clamp="8"
@@ -16,43 +29,6 @@
         </ul>
     </div>
 </template>
-
-<script lang="ts">
-import { PCollapsiblePanel } from '@spaceone/design-system';
-
-import { iso8601Formatter } from '@cloudforet/utils';
-
-export default {
-    name: 'AlertDetailTabsPushedEventVerticalTimeline',
-    components: {
-        PCollapsiblePanel,
-    },
-    props: {
-        item: {
-            type: Object,
-            default: () => ({}),
-        },
-        timezone: {
-            type: String,
-            default: undefined,
-        },
-        eventType: {
-            type: String,
-            default: undefined,
-        },
-        isLastItem: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        return {
-            iso8601Formatter,
-        };
-    },
-};
-
-</script>
 
 <style lang="postcss" scoped>
 @define-mixin circle-style {

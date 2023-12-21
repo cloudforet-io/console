@@ -26,14 +26,10 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alert, secondary } from '@/styles/colors';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
+import { ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
 import type { AlertListPageUrlQuery } from '@/services/alert-manager/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-
-const ASSIGNED_STATE = Object.freeze({
-    ALL: 'ALL',
-    ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
-});
 
 interface AlertState {
     name: string;
