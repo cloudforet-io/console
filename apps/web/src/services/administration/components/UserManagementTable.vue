@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
@@ -14,11 +14,9 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
@@ -65,6 +63,7 @@ const state = reactive({
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
     tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
+    roleList: [] as RoleModel[],
 });
 const tableState = reactive({
     userTableFields: computed(() => {
@@ -73,6 +72,11 @@ const tableState = reactive({
             additionalFields.push(
                 { name: 'mfa', label: 'Multi-factor Auth', sortable: false },
                 { name: 'api_key_count', label: 'API Key', sortable: false },
+                { name: 'role_type', label: 'Role Type', sortable: false },
+            );
+        } else {
+            additionalFields.push(
+                { name: 'role_binding', label: 'Role', sortable: false },
             );
         }
         const baseFields = [
@@ -80,7 +84,6 @@ const tableState = reactive({
             { name: 'name', label: 'Name', sortable: false },
             { name: 'state', label: 'State', sortable: false },
             ...additionalFields,
-            { name: 'role_type', label: userPageState.isAdminMode ? 'Role Type' : 'Role', sortable: false },
             { name: 'tags', label: 'Tags' },
             { name: 'auth_type', label: 'Auth Type', sortable: false },
             { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
@@ -89,7 +92,7 @@ const tableState = reactive({
         return userPageStore.isWorkspaceOwner
             ? [
                 ...baseFields,
-                { name: 'role_binding_info', label: ' ', sortable: false },
+                { name: 'remove_button', label: ' ', sortable: false },
             ]
             : baseFields;
     }),
@@ -107,7 +110,35 @@ const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
 };
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
-    await fetchListRoles(inputText);
+    dropdownState.loading = true;
+
+    roleListApiQueryHelper.setFilters([{
+        k: 'role_type',
+        v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
+        o: '=',
+    }]);
+    if (inputText) {
+        roleListApiQueryHelper.addFilter({
+            k: 'name',
+            v: inputText,
+            o: '',
+        });
+    }
+    try {
+        const results = await userPageStore.listRoles({
+            query: roleListApiQueryHelper.data,
+        });
+        dropdownState.menuItems = results?.map((role) => ({
+            label: role.name,
+            name: role.role_id,
+            role_type: role.role_type,
+        })) as SelectDropdownMenuItem[];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        dropdownState.loading = false;
+    }
+
     return {
         results: dropdownState.menuItems,
     };
@@ -152,36 +183,10 @@ const handleClickButton = async (value: RoleBindingModel) => {
         ErrorHandler.handleError(e);
     }
 };
-const fetchListRoles = async (inputText: string) => {
-    dropdownState.loading = true;
 
-    roleListApiQueryHelper.setFilters([{
-        k: 'role_type',
-        v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
-        o: '=',
-    }]);
-    if (inputText) {
-        roleListApiQueryHelper.addFilter({
-            k: 'name',
-            v: inputText,
-            o: '',
-        });
-    }
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
-            query: roleListApiQueryHelper.data,
-        });
-        dropdownState.menuItems = results?.map((role) => ({
-            label: role.name,
-            name: role.role_id,
-            role_type: role.role_type,
-        })) as SelectDropdownMenuItem[];
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    } finally {
-        dropdownState.loading = false;
-    }
-};
+onMounted(async () => {
+    await userPageStore.listRoles();
+});
 </script>
 
 <template>
@@ -214,19 +219,28 @@ const fetchListRoles = async (inputText: string) => {
                           class="capitalize"
                 />
             </template>
-            <template #col-role_type-format="{value, rowIndex}">
+            <template #col-role_type-format="{value}">
+                <div class="role-type-wrapper">
+                    <img :src="useRoleFormatter(value).image"
+                         alt="role-type-icon"
+                         class="role-type-icon"
+                    >
+                    <span>{{ useRoleFormatter(value).name }}</span>
+                </div>
+            </template>
+            <template #col-role_binding-format="{value, rowIndex}">
                 <div class="role-type-wrapper">
                     <p-tooltip position="bottom"
-                               :contents="useRoleFormatter(value).name"
+                               :contents="useRoleFormatter(value.type).name"
                                class="tooltip"
                     >
-                        <img :src="useRoleFormatter(value).image"
+                        <img :src="useRoleFormatter(value.type).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >
                     </p-tooltip>
-                    <span>{{ useRoleFormatter(value, !userPageState.isAdminMode).name }}</span>
-                    <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && value !== ROLE_TYPE.DOMAIN_ADMIN"
+                    <span>{{ value.name }}</span>
+                    <p-select-dropdown v-if="userPageStore.isWorkspaceOwner"
                                        is-filterable
                                        use-fixed-menu-style
                                        menu-position="right"
@@ -289,13 +303,13 @@ const fetchListRoles = async (inputText: string) => {
                     <span />
                 </template>
             </template>
-            <template #col-role_binding_info-format="{value}">
+            <template #col-remove_button-format="value">
                 <p-button style-type="tertiary"
                           size="sm"
                           class="remove-button"
-                          @click="handleClickButton(value)"
+                          @click="handleClickButton(value.role_binding_info.role_binding_id)"
                 >
-                    {{ $t('IAM.USER.MAIN.REMOVE') }}
+                    {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
             </template>
         </p-toolbox-table>

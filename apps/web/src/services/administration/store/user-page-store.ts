@@ -3,11 +3,10 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { AppDeleteParameters } from '@/schema/identity/app/api-verbs/delete';
-import type { AppDisableParameters } from '@/schema/identity/app/api-verbs/disable';
-import type { AppEnableParameters } from '@/schema/identity/app/api-verbs/enable';
-import type { AppModel } from '@/schema/identity/app/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleType } from '@/schema/identity/role/type';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
@@ -23,6 +22,7 @@ export const useUserPageStore = defineStore('user-page', {
         isAdminMode: false,
         loading: false,
         users: [] as UserListItemType[],
+        roles: [] as RoleModel[],
         totalCount: 0,
         selectedIndices: [],
         pageStart: 1,
@@ -44,7 +44,14 @@ export const useUserPageStore = defineStore('user-page', {
         selectedUsers: (state) => {
             const users: UserListItemType[] = [];
             state.selectedIndices.forEach((d:number) => {
-                users.push(state.users[d]);
+                users.push({
+                    ...state.users[d],
+                    role_type: state.isAdminMode ? state.users[d].role_type : state.users[d]?.role_binding_info?.role_type,
+                    role_binding: {
+                        type: state.users[d].role_binding_info?.role_type as RoleType,
+                        name: state.roles.find((role) => role.role_id === state.users[d]?.role_binding_info?.role_id)?.name ?? '',
+                    },
+                });
             });
             return users ?? [];
         },
@@ -81,28 +88,15 @@ export const useUserPageStore = defineStore('user-page', {
                 throw e;
             }
         },
-        // API Key
-        async enableApiKey(params: AppEnableParameters) {
+        // Role
+        async listRoles(params?: RoleListParameters) {
             try {
-                await SpaceConnector.clientV2.identity.app.enable<AppEnableParameters, AppModel>(params);
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                this.roles = results || [];
+                return results;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
-        async disableApiKey(params: AppDisableParameters) {
-            try {
-                await SpaceConnector.clientV2.identity.app.disable<AppDisableParameters, AppModel>(params);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                throw e;
-            }
-        },
-        async deleteApiKey(params: AppDeleteParameters) {
-            try {
-                await SpaceConnector.clientV2.identity.app.delete<AppDeleteParameters>(params);
-            } catch (e) {
-                ErrorHandler.handleError(e);
+                this.roles = [];
                 throw e;
             }
         },

@@ -4,6 +4,7 @@ import {
 } from 'vue';
 
 import {
+    PButton,
     PDefinitionTable, PHeading, PI, PStatus,
 } from '@spaceone/design-system';
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
@@ -17,8 +18,6 @@ import config from '@/lib/config';
 import { postValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
-import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 
 import {
     calculateTime,
@@ -27,11 +26,7 @@ import {
 } from '@/services/administration/composables/refined-table-data';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
-
-
 const userPageStore = useUserPageStore();
-
-const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const storeState = reactive({
     userInfo: computed(() => store.state.user),
@@ -39,6 +34,7 @@ const storeState = reactive({
 });
 const state = reactive({
     loading: false,
+    verifyEmailLoading: false,
     selectedUser: computed(() => userPageStore.selectedUsers[0]),
 });
 const tableState = reactive({
@@ -60,7 +56,7 @@ const tableState = reactive({
             );
         } else {
             additionalRoleFields.push({
-                name: 'role_binding_info',
+                name: 'role_binding',
                 label: i18n.t('IAM.USER.MAIN.ROLE'),
             });
         }
@@ -80,29 +76,21 @@ const tableState = reactive({
         ];
     }),
 });
-const modalState = reactive({
-    verifyEmailLoading: false,
-    isModalVisible: false,
-    modalType: '',
-});
 
 /* API */
-const handleClickVerifyButton = async (type: string) => {
-    modalState.verifyEmailLoading = true;
+const handleClickVerifyButton = async () => {
+    state.verifyEmailLoading = true;
     try {
         if (tableState.refinedUserItems.email_verified) return;
         await postValidationEmail({
-            user_id: tableState.refinedUserItems.user_id,
-            domain_id: tableState.refinedUserItems.domain_id,
+            user_id: tableState.refinedUserItems.user_id || '',
             email: tableState.refinedUserItems.email,
         });
         await store.dispatch('user/setUser', { email: tableState.refinedUserItems.email });
     } catch (e: any) {
         ErrorHandler.handleError(e);
     } finally {
-        modalState.isModalVisible = true;
-        modalState.verifyEmailLoading = false;
-        modalState.modalType = type;
+        state.verifyEmailLoading = false;
     }
 };
 </script>
@@ -137,7 +125,7 @@ const handleClickVerifyButton = async (type: string) => {
                 </span>
             </template>
             <template #data-role_binding_info="{value}">
-                {{ useRoleFormatter(value.role_type).name }}
+                {{ value.name }}
             </template>
             <template #data-last_accessed_at="{data}">
                 <span v-if="data === -1">
@@ -157,7 +145,9 @@ const handleClickVerifyButton = async (type: string) => {
                 {{ iso8601Formatter(data, userPageStore.timezone) }}
             </template>
             <template #data-email="{data}">
-                <div v-if="data && data !== ''">
+                <div v-if="data && data !== ''"
+                     class="col-email"
+                >
                     <span :class="tableState.refinedUserItems.email_verified && 'verified-text'">{{ data }}</span>
                     <span v-if="tableState.refinedUserItems.email_verified">
                         <p-i name="ic_verified"
@@ -175,25 +165,18 @@ const handleClickVerifyButton = async (type: string) => {
                 </div>
             </template>
             <template #extra="{label}">
-                <verify-button
-                    v-if="label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')
-                        && tableState.refinedUserItems.email
-                        && tableState.refinedUserItems.email !== ''"
-                    :loading="modalState.verifyEmailLoading"
-                    :email="tableState.refinedUserItems.email || ''"
-                    :verified="tableState.refinedUserItems.email_verified"
-                    is-administration
-                    @click-button="handleClickVerifyButton"
+                <p-button v-if="label === $t('IAM.USER.MAIN.NOTIFICATION_EMAIL')
+                              && !tableState.refinedUserItems.email_verified
+                              && tableState.refinedUserItems.email
+                              && tableState.refinedUserItems.email !== ''"
+                          style-type="primary"
+                          size="sm"
+                          :loading="state.verifyEmailLoading"
+                          class="toolbox-button send-mail-button"
+                          @click="handleClickVerifyButton"
                 >
-                    <notification-email-modal
-                        :domain-id="tableState.refinedUserItems.domain_id"
-                        :user-id="tableState.refinedUserItems.user_id"
-                        :email="tableState.refinedUserItems.email"
-                        :modal-type="modalState.modalType"
-                        :visible.sync="modalState.isModalVisible"
-                        @refresh-user="emit('confirm')"
-                    />
-                </verify-button>
+                    <span>{{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFY') }}</span>
+                </p-button>
             </template>
         </p-definition-table>
     </div>
@@ -223,16 +206,24 @@ const handleClickVerifyButton = async (type: string) => {
     }
 }
 .user-definition-table {
-    .not-verified {
-        @apply bg-yellow-200 text-label-sm;
-        height: 1.25rem;
-        padding: 0.15rem 0.5rem;
-        border-radius: 6.25rem;
-    }
-    .verified-icon {
-        @apply absolute;
-        bottom: -0.1rem;
-        left: 0;
+    .col-email {
+        @apply relative;
+        .not-verified {
+            @apply absolute bg-yellow-200 text-label-sm;
+            width: 5.375rem;
+            height: 1.25rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6.25rem;
+            right: -7rem;
+        }
+        .verified-text {
+            margin-left: 1.5rem;
+        }
+        .verified-icon {
+            @apply absolute;
+            bottom: -0.025rem;
+            left: 0;
+        }
     }
     .role-type {
         @apply flex items-center;
