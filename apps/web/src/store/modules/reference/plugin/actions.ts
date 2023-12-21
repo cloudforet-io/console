@@ -2,8 +2,11 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
 import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
+import type { RepositoryModel } from '@/schema/repository/repository/model';
 
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { PluginReferenceMap, PluginReferenceState } from '@/store/modules/reference/plugin/type';
@@ -12,7 +15,6 @@ import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
 
 
 let lastLoadedTime = 0;
@@ -27,23 +29,19 @@ export const load: Action<PluginReferenceState, any> = async ({ state, commit },
     ) return;
 
     try {
-        const repoResponse = await SpaceConnector.client.repository.repository.list({
-            query: {
-                only: ['repository_id'],
-            },
-        }, { timeout: 3000 });
+        const repoResponse = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({}, { timeout: 3000 });
 
         const plugins: PluginReferenceMap = {};
 
-        const promises = repoResponse.results.map(async (repoInfo) => {
-            const pluginResponse = await SpaceConnector.client.repository.plugin.list({
+        const promises = (repoResponse.results ?? []).map(async (repoInfo) => {
+            const pluginResponse = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
                 query: {
                     only: ['plugin_id', 'name', 'tags'],
                 },
                 repository_id: repoInfo.repository_id,
             }, { timeout: 3000 });
 
-            pluginResponse.results.forEach((pluginInfo: PluginModel): void => {
+            (pluginResponse.results ?? []).forEach((pluginInfo: PluginModel): void => {
                 plugins[pluginInfo.plugin_id] = {
                     key: pluginInfo.plugin_id,
                     label: pluginInfo.name,

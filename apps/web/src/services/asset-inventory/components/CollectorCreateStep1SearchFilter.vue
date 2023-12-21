@@ -122,7 +122,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
-import type { RepositoryInfo } from '@/schema/repository/repository/model';
+import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -159,7 +159,7 @@ const state = reactive({
         {
             name: 'all', label: 'All Repository', icon: null, color: null,
         },
-        ...state.repositories.map((repo: RepositoryInfo) => ({
+        ...state.repositories.map((repo: RepositoryModel) => ({
             label: repo.name,
             name: repo.repository_id,
             icon: repositoryIconMap[repo.repository_type],
@@ -173,7 +173,7 @@ const state = reactive({
 
 const getRepositories = async () => {
     try {
-        const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryInfo>>();
+        const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>();
         state.repositories = res.results;
     } catch (e) {
         ErrorHandler.handleError(e);

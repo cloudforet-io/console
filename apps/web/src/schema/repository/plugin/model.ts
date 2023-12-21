@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 import type { Capability, PluginState, RegistryType } from '@/schema/repository/plugin/type';
-import type { RepositoryInfo } from '@/schema/repository/repository/model';
+import type { RepositoryModel } from '@/schema/repository/repository/model';
 
 export interface PluginModel {
     plugin_id: string;
@@ -12,7 +12,7 @@ export interface PluginModel {
     registry_url: string;
     registry_config: object;
     capability: Capability;
-    repository_info: RepositoryInfo;
+    repository_info: RepositoryModel;
     labels: string[];
     tags: {
         icon?: string;

@@ -70,7 +70,10 @@ import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 
-import type { CollectorPluginModel } from '@/schema/inventory/collector/model';
+import type {
+    GetPluginMetadataParameters,
+    GetPluginMetadataResponse,
+} from '@/schema/plugin/plugin/api-verbs/get-plugin-metadata';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -99,18 +102,18 @@ const state = reactive({
     schema: null as null|JsonSchema|object,
 });
 
-const fetchGetPluginMetadata = (provider: string|null): Promise<CollectorPluginModel> => {
+const fetchGetPluginMetadata = (provider: string|undefined): Promise<GetPluginMetadataResponse> => {
     const options = provider ? {
         provider,
     } : {};
-    return SpaceConnector.clientV2.plugin.plugin.getPluginMetadata({
+    return SpaceConnector.clientV2.plugin.plugin.getPluginMetadata<GetPluginMetadataParameters, GetPluginMetadataResponse>({
         plugin_id: state.pluginId,
         version: collectorFormState.version,
         options,
     });
 };
 
-const getPluginMetadata = async (provider: string|null) => {
+const getPluginMetadata = async (provider: string|undefined) => {
     try {
         state.loading = true;
         state.isLoadFailed = false;
