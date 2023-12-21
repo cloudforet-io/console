@@ -89,12 +89,20 @@ export const useDashboardStore = defineStore('dashboard', () => {
     };
 
     /* Actions */
+    const fetchApiQueryHelper = new ApiQueryHelper();
     const fetchDashboard = async (dashboardType: DashboardType, params?: ListDashboardParameters) => {
         const fetcher = dashboardType === 'PRIVATE'
             ? SpaceConnector.clientV2.dashboard.privateDashboard.list
             : SpaceConnector.clientV2.dashboard.publicDashboard.list;
         try {
-            const res: ListResponse<DashboardModel> = await fetcher(params);
+            fetchApiQueryHelper.setFilters(state.searchFilters);
+            const res: ListResponse<DashboardModel> = await fetcher({
+                ...params,
+                query: {
+                    ...(params?.query || {}),
+                    ...fetchApiQueryHelper.data,
+                },
+            });
             const results = res.results || [];
             const totalCount = res.total_count || 0;
             if (dashboardType === 'PRIVATE') {

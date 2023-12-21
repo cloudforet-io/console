@@ -72,7 +72,7 @@ const init = async () => {
 };
 
 const getDashboardValueHandler = (): ValueHandler | undefined => {
-    const labelsValueHandler = makeDistinctValueHandler('dashboard.Dashboard', 'labels');
+    const labelsValueHandler = makeDistinctValueHandler('dashboard.PublicDashboard', 'labels');
     if (!labelsValueHandler) return undefined;
 
     return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
