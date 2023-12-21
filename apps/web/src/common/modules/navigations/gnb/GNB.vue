@@ -1,58 +1,7 @@
-<template>
-    <div ref="gnbRef"
-         :class="{'gnb': true, 'admin-gnb': isAdminMode}"
-    >
-        <div class="left-part">
-            <div class="site-map-wrapper">
-                <site-map :menu-list="siteMapMenuList"
-                          :visible.sync="showSiteMap"
-                          :disabled="!hasPermission"
-                          :is-admin-mode="isAdminMode"
-                />
-            </div>
-
-            <g-n-b-header ref="gnbHeaderRef"
-                          :to="logoLink"
-                          :is-admin-mode="isAdminMode"
-            />
-
-            <g-n-b-menu v-for="(menu, idx) in visibleGnbMenuList"
-                        ref="gnbMenuRef"
-                        :key="`gnb-menu-${idx}`"
-                        :class="{ 'gnb-menu-list': true, 'gnb-first-menu': idx === 0 }"
-                        :is-admin-mode="isAdminMode"
-                        :show="menu.show"
-                        :menu-id="menu.id"
-                        :label="menu.label"
-                        :to="menu.to"
-                        :sub-menu-list="menu.subMenuList"
-                        :has-permission="hasPermission"
-                        :is-opened="openedMenu === menu.id"
-                        :is-selected="getMenuIsSelected(menu.id)"
-                        :highlight-tag="menu.highlightTag"
-                        @open-menu="handleOpenMenu"
-                        @hide-menu="hideMenu"
-            />
-            <g-n-b-invisible-menu-dropdown v-if="invisibleGnbMenuList.length"
-                                           :is-admin-mode="isAdminMode"
-                                           :menu="invisibleGnbMenuList"
-                                           :selected-menu-id="selectedInvisibleGNBMenuId"
-                                           @select-menu="handleSelectGNBMenu"
-            />
-        </div>
-        <g-n-b-toolset ref="gnbToolsetRef"
-                       class="right-part"
-                       :opened-menu="openedMenu"
-                       @open-menu="handleOpenMenu"
-                       @hide-menu="hideMenu"
-        />
-    </div>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import type { Ref } from 'vue';
 import {
-    reactive, toRefs, computed, defineComponent, onMounted, ref, watch, nextTick,
+    reactive, computed, onMounted, ref, watch, nextTick,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -84,192 +33,221 @@ const ALLOWED_MENUS_FOR_ALL_USERS = ['notifications', 'support', 'profile'];
 const DEFAULT_INVISIBLE_MENU_WIDTH = 64;
 const MINIMAL_GAP_BETWEEN_MENU_N_TOOLSET = 16;
 
-export default defineComponent({
-    name: 'GNB',
-    components: {
-        GNBInvisibleMenuDropdown,
-        GNBHeader,
-        GNBMenu,
-        SiteMap,
-        GNBToolset,
-    },
-    setup() {
-        const router = useRouter();
-        const route = useRoute();
-        const appContextStore = useAppContextStore();
+const router = useRouter();
+const route = useRoute();
+const appContextStore = useAppContextStore();
 
-        const state = reactive({
-            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-            openedMenu: '',
-            showSiteMap: false,
-            hasPermission: computed((() => store.getters['user/hasPermission'])),
-            logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pageAccessPermissionList']) ? { name: ROOT_ROUTE._NAME } : null)),
-            gnbMenuList: computed<GNBMenuType[]>(() => {
-                let menuList = [...store.getters['display/GNBMenuList']];
-                if (state.integrationMenu) menuList = [...menuList, state.integrationMenu];
-                return menuList;
-            }),
-            visibleGnbMenuList: computed<GNBMenuType[]>(() => {
-                const menuList = state.gnbMenuList;
-                const result = menuList.slice(0, state.availableMenuCount);
-                return result;
-            }),
-            invisibleGnbMenuList: computed<MenuItem[]>(() => {
-                const menuList = state.gnbMenuList.slice(state.availableMenuCount);
-                let result = [] as MenuItem[];
-                menuList.forEach((menu) => {
-                    const dividerItem = result.length ? [{ type: 'divider' }] : [];
-                    result = [
-                        ...result,
-                        ...dividerItem,
-                        {
-                            ...menu,
-                            name: menu.id,
-                            type: 'header',
-                        },
-                    ];
-                    if (menu.subMenuList) {
-                        result = [...result, ...convertGNBMenuToMenuItem(menu.subMenuList)];
-                    }
-                });
-                return result;
-            }),
-            selectedInvisibleGNBMenuId: computed(() => {
-                const selectedMenu = state.invisibleGnbMenuList.find((menu) => getMenuIsSelected(menu.id) && menu.type === 'item');
-                return selectedMenu?.id;
-            }),
-            siteMapMenuList: computed<GNBMenuType[]>(() => {
-                const basicSiteMapList: GNBMenuType[] = store.getters['display/siteMapMenuList'];
-                if (!state.isAdminMode) {
-                    const IAMMenu = basicSiteMapList.find((menu) => menu.id === MENU_ID.IAM) as GNBMenuType;
-                    IAMMenu.icon = 'ic_service_administration';
-                    return basicSiteMapList;
-                }
-                const adminSiteMapList: GNBMenuType[] = [];
-                basicSiteMapList.forEach((menu) => {
-                    if (menu.id === MENU_ID.ADMINISTRATION) {
-                        let integralSubMenuList: GNBMenuType[] = [];
-                        (menu.subMenuList ?? []).forEach((subMenu) => {
-                            integralSubMenuList = [...integralSubMenuList, ...(subMenu.subMenuList ?? [])];
-                        });
-                        adminSiteMapList.push({
-                            ...menu,
-                            subMenuList: integralSubMenuList,
-                        });
-                    } else {
-                        adminSiteMapList.push(menu);
-                    }
-                });
-                return adminSiteMapList;
-            }),
-            integrationMenu: computed<GNBMenuType | undefined>(() => {
-                const extraMenu = store.getters['domain/domainExtraMenu'];
-                if (extraMenu?.title) {
-                    return {
-                        show: true,
-                        id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
-                        label: extraMenu.title,
-                        to: {},
-                    };
-                }
-                return undefined;
-            }),
-            availableMenuCount: 0,
-            isInvisibleMenuExists: false,
-        });
-
-        const getMenuIsSelected = (menuId?: MenuId): boolean => {
-            if (!menuId) return false;
-            const matchedPaths = route.matched;
-            return matchedPaths.some((matchedPath) => matchedPath.meta?.menuId === menuId);
-        };
-
-        const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenuType = 'item'): MenuItem[] => menuList.map((menu) => ({
-            ...menu,
-            name: menu.id,
-            type: menuType,
-        }));
-
-        const gnbRef = ref<HTMLElement|null>(null);
-        const gnbMenuRef = ref<(InstanceType<typeof GNBMenu>)[]>();
-        const gnbToolsetRef = ref<InstanceType<typeof GNBToolset>>();
-        const gnbHeaderRef = ref<InstanceType<typeof GNBHeader>>();
-        const { containerWidth } = useGnbContainerWidth({ containerRef: gnbRef, observeResize: true });
-
-        /* event */
-        const hideMenu = () => {
-            state.openedMenu = '';
-        };
-        const handleOpenMenu = (menuId: MenuId) => {
-            if (state.openedMenu === menuId) {
-                hideMenu();
-            } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuId)) {
-                state.openedMenu = menuId;
-                state.showSiteMap = false;
+const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    openedMenu: '',
+    showSiteMap: false,
+    hasPermission: computed((() => store.getters['user/hasPermission'])),
+    logoLink: computed(() => (isUserAccessibleToMenu(MENU_ID.HOME_DASHBOARD, store.getters['user/pageAccessPermissionList']) ? { name: ROOT_ROUTE._NAME } : null)),
+    gnbMenuList: computed<GNBMenuType[]>(() => {
+        let menuList = [...store.getters['display/GNBMenuList']];
+        if (state.integrationMenu) menuList = [...menuList, state.integrationMenu];
+        return menuList;
+    }),
+    visibleGnbMenuList: computed<GNBMenuType[]>(() => {
+        const menuList = state.gnbMenuList;
+        const result = menuList.slice(0, state.availableMenuCount);
+        return result;
+    }),
+    invisibleGnbMenuList: computed<MenuItem[]>(() => {
+        const menuList = state.gnbMenuList.slice(state.availableMenuCount);
+        let result = [] as MenuItem[];
+        menuList.forEach((menu) => {
+            const dividerItem = result.length ? [{ type: 'divider' }] : [];
+            result = [
+                ...result,
+                ...dividerItem,
+                {
+                    ...menu,
+                    name: menu.id,
+                    type: 'header',
+                },
+            ];
+            if (menu.subMenuList) {
+                result = [...result, ...convertGNBMenuToMenuItem(menu.subMenuList)];
             }
-        };
-
-        const handleSelectGNBMenu = (menuId: string) => {
-            if (router.currentRoute.name === menuId) return;
-            const selectedRoute = state.invisibleGnbMenuList.find((menu) => menu.id === menuId)?.to;
-            router.push(selectedRoute);
-        };
-
-
-        // GNB Layout helpers
-        const getComponentWidth = (componentRef: Ref<InstanceType<any>>) => componentRef.value?.$el.clientWidth ?? 0;
-        const getAvailableGNBMenuWidth = (gnbWidth: number): number => {
-            const gnbToolsetWidth = getComponentWidth(gnbToolsetRef);
-            const gnbHeaderWidth = getComponentWidth(gnbHeaderRef);
-            const invisibleMenuWidth = state.isInvisibleMenuExists ? DEFAULT_INVISIBLE_MENU_WIDTH : 0;
-            return gnbWidth - (gnbToolsetWidth + gnbHeaderWidth + invisibleMenuWidth + MINIMAL_GAP_BETWEEN_MENU_N_TOOLSET);
-        };
-        const getVisibleMenuCountWithinWidth = (availableWidth: number): number => {
-            let visibleMenuCount = 0;
-            let _availableWidth = availableWidth;
-            const menuRefs = gnbMenuRef.value;
-
-            menuRefs?.forEach((menuRef) => {
-                _availableWidth -= menuRef.$el.clientWidth;
-                if (_availableWidth > 0) visibleMenuCount += 1;
-            });
-            return visibleMenuCount;
-        };
-        const updateGNBLayout = (gnbWidth: number) => {
-            const availableWidth = getAvailableGNBMenuWidth(gnbWidth);
-            const visibleMenuCount = getVisibleMenuCountWithinWidth(availableWidth);
-
-            state.availableMenuCount = visibleMenuCount;
-            state.isInvisibleMenuExists = visibleMenuCount < state.gnbMenuList.length;
-        };
-
-
-        onMounted(() => {
-            store.dispatch('domain/loadExtraMenu');
         });
-
-
-        watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {
-            if (!changedWidth) return;
-            state.availableMenuCount = state.gnbMenuList.length;
-            await nextTick();
-            updateGNBLayout(changedWidth);
-        }, { immediate: true });
-
-        return {
-            gnbRef,
-            gnbMenuRef,
-            gnbHeaderRef,
-            gnbToolsetRef,
-            ...toRefs(state),
-            hideMenu,
-            handleOpenMenu,
-            handleSelectGNBMenu,
-            getMenuIsSelected,
-        };
-    },
+        return result;
+    }),
+    selectedInvisibleGNBMenuId: computed(() => {
+        const selectedMenu = state.invisibleGnbMenuList.find((menu) => getMenuIsSelected(menu.id) && menu.type === 'item');
+        return selectedMenu?.id;
+    }),
+    siteMapMenuList: computed<GNBMenuType[]>(() => {
+        const basicSiteMapList: GNBMenuType[] = store.getters['display/siteMapMenuList'];
+        if (!state.isAdminMode) {
+            // WORKSPACE_OWNER case
+            const IAMMenu = basicSiteMapList.find((menu) => menu.id === MENU_ID.IAM) as GNBMenuType;
+            if (IAMMenu) IAMMenu.icon = 'ic_service_administration';
+            return basicSiteMapList;
+        }
+        const adminSiteMapList: GNBMenuType[] = [];
+        basicSiteMapList.forEach((menu) => {
+            if (menu.id === MENU_ID.ADMINISTRATION) {
+                let integralSubMenuList: GNBMenuType[] = [];
+                (menu.subMenuList ?? []).forEach((subMenu) => {
+                    integralSubMenuList = [...integralSubMenuList, ...(subMenu.subMenuList ?? [])];
+                });
+                adminSiteMapList.push({
+                    ...menu,
+                    subMenuList: integralSubMenuList,
+                });
+            } else {
+                adminSiteMapList.push(menu);
+            }
+        });
+        return adminSiteMapList;
+    }),
+    integrationMenu: computed<GNBMenuType | undefined>(() => {
+        const extraMenu = store.getters['domain/domainExtraMenu'];
+        if (extraMenu?.title) {
+            return {
+                show: true,
+                id: DOMAIN_CONFIG_TYPE.EXTRA_MENU as MenuId,
+                label: extraMenu.title,
+                to: {},
+            };
+        }
+        return undefined;
+    }),
+    availableMenuCount: 0,
+    isInvisibleMenuExists: false,
 });
+
+const getMenuIsSelected = (menuId?: MenuId): boolean => {
+    if (!menuId) return false;
+    const matchedPaths = route.matched;
+    return matchedPaths.some((matchedPath) => matchedPath.meta?.menuId === menuId);
+};
+
+const convertGNBMenuToMenuItem = (menuList: GNBMenuType[], menuType: ContextMenuType = 'item'): MenuItem[] => menuList.map((menu) => ({
+    ...menu,
+    name: menu.id,
+    type: menuType,
+}));
+
+const gnbRef = ref<HTMLElement|null>(null);
+const gnbMenuRef = ref<(InstanceType<typeof GNBMenu>)[]>();
+const gnbToolsetRef = ref<InstanceType<typeof GNBToolset>>();
+const gnbHeaderRef = ref<InstanceType<typeof GNBHeader>>();
+const { containerWidth } = useGnbContainerWidth({ containerRef: gnbRef, observeResize: true });
+
+/* event */
+const hideMenu = () => {
+    state.openedMenu = '';
+};
+const handleOpenMenu = (menuId: MenuId) => {
+    if (state.openedMenu === menuId) {
+        hideMenu();
+    } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuId)) {
+        state.openedMenu = menuId;
+        state.showSiteMap = false;
+    }
+};
+
+const handleSelectGNBMenu = (menuId: string) => {
+    if (router.currentRoute.name === menuId) return;
+    const selectedRoute = state.invisibleGnbMenuList.find((menu) => menu.id === menuId)?.to;
+    router.push(selectedRoute);
+};
+
+
+// GNB Layout helpers
+const getComponentWidth = (componentRef: Ref<InstanceType<any>>) => componentRef.value?.$el.clientWidth ?? 0;
+const getAvailableGNBMenuWidth = (gnbWidth: number): number => {
+    const gnbToolsetWidth = getComponentWidth(gnbToolsetRef);
+    const gnbHeaderWidth = getComponentWidth(gnbHeaderRef);
+    const invisibleMenuWidth = state.isInvisibleMenuExists ? DEFAULT_INVISIBLE_MENU_WIDTH : 0;
+    return gnbWidth - (gnbToolsetWidth + gnbHeaderWidth + invisibleMenuWidth + MINIMAL_GAP_BETWEEN_MENU_N_TOOLSET);
+};
+const getVisibleMenuCountWithinWidth = (availableWidth: number): number => {
+    let visibleMenuCount = 0;
+    let _availableWidth = availableWidth;
+    const menuRefs = gnbMenuRef.value;
+
+    menuRefs?.forEach((menuRef) => {
+        _availableWidth -= menuRef.$el.clientWidth;
+        if (_availableWidth > 0) visibleMenuCount += 1;
+    });
+    return visibleMenuCount;
+};
+const updateGNBLayout = (gnbWidth: number) => {
+    const availableWidth = getAvailableGNBMenuWidth(gnbWidth);
+    const visibleMenuCount = getVisibleMenuCountWithinWidth(availableWidth);
+
+    state.availableMenuCount = visibleMenuCount;
+    state.isInvisibleMenuExists = visibleMenuCount < state.gnbMenuList.length;
+};
+
+
+onMounted(() => {
+    store.dispatch('domain/loadExtraMenu');
+});
+
+
+watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {
+    if (!changedWidth) return;
+    state.availableMenuCount = state.gnbMenuList.length;
+    await nextTick();
+    updateGNBLayout(changedWidth);
+}, { immediate: true });
+
 </script>
+
+<template>
+    <div ref="gnbRef"
+         :class="{'gnb': true, 'admin-gnb': state.isAdminMode}"
+    >
+        <div class="left-part">
+            <div class="site-map-wrapper">
+                <site-map :menu-list="state.siteMapMenuList"
+                          :visible.sync="state.showSiteMap"
+                          :disabled="!state.hasPermission"
+                          :is-admin-mode="state.isAdminMode"
+                />
+            </div>
+
+            <g-n-b-header ref="gnbHeaderRef"
+                          :to="state.logoLink"
+                          :is-admin-mode="state.isAdminMode"
+            />
+
+            <g-n-b-menu v-for="(menu, idx) in state.visibleGnbMenuList"
+                        ref="gnbMenuRef"
+                        :key="`gnb-menu-${idx}`"
+                        :class="{ 'gnb-menu-list': true, 'gnb-first-menu': idx === 0 }"
+                        :is-admin-mode="state.isAdminMode"
+                        :show="menu.show"
+                        :menu-id="menu.id"
+                        :label="menu.label"
+                        :to="menu.to"
+                        :sub-menu-list="menu.subMenuList"
+                        :has-permission="state.hasPermission"
+                        :is-opened="state.openedMenu === menu.id"
+                        :is-selected="getMenuIsSelected(menu.id)"
+                        :highlight-tag="menu.highlightTag"
+                        @open-menu="handleOpenMenu"
+                        @hide-menu="hideMenu"
+            />
+            <g-n-b-invisible-menu-dropdown v-if="state.invisibleGnbMenuList.length"
+                                           :is-admin-mode="state.isAdminMode"
+                                           :menu="state.invisibleGnbMenuList"
+                                           :selected-menu-id="state.selectedInvisibleGNBMenuId"
+                                           @select-menu="handleSelectGNBMenu"
+            />
+        </div>
+        <g-n-b-toolset ref="gnbToolsetRef"
+                       class="right-part"
+                       :opened-menu="state.openedMenu"
+                       @open-menu="handleOpenMenu"
+                       @hide-menu="hideMenu"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .gnb {
