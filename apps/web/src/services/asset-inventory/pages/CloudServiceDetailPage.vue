@@ -4,7 +4,7 @@ import { reactive, computed, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PDivider,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
@@ -220,7 +220,7 @@ const getQuery = (schema?) => {
 const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
     typeOptionState.loading = true;
     try {
-        const res = await SpaceConnector.client.inventory.cloudService.list({
+        const res = await SpaceConnector.clientV2.inventory.cloudService.list({
             query: getQuery(schema),
             ...(overviewState.period && {
                 date_range: {
@@ -419,8 +419,9 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                                       @click-settings="handleClickSettings"
                     >
                         <template #toolbox-left>
-                            <p-button style-type="primary"
+                            <p-button style-type="secondary"
                                       :disabled="!tableState.consoleLink || tableState.selectedItems.length > 1"
+                                      icon-right="ic_external-link"
                                       @click="handleClickConnectToConsole"
                             >
                                 {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
@@ -429,6 +430,9 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                         <template v-if="!props.isServerPage"
                                   #toolbox-bottom
                         >
+                            <div class="mb-3">
+                                <p-divider />
+                            </div>
                             <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"
                                                           :filters="searchFilters"
                                                           :hidden-filters="hiddenFilters"
