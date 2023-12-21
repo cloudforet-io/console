@@ -46,7 +46,8 @@ export const getUserAccessLevel = (
     if (referenceMenuIds.length) {
         isAccessible = getIsAccessibleByReferenceMenuIds(referenceMenuIds, pagePermissions);
     } else {
-        const menuId = route?.meta?.menuId;
+        const closetMenuRoute = clone(route?.matched)?.reverse().find((match) => !!match.meta.menuId);
+        const menuId = closetMenuRoute?.meta.menuId;
         if (!menuId) return ACCESS_LEVEL.AUTHENTICATED;
         isAccessible = getAccessPermissionOfMenu(menuId, pagePermissions);
     }
