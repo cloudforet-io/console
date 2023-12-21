@@ -58,14 +58,16 @@ export class SpaceRouter {
             nextPath = to.fullPath;
             const isTokenAlive = SpaceConnector.isTokenAlive;
             const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
+            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
+            const isAdminPathFromRawUrl = window.location.pathname.startsWith('/admin');
 
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
-            const isDuplicatedRoute = to.name?.startsWith('admin.') && from.name?.startsWith('admin.');
+            const isDuplicatedRoute = (to.name?.startsWith('admin.') || isAdminPathFromRawUrl) && from.name?.startsWith('admin.');
             const isDuplicateWorkspace = (to.params.workspaceId && from.params.workspaceId) && to.params.workspaceId === from.params.workspaceId;
             if (refreshToken && isTokenAlive && !isDuplicatedRoute && !isDuplicateWorkspace && isNotErrorRoute) {
                 let scope: string;
-                if (to.name?.startsWith('admin.')) {
+                if (isAdminPathFromRawUrl || isAdminMode) {
                     scope = 'DOMAIN';
                 } else if (to.params.workspaceId) {
                     scope = 'WORKSPACE';
@@ -84,7 +86,6 @@ export class SpaceRouter {
             const routeAccessLevel = getRouteAccessLevel(to);
             const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
 
-            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
