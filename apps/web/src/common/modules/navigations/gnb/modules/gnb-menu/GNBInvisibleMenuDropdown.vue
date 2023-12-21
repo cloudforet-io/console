@@ -46,7 +46,7 @@ const handleOpenMenu = () => {
     state.isVisibleMenu = !state.isVisibleMenu;
 };
 const handleSelectMenu = (menu: MenuItem[]) => {
-    if (!menu || !menu.length) return;
+    if (!menu || !menu?.length) return;
     const menuId = menu[0].name;
     emit('select-menu', menuId);
     hideMenu();
