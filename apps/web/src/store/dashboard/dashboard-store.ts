@@ -144,10 +144,14 @@ export const useDashboardStore = defineStore('dashboard', () => {
             },
         };
         state.loading = true;
-        await Promise.allSettled([
-            fetchDashboard('PRIVATE', params),
-            fetchDashboard('PUBLIC', _publicDashboardParams),
-        ]);
+        if (_state.isAdminMode) {
+            await fetchDashboard('PUBLIC', _publicDashboardParams);
+        } else {
+            await Promise.allSettled([
+                fetchDashboard('PRIVATE', params),
+                fetchDashboard('PUBLIC', _publicDashboardParams),
+            ]);
+        }
         state.loading = false;
     };
 
