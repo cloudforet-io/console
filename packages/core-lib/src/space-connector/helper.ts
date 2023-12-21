@@ -4,6 +4,8 @@ import type { Query, Sort } from '@/space-connector/type';
 class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
 
+    #sortList: Sort[] = [];
+
     get data(): Query {
         const { filter, keyword, filterOr } = this.apiQuery;
 
@@ -17,6 +19,16 @@ class ApiQueryHelper extends QueryHelper {
         else delete this._data.keyword;
 
         return { ...this._data };
+    }
+
+    // This is for api v2.
+    get dataV2(): Query {
+        const data = this.data;
+
+        if (this.#sortList.length > 0) data.sort = this.#sortList;
+        else delete data.sort;
+
+        return data;
     }
 
     setPage(start: number, limit: number): ApiQueryHelper {
@@ -50,23 +62,24 @@ class ApiQueryHelper extends QueryHelper {
             key,
             desc: desc ?? (this._data.sort as Sort)?.desc ?? false,
         };
+
+        this.#sortList = [this._data.sort as Sort];
+
         return this;
     }
 
-    setMultiSort(sort: Sort[]): ApiQueryHelper {
+    setMultiSort(sorts: Sort[]): ApiQueryHelper {
         if (!this._data.sort) {
             this._data.sort = {};
         }
-        this._data.sort.keys = sort;
+        this._data.sort.keys = sorts;
+        this.#sortList = sorts;
         return this;
     }
 
     // This method is temporarily added for v2 api.
     setMultiSortV2(sortList: Sort[]): ApiQueryHelper {
-        if (!this._data.sort) {
-            this._data.sort = {};
-        }
-        this._data.sort = sortList;
+        this.#sortList = sortList;
         return this;
     }
 
@@ -76,6 +89,8 @@ class ApiQueryHelper extends QueryHelper {
         }
 
         (this._data.sort as Sort).desc = desc;
+
+        this.#sortList = [this._data.sort as Sort];
         return this;
     }
 
