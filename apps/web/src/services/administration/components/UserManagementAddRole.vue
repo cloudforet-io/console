@@ -16,8 +16,8 @@ import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
+import type { AddModalMenuItem } from '@/services/administration/types/user-type';
 
 
 const emit = defineEmits<{(e: 'change-role', role: AddModalMenuItem): void}>();

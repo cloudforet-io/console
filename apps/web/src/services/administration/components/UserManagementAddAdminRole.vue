@@ -20,9 +20,9 @@ import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-import type { AddModalMenuItem } from '@/services/administration/components/UserManagementAddModal.vue';
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import type { AddModalMenuItem } from '@/services/administration/types/user-type';
 
 interface Props {
     isSetAdminRole: boolean;
