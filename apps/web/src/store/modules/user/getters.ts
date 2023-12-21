@@ -14,6 +14,7 @@ import type { UserState } from './type';
 
 // TODO: temporary defence
 export const isDomainAdmin = (state: UserState): boolean => state.roleType === ROLE_TYPE.DOMAIN_ADMIN;
+export const isSystemAdmin = (state: UserState): boolean => state.roleType === ROLE_TYPE.SYSTEM_ADMIN;
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 
 // TODO: to be refactored by new planning

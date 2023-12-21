@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useResizeObserver } from '@vueuse/core';
 import {
-    computed, getCurrentInstance, reactive, watch, ref,
+    computed, reactive, watch, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
-import type { Vue } from 'vue/types/vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
@@ -33,12 +33,13 @@ import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
-const vm = getCurrentInstance()?.proxy as Vue;
+const router = useRouter();
+const route = useRoute();
 
 const state = reactive({
-    showGNB: computed(() => vm.$route.matched[0]?.name === 'root' || state.isMyPage),
-    isMyPage: computed(() => vm.$route.matched[0]?.name === 'my_page'),
-    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
+    showGNB: computed(() => route.matched[0]?.name === 'root' || state.isMyPage),
+    isMyPage: computed(() => route.matched[0]?.name === 'my_page'),
+    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED),
     isRoutingToSignIn: false,
     isEmailVerified: computed(() => store.state.user.emailVerified),
     userId: computed<string>(() => store.state.user.userId),
@@ -61,15 +62,15 @@ const goToSignIn = async () => {
     state.isRoutingToSignIn = true;
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: vm.$route.fullPath },
+        query: { nextPath: route.fullPath },
     };
     store.commit('error/setVisibleSessionExpiredError', false);
-    await vm.$router.push(res);
+    await router.push(res);
     state.isRoutingToSignIn = false;
 };
 const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
 
-watch(() => vm.$route, (value) => {
+watch(() => route, (value) => {
     state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
 });
 
