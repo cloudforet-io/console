@@ -1,4 +1,4 @@
-export interface RepositoryInfo {
+export interface RepositoryModel {
     repository_id: string;
     name: string;
     repository_type: string;

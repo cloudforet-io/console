@@ -10,6 +10,12 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { Tags } from '@/schema/_common/model';
+import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
+import type { PluginModel } from '@/schema/repository/plugin/model';
+import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
+import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,6 +29,8 @@ interface WebhookType {
     label: string;
     icon: string;
     data: any;
+    name: string;
+    tags: Tags;
 }
 
 interface Props {
@@ -55,22 +63,20 @@ const state = reactive({
 });
 
 /* api */
-const repositoryIdApiQuery = new ApiQueryHelper();
 const listApiQuery = new ApiQueryHelper();
 
 const getRepositoryID = async () => {
-    repositoryIdApiQuery.setFilters([{ k: 'repository_type', v: 'remote', o: '=' }]);
-    const res = await SpaceConnector.client.repository.repository.list({
-        query: repositoryIdApiQuery.data,
+    const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
+        repository_type: 'remote',
     });
-    const repositoryId = res.results[0].repository_id;
+    const repositoryId = res.results ? res.results[0].repository_id : '';
     return repositoryId;
 };
 const getListWebhookType = async () => {
     try {
         listApiQuery.setFilters([{ k: 'service_type', v: 'monitoring.Webhook', o: '=' }]);
         const repositoryId = await getRepositoryID();
-        const { results } = await SpaceConnector.client.repository.plugin.list({
+        const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
             repository_id: repositoryId,
             query: listApiQuery.data,
         });

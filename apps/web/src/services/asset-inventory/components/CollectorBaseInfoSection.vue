@@ -73,6 +73,7 @@ import type {
 } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
+import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';
 
@@ -148,7 +149,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
 };
 const getRepositoryPlugin = async (pluginId: string) => {
     try {
-        state.repositoryPlugin = await SpaceConnector.clientV2.repository.plugin.get({
+        state.repositoryPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
             plugin_id: pluginId,
         });
     } catch (e) {
