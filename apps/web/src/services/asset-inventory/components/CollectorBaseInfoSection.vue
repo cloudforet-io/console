@@ -65,7 +65,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
-import { UPGRADE_MODE } from '@/schema/inventory/collector/constant';
 import type {
     CollectorModel,
     CollectorPluginModel,
@@ -73,6 +72,7 @@ import type {
 
 } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
+import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';
 

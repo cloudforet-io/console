@@ -119,8 +119,9 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
 import type { RepositoryInfo } from '@/schema/repository/repository/model';
 import { store } from '@/store';
 
@@ -170,13 +171,9 @@ const state = reactive({
     isLaptopView: computed<boolean>(() => width.value > screens.tablet.max),
 });
 
-const repoApiQuery = new ApiQueryHelper();
 const getRepositories = async () => {
     try {
-        repoApiQuery.setSort('repository_type', true);
-        const res = await SpaceConnector.clientV2.repository.repository.list({
-            query: repoApiQuery.data,
-        });
+        const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryInfo>>();
         state.repositories = res.results;
     } catch (e) {
         ErrorHandler.handleError(e);
