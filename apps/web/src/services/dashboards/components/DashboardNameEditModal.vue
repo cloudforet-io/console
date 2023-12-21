@@ -46,6 +46,7 @@ const {
     _name: '',
 }, {
     _name(value: string) {
+        if (value === props.name) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
@@ -54,11 +55,8 @@ const {
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType, dashboardDetailState.name, dashboardDetailState.projectId)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
 });
-
-// const _invalid_unique = 'Dashboard name must be unique'; i18n.t('VALIDATION_DASHBOARD_NAME_UNIQUE')
-// const _invalid_input = 'Please input dashboard name'; i18n.t('VALIDATION_DASHBOARD_NAME_INPUT')
 
 const updateDashboard = async () => {
     try {

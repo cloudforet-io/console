@@ -8,9 +8,12 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import { DASHBOARD_TYPE } from '@/schema/dashboard/_constants/dashboard-constant';
 import type {
     DashboardType,
 } from '@/schema/dashboard/_types/dashboard-type';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
@@ -48,7 +51,6 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const {
     forms: {
         name,
-        dashboardType,
     },
     setForm,
     initForm,
@@ -57,7 +59,6 @@ const {
     isAllValid,
 } = useFormValidator({
     name: '',
-    dashboardType: 'PRIVATE' as DashboardType,
 }, {
     name(value: string) {
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
@@ -65,29 +66,24 @@ const {
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
         return '';
     },
-    dashboardType(value: DashboardType) { return value.length ? '' : i18n.t('DASHBOARDS.FORM.REQUIRED'); },
+});
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 const state = reactive({
-    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     proxyVisible: useProxyValue('visible', props, emit),
+    dashboardType: 'PRIVATE' as DashboardType,
     filteredVisibilityList: computed(() => [
         { name: 'PRIVATE', label: i18n.t('DASHBOARDS.FORM.LABEL_PRIVATE'), icon: 'ic_lock-filled' },
         { name: 'PUBLIC', label: i18n.t('DASHBOARDS.FORM.LABEL_PUBLIC') },
     ]),
-    projectId: computed(() => {
-        if (props.dashboard?.project_id?.length) return props.dashboard.project_id;
-        return '';
+    projectId: computed<string|undefined>(() => {
+        if (props.dashboard?.project_id !== '*') return props.dashboard?.project_id;
+        return undefined;
     }),
     dashboardNameList: computed<string[]>(() => {
-        if (state.isAdminMode) return dashboardGetters.domainItems.map((item) => item.name);
-        if (state.projectId) {
-            return dashboardGetters.projectItems
-                .filter((item) => (
-                    item.project_id === state.projectId)
-                            && item.name !== props.dashboard?.name)
-                .map((_item) => _item.name);
-        }
-        return dashboardGetters.workspaceItems.map((item) => item.name);
+        if (storeState.isAdminMode) return dashboardGetters.domainItems.map((item) => item.name);
+        return dashboardStore.getDashboardNameList(state.dashboardType);
     }),
 });
 
@@ -104,14 +100,18 @@ const createDashboard = async () => {
             settings: props.dashboard?.settings,
             variables: props.dashboard?.variables,
             variables_schema: props.dashboard?.variables_schema,
+            tags: { created_by: store.state.user.userId },
         };
-        if (dashboardType.value !== 'PRIVATE') {
+        if (storeState.isAdminMode) {
+            state.dashboardType = DASHBOARD_TYPE.PUBLIC;
+            params.resource_group = RESOURCE_GROUP.DOMAIN;
+        } else if (state.dashboardType !== 'PRIVATE') {
             params.resource_group = props.dashboard?.resource_group; // workspace, project
             if (props.dashboard?.project_id && props.dashboard?.project_id !== '*') {
                 params.project_id = props.dashboard?.project_id;
             }
         }
-        const res = await dashboardDetailStore.createDashboard(params, dashboardType.value);
+        const res = await dashboardDetailStore.createDashboard(params, state.dashboardType);
         return res.public_dashboard_id || res.private_dashboard_id;
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('DASHBOARDS.FORM.ALT_E_CREATE_DASHBOARD'));
@@ -119,16 +119,19 @@ const createDashboard = async () => {
     return undefined;
 };
 
+const handleChangeDashboardType = (value: DashboardType) => {
+    state.dashboardType = value;
+};
 const handleConfirm = async () => {
     if (!isAllValid) return;
     const clonedDashboardId = await createDashboard();
+    state.proxyVisible = false;
     if (clonedDashboardId) {
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: { dashboardId: clonedDashboardId },
         });
     }
-    state.proxyVisible = false;
 };
 
 const init = () => {
@@ -163,18 +166,17 @@ watch(() => props.visible, (visible) => {
                     />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('DASHBOARDS.FORM.LABEL_VIEWERS')"
-                           :invalid="invalidState.dashboardType"
-                           :invalid-text="invalidTexts.dashboardType"
+            <p-field-group v-if="!storeState.isAdminMode"
+                           :label="$t('DASHBOARDS.FORM.LABEL_VIEWERS')"
                            required
                            class="mt-6"
             >
                 <p-radio v-for="{ name: visibilityName, label, icon } in state.filteredVisibilityList"
                          :key="visibilityName"
                          :value="visibilityName"
-                         :selected="dashboardType"
+                         :selected="state.dashboardType"
                          class="radio-group"
-                         @change="setForm('dashboardType', $event)"
+                         @change="handleChangeDashboardType"
                 >
                     <p-i v-if="icon"
                          :name="icon"
