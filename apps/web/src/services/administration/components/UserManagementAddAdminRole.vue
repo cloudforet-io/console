@@ -5,7 +5,10 @@ import { useRouter } from 'vue-router/composables';
 import {
     PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PToggleButton, PDivider, PButton,
 } from '@spaceone/design-system';
-import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import type {
+    AutocompleteHandler,
+    SelectDropdownMenuItem,
+} from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -35,8 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
-const emit = defineEmits<{(e: 'change-role', role: AddModalMenuItem): void,
-    (e: 'change-workspace', workspace: AddModalMenuItem[]): void
+const emit = defineEmits<{(e: 'change-input', formState): void,
 }>();
 
 const state = reactive({
@@ -68,13 +70,13 @@ const workspaceListApiQueryHelper = new ApiQueryHelper()
 const workspaceMenuHandler: AutocompleteHandler = async (inputText: string) => {
     await fetchListWorkspaces(inputText);
     return {
-        results: workspaceState.menuItems,
+        results: workspaceState.menuItems as SelectDropdownMenuItem[],
     };
 };
 const roleMenuHandler: AutocompleteHandler = async (inputText: string) => {
     await fetchListRoles(inputText);
     return {
-        results: roleState.menuItems,
+        results: roleState.menuItems as SelectDropdownMenuItem[],
     };
 };
 const handleChangeToggleButton = () => {
@@ -143,11 +145,11 @@ const fetchListWorkspaces = async (inputText: string) => {
 };
 
 /* Watcher */
-watch(() => roleState.selectedItems, (selectedItems) => {
-    emit('change-role', selectedItems[0]);
-});
-watch(() => workspaceState.selectedItems, (selectedItems) => {
-    emit('change-workspace', selectedItems);
+watch([() => roleState.selectedItems, () => workspaceState.selectedItems], ([role, workspace]) => {
+    emit('change-input', {
+        role: role[0],
+        workspace,
+    });
 });
 watch(() => state.proxyIsSetAdminRole, () => {
     roleState.selectedItems = [];
