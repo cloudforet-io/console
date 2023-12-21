@@ -66,17 +66,15 @@ const state = reactive({
 });
 
 /* Component */
-const handleChangeList = (items: AddModalMenuItem[]) => {
-    state.userList = items;
-    const newUserItem = items.filter((item) => item.isNew);
-    state.localUserItem = items.filter((item) => item.auth_type === 'LOCAL');
-    state.resetPasswordVisible = state.localUserItem.length > 0 && newUserItem.length > 0;
-};
-const handleChangeRole = (role: AddModalMenuItem) => {
-    state.role = role;
-};
-const handleChangeWorkspace = (value: AddModalMenuItem[]) => {
-    state.workspace = value;
+const handleChangeInput = (items) => {
+    if (items.role) state.role = items.role;
+    if (items.workspace) state.workspace = items.workspace;
+    if (items.userList) {
+        state.userList = items.userList;
+        const newUserItem = state.userList.filter((item) => item.isNew);
+        state.localUserItem = state.userList.filter((item) => item.auth_type === 'LOCAL');
+        state.resetPasswordVisible = state.localUserItem.length > 0 && newUserItem.length > 0;
+    }
 };
 
 const handleConfirm = async () => {
@@ -106,44 +104,49 @@ const handleClose = () => {
         _state.modal = cloneDeep(_state.modal);
     });
 };
-
 /* API */
-const fetchCreateUser = async (item: AddModalMenuItem): Promise<any> => {
+const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     const userInfoParams = {
         user_id: item.user_id || '',
         auth_type: item.auth_type || 'LOCAL',
         password: state.password || '',
         reset_password: item.auth_type === 'LOCAL' && state.isResetPassword,
     };
-    const roleBindingParams = {
-        user_id: item.user_id || '',
-        role_id: state.role.name || '',
-        resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+
+    const createRoleBinding = async () => {
+        if (state.isSetAdminRole) {
+            await fetchCreateRoleBinding(item);
+        } else {
+            await Promise.all(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
+        }
     };
 
     if (userPageState.isAdminMode) {
-        // TODO: Reviewing Workspace Role Assignment Feature
-        const adminRoleParams = !state.isSetAdminRole ? {
-            ...roleBindingParams,
-            workspace_id: state.workspace.map((w) => w.name || ''),
-        } : roleBindingParams;
-
         await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
             ...userInfoParams,
             tags: state.tags,
         });
-        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(adminRoleParams);
-        return;
-    }
-
-    if (item.isNew) {
+        await createRoleBinding();
+    } else if (item.isNew) {
         await SpaceConnector.clientV2.identity.workspaceUser.create<WorkspaceUserCreateParameters, WorkspaceUserModel>({
             ...userInfoParams,
             role_id: state.role.name || '',
         });
     } else {
-        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleBindingParams);
+        await createRoleBinding();
     }
+};
+const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModalMenuItem) => {
+    const baseRoleParams = {
+        user_id: userItem.user_id || '',
+        role_id: state.role.name || '',
+        resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+    };
+    const roleParams = state.isSetAdminRole ? baseRoleParams : {
+        ...baseRoleParams,
+        workspace_id: item?.name || '',
+    };
+    await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>(roleParams);
 };
 </script>
 
@@ -163,18 +166,17 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<any> => {
     >
         <template #body>
             <div class="modal-contents">
-                <user-management-add-user @change-list="handleChangeList" />
+                <user-management-add-user @change-input="handleChangeInput" />
                 <user-management-add-password v-if="state.resetPasswordVisible && state.userList.length > 0"
                                               :is-reset.sync="state.isResetPassword"
                                               :password.sync="state.password"
                 />
                 <user-management-add-admin-role v-if="userPageState.isAdminMode"
                                                 :is-set-admin-role.sync="state.isSetAdminRole"
-                                                @change-role="handleChangeRole"
-                                                @change-workspace="handleChangeWorkspace"
+                                                @change-input="handleChangeInput"
                 />
                 <user-management-add-role v-else
-                                          @change-role="handleChangeRole"
+                                          @change-input="handleChangeInput"
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
                                          :tags.sync="state.tags"

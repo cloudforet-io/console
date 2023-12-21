@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
-    computed, reactive, ref, watch,
+    reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
-import type { MenuItem } from '@spaceone/design-system/src/inputs/context-menu/type';
 import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -20,7 +19,6 @@ import type { AuthType } from '@/schema/identity/user/type';
 import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -37,35 +35,21 @@ const containerRef = ref<HTMLElement|null>(null);
 const contextMenuRef = ref<any|null>(null);
 const targetRef = ref<HTMLElement | null>(null);
 
-const emit = defineEmits<{(e: 'change-list', selectedItems: MenuItem[]): void}>();
+const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
-const authTypeMenuItem = [
-    { label: 'External', name: 'EXTERNAL', key: 'EXTERNAL' },
-    { label: 'Local', name: 'LOCAL', key: 'LOCAL' },
-];
+const authTypeMenuItem = ref([
+    { label: 'Local', name: 'LOCAL' },
+]);
 
-const storeState = reactive({
-    userAuthType: computed(() => store.state.user.authType),
-});
 const state = reactive({
     loading: false,
     menuVisible: false,
     menuItems: [] as AddModalMenuItem[],
     selectedItems: [] as AddModalMenuItem[],
-    // TODO: will be changed
-    authTypeMenuItems: computed<MenuItem[]>(() => {
-        if (storeState.userAuthType === 'LOCAL') {
-            return [{ label: 'local', name: 'LOCAL' }];
-        }
-        return [
-            { label: 'local', name: 'LOCAL' },
-            { label: 'external', name: 'EXTERNAL' },
-        ];
-    }),
 });
 const authTypeState = reactive({
     selectedUserAuthType: '' as AuthType,
-    selectedMenuItem: authTypeMenuItem[0].name,
+    selectedMenuItem: authTypeMenuItem.value[0].name as AuthType,
 });
 const formState = reactive({
     searchText: '',
@@ -77,7 +61,7 @@ const validationState = reactive({
 
 /* Component */
 const hideMenu = () => {
-    emit('change-list', state.selectedItems);
+    emit('change-input', { userList: state.selectedItems });
     state.menuVisible = false;
 };
 const handleClickTextInput = async () => {
@@ -110,14 +94,15 @@ const handleEnterTextInput = () => {
 };
 const handleClickDeleteButton = (idx: number) => {
     state.selectedItems.splice(idx, 1);
-    emit('change-list', state.selectedItems);
+    emit('change-input', { userList: state.selectedItems });
 };
-const handleSelectAuthTypeItem = (value: string, idx: number) => {
-    state.selectedItems[idx].auth_type = value;
-    emit('change-list', state.selectedItems);
+const handleSelectAuthTypeItem = (selected: string, idx: number) => {
+    state.selectedItems[idx].auth_type = selected as AuthType;
+    handleSelectDropdownItem(selected);
+    emit('change-input', { userList: state.selectedItems });
 };
 const handleSelectDropdownItem = (selected: string) => {
-    authTypeState.selectedMenuItem = selected;
+    authTypeState.selectedMenuItem = selected as AuthType;
 };
 const getUserList = async () => {
     try {
@@ -132,7 +117,7 @@ const getUserList = async () => {
             label: formState.searchText,
             name: formState.searchText,
             isNew: true,
-            auth_type: userPageState.isAdminMode ? authTypeState.selectedMenuItem : state.authTypeMenuItems[0].name as AuthType,
+            auth_type: authTypeState.selectedMenuItem,
         });
         formState.searchText = '';
         validationState.userIdInvalid = false;
@@ -164,6 +149,15 @@ const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     state.selectedItems.push(menuItem);
     await hideMenu();
 };
+// TODO: Will be Improved in the next step.
+// const initAuthTypeList = async () => {
+//     if (store.state.domain.extendedAuthType !== undefined) {
+//         authTypeMenuItem.value = [
+//             { label: store.getters['domain/extendedAuthTypeLabel'], name: 'EXTERNAL' },
+//             ...authTypeMenuItem.value,
+//         ];
+//     }
+// };
 
 /* API */
 const fetchListUsers = async () => {
@@ -213,6 +207,11 @@ watch(() => state.menuVisible, async (menuVisible) => {
         }
     }
 });
+
+// TODO: Will be Improved in the next step.
+// onMounted(() => {
+//     initAuthTypeList();
+// });
 </script>
 
 <template>
@@ -340,6 +339,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
     .selected-user-list {
         @apply overflow-y-scroll;
         height: 12.5rem;
+        margin-top: 1rem;
         .selected-user-list-item {
             @apply flex items-center justify-between;
             height: 2.25rem;
