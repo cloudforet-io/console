@@ -1,8 +1,6 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
-import type { UPGRADE_MODE, STATE } from '@/schema/inventory/collector/constant';
-
-export type UpgradeMode = typeof UPGRADE_MODE[keyof typeof UPGRADE_MODE];
+import type { STATE } from '@/schema/inventory/collector/constant';
 
 export interface CollectorOptions {
     [key: string]: any;

@@ -1,4 +1,5 @@
-import type { CollectorOptions, UpgradeMode } from '@/schema/inventory/collector/type';
+import type { CollectorOptions } from '@/schema/inventory/collector/type';
+import type { UpgradeMode } from '@/schema/plugin/plugin/type';
 
 export interface CollectorUpdatePluginParameters {
     collector_id: string;

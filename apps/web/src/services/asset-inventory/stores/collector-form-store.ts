@@ -38,7 +38,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
     state: () => ({
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
         repositoryPlugin: null as PluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
-        provider: null as string|null,
+        provider: undefined as string|undefined,
         tags: {} as Tag,
         name: '',
         version: '' as string,

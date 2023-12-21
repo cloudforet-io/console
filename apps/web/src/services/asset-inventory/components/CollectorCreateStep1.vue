@@ -80,6 +80,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -121,15 +123,14 @@ const getPlugins = async (): Promise<PluginModel[]> => {
         pluginApiQuery.setPage(getPageStart(state.currentPage, 10), 10).setSort('name', false)
             .setFilters([{ v: state.inputValue }]);
 
-        const params = {
-            service_type: 'inventory.Collector',
+        const res = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
+            resource_type: 'inventory.Collector',
             repository_id: state.selectedRepository === 'all' ? '' : state.selectedRepository,
-            provider: collectorFormState.provider === 'all' ? null : collectorFormState.provider,
+            provider: collectorFormState.provider === 'all' ? undefined : collectorFormState.provider,
             query: pluginApiQuery.data,
-        };
-        const res = await SpaceConnector.clientV2.repository.plugin.list<>(params);
-        state.totalCount = res.total_count;
-        return res.results;
+        });
+        state.totalCount = res.total_count ?? 0;
+        return res.results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         return [];
