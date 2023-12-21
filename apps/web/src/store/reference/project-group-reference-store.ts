@@ -34,7 +34,7 @@ const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupMod
         return undefined;
     }
 };
-export const useProjectGroupStore = defineStore('project-group', () => {
+export const useProjectGroupReferenceStore = defineStore('project-group-reference', () => {
     const fetcher = getCancellableFetcher<ListResponse<ProjectGroupModel>>(SpaceConnector.clientV2.identity.projectGroup.list);
     const state = reactive({
         items: null as ProjectGroupReferenceMap | null,
@@ -116,6 +116,7 @@ export const useProjectGroupStore = defineStore('project-group', () => {
     const actions = {
         load,
         sync,
+        flush: () => { state.items = null; },
     };
 
     return {

@@ -24,7 +24,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
-export const useProjectStore = defineStore('project', () => {
+export const useProjectReferenceStore = defineStore('project-reference', () => {
     const fetcher = getCancellableFetcher<ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
     const state = reactive({
         items: null as ProjectReferenceMap | null,
@@ -114,6 +114,7 @@ export const useProjectStore = defineStore('project', () => {
     const actions = {
         load,
         sync,
+        flush: () => { state.items = null; },
     };
 
     return {

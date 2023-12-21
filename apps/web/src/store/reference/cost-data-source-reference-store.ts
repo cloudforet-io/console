@@ -80,6 +80,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
                 ErrorHandler.handleError(e);
             }
         },
+        flush() { state.items = null; },
     };
 
     return {

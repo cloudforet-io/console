@@ -18,7 +18,7 @@ import type { ServiceAccountReferenceMap } from '@/store/modules/reference/servi
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { WorkspaceReferenceMap } from '@/store/reference/workspace-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 

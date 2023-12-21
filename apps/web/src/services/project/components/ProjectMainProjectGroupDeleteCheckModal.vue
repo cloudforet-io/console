@@ -5,7 +5,7 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useProjectGroupStore } from '@/store/reference/project-group-store';
+import { useProjectGroupReferenceStore } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -15,7 +15,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
-const projectGroupStore = useProjectGroupStore();
+const projectGroupStore = useProjectGroupReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;

@@ -95,6 +95,7 @@ export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-
                 ErrorHandler.handleError(e);
             }
         },
+        flush() { state.items = null; },
     };
 
     return {

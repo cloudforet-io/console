@@ -96,6 +96,7 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
     const actions = {
         load,
         sync,
+        flush: () => { state.items = null; },
     };
 
     return {
