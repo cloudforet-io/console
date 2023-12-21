@@ -6,7 +6,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CloudServiceTypeInfo } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -29,8 +29,8 @@ export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-
         provider: '' as string,
         group: '' as string,
         name: undefined as undefined | string,
-        cloudServiceTypeList: [] as CloudServiceTypeInfo[],
-        selectedCloudServiceType: undefined as undefined | CloudServiceTypeInfo,
+        cloudServiceTypeList: [] as CloudServiceTypeModel[],
+        selectedCloudServiceType: undefined as undefined | CloudServiceTypeModel,
         searchFilters: [] as ConsoleFilter[],
     }),
     getters: {
