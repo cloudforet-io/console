@@ -85,6 +85,7 @@ const handleQueryChange = (options: ToolboxOptions = {}) => {
     if (options.queryTags !== undefined) {
         searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
         dashboardStore.setSearchFilters(searchQueryHelper.filters);
+        dashboardStore.load();
     }
 };
 
@@ -106,14 +107,16 @@ const init = async () => {
 };
 
 const getDashboardValueHandler = (): ValueHandler | undefined => {
-    const labelsValueHandler = makeDistinctValueHandler('dashboard.Dashboard', 'labels');
-    if (!labelsValueHandler) return undefined;
+    const publicLabelsValueHandler = makeDistinctValueHandler('dashboard.PublicDashboard', 'labels');
+    const privateLabelsValueHandler = makeDistinctValueHandler('dashboard.PrivateDashboard', 'labels');
+    if (!publicLabelsValueHandler && !privateLabelsValueHandler) return undefined;
 
     return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
         const results = [] as ValueMenuItem[];
         const promises = [] as (HandlerResponse | Promise<HandlerResponse>)[];
 
-        if (labelsValueHandler) promises.push(labelsValueHandler(inputText, keyItem, currentDataType, subPath));
+        if (publicLabelsValueHandler) promises.push(publicLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+        if (privateLabelsValueHandler) promises.push(privateLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
         const responses = await Promise.allSettled(promises);
 
         // combine both of results and sort
