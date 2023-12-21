@@ -11,7 +11,7 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 const AlertManagerContainer = () => import('@/services/alert-manager/AlertManagerContainer.vue');
 
 const AlertDashboardPage = () => import('@/services/alert-manager/pages/AlertDashboardPage.vue');
-const AlertPage = () => import('@/services/alert-manager/pages/AlertPage.vue');
+const AlertMainPage = () => import('@/services/alert-manager/pages/AlertMainPage.vue');
 const EscalationPolicyPage = () => import('@/services/alert-manager/pages/EscalationPolicyPage.vue');
 const AlertDetailPage = () => import('@/services/alert-manager/pages/AlertDetailPage.vue');
 
@@ -37,7 +37,7 @@ const alertManagerRoutes: RouteConfig = {
                     path: '/',
                     name: ALERT_MANAGER_ROUTE.ALERT._NAME,
                     meta: { lnbVisible: true },
-                    component: AlertPage as any,
+                    component: AlertMainPage as any,
                 },
                 {
                     path: ':id?',
