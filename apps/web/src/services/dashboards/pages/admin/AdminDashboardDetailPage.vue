@@ -72,9 +72,8 @@ watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
 }, { immediate: true });
 
 onUnmounted(() => {
-    dashboardDetailStore.revertDashboardData();
+    dashboardDetailStore.reset();
 });
-
 </script>
 
 <template>

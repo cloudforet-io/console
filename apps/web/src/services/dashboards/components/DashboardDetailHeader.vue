@@ -2,14 +2,12 @@
 import { reactive } from 'vue';
 
 import {
-    PI, PIconButton, PHeading, PSkeleton,
+    PIconButton, PHeading, PSkeleton,
 } from '@spaceone/design-system';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-
-import { gray } from '@/styles/colors';
 
 import DashboardCloneModal from '@/services/dashboards/components/DashboardCloneModal.vue';
 import DashboardControlButtons from '@/services/dashboards/components/DashboardControlButtons.vue';
@@ -23,10 +21,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const PUBLIC_ICON_COLOR = gray[500];
-
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailGetters = dashboardDetailStore.getters;
 const dashboardDetailState = dashboardDetailStore.state;
 const state = reactive({
     nameEditModalVisible: false,
@@ -58,17 +53,6 @@ const handleNameUpdate = (name: string) => {
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="dashboardDetailState.name && dashboardDetailGetters.dashboardType === 'PUBLIC'"
-                      #title-left-extra
-            >
-                <div class="title-left-extra">
-                    <p-i name="ic_globe-filled"
-                         width="1rem"
-                         height="1rem"
-                         :color="PUBLIC_ICON_COLOR"
-                    />
-                </div>
-            </template>
             <template v-if="dashboardDetailState.name"
                       #title-right-extra
             >
@@ -114,11 +98,6 @@ const handleNameUpdate = (name: string) => {
 <style lang="postcss" scoped>
 .p-heading {
     margin-bottom: 0.75rem;
-}
-.title-left-extra {
-    @apply inline-block;
-    height: 2rem;
-    margin-top: 0.075rem;
 }
 .title-right-extra {
     @apply flex-shrink-0 inline-flex items-center;

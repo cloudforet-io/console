@@ -79,14 +79,7 @@ const goStep = (direction: 'prev'|'next') => {
 };
 
 const saveCurrentStateToStore = () => {
-    const _dashboardTemplate: PublicDashboardModel = {
-        ...dashboardTemplate.value,
-        name: '',
-    };
-
-    dashboardDetailStore.setDashboardInfo(_dashboardTemplate);
-    dashboardDetailStore.setDashboardId(undefined);
-    dashboardDetailStore.setPlaceholder(dashboardTemplate.value.name);
+    dashboardDetailStore.setDashboardTemplate(dashboardTemplate.value);
 };
 
 const createDashboard = async () => {
@@ -104,7 +97,7 @@ const createDashboard = async () => {
             resource_group: RESOURCE_GROUP.DOMAIN,
         };
 
-        const createdDashboard: PublicDashboardModel = await dashboardDetailStore.createDashboard(apiParam);
+        const createdDashboard = await dashboardDetailStore.createDashboard(apiParam) as PublicDashboardModel;
         await SpaceRouter.router.push({
             name: DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
