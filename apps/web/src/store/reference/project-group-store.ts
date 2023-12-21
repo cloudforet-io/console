@@ -116,6 +116,7 @@ export const useProjectGroupStore = defineStore('project-group', () => {
     const actions = {
         load,
         sync,
+        flush: () => { state.items = null; },
     };
 
     return {

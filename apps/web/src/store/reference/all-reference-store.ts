@@ -1,7 +1,6 @@
 import { asyncComputed } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
-import { camelCase } from 'lodash';
 import { defineStore } from 'pinia';
 
 import { store } from '@/store';
@@ -20,7 +19,6 @@ import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trust
 import type {
     ReferenceMap,
     VuexStoreReferenceType,
-    ReferenceLoadOptions,
 } from '@/store/modules/reference/type';
 import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import { useCloudServiceQuerySetReferenceStore } from '@/store/reference/cloue-service-query-set-reference-store';
@@ -188,30 +186,12 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     });
 
     const actions = {
-        async loadAll(options?: ReferenceLoadOptions) {
-            await Promise.allSettled([
-                store.dispatch('reference/loadAll', options),
-                costDataSourceReferenceStore.load(options),
-                cloudServiceQuerySetReferenceStore.load(options),
-                projectReferenceStore.load(options),
-                projectGroupReferenceStore.load(options),
-                workspaceReferenceStore.load(options),
-            ]);
-        },
-        async load(type: ReferenceType, options?: ReferenceLoadOptions) {
-            if (type === 'costDataSource' || type === 'cost_data_source') {
-                await costDataSourceReferenceStore.load(options);
-            } else if (type === 'cloudServiceQuerySet' || type === 'cloud_service_query_set') {
-                await cloudServiceQuerySetReferenceStore.load(options);
-            } else if (type === 'project') {
-                await projectReferenceStore.load(options);
-            } else if (type === 'projectGroup' || type === 'project_group') {
-                await projectGroupReferenceStore.load(options);
-            } else if (type === 'workspace') {
-                await workspaceReferenceStore.load(options);
-            } else {
-                await store.dispatch(`reference/${camelCase(type)}/load`, options);
-            }
+        flush() {
+            costDataSourceReferenceStore.flush();
+            cloudServiceQuerySetReferenceStore.flush();
+            projectReferenceStore.flush();
+            projectGroupReferenceStore.flush();
+            workspaceReferenceStore.flush();
         },
     };
 

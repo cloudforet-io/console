@@ -114,6 +114,7 @@ export const useProjectStore = defineStore('project', () => {
     const actions = {
         load,
         sync,
+        flush: () => { state.items = null; },
     };
 
     return {
