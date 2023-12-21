@@ -1904,7 +1904,8 @@
 					"ENABLE_DESC": "선택한 사용자를 활성화 하시겠습니까?",
 					"ENABLE_TITLE": "사용자 활성화",
 					"INVITE_TITLE": "",
-					"REMOVE_TITLE": ""
+					"REMOVE_TITLE": "",
+					"UPDATE_TITLE": ""
 				},
 				"NAME": "이름",
 				"NOTIFICATION": "알림",
