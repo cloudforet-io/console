@@ -3,8 +3,6 @@ import {
     PRadio, PRadioGroup, PFieldTitle, PI,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
-
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
@@ -31,11 +29,6 @@ const handleSelectScope = (scopeType: DashboardScope) => {
 const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
     emit('set-project', projects[0]);
 };
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/project/load');
-})();
 </script>
 
 <template>

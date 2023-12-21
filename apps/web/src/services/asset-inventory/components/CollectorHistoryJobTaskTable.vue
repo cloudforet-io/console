@@ -17,8 +17,9 @@ import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -31,6 +32,7 @@ import {
     statusTextFormatter,
 } from '@/services/asset-inventory/helpers/collector-history-formatter-helper';
 import { JOB_SELECTED_STATUS, JOB_TASK_STATE } from '@/services/asset-inventory/types/collector-history-page-type';
+
 
 interface Props {
     jobId: string;
@@ -64,9 +66,10 @@ const statusList = computed(() => [
 
 const emit = defineEmits<{(e: 'select', array): void}>();
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
 });
 
 const state = reactive({
@@ -206,10 +209,7 @@ onDeactivated(() => {
 
 // LOAD REFERENCE STORE
 (async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/serviceAccount/load'),
-        store.dispatch('reference/project/load'),
-    ]);
+    await store.dispatch('reference/serviceAccount/load');
 })();
 </script>
 

@@ -9,10 +9,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -40,10 +40,11 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const alertPageStore = useAlertPageStore();
 
 const storeState = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
@@ -121,7 +122,6 @@ const handleChangeTable = async (options: any = {}) => {
 (async () => {
     await Promise.allSettled([
         getProjectUserData(),
-        store.dispatch('reference/user/load'),
     ]);
 })();
 </script>

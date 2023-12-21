@@ -68,9 +68,9 @@ import { i18n } from '@/translations';
 import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import {
     convertCloudServiceConfigToReferenceData,

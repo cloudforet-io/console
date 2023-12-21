@@ -18,7 +18,9 @@ import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -68,10 +70,11 @@ const tabState = reactive({
         },
     },
 });
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-    projects: computed(() => store.getters['reference/projectItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     urgencyList: computed(() => ([
         {
             name: EXTENDED_ALERT_URGENCY.ALL,
@@ -171,14 +174,6 @@ const onClickRefresh = async () => {
     state.thisPage = 1;
     await listAlerts();
 };
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/user/load'),
-    ]);
-})();
 
 /* Watcher */
 watch(() => props.activatedProjects, async (activatedProjects) => {

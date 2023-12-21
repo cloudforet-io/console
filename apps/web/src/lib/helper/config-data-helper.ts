@@ -5,14 +5,15 @@ import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+
 
 type Config = FavoriteConfig & RecentConfig;
 
@@ -186,8 +187,8 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
 };
 
 export const getCompoundKeyWithManagedCostQuerySetFavoriteKey = (dataSourceId:string, costQuerySetId: string): string => `managed_${dataSourceId}_${costQuerySetId}`;
-export const getParsedKeysWithManagedCostQueryFavoriteKey = (managedCostQuerySetId: string): [string, string]|undefined => {
-    if (!managedCostQuerySetId.startsWith('managed_')) return undefined;
+export const getParsedKeysWithManagedCostQueryFavoriteKey = (managedCostQuerySetId?: string): [string, string]|undefined => {
+    if (!managedCostQuerySetId?.startsWith('managed_')) return undefined;
     const [, dataSourceId, costQuerySetId] = managedCostQuerySetId.split('_');
     return [dataSourceId, costQuerySetId];
 };

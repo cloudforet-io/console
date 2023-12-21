@@ -97,7 +97,6 @@
 </template>
 
 <script lang="ts">
-
 import type { PropType } from 'vue';
 import {
     computed, reactive, toRefs, watch,
@@ -108,8 +107,9 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -148,10 +148,11 @@ export default {
         },
     },
     setup(props) {
+        const allReferenceStore = useAllReferenceStore();
         const escalationPolicyFormStore = useEscalationPolicyFormStore();
         const escalationPolicyFormState = escalationPolicyFormStore.$state;
         const state = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
+            projects: computed(() => allReferenceStore.getters.project),
             //
             scopeLabels: computed(() => ({
                 [SCOPE.DOMAIN]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
@@ -223,11 +224,6 @@ export default {
         watch(() => isAllValid.value, (_isAllValid) => {
             escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: _isAllValid });
         }, { immediate: true });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
 
         return {
             ...toRefs(state),

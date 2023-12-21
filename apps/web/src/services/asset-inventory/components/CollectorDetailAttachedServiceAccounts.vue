@@ -19,9 +19,10 @@ import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -41,6 +42,7 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:totalCount', totalCount: number): void;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
@@ -83,7 +85,7 @@ const state = reactive({
         return (state.isExcludeFilter) ? (state.secretFilter.exclude_service_accounts ?? []) : (state.secretFilter.service_accounts ?? []);
     }),
     // reference data
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
 });
@@ -179,7 +181,6 @@ watch([() => collectorFormStore.collectorProvider, () => state.serviceAccountsFi
 onMounted(async () => {
     await Promise.allSettled([
         store.dispatch('reference/serviceAccount/load'),
-        store.dispatch('reference/project/load'),
         store.dispatch('reference/provider/load'),
     ]);
 });

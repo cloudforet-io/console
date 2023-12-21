@@ -19,7 +19,8 @@ import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -43,8 +44,9 @@ const props = withDefaults(defineProps<Props>(), {
     projectId: '',
 });
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     alertStates: computed<AlertState[]>(() => ([
         {
             name: ALERT_STATE.TRIGGERED,
@@ -139,10 +141,6 @@ const statAlerts = async () => {
         state.alertStateCounts = 0;
     }
 };
-
-(async () => {
-    await store.dispatch('reference/user/load');
-})();
 
 watch(() => props.projectId, async (projectId) => {
     if (projectId) {

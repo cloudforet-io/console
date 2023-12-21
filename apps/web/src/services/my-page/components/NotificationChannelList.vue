@@ -107,7 +107,6 @@ import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-// import type { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/administration/iam/user/type';
 import type {
     ChannelItem,
     EnrichedProtocolItem,
@@ -274,7 +273,7 @@ export default {
         };
 
         (async () => {
-            await Promise.allSettled([await store.dispatch('reference/user/load'), await store.dispatch('reference/plugin/load')]);
+            await store.dispatch('reference/plugin/load');
             await listProtocol();
             await listChannel();
         })();

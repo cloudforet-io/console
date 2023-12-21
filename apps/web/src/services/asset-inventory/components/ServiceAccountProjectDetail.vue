@@ -35,7 +35,8 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceRouter } from '@/router';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { AccountType } from '@/schema/identity/service-account/type';
-import { store } from '@/store';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -58,8 +59,9 @@ export default {
         },
     },
     setup(props) {
+        const allReferenceStore = useAllReferenceStore();
         const storeState = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
+            projects: computed(() => allReferenceStore.getters.project),
         });
         const state = reactive({
             projectName: computed(() => {
@@ -75,13 +77,6 @@ export default {
                 return undefined;
             }),
         });
-
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

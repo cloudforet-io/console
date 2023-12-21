@@ -59,7 +59,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     reactive, toRefs, computed,
 } from 'vue';
@@ -81,6 +80,8 @@ import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -91,6 +92,7 @@ import { useManagePermissionState } from '@/common/composables/page-manage-permi
 import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
 import EscalationPolicyFormModal from '@/services/alert-manager/components/EscalationPolicyFormModal.vue';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
+
 
 export default {
     name: 'EscalationPolicyPage',
@@ -104,13 +106,14 @@ export default {
         PToolbox,
     },
     setup() {
+        const allReferenceStore = useAllReferenceStore();
         const currentQuery = SpaceRouter.router.currentRoute.query;
         const escalationPolicyApiQueryHelper = new ApiQueryHelper()
             .setSort('created_at', true)
             .setPage(1, 15)
             .setFiltersAsRawQueryString(currentQuery.filters);
         const storeState = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
+            projects: computed(() => allReferenceStore.getters.project),
         });
         const handlerState = reactive({
             keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -244,8 +247,6 @@ export default {
         /* init */
         (async () => {
             await listEscalationPolicies();
-            // LOAD REFERENCE STORE
-            await store.dispatch('reference/project/load');
         })();
 
         return {

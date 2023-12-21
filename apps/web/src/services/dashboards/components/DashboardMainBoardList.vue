@@ -11,12 +11,12 @@ import type { BoardSet } from '@spaceone/design-system/types/data-display/board/
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
@@ -44,6 +44,7 @@ type DashboardBoardSet = BoardSet & DashboardModel;
 
 const router = useRouter();
 
+const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
@@ -53,7 +54,7 @@ const storeState = reactive({
 const state = reactive({
     thisPage: 1,
     dashboardTotalCount: computed<number>(() => props.dashboardList.length ?? 0),
-    projectItems: computed(() => store.getters['reference/projectItems']),
+    projectItems: computed(() => allReferenceStore.getters.project),
     dashboardListByBoardSets: computed<DashboardBoardSet[]>(() => props.dashboardList
         .slice((state.thisPage - 1) * PAGE_SIZE, state.thisPage * PAGE_SIZE)
         .map((d) => {

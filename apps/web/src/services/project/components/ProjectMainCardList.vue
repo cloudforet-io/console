@@ -21,8 +21,9 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap, ProviderReferenceItem } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { arrayToQueryString } from '@/lib/router-query-string';
 
@@ -52,11 +53,13 @@ const props = withDefaults(defineProps<Props>(), {
     parentGroups: () => [],
 });
 
+const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
 const projectPageGetters = projectPageStore.getters;
 const storeState = reactive({
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projects: computed(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 const state = reactive({

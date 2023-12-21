@@ -13,7 +13,8 @@ import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/g
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { store } from '@/store';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -32,8 +33,9 @@ interface UserItem {
     user_name: string;
 }
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
 const state = reactive({
     fields: [
@@ -97,11 +99,6 @@ watch(() => props.cloudServiceProjectId, (after, before) => {
         state.projectUserIdList = [];
     } else if (after !== before) getProjectUserData();
 }, { immediate: true });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/user/load');
-})();
 </script>
 
 <template>

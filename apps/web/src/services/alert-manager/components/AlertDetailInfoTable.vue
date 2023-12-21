@@ -14,8 +14,9 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -46,6 +47,7 @@ const props = defineProps<{
     manageDisabled?: boolean;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const alertPageStore = useAlertPageStore();
 const alertPageState = alertPageStore.$state;
 
@@ -71,7 +73,7 @@ const state = reactive({
         { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
         { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
     ]),
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
     data: computed(() => alertPageState.alertData ?? {}),
     escalationPolicyName: '',
@@ -95,7 +97,6 @@ const getEscalationPolicy = async () => {
     await Promise.allSettled([
         getEscalationPolicy(),
         store.dispatch('reference/webhook/load'),
-        store.dispatch('reference/user/load'),
     ]);
 })();
 

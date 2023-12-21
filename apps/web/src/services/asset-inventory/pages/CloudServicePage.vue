@@ -90,9 +90,10 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
@@ -141,12 +142,13 @@ export default {
         PEmpty,
     },
     setup() {
+        const allReferenceStore = useAllReferenceStore();
         const cloudServicePageStore = useCloudServicePageStore();
         const cloudServicePageState = cloudServicePageStore.$state;
 
         const storeState = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+            projects: computed(() => allReferenceStore.getters.project),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
@@ -263,8 +265,6 @@ export default {
 
             // LOAD REFERENCE STORE
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/serviceAccount/load'),
             ]);
 

@@ -99,8 +99,6 @@ export default defineComponent<Props>({
         /* Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/cloudServiceType/load'),
             ]);
         })();

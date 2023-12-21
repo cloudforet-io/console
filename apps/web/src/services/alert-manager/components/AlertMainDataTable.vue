@@ -162,9 +162,10 @@ import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import { store } from '@/store';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -237,6 +238,7 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const allReferenceStore = useAllReferenceStore();
         const tagQueryHelper = new ApiQueryHelper().setFilters(props.filters);
 
         const valueHandlerFilters = new QueryHelper().setFilters([
@@ -245,8 +247,8 @@ export default {
 
         const storeState = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+            users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
         });
 
@@ -466,11 +468,9 @@ export default {
         (async () => {
             await Promise.allSettled([
                 store.dispatch('reference/webhook/load'),
-                store.dispatch('reference/user/load'),
-                store.dispatch('reference/project/load'),
             ]);
             state.tags = tagQueryHelper.setReference({
-                'identity.Project': computed(() => store.getters['reference/projectItems']),
+                'identity.Project': computed(() => allReferenceStore.getters.project),
                 'monitoring.Webhook': computed(() => store.getters['reference/webhookItems']),
             }).setKeyItemSets(querySearchHandlerState.keyItemSets).queryTags;
         })();

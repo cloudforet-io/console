@@ -47,10 +47,10 @@ import type { FavoriteItem } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
@@ -74,6 +74,7 @@ import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSugge
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
+
 const RECENT_LIMIT = 30;
 
 export default defineComponent({
@@ -96,8 +97,8 @@ export default defineComponent({
 
         const storeState = reactive({
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
             recents: computed<RecentConfig[]>(() => store.state.recent.allItems),

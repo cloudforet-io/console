@@ -13,10 +13,10 @@ import { find } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -27,6 +27,7 @@ import { red, yellow } from '@/styles/colors';
 import AlertDashboardTop5ProjectActivityWidgetTooltip from '@/services/alert-manager/components/AlertDashboardTop5ProjectActivityWidgetTooltip.vue';
 import { ALERT_STATE_FILTER } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
+
 
 const ACTIVITY = {
     HIGH: 'HIGH',
@@ -56,9 +57,10 @@ interface Activity {
 }
 
 const vm = getCurrentInstance()?.proxy as Vue;
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
-    projects: computed(() => store.getters['reference/projectItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     top5Projects: [] as string[],
     activity: {},
     periods: [
@@ -162,12 +164,6 @@ watch(() => state.selectedPeriod, async () => {
     await Promise.all(state.top5Projects.map((d) => getActivities(d)));
     state.loading = false;
 }, { immediate: true });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/project/load');
-})();
-
 </script>
 
 <template>
