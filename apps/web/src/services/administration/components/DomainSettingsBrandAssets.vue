@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PHeading, PPaneLayout, PFieldTitle, PTextInput, PButton,
@@ -30,13 +30,6 @@ const state = reactive({
     loginPageImageUrl: undefined as string | undefined,
 });
 
-/* Util */
-const init = () => {
-    state.wordtypeLogoUrl = domainConfigGetters.wordtypeLogoUrl;
-    state.symbolFaviconUrl = domainConfigGetters.symbolFaviconUrl;
-    state.loginPageImageUrl = domainConfigGetters.loginPageImageUrl;
-};
-
 /* Event */
 const handleSaveChanges = async () => {
     try {
@@ -51,9 +44,16 @@ const handleSaveChanges = async () => {
     }
 };
 
-(async () => {
-    init();
-})();
+/* Watcher */
+watch(() => domainConfigGetters.wordtypeLogoUrl, (val) => {
+    state.wordtypeLogoUrl = val;
+}, { immediate: true });
+watch(() => domainConfigGetters.symbolFaviconUrl, (val) => {
+    state.symbolFaviconUrl = val;
+}, { immediate: true });
+watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
+    state.loginPageImageUrl = val;
+}, { immediate: true });
 </script>
 
 <template>

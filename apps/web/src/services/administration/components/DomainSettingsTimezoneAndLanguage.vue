@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PHeading, PPaneLayout, PFieldTitle, PButton, PSelectDropdown,
@@ -38,14 +38,6 @@ const state = reactive({
     })) as SelectDropdownMenuItem[],
 });
 
-/* Util */
-const init = () => {
-    if (domainConfigGetters.timezone) {
-        state.selectedTimezone = [{ name: domainConfigGetters.timezone }];
-    }
-    state.selectedLanguage = domainConfigGetters.language;
-};
-
 /* Event */
 const handleSaveChanges = async () => {
     try {
@@ -59,9 +51,13 @@ const handleSaveChanges = async () => {
     }
 };
 
-(async () => {
-    init();
-})();
+/* Watcher */
+watch(() => domainConfigGetters.timezone, (val) => {
+    if (val) state.selectedTimezone = [{ name: val }];
+}, { immediate: true });
+watch(() => domainConfigGetters.language, (val) => {
+    state.selectedLanguage = val;
+}, { immediate: true });
 </script>
 
 <template>

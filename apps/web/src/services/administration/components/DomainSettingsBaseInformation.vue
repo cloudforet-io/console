@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
-    PFieldGroup, PHeading, PPaneLayout, PFieldTitle, PCopyButton, PTextInput, PButton,
+    PHeading, PPaneLayout, PFieldTitle, PCopyButton, PTextInput, PButton,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -34,12 +34,6 @@ const state = reactive({
     adminEmailChangeModalVisible: false,
 });
 
-/* Util */
-const init = () => {
-    state.displayName = domainConfigGetters.displayName;
-    state.adminEmail = domainConfigGetters.adminEmail;
-};
-
 /* Event */
 const handleClickSaveDisplayName = async () => {
     try {
@@ -51,13 +45,17 @@ const handleClickSaveDisplayName = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_UPDATE_DISPLAY_NAME'));
     }
 };
-const handleClickChangeAdminEmail = () => {
-    state.adminEmailChangeModalVisible = true;
-};
+// const handleClickChangeAdminEmail = () => {
+//     state.adminEmailChangeModalVisible = true;
+// };
 
-(async () => {
-    init();
-})();
+/* Watcher */
+watch(() => domainConfigGetters.displayName, (val) => {
+    state.displayName = val;
+}, { immediate: true });
+watch(() => domainConfigGetters.adminEmail, (val) => {
+    state.adminEmail = val;
+}, { immediate: true });
 </script>
 
 <template>
@@ -92,24 +90,24 @@ const handleClickChangeAdminEmail = () => {
                     </p-button>
                 </div>
             </div>
-            <div class="field-wrapper">
-                <p-field-group :label="$t('IAM.DOMAIN_SETTINGS.ADMIN_EMAIL')"
-                               required
-                >
-                    <div class="input-wrapper">
-                        <p-text-input :value="state.adminEmail"
-                                      disabled
-                        />
-                        <p-button class="ml-2"
-                                  style-type="tertiary"
-                                  icon-left="ic_edit"
-                                  @click="handleClickChangeAdminEmail"
-                        >
-                            {{ $t('IAM.DOMAIN_SETTINGS.CHANGE') }}
-                        </p-button>
-                    </div>
-                </p-field-group>
-            </div>
+            <!--            <div class="field-wrapper">-->
+            <!--                <p-field-group :label="$t('IAM.DOMAIN_SETTINGS.ADMIN_EMAIL')"-->
+            <!--                               required-->
+            <!--                >-->
+            <!--                    <div class="input-wrapper">-->
+            <!--                        <p-text-input :value="state.adminEmail"-->
+            <!--                                      disabled-->
+            <!--                        />-->
+            <!--                        <p-button class="ml-2"-->
+            <!--                                  style-type="tertiary"-->
+            <!--                                  icon-left="ic_edit"-->
+            <!--                                  @click="handleClickChangeAdminEmail"-->
+            <!--                        >-->
+            <!--                            {{ $t('IAM.DOMAIN_SETTINGS.CHANGE') }}-->
+            <!--                        </p-button>-->
+            <!--                    </div>-->
+            <!--                </p-field-group>-->
+            <!--            </div>-->
         </div>
         <domain-settings-change-admin-email-modal :visible.sync="state.adminEmailChangeModalVisible" />
     </p-pane-layout>
