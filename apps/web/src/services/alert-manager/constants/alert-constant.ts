@@ -27,12 +27,3 @@ export const ALERT_URGENCY_FILTER = {
     ...ALERT_URGENCY,
     ALL: 'ALL',
 } as const;
-
-export const ALERT_SEVERITY = {
-    CRITICAL: 'Critical',
-    ERROR: 'Error',
-    WARNING: 'Warning',
-    INFO: 'Info',
-    NOT_AVAILABLE: 'Not Available',
-    NONE: 'None',
-} as const;

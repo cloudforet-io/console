@@ -11,6 +11,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { AlertSeverity } from '@/schema/monitoring/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { store } from '@/store';
@@ -30,12 +31,19 @@ import AlertDetailInfoTableDescription
     from '@/services/alert-manager/components/AlertDetailInfoTableDescription.vue';
 import AlertDetailInfoTableProject from '@/services/alert-manager/components/AlertDetailInfoTableProject.vue';
 import AlertTriggeredBy from '@/services/alert-manager/components/AlertMainDataTableTriggeredByField.vue';
-import { ALERT_SEVERITY } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 
-const ALERT_SEVERITY_COLORS: Record<keyof typeof ALERT_SEVERITY, string> = {
+const ALERT_SEVERITY_LABELS: Record<AlertSeverity, string> = {
+    CRITICAL: 'Critical',
+    ERROR: 'Error',
+    WARNING: 'Warning',
+    INFO: 'Info',
+    NOT_AVAILABLE: 'Not Available',
+    NONE: 'None',
+};
+const ALERT_SEVERITY_COLORS: Record<AlertSeverity, string> = {
     CRITICAL: red[600],
     ERROR: coral[600],
     WARNING: yellow[600],
@@ -131,7 +139,7 @@ const getEscalationPolicy = async () => {
                          :text-color="ALERT_SEVERITY_COLORS[value]"
                          :outline-color="ALERT_SEVERITY_COLORS[value]"
                 >
-                    {{ ALERT_SEVERITY[value] || value }}
+                    {{ ALERT_SEVERITY_LABELS[value] || value }}
                 </p-badge>
             </template>
             <template #data-escalation_policy_id>

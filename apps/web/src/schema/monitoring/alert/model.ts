@@ -1,13 +1,6 @@
-import type { TimeStamp } from '@/schema/_common/model';
 import type { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 
-
-type Responder = {
-    resource_type: string;
-    resource_id: string;
-};
-
-interface Resource {
+interface AlertResource {
     resource_id?: string;
     resource_type?: string;
     name?: string;
@@ -23,27 +16,28 @@ export interface AlertModel {
     alert_id: string;
     title: string;
     state: AlertState;
-    status_message: string;
     description: string;
     assignee: string;
     urgency: AlertUrgency;
     severity: AlertSeverity;
     rule: string;
-    resource: Resource;
-    additional_info: any;
+    image_url: string;
+    resource: AlertResource;
+    provider: string;
+    account: string;
+    additional_info: Record<string, any>;
     escalation_step: number;
     escalation_ttl: number;
-    responders: Responder[];
-    project_dependencies: string[];
     triggered_by: string;
     webhook_id: string;
     escalation_policy_id: string;
     project_id: string;
+    workspace_id: string;
     domain_id: string;
     //
-    created_at: TimeStamp;
-    updated_at: TimeStamp;
-    acknowledged_at: TimeStamp;
-    resolved_at: TimeStamp;
-    escalated_at: TimeStamp;
+    created_at: string;
+    updated_at: string;
+    acknowledged_at: string;
+    resolved_at: string;
+    escalated_at: string;
 }

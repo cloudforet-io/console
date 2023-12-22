@@ -66,7 +66,7 @@ const queryTagsHelper = useQueryTags({
             { name: 'name', label: 'Name' },
             { name: 'finish_condition', label: 'Finish Condition' },
             { name: 'scope', label: 'Scope' },
-            { name: 'project_id', label: 'Project', valueSet: storeState.projects },
+            { name: 'project_id', label: 'Project', valueSet: allReferenceStore.getters.project },
             { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     }]),
@@ -88,9 +88,6 @@ const escalationPolicyApiQueryHelper = new ApiQueryHelper()
     .setPage(1, 15);
 
 /* States */
-const storeState = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
-});
 const tableState = reactive({
     loading: true,
     totalCount: 0,
