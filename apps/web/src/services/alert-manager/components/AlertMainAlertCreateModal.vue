@@ -186,6 +186,7 @@ watch(() => state.proxyVisible, (visible) => {
                 </template>
                 <project-select-dropdown :invalid="state.projectInvalid"
                                          project-selectable
+                                         :project-group-selectable="false"
                                          @select="onSelectProject"
                 />
             </p-field-group>

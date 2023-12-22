@@ -16,6 +16,8 @@ import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
 import { useFormValidator } from '@/common/composables/form-validator';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
@@ -25,7 +27,6 @@ import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/es
 import type { ActionMode } from '@/services/alert-manager/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
-
 
 const props = withDefaults(defineProps<{
     mode: ActionMode;

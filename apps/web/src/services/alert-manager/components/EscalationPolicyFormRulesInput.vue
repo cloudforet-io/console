@@ -23,22 +23,22 @@ import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/es
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
-const NOTIFICATION_LEVELS = Object.freeze([
+const NOTIFICATION_LEVELS: {name: EscalationPolicyRule['notification_level']; label: string}[] = [
     { name: 'ALL', label: 'All' },
     { name: 'LV1', label: 'Level 1' },
     { name: 'LV2', label: 'Level 2' },
     { name: 'LV3', label: 'Level 3' },
     { name: 'LV4', label: 'Level 4' },
     { name: 'LV5', label: 'Level 5' },
-]);
-const MINIFIED_NOTIFICATION_LEVELS = Object.freeze([
+];
+const MINIFIED_NOTIFICATION_LEVELS: {name: EscalationPolicyRule['notification_level']; label: string}[] = [
     { name: 'ALL', label: 'All' },
     { name: 'LV1', label: '1' },
     { name: 'LV2', label: '2' },
     { name: 'LV3', label: '3' },
     { name: 'LV4', label: '4' },
     { name: 'LV5', label: '5' },
-]);
+];
 const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
 
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
@@ -58,7 +58,10 @@ const {
     isAllValid,
 } = useFormValidator({
     repeatCount: 0,
-    rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }] as EscalationPolicyRule[],
+    rules: [{
+        notification_level: DEFAULT_NOTIFICATION_LEVEL,
+        escalate_minutes: undefined,
+    }] as EscalationPolicyRule[],
 }, {
     repeatCount(value) {
         if (Number.isNaN(value) || typeof value !== 'number') return 'Only numbers are allowed.';
@@ -90,13 +93,13 @@ const listProjectChannel = async (projectId: string) => {
 };
 
 /* util */
-const showEscalatesAfterForm = (idx) => {
+const showEscalatesAfterForm = (idx: number) => {
     if (idx < rules.value.length - 1) return true;
     return repeatCount.value > 0;
 };
 
 /* event */
-const handleDeleteRule = (idx) => {
+const handleDeleteRule = (idx: number) => {
     const _rules = cloneDeep(rules.value);
     _rules.splice(idx, 1);
     if (_rules.length > 0 && !repeatCount.value) _rules[_rules.length - 1].escalate_minutes = undefined;
@@ -111,7 +114,7 @@ const handleAddStep = () => {
     });
     setForm('rules', _rules);
 };
-const handleUpdateRepeatCount = (_repeatCount) => {
+const handleUpdateRepeatCount = (_repeatCount: number) => {
     const _after = Number(_repeatCount);
     const _before = repeatCount.value;
     const _rules = cloneDeep(rules.value);
@@ -359,7 +362,8 @@ watch(() => isAllValid.value, (_isAllValid) => {
         .col-rule {
             @apply col-span-4 text-gray-900;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
+            gap: 0.5rem;
             align-items: center;
             font-size: 0.875rem;
             line-height: 1.4;
