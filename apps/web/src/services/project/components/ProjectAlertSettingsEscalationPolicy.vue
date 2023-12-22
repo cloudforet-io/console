@@ -14,33 +14,34 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
-import { FINISH_CONDITION } from '@/services/alert-manager/constants/alert-constant';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
 
 interface Props {
     projectId?: string;
-    escalationPolicy?: object;
+    escalationPolicy?: EscalationPolicyModel;
 }
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
-    escalationPolicy: () => ({}),
+    escalationPolicy: undefined,
 });
 
 const queryHelper = new QueryHelper();
 const state = reactive({
     finishConditions: computed(() => ([
         {
-            name: FINISH_CONDITION.acknowledged,
+            name: ESCALATION_POLICY_FINISH_CONDITION.acknowledged,
             label: i18n.t('PROJECT.DETAIL.ALERT.ACKNOWLEDGED'),
         },
         {
-            name: FINISH_CONDITION.resolved,
+            name: ESCALATION_POLICY_FINISH_CONDITION.resolved,
             label: i18n.t('PROJECT.DETAIL.ALERT.RESOLVED'),
         },
     ])),

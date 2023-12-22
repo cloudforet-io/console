@@ -1,16 +1,16 @@
 import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 
-import { FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
-import type { Rule, EscalationPolicyDataModel, ScopeType } from '@/services/alert-manager/types/alert-type';
-
+import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 
 interface EscalationPolicyFormState {
-    escalationPolicyData?: EscalationPolicyDataModel|undefined;
+    escalationPolicyData?: EscalationPolicyModel|undefined;
     name?: string;
-    scope: ScopeType;
-    rules: Rule[];
-    finishCondition: FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
+    resource_group: EscalationPolicyModel['resource_group'];
+    rules: EscalationPolicyRule[];
+    finishCondition: EscalationPolicyFinishCondition;
     repeatCount: number;
     projectId?: string;
     //
@@ -21,18 +21,18 @@ type EscalationPolicyFormGetters = _GettersTree<{
     isAllValid: boolean;
 }> & _GettersTree<EscalationPolicyFormState>;
 interface EscalationPolicyFormActions {
-    initEscalationPolicyFormData: (escalationPolicyData: EscalationPolicyDataModel) => void;
+    initEscalationPolicyFormData: (escalationPolicyData: EscalationPolicyModel) => void;
 }
 
 const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
 
 export const useEscalationPolicyFormStore = defineStore<string, EscalationPolicyFormState, EscalationPolicyFormGetters, EscalationPolicyFormActions>('escalation-policy-form', {
     state: () => ({
-        escalationPolicyData: {} as EscalationPolicyDataModel|undefined,
+        escalationPolicyData: {} as EscalationPolicyModel|undefined,
         name: undefined,
-        scope: SCOPE.DOMAIN,
+        resource_group: 'PROJECT',
         rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
-        finishCondition: FINISH_CONDITION.acknowledged,
+        finishCondition: ESCALATION_POLICY_FINISH_CONDITION.acknowledged,
         repeatCount: 0,
         projectId: undefined,
         //
@@ -43,10 +43,10 @@ export const useEscalationPolicyFormStore = defineStore<string, EscalationPolicy
         isAllValid: (state) => state.isNameProjectIdFormValid && state.isEscalationRulesFormValid,
     },
     actions: {
-        initEscalationPolicyFormData(escalationPolicyData: EscalationPolicyDataModel) {
+        initEscalationPolicyFormData(escalationPolicyData: EscalationPolicyModel) {
             this.escalationPolicyData = escalationPolicyData;
             this.name = escalationPolicyData.name;
-            this.scope = escalationPolicyData.scope;
+            this.resource_group = escalationPolicyData.resource_group;
             this.rules = escalationPolicyData.rules;
             this.finishCondition = escalationPolicyData.finish_condition;
             this.repeatCount = escalationPolicyData.repeat_count;

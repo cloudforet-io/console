@@ -1,11 +1,11 @@
 import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 
-export enum ACTION {
-    create = 'create',
-    delete = 'delete',
-    update = 'update',
-    default = 'default',
-}
+export const ACTION = {
+    create: 'create',
+    delete: 'delete',
+    update: 'update',
+    default: 'default',
+} as const;
 
 export const EDIT_MODE = {
     DESCRIPTION: 'description',
@@ -16,11 +16,6 @@ export const SCOPE = {
     DOMAIN: 'DOMAIN',
     PROJECT: 'PROJECT',
 } as const;
-
-export enum FINISH_CONDITION {
-    acknowledged = 'ACKNOWLEDGED',
-    resolved = 'RESOLVED',
-}
 
 export const ALERT_STATE_FILTER = {
     OPEN: 'OPEN',

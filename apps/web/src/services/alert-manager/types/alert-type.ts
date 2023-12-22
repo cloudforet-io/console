@@ -7,29 +7,15 @@ import type { AlertState } from '@/schema/monitoring/alert/model';
 import type { RouteQueryString } from '@/lib/router-query-string';
 
 import type {
-    FINISH_CONDITION, ALERT_STATE_FILTER, ASSIGNED_STATE, SCOPE,
+    ALERT_STATE_FILTER, ASSIGNED_STATE,
     EXTENDED_ALERT_URGENCY,
+    ACTION,
 } from '@/services/alert-manager/constants/alert-constant';
 
 export type ExtendedAlertUrgency = typeof EXTENDED_ALERT_URGENCY[keyof typeof EXTENDED_ALERT_URGENCY];
 
-export interface Rule {
-    notification_level: string;
-    escalate_minutes?: number;
-}
+export type ActionMode = typeof ACTION[keyof typeof ACTION];
 
-type FinishCondition = FINISH_CONDITION.acknowledged | FINISH_CONDITION.resolved;
-export type ScopeType = typeof SCOPE[keyof typeof SCOPE];
-export interface EscalationPolicyDataModel {
-    escalation_policy_id: string;
-    finish_condition: FinishCondition;
-    is_default?: boolean;
-    name: string;
-    project_id?: string;
-    repeat_count: number;
-    rules: Rule[];
-    scope: ScopeType;
-}
 
 export interface Event {
     additional_info: any;

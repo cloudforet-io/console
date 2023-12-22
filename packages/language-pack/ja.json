@@ -2887,7 +2887,6 @@
 					"ESCALATION_RULES_HELP_TEXT": "少なくとも1以上のルールが必要です。(最大５)",
 					"ESCALATION_RULES_LABEL": "エスカレーションルール",
 					"FINISH_CONDITION_LABEL": "終了条件",
-					"GLOBAL": "グローバル",
 					"GO_CREATE_PROJECT": "プロジェクト作成に移動",
 					"MIN": "分",
 					"NAME_INVALID_TEXT": "名前の最大長さは40文字です。",
@@ -2907,7 +2906,8 @@
 					"RULE": "ルール",
 					"SCOPE_LABEL": "スコア",
 					"STEP": "ステップ",
-					"TIME": "時間"
+					"TIME": "時間",
+					"WORKSPACE": ""
 				},
 				"GLOBAL": "グローバル",
 				"PROJECT": "プロジェクト",
