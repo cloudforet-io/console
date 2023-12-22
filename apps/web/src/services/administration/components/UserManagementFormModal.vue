@@ -24,7 +24,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import UserManagementAddAdminRole from '@/services/administration/components/UserManagementAddAdminRole.vue';
+import UserManagementFormAdminRole from '@/services/administration/components/user-management-form-admin-role.vue';
 import UserManagementAddTag from '@/services/administration/components/UserManagementAddTag.vue';
 import UserManagementFormInfoForm from '@/services/administration/components/UserManagementFormInfoForm.vue';
 import UserManagementFormMultiFactorAuth
@@ -60,7 +60,6 @@ const state = reactive({
     mfa: computed(() => store.state.user.mfa),
     loginUserId: computed(() => store.state.user.userId),
     isChangedToggle: false,
-    isSetAdminRole: false,
     roleBindingList: [] as RoleBindingModel[],
 });
 const formState = reactive({
@@ -72,8 +71,6 @@ const formState = reactive({
     passwordManual: false,
     // role
     role: {} as AddModalMenuItem,
-    roleBindingId: computed(() => state.roleBindingList.find((r) => r.role_id === formState.role.name)?.role_binding_id),
-    workspace: [] as AddModalMenuItem[],
     // tag
     tags: {} as Tags,
 });
@@ -95,7 +92,6 @@ const handleChangeInputs = (value) => {
     if (value.password) formState.password = value.password || '';
     if (value.passwordType) formState.passwordType = value.passwordType;
     if (value.role) formState.role = value.role;
-    if (value.workspace) formState.workspace = value.workspace;
 };
 const handleChangeVerify = (status) => {
     state.data.email_verified = status;
@@ -108,18 +104,6 @@ const buildUserInfoParams = (): UserManagementData => ({
     password: formState.password || '',
     reset_password: state.data.auth_type === 'LOCAL' && formState.passwordType === PASSWORD_TYPE.RESET,
 });
-const buildRoleParams = (item?: AddModalMenuItem): any => {
-    const baseRoleParams = {
-        role_id: formState.role.name || '',
-    };
-    if (isEmpty(formState.role)) {
-        return baseRoleParams;
-    }
-    return {
-        ...baseRoleParams,
-        workspace_id: item?.name || '',
-    };
-};
 
 /* API */
 const handleConfirm = async () => {
@@ -130,11 +114,7 @@ const handleConfirm = async () => {
             await fetchPostDisableMfa();
         }
 
-        if (state.isSetAdminRole) {
-            await fetchRoleBinding();
-        } else {
-            await Promise.all(formState.workspace.map(fetchRoleBinding));
-        }
+        await fetchRoleBinding();
 
         const userInfoParams = buildUserInfoParams();
         await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>(userInfoParams);
@@ -151,19 +131,24 @@ const handleConfirm = async () => {
 const fetchRoleBinding = async (item?: AddModalMenuItem) => {
     if (isEmpty(formState.role)) return;
 
-    const roleParams = buildRoleParams(item);
+    const roleParams = {
+        role_id: formState.role.name || '',
+    };
+
+    const roleBindingItem = state.roleBindingList.find((r) => r.role_id === formState.role.name);
 
     try {
-        if (formState.roleBindingId) {
-            await SpaceConnector.clientV2.identity.roleBinding.update<RoleUpdateParameters, RoleBindingModel>({
+        if (item?.name === roleBindingItem?.workspace_id) {
+            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
                 ...roleParams,
-                role_binding_id: formState.roleBindingId,
+                role_binding_id: roleBindingItem?.role_binding_id || '',
             });
         } else {
             await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
                 ...roleParams,
+                workspace_id: item?.name || '',
                 user_id: state.data.user_id || '',
-                resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
+                resource_group: RESOURCE_GROUP.DOMAIN,
             });
         }
     } catch (e: any) {
@@ -231,9 +216,8 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                     @change-input="handleChangeInputs"
                 />
                 <user-management-form-multi-factor-auth :is-changed-toggle.sync="state.isChangedToggle" />
-                <user-management-add-admin-role v-if="userPageState.isAdminMode"
-                                                :is-set-admin-role.sync="state.isSetAdminRole"
-                                                @change-input="handleChangeInputs"
+                <user-management-form-admin-role v-if="userPageState.isAdminMode"
+                                                 @change-input="handleChangeInputs"
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
                                          :tags.sync="formState.tags"

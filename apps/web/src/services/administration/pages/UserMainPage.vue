@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onUnmounted, reactive, watch,
+    computed, onMounted, onUnmounted, reactive, watch,
 } from 'vue';
 
 import { PHorizontalLayout } from '@spaceone/design-system';
@@ -31,7 +31,9 @@ const userListApiQueryHelper = new ApiQueryHelper()
 /* API */
 const refreshUserList = () => {
     userPageStore.$patch({ loading: true });
-    userListApiQueryHelper.setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit);
+    userListApiQueryHelper
+        .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
+        .setFilters(userPageState.searchFilters);
     try {
         if (storeState.isAdminMode) {
             userPageStore.listUsers({ query: userListApiQueryHelper.data });
@@ -49,9 +51,10 @@ watch(() => storeState.isAdminMode, (isAdminMode) => {
 }, { immediate: true });
 
 /* Init */
-(async () => {
+onMounted(async () => {
+    await userPageStore.listRoles();
     await refreshUserList();
-})();
+});
 
 /* Unmount */
 onUnmounted(() => {

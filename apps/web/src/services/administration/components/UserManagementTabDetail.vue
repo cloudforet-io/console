@@ -28,6 +28,8 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 
 const userPageStore = useUserPageStore();
 
+const emit = defineEmits<{(e: 'refresh', id: string): void }>();
+
 const storeState = reactive({
     userInfo: computed(() => store.state.user),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
@@ -86,6 +88,7 @@ const handleClickVerifyButton = async () => {
             user_id: tableState.refinedUserItems.user_id || '',
             email: tableState.refinedUserItems.email,
         });
+        await emit('refresh', tableState.refinedUserItems.user_id || '');
         await store.dispatch('user/setUser', { email: tableState.refinedUserItems.email });
     } catch (e: any) {
         ErrorHandler.handleError(e);
@@ -124,7 +127,7 @@ const handleClickVerifyButton = async () => {
                     <span>{{ useRoleFormatter(value).name }}</span>
                 </span>
             </template>
-            <template #data-role_binding_info="{value}">
+            <template #data-role_binding="{value}">
                 {{ value.name }}
             </template>
             <template #data-last_accessed_at="{data}">
