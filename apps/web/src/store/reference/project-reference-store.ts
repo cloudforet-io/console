@@ -26,6 +26,7 @@ interface ProjectResourceItemData {
         id: string;
         name: string;
     };
+    users: string[];
 }
 export type ProjectReferenceItem = Required<Pick<ReferenceItem<ProjectResourceItemData>, 'key'|'label'|'name'|'data'>>;
 export type ProjectReferenceMap = ReferenceMap<ProjectReferenceItem>;
@@ -72,7 +73,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
 
         const params: ProjectListParameters = {
             query: {
-                only: ['project_id', 'name', 'project_group_id', 'workspace_id'],
+                only: ['project_id', 'name', 'project_group_id', 'users'],
             },
         };
         const { status, response } = await fetcher(params);
@@ -93,6 +94,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
                         id: projectGroup.project_group_id,
                         name: projectGroup.name,
                     } : undefined,
+                    users: projectInfo.users || [],
                 },
             };
         }
