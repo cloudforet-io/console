@@ -13,6 +13,7 @@ import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-ve
 import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
 import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
@@ -24,8 +25,8 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import UserManagementFormAdminRole from '@/services/administration/components/user-management-form-admin-role.vue';
 import UserManagementAddTag from '@/services/administration/components/UserManagementAddTag.vue';
+import UserManagementFormAdminRole from '@/services/administration/components/UserManagementFormAdminRole.vue';
 import UserManagementFormInfoForm from '@/services/administration/components/UserManagementFormInfoForm.vue';
 import UserManagementFormMultiFactorAuth
     from '@/services/administration/components/UserManagementFormMultiFactorAuth.vue';
@@ -176,9 +177,22 @@ const fetchPostDisableMfa = async () => {
     }
 };
 const fetchListRoleBindingInfo = async () => {
-    const { results } = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListParameters, ListResponse<RoleBindingModel>>({
+    const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListParameters, ListResponse<RoleBindingModel>>({
         user_id: state.data.user_id || '',
+        query: {
+            filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'eq' }],
+        },
     });
+    const results = response.results || [];
+    if (results?.length > 0) {
+        const matchingRole = userPageState.roles.find((r) => r.role_id === results[0].role_id);
+        formState.role = matchingRole ? {
+            label: matchingRole.name,
+            name: matchingRole.role_id,
+            role_type: matchingRole.role_type,
+        } : {};
+    }
+
     state.roleBindingList = results || [];
 };
 
@@ -187,6 +201,11 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
     if (visible) {
         await setForm();
         await fetchListRoleBindingInfo();
+    } else {
+        formState.password = '';
+        formState.passwordType = '';
+        formState.passwordManual = false;
+        formState.role = {} as AddModalMenuItem;
     }
 });
 </script>
@@ -217,7 +236,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                 />
                 <user-management-form-multi-factor-auth :is-changed-toggle.sync="state.isChangedToggle" />
                 <user-management-form-admin-role v-if="userPageState.isAdminMode"
-                                                 @change-input="handleChangeInputs"
+                                                 :role="formState.role"
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
                                          :tags.sync="formState.tags"
