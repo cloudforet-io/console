@@ -41,11 +41,14 @@ const roleState = reactive({
     visible: false,
     menuItems: [] as AddModalMenuItem[],
     proxySelectedItems: useProxyValue('role', props, emit),
-    selectedItems: computed(() => ([{
-        label: roleState.proxySelectedItems.label,
-        name: roleState.proxySelectedItems.name,
-        role_type: roleState.proxySelectedItems.role_type,
-    }])),
+    selectedItems: computed(() => {
+        if (isEmpty(roleState.proxySelectedItems)) return [];
+        return [{
+            label: roleState.proxySelectedItems.label,
+            name: roleState.proxySelectedItems.name,
+            role_type: roleState.proxySelectedItems.role_type,
+        }];
+    }),
     searchText: '',
 });
 

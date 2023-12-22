@@ -139,17 +139,17 @@ const fetchRoleBinding = async (item?: AddModalMenuItem) => {
     const roleBindingItem = state.roleBindingList.find((r) => r.role_id === formState.role.name);
 
     try {
-        if (item?.name === roleBindingItem?.workspace_id) {
-            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
-                ...roleParams,
-                role_binding_id: roleBindingItem?.role_binding_id || '',
-            });
-        } else {
+        if (isEmpty(roleBindingItem)) {
             await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
                 ...roleParams,
                 workspace_id: item?.name || '',
                 user_id: state.data.user_id || '',
                 resource_group: RESOURCE_GROUP.DOMAIN,
+            });
+        } else {
+            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
+                ...roleParams,
+                role_binding_id: roleBindingItem?.role_binding_id || '',
             });
         }
     } catch (e: any) {
@@ -236,7 +236,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
                 />
                 <user-management-form-multi-factor-auth :is-changed-toggle.sync="state.isChangedToggle" />
                 <user-management-form-admin-role v-if="userPageState.isAdminMode"
-                                                 :role="formState.role"
+                                                 :role.sync="formState.role"
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
                                          :tags.sync="formState.tags"
