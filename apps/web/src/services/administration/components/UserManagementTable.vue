@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PBadge, PStatus, PToolboxTable, PButton, PSelectDropdown, PTooltip,
@@ -14,17 +13,16 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import UserManagementTableToolbox from '@/services/administration/components/UserManagementTableToolbox.vue';
 import {
@@ -44,15 +42,15 @@ const props = withDefaults(defineProps<Props>(), {
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
-const route = useRoute();
 const emit = defineEmits<{(e: 'confirm'): void; }>();
 
 const roleListApiQueryHelper = new ApiQueryHelper();
 const userListApiQueryHelper = new ApiQueryHelper()
     .setPageStart(userPageState.pageStart).setPageLimit(userPageState.pageLimit)
-    .setSort('name', true)
-    .setFiltersAsRawQueryString(route.query.filters);
+    .setSort('name', true);
 let userListApiQuery = userListApiQueryHelper.data;
+const queryTagHelper = useQueryTags({ keyItemSets: USER_SEARCH_HANDLERS.keyItemSets });
+const { queryTags } = queryTagHelper;
 
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
@@ -62,7 +60,6 @@ const state = reactive({
         last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
     }))),
     isSelected: computed(() => userPageState.selectedIndices.length > 0),
-    tags: userListApiQueryHelper.setKeyItemSets(USER_SEARCH_HANDLERS.keyItemSets).queryTags,
     roleList: [] as RoleModel[],
 });
 const tableState = reactive({
@@ -70,9 +67,9 @@ const tableState = reactive({
         const additionalFields: DefinitionField[] = [];
         if (userPageState.isAdminMode) {
             additionalFields.push(
-                { name: 'mfa', label: 'Multi-factor Auth', sortable: false },
+                { name: 'mfa', label: 'Multi-factor Auth' },
                 { name: 'api_key_count', label: 'API Key', sortable: false },
-                { name: 'role_type', label: 'Role Type', sortable: false },
+                { name: 'role_type', label: 'Role Type' },
             );
         } else {
             additionalFields.push(
@@ -80,14 +77,14 @@ const tableState = reactive({
             );
         }
         const baseFields = [
-            { name: 'user_id', label: 'User ID', sortable: false },
-            { name: 'name', label: 'Name', sortable: false },
-            { name: 'state', label: 'State', sortable: false },
+            { name: 'user_id', label: 'User ID' },
+            { name: 'name', label: 'Name' },
+            { name: 'state', label: 'State' },
             ...additionalFields,
-            { name: 'tags', label: 'Tags' },
-            { name: 'auth_type', label: 'Auth Type', sortable: false },
-            { name: 'last_accessed_at', label: 'Last Activity', sortable: false },
-            { name: 'timezone', label: 'Timezone', sortable: false },
+            { name: 'tags', label: 'Tags', sortable: false },
+            { name: 'auth_type', label: 'Auth Type' },
+            { name: 'last_accessed_at', label: 'Last Activity' },
+            { name: 'timezone', label: 'Timezone' },
         ];
         return userPageStore.isWorkspaceOwner
             ? [
@@ -109,6 +106,7 @@ const dropdownState = reactive({
 const handleSelect = async (index) => {
     userPageStore.$patch({ selectedIndices: index });
 };
+/* API */
 const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
     dropdownState.loading = true;
 
@@ -145,10 +143,9 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
-            user_id: state.refinedUserItems[rowIndex].user_id || '',
+        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
+            role_binding_id: state.refinedUserItems[rowIndex].role_binding_info?.role_binding_id || '',
             role_id: value.name || '',
-            resource_group: RESOURCE_GROUP.WORKSPACE,
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
         emit('confirm');
@@ -156,12 +153,12 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
-
-/* API */
 const handleChange = async (options: any = {}) => {
     userListApiQuery = getApiQueryWithToolboxOptions(userListApiQueryHelper, options) ?? userListApiQuery;
     if (options.queryTags !== undefined) {
-        await replaceUrlQuery('filters', userListApiQueryHelper.rawQueryStrings);
+        userPageStore.$patch((_state) => {
+            _state.searchFilters = userListApiQueryHelper.filters;
+        });
     }
     if (options.pageStart !== undefined) userPageStore.$patch({ pageStart: options.pageStart });
     if (options.pageLimit !== undefined) userPageStore.$patch({ pageLimit: options.pageLimit });
@@ -183,10 +180,6 @@ const handleClickButton = async (value: RoleBindingModel) => {
         ErrorHandler.handleError(e);
     }
 };
-
-onMounted(async () => {
-    await userPageStore.listRoles();
-});
 </script>
 
 <template>
@@ -205,7 +198,7 @@ onMounted(async () => {
             :total-count="userPageState.totalCount"
             :key-item-sets="USER_SEARCH_HANDLERS.keyItemSets"
             :value-handler-map="USER_SEARCH_HANDLERS.valueHandlerMap"
-            :query-tags="state.tags"
+            :query-tags="queryTags"
             :style="{height: `${props.tableHeight}px`}"
             @select="handleSelect"
             @change="handleChange"
