@@ -1,9 +1,10 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 import type {
-    AlertModel, AlertSeverity, AlertState, AlertUrgency,
-} from '@/schema/monitoring/alert/model';
+    AlertSeverity, AlertState, AlertUrgency,
+} from '@/schema/monitoring/alert/type';
 
 export interface AlertListParameters {
     alert_number?: number;

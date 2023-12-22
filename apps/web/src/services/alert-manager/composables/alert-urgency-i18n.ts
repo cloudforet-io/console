@@ -2,7 +2,7 @@ import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
-import type { AlertUrgency } from '@/schema/monitoring/alert/model';
+import type { AlertUrgency } from '@/schema/monitoring/alert/type';
 import { i18n } from '@/translations';
 
 

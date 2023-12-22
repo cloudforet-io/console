@@ -11,7 +11,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { AlertSeverity } from '@/schema/monitoring/alert/model';
+import type { AlertSeverity } from '@/schema/monitoring/alert/type';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { store } from '@/store';
