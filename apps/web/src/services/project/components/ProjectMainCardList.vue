@@ -119,13 +119,6 @@ const fetchProjectList = async () => {
     if (state.searchText !== undefined) {
         listProjectApiQueryHelper.setFilters([{ v: state.searchText }]);
     }
-    if (!projectPageState.isWorkspaceOwner) {
-        listProjectApiQueryHelper.setOrFilters([
-            { k: 'project_type', v: 'PUBLIC', o: '=' },
-            { k: 'created_by', v: store.state.user.userId, o: '=' },
-            { k: 'users', v: [store.state.user.userId], o: '=' },
-        ]);
-    }
 
     try {
         state.loading = true;

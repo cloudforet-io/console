@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PHeading, PI, PTableCheckModal, PToolboxTable,
@@ -15,11 +15,9 @@ import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
-import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -58,7 +56,6 @@ const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const storeState = reactive({
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
 });
 const state = reactive({
     searchText: props.filters.map((d) => d.v).join(' ') || '',
@@ -174,9 +171,9 @@ const handleConfirmInvite = () => {
 };
 
 /* Watcher */
-watch(() => store.state.reference.project.items, (projects) => {
-    if (projects) fetchUserList();
-}, { immediate: true });
+(async () => {
+    fetchUserList();
+})();
 </script>
 
 <template>
