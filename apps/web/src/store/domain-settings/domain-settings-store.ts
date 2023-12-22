@@ -15,7 +15,7 @@ import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-interface DomainConfigData {
+interface DomainSettingsData {
     display_name?: string;
     admin_email?: string;
     timezone?: string;
@@ -25,9 +25,9 @@ interface DomainConfigData {
     login_page_image_url?: string;
 }
 
-export const useDomainConfigStore = defineStore('domain-config', () => {
+export const useDomainSettingsStore = defineStore('domain-config', () => {
     const state = reactive({
-        domainConfig: null as null|DomainConfigModel<DomainConfigData>,
+        domainConfig: null as null|DomainConfigModel<DomainSettingsData>,
     });
 
     const getters = reactive({
@@ -41,7 +41,7 @@ export const useDomainConfigStore = defineStore('domain-config', () => {
     });
 
     /* Actions */
-    const fetchDomainConfig = async () => {
+    const fetchDomainSettings = async () => {
         try {
             const res = await SpaceConnector.client.config.domainConfig.list<GetDomainConfigParameters, ListResponse<DomainConfigModel>>({
                 name: DOMAIN_CONFIG_TYPE.SETTINGS,
@@ -52,7 +52,7 @@ export const useDomainConfigStore = defineStore('domain-config', () => {
             state.domainConfig = null;
         }
     };
-    const createDomainConfig = async (data: DomainConfigData) => {
+    const createDomainSettings = async (data: DomainSettingsData) => {
         try {
             state.domainConfig = await SpaceConnector.client.config.domainConfig.create<CreateDomainConfigParameters, DomainConfigModel>({
                 name: DOMAIN_CONFIG_TYPE.SETTINGS,
@@ -63,9 +63,9 @@ export const useDomainConfigStore = defineStore('domain-config', () => {
             throw e;
         }
     };
-    const updateDomainConfig = async (data: DomainConfigData) => {
+    const updateDomainSettings = async (data: DomainSettingsData) => {
         if (!state.domainConfig) {
-            await createDomainConfig(data);
+            await createDomainSettings(data);
             return;
         }
         try {
@@ -83,8 +83,8 @@ export const useDomainConfigStore = defineStore('domain-config', () => {
     };
 
     const actions = {
-        fetchDomainConfig,
-        updateDomainConfig,
+        fetchDomainSettings,
+        updateDomainSettings,
     };
 
     return {

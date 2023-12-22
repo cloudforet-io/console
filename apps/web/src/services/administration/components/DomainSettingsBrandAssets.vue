@@ -7,14 +7,14 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
 const state = reactive({
     isChanged: computed<boolean>(() => {
@@ -33,7 +33,7 @@ const state = reactive({
 /* Event */
 const handleSaveChanges = async () => {
     try {
-        await domainConfigStore.updateDomainConfig({
+        await domainConfigStore.updateDomainSettings({
             wordtype_logo_url: state.wordtypeLogoUrl,
             symbol_favicon_url: state.symbolFaviconUrl,
             login_page_image_url: state.loginPageImageUrl,

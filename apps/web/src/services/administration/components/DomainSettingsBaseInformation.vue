@@ -8,7 +8,7 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -18,7 +18,7 @@ import DomainSettingsChangeAdminEmailModal
     from '@/services/administration/components/DomainSettingsChangeAdminEmailModal.vue';
 
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
 const storeState = reactive({
     domainId: computed<string>(() => store.state.domain.domainId),
@@ -37,7 +37,7 @@ const state = reactive({
 /* Event */
 const handleClickSaveDisplayName = async () => {
     try {
-        await domainConfigStore.updateDomainConfig({
+        await domainConfigStore.updateDomainSettings({
             display_name: state.displayName,
         });
         showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_DISPLAY_NAME'), '');

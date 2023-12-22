@@ -7,7 +7,7 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
@@ -27,7 +27,7 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
     (e: 'confirm'): void;
 }>();
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = useDomainSettingsStore();
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     loading: false,
@@ -53,7 +53,7 @@ const handleClickSendCode = () => {
 };
 const confirm = async () => {
     try {
-        await domainConfigStore.updateDomainConfig({
+        await domainConfigStore.updateDomainSettings({
             admin_email: adminEmail.value,
         });
         showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_ADMIN_EMAIL'), '');
