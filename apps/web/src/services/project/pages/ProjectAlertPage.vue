@@ -9,6 +9,8 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -56,7 +58,8 @@ const getProjectAlertConfig = async () => {
 };
 const onActivateAlert = async () => {
     try {
-        await SpaceConnector.client.monitoring.projectAlertConfig.create({
+        if (!props.id) throw new Error('Project ID is required');
+        await SpaceConnector.clientV2.monitoring.projectAlertConfig.create<ProjectAlertConfigCreateParameters, ProjectAlertConfigModel>({
             project_id: props.id,
         });
         state.isActivated = true;
