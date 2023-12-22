@@ -17,6 +17,7 @@ import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
 import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
+import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
 import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
@@ -59,6 +60,7 @@ const init = async (store) => {
         await initApiClient(store, config);
         const domainId = await initDomain(store, config);
         const userId = await initUserAndAuth(store, config);
+        initDomainSettings(store);
         initModeSetting();
         await initWorkspace(userId);
         initRouter(domainId);
