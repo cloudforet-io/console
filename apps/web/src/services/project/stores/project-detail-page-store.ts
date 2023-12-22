@@ -43,8 +43,10 @@ export const useProjectDetailPageStore = defineStore('project-detail-page', () =
     const getProject = async (projectId?: string) => {
         try {
             state.loading = true;
+            const _projectId = projectId || state.projectId;
+            if (!_projectId) throw new Error('projectId is required');
             state.currentProject = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-                project_id: projectId || state.projectId,
+                project_id: _projectId,
             });
         } catch (e) {
             state.currentProject = null;
