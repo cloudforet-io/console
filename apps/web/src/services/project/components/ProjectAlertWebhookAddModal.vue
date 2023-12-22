@@ -74,7 +74,7 @@ const getRepositoryID = async () => {
 };
 const getListWebhookType = async () => {
     try {
-        listApiQuery.setFilters([{ k: 'service_type', v: 'monitoring.Webhook', o: '=' }]);
+        listApiQuery.setFilters([{ k: 'resource_type', v: 'monitoring.Webhook', o: '=' }]);
         const repositoryId = await getRepositoryID();
         const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
             repository_id: repositoryId,
