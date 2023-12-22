@@ -16,12 +16,11 @@ import config from '@/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
-    green, red, yellow, white, gray,
+    green, red, white, gray,
 } from '@/styles/colors';
 
 enum PROJECT_STATUS {
     issue = 'issue',
-    maintenance = 'maintenance',
     healthy = 'healthy',
 }
 interface ChartData {
@@ -36,7 +35,6 @@ const state = reactive({
     count: {
         total: 0,
         issue: 0,
-        maintenance: 0,
         healthy: 0,
     },
     data: computed(() => ([
@@ -44,11 +42,6 @@ const state = reactive({
             status: PROJECT_STATUS.issue,
             count: state.count.issue,
             color: red[400],
-        },
-        {
-            status: PROJECT_STATUS.maintenance,
-            count: state.count.maintenance,
-            color: yellow[400],
         },
         {
             status: PROJECT_STATUS.healthy,
@@ -113,7 +106,6 @@ const getCurrentProjectStatus = async () => {
         state.count.total = total_count;
         state.count.issue = results.filter((d) => d.is_issued).length;
         state.count.healthy = total_count - state.count.issue;
-        // todo: maintenance 향후 추가 예정
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -160,11 +152,6 @@ watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => 
                     <span class="label">{{ $t('MONITORING.ALERT.DASHBOARD.ISSUE') }}</span>
                     <span class="count">{{ state.count.issue }}</span>
                 </p>
-                <p class="legend maintenance">
-                    <span class="circle" />
-                    <span class="label">{{ $t('MONITORING.ALERT.DASHBOARD.MAINTENANCE') }}</span>
-                    <span class="count">{{ state.count.maintenance }}</span>
-                </p>
                 <p class="legend healthy">
                     <span class="circle" />
                     <span class="label">{{ $t('MONITORING.ALERT.DASHBOARD.HEALTHY') }}</span>
@@ -209,11 +196,6 @@ watch([() => state.loading, () => chartContext.value], ([loading, chartCtx]) => 
                     }
                     .count {
                         @apply text-red-400;
-                    }
-                }
-                &.maintenance {
-                    .circle {
-                        @apply bg-yellow-400;
                     }
                 }
                 &.healthy {

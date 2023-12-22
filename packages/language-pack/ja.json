@@ -2742,8 +2742,6 @@
 				"HIGH": "高い",
 				"ISSUE": "問題",
 				"LOW": "低い",
-				"MAINTENANCE": "メンテナンス",
-				"MAINTENANCE_WINDOW": "メンテナンス期間",
 				"MONTHLY_TOTAL": "月平均",
 				"MORE_ALERTS_HELP_TEXT": "多くのアラートが作成されました",
 				"NO_ALERT": "アラートがありません",
@@ -2755,8 +2753,7 @@
 				"SCHEDULE": "スケジュール",
 				"TOP_5_PROJECT_ACTIVITY": "Top5のプロジェクト活動",
 				"TOTAL": "合計",
-				"VIEW_ALL_OPEN_ALERTS": "全ての発生アラートを見る",
-				"VIEW_ALL_OPEN_MAINTENANCE_WINDOW": "全てのメンテナンス期間を見る"
+				"VIEW_ALL_OPEN_ALERTS": "全ての発生アラートを見る"
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "アラート削除に失敗",
@@ -3178,42 +3175,6 @@
 				"EVENT_RULE": "イベントルール",
 				"FINISH_CONDITION_LABEL": "終了条件",
 				"HIGH_URGENCY_NOTIFICATIONS": "緊急度の高い通知のみ",
-				"MAINTENANCE_WINDOW": {
-					"ACTION": "作業",
-					"ALT_E_CLOSE_MAINTENANCE_WINDOW": "メンテナンス期間を閉じるのに失敗",
-					"ALT_E_CREATE_MAINTENANCE_WINDOW": "メンテナンス期間の作成に失敗",
-					"ALT_E_UPDATE_MAINTENANCE_WINDOW": "メンテナンス期間の編集に失敗",
-					"ALT_S_CLOSE_MAINTENANCE_WINDOW": "メンテナンス期間を閉じるのに成功",
-					"ALT_S_CREATE_MAINTENANCE_WINDOW": "メンテナンス期間の作成に成功",
-					"ALT_S_UPDATE_MAINTENANCE_WINDOW": "メンテナンス期間の編集に成功",
-					"CHECK_MODAL": {
-						"DESC_CLOSE": "選択したメンテナンスページを削除しますか？",
-						"TITLE_CLOSE": "メンテナンス期間を閉じる"
-					},
-					"CLOSE": "閉じる",
-					"CLOSE_NOW": "即時閉じる",
-					"CREATE": "メンテナンス期間の作成",
-					"FORM": {
-						"CREATE_TITLE": "メンテナンス期間の作成",
-						"DAYS": "日",
-						"DESC": "メンテナンス期間中、このプロジェクトに新しい通知は作成できません",
-						"HOURS": "時間",
-						"INVALID_TEXT": "終了日を開始日の前に設定することはできません。",
-						"LABEL_END_TIME": "終了時間",
-						"LABEL_SCHEDULE": "スケジュール",
-						"LABEL_START_TIME": "開始時間",
-						"LABEL_TIMEZONE": "タイムゾーン",
-						"LABEL_TIME_PERIOD": "メンテナンス期間",
-						"LABEL_TITLE": "タイトル",
-						"MINUTES": "分",
-						"REQUIRED": "必須入力項目です",
-						"START_AT_TIME": "予定された時間に開始する",
-						"START_NOW": "今すぐ開始して終了",
-						"UPDATE_TITLE": "メンテナンス期間編集"
-					},
-					"TITLE": "メンテナンス期間",
-					"UPDATE": "編集"
-				},
 				"MANUAL_OPERATION": "手動で行う",
 				"MINUTE": "分",
 				"NAME_LABEL": "名前",
@@ -3336,7 +3297,6 @@
 			"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 			"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "ロード中...",
-			"NOW_HAPPENING_MAINTENANCE": "現在メンテナンス中です。",
 			"PROJECT_ALERT_ACTIVATE": "通知有効化",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "このプロジェクトのアラートを設定する",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "統合された外部イベントを受信するかこのプロジェクトを管理のためには「通知有効化」をクリックしてください。",
@@ -3361,7 +3321,6 @@
 				"TRIGGERED": "生成"
 			},
 			"TAB_ALERT": "アラート",
-			"TAB_MAINTENANCE_WINDOW": "メンテナンス期間",
 			"TAB_MEMBER": "メンバー",
 			"TAB_NOTIFICATIONS": "通知",
 			"TAB_REPORT": "レポート",

@@ -2742,8 +2742,6 @@
 				"HIGH": "High",
 				"ISSUE": "Issue",
 				"LOW": "Low",
-				"MAINTENANCE": "Maintenance",
-				"MAINTENANCE_WINDOW": "Maintenance Window",
 				"MONTHLY_TOTAL": "Monthly Total",
 				"MORE_ALERTS_HELP_TEXT": "more alert(s) was created",
 				"NO_ALERT": "No Alert",
@@ -2755,8 +2753,7 @@
 				"SCHEDULE": "Schedule",
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity",
 				"TOTAL": "Total",
-				"VIEW_ALL_OPEN_ALERTS": "View all open alerts",
-				"VIEW_ALL_OPEN_MAINTENANCE_WINDOW": "View all open maintenance windows"
+				"VIEW_ALL_OPEN_ALERTS": "View all open alerts"
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "Failed to Delete Alert",
@@ -3178,42 +3175,6 @@
 				"EVENT_RULE": "Event Rule",
 				"FINISH_CONDITION_LABEL": "Finish Condition",
 				"HIGH_URGENCY_NOTIFICATIONS": "High Urgency Notifications",
-				"MAINTENANCE_WINDOW": {
-					"ACTION": "Action",
-					"ALT_E_CLOSE_MAINTENANCE_WINDOW": "Failed to Close Maintenance Window",
-					"ALT_E_CREATE_MAINTENANCE_WINDOW": "Failed to Create Maintenance Window",
-					"ALT_E_UPDATE_MAINTENANCE_WINDOW": "Failed to Update Maintenance Window",
-					"ALT_S_CLOSE_MAINTENANCE_WINDOW": "Maintenance Window successfully closed ",
-					"ALT_S_CREATE_MAINTENANCE_WINDOW": "Maintenance Window successfully created",
-					"ALT_S_UPDATE_MAINTENANCE_WINDOW": "Maintenance Window successfully updated ",
-					"CHECK_MODAL": {
-						"DESC_CLOSE": "Are you sure you want to close the selected maintenance window?",
-						"TITLE_CLOSE": "Close Maintenance Window"
-					},
-					"CLOSE": "Close",
-					"CLOSE_NOW": "Close Now",
-					"CREATE": "Create Maintenance Window",
-					"FORM": {
-						"CREATE_TITLE": "Create Maintenance Window",
-						"DAYS": "days",
-						"DESC": "During a maintenance window, no new alerts will be created for this project.",
-						"HOURS": "hours",
-						"INVALID_TEXT": "The end date can not be earlier than the start date.",
-						"LABEL_END_TIME": "End Time",
-						"LABEL_SCHEDULE": "Schedule",
-						"LABEL_START_TIME": "Start Time",
-						"LABEL_TIMEZONE": "Timezone",
-						"LABEL_TIME_PERIOD": "Maintenance Time Period",
-						"LABEL_TITLE": "Title",
-						"MINUTES": "minutes",
-						"REQUIRED": "Required field",
-						"START_AT_TIME": "Start at scheduled time",
-						"START_NOW": "Start now and end in",
-						"UPDATE_TITLE": "Update Maintenance Window"
-					},
-					"TITLE": "Maintenance Window",
-					"UPDATE": "Update"
-				},
 				"MANUAL_OPERATION": "Do It Manually",
 				"MINUTE": "min.",
 				"NAME_LABEL": "Name",
@@ -3336,7 +3297,6 @@
 			"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 			"MODAL_VALIDATION_REQUIRED": "Required field",
 			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "Loading...",
-			"NOW_HAPPENING_MAINTENANCE": "Maintenance Happening Now.",
 			"PROJECT_ALERT_ACTIVATE": "Activate Alert",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "Set an Alert of this Project",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Activate Alert’ to receive integrated external events or manage of this project.",
@@ -3361,7 +3321,6 @@
 				"TRIGGERED": "Triggered"
 			},
 			"TAB_ALERT": "Alert",
-			"TAB_MAINTENANCE_WINDOW": "Maintenance Window",
 			"TAB_MEMBER": "Member",
 			"TAB_NOTIFICATIONS": "Notifications",
 			"TAB_REPORT": "Report",

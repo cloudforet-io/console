@@ -3,5 +3,5 @@ import type { ProjectAlertConfigOptions } from '@/schema/monitoring/project-aler
 export interface ProjectAlertConfigUpdateParameters {
     project_id: string;
     escalation_policy_id?: string;
-    options?: ProjectAlertConfigOptions;
+    options?: Partial<ProjectAlertConfigOptions>;
 }

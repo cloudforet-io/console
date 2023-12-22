@@ -14,6 +14,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { ProjectAlertConfigGetParameters } from '@/schema/monitoring/project-alert-config/api-verbs/get';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type {
+    ProjectAlertConfigNotiUrgency,
+    ProjectAlertConfigRecoveryMode,
+} from '@/schema/monitoring/project-alert-config/type';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -42,6 +48,12 @@ const RECOVERY_MODE = Object.freeze({
     AUTO: 'AUTO',
 });
 
+interface NotificationUrgencyOption {
+    name: ProjectAlertConfigNotiUrgency;
+    label: string;
+    icon?: string;
+}
+
 interface Props {
     id?: string;
 }
@@ -49,7 +61,7 @@ const props = defineProps<Props>();
 const router = useRouter();
 
 const state = reactive({
-    notificationUrgencyList: computed(() => ([
+    notificationUrgencyList: computed<NotificationUrgencyOption[]>(() => ([
         {
             name: NOTIFICATION_URGENCY.ALL,
             label: i18n.t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS') as string,
@@ -60,11 +72,11 @@ const state = reactive({
             icon: 'ic_error-filled',
         },
     ])),
-    projectAlertConfig: {},
+    projectAlertConfig: undefined as ProjectAlertConfigModel|undefined,
     escalationPolicy: undefined as EscalationPolicyModel|undefined,
-    notificationUrgency: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
-    recoveryMode: computed(() => get(state.projectAlertConfig, 'options.recovery_mode')),
-    escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
+    notificationUrgency: computed<ProjectAlertConfigNotiUrgency|undefined>(() => get(state.projectAlertConfig, 'options.notification_urgency')),
+    recoveryMode: computed<ProjectAlertConfigRecoveryMode|undefined>(() => get(state.projectAlertConfig, 'options.recovery_mode')),
+    escalationPolicyId: computed<string|undefined>(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
     eventRuleTotalCount: 0,
     //
     updateNotificationPolicyModalVisible: false,
@@ -79,12 +91,13 @@ const notificationOptionFormatter = (option) => state.notificationUrgencyList.fi
 /* api */
 const getProjectAlertConfig = async () => {
     try {
-        state.projectAlertConfig = await SpaceConnector.client.monitoring.projectAlertConfig.get({
+        if (!props.id) throw new Error('Project ID is required');
+        state.projectAlertConfig = await SpaceConnector.clientV2.monitoring.projectAlertConfig.get<ProjectAlertConfigGetParameters, ProjectAlertConfigModel>({
             project_id: props.id,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.projectAlertConfig = {};
+        state.projectAlertConfig = undefined;
     }
 };
 const getEventRuleCount = async () => {

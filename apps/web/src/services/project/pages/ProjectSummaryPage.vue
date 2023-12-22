@@ -5,6 +5,9 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -20,7 +23,7 @@ import ProjectSummaryTrustedAdvisorWidget from '@/services/project/components/Pr
 
 
 interface Props {
-    id?: string;
+    id: string;
 }
 const props = defineProps<Props>();
 const state = reactive({
@@ -30,10 +33,10 @@ const state = reactive({
 /* api */
 const getProjectAlertConfig = async () => {
     try {
-        const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
+        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
             project_id: props.id,
         });
-        state.hasAlertConfig = !!results.length;
+        state.hasAlertConfig = !!results?.length;
     } catch (e) {
         ErrorHandler.handleError(e);
     }

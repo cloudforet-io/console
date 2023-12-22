@@ -3,7 +3,6 @@ import { computed, reactive } from 'vue';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
@@ -20,11 +19,6 @@ export interface AlertCount {
     state: AlertState;
     total: number;
 }
-export interface MaintenanceHappening {
-    title: string;
-    startTime: string;
-    endTime: string;
-}
 
 export const useProjectDetailPageStore = defineStore('project-detail-page', () => {
     const state = reactive({
@@ -32,7 +26,6 @@ export const useProjectDetailPageStore = defineStore('project-detail-page', () =
         projectId: undefined as string | undefined,
         currentProject: null as ProjectModel | null,
         alertCounts: [] as AlertCount[],
-        maintenanceHappenings: [] as MaintenanceHappening[],
     });
     const getters = reactive({
         projectType: computed<ProjectType|undefined>(() => state.currentProject?.project_type),
@@ -50,8 +43,10 @@ export const useProjectDetailPageStore = defineStore('project-detail-page', () =
     const getProject = async (projectId?: string) => {
         try {
             state.loading = true;
+            const _projectId = projectId || state.projectId;
+            if (!_projectId) throw new Error('projectId is required');
             state.currentProject = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
-                project_id: projectId || state.projectId,
+                project_id: _projectId,
             });
         } catch (e) {
             state.currentProject = null;
@@ -71,30 +66,10 @@ export const useProjectDetailPageStore = defineStore('project-detail-page', () =
             console.error(e);
         }
     };
-    const loadMaintenanceHappenings = async () => {
-        const queryHelper = new ApiQueryHelper().setFilters([{
-            k: 'state', v: 'OPEN', o: '=',
-        }]);
-        try {
-            const { results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
-                project_id: state.projectId,
-                query: queryHelper.data,
-            });
-            state.maintenanceHappenings = results.map((d) => ({
-                title: d.title,
-                startTime: d.start_time,
-                endTime: d.end_time,
-            }));
-        } catch (e) {
-            state.maintenanceHappenings = [];
-            console.error(e);
-        }
-    };
     const reset = () => {
         state.projectId = '';
         state.currentProject = null;
         state.alertCounts = [];
-        state.maintenanceHappenings = [];
     };
 
     const mutations = {
@@ -104,7 +79,6 @@ export const useProjectDetailPageStore = defineStore('project-detail-page', () =
     const actions = {
         getProject,
         getAlertCounts,
-        loadMaintenanceHappenings,
         reset,
     };
 

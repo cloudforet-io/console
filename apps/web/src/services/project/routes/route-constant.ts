@@ -12,7 +12,6 @@ export const PROJECT_ROUTE = Object.freeze({
                 _NAME: `${MENU_ID.PROJECT}.detail.tab.alert`,
                 ALERT: { _NAME: `${MENU_ID.PROJECT}.detail.tab.alert.alert_list` },
                 WEBHOOK: { _NAME: `${MENU_ID.PROJECT}.detail.tab.alert.webhook` },
-                MAINTENANCE_WINDOW: { _NAME: `${MENU_ID.PROJECT}.detail.tab.alert.maintenance_window` },
                 SETTINGS: { _NAME: `${MENU_ID.PROJECT}.detail.tab.alert.settings` },
             },
             NOTIFICATIONS: {

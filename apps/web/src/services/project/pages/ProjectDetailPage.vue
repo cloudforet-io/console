@@ -6,13 +6,12 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PBadge, PBreadcrumbs, PButton, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
+    PBadge, PBreadcrumbs, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
@@ -34,8 +33,6 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
-import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
@@ -62,14 +59,9 @@ const state = reactive({
     item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
     projectGroupId: computed<string>(() => state.item?.project_group_id || ''),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
-    // projectGroupNames: [],
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
             { name: i18n.t('MENU.PROJECT') as string, path: '/project' },
-            // ...state.projectGroupNames.map(d => ({
-            //     name: d.name,
-            //     path: `/project?select_pg=${d.project_group_id}`,
-            // })),
         ];
         if (state.projectGroupId?.length) {
             results.push({ name: state.projectGroupInfo?.name || '', path: `/project?select_pg=${state.projectGroupId}` });
@@ -77,7 +69,6 @@ const state = reactive({
         results.push({ name: state.item?.name || '' });
         return results;
     }),
-    maintenanceWindowFormVisible: false,
     counts: computed(() => ({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
     })),
@@ -154,13 +145,6 @@ const handleConfirmProjectForm = (data: ProjectModel) => {
 const onChangeTab = (activeTab) => {
     if (activeTab === route.name) return;
     router.replace({ name: activeTab });
-};
-
-const urlQueryHelper = new QueryHelper();
-const handleCreateMaintenanceWindow = (maintenanceWindowId: string) => {
-    singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME;
-    urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
-    router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
 };
 
 /* Watchers */
@@ -244,22 +228,10 @@ onUnmounted(() => {
                                                :value="projectDetailPageState.projectId"
                                 />
                             </p>
-                            <p-button v-if="singleItemTabState.activeTab === PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME"
-                                      style-type="tertiary"
-                                      icon-left="ic_spanner-filled"
-                                      class="ml-3"
-                                      @click="state.maintenanceWindowFormVisible = true"
-                            >
-                                {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
-                            </p-button>
                         </div>
                     </template>
                 </p-heading>
             </div>
-
-            <maintenance-happening-list class="maintenance-happening-list"
-                                        :project-id="projectDetailPageState.projectId"
-            />
 
             <p-tab v-if="state.item"
                    :tabs="singleItemTabState.tabs"
@@ -276,7 +248,7 @@ onUnmounted(() => {
                     >
                         {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
                     </p-badge>
-                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
+                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications'" />
                 </template>
             </p-tab>
         </p-data-loader>
@@ -305,10 +277,6 @@ onUnmounted(() => {
             :project="state.item"
             @confirm="handleConfirmProjectForm"
             @update:visible="projectPageStore.setProjectFormModalVisible"
-        />
-        <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
-                                       :project-id="projectDetailPageState.projectId"
-                                       @confirm="handleCreateMaintenanceWindow"
         />
     </general-page-layout>
 </template>
@@ -359,9 +327,5 @@ onUnmounted(() => {
 
 .edit-btn {
     @apply ml-3;
-}
-
-.maintenance-happening-list {
-    margin-bottom: 1.875rem;
 }
 </style>

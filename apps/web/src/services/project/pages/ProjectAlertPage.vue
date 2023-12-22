@@ -9,7 +9,9 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';
+import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 import { i18n } from '@/translations';
 
@@ -32,12 +34,11 @@ const state = reactive({
     isActivated: false,
 });
 const tabState = reactive({
-    tabs: computed(() => ([
+    tabs: computed<TabItem[]>(() => ([
         { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_ALERT') },
-        { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, label: i18n.t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW') },
         { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_WEBHOOK') },
         { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.SETTINGS._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_SETTINGS') },
-    ] as TabItem[])),
+    ])),
     activeTab: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
 });
 
@@ -45,10 +46,10 @@ const tabState = reactive({
 const getProjectAlertConfig = async () => {
     try {
         state.loading = true;
-        const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list({
+        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>({
             project_id: props.id,
         });
-        state.isActivated = !!results.length;
+        state.isActivated = !!results?.length;
     } catch (e) {
         state.isActivated = false;
         ErrorHandler.handleError(e);

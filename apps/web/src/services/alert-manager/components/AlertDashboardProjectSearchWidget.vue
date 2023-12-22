@@ -23,7 +23,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import AlertDashboardProjectSearchWidgetAlertList from '@/services/alert-manager/components/AlertDashboardProjectSearchWidgetAlertList.vue';
-import AlertDashboardProjectSearchWidgetMaintenanceWindowList from '@/services/alert-manager/components/AlertDashboardProjectSearchWidgetMaintenanceWindowList.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
 
@@ -95,11 +94,7 @@ const onChange = async (options?: any) => {
     await listAlertByProject();
 };
 const onClickProjectBox = (item) => {
-    if (item.maintenance_window_count > 0) {
-        vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: item.project_id } });
-    } else {
-        vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, params: { id: item.project_id } });
-    }
+    vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, params: { id: item.project_id } });
 };
 
 /* init */
@@ -139,13 +134,7 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
                     <p class="title">
                         {{ projectNameFormatter(item.project_id, state.projects) }}
                     </p>
-                    <div class="content-wrapper"
-                         :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}"
-                    >
-                        <alert-dashboard-project-search-widget-maintenance-window-list
-                            v-if="item.maintenance_window_count > 0"
-                            :project-id="item.project_id"
-                        />
+                    <div class="content-wrapper">
                         <alert-dashboard-project-search-widget-alert-list
                             v-if="item.alert_count > 0"
                             :project-id="item.project_id"
@@ -208,27 +197,10 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
                 flex-direction: column;
                 gap: 0.75rem;
 
-                /* custom project-maintenance-window-list-item */
-
-                /* custom project-alert-list-item */
-
                 /* custom design-system component - p-list-card */
-                :deep(.project-maintenance-window-list-item), :deep(.project-alert-list-item) {
+                :deep(.project-alert-list-item) {
                     .body {
                         max-height: 12.5rem;
-                    }
-                }
-
-                &.multiple-items {
-                    /* custom project-maintenance-window-list-item */
-
-                    /* custom project-alert-list-item */
-
-                    /* custom design-system component - p-list-card */
-                    :deep(.project-maintenance-window-list-item), :deep(.project-alert-list-item) {
-                        .body {
-                            max-height: 5rem;
-                        }
                     }
                 }
             }

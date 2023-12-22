@@ -8,7 +8,7 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 const ProjectPage = () => import('@/services/project/pages/ProjectPage.vue');
 const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 
-const ProjectDashboardPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
+const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
 const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
@@ -18,8 +18,6 @@ const ProjectAlertEventRulePage = () => import('@/services/project/pages/Project
 const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
 
 const ProjectAlertListPage = () => import('@/services/project/pages/ProjectAlertListPage.vue');
-// eslint-disable-next-line max-len
-const ProjectMaintenanceWindowPage = () => import('@/services/project/pages/ProjectMaintenanceWindowPage.vue');
 const ProjectWebhookPage = () => import('@/services/project/pages/ProjectWebhookPage.vue');
 const ProjectAlertSettingsPage = () => import('@/services/project/pages/ProjectAlertSettingsPage.vue');
 
@@ -56,7 +54,7 @@ export default {
                             path: 'summary',
                             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                             props: true,
-                            component: ProjectDashboardPage,
+                            component: ProjectSummaryPage,
                         },
                         {
                             path: 'member',
@@ -76,12 +74,6 @@ export default {
                                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
                                     props: true,
                                     component: ProjectAlertListPage,
-                                },
-                                {
-                                    path: 'maintenance-window',
-                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME,
-                                    props: true,
-                                    component: ProjectMaintenanceWindowPage,
                                 },
                                 {
                                     path: 'webhook',

@@ -136,9 +136,6 @@ onMounted(() => {
     &.LOW {
         @apply border-red-300;
     }
-    &.MAINTENANCE {
-        @apply border-yellow-300;
-    }
 
     .tooltip-title-wrapper {
         width: max-content;
