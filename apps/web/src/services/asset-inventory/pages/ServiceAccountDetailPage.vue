@@ -61,7 +61,7 @@ const state = reactive({
     }),
     projectId: computed(() => state.item.project_info?.project_id),
     deleteModalVisible: false,
-    isManagedTrustedAccount: computed(() => state.item.tags?.is_managed === 'true'),
+    isManagedTrustedAccount: computed(() => state.item.workspace_id === '*'),
 });
 
 /* Api */
