@@ -3336,7 +3336,6 @@
 		"EVENT_RULE": {
 			"ADD": "追加",
 			"ADDITIONAL_INFORMATION": "追加情報",
-			"ADDITIONAL_RESPONDER": "追加受信先",
 			"ADD_EVENT_RULE": "イベントルール追加",
 			"ALL": "すべて",
 			"ALT_E_CREATE_EVENT_RULE": "イベントルール作成に失敗",
@@ -3372,7 +3371,6 @@
 			"OF_THE_FOLLOWING_ARE_MET": "が満足させる場合",
 			"ON": "オン",
 			"PAUSE_NOTIFICATION": "通知停止",
-			"PROJECT_DEPENDENCY": "プロジェクト依存性",
 			"PROJECT_ROUTING": "プロジェクトルーティング",
 			"SAVE": "保存",
 			"SNOOZED_NOTIFICATIONS": "通知なし",

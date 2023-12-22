@@ -57,7 +57,7 @@ const getProjectAlertConfig = async () => {
         state.loading = false;
     }
 };
-const onActivateAlert = async () => {
+const handleActivateAlert = async () => {
     try {
         if (!props.id) throw new Error('Project ID is required');
         await SpaceConnector.clientV2.monitoring.projectAlertConfig.create<ProjectAlertConfigCreateParameters, ProjectAlertConfigModel>({
@@ -100,7 +100,7 @@ watch(() => props.id, (projectId) => {
             <strong>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_1') }}</strong>
             <p>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_2') }}</p>
             <p-button style-type="positive"
-                      @click="onActivateAlert"
+                      @click="handleActivateAlert"
             >
                 {{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATE') }}
             </p-button>

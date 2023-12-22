@@ -3336,7 +3336,6 @@
 		"EVENT_RULE": {
 			"ADD": "추가",
 			"ADDITIONAL_INFORMATION": "추가 정보",
-			"ADDITIONAL_RESPONDER": "추가 수신자",
 			"ADD_EVENT_RULE": "이벤트 규칙 추가",
 			"ALL": "모두를",
 			"ALT_E_CREATE_EVENT_RULE": "이벤트 규칙 생성 실패",
@@ -3372,7 +3371,6 @@
 			"OF_THE_FOLLOWING_ARE_MET": "만족시키는 경우",
 			"ON": "켜짐",
 			"PAUSE_NOTIFICATION": "알림 정지",
-			"PROJECT_DEPENDENCY": "프로젝트 의존성",
 			"PROJECT_ROUTING": "프로젝트 라우팅",
 			"SAVE": "저장",
 			"SNOOZED_NOTIFICATIONS": "알림 중지",

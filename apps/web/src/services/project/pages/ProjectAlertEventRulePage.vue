@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive,
 } from 'vue';
@@ -9,8 +9,13 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { EventRuleChangeOrderParameters } from '@/schema/monitoring/event-rule/api-verbs/change-order';
+import type { EventRuleDeleteParameters } from '@/schema/monitoring/event-rule/api-verbs/delete';
+import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
+import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,12 +28,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import ProjectAlertEventRuleContent from '@/services/project/components/ProjectAlertEventRuleContent.vue';
 import ProjectAlertEventRuleForm from '@/services/project/components/ProjectAlertEventRuleForm.vue';
 
-
-const EDIT_MODE = Object.freeze({
-    CREATE: 'CREATE',
-    UPDATE: 'UPDATE',
-});
-type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
+type EditMode = 'CREATE' | 'UPDATE';
 
 interface Props {
     projectId: string;
@@ -38,12 +38,14 @@ const props = defineProps<Props>();
 const state = reactive({
     loading: true,
     project: {},
-    cardData: [],
-    // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-    orderedCardData: computed(() => state.cardData.sort((a, b) => a.order - b.order)),
+    cardData: [] as EventRuleModel[],
+    orderedCardData: computed<EventRuleModel[]>(() => {
+        const data = state.cardData;
+        return data.sort((a, b) => a.order - b.order);
+    }),
     isEditMode: false,
     mode: undefined as undefined | EditMode,
-    selectedOrder: undefined,
+    selectedOrder: undefined as number|undefined,
 });
 const routeState = reactive({
     routes: computed(() => ([
@@ -82,10 +84,10 @@ const getProject = async () => {
 const listEventRule = async () => {
     try {
         state.loading = true;
-        const res = await SpaceConnector.client.monitoring.eventRule.list({
+        const res = await SpaceConnector.clientV2.monitoring.eventRule.list<EventRuleListParameters, ListResponse<EventRuleModel>>({
             project_id: props.projectId,
         });
-        state.cardData = res.results;
+        state.cardData = res.results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.cardData = [];
@@ -97,15 +99,15 @@ const listEventRule = async () => {
 /* event */
 const onClickAddEventRule = async () => {
     state.isEditMode = true;
-    state.mode = EDIT_MODE.CREATE;
+    state.mode = 'CREATE';
     state.selectedOrder = undefined;
 };
-const onClickUpButton = async (data) => {
+const handleClickUpButton = async (data) => {
     const tempCardData = [...state.cardData];
     const tempOrder = data.order;
     try {
         changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
-        await SpaceConnector.client.monitoring.eventRule.changeOrder({
+        await SpaceConnector.clientV2.monitoring.eventRule.changeOrder<EventRuleChangeOrderParameters>({
             event_rule_id: data.event_rule_id,
             order: tempOrder - 1,
         });
@@ -122,7 +124,7 @@ const onClickDownButton = async (data) => {
     const tempOrder = data.order;
     try {
         changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
-        await SpaceConnector.client.monitoring.eventRule.changeOrder({
+        await SpaceConnector.clientV2.monitoring.eventRule.changeOrder<EventRuleChangeOrderParameters>({
             event_rule_id: data.event_rule_id,
             order: tempOrder + 1,
         });
@@ -137,7 +139,8 @@ const onClickDownButton = async (data) => {
 };
 const eventRuleDeleteConfirm = async () => {
     try {
-        await SpaceConnector.client.monitoring.eventRule.delete({
+        if (state.selectedOrder === undefined) throw new Error('Selected order is required');
+        await SpaceConnector.clientV2.monitoring.eventRule.delete<EventRuleDeleteParameters>({
             event_rule_id: state.orderedCardData[state.selectedOrder - 1].event_rule_id,
         });
         showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_DELETE_EVENT_RULE'), '');
@@ -149,21 +152,21 @@ const eventRuleDeleteConfirm = async () => {
         state.selectedOrder = undefined;
     }
 };
-const onClickDeleteButton = (order) => {
+const handleClickDeleteButton = (order: number) => {
     checkDeleteState.visible = true;
     state.selectedOrder = order;
 };
-const onClickEditButton = (order) => {
+const handleClickEditButton = (order: number) => {
     state.isEditMode = true;
-    state.mode = EDIT_MODE.UPDATE;
+    state.mode = 'UPDATE';
     state.selectedOrder = order;
 };
-const onClickFormConfirm = async () => {
+const handleClickFormConfirm = async () => {
     state.isEditMode = false;
     state.selectedOrder = undefined;
     await listEventRule();
 };
-const onClickFormCancel = () => {
+const handleClickFormCancel = () => {
     state.isEditMode = false;
     state.selectedOrder = undefined;
 };
@@ -219,7 +222,7 @@ const onClickFormCancel = () => {
                             <span class="order-text">#<strong>{{ data.order }}</strong></span>
                             <span :class="{'disabled': data.order === 1 || state.isEditMode}"
                                   class="arrow-button"
-                                  @click="onClickUpButton(data)"
+                                  @click="handleClickUpButton(data)"
                             >
                                 <p-i name="ic_arrow-up"
                                      width="1.5rem"
@@ -241,14 +244,14 @@ const onClickFormCancel = () => {
                         <div class="right-part">
                             <span class="text-button delete"
                                   :class="{'disabled': state.isEditMode}"
-                                  @click="onClickDeleteButton(data.order)"
+                                  @click="handleClickDeleteButton(data.order)"
                             >
                                 {{ $t('PROJECT.EVENT_RULE.DELETE') }}
                             </span>
                             <span class="text-gray-300">|</span>
                             <span class="text-button edit"
                                   :class="{'disabled': state.isEditMode}"
-                                  @click="onClickEditButton(data.order)"
+                                  @click="handleClickEditButton(data.order)"
                             >
                                 <p-i name="ic_edit"
                                      width="1rem"
@@ -264,9 +267,9 @@ const onClickFormCancel = () => {
                     v-if="state.isEditMode && (state.selectedOrder === data.order)"
                     :project-id="props.projectId"
                     :event-rule-id="data.event_rule_id"
-                    :mode="EDIT_MODE.UPDATE"
-                    @confirm="onClickFormConfirm"
-                    @cancel="onClickFormCancel"
+                    mode="UPDATE"
+                    @confirm="handleClickFormConfirm"
+                    @cancel="handleClickFormCancel"
                 />
                 <project-alert-event-rule-content
                     v-else
@@ -274,15 +277,15 @@ const onClickFormCancel = () => {
                 />
             </p-card>
         </div>
-        <p-card v-if="state.isEditMode && (state.mode === EDIT_MODE.CREATE)"
+        <p-card v-if="state.isEditMode && (state.mode === 'CREATE')"
                 style-type="indigo400"
                 :header="$t('PROJECT.EVENT_RULE.ADD_EVENT_RULE')"
         >
             <project-alert-event-rule-form
                 :project-id="props.projectId"
-                :mode="EDIT_MODE.CREATE"
-                @confirm="onClickFormConfirm"
-                @cancel="onClickFormCancel"
+                mode="CREATE"
+                @confirm="handleClickFormConfirm"
+                @cancel="handleClickFormCancel"
             />
         </p-card>
         <p-button v-if="state.cardData.length"
