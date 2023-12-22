@@ -6,6 +6,7 @@ export interface DomainState {
     extendedAuthType?: ExtendedAuthType;
     authOptions?: Record<string, any>;
     extraMenu?: ExtraMenuSet;
+    config?: Record<string, any>;
 }
 
 export interface ExtraMenuSet {

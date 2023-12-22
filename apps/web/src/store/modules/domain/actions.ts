@@ -42,6 +42,7 @@ export const load = async ({ commit }, name: string): Promise<void|Error> => {
             name: response.name,
             extendedAuthType: getExtendedAuthType(authMetadata.auth_type),
             authOptions: getAuthOptions(authMetadata.plugin_info),
+            config: response.config,
         });
     } else {
         throw new Error(`Can not find '${name}' domain.`);
