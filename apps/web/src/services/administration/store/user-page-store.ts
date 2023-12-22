@@ -74,12 +74,12 @@ export const useUserPageStore = defineStore('user-page', {
         // Workspace User
         async listWorkspaceUsers(params: WorkspaceUserListParameters) {
             try {
-                const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
-                this.users = res.results?.map((item) => ({
+                const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
+                this.users = (results ?? [])?.map((item) => ({
                     ...item,
                     role_type: item.role_binding_info.role_type,
-                })) || [];
-                this.totalCount = res.total_count ?? 0;
+                }));
+                this.totalCount = total_count ?? 0;
                 this.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);

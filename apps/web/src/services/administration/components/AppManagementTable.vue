@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PToolboxTable, PSelectDropdown, PStatus, PCopyButton, PBadge,
 } from '@spaceone/design-system';
+import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { cloneDeep, isEmpty } from 'lodash';
@@ -15,14 +15,14 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import { APP_STATUS_TYPE } from '@/schema/identity/app/constant';
 import type { AppModel } from '@/schema/identity/app/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
-import { replaceUrlQuery } from '@/lib/router-query-string';
-
 import UserAPIKeyModal from '@/common/components/modals/UserAPIKeyModal.vue';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import AppManagementFormModal from '@/services/administration/components/AppManagementFormModal.vue';
 import AppManagementStatusModal from '@/services/administration/components/AppManagementStatusModal.vue';
@@ -33,15 +33,8 @@ import {
 import {
     APP_DROPDOWN_MODAL_TYPE,
     APP_SEARCH_HANDLERS,
-    APP_TABLE_FIELDS,
 } from '@/services/administration/constants/app-constant';
-import {
-    ROLE_SEARCH_HANDLERS,
-} from '@/services/administration/constants/role-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
-
-
-const DEFAULT_PAGE_LIMIT = 15;
 
 interface Props {
     tableHeight?: number;
@@ -55,13 +48,8 @@ const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 
-const route = useRoute();
-
 const appListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
-    .setSort('name', true)
-    .setFiltersAsRawQueryString(route.query.filters);
-let appListApiQuery = appListApiQueryHelper.data;
+    .setSort('name', true);
 
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -71,9 +59,29 @@ const state = reactive({
     loading: false,
     refinedUserItems: computed(() => appPageState.apps.map((app) => ({
         ...app,
+        role_type: appPageState.roles.filter((r) => r.role_id === app.role_id)[0]?.name || '',
         last_accessed_at: calculateTime(app?.last_accessed_at, storeState.timezone),
     }))),
-    tags: appListApiQueryHelper.setKeyItemSets(ROLE_SEARCH_HANDLERS.keyItemSets).queryTags,
+    fields: computed(() => {
+        const additionalFields: DefinitionField[] = [];
+        if (storeState.isAdminMode) {
+            additionalFields.push({ name: 'role_type', label: 'Admin Role' });
+        } else {
+            additionalFields.push({ name: 'role_type', label: 'Workspace Owner Role' });
+        }
+        return [
+            { name: 'name', label: 'App Name' },
+            { name: 'state', label: 'State' },
+            {
+                name: 'app_id', label: 'App ID', sortable: false, disableCopy: false,
+            },
+            ...additionalFields,
+            { name: 'tags', label: 'Tags', sortable: false },
+            { name: 'last_accessed_at', label: 'Last Activity' },
+            { name: 'expired_at', label: 'Expiration Date' },
+            { name: 'created_at', label: 'Created' },
+        ];
+    }),
 });
 const modalState = reactive({
     apiKeyModalVisible: false,
@@ -151,8 +159,10 @@ const handleSelect = (index: number[]) => {
 };
 const handleChange = async (options: ToolboxOptions = {}) => {
     appListApiQuery = getApiQueryWithToolboxOptions(appListApiQueryHelper, options) ?? appListApiQuery;
+    if (options.pageStart !== undefined) appPageStore.$patch({ pageStart: options.pageStart });
+    if (options.pageLimit !== undefined) appPageStore.$patch({ pageLimit: options.pageLimit });
     if (options.queryTags !== undefined) {
-        await replaceUrlQuery('filters', appListApiQueryHelper.rawQueryStrings);
+        queryTagHelper.setQueryTags(options.queryTags);
     }
     await getListApps();
 };
@@ -191,10 +201,19 @@ const handleClickModalConfirm = async () => {
 };
 
 /* API */
+const queryTagHelper = useQueryTags({ keyItemSets: APP_SEARCH_HANDLERS.keyItemSets });
+const { queryTags } = queryTagHelper;
+let appListApiQuery = appListApiQueryHelper.data;
 const getListApps = async () => {
     state.loading = true;
     try {
-        await appPageStore.listApps({ query: appListApiQuery });
+        appListApiQueryHelper
+            .setPageStart(appPageState.pageStart).setPageLimit(appPageState.pageLimit)
+            .setFilters(queryTagHelper.filters.value);
+        await appPageStore.listApps({
+            query: appListApiQuery,
+            role_type: !storeState.isAdminMode && ROLE_TYPE.WORKSPACE_OWNER || undefined,
+        });
     } finally {
         state.loading = false;
     }
@@ -220,14 +239,14 @@ watch(() => appPageState.modal.visible.apiKey, (visible) => {
                          disabled
                          :multi-select="false"
                          :items="state.refinedUserItems"
-                         :fields="APP_TABLE_FIELDS"
+                         :fields="state.fields"
                          sort-by="name"
                          :select-index="appPageState.selectedIndex"
                          :key-item-sets="APP_SEARCH_HANDLERS.keyItemSets"
                          :value-handler-map="APP_SEARCH_HANDLERS.valueHandlerMap"
                          :sort-desc="true"
                          :total-count="appPageState.totalCount"
-                         :query-tags="state.tags"
+                         :query-tags="queryTags"
                          :style="{height: `${props.tableHeight}px`}"
                          @select="handleSelect"
                          @change="handleChange"

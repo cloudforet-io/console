@@ -112,11 +112,11 @@ const fetchListRoles = async (inputText: string) => {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
             query: roleListApiQueryHelper.data,
         });
-        roleState.menuItems = results?.map((role) => ({
+        roleState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
-        })) as AddModalMenuItem[];
+        }));
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -133,10 +133,10 @@ const fetchListWorkspaces = async (inputText: string) => {
     }]);
     try {
         const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>();
-        workspaceState.menuItems = results?.map((role) => ({
+        workspaceState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.workspace_id,
-        })) as AddModalMenuItem[];
+        }));
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

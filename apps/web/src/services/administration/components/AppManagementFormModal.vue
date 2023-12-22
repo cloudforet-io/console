@@ -8,11 +8,15 @@ import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/desi
 import type { InputItem } from '@spaceone/design-system/types/inputs/input/text-input/type';
 import { cloneDeep } from 'lodash';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 
@@ -99,7 +103,7 @@ const fetchListRoles = async (inputText: string) => {
     dropdownState.loading = true;
     roleListApiQueryHelper.setFilters([{
         k: 'role_type',
-        v: [ROLE_TYPE.WORKSPACE_OWNER, ROLE_TYPE.WORKSPACE_MEMBER],
+        v: storeState.isAdminMode ? [ROLE_TYPE.DOMAIN_ADMIN] : [ROLE_TYPE.WORKSPACE_OWNER],
         o: '=',
     }]);
     if (inputText) {
@@ -111,10 +115,10 @@ const fetchListRoles = async (inputText: string) => {
     }
 
     try {
-        const response = await appPageStore.listRoles({
+        const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
             query: roleListApiQueryHelper.data,
         });
-        dropdownState.menuItems = response.map((role) => ({
+        dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.role_id,
         }));
@@ -175,43 +179,46 @@ watch(() => storeState.isEdit, (isEdit) => {
                         @close="handleClose"
         >
             <template #body>
-                <p-field-group :label="$t('IAM.APP.MODAL.COL_NAME')"
-                               class="input-form"
-                               required
-                >
-                    <p-text-input v-model="formState.name"
-                                  class="text-input"
-                                  block
-                    />
-                </p-field-group>
-                <p-field-group v-if="!storeState.isEdit"
-                               :label="storeState.isAdminMode ? $t('IAM.APP.MODAL.COL_ADMIN_ROLE') : $t('IAM.APP.MODAL.COL_WORKSPACE_ROLE')"
-                               required
-                >
-                    <p-select-dropdown use-fixed-menu-style
-                                       :placeholder="$t('IAM.APP.MODAL.COL_ADMIN_ROLE_PLACEHOLDER')"
-                                       :visible-menu.sync="dropdownState.visible"
-                                       :loading="dropdownState.loading"
-                                       :search-text.sync="dropdownState.searchText"
-                                       :selected.sync="dropdownState.selectedMenuItems"
-                                       :handler="menuHandler"
-                                       is-filterable
-                                       :multi-selectable="false"
-                                       class="role-select-dropdown"
-                                       @select="handleSelectItem"
-                    />
-                </p-field-group>
-                <p-field-group :label="$t('IAM.APP.MODAL.COL_TAG')"
-                               class="input-form"
-                >
-                    <p-text-input class="text-input"
-                                  multi-input
-                                  appearance-type="stack"
-                                  block
-                                  :selected="storeState.isEdit ? formState.selectedTags : []"
-                                  @update:selected="handleChangeTags"
-                    />
-                </p-field-group>
+                <div class="form-contents">
+                    <p-field-group :label="$t('IAM.APP.MODAL.COL_NAME')"
+                                   class="input-form"
+                                   required
+                    >
+                        <p-text-input v-model="formState.name"
+                                      class="text-input"
+                                      block
+                        />
+                    </p-field-group>
+                    <p-field-group v-if="!storeState.isEdit"
+                                   :label="storeState.isAdminMode ? $t('IAM.APP.MODAL.COL_ADMIN_ROLE') : $t('IAM.APP.MODAL.COL_WORKSPACE_ROLE')"
+                                   required
+                                   class="input-form"
+                    >
+                        <p-select-dropdown use-fixed-menu-style
+                                           :placeholder="$t('IAM.APP.MODAL.COL_ADMIN_ROLE_PLACEHOLDER')"
+                                           :visible-menu.sync="dropdownState.visible"
+                                           :loading="dropdownState.loading"
+                                           :search-text.sync="dropdownState.searchText"
+                                           :selected.sync="dropdownState.selectedMenuItems"
+                                           :handler="menuHandler"
+                                           is-filterable
+                                           :multi-selectable="false"
+                                           class="role-select-dropdown"
+                                           @select="handleSelectItem"
+                        />
+                    </p-field-group>
+                    <p-field-group :label="$t('IAM.APP.MODAL.COL_TAG')"
+                                   class="input-form"
+                    >
+                        <p-text-input class="text-input"
+                                      multi-input
+                                      appearance-type="stack"
+                                      block
+                                      :selected="storeState.isEdit ? formState.selectedTags : []"
+                                      @update:selected="handleChangeTags"
+                        />
+                    </p-field-group>
+                </div>
             </template>
         </p-button-modal>
     </div>
@@ -220,5 +227,12 @@ watch(() => storeState.isEdit, (isEdit) => {
 <style lang="postcss">
 .app-management-form-modal {
     display: initial;
+    .form-contents {
+        @apply flex flex-col;
+        gap: 1rem;
+        .input-form {
+            margin-bottom: 0;
+        }
+    }
 }
 </style>

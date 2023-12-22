@@ -19,8 +19,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export const useAppPageStore = defineStore('app-page', {
     state: () => ({
         apps: [] as AppModel[],
+        roles: [] as RoleModel[],
         selectedIndex: [] as number[]|undefined,
         totalCount: 0,
+        pageStart: 1,
+        pageLimit: 15,
         modal: {
             loading: false,
             type: '',
@@ -39,13 +42,13 @@ export const useAppPageStore = defineStore('app-page', {
     actions: {
         async listApps(params: AppListParameters) {
             try {
-                const res = await SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>(params);
-                this.apps = res.results?.map((item) => ({
+                const { results, total_count } = await SpaceConnector.clientV2.identity.app.list<AppListParameters, ListResponse<AppModel>>(params);
+                this.apps = (results ?? []).map((item) => ({
                     ...item,
                     tags: item.tags || {},
-                })) || [];
+                }));
                 this.selectedIndex = [];
-                this.totalCount = res.total_count ?? 0;
+                this.totalCount = total_count ?? 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.apps = [];
@@ -120,13 +123,13 @@ export const useAppPageStore = defineStore('app-page', {
             }
         },
         //
-        async listRoles(params: RoleListParameters) {
+        async listRoles(params?: RoleListParameters) {
             try {
                 const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
-                return results || [];
+                this.roles = results || [];
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return [];
+                this.roles = [];
             }
         },
     },
