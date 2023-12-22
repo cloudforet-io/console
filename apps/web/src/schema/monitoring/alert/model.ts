@@ -1,15 +1,6 @@
-import type { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
-
-interface AlertResource {
-    resource_id?: string;
-    resource_type?: string;
-    name?: string;
-    ip_address?: string;
-}
-
-export type AlertSeverity = 'CRITICAL' | 'ERROR' | 'WARNING' | 'INFO' | 'NOT_AVAILABLE' | 'NONE';
-export type AlertState = typeof ALERT_STATE[keyof typeof ALERT_STATE];
-export type AlertUrgency = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];
+import type {
+    AlertResource, AlertSeverity, AlertState, AlertUrgency,
+} from '@/schema/monitoring/alert/type';
 
 export interface AlertModel {
     alert_number: number;

@@ -1,4 +1,4 @@
-import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/model';
+import type { AlertState, AlertUrgency } from '@/schema/monitoring/alert/type';
 
 export interface AlertUpdateParameters {
     alert_id: string;

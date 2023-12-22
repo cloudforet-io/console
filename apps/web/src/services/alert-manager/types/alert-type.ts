@@ -2,7 +2,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 
 import type { TimeStamp } from '@/schema/_common/model';
-import type { AlertState } from '@/schema/monitoring/alert/model';
+import type { AlertState } from '@/schema/monitoring/alert/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
 
