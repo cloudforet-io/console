@@ -8,7 +8,7 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 const ProjectPage = () => import('@/services/project/pages/ProjectPage.vue');
 const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 
-const ProjectDashboardPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
+const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
 const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
@@ -56,7 +56,7 @@ export default {
                             path: 'summary',
                             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                             props: true,
-                            component: ProjectDashboardPage,
+                            component: ProjectSummaryPage,
                         },
                         {
                             path: 'member',

@@ -6,12 +6,21 @@ import {
 import {
     PButtonModal, PBoxTab,
 } from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { EscalationPolicyCreateParameters } from '@/schema/monitoring/escalation-policy/api-verbs/create';
+import type {
+    EscalationPolicyListParameters,
+    EscalationPolicyListResponse,
+} from '@/schema/monitoring/escalation-policy/api-verbs/list';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { ProjectAlertConfigUpdateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/update';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -22,8 +31,16 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/alert-manager/components/EscalationPolicyForm.vue';
+import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form-store';
 
+interface TableItem extends Omit<EscalationPolicyModel, 'name'> {
+    name: {
+        label: string;
+        isDefault: boolean;
+    };
+    created_at: string;
+}
 
 interface Props {
     projectId?: string;
@@ -47,13 +64,13 @@ const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const tableState = reactive({
     loading: true,
-    items: [] as any,
+    items: [] as TableItem[],
     selectIndex: [] as number[],
 });
 const state = reactive({
-    timezone: computed(() => store.state.user.timezone),
-    proxyVisible: useProxyValue('visible', props, emit),
-    tabs: computed(() => ([
+    timezone: computed<string>(() => store.state.user.timezone),
+    proxyVisible: useProxyValue<boolean>('visible', props, emit),
+    tabs: computed<TabItem[]>(() => ([
         {
             name: FORM_MODE.SELECT,
             label: i18n.t('PROJECT.DETAIL.ALERT.SELECT_POLICY'),
@@ -64,8 +81,8 @@ const state = reactive({
         },
     ])),
     activeTab: FORM_MODE.SELECT as FormMode,
-    selectedEscalationPolicyId: undefined,
-    isModalValid: computed(() => {
+    selectedEscalationPolicyId: undefined as string|undefined,
+    isModalValid: computed<boolean>(() => {
         if (state.activeTab === FORM_MODE.SELECT) return tableState.selectIndex.length;
         return escalationPolicyFormStore.isAllValid;
     }),
@@ -73,15 +90,15 @@ const state = reactive({
 
 /* Util */
 const setSelectIndex = () => {
-    let selectedIndex;
-    // eslint-disable-next-line consistent-return
-    tableState.items.forEach((item, idx) => {
+    let selectedIndex: number|undefined;
+    tableState.items.some((item, idx) => {
         if (item.escalation_policy_id === props.escalationPolicyId) {
             selectedIndex = idx;
-            return false;
+            return true;
         }
+        return false;
     });
-    tableState.selectIndex = [selectedIndex];
+    if (selectedIndex !== undefined) tableState.selectIndex = [selectedIndex];
 };
 
 /* Api */
@@ -92,17 +109,17 @@ let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
 const listEscalationPolicies = async () => {
     try {
         tableState.loading = true;
-        const { results } = await SpaceConnector.client.monitoring.escalationPolicy.list({
+        const { results } = await SpaceConnector.clientV2.monitoring.escalationPolicy.list<EscalationPolicyListParameters, EscalationPolicyListResponse>({
             query: escalationPolicyApiQuery,
         });
-        tableState.items = results.map((d) => ({
+        tableState.items = results?.map((d) => ({
             ...d,
             name: {
                 label: d.name,
                 isDefault: d.is_default,
             },
             created_at: iso8601Formatter(d.created_at, state.timezone),
-        }));
+        })) ?? [];
         setSelectIndex();
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -113,10 +130,11 @@ const listEscalationPolicies = async () => {
 };
 const createEscalationPolicy = async (): Promise<string | undefined> => {
     try {
-        const { escalation_policy_id } = await SpaceConnector.client.monitoring.escalationPolicy.create({
+        if (!escalationPolicyFormState.name) throw new Error('name is required');
+        const { escalation_policy_id } = await SpaceConnector.clientV2.monitoring.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>({
             name: escalationPolicyFormState.name,
             rules: escalationPolicyFormState.rules,
-            scope: escalationPolicyFormState.scope,
+            resource_group: escalationPolicyFormState.resourceGroup,
             finish_condition: escalationPolicyFormState.finishCondition,
             repeat_count: escalationPolicyFormState.repeatCount,
             project_id: props.projectId,
@@ -129,7 +147,7 @@ const createEscalationPolicy = async (): Promise<string | undefined> => {
 };
 const updateProjectAlertConfig = async (escalationPolicyId: string) => {
     try {
-        await SpaceConnector.client.monitoring.projectAlertConfig.update({
+        await SpaceConnector.clientV2.monitoring.projectAlertConfig.update<ProjectAlertConfigUpdateParameters, ProjectAlertConfigModel>({
             project_id: props.projectId,
             escalation_policy_id: escalationPolicyId,
         });
@@ -140,7 +158,7 @@ const updateProjectAlertConfig = async (escalationPolicyId: string) => {
 
 /* Event */
 const handleClickConfirm = async () => {
-    let newEscalationPolicyId;
+    let newEscalationPolicyId: string|undefined;
     if (state.activeTab === FORM_MODE.CREATE) {
         if (!escalationPolicyFormStore.isAllValid) return;
         newEscalationPolicyId = await createEscalationPolicy();
@@ -192,7 +210,7 @@ watch(() => props.visible, (visible) => {
                     <template #create>
                         <escalation-policy-form v-if="state.activeTab === FORM_MODE.CREATE"
                                                 :show-scope="false"
-                                                :mode="state.activeTab"
+                                                :mode="ACTION.create"
                         />
                     </template>
                 </p-box-tab>

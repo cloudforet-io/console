@@ -135,7 +135,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                     <p-radio v-for="(item, idx) in state.scopes"
                              :key="idx"
                              :selected="item.value"
-                             :value="escalationPolicyFormState.resource_group"
+                             :value="escalationPolicyFormState.resourceGroup"
                              @change="handleChangeScope(item.value)"
                     >
                         {{ item.label }}
@@ -147,7 +147,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                       class="scope-text"
                 >
                     <span>{{ state.scopeLabels[escalationPolicyFormState.resourceGroup] }}</span>
-                    <span v-if="escalationPolicyFormState.resource_group === 'PROJECT'">
+                    <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                  new-tab
                                  :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"

@@ -43,7 +43,7 @@ const createEscalationPolicy = async () => {
         await SpaceConnector.clientV2.monitoring.escalationPolicy.create<EscalationPolicyCreateParameters, EscalationPolicyModel>({
             name: escalationPolicyFormState.name,
             rules: escalationPolicyFormState.rules,
-            resource_group: escalationPolicyFormState.resource_group,
+            resource_group: escalationPolicyFormState.resourceGroup,
             finish_condition: escalationPolicyFormState.finishCondition,
             repeat_count: escalationPolicyFormState.repeatCount,
             project_id: escalationPolicyFormState.projectId,

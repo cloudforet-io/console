@@ -9,6 +9,9 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectAlertConfigUpdateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/update';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type { ProjectAlertConfigNotiUrgency } from '@/schema/monitoring/project-alert-config/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -17,7 +20,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { red } from '@/styles/colors';
-
 
 const URGENCY_COLOR = red[400];
 
@@ -29,7 +31,7 @@ interface Props {
         label: string;
         icon?: string;
     }[];
-    selectedOption?: string;
+    selectedOption?: ProjectAlertConfigNotiUrgency;
 }
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
@@ -41,12 +43,12 @@ const emit = defineEmits<{(e: 'confirm'): void}>();
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    notificationUrgency: undefined as string|undefined,
+    notificationUrgency: undefined as ProjectAlertConfigNotiUrgency|undefined,
 });
 
 const onClickConfirm = async () => {
     try {
-        await SpaceConnector.client.monitoring.projectAlertConfig.update({
+        await SpaceConnector.clientV2.monitoring.projectAlertConfig.update<ProjectAlertConfigUpdateParameters, ProjectAlertConfigModel>({
             project_id: props.projectId,
             options: {
                 notification_urgency: state.notificationUrgency,

@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PLink, PButton,
@@ -12,6 +13,9 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
+import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';
+import type { ProjectAlertConfigGetParameters } from '@/schema/monitoring/project-alert-config/api-verbs/get';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -39,25 +43,25 @@ const state = reactive({
     selectedProjectId: props.projectId,
     description: '',
     // validation
-    titleInvalidText: computed(() => {
+    titleInvalidText: computed<TranslateResult|undefined>(() => {
         if (!state.title?.trim()) return i18n.t('MONITORING.ALERT.ALERT_LIST.FORM.REQUIRED_TITLE');
         return undefined;
     }),
-    titleInvalid: computed(() => state.title !== undefined && !!state.titleInvalidText),
+    titleInvalid: computed<boolean>(() => state.title !== undefined && !!state.titleInvalidText),
     isProjectAlertSet: undefined as undefined|boolean,
-    projectInvalidText: computed(() => {
+    projectInvalidText: computed<TranslateResult|undefined>(() => {
         if (state.selectedProjectId === undefined) return i18n.t('MONITORING.ALERT.ALERT_LIST.FORM.REQUIRED_PROJECT');
         if (state.isProjectAlertSet === false) return i18n.t('MONITORING.ALERT.ALERT_LIST.FORM.NEED_TO_SET_PROJECT_ALERT');
         return undefined;
     }),
-    projectInvalid: computed(() => state.selectedProjectId !== undefined && !!state.projectInvalidText),
-    isAllValid: computed(() => state.title !== undefined && !state.titleInvalid && state.selectedProjectId && !state.projectInvalid),
+    projectInvalid: computed<boolean>(() => state.selectedProjectId !== undefined && !!state.projectInvalidText),
+    isAllValid: computed<boolean>(() => state.title !== undefined && !state.titleInvalid && state.selectedProjectId && !state.projectInvalid),
 });
 
 const checkProject = async () => {
     state.isProjectAlertSet = undefined;
     try {
-        await SpaceConnector.client.monitoring.projectAlertConfig.get({
+        await SpaceConnector.clientV2.monitoring.projectAlertConfig.get<ProjectAlertConfigGetParameters, ProjectAlertConfigModel>({
             project_id: state.selectedProjectId,
         });
         state.isProjectAlertSet = true;
@@ -68,7 +72,7 @@ const checkProject = async () => {
 
 const setProjectAlert = async () => {
     try {
-        await SpaceConnector.client.monitoring.projectAlertConfig.create({
+        await SpaceConnector.clientV2.monitoring.projectAlertConfig.create<ProjectAlertConfigCreateParameters, ProjectAlertConfigModel>({
             project_id: state.selectedProjectId,
         });
         state.isProjectAlertSet = true;

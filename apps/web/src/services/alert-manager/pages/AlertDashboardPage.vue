@@ -1,13 +1,55 @@
+<script setup lang="ts">
+import { reactive } from 'vue';
+
+import { PHeading } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectAlertConfigListParameters } from '@/schema/monitoring/project-alert-config/api-verbs/list';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import AlertDashboardAlertHistoryWidget from '@/services/alert-manager/components/AlertDashboardAlertHistoryWidget.vue';
+import AlertDashboardAlertStateWidget from '@/services/alert-manager/components/AlertDashboardAlertStateWidget.vue';
+import AlertDashboardCurrentProjectStatusWidget from '@/services/alert-manager/components/AlertDashboardCurrentProjectStatusWidget.vue';
+import AlertDashboardProjectSearchWidget from '@/services/alert-manager/components/AlertDashboardProjectSearchWidget.vue';
+import AlertDashboardTop5ProjectActivityWidget from '@/services/alert-manager/components/AlertDashboardTop5ProjectActivityWidget.vue';
+
+
+const state = reactive({
+    activatedProjects: [] as string[],
+});
+
+/* api */
+const listProjectAlertConfig = async () => {
+    try {
+        const { results } = await SpaceConnector.clientV2.monitoring.projectAlertConfig.list<ProjectAlertConfigListParameters, ListResponse<ProjectAlertConfigModel>>();
+        state.activatedProjects = results?.map((d) => d.project_id) ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.activatedProjects = [];
+    }
+};
+
+/* init */
+(async () => {
+    await listProjectAlertConfig();
+})();
+
+</script>
+
 <template>
     <div class="alert-dashboard-page">
         <p-heading :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
         <div class="widget-wrapper">
             <alert-dashboard-alert-state-widget
-                :activated-projects="activatedProjects"
+                :activated-projects="state.activatedProjects"
                 class="alert-state-widget"
             />
             <alert-dashboard-alert-history-widget
-                :activated-projects="activatedProjects"
+                :activated-projects="state.activatedProjects"
                 class="alert-history-widget"
             />
             <h2 class="widget-title">
@@ -16,64 +58,12 @@
             <alert-dashboard-current-project-status-widget class="current-project-status-widget" />
             <alert-dashboard-top5-project-activity-widget class="top5-project-activity-widget" />
             <alert-dashboard-project-search-widget
-                :activated-projects="activatedProjects"
+                :activated-projects="state.activatedProjects"
                 class="col-span-12"
             />
         </div>
     </div>
 </template>
-
-<script lang="ts">
-
-import {
-    reactive, toRefs,
-} from 'vue';
-
-import { PHeading } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import AlertDashboardAlertHistoryWidget from '@/services/alert-manager/components/AlertDashboardAlertHistoryWidget.vue';
-import AlertDashboardAlertStateWidget from '@/services/alert-manager/components/AlertDashboardAlertStateWidget.vue';
-import AlertDashboardCurrentProjectStatusWidget from '@/services/alert-manager/components/AlertDashboardCurrentProjectStatusWidget.vue';
-import AlertDashboardProjectSearchWidget from '@/services/alert-manager/components/AlertDashboardProjectSearchWidget.vue';
-import AlertDashboardTop5ProjectActivityWidget from '@/services/alert-manager/components/AlertDashboardTop5ProjectActivityWidget.vue';
-
-export default {
-    name: 'AlertDashboardPage',
-    components: {
-        AlertDashboardProjectSearchWidget,
-        AlertDashboardTop5ProjectActivityWidget,
-        AlertDashboardCurrentProjectStatusWidget,
-        AlertDashboardAlertHistoryWidget,
-        AlertDashboardAlertStateWidget,
-        PHeading,
-    },
-    setup() {
-        const state = reactive({
-            activatedProjects: [] as string[],
-        });
-
-        /* api */
-        const listProjectAlertConfig = async () => {
-            try {
-                const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list();
-                state.activatedProjects = results.map((d) => d.project_id);
-            } catch (e) {
-            }
-        };
-
-        /* init */
-        (async () => {
-            await listProjectAlertConfig();
-        })();
-
-        return {
-            ...toRefs(state),
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .alert-dashboard-page {
