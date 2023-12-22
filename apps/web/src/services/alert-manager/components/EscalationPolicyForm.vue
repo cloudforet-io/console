@@ -12,8 +12,9 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
@@ -35,10 +36,12 @@ const props = withDefaults(defineProps<{
     showScope: true,
     escalationPolicyData: undefined,
 });
+
+const allReferenceStore = useAllReferenceStore();
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const state = reactive({
-    projects: computed(() => store.getters['reference/projectItems']),
+    projects: computed(() => allReferenceStore.getters.project),
     //
     scopeLabels: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
@@ -74,11 +77,6 @@ const {
         return true;
     },
 });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/project/load');
-})();
 
 /* event */
 const handleChangeScope = (value: EscalationPolicyModel['resource_group']) => {

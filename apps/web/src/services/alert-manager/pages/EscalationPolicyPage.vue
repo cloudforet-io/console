@@ -28,6 +28,8 @@ import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-polic
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 
@@ -53,8 +55,10 @@ const escalationPolicyApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
     .setPage(1, 15)
     .setFiltersAsRawQueryString(currentQuery.filters);
+
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    projects: computed(() => store.getters['reference/projectItems']),
+    projects: computed(() => allReferenceStore.getters.project),
 });
 const handlerState = reactive({
     keyItemSets: computed<KeyItemSet[]>(() => [{
@@ -197,8 +201,6 @@ const onChange = async (options: ToolboxOptions = {}) => {
 /* init */
 (async () => {
     await listEscalationPolicies();
-    // LOAD REFERENCE STORE
-    await store.dispatch('reference/project/load');
 })();
 
 </script>
