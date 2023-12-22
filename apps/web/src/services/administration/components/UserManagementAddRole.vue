@@ -20,7 +20,7 @@ import { useRoleFormatter } from '@/services/administration/composables/refined-
 import type { AddModalMenuItem } from '@/services/administration/types/user-type';
 
 
-const emit = defineEmits<{(e: 'change-role', role: AddModalMenuItem): void}>();
+const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
     loading: true,
@@ -78,7 +78,7 @@ const fetchListRoles = async (inputText: string) => {
 
 /* Watcher */
 watch(() => state.selectedItems, (selectedItems) => {
-    emit('change-role', selectedItems[0]);
+    emit('change-input', { role: selectedItems[0] });
 });
 </script>
 

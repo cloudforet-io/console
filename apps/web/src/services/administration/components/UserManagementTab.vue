@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PEmpty, PStatus, PTab, PDataTable,
+    PEmpty, PStatus, PTab, PDataTable, PBadge,
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
@@ -14,7 +14,11 @@ import UserManagementTabDetail from '@/services/administration/components/UserMa
 import UserManagementTabProjects from '@/services/administration/components/UserManagementTabProjects.vue';
 import UserManagementTabTag from '@/services/administration/components/UserManagementTabTag.vue';
 import UserManagementTabWorkspace from '@/services/administration/components/UserManagementTabWorkspace.vue';
-import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
+import {
+    calculateTime,
+    useRoleFormatter,
+    userStateFormatter,
+} from '@/services/administration/composables/refined-table-data';
 import { USER_TAB_TABLE_FIELDS, USER_TABS } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
@@ -39,6 +43,10 @@ const multiItemTabState = reactive({
         { label: i18n.t('IAM.USER.MAIN.TAB_SELECTED_DATA'), name: USER_TABS.DATA },
     ])),
     activeTab: USER_TABS.DATA,
+    refinedUserItems: computed(() => userPageStore.selectedUsers.map((user) => ({
+        ...user,
+        last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
+    }))),
 });
 </script>
 
@@ -69,7 +77,7 @@ const multiItemTabState = reactive({
                 <p-data-table :fields="USER_TAB_TABLE_FIELDS"
                               :sortable="false"
                               :selectable="false"
-                              :items="userPageStore.selectedUsers"
+                              :items="multiItemTabState.refinedUserItems"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
@@ -92,6 +100,31 @@ const multiItemTabState = reactive({
                             {{ value }} {{ $t('IAM.USER.MAIN.DAYS') }}
                         </span>
                     </template>
+                    <template #col-role_type-format="{value}">
+                        <div class="role-type-wrapper">
+                            <img :src="useRoleFormatter(value).image"
+                                 alt="role-type-icon"
+                                 class="role-type-icon"
+                            >
+                            <span>{{ useRoleFormatter(value).name }}</span>
+                        </div>
+                    </template>
+                    <template #col-tags-format="{value}">
+                        <template v-if="!!Object.keys(value).length">
+                            <p-badge v-for="([key, val], idx) in Object.entries(value)"
+                                     :key="`${key}-${val}-${idx}`"
+                                     badge-type="subtle"
+                                     shape="square"
+                                     style-type="gray200"
+                                     class="mr-2"
+                            >
+                                {{ key }}: {{ val }}
+                            </p-badge>
+                        </template>
+                        <template v-else>
+                            <span />
+                        </template>
+                    </template>
                 </p-data-table>
             </template>
         </p-tab>
@@ -112,5 +145,14 @@ const multiItemTabState = reactive({
 }
 .selected-data-tab {
     @apply mt-8;
+    .role-type-wrapper {
+        @apply flex items-center;
+        gap: 0.25rem;
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    }
 }
 </style>
