@@ -177,7 +177,6 @@ const handleClickSendEmailButton = async () => {
     state.loading = true;
     try {
         await postValidationEmail({
-            user_id: props.userId,
             email: formState.newNotificationEmail,
         });
         if (state.loginUserId === props.userId) {
@@ -195,10 +194,8 @@ const handleClickConfirmButton = async () => {
     state.loading = true;
     try {
         await postValidationCode({
-            user_id: props.userId,
-            domain_id: props.domainId,
-            code: formState.verificationCode,
-        }, state.loginUserId === props.userId);
+            verify_code: formState.verificationCode,
+        });
         emit('refresh-user');
         state.proxyVisible = false;
         resetFormData();
