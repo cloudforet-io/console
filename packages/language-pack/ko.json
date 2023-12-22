@@ -932,7 +932,8 @@
 				"SHOW_ALL": "모두 보기"
 			},
 			"MY_PAGE": {
-				"BACK_LINK": ""
+				"BACK_LINK": "",
+				"BACK_LINK_SHORT": ""
 			},
 			"NOTICE": {
 				"DETAIL_LINK": "상세 링크:",

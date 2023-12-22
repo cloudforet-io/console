@@ -40,7 +40,7 @@ const state = reactive({
                      height="1rem"
                 />
                 <span class="link-text">{{ $t('COMMON.GNB.MY_PAGE.BACK_LINK') }}</span>
-                <span class="link-text-mobile">{{ $t('Back') }}</span>
+                <span class="link-text-mobile">{{ $t('COMMON.GNB.MY_PAGE.BACK_LINK_SHORT') }}</span>
             </router-link>
         </div>
         <my-page-g-n-b-toolset class="right-part" />

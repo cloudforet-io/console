@@ -932,7 +932,8 @@
 				"SHOW_ALL": "すべて表示"
 			},
 			"MY_PAGE": {
-				"BACK_LINK": ""
+				"BACK_LINK": "",
+				"BACK_LINK_SHORT": ""
 			},
 			"NOTICE": {
 				"DETAIL_LINK": "詳細リンク",
