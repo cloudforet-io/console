@@ -3336,7 +3336,6 @@
 		"EVENT_RULE": {
 			"ADD": "Add",
 			"ADDITIONAL_INFORMATION": "Additional Information",
-			"ADDITIONAL_RESPONDER": "Additional Responder",
 			"ADD_EVENT_RULE": "Add Event Rule",
 			"ALL": "All",
 			"ALT_E_CREATE_EVENT_RULE": "Failed to Create Event Rule",
@@ -3372,7 +3371,6 @@
 			"OF_THE_FOLLOWING_ARE_MET": "of the following are met",
 			"ON": "On",
 			"PAUSE_NOTIFICATION": "Pause Notifications",
-			"PROJECT_DEPENDENCY": "Project Dependency",
 			"PROJECT_ROUTING": "Project Routing",
 			"SAVE": "Save",
 			"SNOOZED_NOTIFICATIONS": "No Notifications",

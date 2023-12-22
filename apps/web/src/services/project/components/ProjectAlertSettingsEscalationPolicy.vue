@@ -1,7 +1,9 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onActivated, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
 
 import {
     PBadge, PDivider, PI, PLink,
@@ -14,15 +16,23 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import { i18n } from '@/translations';
+import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
+import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
+import { i18n as _i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
 import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-constant';
 
+interface FinishConditionItem {
+    name: EscalationPolicyFinishCondition;
+    label: TranslateResult;
+}
 
 interface Props {
     projectId?: string;
@@ -35,28 +45,29 @@ const props = withDefaults(defineProps<Props>(), {
 
 const queryHelper = new QueryHelper();
 const state = reactive({
-    finishConditions: computed(() => ([
+    finishConditions: computed<FinishConditionItem[]>(() => ([
         {
             name: ESCALATION_POLICY_FINISH_CONDITION.acknowledged,
-            label: i18n.t('PROJECT.DETAIL.ALERT.ACKNOWLEDGED'),
+            label: _i18n.t('PROJECT.DETAIL.ALERT.ACKNOWLEDGED'),
         },
         {
             name: ESCALATION_POLICY_FINISH_CONDITION.resolved,
-            label: i18n.t('PROJECT.DETAIL.ALERT.RESOLVED'),
+            label: _i18n.t('PROJECT.DETAIL.ALERT.RESOLVED'),
         },
     ])),
-    escalationPolicyName: computed(() => get(props.escalationPolicy, 'name')),
-    finishCondition: computed(() => {
+    escalationPolicyName: computed<string|undefined>(() => get(props.escalationPolicy, 'name')),
+    finishCondition: computed<TranslateResult>(() => {
         const finishCondition = get(props.escalationPolicy, 'finish_condition');
         if (finishCondition) return state.finishConditions.find((d) => d.name === finishCondition).label;
         return '';
     }),
-    escalationRules: computed(() => get(props.escalationPolicy, 'rules')),
-    repeatCount: computed(() => get(props.escalationPolicy, 'repeat_count')),
-    projectChannels: [],
-    escalationPolicyLink: computed(() => {
+    escalationRules: computed<EscalationPolicyRule[]|undefined>(() => get(props.escalationPolicy, 'rules')),
+    repeatCount: computed<number|undefined>(() => get(props.escalationPolicy, 'repeat_count')),
+    projectChannels: [] as ProjectChannelModel[],
+    escalationPolicyLink: computed<Location>(() => {
         const filters: ConsoleFilter[] = [];
-        filters.push({ k: 'escalation_policy_id', o: '=', v: get(props.escalationPolicy, 'escalation_policy_id') });
+        const escalationPolicyId: string|undefined = get(props.escalationPolicy, 'escalation_policy_id');
+        filters.push({ k: 'escalation_policy_id', o: '=', v: escalationPolicyId });
         return {
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
             query: {
@@ -67,7 +78,7 @@ const state = reactive({
 });
 
 /* util */
-const notificationLevelFormatter = (str) => str.replace('LV', '');
+const notificationLevelFormatter = (str: string) => str.replace('LV', '');
 
 /* api */
 const apiQuery = new ApiQueryHelper();
@@ -78,7 +89,7 @@ const getQuery = () => {
 };
 const listProjectChannel = async () => {
     try {
-        const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
+        const { results } = await SpaceConnector.clientV2.notification.projectChannel.list<ProjectChannelListParameters, ListResponse<ProjectChannelModel>>({ query: getQuery() });
         state.projectChannels = results;
     } catch (e) {
         state.projectChannels = [];
@@ -117,7 +128,9 @@ onActivated(async () => {
         <section>
             <span class="label">{{ $t('PROJECT.DETAIL.ALERT.ESCALATION_RULES_LABEL') }}</span>
             <div class="escalation-rules-wrapper">
-                <div class="rule-wrapper">
+                <div v-if="state.escalationRules"
+                     class="rule-wrapper"
+                >
                     <div v-for="(rule, idx) in state.escalationRules"
                          :key="`rule-${idx}`"
                     >

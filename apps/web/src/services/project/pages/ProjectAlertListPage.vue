@@ -4,15 +4,21 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
+import { queryStringToString } from '@/lib/router-query-string';
+
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import AlertMainDataTable from '@/services/alert-manager/components/AlertMainDataTable.vue';
 import {
     ALERT_STATE_FILTER, ALERT_ASSIGNED_FILTER, ALERT_URGENCY_FILTER,
 } from '@/services/alert-manager/constants/alert-constant';
-import type { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/alert-manager/types/alert-type';
+import type {
+    AlertAssignedFilter,
+    AlertListPageUrlQuery,
+    AlertListTableFilters,
+    AlertStateFilter, AlertUrgencyFilter,
+} from '@/services/alert-manager/types/alert-type';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
-
 
 interface Props {
     id?: string;
@@ -22,12 +28,33 @@ const route = useRoute();
 const router = useRouter();
 
 const projectDetailPageStore = useProjectDetailPageStore();
-const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(route.query.filters);
+
+const queryTagsHelper = useQueryTags({});
+queryTagsHelper.setURLQueryStringFilters(route.query.filters);
+const { filters } = queryTagsHelper;
+
+const getInitialAlertState = (): AlertStateFilter => {
+    const value = queryStringToString(route.query.state);
+    if (!value) return ALERT_STATE_FILTER.OPEN;
+    if (value in ALERT_STATE_FILTER) return value as AlertStateFilter;
+    return ALERT_STATE_FILTER.OPEN;
+};
+const getInitialUrgency = (): AlertUrgencyFilter => {
+    const value = queryStringToString(route.query.urgency);
+    if (!value) return ALERT_URGENCY_FILTER.ALL;
+    if (value in ALERT_URGENCY_FILTER) return value as AlertUrgencyFilter;
+    return ALERT_URGENCY_FILTER.ALL;
+};
+const getInitialAssigned = (): AlertAssignedFilter => {
+    const value = queryStringToString(route.query.assigned);
+    if (!value) return ALERT_ASSIGNED_FILTER.ALL;
+    if (value in ALERT_ASSIGNED_FILTER) return value as AlertAssignedFilter;
+    return ALERT_ASSIGNED_FILTER.ALL;
+};
 const state = reactive({
-    alertState: route.query.state ?? ALERT_STATE_FILTER.OPEN,
-    urgency: route.query.urgency ?? ALERT_URGENCY_FILTER.ALL,
-    assigned: route.query.assigned ?? ALERT_ASSIGNED_FILTER.ALL,
-    filters: tagQueryHelper.filters,
+    alertState: getInitialAlertState(),
+    urgency: getInitialUrgency(),
+    assigned: getInitialAssigned(),
 });
 
 /* util */
@@ -54,8 +81,7 @@ const onUpdateTable = (changed: Partial<AlertListTableFilters>) => {
         query.assigned = changed.assigned;
     }
     if (changed.filters) {
-        tagQueryHelper.setFilters(changed.filters);
-        query.filters = tagQueryHelper.rawQueryStrings;
+        queryTagsHelper.setFilters(changed.filters);
     }
     replaceAlertListPageUrlQuery(query);
 };
@@ -65,10 +91,10 @@ const onChangeList = () => {
 };
 
 onActivated(() => {
-    state.alertState = route.query.state ?? ALERT_STATE_FILTER.OPEN;
-    state.urgency = route.query.urgency ?? ALERT_URGENCY_FILTER.ALL;
-    state.assigned = route.query.assigned ?? ALERT_ASSIGNED_FILTER.ALL;
-    state.filters = tagQueryHelper.setFiltersAsRawQueryString(route.query.filters).filters;
+    state.alertState = getInitialAlertState();
+    state.urgency = getInitialUrgency();
+    state.assigned = getInitialAssigned();
+    queryTagsHelper.setURLQueryStringFilters(route.query.filters);
 });
 </script>
 
@@ -79,7 +105,7 @@ onActivated(() => {
             :alert-state="state.alertState"
             :urgency="state.urgency"
             :assigned="state.assigned"
-            :filters="state.filters"
+            :filters="filters"
             keep-alive
             @update="onUpdateTable"
             @change-list="onChangeList"

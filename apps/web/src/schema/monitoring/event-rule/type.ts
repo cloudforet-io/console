@@ -13,7 +13,7 @@ export type EventRuleConditionKey =
 
 export type EventRuleConditionOperator =
     |'eq'
-    |'contains'
+    |'contain'
     | 'not'
     |'not_contain';
 
@@ -26,14 +26,15 @@ export interface EventRuleCondition {
 export type EventRuleConditionsPolicy = 'ALL'|'ANY';
 
 export interface EventRuleActions {
-    change_assignee: string;
-    change_urgency: AlertUrgency;
-    add_additional_info: Record<string, string>;
-    no_notification: boolean;
+    change_assignee?: string;
+    change_urgency?: AlertUrgency;
+    change_project?: string;
+    add_additional_info?: Record<string, string>;
+    no_notification?: boolean;
 }
 
 export interface EventRuleOptions {
-    stop_processing: boolean;
+    stop_processing?: boolean;
 }
 
 export type EventRuleResourceGroup = 'WORKSPACE'|'PROJECT';

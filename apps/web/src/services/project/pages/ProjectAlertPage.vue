@@ -57,7 +57,7 @@ const getProjectAlertConfig = async () => {
         state.loading = false;
     }
 };
-const onActivateAlert = async () => {
+const handleActivateAlert = async () => {
     try {
         if (!props.id) throw new Error('Project ID is required');
         await SpaceConnector.clientV2.monitoring.projectAlertConfig.create<ProjectAlertConfigCreateParameters, ProjectAlertConfigModel>({
@@ -73,7 +73,7 @@ const onActivateAlert = async () => {
 };
 
 /* event */
-const onChangeTab = async (activeTab) => {
+const handleChangeTab = async (activeTab: string) => {
     if (activeTab === route.name) return;
     await router.replace({ name: activeTab });
 };
@@ -100,7 +100,7 @@ watch(() => props.id, (projectId) => {
             <strong>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_1') }}</strong>
             <p>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_2') }}</p>
             <p-button style-type="positive"
-                      @click="onActivateAlert"
+                      @click="handleActivateAlert"
             >
                 {{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATE') }}
             </p-button>
@@ -108,7 +108,7 @@ watch(() => props.id, (projectId) => {
         <p-button-tab v-else
                       :tabs="tabState.tabs"
                       :active-tab.sync="tabState.activeTab"
-                      @change="onChangeTab"
+                      @change="handleChangeTab"
         >
             <keep-alive><router-view /></keep-alive>
         </p-button-tab>

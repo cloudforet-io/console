@@ -12,6 +12,9 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -27,9 +30,9 @@ const props = defineProps<{
 
 const state = reactive({
     totalCount: 0,
-    alerts: [],
+    alerts: [] as AlertModel[],
     moreCount: undefined as undefined | number,
-    timezone: computed(() => store.state.user.timezone),
+    timezone: computed<string>(() => store.state.user.timezone),
 });
 
 /* util */
@@ -61,20 +64,20 @@ const getQuery = () => {
         v: end,
     });
     apiQuery.setFilters(filters);
-    return apiQuery.data;
+    return apiQuery.dataV2;
 };
 const getAlerts = async () => {
     try {
-        const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
             project_id: props.projectId,
             query: {
                 ...getQuery(),
                 only: ['title', 'urgency', 'created_at'],
             },
         });
-        state.totalCount = total_count;
-        state.alerts = results;
-        if (total_count > 10) state.moreCount = total_count - 10;
+        state.totalCount = total_count ?? 0;
+        state.alerts = results ?? [];
+        if (state.totalCount > 10) state.moreCount = state.totalCount - 10;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.alerts = [];

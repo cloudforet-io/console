@@ -12,6 +12,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { AlertCreateParameters } from '@/schema/monitoring/alert/api-verbs/create';
 import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import type { ProjectAlertConfigCreateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/create';
 import type { ProjectAlertConfigGetParameters } from '@/schema/monitoring/project-alert-config/api-verbs/get';
@@ -84,7 +85,7 @@ const setProjectAlert = async () => {
 
 const createAlert = async () => {
     try {
-        await SpaceConnector.client.monitoring.alert.create({
+        await SpaceConnector.clientV2.monitoring.alert.create<AlertCreateParameters>({
             title: state.title,
             urgency: state.urgency,
             project_id: state.selectedProjectId,
@@ -185,6 +186,7 @@ watch(() => state.proxyVisible, (visible) => {
                 </template>
                 <project-select-dropdown :invalid="state.projectInvalid"
                                          project-selectable
+                                         :project-group-selectable="false"
                                          @select="onSelectProject"
                 />
             </p-field-group>

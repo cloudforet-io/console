@@ -9,21 +9,16 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/create';
+import type { NoteDeleteParameters } from '@/schema/monitoring/note/api-verbs/delete';
+import type { NoteListParameters } from '@/schema/monitoring/note/api-verbs/list';
+import type { NoteModel } from '@/schema/monitoring/note/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-
-
-interface NoteModel {
-    note_id: string;
-    alert_id: string;
-    note: string;
-    user_id: string;
-    project_id: string;
-    created_at: string;
-}
 
 const props = defineProps<{
     id: string;
@@ -33,8 +28,7 @@ const props = defineProps<{
 const state = reactive({
     noteInput: '',
     noteList: [] as NoteModel[],
-    timezone: computed(() => store.state.user.timezone),
-    userId: computed(() => store.state.user.userId),
+    timezone: computed<string>(() => store.state.user.timezone),
     menuItems: [
         {
             label: 'Delete', name: 'delete',
@@ -49,18 +43,18 @@ const handleChangeNoteInput = (e) => {
 const apiQuery = new ApiQueryHelper();
 const listNote = async () => {
     try {
-        apiQuery.setFilters([{ k: 'alert_id', v: props.id, o: '=' }]).setSort('created_at');
-        const res = await SpaceConnector.client.monitoring.note.list({
-            query: apiQuery.data,
+        apiQuery.setFilters([{ k: 'alert_id', v: props.id, o: '=' }]).setSort('created_at', true);
+        const res = await SpaceConnector.clientV2.monitoring.note.list<NoteListParameters, ListResponse<NoteModel>>({
+            query: apiQuery.dataV2,
         });
-        state.noteList = res.results.map((d) => ({
+        state.noteList = res.results?.map((d) => ({
             title: d.created_by,
             data: {
                 note: d.note,
                 note_id: d.note_id,
             },
             ...d,
-        })).reverse();
+        })) ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.noteList = [];
@@ -69,9 +63,8 @@ const listNote = async () => {
 
 const handleCreateNote = async () => {
     try {
-        await SpaceConnector.client.monitoring.note.create({
+        await SpaceConnector.clientV2.monitoring.note.create<NoteCreateParameters>({
             alert_id: props.id,
-            user_id: state.userId,
             note: state.noteInput,
         });
     } catch (e) {
@@ -100,7 +93,7 @@ const handleSelect = (noteId) => {
 const handleDeleteNote = async () => {
     checkDeleteState.loading = true;
     try {
-        await SpaceConnector.client.monitoring.note.delete({
+        await SpaceConnector.clientV2.monitoring.note.delete<NoteDeleteParameters>({
             note_id: state.selectedNoteIdForDelete,
         });
     } catch (e) {

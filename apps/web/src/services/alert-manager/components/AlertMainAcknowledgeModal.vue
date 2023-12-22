@@ -7,17 +7,15 @@ import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-
-import type { AlertStateUpdateParams } from '@/services/alert-manager/types/alert-type';
 
 const props = defineProps<{
     visible: boolean;
@@ -33,12 +31,15 @@ const state = reactive({
 
 /* api */
 const updateToAcknowledge = async () => {
-    const params: AlertStateUpdateParams = {
-        alerts: props.alerts?.map((d) => d.alert_id),
-        state: ALERT_STATE.ACKNOWLEDGED,
-    };
-    if (state.isAssignedToMe) params.assignee = store.state.user.userId;
-    await SpaceConnector.client.monitoring.alert.updateState(params);
+    try {
+        const promises = props.alerts?.map((d) => SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters>({
+            alert_id: d.alert_id,
+            state: ALERT_STATE.ACKNOWLEDGED,
+        }));
+        await Promise.allSettled(promises);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
 };
 
 const onClickConfirm = async () => {

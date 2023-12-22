@@ -13,7 +13,6 @@ const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPa
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
 const ProjectTagPage = () => import('@/services/project/pages/ProjectTagPage.vue');
-// eslint-disable-next-line max-len
 const ProjectAlertEventRulePage = () => import('@/services/project/pages/ProjectAlertEventRulePage.vue');
 const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
 
@@ -37,7 +36,6 @@ export default {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
             meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-            // redirect: ':id/summary',
             redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },
@@ -45,7 +43,6 @@ export default {
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    // redirect: 'summary',
                     redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDetailPage,

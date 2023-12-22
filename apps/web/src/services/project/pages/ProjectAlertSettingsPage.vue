@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onActivated, reactive, watch,
 } from 'vue';
@@ -11,9 +11,12 @@ import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
+import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
 import type { ProjectAlertConfigGetParameters } from '@/schema/monitoring/project-alert-config/api-verbs/get';
 import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
 import type {
@@ -38,16 +41,6 @@ import ProjectAlertSettingsNotificationPolicyUpdateModal
     from '@/services/project/components/ProjectAlertSettingsNotificationPolicyUpdateModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-
-const NOTIFICATION_URGENCY = Object.freeze({
-    ALL: 'ALL',
-    HIGH_ONLY: 'HIGH_ONLY',
-});
-const RECOVERY_MODE = Object.freeze({
-    MANUAL: 'MANUAL',
-    AUTO: 'AUTO',
-});
-
 interface NotificationUrgencyOption {
     name: ProjectAlertConfigNotiUrgency;
     label: string;
@@ -63,11 +56,11 @@ const router = useRouter();
 const state = reactive({
     notificationUrgencyList: computed<NotificationUrgencyOption[]>(() => ([
         {
-            name: NOTIFICATION_URGENCY.ALL,
+            name: 'ALL',
             label: i18n.t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS') as string,
         },
         {
-            name: NOTIFICATION_URGENCY.HIGH_ONLY,
+            name: 'HIGH_ONLY',
             label: i18n.t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS') as string,
             icon: 'ic_error-filled',
         },
@@ -102,10 +95,10 @@ const getProjectAlertConfig = async () => {
 };
 const getEventRuleCount = async () => {
     try {
-        const { total_count } = await SpaceConnector.client.monitoring.eventRule.list({
+        const { total_count } = await SpaceConnector.clientV2.monitoring.eventRule.list<EventRuleListParameters, ListResponse<EventRuleModel>>({
             project_id: props.id,
         });
-        state.eventRuleTotalCount = total_count;
+        state.eventRuleTotalCount = total_count ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.eventRuleTotalCount = 0;
@@ -171,8 +164,8 @@ onActivated(() => {
             </div>
             <div class="content-wrapper">
                 <p-i v-if="state.notificationUrgency"
-                     :name="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_gnb_bell' : 'ic_error-filled'"
-                     :color="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? undefined : red[400]"
+                     :name="state.notificationUrgency === 'ALL' ? 'ic_gnb_bell' : 'ic_error-filled'"
+                     :color="state.notificationUrgency === 'ALL' ? undefined : red[400]"
                 />
                 <span class="text">{{ notificationOptionFormatter(state.notificationUrgency) }}</span>
             </div>
@@ -185,10 +178,10 @@ onActivated(() => {
                 />
             </div>
             <div class="content-wrapper">
-                <p-i v-if="state.recoveryMode === RECOVERY_MODE.AUTO"
+                <p-i v-if="state.recoveryMode === 'AUTO'"
                      name="ic_service_automation"
                 />
-                <span class="text">{{ (state.recoveryMode === RECOVERY_MODE.AUTO) ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
+                <span class="text">{{ (state.recoveryMode === 'AUTO') ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
             </div>
         </section>
         <section class="section event-rule-wrapper">

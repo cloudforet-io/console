@@ -25,7 +25,7 @@ class ApiQueryHelper extends QueryHelper {
     get dataV2(): Query {
         const data = this.data;
 
-        if (this.#sortList.length > 0) data.sort = this.#sortList;
+        if (this.#sortList.length > 0) data.sort = { keys: this.#sortList };
         else delete data.sort;
 
         return data;
@@ -79,6 +79,10 @@ class ApiQueryHelper extends QueryHelper {
 
     // This method is temporarily added for v2 api.
     setMultiSortV2(sortList: Sort[]): ApiQueryHelper {
+        if (!this._data.sort) {
+            this._data.sort = {};
+        }
+        this._data.sort = sortList;
         this.#sortList = sortList;
         return this;
     }
