@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { CreateDomainConfigParameters } from '@/schema/config/domain-config/api-verbs/create';
 import type { GetDomainConfigParameters } from '@/schema/config/domain-config/api-verbs/get';
 import type { UpdateDomainConfigParameters } from '@/schema/config/domain-config/api-verbs/update';
@@ -42,7 +43,10 @@ export const useDomainConfigStore = defineStore('domain-config', () => {
     /* Actions */
     const fetchDomainConfig = async () => {
         try {
-            state.domainConfig = await SpaceConnector.client.config.domainConfig.get<GetDomainConfigParameters, DomainConfigModel>();
+            const res = await SpaceConnector.client.config.domainConfig.list<GetDomainConfigParameters, ListResponse<DomainConfigModel>>({
+                name: DOMAIN_CONFIG_TYPE.SETTINGS,
+            });
+            state.domainConfig = res.results?.[0] ?? null;
         } catch (e) {
             ErrorHandler.handleError(e);
             state.domainConfig = null;
@@ -67,7 +71,10 @@ export const useDomainConfigStore = defineStore('domain-config', () => {
         try {
             state.domainConfig = await SpaceConnector.client.config.domainConfig.update<UpdateDomainConfigParameters, DomainConfigModel>({
                 name: DOMAIN_CONFIG_TYPE.SETTINGS,
-                data,
+                data: {
+                    ...state.domainConfig.data,
+                    ...data,
+                },
             });
         } catch (e) {
             ErrorHandler.handleError(e);
