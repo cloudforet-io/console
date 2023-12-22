@@ -9,6 +9,7 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { WebhookUpdateParameters } from '@/schema/monitoring/webhook/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -49,8 +50,7 @@ const state = reactive({
 /* api */
 const updateWebhook = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.update({
-            // eslint-disable-next-line camelcase
+        await SpaceConnector.clientV2.monitoring.webhook.update<WebhookUpdateParameters>({
             webhook_id: props.selectedItem[0].webhook_id,
             name: state.webhookName,
         });

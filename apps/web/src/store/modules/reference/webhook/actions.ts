@@ -2,11 +2,16 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 import type { WebhookReferenceMap, WebhookReferenceState } from '@/store/modules/reference/webhook/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 let lastLoadedTime = 0;
 
@@ -21,14 +26,14 @@ export const load: Action<WebhookReferenceState, any> = async ({ state, commit }
     lastLoadedTime = currentTime;
 
     try {
-        const response = await SpaceConnector.client.monitoring.webhook.list({
+        const response = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
             query: {
                 only: ['webhook_id', 'name'],
             },
         }, { timeout: 3000 });
         const webhooks: WebhookReferenceMap = {};
 
-        response.results.forEach((webhookInfo: any): void => {
+        response.results?.forEach((webhookInfo: any): void => {
             webhooks[webhookInfo.webhook_id] = {
                 key: webhookInfo.webhook_id,
                 label: webhookInfo.name,

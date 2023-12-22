@@ -12,6 +12,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Tags } from '@/schema/_common/model';
+import type { WebhookCreateParameters } from '@/schema/monitoring/webhook/api-verbs/create';
 import type { PluginListParameters } from '@/schema/repository/plugin/api-verbs/list';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
@@ -74,7 +75,7 @@ const getRepositoryID = async () => {
 };
 const getListWebhookType = async () => {
     try {
-        listApiQuery.setFilters([{ k: 'service_type', v: 'monitoring.Webhook', o: '=' }]);
+        listApiQuery.setFilters([{ k: 'resource_type', v: 'monitoring.Webhook', o: '=' }]);
         const repositoryId = await getRepositoryID();
         const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
             repository_id: repositoryId,
@@ -89,7 +90,7 @@ const getListWebhookType = async () => {
 const createWebhook = async () => {
     state.loading = true;
     try {
-        await SpaceConnector.client.monitoring.webhook.create({
+        await SpaceConnector.clientV2.monitoring.webhook.create<WebhookCreateParameters>({
             name: state.webhookName,
             plugin_info: {
                 plugin_id: state.selectedWebhookType?.plugin_id,
@@ -108,7 +109,6 @@ const createWebhook = async () => {
 
 /* event */
 const onFirstInputName = (value) => {
-    state.disabled = true;
     state.showValidation = true;
     state.webhookName = value;
 };
@@ -126,7 +126,6 @@ const onClickConfirm = async () => {
 const initInputModel = () => {
     state.webhookName = '';
     state.selectedWebhookType = {} as WebhookType;
-    state.disabled = false;
     state.showValidation = false;
 };
 
