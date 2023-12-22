@@ -22,7 +22,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { red, yellow } from '@/styles/colors';
+import { red } from '@/styles/colors';
 
 import AlertDashboardTop5ProjectActivityWidgetTooltip from '@/services/alert-manager/components/AlertDashboardTop5ProjectActivityWidgetTooltip.vue';
 import { ALERT_STATE_FILTER } from '@/services/alert-manager/constants/alert-constant';
@@ -32,13 +32,11 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 const ACTIVITY = {
     HIGH: 'HIGH',
     LOW: 'LOW',
-    // MAINTENANCE: 'MAINTENANCE',
 } as const;
 export type AlertActivity = typeof ACTIVITY[keyof typeof ACTIVITY];
 const ACTIVITY_COLOR = Object.freeze({
     HIGH: red[400],
     LOW: red[200],
-    MAINTENANCE: yellow[400],
 });
 const PERIOD = Object.freeze({
     '14D': '14d',
@@ -317,13 +315,6 @@ watch(() => state.selectedPeriod, async () => {
                             @apply bg-red-200;
                             &:hover {
                                 @apply border-red-400;
-                                border-width: 0.25rem;
-                            }
-                        }
-                        &.MAINTENANCE {
-                            @apply bg-yellow-300;
-                            &:hover {
-                                @apply border-yellow-600;
                                 border-width: 0.25rem;
                             }
                         }

@@ -18,8 +18,6 @@ const ProjectAlertEventRulePage = () => import('@/services/project/pages/Project
 const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
 
 const ProjectAlertListPage = () => import('@/services/project/pages/ProjectAlertListPage.vue');
-// eslint-disable-next-line max-len
-const ProjectMaintenanceWindowPage = () => import('@/services/project/pages/ProjectMaintenanceWindowPage.vue');
 const ProjectWebhookPage = () => import('@/services/project/pages/ProjectWebhookPage.vue');
 const ProjectAlertSettingsPage = () => import('@/services/project/pages/ProjectAlertSettingsPage.vue');
 
@@ -76,12 +74,6 @@ export default {
                                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
                                     props: true,
                                     component: ProjectAlertListPage,
-                                },
-                                {
-                                    path: 'maintenance-window',
-                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME,
-                                    props: true,
-                                    component: ProjectMaintenanceWindowPage,
                                 },
                                 {
                                     path: 'webhook',
