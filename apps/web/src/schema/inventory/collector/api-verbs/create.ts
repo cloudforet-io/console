@@ -10,6 +10,6 @@ export interface CollectorCreateParameters {
     secret_filter?: SecretFilter; // backend api will replace whole schedule object
     provider?: string;
     tags?: Tags;
-    resource_group?: ResourceGroup;
+    resource_group: Extract<ResourceGroup, 'DOMAIN'|'WORKSPACE'>;
     workspace_id?: string;
 }

@@ -50,7 +50,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PTextButton, PButtonModal,
@@ -59,11 +60,14 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
 import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -79,6 +83,7 @@ import {
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const appContextStore = useAppContextStore();
 
 const emit = defineEmits([
     'update:currentStep',
@@ -91,6 +96,7 @@ const state = reactive<{
     createLoading: boolean;
     collectLoading: boolean;
     createdCollectorId?: string;
+    isAdminMode: ComputedRef<boolean>;
 }>({
     deleteModalVisible: false,
     isAbleToCreateCollector: true,
@@ -98,6 +104,7 @@ const state = reactive<{
     createLoading: false,
     collectLoading: false,
     createdCollectorId: undefined,
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const handleClickPrevButton = () => {
@@ -124,6 +131,7 @@ const handleClickCreateButton = async () => {
                 hours: collectorFormState.scheduleHours,
             },
             tags: collectorFormState.tags,
+            resource_group: state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
         };
         const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
             service_accounts: collectorFormStore.serviceAccounts,
