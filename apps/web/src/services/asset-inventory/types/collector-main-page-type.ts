@@ -20,7 +20,6 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     PROVIDER: 'provider',
     TAGS: 'tags',
     PLUGIN_INFO: 'plugin_info',
-    STATE: 'state',
     SCHEDULE: 'schedule',
     SECRET_FILTER: 'secret_filter',
 } as const;

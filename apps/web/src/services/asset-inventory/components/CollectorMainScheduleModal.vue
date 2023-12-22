@@ -39,7 +39,7 @@ import { useCollectorPageStore } from '@/services/asset-inventory/stores/collect
 
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+const collectorPageState = collectorPageStore.state;
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
 
@@ -52,9 +52,7 @@ const state = reactive({
 /* Components */
 
 const closeScheduleModal = () => {
-    collectorPageStore.$patch((_state) => {
-        _state.visible.scheduleModal = false;
-    });
+    collectorPageState.visible.scheduleModal = false;
 };
 
 const handleCloseModal = () => {
@@ -76,7 +74,7 @@ const handleConfirm = async () => {
 };
 
 /* API */
-const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
+const fetchCollectorUpdate = async (): Promise<CollectorModel|undefined> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is not defined');
     const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
