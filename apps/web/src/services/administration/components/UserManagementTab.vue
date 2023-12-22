@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -37,6 +37,8 @@ const singleItemTabState = reactive({
         { label: i18n.t('IAM.USER.MAIN.TAG'), name: USER_TABS.TAG },
     ])),
     activeTab: USER_TABS.DETAIL,
+    selectedIndex: computed(() => userPageState.selectedIndices[0]),
+    selectedUserId: computed(() => userPageState.users[singleItemTabState.selectedIndex].user_id),
 });
 const multiItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
@@ -48,6 +50,26 @@ const multiItemTabState = reactive({
         last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
     }))),
 });
+
+/* API */
+const initUserData = async (user_id?: string) => {
+    if (!user_id) return;
+    if (userPageState.isAdminMode) {
+        await userPageStore.getUser({
+            user_id: user_id || '',
+        });
+    } else {
+        await userPageStore.getWorkspaceUser({
+            user_id: user_id || '',
+        });
+    }
+};
+
+/* Watcher */
+watch(() => userPageState.selectedIndices[0], (index) => {
+    const user_id = userPageState.users[index]?.user_id;
+    initUserData(user_id);
+});
 </script>
 
 <template>
@@ -57,7 +79,7 @@ const multiItemTabState = reactive({
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <user-management-tab-detail />
+                <user-management-tab-detail @refresh="initUserData" />
             </template>
             <template #workspace>
                 <user-management-tab-workspace :active-tab="singleItemTabState.activeTab" />
