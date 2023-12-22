@@ -16,7 +16,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
-import type { RoleModel } from '@/schema/identity/role/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -52,6 +52,9 @@ let userListApiQuery = userListApiQueryHelper.data;
 const queryTagHelper = useQueryTags({ keyItemSets: USER_SEARCH_HANDLERS.keyItemSets });
 const { queryTags } = queryTagHelper;
 
+const storeState = reactive({
+    loginUserId: computed(() => store.state.user.userId),
+});
 const state = reactive({
     refinedUserItems: computed(() => userPageState.users.map((user) => ({
         ...user,
@@ -59,8 +62,6 @@ const state = reactive({
         mfa: user?.mfa?.state === 'ENABLED' ? 'ON' : 'OFF',
         last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
     }))),
-    isSelected: computed(() => userPageState.selectedIndices.length > 0),
-    roleList: [] as RoleModel[],
 });
 const tableState = reactive({
     userTableFields: computed(() => {
@@ -233,7 +234,7 @@ const handleClickButton = async (value: RoleBindingModel) => {
                         >
                     </p-tooltip>
                     <span>{{ value.name }}</span>
-                    <p-select-dropdown v-if="userPageStore.isWorkspaceOwner"
+                    <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && state.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
                                        is-filterable
                                        use-fixed-menu-style
                                        menu-position="right"
