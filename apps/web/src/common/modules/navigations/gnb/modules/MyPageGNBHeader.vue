@@ -1,18 +1,15 @@
 <script setup lang="ts">
 
 import { computed, reactive } from 'vue';
-import type { Location } from 'vue-router';
+import type { Location } from 'vue-router/types/router';
 
 import config from '@/lib/config';
 
 interface Props {
-    isAdminMode: boolean;
     to: Location;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-    isAdminMode: false,
-});
+const props = defineProps<Props>();
 
 const state = reactive({
     ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
@@ -23,7 +20,7 @@ const state = reactive({
 </script>
 
 <template>
-    <div class="gnb-header">
+    <div class="my-page-gnb-header">
         <component :is="props.to ? 'router-link' : 'div'"
                    class="title-wrapper"
                    :to="props.to"
@@ -43,7 +40,7 @@ const state = reactive({
 </template>
 
 <style scoped lang="postcss">
-.gnb-header {
+.my-page-gnb-header {
     @apply inline-flex items-center w-full;
     max-width: 16.25rem;
     width: 16.25rem;

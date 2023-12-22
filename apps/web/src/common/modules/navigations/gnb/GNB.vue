@@ -80,7 +80,7 @@ const state = reactive({
     siteMapMenuList: computed<GNBMenuType[]>(() => {
         const basicSiteMapList: GNBMenuType[] = store.getters['display/siteMapMenuList'];
         if (!state.isAdminMode) {
-            // WORKSPACE_OWNER case
+            // WORKSPACE_OWNER case: only WORKSPACE OWNER can see IAM menu
             const IAMMenu = basicSiteMapList.find((menu) => menu.id === MENU_ID.IAM) as GNBMenuType;
             if (IAMMenu) IAMMenu.icon = 'ic_service_administration';
             return basicSiteMapList;

@@ -57,78 +57,6 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     await SpaceConnector.clientV2.identity.user.update(request);
 };
 
-const getRoleTypeByManagedRoleId = (roleId: string): RoleType => MANAGED_ROLES[roleId];
-
-const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRoleType: RoleType): Promise<RoleInfo|undefined> => {
-    // DOMAIN_ADMIN -> enter workspace case
-    if (baseRoleType === ROLE_TYPE.DOMAIN_ADMIN && currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
-        return {
-            roleType: ROLE_TYPE.WORKSPACE_OWNER,
-            roleId: 'managed-workspace-owner',
-            pageAccess: ['*'],
-        };
-    }
-
-    // MANAGED_ROLE case
-    const MANAGED_ROLE_IDS: string[] = Object.keys(MANAGED_ROLES);
-    const isManagedRole = MANAGED_ROLE_IDS.includes(roleId);
-    if (isManagedRole) {
-        return {
-            roleType: getRoleTypeByManagedRoleId(roleId),
-            roleId,
-            pageAccess: ['*'],
-        };
-    }
-
-    // normal case
-    try {
-        const response = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
-            role_id: roleId,
-        });
-
-        return {
-            roleType: response.role_type,
-            roleId: response.role_id,
-            pageAccess: response.page_access,
-        };
-    } catch (e) {
-        console.error(`Role Load Error: ${e}`);
-        return undefined;
-    }
-};
-
-// const generatePageAccessForManagedRole = (roleId: string): string[] => {
-//     if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.DOMAIN_ADMIN]) {
-//         return ['*'];
-//     } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_OWNER]) {
-//         return [
-//             MENU_ID.HOME_DASHBOARD,
-//             `${MENU_ID.DASHBOARDS}.*`,
-//             `${MENU_ID.PROJECT}.*`,
-//             `${MENU_ID.ASSET_INVENTORY}.*`,
-//             `${MENU_ID.COST_EXPLORER}.*`,
-//             `${MENU_ID.ALERT_MANAGER}.*`,
-//             `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.USER}`,
-//             `${MENU_ID.ADMINISTRATION}.${MENU_ID.IAM}.${MENU_ID.APP}`,
-//             `${MENU_ID.MY_PAGE}.*`,
-//             `${MENU_ID.INFO}.*`,
-//         ];
-//     } if (roleId === MANAGED_ROLE_TYPE[ROLE_TYPE.WORKSPACE_MEMBER]) {
-//         return [
-//             MENU_ID.HOME_DASHBOARD,
-//             `${MENU_ID.DASHBOARDS}.*`,
-//             `${MENU_ID.PROJECT}.*`,
-//             `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.CLOUD_SERVICE}`,
-//             `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVER}`,
-//             `${MENU_ID.ASSET_INVENTORY}.${MENU_ID.SERVICE_ACCOUNT}`,
-//             `${MENU_ID.COST_EXPLORER}.*`,
-//             `${MENU_ID.ALERT_MANAGER}.*`,
-//             `${MENU_ID.MY_PAGE}.*`,
-//             `${MENU_ID.INFO}.*`,
-//         ];
-//     } return [];
-// };
-
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
     const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
@@ -170,6 +98,54 @@ export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest
     } catch (e) {
         commit('setCurrentRoleInfo', undefined);
         console.error(`Role Grant Error: ${e}`);
+    }
+};
+
+const getRoleTypeByManagedRoleId = (roleId: string): RoleType => MANAGED_ROLES[roleId];
+
+const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRoleType: RoleType): Promise<RoleInfo|undefined> => {
+    // DOMAIN_ADMIN -> enter workspace case
+    if (baseRoleType === ROLE_TYPE.DOMAIN_ADMIN && currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
+        return {
+            roleType: ROLE_TYPE.WORKSPACE_OWNER,
+            roleId: 'managed-workspace-owner',
+            pageAccess: ['*'],
+        };
+    }
+    // USER -> grant USER case
+    if (currentRoleType === ROLE_TYPE.USER && !roleId) {
+        return {
+            roleType: ROLE_TYPE.USER,
+            roleId: 'no-role',
+            pageAccess: ['*'],
+        };
+    }
+
+    // MANAGED_ROLE case
+    const MANAGED_ROLE_IDS: string[] = Object.keys(MANAGED_ROLES);
+    const isManagedRole = MANAGED_ROLE_IDS.includes(roleId);
+    if (isManagedRole) {
+        return {
+            roleType: getRoleTypeByManagedRoleId(roleId),
+            roleId,
+            pageAccess: ['*'],
+        };
+    }
+
+    // normal case
+    try {
+        const response = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
+            role_id: roleId,
+        });
+
+        return {
+            roleType: response.role_type,
+            roleId: response.role_id,
+            pageAccess: response.page_access,
+        };
+    } catch (e) {
+        console.error(`Role Load Error: ${e}`);
+        return undefined;
     }
 };
 

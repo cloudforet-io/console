@@ -62,7 +62,7 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
     userId: computed(() => store.state.user.userId),
-    hasPermission: computed(() => store.getters['user/hasPermission']),
+    isMyPage: computed(() => route.matched.some((item) => item.name === MY_PAGE_ROUTE._NAME)),
     languageMenuVisible: false,
     supportedMenu: computed(() => {
         const docsList = config.get('DOCS') ?? [];
@@ -243,7 +243,7 @@ const handleClickSignOut = async () => {
                     </router-link>
                 </div>
             </div>
-            <template v-if="state.hasPermission">
+            <template v-if="!state.isMyPage">
                 <p-divider />
                 <div class="sub-menu-wrapper">
                     <router-link class="sub-menu"
