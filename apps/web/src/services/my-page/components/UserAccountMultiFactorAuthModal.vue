@@ -96,8 +96,6 @@ const handleClickVerifyButton = async () => {
     state.loading = true;
     try {
         await postValidationMfaCode({
-            user_id: state.userId,
-            domain_id: state.domainId,
             verify_code: validationState.verificationCode,
         });
         if (modalState.proxyType !== 'change') {

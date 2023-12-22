@@ -19,8 +19,6 @@ import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue
 import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
 import UserAccountMultiFactorAuthModal from '@/services/my-page/components/UserAccountMultiFactorAuthModal.vue';
 
-
-
 // Currently, only email is supported.
 const contextMenuItems = [
     { label: 'Email', name: 'EMAIL' },
@@ -65,12 +63,10 @@ const handleClickVerifyButton = async () => {
         state.loading = true;
         try {
             await postEnableMfa({
-                user_id: state.userId,
                 mfa_type: state.selectedItem,
                 options: {
                     email: email.value,
                 },
-                domain_id: state.domainId,
             });
             modalState.modalType = 'verify';
         } finally {
