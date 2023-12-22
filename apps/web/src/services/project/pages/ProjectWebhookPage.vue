@@ -147,7 +147,7 @@ let webhookListApiQuery = webhookListApiQueryHelper.data;
 const listWebhooks = async () => {
     state.loading = true;
     try {
-        const { results, total_count } = await SpaceConnector.client.monitoring.webhook.list({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.webhook.list({
             project_id: props.id,
             query: webhookListApiQuery,
         });
@@ -164,7 +164,7 @@ const listWebhooks = async () => {
 };
 const enableWebhook = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.enable({
+        await SpaceConnector.clientV2.monitoring.webhook.enable({
             // eslint-disable-next-line camelcase
             webhook_id: state.selectedItem[0].webhook_id,
         });
@@ -179,7 +179,7 @@ const enableWebhook = async () => {
 };
 const disableWebhook = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.disable({
+        await SpaceConnector.clientV2.monitoring.webhook.disable({
             // eslint-disable-next-line camelcase
             webhook_id: state.selectedItem[0].webhook_id,
         });
@@ -194,7 +194,7 @@ const disableWebhook = async () => {
 };
 const deleteWebhookConfirm = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.delete({
+        await SpaceConnector.clientV2.monitoring.webhook.delete({
             webhook_id: state.selectedItem[0].webhook_id,
         });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '');

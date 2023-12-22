@@ -21,7 +21,7 @@ export const load: Action<WebhookReferenceState, any> = async ({ state, commit }
     lastLoadedTime = currentTime;
 
     try {
-        const response = await SpaceConnector.client.monitoring.webhook.list({
+        const response = await SpaceConnector.clientV2.monitoring.webhook.list({
             query: {
                 only: ['webhook_id', 'name'],
             },

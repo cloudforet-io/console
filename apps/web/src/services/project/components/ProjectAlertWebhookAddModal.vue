@@ -89,7 +89,7 @@ const getListWebhookType = async () => {
 const createWebhook = async () => {
     state.loading = true;
     try {
-        await SpaceConnector.client.monitoring.webhook.create({
+        await SpaceConnector.clientV2.monitoring.webhook.create({
             name: state.webhookName,
             plugin_info: {
                 plugin_id: state.selectedWebhookType?.plugin_id,
@@ -108,7 +108,6 @@ const createWebhook = async () => {
 
 /* event */
 const onFirstInputName = (value) => {
-    state.disabled = true;
     state.showValidation = true;
     state.webhookName = value;
 };
@@ -126,7 +125,6 @@ const onClickConfirm = async () => {
 const initInputModel = () => {
     state.webhookName = '';
     state.selectedWebhookType = {} as WebhookType;
-    state.disabled = false;
     state.showValidation = false;
 };
 

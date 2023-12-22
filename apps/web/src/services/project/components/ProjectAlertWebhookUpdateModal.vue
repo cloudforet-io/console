@@ -49,8 +49,7 @@ const state = reactive({
 /* api */
 const updateWebhook = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.update({
-            // eslint-disable-next-line camelcase
+        await SpaceConnector.clientV2.monitoring.webhook.update({
             webhook_id: props.selectedItem[0].webhook_id,
             name: state.webhookName,
         });
