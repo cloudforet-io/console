@@ -103,9 +103,12 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
+
+import type { TranslateResult } from 'vue-i18n';
 
 import type { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
 import { THEME_COLORS } from '@/feedbacks/modals/button-modal/type';
@@ -116,6 +119,7 @@ import { useProxyValue } from '@/hooks';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+
 
 
 export default defineComponent<ButtonModalProps>({
@@ -155,7 +159,7 @@ export default defineComponent<ButtonModalProps>({
             },
         },
         headerTitle: {
-            type: String,
+            type: String as PropType<string|TranslateResult>,
             default: '',
         },
         hideHeader: {
