@@ -9,11 +9,15 @@ import {
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
     usePageAccessDefinitionTableData,
@@ -69,8 +73,11 @@ const state = reactive({
 const getRoleDetailData = async (roleId) => {
     state.loading = true;
     try {
-        state.data = await rolePageStore.getRoleDetail({ role_id: roleId });
+        state.data = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
+            role_id: roleId,
+        });
     } catch (e) {
+        ErrorHandler.handleError(e);
         state.data = {};
     } finally {
         state.loading = false;

@@ -5,9 +5,13 @@ import {
 
 import { PDataTable } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { RoleDeleteParameters } from '@/schema/identity/role/api-verbs/delete';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -26,7 +30,6 @@ import {
     ROLE_UN_DELETABLE_TABLE_FIELDS,
 } from '@/services/administration/constants/role-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
-
 
 interface UnDeletableRole {
     roleName: string;
@@ -66,9 +69,10 @@ const state = reactive({
 const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
     state.loading = true;
     try {
-        const results = await rolePageStore.listRoleBindings({
+        const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
             role_id: role.role_id,
         });
+        const results = response.results || [];
         const roleBindingList: UnDeletableRole[] = results?.map((roleBinding: RoleBindingModel) => ({
             roleName: role.name,
             roleId: role.role_id,
@@ -87,9 +91,10 @@ const handleDelete = async () => {
     let isAllSucceed = true;
     await Promise.all(rolePageStore.selectedRoles.map(async (role) => {
         try {
-            await rolePageStore.deleteRole({ role_id: role.role_id });
-        } catch (e) {
+            await SpaceConnector.clientV2.identity.role.delete<RoleDeleteParameters>({ role_id: role.role_id });
+        } catch (e: any) {
             isAllSucceed = false;
+            ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
         }
     }));
     if (isAllSucceed) {
@@ -109,7 +114,8 @@ watch(() => state.proxyVisible, async (after) => {
 </script>
 
 <template>
-    <delete-modal :visible.sync="state.proxyVisible"
+    <delete-modal v-if="state.proxyVisible && !state.loading"
+                  :visible.sync="state.proxyVisible"
                   size="md"
                   :header-title="state.headerTitle"
                   :hide-footer="!state.isDeletable"
