@@ -12,16 +12,12 @@ import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
-import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { checkEmailFormat } from '@/services/administration/helpers/user-management-form-validations';
@@ -46,6 +42,7 @@ const state = reactive({
     menuVisible: false,
     menuItems: [] as AddModalMenuItem[],
     selectedItems: [] as AddModalMenuItem[],
+    independentUsersList: [] as SummaryWorkspaceUserModel[],
 });
 const authTypeState = reactive({
     selectedUserAuthType: '' as AuthType,
@@ -105,10 +102,13 @@ const handleSelectDropdownItem = (selected: string) => {
     authTypeState.selectedMenuItem = selected as AuthType;
 };
 const getUserList = async () => {
+    let isNew = userPageState.isAdminMode;
     try {
         if (userPageState.isAdminMode) {
             await fetchGetUsers(formState.searchText);
         } else {
+            const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
+            isNew = !isIndependentUser;
             await fetchGetWorkspaceUsers(formState.searchText);
         }
     } catch (e) {
@@ -116,7 +116,7 @@ const getUserList = async () => {
             user_id: formState.searchText,
             label: formState.searchText,
             name: formState.searchText,
-            isNew: true,
+            isNew,
             auth_type: authTypeState.selectedMenuItem,
         });
         formState.searchText = '';
@@ -164,16 +164,15 @@ const fetchListUsers = async () => {
     state.loading = true;
 
     try {
-        const { results } = await SpaceConnector.clientV2.identity.workspaceUser.find<FindWorkspaceUserParameters, ListResponse<SummaryWorkspaceUserModel>>({
+        const results = await userPageStore.findWorkspaceUser({
             keyword: formState.searchText || '@',
         });
-        state.menuItems = (results ?? []).map((user) => ({
+        state.menuItems = results.map((user) => ({
             user_id: user.user_id,
             label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
             name: user.user_id,
         }));
-    } catch (e: any) {
-        ErrorHandler.handleRequestError(e, e.message);
+    } catch (e) {
         state.menuItems = [];
     } finally {
         state.loading = false;
@@ -199,12 +198,14 @@ onClickOutside(containerRef, clickOutside);
 
 watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
-        state.menuItems = [];
         formState.searchText = '';
         authTypeState.selectedUserAuthType = authTypeState.selectedMenuItem as AuthType;
         if (!userPageState.isAdminMode) {
             await fetchListUsers();
+            state.independentUsersList = await userPageStore.findWorkspaceUser();
         }
+    } else {
+        state.menuItems = [];
     }
 });
 
