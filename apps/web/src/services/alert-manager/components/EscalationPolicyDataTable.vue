@@ -65,14 +65,16 @@ import type { DataTableField } from '@spaceone/design-system/types/data-display/
 import { capitalize } from 'lodash';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
+
 
 export default {
     name: 'EscalationPolicyDataTable',
@@ -100,8 +102,9 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const allReferenceStore = useAllReferenceStore();
         const state = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
+            projects: computed(() => allReferenceStore.getters.project),
             finishConditions: computed(() => ({
                 ACKNOWLEDGED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ACKNOWLEDGED'),
                 RESOLVED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.RESOLVED'),
@@ -144,11 +147,6 @@ export default {
         const onChangeSort = (sortBy, sortDesc) => {
             emit('change', { sortBy, sortDesc });
         };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
 
         return {
             ...toRefs(state),

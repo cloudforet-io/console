@@ -11,9 +11,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { store } from '@/store';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -24,9 +24,10 @@ const props = defineProps<{
     projectId: string;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     items: [],
     totalCount: 0,
 });
@@ -57,12 +58,6 @@ const listAlerts = async () => {
         state.loading = false;
     }
 };
-
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/user/load'),
-    ]);
-})();
 
 watch(() => props.projectId, async (projectId) => {
     if (projectId) await listAlerts();

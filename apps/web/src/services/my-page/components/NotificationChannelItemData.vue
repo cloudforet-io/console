@@ -122,9 +122,8 @@ import {
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
-import { store } from '@/store';
-
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 
@@ -135,6 +134,7 @@ import {
     PARAM_KEY_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/my-page/types/notification-item-type';
+
 
 export default {
     name: 'NotificationChannelItemData',
@@ -161,6 +161,7 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const allReferenceStore = useAllReferenceStore();
         const {
             state: notificationItemState,
             cancelEdit,
@@ -178,7 +179,7 @@ export default {
             keyListForRead: [],
             valueList: [],
             //
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+            users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
             schema: props.channelData?.schema,
             isSecretData: computed(() => props.channelData?.secret_id.length > 0),
             isSpaceOneUserProtocol: computed(() => state.keyListForEdit.includes('users')),
@@ -228,8 +229,6 @@ export default {
         (async () => {
             await Promise.allSettled([
                 setKeyListForEdit(), setKeyListForRead(), setValueList(),
-                // LOAD REFERENCE STORE
-                store.dispatch('reference/user/load'),
             ]);
         })();
 

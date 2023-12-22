@@ -12,9 +12,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { store } from '@/store';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -31,8 +31,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{(e: 'change', value: any): void; }>();
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
 const state = reactive({
     loading: true,
@@ -69,8 +70,6 @@ const listProjectMember = async () => {
 (async () => {
     await Promise.allSettled([
         listProjectMember(),
-        // LOAD REFERENCE STORE
-        store.dispatch('reference/user/load'),
     ]);
 })();
 

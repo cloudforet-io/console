@@ -9,11 +9,11 @@ import {
 } from '@spaceone/design-system';
 
 import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
-import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { ADMIN_DASHBOARD_TEMPLATES, DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
@@ -35,11 +35,13 @@ const props = defineProps<Props>();
 
 const templateContainerRef = ref<HTMLElement | null>(null);
 
+const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
 });
 const state = reactive({
     selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
@@ -70,10 +72,9 @@ const existingTemplateState = reactive({
             ...d,
             // below values are used only for render
             value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${d.public_dashboard_id || d.private_dashboard_id}`,
-            groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
+            groupLabel: storeState.projects[d.project_id ?? '']?.label || existingTemplateState.groupLabel,
         }))
         .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
-    projectItems: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
     groupLabel: computed<string>(() => {
         if (props.dashboardScope === 'WORKSPACE') return 'Workspace';
         return '';

@@ -14,15 +14,16 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { Tags } from '@/schema/_common/model';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface UserRoleItem {
     labels?: string[]|string;
@@ -44,6 +45,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const router = useRouter();
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     title: computed(() => i18n.t('IAM.USER.MAIN.ASSIGNED_ROLES')),
     loading: true,
@@ -55,8 +57,8 @@ const state = reactive({
         { name: 'labels', label: 'Labels' },
     ]),
     items: [] as UserRoleItem[],
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-    projects: computed(() => store.getters['reference/projectItems']),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+    projects: computed(() => allReferenceStore.getters.project),
 });
 
 const getProjectLink = (value, isProject: true) => {
@@ -94,14 +96,6 @@ watch(() => props.userId, () => {
     const userId = props.userId;
     getUserDetailData(userId);
 }, { immediate: true });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
-    ]);
-})();
 </script>
 
 <template>

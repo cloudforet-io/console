@@ -18,8 +18,9 @@ import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model'
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -50,13 +51,14 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update-filters', filters: any): void;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const storeState = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
 });
 const state = reactive({
     searchText: props.filters.map((d) => d.v).join(' ') || '',
@@ -170,15 +172,6 @@ const handleConfirmDeleteMember = async (items) => {
 const handleConfirmInvite = () => {
     fetchUserList();
 };
-
-/* Init */
-(async () => {
-    // LOAD REFERENCE STORE
-    await Promise.allSettled([
-        store.dispatch('reference/user/load'),
-        store.dispatch('reference/project/load'),
-    ]);
-})();
 
 /* Watcher */
 watch(() => store.state.reference.project.items, (projects) => {

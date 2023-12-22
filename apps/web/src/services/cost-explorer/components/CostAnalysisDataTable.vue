@@ -19,10 +19,11 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -60,6 +61,7 @@ type CostAnalyzeRawData = {
     _total_value_sum?: number;
 };
 
+const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
 const costAnalysisPageGetters = costAnalysisPageStore.getters;
 const costAnalysisPageState = costAnalysisPageStore.state;
@@ -73,7 +75,7 @@ const state = reactive({
         return 'YYYY-MM-DD';
     }),
     //
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
@@ -396,7 +398,6 @@ watch(
 // LOAD REFERENCE STORE
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/project/load'),
         store.dispatch('reference/provider/load'),
         store.dispatch('reference/region/load'),
         store.dispatch('reference/serviceAccount/load'),

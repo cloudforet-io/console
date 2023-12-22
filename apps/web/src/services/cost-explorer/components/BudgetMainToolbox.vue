@@ -23,10 +23,10 @@ import type { Query } from '@cloudforet/core-lib/space-connector/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { useQueryTags } from '@/common/composables/query-tags';
 

@@ -7,11 +7,11 @@ import {
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ReferenceMap } from '@/store/modules/reference/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -58,9 +58,10 @@ const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
     (e: 'update:selected-project-ids', value: string[]): void;
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projects: computed<ProjectReferenceMap>(allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
 });
 const state = reactive({
     loading: true,
@@ -214,7 +215,7 @@ const handleUpdateVisibleMenu = (value: boolean) => {
 };
 
 const refreshProjectTree = async () => {
-    store.dispatch('reference/project/load', { force: true });
+    await allReferenceStore.load('project', { force: true });
     state.contextKey = Math.floor(Math.random() * Date.now());
 };
 
@@ -243,15 +244,6 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
         emit('update:selected-project-ids', selectedProjectIds);
     }
 });
-
-/* init */
-(async () => {
-    await Promise.allSettled([
-        // LOAD REFERENCE STORE
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
-    ]);
-})();
 </script>
 
 <template>

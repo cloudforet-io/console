@@ -263,7 +263,6 @@ watch(() => tableState.selectedAccountType, () => {
 
 (async () => {
     const actionList = [
-        store.dispatch('reference/project/load'),
         store.dispatch('reference/provider/load'),
     ];
     if (state.selectedProvider) actionList.push(serviceAccountSchemaStore.setProviderSchema(state.selectedProvider));

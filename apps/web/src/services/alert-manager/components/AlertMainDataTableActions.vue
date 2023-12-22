@@ -76,7 +76,6 @@
 </template>
 
 <script lang="ts">
-
 import type { SetupContext } from 'vue';
 import {
     computed, reactive, toRefs,
@@ -94,8 +93,9 @@ import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants'
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -109,6 +109,7 @@ import { useAlertStateI18n } from '@/services/alert-manager/composables/alert-st
 import { useAlertUrgencyI18n } from '@/services/alert-manager/composables/alert-urgency-i18n';
 import { alertStateBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 
@@ -156,10 +157,11 @@ export default {
         },
     },
     setup(props, { emit }: SetupContext) {
+        const allReferenceStore = useAllReferenceStore();
         const projectDetailPageStore = useProjectDetailPageStore();
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
             webhooks: computed<WebhookReferenceMap>(() => store.getters['reference/webhookItems']),
             selectedItemsState: computed(() => props.selectedItems.map((selectedItem) => selectedItem.state)),
             isSelectedNone: computed(() => props.selectedItems.length === 0),
@@ -231,7 +233,6 @@ export default {
         // LOAD REFERENCE STORE
         (async () => {
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
                 store.dispatch('reference/webhook/load'),
             ]);
         })();

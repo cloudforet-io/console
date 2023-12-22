@@ -17,12 +17,11 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
-import { store } from '@/store';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import type { ProjectForm } from '@/services/asset-inventory/types/service-account-page-type';
+
 
 export default {
     name: 'ServiceAccountProjectForm',
@@ -52,13 +51,6 @@ export default {
             state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0] : undefined };
             state.proxyIsValid = !!selectedProject.length;
         };
-
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-            ]);
-        })();
 
         /* Watcher */
         watch(() => props.projectId, (projectId) => {

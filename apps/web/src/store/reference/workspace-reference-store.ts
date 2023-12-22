@@ -17,8 +17,8 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 
 type PickedWorkspaceModel = Pick<WorkspaceModel, 'state'>;
-export type WorkspaceItems = Required<Pick<ReferenceItem<PickedWorkspaceModel>, 'key'|'label'|'name'|'data'>>;
-export type WorkspaceReferenceMap = ReferenceMap<WorkspaceItems>;
+export type WorkspaceItem = Required<Pick<ReferenceItem<PickedWorkspaceModel>, 'key'|'label'|'name'|'data'>>;
+export type WorkspaceReferenceMap = ReferenceMap<WorkspaceItem>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;

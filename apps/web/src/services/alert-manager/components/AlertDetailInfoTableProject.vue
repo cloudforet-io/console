@@ -6,7 +6,8 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { store } from '@/store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -14,6 +15,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 
 import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
 import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
+
 
 const props = defineProps<{
     id?: string;
@@ -31,8 +33,9 @@ const {
     dataForUpdate: props.alertData?.project_id,
 });
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    projects: computed(() => store.getters['reference/projectItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     modalVisible: false,
 });
 
@@ -43,11 +46,6 @@ const openModal = () => {
 const onSelectProject = (selected) => {
     alertDetailItemState.dataForUpdate = selected[0]?.id;
 };
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/project/load');
-})();
 </script>
 
 <template>

@@ -15,9 +15,8 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import { store } from '@/store';
-
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -27,12 +26,14 @@ import AlertDashboardProjectSearchWidgetAlertList from '@/services/alert-manager
 import AlertDashboardProjectSearchWidgetMaintenanceWindowList from '@/services/alert-manager/components/AlertDashboardProjectSearchWidgetMaintenanceWindowList.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
+
 const props = defineProps<{
     activatedProjects: string[];
 }>();
 const vm = getCurrentInstance()?.proxy as Vue;
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    projects: computed(() => store.getters['reference/projectItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     totalCount: 0,
     pageLimit: 12,
     items: [],
@@ -107,12 +108,6 @@ watch(() => props.activatedProjects, async (activatedProjects) => {
         await listAlertByProject();
     }
 });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await store.dispatch('reference/project/load');
-})();
-
 </script>
 
 <template>

@@ -6,15 +6,12 @@ import collector from './collector';
 import * as getters from './getters';
 import * as mutations from './mutations';
 import plugin from './plugin';
-import project from './project';
-import projectGroup from './project-group';
 import protocol from './protocol';
 import provider from './provider';
 import region from './region';
 import secret from './secret';
 import serviceAccount from './service-account';
 import trustedAccount from './trusted-account';
-import user from './user';
 import webhook from './webhook';
 
 // TODO: This is a temporary state. It must be changed to check each modules' items state is null.
@@ -29,8 +26,6 @@ export default {
     actions,
     getters,
     modules: {
-        project,
-        projectGroup,
         serviceAccount,
         trustedAccount,
         cloudServiceType,
@@ -39,7 +34,6 @@ export default {
         provider,
         region,
         plugin,
-        user,
         protocol,
         webhook,
     },

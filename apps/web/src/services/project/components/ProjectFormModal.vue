@@ -15,7 +15,7 @@ import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ProjectType } from '@/schema/identity/project/type';
 import { i18n } from '@/translations';
 
-import type { ProjectReferenceItem } from '@/store/modules/reference/project/type';
+import type { ProjectReferenceItem } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';

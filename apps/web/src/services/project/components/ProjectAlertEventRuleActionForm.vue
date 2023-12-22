@@ -8,15 +8,16 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
 
 const URGENCY = Object.freeze({
     NO_SET: 'NO_SET',
@@ -34,8 +35,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits(['update:actions', 'update:options']);
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     userItems: computed(() => Object.keys(state.users).map((k) => ({
         name: k,
         label: state.users[k]?.label || k,

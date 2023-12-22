@@ -6,8 +6,9 @@ import {
 import { PLink } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -19,6 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
     data: () => ({}),
 });
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     fields: computed(() => ([
         { name: 'no_notification', label: i18n.t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') },
@@ -31,7 +33,7 @@ const state = reactive({
         { name: 'stop_processing', label: i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
     ])),
     items: [] as any,
-    projects: computed(() => store.getters['reference/projectItems']),
+    projects: computed(() => allReferenceStore.getters.project),
     conditions: computed(() => ({
         ANY: i18n.t('PROJECT.EVENT_RULE.ANY'),
         ALL: i18n.t('PROJECT.EVENT_RULE.ALL'),
@@ -48,8 +50,6 @@ watch(() => props.data, () => {
 
 (async () => {
     getData();
-    // LOAD REFERENCE STORE
-    await store.dispatch('reference/project/load');
 })();
 </script>
 

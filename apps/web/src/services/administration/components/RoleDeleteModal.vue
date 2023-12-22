@@ -11,7 +11,8 @@ import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -25,6 +26,7 @@ import {
     ROLE_UN_DELETABLE_TABLE_FIELDS,
 } from '@/services/administration/constants/role-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
 
 interface UnDeletableRole {
     roleName: string;
@@ -47,11 +49,12 @@ const emit = defineEmits<{(e: ':update:visible'): void,
     (e: 'refresh'): void,
 }>();
 
+const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 const state = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     loading: true,
     proxyVisible: useProxyValue('visible', props, emit),
     unDeletableRoles: [] as UnDeletableRole[],
@@ -103,13 +106,6 @@ watch(() => state.proxyVisible, async (after) => {
         await getRoleBindingList();
     }
 }, { immediate: true });
-
-/* Init */
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/user/load'),
-    ]);
-})();
 </script>
 
 <template>

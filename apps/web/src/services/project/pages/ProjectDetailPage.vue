@@ -19,11 +19,11 @@ import { numberFormatter } from '@cloudforet/utils';
 import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -49,13 +49,14 @@ const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
 
+const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageState = projectDetailPageStore.state;
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const storeState = reactive({
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
 });
 const state = reactive({
     item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
