@@ -54,7 +54,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
         return getCancellableFetcher(api.list);
     }
 
-    #getParams(query: ListQuery = {}): Record<string, any> {
+    protected _getParams(query: ListQuery = {}): Record<string, any> {
         const _query: Record<string, any> = {
             filter: [
                 {
@@ -90,7 +90,7 @@ export default class ResourceNameVariableModel implements IResourceNameVariableM
                 if (!this.#fetcher) return this.#response;
             }
             const { status, response } = await this.#fetcher(
-                this.#getParams(query),
+                this._getParams(query),
             );
             if (status === 'succeed') {
                 let more = false;
