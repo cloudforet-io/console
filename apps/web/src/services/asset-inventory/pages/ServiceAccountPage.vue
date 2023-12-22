@@ -25,6 +25,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { ServiceAccountListParameters } from '@/schema/identity/service-account/api-verbs/list';
 import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
@@ -44,7 +45,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import { useQuerySearchPropsWithSearchSchema } from '@/common/composables/dynamic-layout';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import CustomFieldModal from '@/common/modules/custom-table/custom-field-modal/CustomFieldModal.vue';
 
 import ProviderList from '@/services/asset-inventory/components/ProviderList.vue';
@@ -88,7 +88,7 @@ const typeOptionState = reactive({
 });
 
 const tableState = reactive({
-    hasManagePermission: useManagePermissionState(),
+    isWorkspaceMember: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_MEMBER),
     items: [] as ServiceAccountModel[] | TrustedAccountModel[],
     schema: computed<DynamicLayout|undefined>(() => (tableState.isTrustedAccount
         ? serviceAccountSchemaStore.state.trustedAccountTableSchema : serviceAccountSchemaStore.state.generalAccountTableSchema)),
@@ -305,7 +305,7 @@ watch(() => tableState.selectedAccountType, () => {
                 <template #extra>
                     <p-button style-type="primary"
                               icon-left="ic_plus_bold"
-                              :disabled="!tableState.hasManagePermission"
+                              :disabled="tableState.isTrustedAccount && tableState.isWorkspaceMember"
                               @click="clickAddServiceAccount"
                     >
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.CREATE') }}
