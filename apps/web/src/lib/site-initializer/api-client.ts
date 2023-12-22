@@ -38,6 +38,11 @@ const getAfterCallApiMap = (store) => ({
         const allReferenceStore = useAllReferenceStore();
         allReferenceStore.sync('projectGroup', data);
     },
+    '/identity/project-group/delete': () => {
+        useAllReferenceStore(pinia);
+        const allReferenceStore = useAllReferenceStore();
+        allReferenceStore.load('projectGroup');
+    },
     '/notification/protocol/create': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/notification/protocol/update': (data) => { store.dispatch('reference/protocol/sync', data); },
     '/identity/provider/create': (data) => { store.dispatch('reference/provider/sync', data); },
