@@ -11,6 +11,7 @@ import type { RoleType } from '@/schema/identity/role/type';
 import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
 import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
 import type { TokenGrantModel, TokenIssueModel } from '@/schema/identity/token/model';
+import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
@@ -43,9 +44,8 @@ const getUserInfo = async (): Promise<Partial<UserState>> => {
     };
 };
 
-const updateUser = async (userId: string, userType: string, userRequest: UpdateUserRequest): Promise<void> => {
+const updateUser = async (userType: string, userRequest: UpdateUserRequest): Promise<void> => {
     const request: any = {};
-    request.user_id = userId;
 
     if (userRequest.name) request.name = userRequest.name;
     if (userRequest.password) request.password = userRequest.password;
@@ -54,7 +54,7 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     if (userRequest.timezone) request.timezone = userRequest.timezone;
     if (userRequest.tags) request.tags = userRequest.tags;
 
-    await SpaceConnector.clientV2.identity.user.update(request);
+    await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
 };
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
@@ -154,7 +154,7 @@ export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
 };
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
-    await updateUser(state.userId, state.userType, userRequest);
+    await updateUser(state.userType, userRequest);
 
     const convertRequestType = (): UserState => ({
         userId: userRequest.user_id || state.userId,
