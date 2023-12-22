@@ -1,4 +1,4 @@
-import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { Tags } from '@/schema/_common/model';
 
 export interface ProviderModel {
     provider: string;
@@ -10,6 +10,6 @@ export interface ProviderModel {
     options: Record<string, any>;
     tags: Tags;
     is_managed: boolean;
-    created_at: TimeStamp;
-    updated_at: TimeStamp;
+    created_at: string;
+    updated_at: string;
 }
