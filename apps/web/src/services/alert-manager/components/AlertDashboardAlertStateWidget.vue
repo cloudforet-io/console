@@ -27,7 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red } from '@/styles/colors';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
-import { ASSIGNED_STATE, EXTENDED_ALERT_URGENCY } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_ASSIGNED_FILTER, ALERT_URGENCY_FILTER } from '@/services/alert-manager/constants/alert-constant';
 
 
 const TAB_STATE = Object.freeze({
@@ -77,33 +77,33 @@ const state = reactive({
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     urgencyList: computed(() => ([
         {
-            name: EXTENDED_ALERT_URGENCY.ALL,
+            name: ALERT_URGENCY_FILTER.ALL,
             label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL_URGENCY'),
         },
         {
-            name: EXTENDED_ALERT_URGENCY.HIGH,
+            name: ALERT_URGENCY_FILTER.HIGH,
             label: i18n.t('MONITORING.ALERT.DASHBOARD.HIGH'),
             icon: 'ic_error-filled',
         },
         {
-            name: EXTENDED_ALERT_URGENCY.LOW,
+            name: ALERT_URGENCY_FILTER.LOW,
             label: i18n.t('MONITORING.ALERT.DASHBOARD.LOW'),
             icon: 'ic_warning-filled',
         },
     ])),
     assignedStateList: computed(() => [
         {
-            name: ASSIGNED_STATE.ALL,
+            name: ALERT_ASSIGNED_FILTER.ALL,
             label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL'),
         },
         {
-            name: ASSIGNED_STATE.ASSIGNED_TO_ME,
+            name: ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME,
             label: i18n.t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME'),
         },
     ]),
     //
-    selectedUrgency: EXTENDED_ALERT_URGENCY.ALL,
-    selectedAssignedState: ASSIGNED_STATE.ALL,
+    selectedUrgency: ALERT_URGENCY_FILTER.ALL,
+    selectedAssignedState: ALERT_ASSIGNED_FILTER.ALL,
     isAssignedToMe: false,
     items: [],
     thisPage: 1,
@@ -120,7 +120,7 @@ const getQuery = () => {
 
     const filters: ConsoleFilter[] = [];
     filters.push({ k: 'project_id', v: props.activatedProjects, o: '' });
-    if (state.selectedUrgency !== EXTENDED_ALERT_URGENCY.ALL) {
+    if (state.selectedUrgency !== ALERT_URGENCY_FILTER.ALL) {
         filters.push({ k: 'urgency', v: state.selectedUrgency, o: '=' });
     }
     if (tabState.activeTab === TAB_STATE.OPEN) {
@@ -168,7 +168,7 @@ const onPageChange = async () => {
     await listAlerts();
 };
 const onSelectAssignedState = (assignedState) => {
-    state.isAssignedToMe = assignedState === ASSIGNED_STATE.ASSIGNED_TO_ME;
+    state.isAssignedToMe = assignedState === ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME;
 };
 const onClickRefresh = async () => {
     state.thisPage = 1;

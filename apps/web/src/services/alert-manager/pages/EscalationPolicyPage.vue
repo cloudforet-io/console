@@ -2,11 +2,12 @@
 import {
     reactive, computed,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
-import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import {
@@ -16,14 +17,16 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import { SpaceRouter } from '@/router';
 import type { EscalationPolicyDeleteParameters } from '@/schema/monitoring/escalation-policy/api-verbs/delete';
 import type {
     EscalationPolicyListParameters,
     EscalationPolicyListResponse,
 } from '@/schema/monitoring/escalation-policy/api-verbs/list';
 import type { EscalationPolicySetDefaultParameters } from '@/schema/monitoring/escalation-policy/api-verbs/set-default';
-import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
+import {
+    ESCALATION_POLICY_FINISH_CONDITION,
+    ESCALATION_POLICY_RESOURCE_GROUP,
+} from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -36,10 +39,11 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import EscalationPolicyDataTable from '@/services/alert-manager/components/EscalationPolicyDataTable.vue';
 import EscalationPolicyFormModal from '@/services/alert-manager/components/EscalationPolicyFormModal.vue';
-import { ACTION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
+import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import type { ActionMode } from '@/services/alert-manager/types/alert-type';
 
 interface Item extends Omit<EscalationPolicyModel, 'name'> {
@@ -50,17 +54,11 @@ interface Item extends Omit<EscalationPolicyModel, 'name'> {
     created_at: string;
 }
 
-const currentQuery = SpaceRouter.router.currentRoute.query;
-const escalationPolicyApiQueryHelper = new ApiQueryHelper()
-    .setSort('created_at', true)
-    .setPage(1, 15)
-    .setFiltersAsRawQueryString(currentQuery.filters);
-
+const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
-const storeState = reactive({
-    projects: computed(() => allReferenceStore.getters.project),
-});
-const handlerState = reactive({
+
+/* Search Tag */
+const queryTagsHelper = useQueryTags({
     keyItemSets: computed<KeyItemSet[]>(() => [{
         title: 'Properties',
         items: [
@@ -72,18 +70,31 @@ const handlerState = reactive({
             { name: 'created_at', label: 'Created', dataType: 'datetime' },
         ],
     }]),
-    valueHandlerMap: {
-        escalation_policy_id: makeDistinctValueHandler('monitoring.EscalationPolicy', 'escalation_policy_id'),
-        name: makeDistinctValueHandler('monitoring.EscalationPolicy', 'name'),
-        finish_condition: makeEnumValueHandler(ESCALATION_POLICY_FINISH_CONDITION),
-        scope: makeEnumValueHandler(SCOPE),
-        project_id: makeReferenceValueHandler('identity.Project'),
-    },
+    referenceStore: allReferenceStore.getters,
+});
+queryTagsHelper.setURLQueryStringFilters(router.currentRoute.query.filters);
+const { keyItemSets } = queryTagsHelper;
+const valueHandlerMap: ValueHandlerMap = {
+    escalation_policy_id: makeDistinctValueHandler('monitoring.EscalationPolicy', 'escalation_policy_id'),
+    name: makeDistinctValueHandler('monitoring.EscalationPolicy', 'name'),
+    finish_condition: makeEnumValueHandler(ESCALATION_POLICY_FINISH_CONDITION),
+    resource_group: makeEnumValueHandler(ESCALATION_POLICY_RESOURCE_GROUP),
+    project_id: makeReferenceValueHandler('identity.Project'),
+};
+
+/* Api Query */
+const escalationPolicyApiQueryHelper = new ApiQueryHelper()
+    .setSort('created_at', true)
+    .setPage(1, 15);
+
+/* States */
+const storeState = reactive({
+    projects: computed(() => allReferenceStore.getters.project),
 });
 const tableState = reactive({
     loading: true,
     totalCount: 0,
-    tags: computed(() => escalationPolicyApiQueryHelper.setKeyItemSets(handlerState.keyItemSets).queryTags),
+    tags: computed(() => queryTagsHelper.queryTags.value),
 });
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
@@ -105,7 +116,7 @@ const state = reactive({
             type: 'item',
             name: 'default',
             label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
-            disabled: state.selectedItem?.scope === SCOPE.PROJECT,
+            disabled: state.selectedItem?.resource_group === ESCALATION_POLICY_RESOURCE_GROUP.PROJECT,
         },
     ])),
     escalationPolicies: [] as EscalationPolicyModel[],
@@ -187,14 +198,10 @@ const onChange = async (options: ToolboxOptions = {}) => {
     if (options.sortBy !== undefined) escalationPolicyApiQueryHelper.setSort(options.sortBy);
     if (options.sortDesc !== undefined) escalationPolicyApiQueryHelper.setSortDesc(options.sortDesc);
     if (options.queryTags !== undefined) {
-        escalationPolicyApiQueryHelper.setFiltersAsQueryTag(options.queryTags);
-    } else if (options.searchText !== undefined) {
-        escalationPolicyApiQueryHelper.setFilters([{ v: options.searchText || '' }]);
+        queryTagsHelper.setQueryTags(options.queryTags);
+        await replaceUrlQuery('filters', queryTagsHelper.urlQueryStringFilters.value);
     }
 
-    if (options.queryTags !== undefined) {
-        await replaceUrlQuery('filters', escalationPolicyApiQueryHelper.rawQueryStrings);
-    }
     await listEscalationPolicies();
 };
 
@@ -218,8 +225,8 @@ const onChange = async (options: ToolboxOptions = {}) => {
                 search-type="query"
                 :total-count="tableState.totalCount"
                 :query-tags="tableState.tags"
-                :key-item-sets="handlerState.keyItemSets"
-                :value-handler-map="handlerState.valueHandlerMap"
+                :key-item-sets="keyItemSets"
+                :value-handler-map="valueHandlerMap"
                 @change="onChange"
                 @refresh="onChange()"
             >

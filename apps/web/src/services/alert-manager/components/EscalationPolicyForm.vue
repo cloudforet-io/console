@@ -11,7 +11,7 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
+import type { EscalationPolicyFinishCondition, EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -43,11 +43,11 @@ const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     //
-    scopeLabels: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
+    scopeLabels: computed<Record<EscalationPolicyResourceGroup, TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
     })),
-    scopes: computed<{label: TranslateResult; value: EscalationPolicyModel['resource_group']}[]>(() => [
+    scopes: computed<{label: TranslateResult; value: EscalationPolicyResourceGroup}[]>(() => [
         { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'), value: 'WORKSPACE' },
         { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
     ]),
@@ -80,7 +80,7 @@ const {
 
 /* event */
 const handleChangeScope = (value: EscalationPolicyModel['resource_group']) => {
-    escalationPolicyFormStore.$patch({ resource_group: value });
+    escalationPolicyFormStore.$patch({ resourceGroup: value });
     if (value === 'WORKSPACE') {
         escalationPolicyFormStore.$patch({ projectId: undefined });
     }
@@ -146,7 +146,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 <span v-if="props.mode === ACTION.update"
                       class="scope-text"
                 >
-                    <span>{{ state.scopeLabels[escalationPolicyFormState.resource_group] }}</span>
+                    <span>{{ state.scopeLabels[escalationPolicyFormState.resourceGroup] }}</span>
                     <span v-if="escalationPolicyFormState.resource_group === 'PROJECT'">
                         (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                  new-tab
@@ -158,7 +158,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 </span>
             </template>
         </p-field-group>
-        <p-field-group v-if="props.showScope && escalationPolicyFormState.resource_group === 'PROJECT' && props.mode === ACTION.create"
+        <p-field-group v-if="props.showScope && escalationPolicyFormState.resourceGroup === 'PROJECT' && props.mode === ACTION.create"
                        class="project-field"
                        required
                        :invalid="invalidState.projectId"

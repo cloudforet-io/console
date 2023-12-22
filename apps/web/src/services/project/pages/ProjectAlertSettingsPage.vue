@@ -11,6 +11,9 @@ import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
+import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -18,7 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { red } from '@/styles/colors';
 
 import EscalationPolicyFormModal from '@/services/alert-manager/components/EscalationPolicyFormModal.vue';
-import { ACTION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
+import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import ProjectAlertSettingsAutoRecoveryUpdateModal
     from '@/services/project/components/ProjectAlertSettingsAutoRecoveryUpdateModal.vue';
 import ProjectAlertSettingsEscalationPolicy
@@ -49,16 +52,16 @@ const state = reactive({
     notificationUrgencyList: computed(() => ([
         {
             name: NOTIFICATION_URGENCY.ALL,
-            label: i18n.t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS'),
+            label: i18n.t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS') as string,
         },
         {
             name: NOTIFICATION_URGENCY.HIGH_ONLY,
-            label: i18n.t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS'),
+            label: i18n.t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS') as string,
             icon: 'ic_error-filled',
         },
     ])),
     projectAlertConfig: {},
-    escalationPolicy: {},
+    escalationPolicy: undefined as EscalationPolicyModel|undefined,
     notificationUrgency: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
     recoveryMode: computed(() => get(state.projectAlertConfig, 'options.recovery_mode')),
     escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
@@ -97,12 +100,12 @@ const getEventRuleCount = async () => {
 };
 const getEscalationPolicy = async () => {
     try {
-        state.escalationPolicy = await SpaceConnector.client.monitoring.escalationPolicy.get({
+        state.escalationPolicy = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
             escalation_policy_id: state.escalationPolicyId,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.escalationPolicy = {};
+        state.escalationPolicy = undefined;
     }
 };
 
@@ -193,7 +196,7 @@ onActivated(() => {
                     <p-button class="text-button"
                               style-type="tertiary"
                               size="sm"
-                              :disabled="state.escalationPolicy.scope === SCOPE.DOMAIN"
+                              :disabled="state.escalationPolicy?.resource_group === ESCALATION_POLICY_RESOURCE_GROUP.WORKSPACE"
                               @click="onClickUpdateEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}

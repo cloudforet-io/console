@@ -13,6 +13,7 @@ import type { ConsoleFilterOperator, ConsoleFilterValue, ConsoleFilter } from '@
 
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
+import type { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 interface KeyItem extends MirinaeKeyItem {
     reference?: string;
@@ -75,7 +76,7 @@ const filterToQueryTag = (
 
 interface Options {
     keyItemSets?: KeyItemSet[]|Ref<KeyItemSet[]>|ComputedRef<KeyItemSet[]>;
-    referenceStore?: Record<string, ComputedRef<ReferenceMap>>;
+    referenceStore?: Record<string, ComputedRef<ReferenceMap>>|ReturnType<typeof useAllReferenceStore>['getters'];
 }
 export const useQueryTags = ({ keyItemSets, referenceStore }: Options) => {
     let keyMap: KeyMap = {};

@@ -53,7 +53,7 @@ import { PCheckbox, PSelectButton, PSelectStatus } from '@spaceone/design-system
 import { i18n } from '@/translations';
 
 import {
-    ALERT_STATE_FILTER, ASSIGNED_STATE, EXTENDED_ALERT_URGENCY,
+    ALERT_STATE_FILTER, ALERT_ASSIGNED_FILTER, ALERT_URGENCY_FILTER,
 } from '@/services/alert-manager/constants/alert-constant';
 import type {
     AlertBottomFilters,
@@ -74,11 +74,11 @@ export default {
         },
         urgency: {
             type: String,
-            default: EXTENDED_ALERT_URGENCY.ALL,
+            default: ALERT_URGENCY_FILTER.ALL,
         },
         assigned: {
             type: String,
-            default: ASSIGNED_STATE.ALL,
+            default: ALERT_ASSIGNED_FILTER.ALL,
         },
     },
     setup(props, { emit }) {
@@ -95,18 +95,18 @@ export default {
                 { name: ALERT_STATE_FILTER.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
             ]),
             urgencyList: computed(() => [
-                { name: EXTENDED_ALERT_URGENCY.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
-                { name: EXTENDED_ALERT_URGENCY.HIGH, label: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH') },
-                { name: EXTENDED_ALERT_URGENCY.LOW, label: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW') },
+                { name: ALERT_URGENCY_FILTER.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
+                { name: ALERT_URGENCY_FILTER.HIGH, label: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH') },
+                { name: ALERT_URGENCY_FILTER.LOW, label: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW') },
             ]),
             assignedStateList: computed(() => [
-                { name: ASSIGNED_STATE.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
-                { name: ASSIGNED_STATE.ASSIGNED_TO_ME, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME') },
+                { name: ALERT_ASSIGNED_FILTER.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
+                { name: ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME') },
             ]),
         });
 
         const onSelectAssignedCheckbox = (value) => {
-            state.selectedAssigned = value || ASSIGNED_STATE.ALL;
+            state.selectedAssigned = value || ALERT_ASSIGNED_FILTER.ALL;
         };
 
         watch([() => props.alertState, () => props.urgency, () => props.assigned], () => {
@@ -125,7 +125,7 @@ export default {
 
         return {
             ...toRefs(state),
-            ASSIGNED_STATE,
+            ASSIGNED_STATE: ALERT_ASSIGNED_FILTER,
             onSelectAssignedCheckbox,
         };
     },

@@ -1,4 +1,4 @@
-import { ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
+import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 
 export const ACTION = {
     create: 'create',
@@ -12,26 +12,18 @@ export const EDIT_MODE = {
     PROJECT: 'project',
 } as const;
 
-export const SCOPE = {
-    DOMAIN: 'DOMAIN',
-    PROJECT: 'PROJECT',
-} as const;
-
 export const ALERT_STATE_FILTER = {
+    ...ALERT_STATE,
     OPEN: 'OPEN',
-    TRIGGERED: 'TRIGGERED',
-    ACKNOWLEDGED: 'ACKNOWLEDGED',
-    RESOLVED: 'RESOLVED',
-    ERROR: 'ERROR',
     ALL: 'ALL',
 } as const;
 
-export const ASSIGNED_STATE = {
+export const ALERT_ASSIGNED_FILTER = {
     ALL: 'ALL',
     ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
 } as const;
 
-export const EXTENDED_ALERT_URGENCY = {
+export const ALERT_URGENCY_FILTER = {
     ...ALERT_URGENCY,
     ALL: 'ALL',
 } as const;

@@ -27,7 +27,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { alert, secondary } from '@/styles/colors';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
-import { ASSIGNED_STATE } from '@/services/alert-manager/constants/alert-constant';
+import { ALERT_ASSIGNED_FILTER } from '@/services/alert-manager/constants/alert-constant';
 import type { AlertListPageUrlQuery } from '@/services/alert-manager/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -73,15 +73,15 @@ const state = reactive({
     loading: true,
     assignedStateList: computed(() => [
         {
-            name: ASSIGNED_STATE.ALL,
+            name: ALERT_ASSIGNED_FILTER.ALL,
             label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL'),
         },
         {
-            name: ASSIGNED_STATE.ASSIGNED_TO_ME,
+            name: ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME,
             label: i18n.t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME'),
         },
     ]),
-    selectedAssignedState: ASSIGNED_STATE.ALL,
+    selectedAssignedState: ALERT_ASSIGNED_FILTER.ALL,
     items: [],
     totalCount: 0,
     thisPage: 1,
@@ -103,7 +103,7 @@ const getQuery = () => {
     apiQuery
         .setSort('created_at', true)
         .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-    if (state.selectedAssignedState === ASSIGNED_STATE.ASSIGNED_TO_ME) {
+    if (state.selectedAssignedState === ALERT_ASSIGNED_FILTER.ASSIGNED_TO_ME) {
         apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
     } else {
         apiQuery.setFilters([
