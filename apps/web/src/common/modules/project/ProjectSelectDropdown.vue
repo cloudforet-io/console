@@ -60,7 +60,7 @@ const emit = defineEmits<{(e: 'select', value: ProjectTreeNodeData[]): void;
 
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(allReferenceStore.getters.project),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
 });
 const state = reactive({
