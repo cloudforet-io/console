@@ -14,7 +14,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -105,7 +108,7 @@ const state = reactive({
     selectedUrgency: ALERT_URGENCY_FILTER.ALL,
     selectedAssignedState: ALERT_ASSIGNED_FILTER.ALL,
     isAssignedToMe: false,
-    items: [],
+    items: [] as AlertModel[],
     thisPage: 1,
     allPage: 1,
     pageSize: 10,
@@ -132,14 +135,14 @@ const getQuery = () => {
         filters.push({ k: 'assignee', v: store.state.user.userId, o: '=' });
     }
     apiQuery.setFilters(filters);
-    return apiQuery.data;
+    return apiQuery.dataV2;
 };
 const listAlerts = async () => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({ query: getQuery() });
         state.allPage = getAllPage(total_count, 10);
-        state.items = results;
+        state.items = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.items = [];

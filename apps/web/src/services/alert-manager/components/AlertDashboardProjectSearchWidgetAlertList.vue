@@ -10,7 +10,10 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -28,7 +31,7 @@ const allReferenceStore = useAllReferenceStore();
 const state = reactive({
     loading: true,
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-    items: [],
+    items: [] as AlertModel[],
     totalCount: 0,
 });
 
@@ -39,17 +42,17 @@ const getQuery = () => {
         .setSort('created_at', true)
         .setPage(1, 16)
         .setFilters([{ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' }]);
-    return apiQuery.data;
+    return apiQuery.dataV2;
 };
 const listAlerts = async () => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
             project_id: props.projectId,
             query: getQuery(),
         });
-        state.items = results;
-        state.totalCount = total_count;
+        state.items = results ?? [];
+        state.totalCount = total_count ?? 0;
     } catch (e) {
         state.items = [];
         state.totalCount = 0;

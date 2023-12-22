@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
+import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';
 import { ALERT_STATE, ALERT_URGENCY } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
@@ -111,9 +112,21 @@ const alertDurationFormatter = (value) => durationFormatter(value, dayjs().forma
 const handleConfirmDelete = async () => {
     state.closeLoading = true;
     try {
-        await SpaceConnector.client.monitoring.alert.delete({
-            alerts: props.selectedItems.map((d) => d.alert_id),
+        const promises = props.selectedItems.map((d) => SpaceConnector.clientV2.monitoring.alert.delete<AlertDeleteParameters>({
+            alert_id: d.alert_id,
+        }));
+        const results = await Promise.allSettled(promises);
+
+        const failedReasons: any[] = [];
+        results.forEach((result) => {
+            if (result.status === 'rejected') {
+                failedReasons.push(result.reason);
+            }
         });
+        if (failedReasons.length > 0) {
+            throw new Error(failedReasons.join(', '));
+        }
+
         showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '');
         state.visibleDeleteModal = false;
         emit('refresh');

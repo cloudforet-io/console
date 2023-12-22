@@ -6,6 +6,7 @@ import { PIconButton, PHeading } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { AlertDeleteParameters } from '@/schema/monitoring/alert/api-verbs/delete';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -52,8 +53,8 @@ const openAlertDeleteForm = () => {
 
 const alertDeleteConfirm = async () => {
     try {
-        await SpaceConnector.client.monitoring.alert.delete({
-            alerts: [props.id],
+        await SpaceConnector.clientV2.monitoring.alert.delete<AlertDeleteParameters>({
+            alert_id: props.id,
         });
         showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '');
         await router.push({ name: ALERT_MANAGER_ROUTE.ALERT._NAME });

@@ -11,13 +11,15 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { EventListParameters } from '@/schema/monitoring/event/api-verbs/list';
+import type { EventModel } from '@/schema/monitoring/event/model';
 import { store } from '@/store';
 
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
 import AlertDetailTabsPushedEventVerticalTimeline
     from '@/services/alert-manager/components/AlertDetailTabsPushedEventVerticalTimeline.vue';
-import type { Event } from '@/services/alert-manager/types/alert-type';
 
 const PAGE_SIZE = 10;
 
@@ -30,7 +32,7 @@ const eventListApiQueryHelper = new ApiQueryHelper()
 let eventListApiQuery = eventListApiQueryHelper.data;
 
 const state = reactive({
-    itemList: [] as Event[],
+    itemList: [] as EventModel[],
     timezone: computed(() => store.state.user.timezone),
     totalCount: 0,
     thisPage: 1,
@@ -45,10 +47,10 @@ const searchQueryHelper = new QueryHelper();
 const listEvent = async () => {
     eventListApiQueryHelper.setFilters([...searchQueryHelper.filters]);
     if (props.id) eventListApiQueryHelper.addFilter({ k: 'alert_id', v: props.id, o: '=' });
-    eventListApiQuery = eventListApiQueryHelper.data;
-    const { results, total_count } = await SpaceConnector.client.monitoring.event.list({ query: eventListApiQuery });
-    state.itemList = results;
-    state.totalCount = total_count;
+    eventListApiQuery = eventListApiQueryHelper.dataV2;
+    const { results, total_count } = await SpaceConnector.clientV2.monitoring.event.list<EventListParameters, ListResponse<EventModel>>({ query: eventListApiQuery });
+    state.itemList = results ?? [];
+    state.totalCount = total_count ?? 0;
 };
 
 const onChange = async (options: any = {}) => {

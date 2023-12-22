@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -15,7 +15,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -30,7 +33,6 @@ import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue
 import { ALERT_ASSIGNED_FILTER } from '@/services/alert-manager/constants/alert-constant';
 import type { AlertListPageUrlQuery } from '@/services/alert-manager/types/alert-type';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-
 
 interface AlertState {
     name: string;
@@ -82,7 +84,7 @@ const state = reactive({
         },
     ]),
     selectedAssignedState: ALERT_ASSIGNED_FILTER.ALL,
-    items: [],
+    items: [] as AlertModel[],
     totalCount: 0,
     thisPage: 1,
     allPage: 1,
@@ -110,18 +112,18 @@ const getQuery = () => {
             { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
         ]);
     }
-    return apiQuery.data;
+    return apiQuery.dataV2;
 };
 const listAlerts = async () => {
     try {
         state.loading = true;
-        const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
             project_id: props.projectId,
             query: getQuery(),
         });
-        state.totalCount = total_count;
+        state.totalCount = total_count ?? 0;
         state.allPage = getAllPage(total_count, 10);
-        state.items = results;
+        state.items = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.items = [];
