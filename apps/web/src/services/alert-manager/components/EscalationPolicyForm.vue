@@ -9,9 +9,11 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EscalationPolicyFinishCondition, EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -48,10 +50,16 @@ const state = reactive({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
     })),
-    scopes: computed<{label: TranslateResult; value: EscalationPolicyResourceGroup}[]>(() => [
-        { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'), value: 'WORKSPACE' },
-        { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
-    ]),
+    scopes: computed<{label: TranslateResult; value: EscalationPolicyResourceGroup}[]>(() => {
+        const currentRoleType = store.getters['user/getCurrentRoleInfo'].roleType;
+        const scopes: {label: TranslateResult; value: EscalationPolicyResourceGroup}[] = [
+            { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
+        ];
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
+            scopes.splice(0, 0, { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'), value: 'WORKSPACE' });
+        }
+        return scopes;
+    }),
     finishConditions: computed<{label: TranslateResult; value: EscalationPolicyFinishCondition}[]>(() => [
         { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: ESCALATION_POLICY_FINISH_CONDITION.acknowledged },
         { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: ESCALATION_POLICY_FINISH_CONDITION.resolved },
@@ -212,6 +220,10 @@ watch(() => isAllValid.value, (_isAllValid) => {
 
 <style lang="postcss" scoped>
 .escalation-policy-form {
+    .p-field-group {
+        margin-bottom: 1rem;
+    }
+
     /* custom design-system component - p-field-group */
     :deep(.project-field) {
         .label-box {
