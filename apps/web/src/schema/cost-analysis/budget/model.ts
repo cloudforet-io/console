@@ -1,33 +1,15 @@
 import type { Tags } from '@/schema/_common/model';
+import type {
+    BudgetNotification, BudgetPlannedLimit, BudgetTimeUnit, ProviderFilter,
+} from '@/schema/cost-analysis/budget/type';
+import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 import type { Currency } from '@/store/modules/settings/type';
 
 
-
-
-type BudgetTimeUnit = 'MONTHLY' | 'YEARLY' | 'TOTAL';
-type BudgetNotificationType = 'CRITICAL' | 'WARNING';
-type BudgetNotificationUnit = 'PERCENT' | 'ACTUAL_COST';
-
-interface BudgetNotification {
-    threshold: number;
-    unit: BudgetNotificationUnit;
-    notification_type: BudgetNotificationType;
-}
-interface BudgetPlannedLimit {
-    date: string;
-    limit: number;
-}
-interface ProviderFilter {
-    providers: string[];
-    state: 'ENABLED' | 'DISABLED';
-}
-
 export interface BudgetModel {
     budget_id: string;
     name: string;
-    project_id?: string;
-    workspace_id: string;
     limit: number;
     planned_limits: BudgetPlannedLimit[];
     currency: Currency;
@@ -38,7 +20,10 @@ export interface BudgetModel {
     notifications: BudgetNotification[];
     tags: Tags;
     data_source_id: string;
+    resource_group: Extract<ResourceGroup, 'WORKSPACE' | 'PROJECT'>
+    project_id: string;
+    workspace_id: string;
+    domain_id?: string;
     created_at: string;
     updated_at: string;
-    domain_id?: string;
 }
