@@ -4,6 +4,9 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
+import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 import type { DomainGetAuthInfoParams, DomainGetAuthInfoResponse } from '@/schema/identity/domain/api-verbs/get-auth-info';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -48,10 +51,10 @@ export const load = async ({ commit }, name: string): Promise<void|Error> => {
 export const loadExtraMenu: Action<DomainState, any> = async ({ commit, state }) => {
     if (state.extraMenu) return;
     try {
-        const { results } = await SpaceConnector.client.config.domainConfig.list({
+        const { results } = await SpaceConnector.clientV2.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
             name: DOMAIN_CONFIG_TYPE.EXTRA_MENU,
         });
-        commit('setExtraMenu', results[0]?.data ?? {});
+        commit('setExtraMenu', results?.[0]?.data ?? {});
     } catch (e) {
         ErrorHandler.handleError(e);
         commit('setExtraMenu', {});

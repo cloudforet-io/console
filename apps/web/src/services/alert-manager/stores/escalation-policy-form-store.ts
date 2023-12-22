@@ -3,12 +3,12 @@ import { defineStore } from 'pinia';
 
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+import type { EscalationPolicyFinishCondition, EscalationPolicyRule, EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
 
 interface EscalationPolicyFormState {
     escalationPolicyData?: EscalationPolicyModel|undefined;
     name?: string;
-    resource_group: EscalationPolicyModel['resource_group'];
+    resourceGroup: EscalationPolicyResourceGroup;
     rules: EscalationPolicyRule[];
     finishCondition: EscalationPolicyFinishCondition;
     repeatCount: number;
@@ -30,7 +30,7 @@ export const useEscalationPolicyFormStore = defineStore<string, EscalationPolicy
     state: () => ({
         escalationPolicyData: {} as EscalationPolicyModel|undefined,
         name: undefined,
-        resource_group: 'PROJECT',
+        resourceGroup: 'PROJECT',
         rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
         finishCondition: ESCALATION_POLICY_FINISH_CONDITION.acknowledged,
         repeatCount: 0,
@@ -46,7 +46,7 @@ export const useEscalationPolicyFormStore = defineStore<string, EscalationPolicy
         initEscalationPolicyFormData(escalationPolicyData: EscalationPolicyModel) {
             this.escalationPolicyData = escalationPolicyData;
             this.name = escalationPolicyData.name;
-            this.resource_group = escalationPolicyData.resource_group;
+            this.resourceGroup = escalationPolicyData.resource_group;
             this.rules = escalationPolicyData.rules;
             this.finishCondition = escalationPolicyData.finish_condition;
             this.repeatCount = escalationPolicyData.repeat_count;

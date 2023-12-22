@@ -1,6 +1,7 @@
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
+import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
+import type { EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
 
-import { SCOPE } from '@/services/alert-manager/constants/alert-constant';
 
 
 export const alertStateBadgeStyleTypeFormatter = (alertState) => {
@@ -24,7 +25,7 @@ export const alertStateBadgeStyleTypeFormatter = (alertState) => {
     return style;
 };
 
-export const alertScopeBadgeStyleTypeFormatter = (scope) => {
-    if (scope === SCOPE.DOMAIN) return 'green200';
+export const alertScopeBadgeStyleTypeFormatter = (scope: EscalationPolicyResourceGroup) => {
+    if (scope === ESCALATION_POLICY_RESOURCE_GROUP.WORKSPACE) return 'green200';
     return 'primary3';
 };

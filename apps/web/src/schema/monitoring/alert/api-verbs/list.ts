@@ -1,4 +1,9 @@
-import type { AlertSeverity, AlertState, AlertUrgency } from '@/schema/monitoring/alert/model';
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type {
+    AlertModel, AlertSeverity, AlertState, AlertUrgency,
+} from '@/schema/monitoring/alert/model';
 
 export interface AlertListParameters {
     alert_number?: number;
@@ -16,4 +21,7 @@ export interface AlertListParameters {
     escalation_policy_id?: string;
     workspace_id?: string;
     project_id?: string;
+    query?: Query;
 }
+
+export type AlertListResponse = ListResponse<AlertModel>;

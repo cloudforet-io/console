@@ -1,5 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
-import type { EscalationPolicyRule, EscalationPolicyFinishCondition } from '@/schema/monitoring/escalation-policy/type';
+import type { EscalationPolicyRule, EscalationPolicyFinishCondition, EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
 
 export interface EscalationPolicyModel {
     escalation_policy_id: string;
@@ -9,7 +9,7 @@ export interface EscalationPolicyModel {
     repeat_count: number;
     finish_condition: EscalationPolicyFinishCondition;
     tags: Tags;
-    resource_group: 'WORKSPACE'|'PROJECT';
+    resource_group: EscalationPolicyResourceGroup;
     project_id: string;
     workspace_id: string;
     domain_id: string;

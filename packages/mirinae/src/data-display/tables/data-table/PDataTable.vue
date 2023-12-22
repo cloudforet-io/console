@@ -38,7 +38,7 @@
                                         width: field.width || undefined,
                                     }"
                                     :class="{'fix-width': colCopy}"
-                                    @click="onTheadClick(field, fieldColIndex, $event)"
+                                    @click="onTheadClick(field)"
                                 >
                                     <slot :name="`th-${field.name}`"
                                           v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
@@ -228,7 +228,7 @@ export default defineComponent<DataTableProps>({
             default: false,
         },
         fields: {
-            type: Array,
+            type: Array as PropType<DataTableFieldType[]>,
             required: true,
             default: () => [],
         },
@@ -447,7 +447,7 @@ export default defineComponent<DataTableProps>({
             proxyState.proxySelectIndex = [index];
         };
 
-        const onTheadClick = (field) => {
+        const onTheadClick = (field: DataTableFieldType) => {
             if (isFieldSortable(field.sortable)) {
                 const clickedKey = field.sortKey || field.name;
                 let sortBy = proxyState.proxySortBy;

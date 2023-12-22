@@ -12,13 +12,13 @@ import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
-import { SCOPE } from '@/services/alert-manager/constants/alert-constant';
 import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form-store';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
@@ -154,7 +154,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
             <span class="col-rule">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
-            <p-link v-if="escalationPolicyFormState.scope === SCOPE.PROJECT && escalationPolicyFormState.projectId"
+            <p-link v-if="escalationPolicyFormState.resourceGroup === ESCALATION_POLICY_RESOURCE_GROUP.PROJECT && escalationPolicyFormState.projectId"
                     class="link-text"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab
