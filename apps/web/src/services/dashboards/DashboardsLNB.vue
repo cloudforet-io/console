@@ -32,7 +32,7 @@ const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    projects: computed(() => allReferenceStore.getters.projects),
+    projects: computed(() => allReferenceStore.getters.project),
 });
 const state = reactive({
     loading: true,
