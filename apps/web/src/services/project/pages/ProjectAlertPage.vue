@@ -73,7 +73,7 @@ const onActivateAlert = async () => {
 };
 
 /* event */
-const onChangeTab = async (activeTab) => {
+const handleChangeTab = async (activeTab: string) => {
     if (activeTab === route.name) return;
     await router.replace({ name: activeTab });
 };
@@ -108,7 +108,7 @@ watch(() => props.id, (projectId) => {
         <p-button-tab v-else
                       :tabs="tabState.tabs"
                       :active-tab.sync="tabState.activeTab"
-                      @change="onChangeTab"
+                      @change="handleChangeTab"
         >
             <keep-alive><router-view /></keep-alive>
         </p-button-tab>
