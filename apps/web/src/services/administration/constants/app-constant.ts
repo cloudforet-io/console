@@ -33,19 +33,6 @@ export const APP_STATE_COLOR = {
     },
 } as const;
 
-export const APP_TABLE_FIELDS = [
-    { name: 'name', label: 'App Name' },
-    { name: 'state', label: 'State' },
-    {
-        name: 'app_id', label: 'App ID', sortable: false, disableCopy: false,
-    },
-    { name: 'role_id', label: 'Role ID' },
-    { name: 'tags', label: 'Tags', sortable: false },
-    { name: 'last_accessed_at', label: 'Last Activity' },
-    { name: 'expired_at', label: 'Expiration Date' },
-    { name: 'created_at', label: 'Created' },
-];
-
 export const APP_SEARCH_HANDLERS = {
     keyItemSets: [
         {

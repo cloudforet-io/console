@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { computed, onUnmounted, reactive } from 'vue';
+import {
+    computed, onMounted, onUnmounted, reactive,
+} from 'vue';
 
 import {
     PHorizontalLayout, PHeading, PButton, PTab,
@@ -44,6 +46,10 @@ const handleCreateApp = () => {
         _state.modal = cloneDeep(_state.modal);
     });
 };
+
+onMounted(async () => {
+    await appPageStore.listRoles();
+});
 
 onUnmounted(() => {
     appPageStore.$dispose();

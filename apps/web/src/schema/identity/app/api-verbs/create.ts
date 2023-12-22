@@ -7,4 +7,5 @@ export interface AppCreateParameters {
     tags?: Tags;
     expired_at?: TimeStamp;
     resource_group: ResourceGroupType;
+    workspace_id?: string;
 }

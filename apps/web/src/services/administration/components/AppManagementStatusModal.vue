@@ -2,14 +2,12 @@
 import {
     computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PButtonModal, PDefinitionTable, PStatus,
 } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
 import { store } from '@/store';
@@ -23,22 +21,12 @@ import { appStateFormatter } from '@/services/administration/composables/refined
 import { APP_DROPDOWN_MODAL_TYPE } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
 
-const DEFAULT_PAGE_LIMIT = 15;
-
 const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 
-const route = useRoute();
-
-const emit = defineEmits<{(e: 'confirm', app_key_id: string): void;
+const emit = defineEmits<{(e: 'confirm', app_key_id?: string): void;
 }>();
-
-const appListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
-    .setSort('name', true)
-    .setFiltersAsRawQueryString(route.query.filters);
-const appListApiQuery = appListApiQueryHelper.data;
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
@@ -79,7 +67,7 @@ const handleClose = () => {
         _state.modal.visible.status = false;
         _state.modal = cloneDeep(_state.modal);
     });
-    getListApps();
+    emit('confirm');
 };
 
 /* API */
@@ -106,14 +94,6 @@ const checkModalConfirm = async () => {
     } finally {
         state.loading = false;
         handleClose();
-    }
-};
-const getListApps = async () => {
-    state.loading = true;
-    try {
-        await appPageStore.listApps({ query: appListApiQuery });
-    } finally {
-        state.loading = false;
     }
 };
 </script>
