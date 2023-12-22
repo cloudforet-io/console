@@ -26,6 +26,12 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WebhookDeleteParameters } from '@/schema/monitoring/webhook/api-verbs/delete';
+import type { WebhookDisableParameters } from '@/schema/monitoring/webhook/api-verbs/disable';
+import type { WebhookEnableParameters } from '@/schema/monitoring/webhook/api-verbs/enable';
+import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
@@ -147,7 +153,7 @@ let webhookListApiQuery = webhookListApiQueryHelper.data;
 const listWebhooks = async () => {
     state.loading = true;
     try {
-        const { results, total_count } = await SpaceConnector.clientV2.monitoring.webhook.list({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
             project_id: props.id,
             query: webhookListApiQuery,
         });
@@ -164,7 +170,7 @@ const listWebhooks = async () => {
 };
 const enableWebhook = async () => {
     try {
-        await SpaceConnector.clientV2.monitoring.webhook.enable({
+        await SpaceConnector.clientV2.monitoring.webhook.enable<WebhookEnableParameters>({
             webhook_id: state.selectedItem[0].webhook_id,
         });
         showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '');
@@ -178,7 +184,7 @@ const enableWebhook = async () => {
 };
 const disableWebhook = async () => {
     try {
-        await SpaceConnector.clientV2.monitoring.webhook.disable({
+        await SpaceConnector.clientV2.monitoring.webhook.disable<WebhookDisableParameters>({
             webhook_id: state.selectedItem[0].webhook_id,
         });
         showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '');
@@ -192,7 +198,7 @@ const disableWebhook = async () => {
 };
 const deleteWebhookConfirm = async () => {
     try {
-        await SpaceConnector.clientV2.monitoring.webhook.delete({
+        await SpaceConnector.clientV2.monitoring.webhook.delete<WebhookDeleteParameters>({
             webhook_id: state.selectedItem[0].webhook_id,
         });
         showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '');
