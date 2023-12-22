@@ -35,7 +35,7 @@ import type {
 
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+const collectorPageState = collectorPageStore.state;
 
 const storeState = reactive({
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -53,15 +53,11 @@ const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageStore.$patch({
-        selectedProvider: queryStringToString(query.provider) ?? 'all',
-    });
+    collectorPageState.selectedProvider = queryStringToString(query.provider) ?? 'all';
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageStore.$patch({
-            searchFilters: filters,
-        });
+        collectorPageState.searchFilters = filters;
     }
 };
 
@@ -83,9 +79,7 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.$patch({
-        selectedProvider: providerName,
-    });
+    collectorPageState.selectedProvider = providerName;
 };
 
 
@@ -106,7 +100,7 @@ const fetchCollectorCount = async () => {
 
 /* INIT */
 onMounted(async () => {
-    await collectorPageStore.$reset();
+    collectorPageStore.reset();
     setValuesFromUrlQueryString();
     await fetchCollectorCount();
 });

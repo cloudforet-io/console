@@ -33,7 +33,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+const collectorPageState = collectorPageStore.state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorFormStore = useCollectorFormStore();
 
@@ -47,7 +47,7 @@ const state = reactive({
     }),
     recentJob: computed<JobAnalyzeStatus|undefined>(() => {
         if (!props.item) return undefined;
-        return props.item.recentJobAnalyze?.filter((rj) => rj.job_id === collectorPageStore.recentJobForAllAccounts?.job_id)[0];
+        return props.item.recentJobAnalyze?.filter((rj) => rj.job_id === collectorPageStore.getters.recentJobForAllAccounts?.job_id)[0];
     }),
     isScheduleActivated: false,
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
@@ -69,17 +69,17 @@ const handleChangeToggle = async () => {
             },
         };
         const response = await collectorPageStore.updateCollectorSchedule(params);
-        await collectorFormStore.setOriginCollector(response);
+        if (response) await collectorFormStore.setOriginCollector(response);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
 
 /* API */
-const handleClickCollectData = async () => {
+const handleClickCollectData = () => {
     if (!props.item) return;
-    await collectorPageStore.setSelectedCollector(props.item.collectorId);
-    await collectorDataModalStore.$patch((_state) => {
+    collectorPageStore.setSelectedCollector(props.item.collectorId);
+    collectorDataModalStore.$patch((_state) => {
         if (!props.item) return;
         _state.visible = true;
         _state.selectedCollector = collectorPageState.selectedCollector;

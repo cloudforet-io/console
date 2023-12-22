@@ -67,7 +67,7 @@ const makePluginReferenceValueHandler = (distinct: string, plugins: PluginRefere
 };
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+const collectorPageState = collectorPageStore.state;
 
 const storeState = reactive({
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
@@ -189,9 +189,7 @@ const handleChangeToolbox = (options: ToolboxOptions) => {
         // convert queryTags to filters
         searchQueryHelper.setFiltersAsQueryTag(options.queryTags);
         // set filters to store
-        collectorPageStore.$patch((_state) => {
-            _state.searchFilters = searchQueryHelper.filters;
-        });
+        collectorPageState.searchFilters = searchQueryHelper.filters;
     }
 
     fetchCollectorList();
@@ -214,13 +212,12 @@ const handleExportExcel = async () => {
     });
 };
 const fetchCollectorList = async () => {
-    collectorApiQueryHelper.setFilters(collectorPageStore.allFilters);
+    collectorApiQueryHelper.setFilters(collectorPageStore.getters.allFilters);
     try {
         await collectorPageStore.getCollectorList(collectorApiQueryHelper.data);
         await collectorPageStore.getJobs();
     } catch (e) {
         ErrorHandler.handleError(e);
-        await collectorPageStore.$reset();
     }
 };
 
