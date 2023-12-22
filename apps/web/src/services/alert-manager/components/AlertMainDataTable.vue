@@ -222,7 +222,7 @@ const alertApiQueryHelper = new ApiQueryHelper()
     .setOnly(...state.fields.map((d) => d.name), 'alert_id')
     .setPageStart(1).setPageLimit(15)
     .setSort('created_at', true);
-let alertApiQuery = alertApiQueryHelper.data;
+let alertApiQuery = alertApiQueryHelper.dataV2;
 
 const getAlerts = async () => {
     state.loading = true;

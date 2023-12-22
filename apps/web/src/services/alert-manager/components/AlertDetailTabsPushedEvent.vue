@@ -29,7 +29,7 @@ const props = defineProps<{
 const eventListApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
     .setPage(1, 10);
-let eventListApiQuery = eventListApiQueryHelper.data;
+let eventListApiQuery = eventListApiQueryHelper.dataV2;
 
 const state = reactive({
     itemList: [] as EventModel[],

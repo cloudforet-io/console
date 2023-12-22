@@ -105,7 +105,7 @@ const setSelectIndex = () => {
 const escalationPolicyApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
     .setFilters([{ k: 'project_id', v: [props.projectId, null], o: '=' }]);
-let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
+let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.dataV2;
 const listEscalationPolicies = async () => {
     try {
         tableState.loading = true;
