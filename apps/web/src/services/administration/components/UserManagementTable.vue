@@ -128,11 +128,11 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
         const results = await userPageStore.listRoles({
             query: roleListApiQueryHelper.data,
         });
-        dropdownState.menuItems = results?.map((role) => ({
+        dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
-        })) as SelectDropdownMenuItem[];
+        }));
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {

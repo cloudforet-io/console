@@ -167,11 +167,11 @@ const fetchListUsers = async () => {
         const { results } = await SpaceConnector.clientV2.identity.workspaceUser.find<FindWorkspaceUserParameters, ListResponse<SummaryWorkspaceUserModel>>({
             keyword: formState.searchText || '@',
         });
-        state.menuItems = results?.map((user) => ({
+        state.menuItems = (results ?? []).map((user) => ({
             user_id: user.user_id,
             label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
             name: user.user_id,
-        })) as AddModalMenuItem[];
+        }));
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
         state.menuItems = [];

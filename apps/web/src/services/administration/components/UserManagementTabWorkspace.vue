@@ -89,14 +89,14 @@ const getWorkspaceList = async () => {
             state.items = [];
             return;
         }
-        state.items = results?.map((k) => ({
+        state.items = (results ?? []).map((k) => ({
             workspace_id: {
                 name: workspaceResults?.find((w) => w.workspace_id === k.workspace_id)?.name,
                 id: k.workspace_id,
             },
             role_type: k.role_type,
             created_at: k.created_at,
-        })) as TableItem[];
+        }));
     } catch (e) {
         state.items = [];
     } finally {

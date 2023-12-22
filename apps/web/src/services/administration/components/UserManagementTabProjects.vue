@@ -53,11 +53,11 @@ const getProjectList = async () => {
             state.items = [];
             return;
         }
-        state.items = results?.map((k) => ({
+        state.items = (results ?? []).map((k) => ({
             project_id: k.project_id,
             name: k.name,
             date: k.created_at,
-        })) as TableItem[];
+        }));
     } catch (e) {
         state.items = [];
     } finally {

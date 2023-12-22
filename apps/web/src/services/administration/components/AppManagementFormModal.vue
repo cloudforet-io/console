@@ -118,10 +118,10 @@ const fetchListRoles = async (inputText: string) => {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
             query: roleListApiQueryHelper.data,
         });
-        dropdownState.menuItems = results?.map((role) => ({
+        dropdownState.menuItems = (results ?? []).map((role) => ({
             label: role.name,
             name: role.role_id,
-        })) as SelectDropdownMenuItem[];
+        }));
     } finally {
         dropdownState.loading = false;
     }
