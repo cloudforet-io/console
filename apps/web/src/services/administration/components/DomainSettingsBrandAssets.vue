@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PHeading, PPaneLayout, PFieldTitle, PTextInput, PButton,
@@ -7,14 +7,14 @@ import {
 
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
 const state = reactive({
     isChanged: computed<boolean>(() => {
@@ -30,17 +30,10 @@ const state = reactive({
     loginPageImageUrl: undefined as string | undefined,
 });
 
-/* Util */
-const init = () => {
-    state.wordtypeLogoUrl = domainConfigGetters.wordtypeLogoUrl;
-    state.symbolFaviconUrl = domainConfigGetters.symbolFaviconUrl;
-    state.loginPageImageUrl = domainConfigGetters.loginPageImageUrl;
-};
-
 /* Event */
 const handleSaveChanges = async () => {
     try {
-        await domainConfigStore.updateDomainConfig({
+        await domainConfigStore.updateDomainSettings({
             wordtype_logo_url: state.wordtypeLogoUrl,
             symbol_favicon_url: state.symbolFaviconUrl,
             login_page_image_url: state.loginPageImageUrl,
@@ -51,9 +44,16 @@ const handleSaveChanges = async () => {
     }
 };
 
-(async () => {
-    init();
-})();
+/* Watcher */
+watch(() => domainConfigGetters.wordtypeLogoUrl, (val) => {
+    state.wordtypeLogoUrl = val;
+}, { immediate: true });
+watch(() => domainConfigGetters.symbolFaviconUrl, (val) => {
+    state.symbolFaviconUrl = val;
+}, { immediate: true });
+watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
+    state.loginPageImageUrl = val;
+}, { immediate: true });
 </script>
 
 <template>

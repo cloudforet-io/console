@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PHeading, PPaneLayout, PFieldTitle, PButton, PSelectDropdown,
@@ -9,7 +9,7 @@ import { map } from 'lodash';
 
 import { i18n } from '@/translations';
 
-import { useDomainConfigStore } from '@/store/domain-config/domain-config-store';
+import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 import { languages, timezoneList } from '@/store/modules/user/config';
 import type { LanguageCode } from '@/store/modules/user/type';
 
@@ -18,7 +18,7 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const domainConfigStore = useDomainConfigStore();
+const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
 const state = reactive({
     isChanged: computed(() => {
@@ -38,18 +38,10 @@ const state = reactive({
     })) as SelectDropdownMenuItem[],
 });
 
-/* Util */
-const init = () => {
-    if (domainConfigGetters.timezone) {
-        state.selectedTimezone = [{ name: domainConfigGetters.timezone }];
-    }
-    state.selectedLanguage = domainConfigGetters.language;
-};
-
 /* Event */
 const handleSaveChanges = async () => {
     try {
-        await domainConfigStore.updateDomainConfig({
+        await domainConfigStore.updateDomainSettings({
             timezone: state.selectedTimezone[0]?.name,
             language: state.selectedLanguage,
         });
@@ -59,9 +51,13 @@ const handleSaveChanges = async () => {
     }
 };
 
-(async () => {
-    init();
-})();
+/* Watcher */
+watch(() => domainConfigGetters.timezone, (val) => {
+    if (val) state.selectedTimezone = [{ name: val }];
+}, { immediate: true });
+watch(() => domainConfigGetters.language, (val) => {
+    state.selectedLanguage = val;
+}, { immediate: true });
 </script>
 
 <template>
