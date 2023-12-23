@@ -153,24 +153,26 @@ export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
     commit('setIsSessionExpired', isExpired);
 };
 
-export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
+export const setUser = async ({ commit, state, rootState }, userRequest: UpdateUserRequest): Promise<void> => {
     await updateUser(state.userType, userRequest);
 
+    const language = userRequest.language || state.language || rootState.domain.config?.settings?.language;
+    const timezone = userRequest.timezone || state.timezone || rootState.domain.config?.settings?.timezone;
     const convertRequestType = (): UserState => ({
         userId: userRequest.user_id || state.userId,
         name: userRequest.name || state.name,
         email: userRequest.email || state.email,
-        language: userRequest.language || state.language,
-        timezone: userRequest.timezone || state.timezone,
+        language,
+        timezone,
         emailVerified: userRequest.email_verified !== undefined ? userRequest.email_verified : state.emailVerified,
         mfa: userRequest.mfa || state.mfa,
     });
 
     commit('setUser', { ...state, ...convertRequestType() });
-    commit('setTimezone', userRequest.timezone);
-    if (userRequest.language) {
-        commit('setLanguage', userRequest.language);
-        await setI18nLocale(userRequest.language);
+    commit('setTimezone', timezone);
+    if (language) {
+        commit('setLanguage', language);
+        await setI18nLocale(language);
     }
 };
 
