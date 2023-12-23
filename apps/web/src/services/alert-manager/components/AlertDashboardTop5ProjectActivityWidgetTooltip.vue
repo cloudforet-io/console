@@ -64,7 +64,7 @@ const getQuery = () => {
         v: end,
     });
     apiQuery.setFilters(filters);
-    return apiQuery.dataV2;
+    return apiQuery.data;
 };
 const getAlerts = async () => {
     try {

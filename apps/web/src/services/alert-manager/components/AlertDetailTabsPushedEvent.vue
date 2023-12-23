@@ -29,7 +29,7 @@ const props = defineProps<{
 const eventListApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
     .setPage(1, 10);
-let eventListApiQuery = eventListApiQueryHelper.dataV2;
+let eventListApiQuery = eventListApiQueryHelper.data;
 
 const state = reactive({
     itemList: [] as EventModel[],
@@ -47,7 +47,7 @@ const searchQueryHelper = new QueryHelper();
 const listEvent = async () => {
     eventListApiQueryHelper.setFilters([...searchQueryHelper.filters]);
     if (props.id) eventListApiQueryHelper.addFilter({ k: 'alert_id', v: props.id, o: '=' });
-    eventListApiQuery = eventListApiQueryHelper.dataV2;
+    eventListApiQuery = eventListApiQueryHelper.data;
     const { results, total_count } = await SpaceConnector.clientV2.monitoring.event.list<EventListParameters, ListResponse<EventModel>>({ query: eventListApiQuery });
     state.itemList = results ?? [];
     state.totalCount = total_count ?? 0;

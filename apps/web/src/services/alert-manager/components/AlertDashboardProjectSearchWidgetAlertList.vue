@@ -42,7 +42,7 @@ const getQuery = () => {
         .setSort('created_at', true)
         .setPage(1, 16)
         .setFilters([{ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' }]);
-    return apiQuery.dataV2;
+    return apiQuery.data;
 };
 const listAlerts = async () => {
     try {

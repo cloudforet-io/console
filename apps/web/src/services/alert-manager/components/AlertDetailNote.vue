@@ -45,7 +45,7 @@ const listNote = async () => {
     try {
         apiQuery.setFilters([{ k: 'alert_id', v: props.id, o: '=' }]).setSort('created_at', true);
         const res = await SpaceConnector.clientV2.monitoring.note.list<NoteListParameters, ListResponse<NoteModel>>({
-            query: apiQuery.dataV2,
+            query: apiQuery.data,
         });
         state.noteList = res.results?.map((d) => ({
             title: d.created_by,

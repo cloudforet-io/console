@@ -135,7 +135,7 @@ const getQuery = () => {
         filters.push({ k: 'assignee', v: store.state.user.userId, o: '=' });
     }
     apiQuery.setFilters(filters);
-    return apiQuery.dataV2;
+    return apiQuery.data;
 };
 const listAlerts = async () => {
     try {

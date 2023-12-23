@@ -96,7 +96,7 @@ const listProtocol = async () => {
             apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
         }
         const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
-            query: apiQuery.dataV2,
+            query: apiQuery.data,
         });
         state.protocolResp = res.results ?? [];
     } catch (e) {
@@ -124,7 +124,7 @@ const listUserChannel = async () => {
         state.channelLoading = true;
         channelApiQuery.setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
         const res = await SpaceConnector.clientV2.notification.userChannel.list<UserChannelListParameters, ListResponse<UserChannelModel>>({
-            query: channelApiQuery.dataV2,
+            query: channelApiQuery.data,
         });
         state.channelList = res.results?.map((d) => ({
             ...d,
@@ -144,7 +144,7 @@ const listProjectChannel = async () => {
         state.channelLoading = true;
         channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).setSort('notification_level', false);
         const res = await SpaceConnector.clientV2.notification.projectChannel.list<ProjectChannelListParameters, ListResponse<ProjectChannelModel>>({
-            query: channelApiQuery.dataV2,
+            query: channelApiQuery.data,
         });
         state.channelList = res.results?.map((d) => ({
             ...d,

@@ -56,7 +56,7 @@ const apiQuery = new ApiQueryHelper();
 const getQuery = () => {
     apiQuery
         .setFilters([{ k: 'project_id', v: props.alertData.project_id ?? '', o: '=' }]);
-    return apiQuery.dataV2;
+    return apiQuery.data;
 };
 const listProjectChannel = async () => {
     try {

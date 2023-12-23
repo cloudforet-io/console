@@ -126,7 +126,7 @@ const state = reactive({
 });
 
 /* api */
-const escalationPolicyApiQuery = escalationPolicyApiQueryHelper.dataV2;
+const escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
 const listEscalationPolicies = async () => {
     try {
         tableState.loading = true;
