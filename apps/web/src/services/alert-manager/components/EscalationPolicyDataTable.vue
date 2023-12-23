@@ -75,7 +75,6 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/alert-manager/helpers/alert-badge-helper';
 
-
 export default {
     name: 'EscalationPolicyDataTable',
     components: {

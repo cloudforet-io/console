@@ -21,13 +21,13 @@ export interface ProjectTreeOptions {
     check_child?: boolean;
     exclude_type?: ProjectTreeItemType;
     query?: Query;
-    sort?: Sort;
+    sort?: Sort[];
 }
 interface ProjectTreeSearchOptions {
     item_type?: ProjectTreeItemType;
     item_id?: string;
     query?: Query;
-    sort?: Sort;
+    sort?: Sort[];
 }
 interface ProjectTreeSearchResponse {
     open_path: string[];

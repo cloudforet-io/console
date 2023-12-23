@@ -126,7 +126,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             workspace: workspaceReferenceStore.getters.workspaceTypeInfo,
         })),
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
-        project: asyncComputed<ProjectReferenceMap>(async () => projectReferenceStore.getters.projectItems),
+        project: computed<ProjectReferenceMap>(() => projectReferenceStore.getters.projectItems),
         protocol: asyncComputed<ProtocolReferenceMap>(async () => {
             await store.dispatch('reference/protocol/load');
             return store.getters['reference/protocolItems'];
