@@ -25,7 +25,7 @@ export const alertStateBadgeStyleTypeFormatter = (alertState) => {
     return style;
 };
 
-export const alertScopeBadgeStyleTypeFormatter = (scope: EscalationPolicyResourceGroup) => {
-    if (scope === ESCALATION_POLICY_RESOURCE_GROUP.WORKSPACE) return 'green200';
+export const alertResourceGroupBadgeStyleTypeFormatter = (resourceGroup: EscalationPolicyResourceGroup) => {
+    if (resourceGroup === ESCALATION_POLICY_RESOURCE_GROUP.WORKSPACE) return 'green200';
     return 'primary3';
 };

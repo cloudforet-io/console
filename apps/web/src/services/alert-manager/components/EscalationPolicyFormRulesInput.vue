@@ -59,6 +59,7 @@ const {
     invalidState,
     invalidTexts,
     isAllValid,
+    resetValidations,
 } = useFormValidator({
     repeatCount: 0,
     rules: [{
@@ -67,6 +68,7 @@ const {
     }] as EscalationPolicyRule[],
 }, {
     repeatCount(value) {
+        if (value === undefined) return true;
         if (Number.isNaN(value) || typeof value !== 'number') return 'Only numbers are allowed.';
         if (value < 0) return 'Must be 0 or greater.';
         return true;
@@ -133,8 +135,9 @@ watch(() => escalationPolicyFormState.projectId, (projectId) => {
 });
 watch(() => escalationPolicyFormState.escalationPolicyData?.escalation_policy_id, (escalationPolicyId) => {
     if (escalationPolicyId) {
-        setForm('repeatCount', escalationPolicyFormState.repeatCount);
+        setForm('repeatCount', escalationPolicyFormState.repeatCount ?? 0);
         setForm('rules', escalationPolicyFormState.rules);
+        resetValidations();
     }
 }, { immediate: true });
 watch(() => rules.value, (_rules) => {

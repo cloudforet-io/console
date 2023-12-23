@@ -2902,18 +2902,18 @@
 					"REPEAT_ALL": "전체 반복",
 					"REPEAT_LABEL_HELP_TEXT": "위 스텝들 모두 적용",
 					"RESOLVED": "완료",
+					"RESOURCE_GROUP": "리소스 그룹",
 					"RULE": "규칙",
-					"SCOPE_LABEL": "범위",
 					"STEP": "단계",
 					"TIME": "번",
 					"WORKSPACE": "워크스페이스"
 				},
-				"GLOBAL": "글로벌",
 				"PROJECT": "프로젝트",
 				"RESOLVED": "완료",
 				"SET_AS_DEFAULT": "기본으로 설정하기",
 				"UPDATE": "수정",
-				"UPDATE_MODAL_TITLE": "에스컬레이션 정책 수정"
+				"UPDATE_MODAL_TITLE": "에스컬레이션 정책 수정",
+				"WORKSPACE": "워크스페이스"
 			},
 			"MAIN": {
 				"ALERT": "얼럿",
@@ -3163,7 +3163,7 @@
 				"ALT_E_CHANGE_ESCALATION_POLICY": "에스컬레이션 정책 변경 실패",
 				"ALT_E_CHANGE_NOTIFICATION_POLICY": "알림 정책 변경 실패",
 				"ALT_S_CHANGE_AUTO_RECOVERY": "자동 복구 수정 완료",
-				"ALT_S_CHANGE_ESCALATION_POLICY": "에스컬레이션 정책 수정 완료",
+				"ALT_S_CHANGE_ESCALATION_POLICY": "에스컬레이션 정책 변경 완료",
 				"ALT_S_CHANGE_NOTIFICATION_POLICY": "알림 정책 수정 완료",
 				"AUTO_RECOVERY": "자동 복구",
 				"AUTO_RESOLVE_ALERTS": "자동으로 얼럿 완료하기",

@@ -32,11 +32,11 @@ import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-
 
 const props = withDefaults(defineProps<{
     mode: ActionMode;
-    showScope?: boolean;
+    showResourceGroup?: boolean;
     escalationPolicyData?: EscalationPolicyModel;
 }>(), {
     mode: ACTION.create,
-    showScope: true,
+    showResourceGroup: true,
     escalationPolicyData: undefined,
 });
 
@@ -46,19 +46,19 @@ const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const state = reactive({
     projects: computed(() => allReferenceStore.getters.project),
     //
-    scopeLabels: computed<Record<EscalationPolicyResourceGroup, TranslateResult>>(() => ({
+    resourceGroupLabels: computed<Record<EscalationPolicyResourceGroup, TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
     })),
-    scopes: computed<{label: TranslateResult; value: EscalationPolicyResourceGroup}[]>(() => {
+    resourceGroups: computed<{label: TranslateResult; value: EscalationPolicyResourceGroup}[]>(() => {
         const currentRoleType = store.getters['user/getCurrentRoleInfo'].roleType;
-        const scopes: {label: TranslateResult; value: EscalationPolicyResourceGroup}[] = [
+        const resGroup: {label: TranslateResult; value: EscalationPolicyResourceGroup}[] = [
             { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
         ];
         if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
-            scopes.splice(0, 0, { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'), value: 'WORKSPACE' });
+            resGroup.splice(0, 0, { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'), value: 'WORKSPACE' });
         }
-        return scopes;
+        return resGroup;
     }),
     finishConditions: computed<{label: TranslateResult; value: EscalationPolicyFinishCondition}[]>(() => [
         { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: ESCALATION_POLICY_FINISH_CONDITION.acknowledged },
@@ -71,7 +71,6 @@ const {
     setForm,
     invalidState,
     invalidTexts,
-    isAllValid,
 } = useFormValidator({
     name: undefined as string|undefined,
     projectId: undefined as string|undefined,
@@ -88,7 +87,7 @@ const {
 });
 
 /* event */
-const handleChangeScope = (value: EscalationPolicyModel['resource_group']) => {
+const handleChangeResourceGroup = (value: EscalationPolicyModel['resource_group']) => {
     escalationPolicyFormStore.$patch({ resourceGroup: value });
     if (value === 'WORKSPACE') {
         escalationPolicyFormStore.$patch({ projectId: undefined });
@@ -109,14 +108,18 @@ const handleSelectProject = (selected: ProjectTreeNodeData[]) => {
 watch([() => props.mode, () => props.escalationPolicyData], ([mode, escalationPolicyData]) => {
     if (mode === ACTION.create) {
         escalationPolicyFormStore.$reset();
-    } else if (props.escalationPolicyData?.escalation_policy_id) {
+    } else if (escalationPolicyData?.escalation_policy_id) {
         escalationPolicyFormStore.initEscalationPolicyFormData(escalationPolicyData);
         setForm('name', escalationPolicyFormState.name);
         setForm('projectId', escalationPolicyFormState.projectId);
     }
 }, { immediate: true });
-watch(() => isAllValid.value, (_isAllValid) => {
-    escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: _isAllValid });
+watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, () => invalidState.projectId], ([resourceGroup, isNameInvalid, isProjectIdInvalid]) => {
+    if (resourceGroup === 'WORKSPACE' || !props.showResourceGroup) {
+        escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: isNameInvalid === false });
+    } else {
+        escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: isNameInvalid === false && isProjectIdInvalid === false });
+    }
 }, { immediate: true });
 </script>
 
@@ -135,17 +138,17 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 />
             </template>
         </p-field-group>
-        <p-field-group v-if="props.showScope"
-                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE_LABEL')"
+        <p-field-group v-if="props.showResourceGroup"
+                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOURCE_GROUP')"
                        required
         >
             <template #default>
                 <div v-if="props.mode === ACTION.create">
-                    <p-radio v-for="(item, idx) in state.scopes"
+                    <p-radio v-for="(item, idx) in state.resourceGroups"
                              :key="idx"
                              :selected="item.value"
                              :value="escalationPolicyFormState.resourceGroup"
-                             @change="handleChangeScope(item.value)"
+                             @change="handleChangeResourceGroup(item.value)"
                     >
                         {{ item.label }}
                     </p-radio>
@@ -153,9 +156,9 @@ watch(() => isAllValid.value, (_isAllValid) => {
             </template>
             <template #label-extra>
                 <span v-if="props.mode === ACTION.update"
-                      class="scope-text"
+                      class="resource-group-text"
                 >
-                    <span>{{ state.scopeLabels[escalationPolicyFormState.resourceGroup] }}</span>
+                    <span>{{ state.resourceGroupLabels[escalationPolicyFormState.resourceGroup] }}</span>
                     <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                  new-tab
@@ -167,7 +170,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
                 </span>
             </template>
         </p-field-group>
-        <p-field-group v-if="props.showScope && escalationPolicyFormState.resourceGroup === 'PROJECT' && props.mode === ACTION.create"
+        <p-field-group v-if="props.showResourceGroup && escalationPolicyFormState.resourceGroup === 'PROJECT' && props.mode === ACTION.create"
                        class="project-field"
                        required
                        :invalid="invalidState.projectId"
@@ -255,7 +258,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
             margin-right: 1.125rem;
         }
     }
-    .scope-text {
+    .resource-group-text {
         text-transform: capitalize;
         font-weight: normal;
         padding-left: 0.5rem;
