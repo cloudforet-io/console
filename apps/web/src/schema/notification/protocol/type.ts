@@ -6,15 +6,19 @@ export interface ProtocolCapability {
     supported_schema: string[];
 }
 
+type ProtocolPluginMetadata = {
+    data_type: 'PLAIN_TEXT'|'SECRET';
+    data: {
+        schema: JsonSchema;
+    }
+} | Record<string, never>;
+
+type ProtocolPluginUpgradeMode = 'AUTO'|'MANUAL';
+
 export interface ProtocolPluginInfo {
     plugin_id: string;
     version: string;
     options: Record<string, any>;
-    metadata: {
-        data_type: 'PLAIN_TEXT'|'SECRET';
-        data: {
-            schema: JsonSchema;
-        }
-    } | Record<string, never>;
-    upgrade_mode: 'AUTO'|'MANUAL';
+    metadata: ProtocolPluginMetadata;
+    upgrade_mode: ProtocolPluginUpgradeMode;
 }
