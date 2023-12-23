@@ -972,6 +972,14 @@
 				"LABEL_API_GUIDE": "APIガイド ",
 				"LABEL_GITHUB": "GitHub",
 				"LABEL_USER_GUIDE": "ユーザーガイド"
+			},
+			"TOOLTIP": {
+				"ENABLE_ADMIN_MODE": "",
+				"EXIT_ADMIN_MODE": "",
+				"NOTIFICATIONS": "通知",
+				"PROFILE": "",
+				"RECENT_FAVORITE": "",
+				"SEARCH": "検索"
 			}
 		},
 		"HANDBOOK_BUTTON": {

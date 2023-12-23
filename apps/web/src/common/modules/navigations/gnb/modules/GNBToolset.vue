@@ -1,21 +1,38 @@
 <template>
     <div class="gnb-toolset">
-        <g-n-b-search v-if="!isAdminMode"
-                      :visible="openedMenu === 'search'"
-                      @update:visible="updateOpenedMenu('search', $event)"
-        />
-        <g-n-b-recent-favorite v-if="!isAdminMode"
-                               :visible="openedMenu === 'recentFavorite'"
-                               @update:visible="updateOpenedMenu('recentFavorite', $event)"
-        />
-        <g-n-b-noti v-if="!isAdminMode"
-                    :visible="openedMenu === 'notifications'"
-                    @update:visible="updateOpenedMenu('notifications', $event)"
-        />
-        <g-n-b-profile v-if="!isAdminMode"
-                       :visible="openedMenu === 'profile'"
-                       @update:visible="updateOpenedMenu('profile', $event)"
-        />
+        <p-tooltip :contents="tooltipTexts.search"
+                   position="bottom"
+        >
+            <g-n-b-search v-if="!isAdminMode"
+                          :visible="openedMenu === 'search'"
+                          @update:visible="updateOpenedMenu('search', $event)"
+            />
+        </p-tooltip>
+        <p-tooltip :contents="tooltipTexts.recentFavorite"
+                   position="bottom"
+        >
+            <g-n-b-recent-favorite v-if="!isAdminMode"
+                                   :visible="openedMenu === 'recentFavorite'"
+                                   @update:visible="updateOpenedMenu('recentFavorite', $event)"
+            />
+        </p-tooltip>
+        <p-tooltip :contents="tooltipTexts.notifications"
+                   position="bottom"
+        >
+            <g-n-b-noti v-if="!isAdminMode"
+                        :visible="openedMenu === 'notifications'"
+                        @update:visible="updateOpenedMenu('notifications', $event)"
+            />
+        </p-tooltip>
+        <p-tooltip :contents="tooltipTexts.profile"
+                   position="bottom"
+        >
+            <g-n-b-profile v-if="!isAdminMode"
+                           :visible="openedMenu === 'profile'"
+                           @update:visible="updateOpenedMenu('profile', $event)"
+            />
+        </p-tooltip>
+
         <g-n-b-menu v-if="isAdminMode"
                     is-admin-mode
                     :menu-id="noticeMenuItem.id"
@@ -23,7 +40,11 @@
                     :to="noticeMenuItem.to"
                     :is-selected="isSelected"
         />
-        <g-n-b-admin-toggle-button v-if="isDomainAdmin" />
+        <p-tooltip :contents="tooltipTexts.adminToggle"
+                   position="bottom"
+        >
+            <g-n-b-admin-toggle-button v-if="isDomainAdmin" />
+        </p-tooltip>
     </div>
 </template>
 
@@ -33,6 +54,8 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
+
+import { PTooltip } from '@spaceone/design-system';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -57,6 +80,7 @@ import GNBAdminToggleButton from '@/common/modules/navigations/gnb/modules/GNBAd
 export default defineComponent({
     name: 'GNBToolset',
     components: {
+        PTooltip,
         GNBProfile,
         GNBRecentFavorite,
         GNBSearch,
@@ -78,6 +102,13 @@ export default defineComponent({
             isDomainAdmin: computed(() => store.getters['user/isDomainAdmin']),
             isAdminMode: computed(() => appContextStore.getters.isAdminMode),
             timezone: computed(() => store.state.user.timezone),
+            tooltipTexts: computed<Record<string, string>>(() => ({
+                search: i18n.t('COMMON.GNB.TOOLTIP.SEARCH') as string,
+                recentFavorite: i18n.t('COMMON.GNB.TOOLTIP.RECENT_FAVORITE') as string,
+                notifications: i18n.t('COMMON.GNB.TOOLTIP.NOTIFICATIONS') as string,
+                profile: i18n.t('COMMON.GNB.TOOLTIP.PROFILE') as string,
+                adminToggle: (state.isAdminMode ? i18n.t('COMMON.GNB.TOOLTIP.EXIT_ADMIN_MODE') : i18n.t('COMMON.GNB.TOOLTIP.ENABLE_ADMIN_MODE')) as string,
+            })),
         });
 
         const noticeState = reactive({
@@ -133,3 +164,9 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="postcss" scoped>
+.gnb-toolset {
+    @apply flex items-center gap-1;
+}
+</style>
