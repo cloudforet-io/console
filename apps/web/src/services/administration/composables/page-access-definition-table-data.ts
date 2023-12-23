@@ -15,8 +15,6 @@ import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
-
-
 interface PageAccessDefinitionTableData {
     label?: TranslateResult;
     data: Record<string, boolean>;
@@ -51,6 +49,8 @@ export const usePageAccessDefinitionTableData = (pagePermissionData: ComputedRef
     MENU_LIST.forEach((menu) => {
         if (!menu.needPermissionByRole) return;
         const menuInfo = MENU_INFO_MAP[menu.id];
+        const definitionTableData = flattenPageAccessDefinitionData(pagePermissionMap, [menu]);
+        if (Object.values(definitionTableData.data).every((value) => value === undefined)) return;
         results.push({
             label: i18n.t(menuInfo.translationId),
             ...flattenPageAccessDefinitionData(pagePermissionMap, [menu]),

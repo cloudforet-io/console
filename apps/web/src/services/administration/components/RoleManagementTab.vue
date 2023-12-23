@@ -8,6 +8,9 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import RoleManagementTabDetail from '@/services/administration/components/RoleManagementTabDetail.vue';
@@ -18,6 +21,9 @@ import { useRolePageStore } from '@/services/administration/store/role-page-stor
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+});
 const singleItemTabState = reactive({
     tabs: computed<TabItem[]>(() => ([
         { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
@@ -62,6 +68,9 @@ const multiItemTabState = reactive({
                             >
                             <span>{{ useRoleFormatter(value).name }}</span>
                         </span>
+                    </template>
+                    <template #col-created_at-format="{value}">
+                        {{ iso8601Formatter(value, storeState.timezone) }}
                     </template>
                 </p-data-table>
             </template>

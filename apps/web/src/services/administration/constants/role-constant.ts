@@ -76,3 +76,30 @@ export const ROLE_TAB_TABLE_FIELDS = [
     { name: 'role_type', label: 'Role Type' },
     { name: 'created_at', label: 'Created', sortable: false },
 ] as const;
+
+export const DOMAIN_ADMIN_MANAGED_PAGE_ACCESS = [
+    '*',
+] as const;
+export const WORKSPACE_OWNER_MANAGED_PAGE_ACCESS = [
+    'dashboards.*',
+    'project.*',
+    'asset_inventory.collector',
+    'asset_inventory.service_account',
+    'cost_explorer.cost_analysis',
+    'cost_explorer.budget',
+    'alert_manager.alert',
+    'alert_manager.escalation_policy',
+    'iam.user',
+    'iam.app',
+] as const;
+
+export const WORKSPACE_MEMBER_MANAGED_PAGE_ACCESS = [
+    'dashboards.*',
+    'project.*',
+    'asset_inventory.service_account',
+    'cost_explorer.cost_analysis',
+    'cost_explorer.budget',
+    'alert_manager.alert',
+    'alert_manager.escalation_policy',
+    'iam.user',
+] as const;
