@@ -1715,13 +1715,14 @@
 			"CREATE": "Create",
 			"DELETE": "Delete",
 			"DETAIL": {
-				"ALL_PERMISSIONS": "This role has all API permissions of Admin.",
+				"ALL_PERMISSIONS": "This role has full permission.",
 				"API_POLICY": "API Policy",
 				"BASE_INFORMATION": "Base Information",
 				"CREATED_AT": "Created",
 				"DESCRIPTION": "Description",
 				"DETAILS": "Details",
 				"NAME": "Name",
+				"NO_DATA": "No Data",
 				"PAGE_ACCESS": "Page Access",
 				"ROLE_TYPE": "Role Type",
 				"SELECTED_DATA": "Selected Data"
