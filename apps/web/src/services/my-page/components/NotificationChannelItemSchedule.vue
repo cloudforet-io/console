@@ -1,65 +1,6 @@
-<template>
-    <li class="content-wrapper"
-        :class="{'edit-mode': isEditMode}"
-    >
-        <span class="content-title">
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
-        </span>
-        <div v-if="isEditMode"
-             class="content"
-        >
-            <notification-add-schedule :schedule="channelData.schedule"
-                                       :is-scheduled="channelData.is_scheduled"
-                                       @change="onChangeSchedule"
-            />
-            <div class="button-group">
-                <p-button style-type="secondary"
-                          size="sm"
-                          class="cancel-button"
-                          @click="cancelEdit"
-                >
-                    {{ $t('COMMON.TAGS.CANCEL') }}
-                </p-button>
-                <p-button style-type="primary"
-                          size="sm"
-                          :disabled="!isScheduleValid"
-                          @click="onClickSave"
-                >
-                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
-                </p-button>
-            </div>
-        </div>
-        <div v-else
-             class="content"
-        >
-            <p v-if="channelData.schedule">
-                <span v-for="day in channelData.schedule.day_of_week"
-                      :key="day"
-                > {{ day }}</span><br>
-                {{ displayStartHour }}:00 ~ {{ displayEndHour }}:00
-            </p>
-            <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
-            <button class="edit-button"
-                    :class="{'edit-disable':disableEdit}"
-                    @click="startEdit(EDIT_TYPE.SCHEDULE)"
-            >
-                <p-i name="ic_edit"
-                     width="1rem"
-                     height="1rem"
-                     color="inherit"
-                     class="edit-icon"
-                />
-                {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
-            </button>
-        </div>
-    </li>
-</template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -78,114 +19,142 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
 import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
-import {
-    EDIT_TYPE,
-    PROTOCOL_TYPE,
-} from '@/services/my-page/types/notification-item-type';
+import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
-export default {
-    name: 'NotificationChannelItemSchedule',
-    components: {
-        PButton,
-        PI,
-        NotificationAddSchedule,
-    },
-    props: {
-        channelData: {
-            type: Object,
-            default: () => ({}),
-        },
-        projectId: {
-            type: String,
-            default: null,
-        },
-        disableEdit: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const timezoneForFormatter = computed(() => store.state.user.timezone).value;
-        const state = reactive({
-            scheduleModeForEdit: props.channelData?.is_scheduled,
-            scheduleForEdit: props.channelData?.schedule,
-            isScheduleValid: false,
-            displayStartHour: computed(() => utcToTimezoneFormatter(props.channelData?.schedule?.start_hour, timezoneForFormatter)),
-            displayEndHour: computed(() => utcToTimezoneFormatter(props.channelData?.schedule?.end_hour, timezoneForFormatter)),
-        });
-        const {
-            state: notificationItemState,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-        } = useNotificationItem({
-            userChannelId: props.channelData?.user_channel_id,
-            projectChannelId: props.channelData?.project_channel_id,
-            isEditMode: false,
+const props = withDefaults(defineProps<{
+    channelData: NotiChannelItem;
+    projectId?: string;
+    disableEdit?: boolean;
+}>(), {
+    projectId: undefined,
+    disableEdit: false,
+});
 
-        });
+const emit = defineEmits<{(event: 'change'): void;
+    (event: 'edit'): void;
+}>();
 
-        const onChangeSchedule = async (value) => {
-            state.scheduleModeForEdit = value.is_scheduled;
-            state.scheduleForEdit = value.schedule;
-            state.isScheduleValid = value.isScheduleValid;
-        };
+const timezoneForFormatter = computed(() => store.state.user.timezone).value;
+const state = reactive({
+    scheduleModeForEdit: props.channelData.is_scheduled,
+    scheduleForEdit: props.channelData.schedule,
+    isScheduleValid: false,
+    displayStartHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule.start_hour, timezoneForFormatter)),
+    displayEndHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule.end_hour, timezoneForFormatter)),
+});
+const {
+    state: notificationItemState,
+    cancelEdit,
+    startEdit,
+} = useNotificationItem<undefined>({
+    userChannelId: props.channelData.user_channel_id,
+    projectChannelId: props.channelData.project_channel_id,
+    isEditMode: false,
+}, emit);
 
-        const setUserChannelSchedule = async () => {
-            try {
-                await SpaceConnector.client.notification.userChannel.setSchedule({
-                    user_channel_id: notificationItemState.userChannelId,
-                    is_scheduled: state.scheduleModeForEdit,
-                    schedule: state.scheduleForEdit,
-                });
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '');
-                notificationItemState.isEditMode = false;
-                emit('edit', undefined);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
-            }
-        };
-        const setProjectChannelSchedule = async () => {
-            try {
-                await SpaceConnector.client.notification.projectChannel.setSchedule({
-                    project_channel_id: notificationItemState.projectChannelId,
-                    is_scheduled: state.scheduleModeForEdit,
-                    schedule: state.scheduleForEdit,
-                });
-                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '');
-                notificationItemState.isEditMode = false;
-                emit('edit', undefined);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
-            }
-        };
-
-        const saveChangedSchedule = async () => {
-            if (props.projectId) await setProjectChannelSchedule();
-            else await setUserChannelSchedule();
-        };
-
-        const onClickSave = async () => {
-            await saveChangedSchedule();
-            emit('change');
-        };
-
-        return {
-            EDIT_TYPE,
-            PROTOCOL_TYPE,
-            ...toRefs(state),
-            ...toRefs(notificationItemState),
-            onClickSave,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-            onChangeSchedule,
-        };
-    },
+const onChangeSchedule = async (value) => {
+    state.scheduleModeForEdit = value.is_scheduled;
+    state.scheduleForEdit = value.schedule;
+    state.isScheduleValid = value.isScheduleValid;
 };
+
+const setUserChannelSchedule = async () => {
+    try {
+        await SpaceConnector.client.notification.userChannel.setSchedule({
+            user_channel_id: notificationItemState.userChannelId,
+            is_scheduled: state.scheduleModeForEdit,
+            schedule: state.scheduleForEdit,
+        });
+        showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '');
+        notificationItemState.isEditMode = false;
+        emit('edit');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
+    }
+};
+const setProjectChannelSchedule = async () => {
+    try {
+        await SpaceConnector.client.notification.projectChannel.setSchedule({
+            project_channel_id: notificationItemState.projectChannelId,
+            is_scheduled: state.scheduleModeForEdit,
+            schedule: state.scheduleForEdit,
+        });
+        showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '');
+        notificationItemState.isEditMode = false;
+        emit('edit');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'));
+    }
+};
+
+const saveChangedSchedule = async () => {
+    if (props.projectId) await setProjectChannelSchedule();
+    else await setUserChannelSchedule();
+};
+
+const onClickSave = async () => {
+    await saveChangedSchedule();
+    emit('change');
+};
+
 </script>
+
+<template>
+    <li class="content-wrapper"
+        :class="{'edit-mode': notificationItemState.isEditMode}"
+    >
+        <span class="content-title">
+            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
+        </span>
+        <div v-if="notificationItemState.isEditMode"
+             class="content"
+        >
+            <notification-add-schedule :schedule="props.channelData.schedule"
+                                       :is-scheduled="props.channelData.is_scheduled"
+                                       @change="onChangeSchedule"
+            />
+            <div class="button-group">
+                <p-button style-type="secondary"
+                          size="sm"
+                          class="cancel-button"
+                          @click="cancelEdit"
+                >
+                    {{ $t('COMMON.TAGS.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="sm"
+                          :disabled="!state.isScheduleValid"
+                          @click="onClickSave"
+                >
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
+                </p-button>
+            </div>
+        </div>
+        <div v-else
+             class="content"
+        >
+            <p v-if="Array.isArray(props.channelData.schedule.day_of_week)">
+                <span v-for="day in props.channelData.schedule.day_of_week"
+                      :key="day"
+                > {{ day }}</span><br>
+                {{ state.displayStartHour }}:00 ~ {{ state.displayEndHour }}:00
+            </p>
+            <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
+            <button class="edit-button"
+                    :class="{'edit-disable': props.disableEdit}"
+                    @click="startEdit('schedule')"
+            >
+                <p-i name="ic_edit"
+                     width="1rem"
+                     height="1rem"
+                     color="inherit"
+                     class="edit-icon"
+                />
+                {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+            </button>
+        </div>
+    </li>
+</template>
 
 <style lang="postcss" scoped>
 @import '../styles/NotificationChannelItem.pcss';

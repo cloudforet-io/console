@@ -112,7 +112,7 @@ const getQuery = () => {
             { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
         ]);
     }
-    return apiQuery.dataV2;
+    return apiQuery.data;
 };
 const listAlerts = async () => {
     try {

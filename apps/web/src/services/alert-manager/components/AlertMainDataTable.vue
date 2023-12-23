@@ -222,7 +222,7 @@ const alertApiQueryHelper = new ApiQueryHelper()
     .setOnly(...state.fields.map((d) => d.name), 'alert_id')
     .setPageStart(1).setPageLimit(15)
     .setSort('created_at', true);
-let alertApiQuery = alertApiQueryHelper.dataV2;
+let alertApiQuery = alertApiQueryHelper.data;
 
 const getAlerts = async () => {
     state.loading = true;
@@ -230,7 +230,7 @@ const getAlerts = async () => {
     try {
         alertApiQueryHelper.setFilters([...queryTagsHelper.filters.value, ...bottomFilterQueryHelper.filters]);
         if (props.projectId) alertApiQueryHelper.addFilter({ k: 'project_id', v: props.projectId, o: '=' });
-        alertApiQuery = alertApiQueryHelper.dataV2;
+        alertApiQuery = alertApiQueryHelper.data;
 
         const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, AlertListResponse>({
             query: alertApiQuery,

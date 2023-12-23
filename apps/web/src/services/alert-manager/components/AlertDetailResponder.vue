@@ -2,7 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
-import VueI18n from 'vue-i18n';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PBadge, PCollapsibleList, PPaneLayout, PHeading,
@@ -11,18 +11,19 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
+import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import ProjectChannelList from '@/services/alert-manager/components/ProjectChannelList.vue';
-
-import TranslateResult = VueI18n.TranslateResult;
 
 interface Props {
     id?: string;
@@ -48,7 +49,7 @@ const state = reactive({
     ]),
     escalationRuleItems: [] as RuleItem[],
     loading: true,
-    projectChannels: [],
+    projectChannels: [] as ProjectChannelModel[],
 });
 
 const apiQuery = new ApiQueryHelper();
@@ -59,8 +60,8 @@ const getQuery = () => {
 };
 const listProjectChannel = async () => {
     try {
-        const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
-        state.projectChannels = results;
+        const { results } = await SpaceConnector.clientV2.notification.projectChannel.list<ProjectChannelListParameters, ListResponse<ProjectChannelModel>>({ query: getQuery() });
+        state.projectChannels = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.projectChannels = [];
