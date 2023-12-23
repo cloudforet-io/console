@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
+
 import { PPopover } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
@@ -6,14 +8,13 @@ import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
+import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
-
-interface Props {
-    budgetData: Partial<BudgetModel>;
-}
-const props = withDefaults(defineProps<Props>(), {
-    budgetData: () => ({}),
+const budgetPageStore = useBudgetDetailPageStore();
+const budgetPageState = budgetPageStore.$state;
+const state = reactive({
+    budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
 });
 const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
 
@@ -25,16 +26,16 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
     >
         <slot />
         <template #content>
-            <div v-if="props.budgetData.time_unit === 'TOTAL'"
+            <div v-if="state.budgetData?.time_unit === 'TOTAL'"
                  class="total-wrapper"
             >
                 <p class="total-data">
-                    {{ currencyMoneyFormatter(props.budgetData.limit, { currency: props.budgetData?.currency, notation: 'standard' }) }}
+                    {{ currencyMoneyFormatter(state.budgetData?.limit, { currency: state.budgetData?.currency, notation: 'standard' }) }}
                 </p>
             </div>
             <template v-else>
                 <div class="monthly-wrapper">
-                    <p v-for="{ date, limit } in props.budgetData?.planned_limits"
+                    <p v-for="{ date, limit } in state.budgetData?.planned_limits"
                        :key="date"
                        class="monthly-data"
                     >
@@ -43,7 +44,7 @@ const dateFormatter = (date: string) => dayjs(date).format('MMMM YYYY');
                                 {{ dateFormatter(date) }}
                             </span>
                             <br>
-                            <span>{{ currencyMoneyFormatter(limit, { currency: props.budgetData?.currency, notation: 'standard' }) }}</span>
+                            <span>{{ currencyMoneyFormatter(limit, { currency: state.budgetData?.currency, notation: 'standard' }) }}</span>
                         </span>
                     </p>
                 </div>

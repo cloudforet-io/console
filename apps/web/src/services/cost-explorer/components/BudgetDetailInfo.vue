@@ -107,9 +107,7 @@ watch(() => costTypeRef.value, (costType) => {
                 >
                     <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
-                <budget-detail-info-amount-planning-type-popover class="summary-content"
-                                                                 :budget-data="state.budgetData"
-                >
+                <budget-detail-info-amount-planning-type-popover class="summary-content">
                     <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </budget-detail-info-amount-planning-type-popover>
             </div>
