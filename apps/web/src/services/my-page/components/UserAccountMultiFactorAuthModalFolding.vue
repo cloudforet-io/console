@@ -36,17 +36,14 @@ const handleClickSendEmailButton = async () => {
     if (props.type === 'disabled' || props.type === 'change') {
         const response = await postDisableMfa({
             user_id: state.userId,
-            domain_id: state.domainId,
         });
         await store.dispatch('user/setUser', response);
     } else {
         await postEnableMfa({
-            user_id: state.userId,
             mfa_type: props.mfaType,
             options: {
                 email: props.email,
             },
-            domain_id: state.domainId,
         });
     }
     state.proxyIsSentCode = true;

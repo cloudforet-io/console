@@ -85,8 +85,7 @@ const handleClickVerifyButton = async () => {
     try {
         if (tableState.refinedUserItems.email_verified) return;
         await postValidationEmail({
-            user_id: tableState.refinedUserItems.user_id || '',
-            email: tableState.refinedUserItems.email,
+            email: tableState.refinedUserItems.email || '',
         });
         await emit('refresh', tableState.refinedUserItems.user_id || '');
         await store.dispatch('user/setUser', { email: tableState.refinedUserItems.email });

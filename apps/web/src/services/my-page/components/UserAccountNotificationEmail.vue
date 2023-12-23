@@ -46,8 +46,6 @@ const handleClickVerifyButton = async (type: string) => {
     try {
         if (state.verified) return;
         await postValidationEmail({
-            user_id: state.userId,
-            domain_id: state.domainId,
             email: notificationEmail.value,
         });
         await store.dispatch('user/setUser', { email: notificationEmail });

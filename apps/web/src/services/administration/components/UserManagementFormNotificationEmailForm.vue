@@ -68,8 +68,7 @@ const handleClickSend = async () => {
     state.loading = true;
     try {
         await postValidationEmail({
-            user_id: state.data.user_id || '',
-            email: email.value,
+            email: email.value || '',
         });
         state.isEdit = false;
         state.isValidEmail = true;

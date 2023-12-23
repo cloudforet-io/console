@@ -56,17 +56,14 @@ const handleClickSendCodeButton = async () => {
     try {
         if (props.type === 'new') {
             await postEnableMfa({
-                user_id: state.userId,
                 mfa_type: props.mfaType,
                 options: {
                     email: email.value,
                 },
-                domain_id: state.domainId,
             });
         } else {
             const response = await postDisableMfa({
                 user_id: state.userId,
-                domain_id: state.domainId,
             });
             await store.dispatch('user/setUser', response);
         }
