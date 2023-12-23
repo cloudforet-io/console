@@ -1,6 +1,6 @@
 <template>
     <p-double-check-modal :visible="proxyVisible"
-                          :header-title="title"
+                          :header-title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.DELETE_BUDGET')"
                           :verification-text="verificationText"
                           modal-size="sm"
                           @confirm="handleConfirm"
@@ -12,19 +12,15 @@
 import {
     computed, reactive, toRefs, watch,
 } from 'vue';
-import VueI18n from 'vue-i18n';
 
 import { PDoubleCheckModal } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { i18n } from '@/translations';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
-import TranslateResult = VueI18n.TranslateResult;
 
 export default {
     name: 'BudgetDetailDeleteModal',
@@ -43,8 +39,7 @@ export default {
 
         const state = reactive({
             proxyVisible: false,
-            title: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.DELETE_BUDGET') as TranslateResult,
-            verificationText: computed(() => budgetPageState.budgetData?.name),
+            verificationText: computed(() => budgetPageState.budgetData?.name || ''),
         });
 
         const handleConfirm = async () => {
