@@ -11,6 +11,7 @@ import type { UserModel } from '@/schema/identity/user/model';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 
+// eslint-disable-next-line import/no-cycle
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ReferenceLoadOptions, ReferenceItem, ReferenceMap } from '@/store/modules/reference/type';
 import type { ReferenceTypeInfo } from '@/store/reference/all-reference-store';

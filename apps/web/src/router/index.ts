@@ -5,6 +5,8 @@ import VueRouter from 'vue-router';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { GrantScope } from '@/schema/identity/token/type';
+
 import { ERROR_ROUTE } from '@/router/constant';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
@@ -19,6 +21,14 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
+const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string) => {
+    const grantRequest = {
+        scope,
+        token,
+        workspace_id: workspaceId,
+    };
+    await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
+};
 
 export class SpaceRouter {
     static router: VueRouter;
@@ -56,31 +66,29 @@ export class SpaceRouter {
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
+            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
             const isTokenAlive = SpaceConnector.isTokenAlive;
             const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
-            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
-            const isAdminPathFromRawUrl = window.location.pathname.startsWith('/admin');
+            const beforeRoutePathByRawUrl = window.location.pathname;
+
+
 
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
-            const isDuplicatedRoute = (to.name?.startsWith('admin.') || isAdminPathFromRawUrl) && from.name?.startsWith('admin.');
-            const isDuplicateWorkspace = (to.params.workspaceId && from.params.workspaceId) && to.params.workspaceId === from.params.workspaceId;
-            if (refreshToken && isTokenAlive && !isDuplicatedRoute && !isDuplicateWorkspace && isNotErrorRoute) {
-                let scope: string;
-                if (isAdminPathFromRawUrl || isAdminMode) {
+            const isContinuedAdminRoute = to.name?.startsWith('admin.') && beforeRoutePathByRawUrl.startsWith('/admin');
+            const isWorkspaceIdUnchanged = (to.params.workspaceId && from.params.workspaceId) && to.params.workspaceId === from.params.workspaceId;
+            const isGrantRoleSkipLogic = isContinuedAdminRoute || isWorkspaceIdUnchanged;
+            if (refreshToken && isTokenAlive && !isGrantRoleSkipLogic && isNotErrorRoute) {
+                let scope: GrantScope;
+                if (beforeRoutePathByRawUrl.startsWith('/admin') || isAdminMode) {
                     scope = 'DOMAIN';
                 } else if (to.params.workspaceId) {
                     scope = 'WORKSPACE';
                 } else scope = 'USER';
 
-                const grantRequest = {
-                    scope,
-                    workspace_id: to.params.workspaceId,
-                    token: refreshToken,
-                };
-
-                await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
+                await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
             }
+
 
             const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);

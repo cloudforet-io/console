@@ -113,12 +113,8 @@ const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRol
         };
     }
     // USER -> grant USER case
-    if (currentRoleType === ROLE_TYPE.USER && !roleId) {
-        return {
-            roleType: ROLE_TYPE.USER,
-            roleId: 'no-role',
-            pageAccess: ['*'],
-        };
+    if (currentRoleType === ROLE_TYPE.USER) {
+        return undefined;
     }
 
     // MANAGED_ROLE case

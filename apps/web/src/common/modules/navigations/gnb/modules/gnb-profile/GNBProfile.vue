@@ -46,7 +46,7 @@ const state = reactive({
     userIcon: computed<string>(() => {
         if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
         if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
-        const currentRoleType = store.getters['user/getCurrentRoleInfo'].roleType;
+        const currentRoleType = store.getters['user/getCurrentRoleInfo']?.roleType;
         if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'img_avatar_workspace-owner';
         if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'img_avatar_workspace-member';
         return 'img_avatar_no-role';
