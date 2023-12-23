@@ -17,6 +17,8 @@ import { PDoubleCheckModal } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { BudgetDeleteParameters } from '@/schema/cost-analysis/budget/api-verbs/delete';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
@@ -44,8 +46,8 @@ export default {
 
         const handleConfirm = async () => {
             try {
-                await SpaceConnector.client.costAnalysis.budget.delete({
-                    budget_id: budgetPageState.budgetData?.budget_id,
+                await SpaceConnector.client.costAnalysis.budget.delete<BudgetDeleteParameters>({
+                    budget_id: budgetPageState.budgetData?.budget_id ?? '',
                 });
                 state.proxyVisible = false;
                 emit('confirm');

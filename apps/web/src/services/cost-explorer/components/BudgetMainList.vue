@@ -14,8 +14,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { SpaceRouter } from '@/router';
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type {
-    BudgetUsageAnalyzeResponse,
     BudgetUsageAnalyzeResult,
 } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
@@ -60,7 +60,7 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 
-const fetchBudgetUsages = async (): Promise<BudgetUsageAnalyzeResponse> => {
+const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeResult>> => {
     try {
         state.loading = true;
         budgetUsageApiQueryHelper
