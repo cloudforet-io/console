@@ -1,9 +1,13 @@
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { defineStore } from 'pinia';
 
 // eslint-disable-next-line import/no-cycle
+import { store } from '@/store';
+
 import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+// eslint-disable-next-line import/no-cycle
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 interface AppContextStoreState {
     isAdminMode: boolean;
@@ -11,6 +15,7 @@ interface AppContextStoreState {
 
 export const useAppContextStore = defineStore('app-context-store', () => {
     const workspaceStore = useWorkspaceStore();
+    const allReferenceStore = useAllReferenceStore();
 
     const state = reactive<AppContextStoreState>({
         isAdminMode: false,
@@ -30,6 +35,12 @@ export const useAppContextStore = defineStore('app-context-store', () => {
             state.isAdminMode = false;
         },
     };
+
+    watch(() => store.getters['user/getCurrentRoleInfo'], async (roleInfo) => {
+        if (!roleInfo) return;
+        await store.dispatch('reference/loadAll', { force: true });
+        allReferenceStore.flush();
+    });
 
     return {
         getters,
