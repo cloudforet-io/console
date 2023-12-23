@@ -10,6 +10,7 @@ export const initUserAndAuth = async (store, config): Promise<string | undefined
     if (devMode && authEnabled) userId = config.get('DEV.AUTH.USER_ID');
 
     if (userId && isTokenAlive) {
+        const domainSettings = store.state.domain.config?.settings;
         try {
             const response = await SpaceConnector.clientV2.identity.userProfile.get<undefined, UserModel>();
             store.commit('user/setUser', {
@@ -18,8 +19,8 @@ export const initUserAndAuth = async (store, config): Promise<string | undefined
                 authType: response.auth_type,
                 name: response.name,
                 email: response.email,
-                language: response.language,
-                timezone: response.timezone,
+                language: response.language || domainSettings?.language,
+                timezone: response.timezone || domainSettings?.timezone,
                 requiredActions: response.required_actions,
                 emailVerified: !!response.email_verified,
                 mfa: response.mfa,
