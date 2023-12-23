@@ -52,9 +52,10 @@ class ApiQueryHelper extends QueryHelper {
 
     setSort(key?: string, desc?: boolean): ApiQueryHelper {
         if (key) {
+            const originDesc = this._data.sort?.[0].desc;
             this._data.sort = [{
                 key,
-                desc: desc ?? (this._data.sort as Sort)?.desc ?? false,
+                desc: desc ?? originDesc ?? false,
             }];
         } else {
             this._data.sort = undefined;
