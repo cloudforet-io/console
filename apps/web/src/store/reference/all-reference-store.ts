@@ -4,6 +4,7 @@ import { computed, reactive } from 'vue';
 import { camelCase } from 'lodash';
 import { defineStore } from 'pinia';
 
+// eslint-disable-next-line import/no-cycle
 import { store } from '@/store';
 
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
@@ -31,7 +32,9 @@ import { useProjectGroupReferenceStore } from '@/store/reference/project-group-r
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 import { useProjectReferenceStore } from '@/store/reference/project-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+// eslint-disable-next-line import/no-cycle
 import { useUserReferenceStore } from '@/store/reference/user-reference-store';
+// eslint-disable-next-line import/no-cycle
 import { useWorkspaceReferenceStore } from '@/store/reference/workspace-reference-store';
 
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
