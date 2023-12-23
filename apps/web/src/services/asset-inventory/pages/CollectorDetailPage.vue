@@ -290,7 +290,7 @@ onMounted(async () => {
     if (collector) {
         collectorJobStore.getAllJobsCount();
         await collectorFormStore.setOriginCollector(collector);
-        collectorDetailPageStore.collector = collector;
+        collectorDetailPageStore.state.collector = collector;
         resume();
     }
 });

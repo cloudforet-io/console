@@ -1,4 +1,4 @@
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive } from 'vue';
 
 import { defineStore } from 'pinia';
 
@@ -16,10 +16,12 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export const useCollectorDetailPageStore = defineStore('collector-detail-page', () => {
     const appContextStore = useAppContextStore();
 
-    const collector = ref<Partial<CollectorModel>>({});
+    const state = reactive({
+        collector: {} as Partial<CollectorModel>,
+    });
 
     const getters = reactive({
-        isManagedCollector: computed(() => collector.value?.workspace_id === '*' ?? false),
+        isManagedCollector: computed(() => state.collector?.workspace_id === '*' ?? false),
         isEditableCollector: computed(() => {
             if (appContextStore.getters.isAdminMode) {
                 return true;
@@ -38,18 +40,18 @@ export const useCollectorDetailPageStore = defineStore('collector-detail-page', 
                 const res = await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
                     collector_id: collectorId,
                 });
-                collector.value = res;
+                state.collector = res;
             } catch (e) {
                 ErrorHandler.handleError(e);
             }
         },
         reset: () => {
-            collector.value = {};
+            state.collector = {};
         },
     };
 
     return {
-        collector,
+        state,
         getters,
         ...action,
     };
