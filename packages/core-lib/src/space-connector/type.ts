@@ -69,12 +69,7 @@ export interface Query {
         start?: number;
         limit?: number;
     };
-    sort?: {
-        key?: string;
-        keys?: Sort[];
-        name?: string;
-        desc?: boolean;
-    } | Sort[];
+    sort?: Sort[];
     only?: Array<string>;
     keyword?: string;
     minimal?: boolean;
