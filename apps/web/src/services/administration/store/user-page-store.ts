@@ -12,9 +12,10 @@ import type { RoleType } from '@/schema/identity/role/type';
 import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
 import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
 import type { UserModel } from '@/schema/identity/user/model';
+import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { WorkspaceUserModel, SummaryWorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -111,6 +112,15 @@ export const useUserPageStore = defineStore('user-page', {
                         name: this.roles.find((role) => role.role_id === res.role_binding_info.role_id)?.name ?? '',
                     },
                 };
+            } catch (e: any) {
+                ErrorHandler.handleRequestError(e, e.message);
+                throw e;
+            }
+        },
+        async findWorkspaceUser(params?: FindWorkspaceUserParameters) {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.workspaceUser.find<FindWorkspaceUserParameters, ListResponse<SummaryWorkspaceUserModel>>(params);
+                return results || [];
             } catch (e: any) {
                 ErrorHandler.handleRequestError(e, e.message);
                 throw e;

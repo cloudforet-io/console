@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PButton,
@@ -8,6 +8,7 @@ import type {
     AutocompleteHandler,
     SelectDropdownMenuItem,
 } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
+import { isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -18,20 +19,36 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
 
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import type { AddModalMenuItem } from '@/services/administration/types/user-type';
 
+interface Props {
+    role?: AddModalMenuItem
+}
 
-const emit = defineEmits<{(e: 'change-input', formState): void,
+const props = withDefaults(defineProps<Props>(), {
+    role: undefined,
+});
+
+const emit = defineEmits<{(e: 'update:role', formState): void,
 }>();
 
 const roleState = reactive({
     loading: true,
     visible: false,
     menuItems: [] as AddModalMenuItem[],
-    selectedItems: [] as AddModalMenuItem[],
+    proxySelectedItems: useProxyValue('role', props, emit),
+    selectedItems: computed(() => {
+        if (isEmpty(roleState.proxySelectedItems)) return [];
+        return [{
+            label: roleState.proxySelectedItems.label,
+            name: roleState.proxySelectedItems.name,
+            role_type: roleState.proxySelectedItems.role_type,
+        }];
+    }),
     searchText: '',
 });
 
@@ -44,6 +61,9 @@ const roleMenuHandler: AutocompleteHandler = async (inputText: string) => {
     return {
         results: roleState.menuItems as SelectDropdownMenuItem[],
     };
+};
+const handleSelectMenuItem = (role: AddModalMenuItem) => {
+    roleState.proxySelectedItems = role;
 };
 
 /* API */
@@ -67,24 +87,17 @@ const fetchListRoles = async (inputText: string) => {
         const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>({
             query: roleListApiQueryHelper.data,
         });
-        roleState.menuItems = results?.map((role) => ({
+        roleState.menuItems = (results ?? [])?.map((role) => ({
             label: role.name,
             name: role.role_id,
             role_type: role.role_type,
-        })) as AddModalMenuItem[];
+        }));
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
         roleState.loading = false;
     }
 };
-
-/* Watcher */
-watch(() => roleState.selectedItems, (role) => {
-    emit('change-input', {
-        role: role[0],
-    });
-});
 </script>
 
 <template>
@@ -101,16 +114,17 @@ watch(() => roleState.selectedItems, (role) => {
                                    :placeholder="$t('IAM.USER.FORM.SELECT_ROLE')"
                                    :visible-menu.sync="roleState.visible"
                                    :loading="roleState.loading"
-                                   :search-text.sync="roleState.searchText"
-                                   :selected.sync="roleState.selectedItems"
+                                   :search-text="roleState.searchText"
+                                   :selected="roleState.selectedItems"
                                    :handler="roleMenuHandler"
                                    is-filterable
                                    show-delete-all-button
                                    class="role-select-dropdown"
+                                   @select="handleSelectMenuItem"
                 >
                     <template #dropdown-left-area>
-                        <img v-if="roleState.selectedItems.length > 0"
-                             :src="useRoleFormatter(roleState.selectedItems[0]?.role_type).image"
+                        <img v-if="!isEmpty(roleState.proxySelectedItems)"
+                             :src="useRoleFormatter(roleState.proxySelectedItems.role_type).image"
                              alt="role-type-icon"
                              class="role-type-icon"
                         >

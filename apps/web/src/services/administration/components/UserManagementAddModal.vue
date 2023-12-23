@@ -37,7 +37,7 @@ const emit = defineEmits<{(e: 'confirm'): void; }>();
 const state = reactive({
     loading: false,
     disabled: computed(() => {
-        if (!state.isSetAdminRole) {
+        if (userPageState.isAdminMode && !state.isSetAdminRole) {
             const baseCondition = state.userList.length === 0 || (state.workspace.length === 0 || isEmpty(state.role));
             if (state.localUserItem.length > 0 && !state.isResetPassword) {
                 return state.password === '' || baseCondition;
@@ -114,7 +114,7 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     };
 
     const createRoleBinding = async () => {
-        if (state.isSetAdminRole) {
+        if (userPageStore.isWorkspaceOwner || state.isSetAdminRole) {
             await fetchCreateRoleBinding(item);
         } else {
             await Promise.all(state.workspace.map((w) => fetchCreateRoleBinding(item, w)));
@@ -142,7 +142,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
         role_id: state.role.name || '',
         resource_group: state.isSetAdminRole ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
     };
-    const roleParams = state.isSetAdminRole ? baseRoleParams : {
+    const roleParams = (userPageStore.isWorkspaceOwner || state.isSetAdminRole) ? baseRoleParams : {
         ...baseRoleParams,
         workspace_id: item?.name || '',
     };
