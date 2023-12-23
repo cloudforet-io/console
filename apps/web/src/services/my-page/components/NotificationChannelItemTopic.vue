@@ -1,72 +1,5 @@
-<template>
-    <li class="content-wrapper"
-        :class="{'edit-mode': isEditMode}"
-    >
-        <span class="content-title">
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
-        </span>
-        <div v-if="isEditMode"
-             class="content"
-        >
-            <notification-add-topic :topic="channelData.subscriptions"
-                                    :topic-mode="channelData.is_subscribe"
-                                    @change="onChangeTopic"
-            />
-            <div class="button-group">
-                <p-button style-type="secondary"
-                          size="sm"
-                          class="cancel-button"
-                          @click="cancelEdit"
-                >
-                    {{ $t('COMMON.TAGS.CANCEL') }}
-                </p-button>
-                <p-button style-type="primary"
-                          size="sm"
-                          :disabled="!isTopicValid"
-                          @click="onClickSave"
-                >
-                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
-                </p-button>
-            </div>
-        </div>
-        <div v-else
-             class="content"
-        >
-            <ul v-if="channelData.subscriptions.length > 0">
-                <li v-for="(item, index) in channelData.subscriptions"
-                    :key="`topic-${index}`"
-                >
-                    <p-badge style-type="gray200"
-                             badge-type="subtle"
-                             shape="square"
-                    >
-                        <span v-if="item === 'monitoring.Alert'">Alert</span>
-                        <span v-else-if="item === 'cost_analysis.Budget'">Budget</span>
-                        <span v-else>{{ item }}</span>
-                    </p-badge>
-                </li>
-            </ul>
-            <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}</span>
-            <button class="edit-button"
-                    :class="{'edit-disable':disableEdit}"
-                    @click="startEdit(EDIT_TYPE.TOPIC)"
-            >
-                <p-i name="ic_edit"
-                     width="1rem"
-                     height="1rem"
-                     color="inherit"
-                     class="edit-icon"
-                />
-                <span class="edit-text">{{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}</span>
-            </button>
-        </div>
-    </li>
-</template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
+<script setup lang="ts">
+import { reactive } from 'vue';
 
 import {
     PBadge, PButton, PI,
@@ -82,110 +15,143 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
-import {
-    EDIT_TYPE,
-    PROTOCOL_TYPE,
-} from '@/services/my-page/types/notification-item-type';
+import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
-export default {
-    name: 'NotificationChannelItemTopic',
-    components: {
-        PButton,
-        PI,
-        PBadge,
-        NotificationAddTopic,
-    },
-    props: {
-        channelData: {
-            type: Object,
-            default: () => ({}),
-        },
-        projectId: {
-            type: String,
-            default: null,
-        },
-        disableEdit: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            topicModeForEdit: undefined,
-            topicForEdit: props.channelData?.subscriptions,
-            isTopicValid: false,
+const props = withDefaults(defineProps<{
+    channelData: NotiChannelItem;
+    projectId?: string;
+    disableEdit?: boolean;
+}>(), {
+    projectId: undefined,
+    disableEdit: false,
+});
+const emit = defineEmits<{(event: 'change'): void;
+    (event: 'edit'): void;
+}>();
+
+const state = reactive({
+    topicModeForEdit: undefined,
+    topicForEdit: props.channelData.subscriptions,
+    isTopicValid: false,
+});
+const {
+    state: notificationItemState,
+    cancelEdit,
+    startEdit,
+} = useNotificationItem<undefined>({
+    userChannelId: props.channelData.user_channel_id,
+    projectChannelId: props.channelData.project_channel_id,
+    isEditMode: false,
+}, emit);
+
+const setUserChannelSubscription = async () => {
+    try {
+        await SpaceConnector.client.notification.userChannel.setSubscription({
+            user_channel_id: notificationItemState.userChannelId,
+            is_subscribe: state.topicModeForEdit,
+            subscriptions: state.topicForEdit,
         });
-        const {
-            state: notificationItemState,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-        } = useNotificationItem({
-            userChannelId: props.channelData?.user_channel_id,
-            projectChannelId: props.channelData?.project_channel_id,
-            isEditMode: false,
-
+        showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
+        notificationItemState.isEditMode = false;
+        emit('edit');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
+    }
+};
+const setProjectChannelSubscription = async () => {
+    try {
+        await SpaceConnector.client.notification.projectChannel.setSubscription({
+            project_channel_id: notificationItemState.projectChannelId,
+            is_subscribe: state.topicModeForEdit,
+            subscriptions: state.topicForEdit,
         });
+        showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
+        notificationItemState.isEditMode = false;
+        emit('edit');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
+    }
+};
+const onChangeTopic = (value) => {
+    state.topicModeForEdit = value.topicMode;
+    state.topicForEdit = value.selectedTopic;
+    state.isTopicValid = value.isTopicValid;
+};
+const saveChangedTopic = async () => {
+    if (props.projectId) await setProjectChannelSubscription();
+    else await setUserChannelSubscription();
+};
 
-        const setUserChannelSubscription = async () => {
-            try {
-                await SpaceConnector.client.notification.userChannel.setSubscription({
-                    user_channel_id: notificationItemState.userChannelId,
-                    is_subscribe: state.topicModeForEdit,
-                    subscriptions: state.topicForEdit,
-                });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
-                notificationItemState.isEditMode = false;
-                emit('edit', undefined);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
-            }
-        };
-        const setProjectChannelSubscription = async () => {
-            try {
-                await SpaceConnector.client.notification.projectChannel.setSubscription({
-                    project_channel_id: notificationItemState.projectChannelId,
-                    is_subscribe: state.topicModeForEdit,
-                    subscriptions: state.topicForEdit,
-                });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
-                notificationItemState.isEditMode = false;
-                emit('edit', undefined);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
-            }
-        };
-        const onChangeTopic = (value) => {
-            state.topicModeForEdit = value.topicMode;
-            state.topicForEdit = value.selectedTopic;
-            state.isTopicValid = value.isTopicValid;
-        };
-        const saveChangedTopic = async () => {
-            if (props.projectId) await setProjectChannelSubscription();
-            else await setUserChannelSubscription();
-        };
-
-        const onClickSave = async () => {
-            await saveChangedTopic();
-            emit('change');
-        };
-
-        return {
-            EDIT_TYPE,
-            PROTOCOL_TYPE,
-            ...toRefs(state),
-            ...toRefs(notificationItemState),
-            onClickSave,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-            onChangeTopic,
-        };
-    },
+const onClickSave = async () => {
+    await saveChangedTopic();
+    emit('change');
 };
 </script>
+
+<template>
+    <li class="content-wrapper"
+        :class="{'edit-mode': notificationItemState.isEditMode}"
+    >
+        <span class="content-title">
+            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
+        </span>
+        <div v-if="notificationItemState.isEditMode"
+             class="content"
+        >
+            <notification-add-topic :topic="props.channelData.subscriptions"
+                                    :topic-mode="props.channelData.is_subscribe"
+                                    @change="onChangeTopic"
+            />
+            <div class="button-group">
+                <p-button style-type="secondary"
+                          size="sm"
+                          class="cancel-button"
+                          @click="cancelEdit"
+                >
+                    {{ $t('COMMON.TAGS.CANCEL') }}
+                </p-button>
+                <p-button style-type="primary"
+                          size="sm"
+                          :disabled="!state.isTopicValid"
+                          @click="onClickSave"
+                >
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
+                </p-button>
+            </div>
+        </div>
+        <div v-else
+             class="content"
+        >
+            <ul v-if="Array.isArray(props.channelData.subscriptions) && props.channelData.subscriptions.length > 0">
+                <li v-for="(item, index) in props.channelData.subscriptions"
+                    :key="`topic-${index}`"
+                >
+                    <p-badge style-type="gray200"
+                             badge-type="subtle"
+                             shape="square"
+                    >
+                        <span v-if="item === 'monitoring.Alert'">Alert</span>
+                        <span v-else-if="item === 'cost_analysis.Budget'">Budget</span>
+                        <span v-else>{{ item }}</span>
+                    </p-badge>
+                </li>
+            </ul>
+            <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}</span>
+            <button class="edit-button"
+                    :class="{'edit-disable': props.disableEdit}"
+                    @click="startEdit('topic')"
+            >
+                <p-i name="ic_edit"
+                     width="1rem"
+                     height="1rem"
+                     color="inherit"
+                     class="edit-icon"
+                />
+                <span class="edit-text">{{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}</span>
+            </button>
+        </div>
+    </li>
+</template>
 
 <style lang="postcss" scoped>
 @import '../styles/NotificationChannelItem.pcss';

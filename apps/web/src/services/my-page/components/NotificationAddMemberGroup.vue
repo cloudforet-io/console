@@ -18,7 +18,6 @@ import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-
 interface Props {
     projectId?: string;
     users?: string[];

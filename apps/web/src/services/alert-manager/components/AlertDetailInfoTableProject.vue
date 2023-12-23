@@ -50,7 +50,7 @@ const onSelectProject = (selected) => {
 
 <template>
     <fragment>
-        <p v-if="!isEditMode"
+        <p v-if="!alertDetailItemState.isEditMode"
            class="content-wrapper"
         >
             <span class="project">

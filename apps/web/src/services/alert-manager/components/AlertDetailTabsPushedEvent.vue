@@ -101,7 +101,7 @@ const onCopyClick = () => {
             @change="onChange"
             @refresh="onChange()"
         />
-        <template v-if="itemList.length > 0">
+        <template v-if="state.itemList.length > 0">
             <div v-for="(item, idx) in state.itemList"
                  :key="item.event_id"
             >

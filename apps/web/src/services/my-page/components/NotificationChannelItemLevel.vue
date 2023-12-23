@@ -1,15 +1,66 @@
+<script setup lang="ts">
+import {
+    PBadge, PButton, PI,
+} from '@spaceone/design-system';
+
+import type { NotificationLevel } from '@/schema/notification/notification/type';
+
+import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
+import { useNotificationItem } from '@/services/my-page/composables/notification-item';
+import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+
+const props = withDefaults(defineProps<{
+    channelData: NotiChannelItem;
+    projectId?: string;
+    disableEdit?: boolean;
+}>(), {
+    projectId: undefined,
+    disableEdit: false,
+});
+
+const emit = defineEmits<{(event: 'change'): void;
+    (event: 'edit', value?: NotificationLevel): void;
+}>();
+
+const {
+    state: notificationItemState,
+    cancelEdit,
+    startEdit,
+    updateProjectChannel,
+} = useNotificationItem<NotificationLevel>({
+    userChannelId: props.channelData.user_channel_id,
+    projectChannelId: props.channelData.project_channel_id,
+    isEditMode: false,
+    dataForEdit: props.channelData.notification_level,
+}, emit);
+
+const saveChangedLevel = async () => {
+    if (props.projectId) await updateProjectChannel('notification_level', notificationItemState.dataForEdit);
+};
+
+const onClickSave = async () => {
+    await saveChangedLevel();
+    emit('change');
+};
+
+const onChangeLevel = (value) => {
+    notificationItemState.dataForEdit = value.level;
+};
+
+</script>
+
 <template>
-    <li v-if="projectId"
+    <li v-if="props.projectId"
         class="content-wrapper"
-        :class="{'edit-mode': isEditMode}"
+        :class="{'edit-mode': notificationItemState.isEditMode}"
     >
         <p class="content-title">
             {{ $t('IDENTITY.USER.NOTIFICATION.FORM.NOTIFICATION_LEVEL') }}
         </p>
-        <div v-if="isEditMode"
+        <div v-if="notificationItemState.isEditMode"
              class="content"
         >
-            <notification-add-level :notification-level="channelData.notification_level"
+            <notification-add-level :notification-level="props.channelData.notification_level"
                                     @change="onChangeLevel"
             />
             <div class="button-group">
@@ -31,35 +82,35 @@
         <div v-else
              class="content"
         >
-            <p-badge v-if="channelData.notification_level === 'LV1'"
+            <p-badge v-if="props.channelData.notification_level === 'LV1'"
                      style-type="secondary1"
                      badge-type="solid-outline"
                      class="level-badge"
             >
-                {{ channelData.notification_level }}
+                {{ props.channelData.notification_level }}
             </p-badge>
-            <p-badge v-if="channelData.notification_level === 'LV2'"
+            <p-badge v-if="props.channelData.notification_level === 'LV2'"
                      style-type="indigo500"
                      badge-type="solid-outline"
                      class="level-badge"
             >
-                {{ channelData.notification_level }}
+                {{ props.channelData.notification_level }}
             </p-badge>
-            <p-badge v-if="channelData.notification_level === 'LV3'"
+            <p-badge v-if="props.channelData.notification_level === 'LV3'"
                      style-type="peacock400"
                      badge-type="solid-outline"
                      class="level-badge"
             >
                 {{ channelData.notification_level }}
             </p-badge>
-            <p-badge v-if="channelData.notification_level === 'LV4'"
+            <p-badge v-if="props.channelData.notification_level === 'LV4'"
                      style-type="coral500"
                      badge-type="solid-outline"
                      class="level-badge"
             >
-                {{ channelData.notification_level }}
+                {{ props.channelData.notification_level }}
             </p-badge>
-            <p-badge v-if="channelData.notification_level === 'LV5'"
+            <p-badge v-if="props.channelData.notification_level === 'LV5'"
                      style-type="alert"
                      badge-type="solid-outline"
                      class="level-badge"
@@ -67,8 +118,8 @@
                 {{ channelData.notification_level }}
             </p-badge>
             <button class="edit-button"
-                    :class="{'edit-disable':disableEdit}"
-                    @click="startEdit(EDIT_TYPE.LEVEL)"
+                    :class="{'edit-disable': props.disableEdit}"
+                    @click="startEdit('notification_level')"
             >
                 <p-i name="ic_edit"
                      width="1rem"
@@ -81,85 +132,6 @@
         </div>
     </li>
 </template>
-
-<script lang="ts">
-import { toRefs } from 'vue';
-
-import {
-    PBadge, PButton, PI,
-} from '@spaceone/design-system';
-
-import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
-import { useNotificationItem } from '@/services/my-page/composables/notification-item';
-import {
-    EDIT_TYPE,
-    PARAM_KEY_TYPE,
-    PROTOCOL_TYPE,
-} from '@/services/my-page/types/notification-item-type';
-
-export default {
-    name: 'NotificationChannelItemLevel',
-    components: {
-        PButton,
-        PI,
-        PBadge,
-        NotificationAddLevel,
-    },
-    props: {
-        channelData: {
-            type: Object,
-            default: () => ({}),
-        },
-        projectId: {
-            type: String,
-            default: null,
-        },
-        disableEdit: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const {
-            state: notificationItemState,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-        } = useNotificationItem({
-            userChannelId: props.channelData?.user_channel_id,
-            projectChannelId: props.channelData?.project_channel_id,
-            isEditMode: false,
-            dataForEdit: props.channelData?.notification_level,
-        });
-
-        const saveChangedLevel = async () => {
-            if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.LEVEL, notificationItemState.dataForEdit);
-        };
-
-        const onClickSave = async () => {
-            await saveChangedLevel();
-            emit('change');
-        };
-
-        const onChangeLevel = (value) => {
-            notificationItemState.dataForEdit = value.level;
-        };
-
-        return {
-            EDIT_TYPE,
-            PROTOCOL_TYPE,
-            ...toRefs(notificationItemState),
-            onClickSave,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-            onChangeLevel,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 @import '../styles/NotificationChannelItem.pcss';

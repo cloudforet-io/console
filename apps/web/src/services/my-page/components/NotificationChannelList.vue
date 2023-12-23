@@ -1,17 +1,199 @@
+<script setup lang="ts">
+import {
+    computed, onActivated, reactive,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import type { Location } from 'vue-router';
+import { useRoute } from 'vue-router/composables';
+
+import {
+    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
+} from '@spaceone/design-system';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { Tags } from '@/schema/_common/model';
+import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
+import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
+import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
+import type { ProtocolModel } from '@/schema/notification/protocol/model';
+import type { UserChannelListParameters } from '@/schema/notification/user-channel/api-verbs/list';
+import type { UserChannelModel } from '@/schema/notification/user-channel/model';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
+
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+
+
+interface EnrichedProtocolItem extends ProtocolModel {
+    label: TranslateResult;
+    link: Partial<Location>;
+    protocolType: string;
+    tags: Tags;
+    icon: any;
+}
+
+const props = withDefaults(defineProps<{
+    projectId?: string;
+    manageDisabled?: boolean;
+}>(), {
+    projectId: '',
+    manageDisabled: false,
+});
+const route = useRoute();
+const state = reactive({
+    loading: true,
+    channelLoading: true,
+    userId: computed<string>(() => (route.params.userId ? decodeURIComponent(route.params.userId) : store.state.user.userId)),
+    channelList: [] as NotiChannelItem[],
+    protocolResp: [] as ProtocolModel[],
+    protocolList: computed<EnrichedProtocolItem[]>(() => state.protocolResp.map((d) => ({
+        label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name }),
+        link: {
+            name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
+            params: {
+                protocol: d.name.replace(/(\s*)/g, ''),
+                protocolId: d.protocol_id,
+                userId: encodeURIComponent(state.userId),
+            },
+            query: {
+                protocolLabel: encodeURIComponent(d.name),
+                projectId: props.projectId ? props.projectId : undefined,
+                supported_schema: d.capability.supported_schema,
+                protocolType: d.protocol_type,
+            },
+        },
+        protocolType: d.protocol_type,
+        tags: d.tags,
+        plugin_info: d.plugin_info,
+        icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
+        name: d.name,
+    }))),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+});
+
+
+const apiQuery = new ApiQueryHelper();
+const listProtocol = async () => {
+    try {
+        state.loading = true;
+        if (props.projectId) {
+            apiQuery.setFilters([])
+                .setSort('protocol_type');
+        } else {
+            apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
+        }
+        const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
+            query: apiQuery.dataV2,
+        });
+        state.protocolResp = res.results ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.protocolResp = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+const injectProtocolName = (channel: UserChannelModel|ProjectChannelModel): string => {
+    const protocolInfoOfChannel = state.protocolResp.find((i) => i.protocol_id === channel.protocol_id);
+    if (protocolInfoOfChannel) return protocolInfoOfChannel.name;
+    return channel.name;
+};
+const injectProtocolSchema = (channel: UserChannelModel|ProjectChannelModel): JsonSchema => {
+    const protocolInfoOfChannel = state.protocolResp.find((i) => i.protocol_id === channel.protocol_id);
+    if (protocolInfoOfChannel?.plugin_info.metadata.data === undefined) return {};
+    return protocolInfoOfChannel.plugin_info.metadata.data.schema;
+};
+
+const channelApiQuery = new ApiQueryHelper();
+const listUserChannel = async () => {
+    try {
+        state.channelLoading = true;
+        channelApiQuery.setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
+        const res = await SpaceConnector.clientV2.notification.userChannel.list<UserChannelListParameters, ListResponse<UserChannelModel>>({
+            query: channelApiQuery.dataV2,
+        });
+        state.channelList = res.results?.map((d) => ({
+            ...d,
+            protocol_name: injectProtocolName(d),
+            schema: injectProtocolSchema(d),
+        })) ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.channelList = [];
+    } finally {
+        state.channelLoading = false;
+    }
+};
+
+const listProjectChannel = async () => {
+    try {
+        state.channelLoading = true;
+        channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).setSort('notification_level', false);
+        const res = await SpaceConnector.clientV2.notification.projectChannel.list<ProjectChannelListParameters, ListResponse<ProjectChannelModel>>({
+            query: channelApiQuery.dataV2,
+        });
+        state.channelList = res.results?.map((d) => ({
+            ...d,
+            protocol_name: injectProtocolName(d),
+            schema: injectProtocolSchema(d),
+        })) ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.channelList = [];
+    } finally {
+        state.channelLoading = false;
+    }
+};
+
+const listChannel = async () => {
+    if (props.projectId) await listProjectChannel();
+    else await listUserChannel();
+};
+
+const onChangeChannelItem = async () => {
+    await listChannel();
+};
+
+(async () => {
+    await store.dispatch('reference/plugin/load');
+    await listProtocol();
+    await listChannel();
+})();
+
+onActivated(async () => {
+    await listProtocol();
+    await listChannel();
+});
+</script>
+
 <template>
     <section class="notification-wrapper">
         <p-pane-layout class="noti-channel-wrapper">
             <h3 class="sub-title">
                 {{ $t('MY_PAGE.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
-            <p-data-loader :data="protocolList"
-                           :loading="loading"
+            <p-data-loader :data="state.protocolList"
+                           :loading="state.loading"
             >
-                <ul class="channel-list-wrapper">
-                    <div v-for="item in protocolList"
-                         :key="item.protocol_id"
-                         class="channel-item-wrapper"
-                         :class="{disabled: manageDisabled}"
+                <div class="channel-list-wrapper">
+                    <ul v-for="item in state.protocolList"
+                        :key="item.protocol_id"
+                        class="channel-item-wrapper"
+                        :class="{disabled: props.manageDisabled}"
                     >
                         <router-link :to="item.link">
                             <li class="channel-item">
@@ -28,7 +210,7 @@
                                             class="service-img"
                                 />
                                 <span class="text"
-                                      :class="{disabled: manageDisabled}"
+                                      :class="{disabled: props.manageDisabled}"
                                 >
                                     <p-i name="ic_plus_bold"
                                          width="1rem"
@@ -39,8 +221,8 @@
                                 </span>
                             </li>
                         </router-link>
-                    </div>
-                </ul>
+                    </ul>
+                </div>
                 <p v-if="projectId"
                    class="spaceone-desc"
                 >
@@ -58,17 +240,17 @@
             </p-data-loader>
             <p-divider class="divider" />
             <p-data-loader class="flex-grow"
-                           :data="channelList"
-                           :loading="channelLoading"
+                           :data="state.channelList"
+                           :loading="state.channelLoading"
             >
                 <div style="min-height: 6.5rem;">
-                    <ul v-for="item in channelList"
+                    <ul v-for="item in state.channelList"
                         :key="`${item.name}-${item.created_at}`"
                     >
                         <li class="mb-4">
                             <notification-channel-item :channel-data="item"
-                                                       :project-id="projectId"
-                                                       :manage-disabled="manageDisabled"
+                                                       :project-id="props.projectId"
+                                                       :manage-disabled="props.manageDisabled"
                                                        @change="onChangeChannelItem"
                                                        @confirm="listChannel"
                             />
@@ -84,216 +266,6 @@
         </p-pane-layout>
     </section>
 </template>
-
-<script lang="ts">
-import {
-    computed, getCurrentInstance, onActivated, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
-
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import type {
-    ChannelItem,
-    EnrichedProtocolItem,
-    ProtocolItem,
-} from '@/services/administration/types/user-notification-type';
-import NotificationChannelItem from '@/services/my-page/components/NotificationChannelItem.vue';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-import { PROTOCOL_TYPE } from '@/services/my-page/types/notification-item-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-
-export default {
-    name: 'NotificationChannelList',
-    components: {
-        NotificationChannelItem,
-        PPaneLayout,
-        PI,
-        PDivider,
-        PEmpty,
-        PLazyImg,
-        PDataLoader,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: '',
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            protocolList: undefined as unknown as ProtocolItem[],
-            loading: true,
-            channelLoading: true,
-            // eslint-disable-next-line no-use-before-define
-            userId: computed(() => ((vm.$route.params.userId) ? decodeURIComponent(vm.$route.params.userId) : store.state.user.userId)),
-            channelList: undefined as unknown as ChannelItem[],
-            protocolResp: [] as ProtocolItem[],
-            plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
-        });
-        const routeState = reactive({
-            routes: computed(() => ([
-                { name: 'My Page', to: { name: MY_PAGE_ROUTE._NAME } },
-                { name: 'Notifications Channel' },
-            ])),
-        });
-
-        const enrichProtocol = async (protocolResp) => {
-            const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async (d) => ({
-                label: computed(() => i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
-                link: {
-                    name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,
-                    params: {
-                        protocol: d.name.replace(/(\s*)/g, ''),
-                        protocolId: d.protocol_id,
-                        userId: encodeURIComponent(state.userId),
-                    },
-                    query: {
-                        protocolLabel: encodeURIComponent(d.name),
-                        projectId: props.projectId ? props.projectId : undefined,
-                        // eslint-disable-next-line camelcase
-                        supported_schema: d.capability.supported_schema,
-                        protocolType: d.protocol_type,
-                    },
-                },
-                protocolType: d.protocol_type,
-                tags: d.tags,
-                plugin_info: d.plugin_info,
-                icon: state.plugins[d.plugin_info?.plugin_id]?.icon || '',
-                name: d.name,
-            })));
-            return enrichedProtocolList;
-        };
-
-        const apiQuery = new ApiQueryHelper();
-        const listProtocol = async () => {
-            try {
-                state.loading = true;
-                let res;
-                if (props.projectId) {
-                    apiQuery.setSort('protocol_type');
-                    res = await SpaceConnector.client.notification.protocol.list({
-                        query: apiQuery.data,
-                    });
-                } else {
-                    apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
-                    res = await SpaceConnector.client.notification.protocol.list({
-                        query: apiQuery.data,
-                    });
-                }
-                state.protocolResp = res.results;
-                state.protocolList = await enrichProtocol(res.results);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.protocolList = [];
-                state.protocolResp = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const injectProtocolName = (channel: ChannelItem) => {
-            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[])?.find((i) => i.protocol_id === channel.protocol_id);
-            if (protocolInfoOfChannel) return protocolInfoOfChannel.name;
-            return channel.name;
-        };
-        const injectProtocolSchema = (channel: ChannelItem) => {
-            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[]).find((i) => i.protocol_id === channel.protocol_id);
-            if (protocolInfoOfChannel?.plugin_info.metadata.data === undefined) return {};
-            return protocolInfoOfChannel.plugin_info.metadata.data.schema;
-        };
-
-        const channelApiQuery = new ApiQueryHelper();
-        const listUserChannel = async () => {
-            try {
-                state.channelLoading = true;
-                channelApiQuery.setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
-                const res = await SpaceConnector.client.notification.userChannel.list({
-                    query: channelApiQuery.data,
-                });
-                state.channelList = res.results.map((d) => ({
-                    ...d,
-                    protocol_name: injectProtocolName(d),
-                    schema: injectProtocolSchema(d),
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.channelList = [];
-            } finally {
-                state.channelLoading = false;
-            }
-        };
-
-        const listProjectChannel = async () => {
-            try {
-                state.channelLoading = true;
-                channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).setSort('notification_level', false);
-                const res = await SpaceConnector.client.notification.projectChannel.list({
-                    query: channelApiQuery.data,
-                });
-                state.channelList = res.results.map((d) => ({
-                    ...d,
-                    protocol_name: injectProtocolName(d),
-                    schema: injectProtocolSchema(d),
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.channelList = [];
-            } finally {
-                state.channelLoading = false;
-            }
-        };
-
-        const listChannel = async () => {
-            if (props.projectId) await listProjectChannel();
-            else await listUserChannel();
-        };
-
-        const onChangeChannelItem = async () => {
-            await listChannel();
-        };
-
-        (async () => {
-            await store.dispatch('reference/plugin/load');
-            await listProtocol();
-            await listChannel();
-        })();
-
-        onActivated(async () => {
-            await listProtocol();
-            await listChannel();
-        });
-
-        return {
-            ...toRefs(state),
-            routeState,
-            PROTOCOL_TYPE,
-            assetUrlConverter,
-            onChangeChannelItem,
-            listChannel,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .noti-channel-wrapper {

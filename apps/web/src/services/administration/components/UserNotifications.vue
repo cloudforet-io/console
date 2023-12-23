@@ -79,14 +79,15 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
-import type { ChannelItem, ProtocolItem } from '@/services/administration/types/user-notification-type';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
 export default {
     name: 'UserNotifications',
@@ -118,8 +119,8 @@ export default {
                 { name: 'schedule', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') },
                 { name: 'subscriptions', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') },
             ]),
-            items: [] as ChannelItem[],
-            protocolList: [] as ProtocolItem[],
+            items: [] as NotiChannelItem[],
+            protocolList: [] as ProtocolModel[],
             manageLink: {
                 name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
                 params: { userId: computed(() => encodeURIComponent(props.userId)) },
@@ -141,7 +142,7 @@ export default {
             }
         };
 
-        const injectProtocolName = (channel: ChannelItem) => (state.protocolList as any).find((i) => i.protocol_id === channel.protocol_id).name;
+        const injectProtocolName = (channel: NotiChannelItem): string|undefined => state.protocolList.find((i) => i.protocol_id === channel.protocol_id)?.name;
 
         const channelApiQuery = new ApiQueryHelper();
         const listUserChannel = async () => {
