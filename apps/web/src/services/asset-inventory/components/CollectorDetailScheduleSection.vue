@@ -3,7 +3,6 @@
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                                          :edit-mode="state.isEditMode"
                                          :hide-edit-button="!collectorFormState.schedulePower"
-                                         :total-count="state.totalCount"
                                          @click-edit="handleClickEdit"
         />
 
@@ -81,7 +80,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             hours: collectorFormState.scheduleHours,
         },
     };
-    return SpaceConnector.clientV2.inventory.collector.update(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 
 const handleClickEdit = () => {

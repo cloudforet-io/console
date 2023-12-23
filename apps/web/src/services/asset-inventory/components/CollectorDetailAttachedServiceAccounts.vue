@@ -15,6 +15,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
 import type { SecretModel } from '@/schema/secret/secret/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -115,7 +117,7 @@ const { queryTags } = queryTagHelper;
 
 /* api fetchers */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchSecrets = async (provider: string, serviceAccounts?: string[]): Promise<{ results: SecretModel[]; total_count: number }> => {
+const fetchSecrets = async (provider: string, serviceAccounts?: string[]): Promise<ListResponse<SecretModel>> => {
     try {
         apiQueryHelper.setPage(state.pageStart, state.pageLimit)
             .setSort(state.sortBy, state.sortDesc)
@@ -127,10 +129,10 @@ const fetchSecrets = async (provider: string, serviceAccounts?: string[]): Promi
             else apiQueryHelper.addFilter({ k: 'service_account_id', v: serviceAccounts, o: '=' });
         }
 
-        const results = await SpaceConnector.client.secret.secret.list({
+        const results = await SpaceConnector.clientV2.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
             query: apiQueryHelper.data,
         });
-        return results;
+        return results ?? { results: [], total_count: 0 };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { results: [], total_count: 0 };
@@ -144,7 +146,7 @@ const getSecrets = async (provider: string, serviceAccounts?: string[]) => {
     const { results, total_count } = await fetchSecrets(provider, serviceAccounts);
     state.secrets = results;
     state.totalCount = total_count;
-    emit('update:totalCount', total_count);
+    emit('update:totalCount', total_count ?? 0);
 
     state.loading = false;
 };

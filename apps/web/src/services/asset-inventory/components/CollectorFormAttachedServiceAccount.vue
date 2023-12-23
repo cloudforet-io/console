@@ -11,7 +11,6 @@ import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/d
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
 import { i18n } from '@/translations';
 
 import SelectBox from '@/common/components/select/SelectBox.vue';
@@ -62,11 +61,10 @@ const state = reactive({
         return !invalidState.selectedAttachedServiceAccount;
     }),
     handlerParams: computed(() => {
-        queryHelper.setFilters([{ k: 'service_account_type', v: ACCOUNT_TYPE.TRUSTED, o: '!=' }]); // init filters
         if (collectorFormStore.collectorProvider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormStore.collectorProvider, o: '=' });
         } else if (collectorFormState.provider) {
-            queryHelper.addFilter({ k: 'provider', v: collectorFormStore.provider, o: '=' });
+            queryHelper.addFilter({ k: 'provider', v: collectorFormState.provider, o: '=' });
         } else if (collectorFormState.repositoryPlugin?.provider) {
             queryHelper.addFilter({ k: 'provider', v: collectorFormState.repositoryPlugin.provider, o: '=' });
         }

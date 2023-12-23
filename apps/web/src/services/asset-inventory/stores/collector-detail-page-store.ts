@@ -43,6 +43,9 @@ export const useCollectorDetailPageStore = defineStore('collector-detail-page', 
                 ErrorHandler.handleError(e);
             }
         },
+        reset: () => {
+            collector.value = {};
+        },
     };
 
     return {
