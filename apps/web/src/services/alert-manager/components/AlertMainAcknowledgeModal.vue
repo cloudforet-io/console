@@ -7,12 +7,14 @@ import { PButtonModal, PCheckbox } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { AlertAssignUserParameters } from '@/schema/monitoring/alert/api-verbs/assign-user';
 import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -30,17 +32,32 @@ const state = reactive({
 });
 
 /* api */
-const updateToAcknowledge = async () => {
+const updateToAcknowledgeAndAssignToMe = async (alertId: string) => {
     try {
-        const promises = props.alerts?.map((d) => SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters>({
-            alert_id: d.alert_id,
+        await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters>({
+            alert_id: alertId,
             state: ALERT_STATE.ACKNOWLEDGED,
-        }));
-        await Promise.allSettled(promises);
+        });
+        if (state.isAssignedToMe) {
+            await SpaceConnector.clientV2.monitoring.alert.assignUser<AlertAssignUserParameters>({
+                alert_id: alertId,
+                assignee: store.state.user.userId,
+            });
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
+        throw new Error(alertId);
     }
 };
+const updateToAcknowledge = async () => {
+    const promises = props.alerts?.map((d) => updateToAcknowledgeAndAssignToMe(d.alert_id));
+    const results = await Promise.allSettled(promises);
+    const rejected = results.filter((d) => d.status === 'rejected');
+    if (rejected.length > 0) {
+        throw new Error(`Error occurred during updating state to acknowledge or assignee for ${rejected.map((d) => (d as any).reason.message).join(', ')}`);
+    }
+};
+
 
 const onClickConfirm = async () => {
     try {
@@ -48,7 +65,7 @@ const onClickConfirm = async () => {
         emit('confirm');
         showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'));
+        showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'), e);
     } finally {
         state.proxyVisible = false;
     }

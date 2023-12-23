@@ -21,7 +21,7 @@ import type { WebhookReferenceMap } from '@/store/modules/reference/webhook/type
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -109,22 +109,25 @@ const state = reactive({
 
 const alertDurationFormatter = (value) => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
 
-const handleConfirmDelete = async () => {
-    state.closeLoading = true;
+const deleteAlert = async (alertId: string) => {
     try {
-        const promises = props.selectedItems.map((d) => SpaceConnector.clientV2.monitoring.alert.delete<AlertDeleteParameters>({
-            alert_id: d.alert_id,
-        }));
+        await SpaceConnector.clientV2.monitoring.alert.delete<AlertDeleteParameters>({
+            alert_id: alertId,
+        });
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        throw new Error(alertId);
+    }
+};
+const handleConfirmDelete = async () => {
+    state.deleteLoading = true;
+    try {
+        const promises = props.selectedItems.map((d) => deleteAlert(d.alert_id));
         const results = await Promise.allSettled(promises);
 
-        const failedReasons: any[] = [];
-        results.forEach((result) => {
-            if (result.status === 'rejected') {
-                failedReasons.push(result.reason);
-            }
-        });
-        if (failedReasons.length > 0) {
-            throw new Error(failedReasons.join(', '));
+        const rejected = results.filter((d) => d.status === 'rejected');
+        if (rejected.length > 0) {
+            throw new Error(`Error occurred during deleting alert for ${rejected.map((d) => (d as any).reason.message).join(', ')}`);
         }
 
         showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_DELETE'), '');
@@ -132,9 +135,9 @@ const handleConfirmDelete = async () => {
         emit('refresh');
         await projectDetailPageStore.getAlertCounts();
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'));
+        showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'), e);
     } finally {
-        state.closeLoading = false;
+        state.deleteLoading = false;
     }
 };
 

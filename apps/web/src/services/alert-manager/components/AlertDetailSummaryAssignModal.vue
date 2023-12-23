@@ -7,19 +7,20 @@ import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import type { AlertAssignUserParameters } from '@/schema/monitoring/alert/api-verbs/assign-user';
 import { i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { useAlertPageStore } from '@/services/alert-manager/stores/alert-page-store';
 
 
 interface UserItem {
@@ -41,17 +42,13 @@ const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
 }>();
 
 const allReferenceStore = useAllReferenceStore();
-const alertPageStore = useAlertPageStore();
 
-const storeState = reactive({
-    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
-});
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
     //
     loading: true,
     selectIndex: [] as number[],
-    selectedUserID: computed(() => state.refinedItems[state.selectIndex]?.resource_id),
+    selectedUserID: computed(() => state.refinedItems[state.selectIndex]?.user_id),
     fields: [
         { label: 'User ID', name: 'user_id', type: 'item' },
         { label: 'Name', name: 'user_name', type: 'item' },
@@ -60,7 +57,7 @@ const state = reactive({
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
             user_id: d,
-            user_name: storeState.users[d]?.name ?? d,
+            user_name: allReferenceStore.getters.user[d]?.label ?? d,
         }));
         const filteredUsers = users.filter((d) => {
             const searchText = state.searchText.toLowerCase();
@@ -77,11 +74,9 @@ const state = reactive({
 
 const reassignMember = async () => {
     try {
-        await alertPageStore.updateAlertData({
-            updateParams: {
-                assignee: state.selectedUserID,
-            },
-            alertId: props.alertId,
+        await SpaceConnector.clientV2.monitoring.alert.assignUser<AlertAssignUserParameters>({
+            alert_id: props.alertId,
+            assignee: state.selectedUserID,
         });
         showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '');
     } catch (e) {
@@ -95,12 +90,27 @@ const handleClickReassign = async () => {
     await reassignMember();
 };
 
+const fetchWorkspaceUserList = async () => {
+    try {
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
+        });
+        state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
+        state.totalCount = res.total_count ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.projectUserIdList = [];
+    }
+};
 const getProjectUserData = async () => {
     try {
         state.loading = true;
         const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.projectId,
         });
+        if (res.project_type === 'PUBLIC') {
+            await fetchWorkspaceUserList();
+            return;
+        }
         state.projectUserIdList = res.users ?? [];
         state.totalCount = res.users?.length ?? 0;
     } catch (e) {

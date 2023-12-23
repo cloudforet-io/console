@@ -104,7 +104,7 @@ const setSelectIndex = () => {
 /* Api */
 const escalationPolicyApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
-    .setFilters([{ k: 'project_id', v: [props.projectId, null], o: '=' }]);
+    .setFilters([{ k: 'project_id', v: [props.projectId ?? '', null], o: '=' }]);
 let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
 const listEscalationPolicies = async () => {
     try {
@@ -147,6 +147,7 @@ const createEscalationPolicy = async (): Promise<string | undefined> => {
 };
 const updateProjectAlertConfig = async (escalationPolicyId: string) => {
     try {
+        if (!props.projectId) throw new Error('projectId is required');
         await SpaceConnector.clientV2.monitoring.projectAlertConfig.update<ProjectAlertConfigUpdateParameters, ProjectAlertConfigModel>({
             project_id: props.projectId,
             escalation_policy_id: escalationPolicyId,
@@ -194,10 +195,10 @@ watch(() => props.visible, (visible) => {
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <p-box-tab v-model="state.activeTab"
+                <p-box-tab :active-tab.sync="state.activeTab"
                            :tabs="state.tabs"
                 >
-                    <template #select>
+                    <template #SELECT>
                         <escalation-policy-data-table
                             v-if="state.activeTab === FORM_MODE.SELECT"
                             :loading="tableState.loading"
@@ -207,9 +208,9 @@ watch(() => props.visible, (visible) => {
                             @change="handleChangeDataTable"
                         />
                     </template>
-                    <template #create>
+                    <template #CREATE>
                         <escalation-policy-form v-if="state.activeTab === FORM_MODE.CREATE"
-                                                :show-scope="false"
+                                                :show-resource-group="false"
                                                 :mode="ACTION.create"
                         />
                     </template>
@@ -222,9 +223,6 @@ watch(() => props.visible, (visible) => {
 <style lang="postcss" scoped>
 /* custom design-system component - p-button-modal */
 .project-alert-settings-escalation-policy-change-modal {
-    :deep(.modal-content) {
-        height: 53.75rem;
-    }
     :deep(.modal-content-wrapper) {
         padding: 1rem 0;
     }

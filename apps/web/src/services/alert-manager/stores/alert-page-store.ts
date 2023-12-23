@@ -11,7 +11,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface UpdateAlertPayload {
     alertId: string;
-    updateParams: any;
+    updateParams: AlertUpdateParameters;
 }
 
 export const useAlertPageStore = defineStore('alert-page', {

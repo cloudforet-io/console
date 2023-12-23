@@ -14,7 +14,7 @@ import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/cr
 import type { NoteModel } from '@/schema/monitoring/note/model';
 import { i18n } from '@/translations';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -49,11 +49,16 @@ const updateAlertAndCreateNote = async (alertId: string) => {
         }
     } catch (e) {
         ErrorHandler.handleError(e);
+        throw new Error(alertId);
     }
 };
 const updateToResolve = async () => {
     const promises = props.alerts?.map((d) => updateAlertAndCreateNote(d.alert_id));
-    await Promise.all(promises);
+    const results = await Promise.allSettled(promises);
+    const rejected = results.filter((d) => d.status === 'rejected');
+    if (rejected.length > 0) {
+        throw new Error(`Error occurred during updating state to resolved or creating note for ${rejected.map((d) => (d as any).reason.message).join(', ')}`);
+    }
 };
 
 /* Handlers */
@@ -63,7 +68,7 @@ const onClickConfirm = async () => {
         emit('confirm');
         showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'));
+        showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'), e);
     } finally {
         state.proxyVisible = false;
     }

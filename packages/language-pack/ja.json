@@ -2902,18 +2902,18 @@
 					"REPEAT_ALL": "すべて繰り返す",
 					"REPEAT_LABEL_HELP_TEXT": "上記のすべてのステップにApplyする",
 					"RESOLVED": "完了",
+					"RESOURCE_GROUP": "",
 					"RULE": "ルール",
-					"SCOPE_LABEL": "スコア",
 					"STEP": "ステップ",
 					"TIME": "時間",
 					"WORKSPACE": ""
 				},
-				"GLOBAL": "グローバル",
 				"PROJECT": "プロジェクト",
 				"RESOLVED": "完了",
 				"SET_AS_DEFAULT": "defaultに設定する",
 				"UPDATE": "編集",
-				"UPDATE_MODAL_TITLE": "エスカレーションポリシー修正"
+				"UPDATE_MODAL_TITLE": "エスカレーションポリシー修正",
+				"WORKSPACE": ""
 			},
 			"MAIN": {
 				"ALERT": "アラート",

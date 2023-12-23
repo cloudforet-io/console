@@ -53,10 +53,10 @@ const state = reactive({
     pageLimit: 24,
     period: {} as Period,
     // api request params
-    sort: {
+    sort: [{
         key: 'budget_usage',
         desc: true,
-    } as Query['sort'],
+    }] as Query['sort'],
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 

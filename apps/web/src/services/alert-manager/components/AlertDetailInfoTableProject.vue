@@ -80,6 +80,7 @@ const onSelectProject = (selected) => {
         >
             <project-select-dropdown :selected-project-ids="alertDetailItemState.dataForUpdate ? [alertDetailItemState.dataForUpdate] : []"
                                      project-selectable
+                                     :project-group-selectable="false"
                                      @select="onSelectProject"
             />
             <div class="button-group ml-2">

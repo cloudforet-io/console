@@ -143,7 +143,7 @@ const dataGetter = (node: ProjectTreeNode): string => node.data.name;
 const dataFetcher = async (node: ProjectTreeNode): Promise<ProjectTreeNodeData[]> => {
     try {
         const params: ProjectTreeOptions = {
-            sort: { key: 'name', desc: false },
+            sort: [{ key: 'name', desc: false }],
             item_type: 'ROOT',
             check_child: true,
         };

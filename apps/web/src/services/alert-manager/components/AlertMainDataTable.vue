@@ -174,9 +174,12 @@ const state = reactive({
             { key: 'urgency', name: 'Urgency' },
             { key: 'resource', name: 'Resource' },
             { key: 'project_id', name: 'Project' },
-            { key: 'created_at', name: 'Created', type: 'datetime' },
             { key: 'assignee', name: 'Assigned to' },
             { key: 'triggered_by', name: 'Triggered by' },
+            { key: 'description', name: 'Description' },
+            { key: 'created_at', name: 'Created Time', type: 'datetime' },
+            { key: 'acknowledged_at', name: 'Acknowledged Time', type: 'datetime' },
+            { key: 'resolved_at', name: 'Resolved Time', type: 'datetime' },
         ];
 
         if (props.projectId) fields.splice(6, 1);
@@ -266,7 +269,7 @@ const handleExportToExcel = async () => {
     await downloadExcel({
         url: '/monitoring/alert/list',
         param: {
-            query: alertApiQuery,
+            query: { ...alertApiQuery, only: state.excelFields.map((d) => d.key) },
         },
         fields: state.excelFields,
         file_name_prefix: FILE_NAME_PREFIX.alert,

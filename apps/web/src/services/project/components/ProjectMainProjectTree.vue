@@ -89,7 +89,7 @@ const getAllCurrentItems = (): {path: number[]; node: any}[] => {
 const dataFetcher = async (node: any = {}, projectOnly = false): Promise<ProjectTreeNodeData[]> => {
     try {
         const params: any = {
-            sort: { key: 'name', desc: false },
+            sort: [{ key: 'name', desc: false }],
             item_type: 'ROOT',
             check_child: true,
         };
