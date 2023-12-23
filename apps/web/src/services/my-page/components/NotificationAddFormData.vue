@@ -3,7 +3,7 @@ import {
     computed, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
-import { useRoute } from 'vue-router/types/composables';
+import { useRoute } from 'vue-router/composables';
 
 import {
     PFieldGroup, PTextInput, PJsonSchemaForm,
