@@ -58,7 +58,7 @@ export const hasSystemRole = (state: UserState): boolean => state.roleType === '
 
 export const hasPermission = (state: UserState): boolean => !!state.currentRoleInfo;
 
-export const getCurrentRoleInfo = (state: UserState): RoleInfo|undefined => state.currentRoleInfo;
+export const getCurrentRoleInfo: Getter<UserState, any> = (state: UserState): RoleInfo|undefined => state.currentRoleInfo;
 
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? [];
