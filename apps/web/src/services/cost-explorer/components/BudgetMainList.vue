@@ -67,10 +67,9 @@ const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeRe
             .setFilters(state.queryFilters)
             .setPage(state.pageStart, state.pageLimit);
         if (storeState.isAdminMode) {
-            budgetUsageApiQueryHelper.addFilter({ // TODO: check after api update
-                k: 'project_id',
-                v: null,
-                o: '=',
+            budgetUsageApiQueryHelper.addFilter({
+                k: 'resource_group',
+                v: 'WORKSPACE',
             });
         }
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
@@ -91,7 +90,7 @@ const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeRe
 const listBudgets = async () => {
     if (state.loading) return;
     const { more, results } = await fetchBudgetUsages();
-    state.budgetUsages = results;
+    state.budgetUsages = results ?? [];
     state.more = !!more;
 };
 

@@ -54,9 +54,9 @@ const state = reactive({
             budgetId: props.budgetUsage.budget_id,
         },
     })),
-    isProject: computed(() => !!props.budgetUsage.project_id),
+    isProjectTarget: computed(() => props.budgetUsage.resource_group === 'PROJECT'),
     targetLabelList: computed<string[]>(() => {
-        const targetId = props.budgetUsage.project_id ?? props.budgetUsage.workspace_id;
+        const targetId = state.isProjectTarget ? props.budgetUsage.project_id : props.budgetUsage.workspace_id;
         if (!targetId) return [];
 
         const targetNameList: string[] = [];
@@ -132,7 +132,7 @@ const state = reactive({
                           class="target-info"
                           :class="{target: index === state.targetLabelList.length - 1}"
                     >
-                        <p-i v-if="state.isProject && index === state.targetLabelList.length - 1"
+                        <p-i v-if="state.isProjectTarget && index === state.targetLabelList.length - 1"
                              name="ic_document-filled"
                              color="inherit"
                              width="1em"
@@ -151,7 +151,7 @@ const state = reactive({
                     {{ props.budgetUsage.name }}
                 </p>
             </div>
-            <div v-if="!state.isProject && !storeState.isAdminMode"
+            <div v-if="!state.isProjectTarget && !storeState.isAdminMode"
                  class="right-part"
             >
                 <p-badge style-type="indigo100"
