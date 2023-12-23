@@ -79,7 +79,7 @@ const targetTextFormatter = (value: string): string => {
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchBudgetUsageAnalyze = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Response> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);

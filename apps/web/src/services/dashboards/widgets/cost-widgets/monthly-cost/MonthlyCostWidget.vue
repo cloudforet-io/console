@@ -141,7 +141,7 @@ const displayState = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Data[]|null> => {
     apiQueryHelper.setFilters(widgetState.consoleFilters);
     try {

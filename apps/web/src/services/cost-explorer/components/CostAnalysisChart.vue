@@ -53,7 +53,7 @@ const state = reactive({
 });
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {

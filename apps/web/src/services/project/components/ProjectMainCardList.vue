@@ -111,7 +111,7 @@ const fetchAll = async () => {
 };
 
 /* Api */
-const listProjectFetcher = getCancellableFetcher<ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
+const listProjectFetcher = getCancellableFetcher<ProjectListParameters, ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
 const listProjectApiQueryHelper = new ApiQueryHelper();
 const fetchProjectList = async () => {
     listProjectApiQueryHelper.setPageStart(state.pageStart).setPageLimit(state.pageSize);

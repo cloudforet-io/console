@@ -35,7 +35,7 @@ const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
 
 export const useProjectReferenceStore = defineStore('project-reference', () => {
-    const fetcher = getCancellableFetcher<ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
+    const fetcher = getCancellableFetcher<ProjectListParameters, ListResponse<ProjectModel>>(SpaceConnector.clientV2.identity.project.list);
     const state = reactive({
         items: null as ProjectReferenceMap | null,
     });

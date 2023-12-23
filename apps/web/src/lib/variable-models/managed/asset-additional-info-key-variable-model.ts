@@ -26,7 +26,7 @@ export default class AssetAdditionalInfoKeyVariableModel implements IBaseVariabl
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, {
         results: { additional_info_keys: string[] }[];
     }>>;
 

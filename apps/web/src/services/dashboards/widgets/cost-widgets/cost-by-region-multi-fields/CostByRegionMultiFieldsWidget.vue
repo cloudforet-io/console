@@ -168,7 +168,7 @@ const getRefinedCircleData = (results?: Data[], regionMap: RegionReferenceMap = 
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, FullData>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<FullData> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);

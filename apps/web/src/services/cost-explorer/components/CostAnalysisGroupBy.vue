@@ -44,7 +44,7 @@ const state = reactive({
 
 /* fetcher */
 const resourceQueryHelper = new QueryHelper();
-const fetchSearchResources = getCancellableFetcher<{results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
+const fetchSearchResources = getCancellableFetcher<object, {results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
 const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|undefined> => {
     try {
         resourceQueryHelper.setFilters([{ k: 'data_source_id', v: [state.dataSourceId], o: '=' }]);

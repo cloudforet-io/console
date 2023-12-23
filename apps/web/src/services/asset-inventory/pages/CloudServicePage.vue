@@ -74,6 +74,7 @@ import {
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@spaceone/design-system';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { isEmpty } from 'lodash';
 
@@ -81,7 +82,6 @@ import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -202,7 +202,7 @@ export default {
         });
 
         /* api */
-        const fetcher = getCancellableFetcher<Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+        const fetcher = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 
         const listCloudServiceType = async () => {
             try {

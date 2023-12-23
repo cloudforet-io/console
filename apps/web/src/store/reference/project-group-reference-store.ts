@@ -44,7 +44,7 @@ const getProjectGroup = async (projectGroupId?: string): Promise<ProjectGroupMod
     }
 };
 export const useProjectGroupReferenceStore = defineStore('project-group-reference', () => {
-    const fetcher = getCancellableFetcher<ListResponse<ProjectGroupModel>>(SpaceConnector.clientV2.identity.projectGroup.list);
+    const fetcher = getCancellableFetcher<ProjectGroupListParameters, ListResponse<ProjectGroupModel>>(SpaceConnector.clientV2.identity.projectGroup.list);
     const state = reactive({
         items: null as ProjectGroupReferenceMap | null,
     });
