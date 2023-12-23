@@ -2,27 +2,35 @@
 import {
     computed, reactive, watch,
 } from 'vue';
-import type { TranslateResult } from 'vue-i18n';
 
 import {
-    PDefinitionTable, PHeading, PI,
+    PDefinitionTable, PHeading, PI, PTextEditor, PEmpty,
 } from '@spaceone/design-system';
 import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import {
     usePageAccessDefinitionTableData,
 } from '@/services/administration/composables/page-access-definition-table-data';
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
+import {
+    DOMAIN_ADMIN_MANAGED_PAGE_ACCESS, WORKSPACE_MEMBER_MANAGED_PAGE_ACCESS,
+    WORKSPACE_OWNER_MANAGED_PAGE_ACCESS,
+} from '@/services/administration/constants/role-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 
 type DataTableTranslationField = DataTableField | {
-    label?: TranslateResult | string;
+    label?: string;
 };
 interface DetailMenuItems {
     name: string;
@@ -38,9 +46,9 @@ const detailMenuItems = computed<DetailMenuItems[]>(() => [
         name: 'base_information',
         label: i18n.t('IAM.ROLE.DETAIL.BASE_INFORMATION') as string,
         fields: [
-            { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') },
-            { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE'), disableCopy: true },
-            { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') },
+            { name: 'name', label: i18n.t('IAM.ROLE.DETAIL.NAME') as string },
+            { name: 'role_type', label: i18n.t('IAM.ROLE.DETAIL.ROLE_TYPE') as string, disableCopy: true },
+            { name: 'created_at', label: i18n.t('IAM.ROLE.DETAIL.CREATED_AT') as string },
         ],
     },
     {
@@ -60,34 +68,36 @@ const state = reactive({
     loading: false,
     data: {} as Partial<RoleModel>,
     selectedRole: computed<RoleModel>(() => rolePageStore.selectedRoles[0]),
-    permissionScopes: computed<string[]>(() => state.data?.permission_scopes ?? []),
-    pageAccess: computed<string[]>(() => state.data?.page_access ?? []),
+    permissions: computed<string[]>(() => state.data?.permissions ?? []),
+    permissionsCode: computed<string>(() => JSON.stringify(state.permissions, null, 4)),
+    pageAccess: computed<string[]>(() => {
+        if (state.data.is_managed) {
+            if (state.data.role_type === ROLE_TYPE.DOMAIN_ADMIN) return DOMAIN_ADMIN_MANAGED_PAGE_ACCESS;
+            if (state.data.role_type === ROLE_TYPE.WORKSPACE_OWNER) return WORKSPACE_OWNER_MANAGED_PAGE_ACCESS;
+            if (state.data.role_type === ROLE_TYPE.WORKSPACE_MEMBER) return WORKSPACE_MEMBER_MANAGED_PAGE_ACCESS;
+        }
+        return state.data.page_access ?? [];
+    }),
     pageAccessDataList: usePageAccessDefinitionTableData(computed(() => state.pageAccess ?? [])),
 });
+
+/* Component */
+const convertPagePermissionLabel = (accessible: boolean) => (accessible || '--');
 
 /* Api */
 const getRoleDetailData = async (roleId) => {
     state.loading = true;
     try {
-        state.data = await rolePageStore.getRoleDetail({ role_id: roleId });
+        state.data = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
+            role_id: roleId,
+        });
     } catch (e) {
+        ErrorHandler.handleError(e);
         state.data = {};
     } finally {
         state.loading = false;
     }
 };
-// TODO: need to refacotor with new design
-// const convertPagePermissionLabel = (data) => {
-//     switch (data) {
-//     case PAGE_PERMISSION_TYPE.MANAGE:
-//         return i18n.t('IAM.ROLE.FORM.MANAGE');
-//     case PAGE_PERMISSION_TYPE.VIEW:
-//         return i18n.t('IAM.ROLE.FORM.VIEW');
-//     default:
-//         return '--';
-//     }
-// };
-const convertPagePermissionLabel = (accessible) => accessible;
 
 /* Watcher */
 watch(() => state.selectedRole.role_id, async (roleId) => {
@@ -128,31 +138,37 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                         </span>
                     </template>
                 </p-definition-table>
-                <div v-for="pageAccessData in state.pageAccessDataList"
-                     v-else-if="item.name === 'page_access'"
-                     :key="pageAccessData.label"
-                     class="page-access-table-wrapper"
-                >
-                    <h4 class="definition-table-header">
-                        {{ pageAccessData.label }}
-                    </h4>
-                    <p-definition-table :fields="pageAccessData.fields"
-                                        :data="pageAccessData.data"
-                                        :loading="state.loading"
-                                        :skeleton-rows="3"
-                                        disable-copy
-                                        class="page-access-table"
-                                        v-on="$listeners"
+                <div v-else-if="item.name === 'page_access'">
+                    <p-empty v-if="state.pageAccessDataList.length === 0">
+                        {{ $t('IAM.ROLE.DETAIL.NO_DATA') }}
+                    </p-empty>
+                    <div v-for="pageAccessData in state.pageAccessDataList"
+                         v-else
+                         :key="pageAccessData.label"
+                         class="page-access-table-wrapper"
                     >
-                        <template #data="{ data }">
-                            {{ convertPagePermissionLabel(data) }}
-                        </template>
-                    </p-definition-table>
+                        <h4 class="definition-table-header">
+                            {{ pageAccessData.label }}
+                        </h4>
+                        <p-definition-table v-if="pageAccessData"
+                                            :fields="pageAccessData.fields"
+                                            :data="pageAccessData.data"
+                                            :loading="state.loading"
+                                            :skeleton-rows="3"
+                                            disable-copy
+                                            class="page-access-table"
+                                            v-on="$listeners"
+                        >
+                            <template #data="{ data }">
+                                {{ convertPagePermissionLabel(data) }}
+                            </template>
+                        </p-definition-table>
+                    </div>
                 </div>
                 <div v-else-if="item.name === 'api_policy'"
                      class="api-policy-table"
                 >
-                    <div v-if="state.permissionScopes.length === 0"
+                    <div v-if="state.permissions.length === 0"
                          class="has-all-permissions"
                     >
                         <p-i name="ic_plugs"
@@ -164,9 +180,11 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                             {{ $t('IAM.ROLE.DETAIL.ALL_PERMISSIONS') }}
                         </span>
                     </div>
-                    <!-- TODO: will be updated after API is ready-->
                     <div v-else>
-                        temp
+                        <p-text-editor :code="state.permissionsCode"
+                                       class="content-wrapper"
+                                       read-only
+                        />
                     </div>
                 </div>
             </div>

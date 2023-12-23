@@ -8,10 +8,8 @@ import {
 const emit = defineEmits<{(e: 'update', value: string): void,
 }>();
 
-// const stringifyPermission = (permissions: Array<string>|undefined) => permissions?.toString().replace(/,/gi, '\n') ?? '';
-
 const state = reactive({
-    code: '',
+    code: '*',
 });
 
 /* Component */

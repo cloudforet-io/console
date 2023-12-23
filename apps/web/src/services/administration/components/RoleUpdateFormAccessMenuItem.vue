@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, reactive, watch,
 } from 'vue';
 
 import { PIconButton, PI, PToggleButton } from '@spaceone/design-system';
@@ -35,6 +35,11 @@ const handleChangeToggle = () => {
     const val = !props.menu.isAccessible;
     emit('update', { id: props.menu.id, val });
 };
+
+/* Watcher */
+watch(() => props.menu.isAccessible, (isAccessible) => {
+    state.toggleState = isAccessible;
+}, { immediate: true });
 </script>
 
 <template>
@@ -62,7 +67,6 @@ const handleChangeToggle = () => {
              :class="isSubMenu ? 'sub-menu' : 'menu'"
         >
             <p-toggle-button :value="state.toggleState"
-                             :disabled="state.isDisabled"
                              @change-toggle="handleChangeToggle"
             />
         </div>

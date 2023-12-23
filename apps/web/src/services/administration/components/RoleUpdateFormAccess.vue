@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import { PFieldTitle } from '@spaceone/design-system';
 
@@ -19,12 +19,17 @@ const emit = defineEmits<{(e: 'update', value: UpdateFormDataType): void,
 
 const state = reactive({
     hideAllMenu: computed(() => props.menuItems?.find((d) => d.id === 'all')?.hideMenu),
+    menuItems: [] as PageAccessMenuItem[],
 });
 
 /* Component */
 const handleUpdate = (value: UpdateFormDataType) => {
     emit('update', value);
 };
+
+watch(() => props.menuItems, (menuItems) => {
+    state.menuItems = menuItems;
+}, { immediate: true });
 </script>
 
 <template>

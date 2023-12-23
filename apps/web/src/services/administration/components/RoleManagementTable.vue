@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
-import { useRoute, useRouter } from 'vue-router/composables';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PToolboxTable, PSelectDropdown, PButton,
@@ -18,9 +18,9 @@ import { i18n } from '@/translations';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
-import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useQueryTags } from '@/common/composables/query-tags';
 
 import RoleDeleteModal
     from '@/services/administration/components/RoleDeleteModal.vue';
@@ -33,8 +33,6 @@ import {
 import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import { useRolePageStore } from '@/services/administration/store/role-page-store';
 
-const DEFAULT_PAGE_LIMIT = 15;
-
 interface Props {
     tableHeight?: number;
 }
@@ -46,24 +44,13 @@ const props = withDefaults(defineProps<Props>(), {
 const rolePageStore = useRolePageStore();
 const rolePageState = rolePageStore.$state;
 
-const route = useRoute();
 const router = useRouter();
 
 const roleListApiQueryHelper = new ApiQueryHelper()
-    .setPageStart(1).setPageLimit(DEFAULT_PAGE_LIMIT)
-    .setSort('name', true)
-    .setFiltersAsRawQueryString(route.query.filters);
-let roleListApiQuery = roleListApiQueryHelper.data;
+    .setSort('name', true);
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-});
-const state = reactive({
-    refinedUserItems: computed(() => rolePageState.roles.map((role) => ({
-        ...role,
-        created_at: iso8601Formatter(role.created_at, storeState.timezone),
-    }))),
-    tags: roleListApiQueryHelper.setKeyItemSets(ROLE_SEARCH_HANDLERS.keyItemSets).queryTags,
 });
 const modalState = reactive({
     modalVisible: false,
@@ -105,13 +92,21 @@ const handleSelect = (index: number[]) => {
 const handleChange = async (options: ToolboxOptions = {}) => {
     roleListApiQuery = getApiQueryWithToolboxOptions(roleListApiQueryHelper, options) ?? roleListApiQuery;
     if (options.queryTags !== undefined) {
-        await replaceUrlQuery('filters', roleListApiQueryHelper.rawQueryStrings);
+        queryTagHelper.setQueryTags(options.queryTags);
     }
+    if (options.pageStart !== undefined) rolePageStore.$patch({ pageStart: options.pageStart });
+    if (options.pageLimit !== undefined) rolePageStore.$patch({ pageLimit: options.pageLimit });
     await rolePageStore.listRoles({ query: roleListApiQuery });
 };
 
 /* API */
+const queryTagHelper = useQueryTags({ keyItemSets: ROLE_SEARCH_HANDLERS.keyItemSets });
+const { queryTags } = queryTagHelper;
+let roleListApiQuery = roleListApiQueryHelper.data;
 const getListRoles = async () => {
+    roleListApiQueryHelper
+        .setPageStart(rolePageState.pageStart).setPageLimit(rolePageState.pageLimit)
+        .setFilters(queryTagHelper.filters.value);
     await rolePageStore.listRoles({ query: roleListApiQuery });
 };
 const handleExport = async () => {
@@ -145,7 +140,7 @@ const handleExport = async () => {
                          exportable
                          :loading="false"
                          disabled
-                         :items="state.refinedUserItems"
+                         :items="rolePageState.roles"
                          :select-index="rolePageState.selectedIndices"
                          :fields="ROLE_TABLE_FIELDS"
                          sort-by="name"
@@ -153,7 +148,7 @@ const handleExport = async () => {
                          :total-count="rolePageState.totalCount"
                          :key-item-sets="ROLE_SEARCH_HANDLERS.keyItemSets"
                          :value-handler-map="ROLE_SEARCH_HANDLERS.valueHandlerMap"
-                         :query-tags="state.tags"
+                         :query-tags="queryTags"
                          :style="{height: `${props.tableHeight}px`}"
                          :get-row-selectable="getRowSelectable"
                          @select="handleSelect"
@@ -176,6 +171,9 @@ const handleExport = async () => {
                     >
                     <span>{{ useRoleFormatter(value).name }}</span>
                 </span>
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
             <template #col-edit_button-format="{ item }">
                 <p-button v-if="item.role_type !== ROLE_TYPE.SYSTEM_ADMIN"
