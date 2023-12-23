@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, onMounted } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import {
@@ -63,8 +63,9 @@ const {
     },
     invalidState,
     setForm,
+    resetAll,
 } = useFormValidator({
-    daysOfWeek: ['MON', 'TUE', 'WED', 'THU', 'FRI'] as ChannelScheduleDayOfWeek[],
+    daysOfWeek: props.schedule?.day_of_week ?? ['MON', 'TUE', 'WED', 'THU', 'FRI'] as ChannelScheduleDayOfWeek[],
     timePeriod: {
         startHour: props.schedule?.start_hour ?? timezoneToUtcFormatter(9, timezone.value),
         endHour: props.schedule?.end_hour ?? timezoneToUtcFormatter(18, timezone.value),
@@ -129,6 +130,10 @@ const handleSelectEndHour = (endHour: number) => {
     setForm('timePeriod', { ...timePeriod.value, endHour });
     emitChange();
 };
+
+onMounted(() => {
+    resetAll();
+});
 </script>
 
 <template>
@@ -156,7 +161,7 @@ const handleSelectEndHour = (endHour: number) => {
             </h5>
             <p-select-button v-for="day in WEEK_DAYS"
                              :key="day.value"
-                             :selected="dayOfWeek"
+                             :selected="daysOfWeek"
                              multi-selectable
                              :value="day.value"
                              class="select-button-wrapper"

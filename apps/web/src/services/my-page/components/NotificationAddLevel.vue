@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-
 import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
 
 import type { NotificationLevel } from '@/schema/notification/notification/type';
@@ -14,22 +12,15 @@ const LEVEL_LIST = Object.freeze([
 ]);
 
 const props = withDefaults(defineProps<{
-    notificationLevel: NotificationLevel;
+    notificationLevel?: NotificationLevel;
 }>(), {
     notificationLevel: 'LV1',
 });
 const emit = defineEmits<{(event: 'change', level: NotificationLevel): void;
 }>();
 
-const state = reactive({
-    proxyNotificationLevel: props.notificationLevel ? props.notificationLevel : 'LV1',
-});
-const emitChange = () => {
-    emit('change', state.proxyNotificationLevel);
-};
-const onChangeLevel = (value) => {
-    state.proxyNotificationLevel = value;
-    emitChange();
+const onChangeLevel = (value: NotificationLevel) => {
+    emit('change', value);
 };
 </script>
 
@@ -40,7 +31,7 @@ const onChangeLevel = (value) => {
                        class="level-dropdown"
         >
             <template #default>
-                <p-select-dropdown :selected="state.proxyNotificationLevel"
+                <p-select-dropdown :selected="props.notificationLevel"
                                    :menu="LEVEL_LIST"
                                    @select="onChangeLevel"
                 />

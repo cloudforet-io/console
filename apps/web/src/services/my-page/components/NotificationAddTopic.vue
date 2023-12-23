@@ -14,8 +14,8 @@ const TOPIC_LIST = [
 ];
 
 const props = withDefaults(defineProps<{
-    topic: string[];
-    topicMode: boolean;
+    topic?: string[];
+    topicMode?: boolean;
 }>(), {
     topic: () => [],
     topicMode: false,
@@ -57,8 +57,8 @@ const onChangeTopic = (topics: string[]) => {
     <div>
         <p-radio v-for="(item, i) in state.topicModeList"
                  :key="i"
-                 :selected="item.value"
-                 :value="state.isTopicModeSelected"
+                 :selected="state.isTopicModeSelected"
+                 :value="item.value"
                  class="mr-4"
                  @change="onChangeTopicMode"
         >
@@ -75,7 +75,6 @@ const onChangeTopic = (topics: string[]) => {
                             :key="item.value"
                             :selected="state.selectedTopic"
                             :value="item.value"
-                            :invalid="!state.isTopicValid"
                             @change="onChangeTopic"
                 >
                     <span class="topic-label">{{ item.label }}</span>

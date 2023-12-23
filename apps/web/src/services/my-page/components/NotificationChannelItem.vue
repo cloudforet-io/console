@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, nextTick } from 'vue';
 
 import {
     PDivider, PIconButton, PPaneLayout, PToggleButton, PFieldTitle,
@@ -103,6 +103,7 @@ const disableProjectChannel = async () => {
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'));
+        throw e;
     }
 };
 
@@ -116,6 +117,7 @@ const disableUserChannel = async () => {
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
+        throw e;
     }
 };
 
@@ -124,9 +126,15 @@ const disableChannel = async () => {
     else await disableUserChannel();
 };
 
-const onToggleChange = async (value) => {
-    if (!value) await disableChannel();
-    else await enableChannel();
+const onToggleChange = async (value: boolean) => {
+    try {
+        state.isActivated = value;
+        if (!value) await disableChannel();
+        else await enableChannel();
+    } catch (e) {
+        await nextTick();
+        state.isActivated = !value;
+    }
 };
 
 const onChange = async () => {
@@ -199,35 +207,35 @@ const onEdit = (value?: EditTarget) => {
         <ul class="card-body">
             <notification-channel-item-name :channel-data="props.channelData"
                                             :project-id="props.projectId"
-                                            :disable-edit="(state.editTarget !== 'name') || props.manageDisabled"
+                                            :disable-edit="(state.editTarget && state.editTarget !== 'name') || props.manageDisabled"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-data :channel-data="props.channelData"
                                             :project-id="props.projectId"
-                                            :disable-edit="(state.editTarget !== 'data') || props.manageDisabled"
+                                            :disable-edit="(state.editTarget && state.editTarget !== 'data') || props.manageDisabled"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider v-if="projectId" />
             <notification-channel-item-level :channel-data="props.channelData"
                                              :project-id="props.projectId"
-                                             :disable-edit="(state.editTarget !== 'notification_level') || props.manageDisabled"
+                                             :disable-edit="(state.editTarget && state.editTarget !== 'notification_level') || props.manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-schedule :channel-data="props.channelData"
                                                 :project-id="props.projectId"
-                                                :disable-edit="(state.editTarget !== 'schedule') || props.manageDisabled"
+                                                :disable-edit="(state.editTarget && state.editTarget !== 'schedule') || props.manageDisabled"
                                                 @change="onChange"
                                                 @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-topic :channel-data="props.channelData"
                                              :project-id="props.projectId"
-                                             :disable-edit="(state.editTarget !== 'topic') || props.manageDisabled"
+                                             :disable-edit="(state.editTarget && state.editTarget !== 'topic') || props.manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
             />
@@ -235,7 +243,7 @@ const onEdit = (value?: EditTarget) => {
         </ul>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
-                      :contents="$t('IDENTITY.USER.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE')"
+                      :contents="$t('IAM.USER.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE')"
                       @confirm="deleteChannelConfirm"
         />
     </p-pane-layout>

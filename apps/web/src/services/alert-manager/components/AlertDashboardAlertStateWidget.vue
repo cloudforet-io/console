@@ -237,7 +237,7 @@ watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
                                          :value="status.name"
                                          :icon="status.icon"
                                          :disable-check-icon="true"
-                                         :icon-color="status.name === ALERT_URGENCY.HIGH ? red[400] : undefined"
+                                         :icon-color="status.name === ALERT_URGENCY_FILTER.HIGH ? red[400] : undefined"
                                          @change="listAlerts"
                         >
                             {{ status.label }}

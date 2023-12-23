@@ -9,7 +9,7 @@ export interface UserChannelModel {
     is_subscribe: boolean;
     subscriptions: string[]; // subscriptions(e.g.) = ['monitoring.Alert', 'power_scheduler.*', ...]
     is_scheduled: boolean;
-    schedule: ChannelSchedule;
+    schedule?: ChannelSchedule;
     tags: Tags;
     secret_id: string;
     protocol_id: string;

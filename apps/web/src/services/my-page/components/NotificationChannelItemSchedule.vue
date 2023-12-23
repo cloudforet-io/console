@@ -21,6 +21,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
 import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
+import type { NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
 const props = withDefaults(defineProps<{
@@ -41,8 +42,8 @@ const state = reactive({
     scheduleModeForEdit: props.channelData.is_scheduled,
     scheduleForEdit: props.channelData.schedule,
     isScheduleValid: false,
-    displayStartHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule.start_hour, timezoneForFormatter)),
-    displayEndHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule.end_hour, timezoneForFormatter)),
+    displayStartHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule?.start_hour, timezoneForFormatter)),
+    displayEndHour: computed(() => utcToTimezoneFormatter(props.channelData.schedule?.end_hour, timezoneForFormatter)),
 });
 const {
     state: notificationItemState,
@@ -54,7 +55,7 @@ const {
     isEditMode: false,
 }, emit);
 
-const onChangeSchedule = async (value) => {
+const onChangeSchedule = async (value: NotificationAddFormSchedulePayload) => {
     state.scheduleModeForEdit = value.is_scheduled;
     state.scheduleForEdit = value.schedule;
     state.isScheduleValid = value.isScheduleValid;
@@ -137,7 +138,7 @@ const onClickSave = async () => {
         <div v-else
              class="content"
         >
-            <p v-if="Array.isArray(props.channelData.schedule.day_of_week)">
+            <p v-if="Array.isArray(props.channelData.schedule?.day_of_week)">
                 <span v-for="day in props.channelData.schedule.day_of_week"
                       :key="day"
                 > {{ day }}</span><br>

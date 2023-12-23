@@ -206,7 +206,7 @@ watch(() => state.selectedPeriod, async () => {
                     >
                         <span v-tooltip.bottom="projectNameFormatter(projectId, state.projects)"
                               class="tablet:hidden"
-                        >{{ projectNameFormatter(projectId, projects) }}</span>
+                        >{{ projectNameFormatter(projectId, state.projects) }}</span>
                         <span class="tablet-text">{{ projectNameFormatter(projectId, state.projects) }}</span>
                     </p-link>
                     <div class="col-activity">

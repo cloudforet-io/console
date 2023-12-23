@@ -43,8 +43,8 @@ const onClickSave = async () => {
     emit('change');
 };
 
-const onChangeLevel = (value) => {
-    notificationItemState.dataForEdit = value.level;
+const onChangeLevel = (level: NotificationLevel) => {
+    notificationItemState.dataForEdit = level;
 };
 
 </script>

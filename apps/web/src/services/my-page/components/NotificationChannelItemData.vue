@@ -47,8 +47,8 @@ const state = reactive({
     //
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     schema: props.channelData.schema,
-    isSecretData: computed(() => props.channelData.secret_id.length > 0),
-    isSpaceOneUserProtocol: computed(() => state.keyListForEdit.includes('users')),
+    isSecretData: computed<boolean>(() => !!props.channelData.secret_id),
+    isSpaceOneUserProtocol: computed<boolean>(() => state.keyListForEdit.includes('users')),
     //
     isSchemaDataValid: false,
     isJsonSchema: computed(() => Object.keys(state.schema).length !== 0),
