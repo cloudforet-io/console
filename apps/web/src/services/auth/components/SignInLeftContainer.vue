@@ -38,6 +38,8 @@ import { computed, reactive } from 'vue';
 
 import { PBadge } from '@spaceone/design-system';
 
+import { store } from '@/store';
+
 import config from '@/lib/config';
 
 interface Props {
@@ -51,7 +53,13 @@ const props = withDefaults(defineProps<Props>(), {
 const state = reactive({
     // eslint-disable-next-line no-undef
     version: VITE_APP_VER,
-    signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
+    signInImage: computed(() => {
+        const domainSettings = store.state.domain.config?.settings;
+        if (domainSettings?.login_page_image_url) {
+            return domainSettings.login_page_image_url;
+        }
+        return config.get('DOMAIN_IMAGE.SIGN_IN');
+    }),
     contactLink: computed(() => config.get('CONTACT_LINK')),
 });
 </script>

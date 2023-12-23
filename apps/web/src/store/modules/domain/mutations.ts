@@ -7,6 +7,7 @@ export const setDomain = (state: DomainState, domainInfo: DomainState): void => 
     state.name = domainInfo.name;
     state.authOptions = domainInfo.authOptions;
     state.extendedAuthType = domainInfo.extendedAuthType;
+    state.config = domainInfo.config;
 };
 
 export const setExtraMenu = (state: DomainState, extraMenu: ExtraMenuSet) => {

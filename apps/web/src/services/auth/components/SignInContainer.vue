@@ -4,6 +4,8 @@ import { useRoute } from 'vue-router/composables';
 
 import { isEmpty } from 'lodash';
 
+import { store } from '@/store';
+
 import config from '@/lib/config';
 
 import SignInLeftContainer from '@/services/auth/components/SignInLeftContainer.vue';
@@ -23,6 +25,13 @@ const state = reactive({
             };
         }
         return undefined;
+    }),
+    wordTypeLogoUrl: computed(() => {
+        const domainSettings = store.state.domain.config?.settings;
+        if (domainSettings?.wordtype_logo_url) {
+            return domainSettings.wordtype_logo_url;
+        }
+        return '@/assets/images/brand/spaceone-logotype-with-Service-Type.svg';
     }),
 });
 
@@ -47,7 +56,7 @@ watch(() => route.name, (name) => {
                      src="@/assets/images/brand/brand_logo.png"
                 >
                 <img class="logo-text"
-                     src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
+                     :src="state.wordTypeLogoUrl"
                 >
             </template>
         </div>
@@ -74,6 +83,7 @@ watch(() => route.name, (name) => {
             width: auto;
             height: 40px;
             margin-top: 2.5rem;
+            margin-left: 0.5rem;
         }
 
         @screen tablet {
