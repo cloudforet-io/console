@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PFieldTitle,
@@ -8,13 +10,13 @@ import {
     PSelectCard,
 } from '@spaceone/design-system';
 
-
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleType } from '@/schema/identity/role/type';
 import { i18n } from '@/translations';
 
 import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
 import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
+import type { RoleFormData } from '@/services/administration/types/role-type';
 
 interface RoleTypeForm {
     label: string;
@@ -29,7 +31,7 @@ const props = withDefaults(defineProps<Props>(), {
     initialData: undefined,
 });
 
-const emit = defineEmits<{(e: 'update-form', name: string): void}>();
+const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void}>();
 
 const state = reactive({
     roleTypes: computed<RoleTypeForm[]>(() => [
@@ -55,7 +57,7 @@ const state = reactive({
 
 /* Watcher */
 watch(() => state.selectedRoleType, (value) => {
-    emit('update-form', value);
+    emit('update-form', { role_type: value });
 });
 </script>
 

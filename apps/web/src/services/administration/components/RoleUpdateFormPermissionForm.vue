@@ -19,20 +19,21 @@ import {
     getPageAccessMenuListByRoleType,
 } from '@/services/administration/helpers/page-access-menu-list';
 import { getPageAccessList } from '@/services/administration/helpers/role-page-permission-helper';
-import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/administration/types/page-access-menu-type';
+import type { PageAccessMenuItem, UpdateFormDataType, RoleFormData } from '@/services/administration/types/role-type';
 
 interface Props {
-    initialPagePermissions?: string[];
+    initialPageAccess?: string[];
+    initialPermissions?: string[];
     roleType?: RoleType;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    initialPagePermissions: undefined,
+    initialPageAccess: undefined,
+    initialPermissions: undefined,
     roleType: ROLE_TYPE.WORKSPACE_OWNER,
 });
 
-const emit = defineEmits<{(e: 'update-form', after: string[]): void,
-    (e: 'update-editor', after: string[]): void,
+const emit = defineEmits<{(e: 'update-form', formData: RoleFormData): void,
 }>();
 
 const menuItems = ref([] as PageAccessMenuItem[]);
@@ -84,13 +85,13 @@ const handleUpdateForm = (value: UpdateFormDataType) => {
     }
 };
 const handleUpdateEditor = (value: string) => {
-    emit('update-editor', value.split('\n'));
+    emit('update-form', { permissions: value.split('\n') });
 };
 
 /* Watcher */
 watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessPermissions) => {
     if (isEqual(pageAccessPermissions, prevPageAccessPermissions)) return;
-    emit('update-form', pageAccessPermissions);
+    emit('update-form', { page_access: pageAccessPermissions });
 });
 watch(() => props.initialPagePermissions, (initialPagePermissions) => {
     // init formState.menuItems
@@ -116,9 +117,14 @@ watchEffect(() => {
                    :title="$t('IAM.ROLE.FORM.PERMISSION')"
         />
         <role-update-form-access :menu-items="menuItems"
+                                 :role-type="props.roleType"
+                                 :initial-page-access="props.initialPageAccess"
                                  @update="handleUpdateForm"
         />
-        <role-update-form-policy @update="handleUpdateEditor" />
+        <role-update-form-policy :role-type="props.roleType"
+                                 :initial-permissions="props.initialPermissions"
+                                 @update="handleUpdateEditor"
+        />
     </p-pane-layout>
 </template>
 

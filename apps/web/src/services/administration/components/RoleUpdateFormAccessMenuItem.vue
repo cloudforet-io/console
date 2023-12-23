@@ -5,7 +5,7 @@ import {
 
 import { PIconButton, PI, PToggleButton } from '@spaceone/design-system';
 
-import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/administration/types/page-access-menu-type';
+import type { PageAccessMenuItem, UpdateFormDataType } from '@/services/administration/types/role-type';
 
 interface Props {
     menu: PageAccessMenuItem;
