@@ -1,3 +1,121 @@
+<script setup lang="ts">
+import { reactive } from 'vue';
+import { useRouter } from 'vue-router/types/composables';
+
+import {
+    PButton, PPaneLayout,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { NotificationLevel } from '@/schema/notification/notification/type';
+import type { ProjectChannelCreateParameters } from '@/schema/notification/project-channel/api-verbs/create';
+import type { ChannelSchedule } from '@/schema/notification/type';
+import type { UserChannelCreateParameters } from '@/schema/notification/user-channel/api-verbs/create';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import NotificationAddFormData from '@/services/my-page/components/NotificationAddFormData.vue';
+import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
+import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
+import type { NotificationAddFormDataPayload, NotificationAddFormTopicPayload, NotificationAddFormSchedulePayload } from '@/services/my-page/types/notification-add-form-type';
+
+const props = withDefaults(defineProps<{
+    projectId: string;
+    protocolType: string;
+    protocolId: string;
+}>(), {
+    projectId: '',
+    protocolType: '',
+    protocolId: '',
+});
+
+const router = useRouter();
+
+const state = reactive({
+    isDataValid: false,
+    notificationLevel: 'LV1' as NotificationLevel,
+    //
+    channelName: '',
+    data: {},
+    topicMode: false,
+    topicList: [] as string[],
+    isTopicValid: true,
+    //
+    schedule: undefined as ChannelSchedule|undefined,
+    isScheduled: false,
+    isScheduleValid: true,
+});
+
+const createUserChannel = async () => {
+    try {
+        await SpaceConnector.clientV2.notification.userChannel.create<UserChannelCreateParameters>({
+            protocol_id: props.protocolId,
+            name: state.channelName,
+            data: state.data,
+            is_subscribe: state.topicMode,
+            subscriptions: state.topicList,
+            schedule: state.schedule,
+            is_scheduled: state.isScheduled,
+        });
+        showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
+    }
+};
+
+const createProjectChannel = async () => {
+    try {
+        await SpaceConnector.clientV2.notification.projectChannel.create<ProjectChannelCreateParameters>({
+            protocol_id: props.protocolId,
+            name: state.channelName,
+            data: state.data,
+            is_subscribe: state.topicMode,
+            subscriptions: state.topicList,
+            schedule: state.schedule,
+            is_scheduled: state.isScheduled,
+            notification_level: state.notificationLevel,
+            project_id: props.projectId,
+        });
+        showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_PROJECT_CHANNEL'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'));
+    }
+};
+
+const onClickSave = async () => {
+    try {
+        if (props.projectId) await createProjectChannel();
+        else await createUserChannel();
+        router.back();
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+const onChangeData = (value: NotificationAddFormDataPayload) => {
+    state.channelName = value.channelName;
+    state.data = value.data;
+    state.notificationLevel = value.level;
+    state.isDataValid = value.isValid;
+};
+
+const onChangeSchedule = ({ schedule, is_scheduled, isScheduleValid }: NotificationAddFormSchedulePayload) => {
+    state.schedule = schedule;
+    state.isScheduled = is_scheduled;
+    state.isScheduleValid = isScheduleValid;
+};
+
+const onChangeTopic = ({ topicMode, selectedTopic, isTopicValid }: NotificationAddFormTopicPayload) => {
+    state.topicMode = topicMode;
+    state.topicList = selectedTopic;
+    state.isTopicValid = isTopicValid;
+};
+</script>
+
 <template>
     <div>
         <section class="content-list-wrapper">
@@ -5,10 +123,9 @@
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.BASE_INFO') }}
                 </h3>
-                <notification-add-form-data :project-id="projectId"
-                                            :supported-schema="supportedSchema"
-                                            :protocol-type="protocolType"
-                                            :protocol-id="protocolId"
+                <notification-add-form-data :project-id="props.projectId"
+                                            :protocol-type="props.protocolType"
+                                            :protocol-id="props.protocolId"
                                             @change="onChangeData"
                 />
             </p-pane-layout>
@@ -40,7 +157,7 @@
             </p-button>
             <p-button style-type="primary"
                       class="text-button"
-                      :disabled="!isDataValid || !isScheduleValid || !isTopicValid"
+                      :disabled="!state.isDataValid || !state.isScheduleValid || !state.isTopicValid"
                       @click="onClickSave"
             >
                 {{ $t('COMMON.TAGS.SAVE') }}
@@ -48,166 +165,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PButton, PPaneLayout,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import NotificationAddFormData from '@/services/my-page/components/NotificationAddFormData.vue';
-import NotificationAddSchedule from '@/services/my-page/components/NotificationAddSchedule.vue';
-import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
-
-interface NotificationSchedule {
-    day_of_week: [],
-    start_hour: number;
-    end_hour: number;
-}
-
-export default {
-    name: 'NotificationAddForm',
-    components: {
-        NotificationAddFormData,
-        NotificationAddSchedule,
-        NotificationAddTopic,
-        PPaneLayout,
-        PButton,
-    },
-    props: {
-        userId: {
-            type: String,
-            default: '',
-        },
-        projectId: {
-            type: String,
-            default: '',
-        },
-        supportedSchema: {
-            type: [String, Array],
-            default: null,
-        },
-        protocolType: {
-            type: String,
-            default: '',
-        },
-        protocolId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            type: '',
-            description: null,
-            project: {} as any,
-            //
-            isDataValid: false,
-            notificationLevel: 'LV1',
-            //
-            channelName: '',
-            data: {},
-            topicMode: false,
-            topicList: [],
-            isTopicValid: true,
-            //
-            schedule: null as NotificationSchedule | null,
-            isScheduled: false,
-            isScheduleValid: true,
-        });
-
-        const createUserChannel = async () => {
-            try {
-                await SpaceConnector.client.notification.userChannel.create({
-                    protocol_id: props.protocolId,
-                    name: state.channelName,
-                    data: state.data,
-                    schema: props.supportedSchema,
-                    is_subscribe: state.topicMode,
-                    subscriptions: state.topicList,
-                    schedule: state.schedule,
-                    is_scheduled: state.isScheduled,
-                    user_id: props.userId,
-                });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'));
-            }
-        };
-
-        const createProjectChannel = async () => {
-            try {
-                await SpaceConnector.client.notification.projectChannel.create({
-                    protocol_id: props.protocolId,
-                    name: state.channelName,
-                    data: state.data,
-                    schema: props.supportedSchema,
-                    is_subscribe: state.topicMode,
-                    subscriptions: state.topicList,
-                    schedule: state.schedule,
-                    is_scheduled: state.isScheduled,
-                    user_id: props.userId,
-                    notification_level: state.notificationLevel,
-                    project_id: props.projectId,
-                });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_PROJECT_CHANNEL'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'));
-            }
-        };
-
-        const onClickSave = async () => {
-            try {
-                if (props.projectId) await createProjectChannel();
-                else await createUserChannel();
-                vm.$router.back();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        const onChangeData = (value) => {
-            state.channelName = value.channelName;
-            state.data = value.data;
-            state.notificationLevel = value.level;
-            state.isDataValid = value.isValid;
-        };
-
-        const onChangeSchedule = (value) => {
-            state.schedule = value.schedule;
-            state.isScheduled = value.is_scheduled;
-            state.isScheduleValid = value.isScheduleValid;
-        };
-
-        const onChangeTopic = (value) => {
-            state.topicMode = value.topicMode;
-            state.topicList = value.selectedTopic;
-            state.isTopicValid = value.isTopicValid;
-        };
-
-        return {
-            ...toRefs(state),
-            onClickSave,
-            onChangeData,
-            onChangeSchedule,
-            onChangeTopic,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .content-list-wrapper {

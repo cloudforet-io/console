@@ -79,6 +79,8 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
 import type { ProtocolModel } from '@/schema/notification/protocol/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -132,10 +134,10 @@ export default {
         const listProtocol = async () => {
             try {
                 apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
-                const res = await SpaceConnector.client.notification.protocol.list({
+                const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
                     query: apiQuery.data,
                 });
-                state.protocolList = res.results;
+                state.protocolList = res.results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.protocolList = [];

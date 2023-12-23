@@ -12,8 +12,11 @@ import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
+import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
+import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -44,7 +47,7 @@ const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
 const escalationPolicyFormStore = useEscalationPolicyFormStore();
 const escalationPolicyFormState = escalationPolicyFormStore.$state;
 const state = reactive({
-    projectChannels: [],
+    projectChannels: [] as ProjectChannelModel[],
 });
 
 const {
@@ -84,8 +87,8 @@ const apiQuery = new ApiQueryHelper();
 const listProjectChannel = async (projectId: string) => {
     try {
         apiQuery.setFilters([{ k: 'project_id', v: projectId, o: '=' }]);
-        const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: apiQuery.data });
-        state.projectChannels = results;
+        const { results } = await SpaceConnector.clientV2.notification.projectChannel.list<ProjectChannelListParameters, ListResponse<ProjectChannelModel>>({ query: apiQuery.data });
+        state.projectChannels = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.projectChannels = [];
