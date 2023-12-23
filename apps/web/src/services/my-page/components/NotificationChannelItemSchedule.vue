@@ -9,6 +9,8 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectChannelSetScheduleParameters } from '@/schema/notification/project-channel/api-verbs/set-schedule';
+import type { UserChannelSetScheduleParameters } from '@/schema/notification/user-channel/api-verbs/set-schedule';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -60,7 +62,8 @@ const onChangeSchedule = async (value) => {
 
 const setUserChannelSchedule = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.setSchedule({
+        if (!notificationItemState.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.setSchedule<UserChannelSetScheduleParameters>({
             user_channel_id: notificationItemState.userChannelId,
             is_scheduled: state.scheduleModeForEdit,
             schedule: state.scheduleForEdit,
@@ -74,7 +77,8 @@ const setUserChannelSchedule = async () => {
 };
 const setProjectChannelSchedule = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.setSchedule({
+        if (!notificationItemState.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.setSchedule<ProjectChannelSetScheduleParameters>({
             project_channel_id: notificationItemState.projectChannelId,
             is_scheduled: state.scheduleModeForEdit,
             schedule: state.scheduleForEdit,

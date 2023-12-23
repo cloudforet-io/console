@@ -7,6 +7,12 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
+import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
+import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';
+import type { UserChannelDeleteParameters } from '@/schema/notification/user-channel/api-verbs/delete';
+import type { UserChannelDisableParameters } from '@/schema/notification/user-channel/api-verbs/disable';
+import type { UserChannelEnableParameters } from '@/schema/notification/user-channel/api-verbs/enable';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -58,7 +64,8 @@ const checkDeleteState = reactive({
 
 const enableProjectChannel = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.enable({
+        if (!state.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.enable<ProjectChannelEnableParameters>({
             project_channel_id: state.projectChannelId,
         });
         state.isActivated = true;
@@ -70,7 +77,8 @@ const enableProjectChannel = async () => {
 
 const enableUserChannel = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.enable({
+        if (!state.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.enable<UserChannelEnableParameters>({
             user_channel_id: state.userChannelId,
         });
         state.isActivated = true;
@@ -87,7 +95,8 @@ const enableChannel = async () => {
 
 const disableProjectChannel = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.disable({
+        if (!state.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.disable<ProjectChannelDisableParameters>({
             project_channel_id: state.projectChannelId,
         });
         state.isActivated = false;
@@ -99,7 +108,8 @@ const disableProjectChannel = async () => {
 
 const disableUserChannel = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.disable({
+        if (!state.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.disable<UserChannelDisableParameters>({
             user_channel_id: state.userChannelId,
         });
         state.isActivated = false;
@@ -129,7 +139,8 @@ const onClickDelete = () => {
 
 const deleteProjectChannel = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.delete({
+        if (!state.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.delete<ProjectChannelDeleteParameters>({
             project_channel_id: state.projectChannelId,
         });
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '');
@@ -143,7 +154,8 @@ const deleteProjectChannel = async () => {
 
 const deleteUserChannel = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.delete({
+        if (!state.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.delete<UserChannelDeleteParameters>({
             user_channel_id: state.userChannelId,
         });
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');

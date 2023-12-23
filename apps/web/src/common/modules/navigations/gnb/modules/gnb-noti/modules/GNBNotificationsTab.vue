@@ -117,6 +117,11 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationDeleteParameters } from '@/schema/notification/notification/api-verbs/delete';
+import type { NotificationListParameters } from '@/schema/notification/notification/api-verbs/list';
+import type { NotificationSetReadParameters } from '@/schema/notification/notification/api-verbs/set-read';
+import type { NotificationModel } from '@/schema/notification/notification/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -246,7 +251,7 @@ export default {
         };
         const notificationApiHelper = new ApiQueryHelper();
         initApiHelper(notificationApiHelper);
-        const fetcher = getCancellableFetcher(SpaceConnector.client.notification.notification.list);
+        const fetcher = getCancellableFetcher<NotificationListParameters, ListResponse<NotificationModel>>(SpaceConnector.clientV2.notification.notification.list);
         const listNotifications = async () => {
             state.loading = true;
             try {
@@ -255,8 +260,8 @@ export default {
                 });
                 if (status === 'succeed') {
                     state.proxyCount = response.total_count;
-                    state.items = state.items.concat(convertNotificationItem(response.results));
-                    await setReadNotifications(response.results);
+                    state.items = state.items.concat(convertNotificationItem(response.results ?? []));
+                    await setReadNotifications(response.results ?? []);
                     // update last read
                     await store.commit('settings/setGnbNotificationLastReadTime', dayjs.utc().toISOString(), { root: true });
                 }
@@ -271,7 +276,7 @@ export default {
             if (ids.length === 0) return;
 
             try {
-                await SpaceConnector.client.notification.notification.setRead({
+                await SpaceConnector.clientV2.notification.notification.setRead<NotificationSetReadParameters>({
                     notifications: ids,
                 });
             } catch (e) {
@@ -280,7 +285,7 @@ export default {
         };
         const deleteNotification = async (notificationIds: string[]): Promise<boolean> => {
             try {
-                await SpaceConnector.client.notification.notification.delete({
+                await SpaceConnector.clientV2.notification.notification.delete<NotificationDeleteParameters>({
                     notifications: notificationIds,
                 });
                 state.items = state.items.filter((d) => !notificationIds.includes(d.notificationId));
