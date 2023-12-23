@@ -282,17 +282,15 @@ onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.$reset();
+    collectorDetailPageStore.reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
     });
     if (collector) {
         collectorJobStore.getAllJobsCount();
-        collectorFormStore.setOriginCollector(collector);
-        collectorDetailPageStore.$patch((_state) => {
-            _state.collector = collector;
-        });
+        await collectorFormStore.setOriginCollector(collector);
+        collectorDetailPageStore.state.collector = collector;
         resume();
     }
 });
@@ -301,7 +299,7 @@ onUnmounted(() => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
-    collectorDetailPageStore.$reset();
+    collectorDetailPageStore.reset();
 });
 
 
