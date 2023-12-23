@@ -9,6 +9,7 @@ import { PButton } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { BudgetCreateParameters } from '@/schema/cost-analysis/budget/api-verbs/create';
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
@@ -46,10 +47,24 @@ const createBudget = async () => {
 
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.costAnalysis.budget.create({
-            ...state.baseInfo,
-            ...state.amountPlanInfo,
-        });
+        const params: BudgetCreateParameters = {
+            name: state.baseInfo.name,
+            provider_filter: state.baseInfo.provider_filter,
+            data_source_id: state.baseInfo.data_source_id,
+            resource_group: storeState.isAdminMode ? 'WORKSPACE' : 'PROJECT',
+            //
+            planned_limits: state.amountPlanInfo.planned_limits,
+            limit: state.amountPlanInfo.limit,
+            time_unit: state.amountPlanInfo.time_unit,
+            start: state.amountPlanInfo.start,
+            end: state.amountPlanInfo.end,
+        };
+        if (storeState.isAdminMode) {
+            params.workspace_id = state.baseInfo.workspace_id;
+        } else {
+            params.project_id = state.baseInfo.project_id;
+        }
+        await SpaceConnector.clientV2.costAnalysis.budget.create<BudgetCreateParameters>(params);
 
         showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '');
         await router.push({

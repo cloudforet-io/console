@@ -14,8 +14,8 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { SpaceRouter } from '@/router';
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type {
-    BudgetUsageAnalyzeResponse,
     BudgetUsageAnalyzeResult,
 } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
@@ -60,17 +60,16 @@ const state = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
 });
 
-const fetchBudgetUsages = async (): Promise<BudgetUsageAnalyzeResponse> => {
+const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeResult>> => {
     try {
         state.loading = true;
         budgetUsageApiQueryHelper
             .setFilters(state.queryFilters)
             .setPage(state.pageStart, state.pageLimit);
         if (storeState.isAdminMode) {
-            budgetUsageApiQueryHelper.addFilter({ // TODO: check after api update
-                k: 'project_id',
-                v: null,
-                o: '=',
+            budgetUsageApiQueryHelper.addFilter({
+                k: 'resource_group',
+                v: 'WORKSPACE',
             });
         }
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
@@ -91,7 +90,7 @@ const fetchBudgetUsages = async (): Promise<BudgetUsageAnalyzeResponse> => {
 const listBudgets = async () => {
     if (state.loading) return;
     const { more, results } = await fetchBudgetUsages();
-    state.budgetUsages = results;
+    state.budgetUsages = results ?? [];
     state.more = !!more;
 };
 
