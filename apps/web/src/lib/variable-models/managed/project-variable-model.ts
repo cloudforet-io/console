@@ -47,7 +47,7 @@ export default class ProjectVariableModel extends ResourceNameVariableModel {
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{ results: ProjectModel[]; total_count: number }>>;
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, { results: ProjectModel[]; total_count: number }>>;
 
     #nameFormatter(data: ProjectModel, projectGroupList: ProjectGroupModel[]): string {
         if (data.project_group_id) {

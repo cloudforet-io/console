@@ -9,6 +9,10 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationListParameters } from '@/schema/notification/notification/api-verbs/list';
+import type { NotificationModel } from '@/schema/notification/notification/model';
+
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type { DisplayState } from '@/store/modules/display/type';
 
@@ -102,7 +106,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
             lastNotificationReadTime,
         );
         debugCheckNotification('[NOTI QUERY.FILTER]', param.query.filter);
-        const { total_count } = await SpaceConnector.client.notification.notification.list(param, {
+        const { total_count } = await SpaceConnector.clientV2.notification.notification.list<NotificationListParameters, ListResponse<NotificationModel>>(param, {
             cancelToken: notificationListApiToken.token,
         });
 

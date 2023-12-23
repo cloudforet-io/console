@@ -26,7 +26,7 @@ export default class CostDataKeyVariableModel implements IBaseVariableModel {
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, {
         results: { keys: string[] }[];
     }>>;
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, nextTick } from 'vue';
 
 import {
     PDivider, PIconButton, PPaneLayout, PToggleButton, PFieldTitle,
@@ -7,6 +7,12 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectChannelDeleteParameters } from '@/schema/notification/project-channel/api-verbs/delete';
+import type { ProjectChannelDisableParameters } from '@/schema/notification/project-channel/api-verbs/disable';
+import type { ProjectChannelEnableParameters } from '@/schema/notification/project-channel/api-verbs/enable';
+import type { UserChannelDeleteParameters } from '@/schema/notification/user-channel/api-verbs/delete';
+import type { UserChannelDisableParameters } from '@/schema/notification/user-channel/api-verbs/disable';
+import type { UserChannelEnableParameters } from '@/schema/notification/user-channel/api-verbs/enable';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -58,7 +64,8 @@ const checkDeleteState = reactive({
 
 const enableProjectChannel = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.enable({
+        if (!state.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.enable<ProjectChannelEnableParameters>({
             project_channel_id: state.projectChannelId,
         });
         state.isActivated = true;
@@ -70,7 +77,8 @@ const enableProjectChannel = async () => {
 
 const enableUserChannel = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.enable({
+        if (!state.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.enable<UserChannelEnableParameters>({
             user_channel_id: state.userChannelId,
         });
         state.isActivated = true;
@@ -87,25 +95,29 @@ const enableChannel = async () => {
 
 const disableProjectChannel = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.disable({
+        if (!state.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.disable<ProjectChannelDisableParameters>({
             project_channel_id: state.projectChannelId,
         });
         state.isActivated = false;
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'));
+        throw e;
     }
 };
 
 const disableUserChannel = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.disable({
+        if (!state.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.disable<UserChannelDisableParameters>({
             user_channel_id: state.userChannelId,
         });
         state.isActivated = false;
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('MY_PAGE.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'));
+        throw e;
     }
 };
 
@@ -114,9 +126,15 @@ const disableChannel = async () => {
     else await disableUserChannel();
 };
 
-const onToggleChange = async (value) => {
-    if (!value) await disableChannel();
-    else await enableChannel();
+const onToggleChange = async (value: boolean) => {
+    try {
+        state.isActivated = value;
+        if (!value) await disableChannel();
+        else await enableChannel();
+    } catch (e) {
+        await nextTick();
+        state.isActivated = !value;
+    }
 };
 
 const onChange = async () => {
@@ -129,7 +147,8 @@ const onClickDelete = () => {
 
 const deleteProjectChannel = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.delete({
+        if (!state.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.delete<ProjectChannelDeleteParameters>({
             project_channel_id: state.projectChannelId,
         });
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '');
@@ -143,7 +162,8 @@ const deleteProjectChannel = async () => {
 
 const deleteUserChannel = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.delete({
+        if (!state.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.delete<UserChannelDeleteParameters>({
             user_channel_id: state.userChannelId,
         });
         showSuccessMessage(i18n.t('MY_PAGE.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '');
@@ -187,35 +207,35 @@ const onEdit = (value?: EditTarget) => {
         <ul class="card-body">
             <notification-channel-item-name :channel-data="props.channelData"
                                             :project-id="props.projectId"
-                                            :disable-edit="(state.editTarget !== 'name') || props.manageDisabled"
+                                            :disable-edit="(state.editTarget && state.editTarget !== 'name') || props.manageDisabled"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-data :channel-data="props.channelData"
                                             :project-id="props.projectId"
-                                            :disable-edit="(state.editTarget !== 'data') || props.manageDisabled"
+                                            :disable-edit="(state.editTarget && state.editTarget !== 'data') || props.manageDisabled"
                                             @change="onChange"
                                             @edit="onEdit"
             />
             <p-divider v-if="projectId" />
             <notification-channel-item-level :channel-data="props.channelData"
                                              :project-id="props.projectId"
-                                             :disable-edit="(state.editTarget !== 'notification_level') || props.manageDisabled"
+                                             :disable-edit="(state.editTarget && state.editTarget !== 'notification_level') || props.manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-schedule :channel-data="props.channelData"
                                                 :project-id="props.projectId"
-                                                :disable-edit="(state.editTarget !== 'schedule') || props.manageDisabled"
+                                                :disable-edit="(state.editTarget && state.editTarget !== 'schedule') || props.manageDisabled"
                                                 @change="onChange"
                                                 @edit="onEdit"
             />
             <p-divider />
             <notification-channel-item-topic :channel-data="props.channelData"
                                              :project-id="props.projectId"
-                                             :disable-edit="(state.editTarget !== 'topic') || props.manageDisabled"
+                                             :disable-edit="(state.editTarget && state.editTarget !== 'topic') || props.manageDisabled"
                                              @change="onChange"
                                              @edit="onEdit"
             />
@@ -223,7 +243,7 @@ const onEdit = (value?: EditTarget) => {
         </ul>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
-                      :contents="$t('IDENTITY.USER.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE')"
+                      :contents="$t('IAM.USER.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE')"
                       @confirm="deleteChannelConfirm"
         />
     </p-pane-layout>

@@ -12,18 +12,18 @@ interface SucceedResponse<T> {
 }
 type CancellableFetcherResponse<T> = CancelledResponse|SucceedResponse<T>;
 
-interface Fetcher {
-    (params: object, config?: AxiosRequestConfig): Promise<any>
+interface Fetcher<Param, Res> {
+    (params: Param, config?: AxiosRequestConfig): Promise<Res>
 }
 
-interface CancellableFetcher<T = any> {
-    (params: object, config?: AxiosRequestConfig): Promise<CancellableFetcherResponse<T>>
+interface CancellableFetcher<Param, Res> {
+    (params: Param, config?: AxiosRequestConfig): Promise<CancellableFetcherResponse<Res>>
 }
 
-export function getCancellableFetcher<T = any>(fetcher: Fetcher): CancellableFetcher<T> {
+export function getCancellableFetcher<Param extends Record<string, any> = Record<string, any>, Res = any>(fetcher: Fetcher<Param, Res>): CancellableFetcher<Param, Res> {
     let cancelTokenSource: CancelTokenSource|undefined;
 
-    return async (params: object, config?: AxiosRequestConfig) => {
+    return async (params: Param, config?: AxiosRequestConfig) => {
         try {
             if (cancelTokenSource) {
                 cancelTokenSource.cancel('[getCancellableFetcher] Next request has been called.');

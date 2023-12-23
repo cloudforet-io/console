@@ -26,7 +26,7 @@ export default class CostTagKeyVariableModel implements IBaseVariableModel {
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, {
         results: { cost_tag_keys: string[] }[];
     }>>;
 

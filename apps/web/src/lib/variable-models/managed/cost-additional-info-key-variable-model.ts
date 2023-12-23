@@ -26,7 +26,7 @@ export default class CostAdditionalInfoKeyVariableModel implements IBaseVariable
 
     #response: ListResponse = { results: [] };
 
-    #fetcher?: ReturnType<typeof getCancellableFetcher<{
+    #fetcher?: ReturnType<typeof getCancellableFetcher<object, {
         results: { cost_additional_info_keys: string[] }[];
     }>>;
 

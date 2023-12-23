@@ -161,7 +161,7 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Response> => {
     if (!widgetState.dataField) return { results: [], more: false };
     apiQueryHelper.setFilters(widgetState.consoleFilters);

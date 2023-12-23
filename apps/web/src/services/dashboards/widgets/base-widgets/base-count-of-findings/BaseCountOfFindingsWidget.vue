@@ -83,7 +83,7 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<object, {results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         state.loading = true;

@@ -192,7 +192,7 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCostAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const fetchData = async (): Promise<Response|null> => {
     try {
         if (!state.dataType) {

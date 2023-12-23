@@ -7,6 +7,10 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type {
+    ProjectChannelSetSubscriptionParameters,
+} from '@/schema/notification/project-channel/api-verbs/set-subscriptiokn';
+import type { UserChannelSetSubscriptionParameters } from '@/schema/notification/user-channel/api-verbs/set-subscriptiokn';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -15,7 +19,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
 import { useNotificationItem } from '@/services/my-page/composables/notification-item';
+import type { NotificationAddFormTopicPayload } from '@/services/my-page/types/notification-add-form-type';
 import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+
 
 const props = withDefaults(defineProps<{
     channelData: NotiChannelItem;
@@ -30,7 +36,7 @@ const emit = defineEmits<{(event: 'change'): void;
 }>();
 
 const state = reactive({
-    topicModeForEdit: undefined,
+    topicModeForEdit: false,
     topicForEdit: props.channelData.subscriptions,
     isTopicValid: false,
 });
@@ -46,7 +52,8 @@ const {
 
 const setUserChannelSubscription = async () => {
     try {
-        await SpaceConnector.client.notification.userChannel.setSubscription({
+        if (!notificationItemState.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.setSubscription<UserChannelSetSubscriptionParameters>({
             user_channel_id: notificationItemState.userChannelId,
             is_subscribe: state.topicModeForEdit,
             subscriptions: state.topicForEdit,
@@ -60,7 +67,8 @@ const setUserChannelSubscription = async () => {
 };
 const setProjectChannelSubscription = async () => {
     try {
-        await SpaceConnector.client.notification.projectChannel.setSubscription({
+        if (!notificationItemState.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.setSubscription<ProjectChannelSetSubscriptionParameters>({
             project_channel_id: notificationItemState.projectChannelId,
             is_subscribe: state.topicModeForEdit,
             subscriptions: state.topicForEdit,
@@ -72,7 +80,7 @@ const setProjectChannelSubscription = async () => {
         ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
     }
 };
-const onChangeTopic = (value) => {
+const onChangeTopic = (value: NotificationAddFormTopicPayload) => {
     state.topicModeForEdit = value.topicMode;
     state.topicForEdit = value.selectedTopic;
     state.isTopicValid = value.isTopicValid;

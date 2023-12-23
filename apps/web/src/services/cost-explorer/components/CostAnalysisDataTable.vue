@@ -297,7 +297,7 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
 
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {

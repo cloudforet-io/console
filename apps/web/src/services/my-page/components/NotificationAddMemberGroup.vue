@@ -10,8 +10,11 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { UserReferenceMap } from '@/store/reference/user-reference-store';
@@ -39,7 +42,7 @@ const state = reactive({
     projectUserIdList: [] as string[],
     allMemberItems: computed<SelectDropdownMenuItem[]>(() => state.projectUserIdList.map((d) => ({
         name: d,
-        label: storeState.users[d]?.name ?? d,
+        label: storeState.users[d]?.label ?? d,
         type: 'item',
     }))),
     selectedMemberItems: props.users.map((d) => ({ name: d, label: d })),
@@ -51,12 +54,26 @@ const emitChange = () => {
     });
 };
 
-const listProjectMember = async () => {
-    state.loading = true;
+const fetchWorkspaceUserList = async () => {
     try {
-        const res: ProjectModel = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
+        });
+        state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.projectUserIdList = [];
+    }
+};
+const listProjectMember = async () => {
+    try {
+        state.loading = true;
+        const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
             project_id: props.projectId,
         });
+        if (res.project_type === 'PUBLIC') {
+            await fetchWorkspaceUserList();
+            return;
+        }
         state.projectUserIdList = res.users ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
@@ -65,7 +82,6 @@ const listProjectMember = async () => {
         state.loading = false;
     }
 };
-
 (async () => {
     await Promise.allSettled([
         listProjectMember(),
