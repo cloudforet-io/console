@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import { PLink, PDivider } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { PDivider } from '@spaceone/design-system';
 
 </script>
 
 <template>
+    <!--    TODO: will be updated stationery-->
     <section>
         <article class="desc-wrapper">
             <h2 class="header2">
@@ -58,15 +56,6 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
         </p>
         <p class="desc4">
             {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_CREATE') }}
-            <p-link :highlight="true"
-                    :action-icon="ACTION_ICON.INTERNAL_LINK"
-                    new-tab
-                    :to="{
-                        name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
-                    }"
-            >
-                {{ $t('IAM.ROLE.HANDBOOK.API_POLICY_LINK') }}
-            </p-link>
         </p>
     </section>
 </template>
