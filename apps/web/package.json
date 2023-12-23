@@ -113,7 +113,7 @@
     "vite-plugin-stylelint": "^3.3.3",
     "vite-plugin-vue-type-imports": "^0.2.4",
     "vitest": "^0.34.5",
-    "vue-template-compiler": "^2.7.14"
+    "vue-template-compiler": "^2.7.15"
   },
   "browserslist": [
     "> 1%",
