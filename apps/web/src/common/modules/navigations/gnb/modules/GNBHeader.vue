@@ -5,7 +5,7 @@ import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PDivider, PSelectDropdown,
+    PDivider, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
@@ -102,12 +102,16 @@ const selectWorkspace = (workspaceId: string): void => {
                            @select="selectWorkspace"
         >
             <template #dropdown-button>
-                <span class="selected-workspace">
-                    {{ state.selectedWorkspace?.name }}
-                </span>
-                <span class="tablet-selected">
-                    ...
-                </span>
+                <p-tooltip position="bottom"
+                           :contents="state.selectedWorkspace?.name ?? ''"
+                >
+                    <span class="selected-workspace">
+                        {{ state.selectedWorkspace?.name }}
+                    </span>
+                    <span class="tablet-selected">
+                        ...
+                    </span>
+                </p-tooltip>
             </template>
             <!--            <template #menu-item&#45;&#45;format="{ item }">-->
             <!--                <span class="menu-wrapper">-->
