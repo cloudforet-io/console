@@ -59,11 +59,10 @@ export const getPageAccessPermissionMapFromRawData = (pageAccessPermissions: str
                 result[id] = true;
             });
 
-            // general case
+            // general case -  asset_inventory.service_account
         } else {
-            const pageHierarchyList = page.split('.');
-            const menuIdByPageName = page.split('.')[pageHierarchyList.length];
-            result[menuIdByPageName] = true;
+            const endMenuIdByPageName = page.split('.').reverse()[0];
+            result[endMenuIdByPageName] = true;
         }
     });
     return result;
