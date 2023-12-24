@@ -2,8 +2,9 @@
 import {
     reactive, computed,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
-import { PI } from '@spaceone/design-system';
+import { PButton } from '@spaceone/design-system';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
@@ -15,11 +16,18 @@ import MyPageGNBHeader from '@/common/modules/navigations/gnb/modules/MyPageGNBH
 import MyPageGNBToolset from '@/common/modules/navigations/gnb/modules/MyPageGNBToolset.vue';
 
 const workspaceStore = useWorkspaceStore();
+const router = useRouter();
 
 const state = reactive({
     workspaceLink: computed(() => (state.hasRole ? { name: ROOT_ROUTE._NAME } : null)),
     hasRole: computed(() => workspaceStore.getters.workspaceList.length > 0),
 });
+
+const handleBackToWorkspace = () => {
+    if (state.hasRole) {
+        router.push({ name: ROOT_ROUTE._NAME });
+    }
+};
 
 
 </script>
@@ -30,18 +38,14 @@ const state = reactive({
             <my-page-g-n-b-header ref="gnbHeaderRef"
                                   :to="state.workspaceLink"
             />
-            <router-link v-if="state.hasRole"
-                         class="back-to-workspace-button"
-                         :to="state.workspaceLink"
+            <p-button style-type="transparent"
+                      class="back-to-workspace-button"
+                      icon-left="ic_arrow-left"
+                      @click="handleBackToWorkspace"
             >
-                <p-i name="ic_arrow-left"
-                     color="inherit"
-                     width="1rem"
-                     height="1rem"
-                />
                 <span class="link-text">{{ $t('COMMON.GNB.MY_PAGE.BACK_LINK') }}</span>
                 <span class="link-text-mobile">{{ $t('COMMON.GNB.MY_PAGE.BACK_LINK_SHORT') }}</span>
-            </router-link>
+            </p-button>
         </div>
         <my-page-g-n-b-toolset class="right-part" />
     </div>

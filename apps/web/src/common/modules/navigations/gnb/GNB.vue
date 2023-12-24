@@ -274,6 +274,7 @@ watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {
         }
 
         .gnb-menu-list {
+            padding-right: 0.25rem;
             &.gnb-first-menu {
                 padding-left: 0.75rem;
             }

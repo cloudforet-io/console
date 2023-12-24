@@ -972,6 +972,14 @@
 				"LABEL_API_GUIDE": "API Guide",
 				"LABEL_GITHUB": "GitHub",
 				"LABEL_USER_GUIDE": "User Guide"
+			},
+			"TOOLTIP": {
+				"ENABLE_ADMIN_MODE": "Enable Admin Mode",
+				"EXIT_ADMIN_MODE": "Exit Admin Mode",
+				"NOTIFICATIONS": "Notifications",
+				"PROFILE": "My Page",
+				"RECENT_FAVORITE": "Recent Visits / Favorites",
+				"SEARCH": "Search"
 			}
 		},
 		"HANDBOOK_BUTTON": {

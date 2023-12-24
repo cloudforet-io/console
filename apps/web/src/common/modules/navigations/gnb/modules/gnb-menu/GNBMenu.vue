@@ -274,7 +274,7 @@ export default defineComponent<Props>({
         position: absolute;
         top: $gnb-height;
         margin-top: -1.125rem;
-        left: 0.5rem;
+        left: 0;
         min-width: 10rem;
         z-index: 1000;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
@@ -287,7 +287,7 @@ export default defineComponent<Props>({
         z-index: 1000;
         top: $gnb-height;
         margin-top: -1.125rem;
-        left: 0.5rem;
+        left: 0;
         min-width: 10rem;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
     }
