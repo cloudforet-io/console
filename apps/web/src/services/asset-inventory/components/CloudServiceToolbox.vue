@@ -15,6 +15,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ExportParameter, ExportOption } from '@/schema/_common/api-verbs/export';
 import { QueryType } from '@/schema/_common/api-verbs/export';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -101,7 +102,7 @@ interface CloudServiceResource {
 
 const getCloudServiceResources = async (): Promise<CloudServiceResource[]> => {
     try {
-        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
             query: getCloudServiceAnalyzeQuery(
                 cloudServicePageStore.allFilters,
                 undefined,

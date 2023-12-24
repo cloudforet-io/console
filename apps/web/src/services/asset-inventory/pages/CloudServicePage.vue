@@ -88,6 +88,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -202,7 +203,7 @@ export default {
         });
 
         /* api */
-        const fetcher = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+        const fetcher = getCancellableFetcher<CloudServiceAnalyzeParameters, Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 
         const listCloudServiceType = async () => {
             try {

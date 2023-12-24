@@ -10,6 +10,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
@@ -60,7 +62,7 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceAnalyze = getCancellableFetcher<object, {results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<CloudServiceAnalyzeParameters, {results: Data[], more?: boolean}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper
