@@ -25,7 +25,7 @@ import type { UserListItemType } from '@/services/administration/types/user-type
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
         isAdminMode: false,
-        loading: false,
+        loading: true,
         users: [] as UserListItemType[],
         selectedUser: {} as UserListItemType,
         roles: [] as RoleModel[],
