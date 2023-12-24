@@ -117,6 +117,7 @@ export const useProjectReferenceStore = defineStore('project-reference', () => {
                         id: projectGroup.project_group_id,
                         name: projectGroup.name,
                     } : undefined,
+                    users: project.users || [],
                 },
             },
         };
