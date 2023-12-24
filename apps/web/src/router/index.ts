@@ -10,6 +10,8 @@ import type { GrantScope } from '@/schema/identity/token/type';
 import { ERROR_ROUTE } from '@/router/constant';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import type { RoleInfo } from '@/store/modules/user/type';
+
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import { getRecentConfig } from '@/lib/helper/router-recent-helper';
@@ -21,13 +23,19 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
-const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string) => {
+const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
     const grantRequest = {
         scope,
         token,
         workspace_id: workspaceId,
     };
     await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
+    return SpaceRouter.router.app?.$store.getters['user/getCurrentRoleInfo'];
+};
+const loadAllReferencesByGrantedRoleInfo = async (grantedRoleInfo?: RoleInfo) => {
+    if (grantedRoleInfo) {
+        await SpaceRouter.router.app?.$store.dispatch('reference/initializeAllReference');
+    }
 };
 
 export class SpaceRouter {
@@ -86,7 +94,8 @@ export class SpaceRouter {
                     scope = 'WORKSPACE';
                 } else scope = 'USER';
 
-                await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
+                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
+                await loadAllReferencesByGrantedRoleInfo(grantedRoleInfo);
             }
 
 
