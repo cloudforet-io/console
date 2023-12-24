@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {
-    computed, getCurrentInstance, reactive,
+    computed, reactive,
 } from 'vue';
-import type { Vue } from 'vue/types/vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PSkeleton, PI, PEmpty } from '@spaceone/design-system';
 import dayjs from 'dayjs';
@@ -11,6 +11,8 @@ import { range } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
@@ -23,6 +25,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 
+const router = useRouter();
 
 interface Props {
     extraParams?: Record<string, any>;
@@ -37,7 +40,6 @@ interface JobItem extends JobModel {
     collector?: string;
 }
 
-const vm = getCurrentInstance()?.proxy as Vue;
 const state = reactive({
     loading: false,
     skeletons: range(2),
@@ -85,7 +87,7 @@ const timeFormatter = (value) => {
 /* api */
 const fetchCollectors = async () => {
     try {
-        const res = await SpaceConnector.clientV2.inventory.collector.list({
+        const res = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
             query: {
                 page: {
                     start: 1,
@@ -149,7 +151,7 @@ const getData = async () => {
 };
 
 const goToCollectorHistory = async (item) => {
-    await vm.$router.push({
+    await router.push({
         name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
         hash: item.job_id,
     });
@@ -251,7 +253,7 @@ init();
         @apply flex-shrink-0 flex justify-end;
         font-size: 0.75rem;
         .more {
-            @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer float-right;
+            @apply text-sm text-blue-600 font-normal float-right inline-flex items-center cursor-pointer;
             &:hover {
                 @apply text-secondary underline;
             }
@@ -305,3 +307,4 @@ init();
     }
 }
 </style>
+

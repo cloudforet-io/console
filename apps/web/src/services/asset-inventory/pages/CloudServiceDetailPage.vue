@@ -26,6 +26,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -220,7 +223,7 @@ const getQuery = (schema?) => {
 const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
     typeOptionState.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.inventory.cloudService.list({
+        const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
             query: getQuery(schema),
             ...(overviewState.period && {
                 date_range: {
@@ -231,9 +234,9 @@ const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalC
         });
 
         // filtering select index
-        typeOptionState.selectIndex = typeOptionState.selectIndex.filter((d) => !!res.results[d]);
+        typeOptionState.selectIndex = typeOptionState.selectIndex.filter((d) => !!(res.results ?? [])[d]);
 
-        return { items: res.results, totalCount: res.total_count };
+        return { items: res.results ?? [], totalCount: res.total_count ?? 0 };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { items: [], totalCount: 0 };

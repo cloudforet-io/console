@@ -14,6 +14,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { ASSET_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 
 import type { ReferenceMap } from '@/store/modules/reference/type';
 
@@ -83,7 +84,7 @@ const state = reactive({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceAnalyze = getCancellableFetcher<object, {results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<CloudServiceAnalyzeParameters, {results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         state.loading = true;

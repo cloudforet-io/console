@@ -17,6 +17,7 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -147,7 +148,7 @@ const analyzeCloudService = async (summaryType: SummaryType, projectIdList: stri
         { k: 'project_id', v: projectIdList, o: '' },
     ]);
     try {
-        const res = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+        const res = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
             query: {
                 group_by: ['project_id'],
                 fields: {
