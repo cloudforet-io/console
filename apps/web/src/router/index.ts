@@ -11,8 +11,6 @@ import { ERROR_ROUTE } from '@/router/constant';
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import type { RoleInfo } from '@/store/modules/user/type';
-// eslint-disable-next-line import/no-cycle
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -35,10 +33,8 @@ const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?:
     return SpaceRouter.router.app?.$store.getters['user/getCurrentRoleInfo'];
 };
 const loadAllReferencesByGrantedRoleInfo = async (grantedRoleInfo?: RoleInfo) => {
-    const allReferenceStore = useAllReferenceStore();
     if (grantedRoleInfo) {
-        await SpaceRouter.router.app?.$store.dispatch('reference/loadAll');
-        allReferenceStore.flush();
+        await SpaceRouter.router.app?.$store.dispatch('reference/initializeAllReference');
     }
 };
 
