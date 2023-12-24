@@ -1,3 +1,149 @@
+<script lang="ts" setup>
+import {
+    computed, getCurrentInstance, reactive,
+} from 'vue';
+import type { Vue } from 'vue/types/vue';
+
+import { PSkeleton, PI, PEmpty } from '@spaceone/design-system';
+import dayjs from 'dayjs';
+import { range } from 'lodash';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
+import type { JobStatus } from '@/schema/inventory/job/type';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+
+import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+
+
+interface Props {
+    extraParams?: Record<string, any>;
+}
+const props = withDefaults(defineProps<Props>(), {
+    extraParams: () => ({}),
+});
+const STATUS_FILTER: JobStatus[] = ['IN_PROGRESS'];
+interface JobItem extends JobModel {
+    progress: string;
+    color?: string;
+    provider?: string;
+    collector?: string;
+}
+
+const vm = getCurrentInstance()?.proxy as Vue;
+const state = reactive({
+    loading: false,
+    skeletons: range(2),
+    timezone: computed(() => store.state.user.timezone || 'UTC'),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    jobs: [] as JobModel[],
+    collectors: [] as CollectorModel[],
+    collectorsMap: computed<Record<string, CollectorModel>>(() => {
+        const map = {} as Record<string, CollectorModel>;
+        state.collectors.forEach((collector) => {
+            map[collector.collector_id] = collector;
+        });
+        return map;
+    }),
+    items: computed<JobItem[]>(() => {
+        const collectorsMap = state.collectorsMap;
+        const providersMap = state.providers;
+        return state.jobs.map((job) => {
+            const collector = collectorsMap[job.collector_id];
+            const provider = providersMap[collector?.provider];
+            return {
+                ...job,
+                progress: `${(Math.round((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100)}%`,
+                color: provider?.color,
+                provider: provider?.label,
+                collector: collector?.name,
+            };
+        });
+    }),
+    fields: computed(() => [
+        { label: i18n.t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },
+        { label: i18n.t('COMMON.WIDGETS.COLLECTING_JOBS_STATUS'), name: 'progress' },
+    ]),
+});
+
+/* util */
+const timeFormatter = (value) => {
+    let time = dayjs(dayjs(value)).utc();
+    if (state.timezone !== 'UTC') {
+        time = dayjs(dayjs(value)).tz(state.timezone);
+    }
+    return time.format('MM-DD HH:mm ~');
+};
+
+/* api */
+const collectorApiQuery = new ApiQueryHelper();
+const fetchCollectors = async (collectorIds: string[]) => {
+    try {
+        collectorApiQuery.setFilters([{ k: 'collector_id', v: collectorIds, o: '=' }]);
+        const res = await SpaceConnector.clientV2.inventory.collector.list({
+            query: collectorApiQuery.data,
+        });
+        state.collectors = res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.collectors = [];
+    }
+};
+
+const jobApiQuery = new ApiQueryHelper();
+const fetchJobs = async () => {
+    try {
+        jobApiQuery.setSort('created_at')
+            .setPage(1, 5)
+            .setFilters([{ k: 'status', v: STATUS_FILTER, o: '=' }]);
+        const res = await SpaceConnector.clientV2.inventory.collector.list({
+            ...props.extraParams,
+            query: jobApiQuery.data,
+        });
+        state.jobs = res.results;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.jobs = [];
+    }
+};
+
+const getData = async () => {
+    state.loading = true;
+    try {
+        await fetchJobs();
+        await fetchCollectors(state.items.map((item) => item.collector_id));
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+const goToCollectorHistory = async (item) => {
+    await vm.$router.push({
+        name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
+        hash: item.job_id,
+    });
+};
+
+const init = async () => {
+    await Promise.allSettled([
+        store.dispatch('reference/provider/load'),
+        getData(),
+    ]);
+};
+init();
+</script>
+
 <template>
     <widget-layout>
         <template #title>
@@ -20,8 +166,8 @@
                 </router-link>
             </div>
         </template>
-        <template v-if="loading">
-            <div v-for="skeleton in skeletons"
+        <template v-if="state.loading">
+            <div v-for="skeleton in state.skeletons"
                  :key="skeleton"
                  class="grid grid-cols-1 gap-1 my-4 w-full"
             >
@@ -33,8 +179,8 @@
                 />
             </div>
         </template>
-        <div v-else-if="!loading && items.length > 0">
-            <div v-for="(item, index) in items"
+        <div v-else-if="!state.loading && state.items.length > 0">
+            <div v-for="(item, index) in state.items"
                  :key="index"
                  class="card grid grid-cols-12 cursor-pointer"
                  @click="goToCollectorHistory(item)"
@@ -63,7 +209,7 @@
                 :title="$t('COMMON.WIDGETS.COLLECTING_JOBS_NO_RUNNING')"
             >
                 <template #image>
-                    <img src="../../../assets/images/illust_star.svg"
+                    <img src="@/assets/images/illust_star.svg"
                          alt="empty-image"
                     >
                 </template>
@@ -71,171 +217,6 @@
         </div>
     </widget-layout>
 </template>
-
-<script lang="ts">
-import {
-    computed, getCurrentInstance, reactive, toRefs,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import { PSkeleton, PI, PEmpty } from '@spaceone/design-system';
-import dayjs from 'dayjs';
-import { range } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import type { CollectorModel } from '@/schema/inventory/collector/model';
-import type { JobModel } from '@/schema/inventory/job/model';
-import type { JobStatus } from '@/schema/inventory/job/type';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-
-
-const STATUS_FILTER: JobStatus[] = ['IN_PROGRESS'];
-interface JobItem extends JobModel {
-    progress: string;
-    color?: string;
-    provider?: string;
-    collector?: string;
-}
-
-export default {
-    name: 'CollectingProgress',
-    components: {
-        WidgetLayout,
-        PSkeleton,
-        PI,
-        PEmpty,
-    },
-    props: {
-        extraParams: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const state = reactive({
-            loading: false,
-            skeletons: range(2),
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            jobs: [] as JobModel[],
-            collectors: [] as CollectorModel[],
-            collectorsMap: computed<Record<string, CollectorModel>>(() => {
-                const map = {} as Record<string, CollectorModel>;
-                state.collectors.forEach((collector) => {
-                    map[collector.collector_id] = collector;
-                });
-                return map;
-            }),
-            items: computed<JobItem[]>(() => {
-                const collectorsMap = state.collectorsMap;
-                const providersMap = state.providers;
-                return state.jobs.map((job) => {
-                    const collector = collectorsMap[job.collector_id];
-                    const provider = providersMap[collector?.provider];
-                    return {
-                        ...job,
-                        progress: `${(Math.round((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100)}%`,
-                        color: provider?.color,
-                        provider: provider?.label,
-                        collector: collector?.name,
-                    };
-                });
-            }),
-            fields: computed(() => [
-                { label: i18n.t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },
-                { label: i18n.t('COMMON.WIDGETS.COLLECTING_JOBS_STATUS'), name: 'progress' },
-            ]),
-        });
-
-        /* util */
-        const timeFormatter = (value) => {
-            let time = dayjs(dayjs(value)).utc();
-            if (state.timezone !== 'UTC') {
-                time = dayjs(dayjs(value)).tz(state.timezone);
-            }
-            return time.format('MM-DD HH:mm ~');
-        };
-
-        /* api */
-        const collectorApiQuery = new ApiQueryHelper();
-        const fetchCollectors = async (collectorIds: string[]) => {
-            try {
-                collectorApiQuery.setFilters([{ k: 'collector_id', v: collectorIds, o: '=' }]);
-                const res = await SpaceConnector.clientV2.inventory.collector.list({
-                    query: collectorApiQuery.data,
-                });
-                state.collectors = res.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.collectors = [];
-            }
-        };
-
-        const jobApiQuery = new ApiQueryHelper();
-        const fetchJobs = async () => {
-            try {
-                jobApiQuery.setSort('created_at')
-                    .setPage(1, 5)
-                    .setFilters([{ k: 'status', v: STATUS_FILTER, o: '=' }]);
-                const res = await SpaceConnector.clientV2.inventory.collector.list({
-                    ...props.extraParams,
-                    query: jobApiQuery.data,
-                });
-                state.jobs = res.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.jobs = [];
-            }
-        };
-
-        const getData = async () => {
-            state.loading = true;
-            try {
-                await fetchJobs();
-                await fetchCollectors(state.items.map((item) => item.collector_id));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const goToCollectorHistory = async (item) => {
-            await vm.$router.push({
-                name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY._NAME,
-                hash: item.job_id,
-            });
-        };
-
-        const init = async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                getData(),
-            ]);
-        };
-        init();
-
-        return {
-            ...toRefs(state),
-            ASSET_INVENTORY_ROUTE,
-            timeFormatter,
-            getData,
-            goToCollectorHistory,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .top {
