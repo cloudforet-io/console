@@ -81,9 +81,6 @@ const state = reactive({
     pageAccessDataList: usePageAccessDefinitionTableData(computed(() => state.pageAccess ?? [])),
 });
 
-/* Component */
-const convertPagePermissionLabel = (accessible: boolean) => (accessible || '--');
-
 /* Api */
 const getRoleDetailData = async (roleId) => {
     state.loading = true;
@@ -160,7 +157,7 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                                             v-on="$listeners"
                         >
                             <template #data="{ data }">
-                                {{ convertPagePermissionLabel(data) }}
+                                {{ data ? 'O' : 'X' }}
                             </template>
                         </p-definition-table>
                     </div>
