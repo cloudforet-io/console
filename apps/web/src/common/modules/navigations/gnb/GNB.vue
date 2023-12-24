@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Ref } from 'vue';
 import {
-    reactive, computed, onMounted, ref, watch, nextTick,
+    reactive, computed, ref, watch, nextTick,
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router/composables';
 
@@ -182,11 +182,6 @@ const updateGNBLayout = (gnbWidth: number) => {
     state.availableMenuCount = visibleMenuCount;
     state.isInvisibleMenuExists = visibleMenuCount < state.gnbMenuList.length;
 };
-
-
-onMounted(() => {
-    store.dispatch('domain/loadExtraMenu');
-});
 
 
 watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {

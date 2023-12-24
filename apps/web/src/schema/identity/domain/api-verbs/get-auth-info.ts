@@ -9,6 +9,7 @@ export interface DomainGetAuthInfoResponse {
     name: string;
     external_auth_state: 'ENABLED' | 'DISABLED';
     metadata: Metadata;
+    config: Record<string, any>;
 }
 
 interface Metadata {
