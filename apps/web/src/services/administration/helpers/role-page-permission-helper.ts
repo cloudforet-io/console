@@ -1,6 +1,6 @@
 import { find } from 'lodash';
 
-import type { PageAccessMenuItem } from '@/services/administration/types/page-access-menu-type';
+import type { PageAccessMenuItem } from '@/services/administration/types/role-type';
 
 export const getPageAccessList = (menuItems: PageAccessMenuItem[]): string[] => {
     // all case

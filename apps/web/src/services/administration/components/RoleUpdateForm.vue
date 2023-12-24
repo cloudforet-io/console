@@ -13,6 +13,7 @@ import RoleUpdateFormBaseInformation from '@/services/administration/components/
 import RoleUpdateFormPermissionForm from '@/services/administration/components/RoleUpdateFormPermissionForm.vue';
 import RoleUpdateFormRoleType from '@/services/administration/components/RoleUpdateFormRoleType.vue';
 import { FORM_TYPE } from '@/services/administration/constants/role-constant';
+import type { RoleFormData } from '@/services/administration/types/role-type';
 
 interface Props {
     initialRoleData?: RoleModel;
@@ -32,9 +33,9 @@ const state = reactive({
     isBaseInformationValid: false,
     baseInfoFormData: '' as string,
     roleTypeData: ROLE_TYPE.DOMAIN_ADMIN as RoleType,
-    pageAccessFormData: [] as string[],
+    pageAccessFormData: ['*'] as string[],
     permissionsData: [] as string[],
-
+    //
     initialSelectedPolicyList: [] as Policy[],
     isAllValid: computed<boolean>(() => state.isBaseInformationValid),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
@@ -50,27 +51,28 @@ const state = reactive({
             }
             : {
                 ...baseData,
-                role_id: props.initialRoleData.role_id,
+                role_id: props.initialRoleData?.role_id || '',
             };
     }),
 });
 
+/* Components */
 const handleBaseInfoValidate = (value: boolean) => {
     state.isBaseInformationValid = value;
 };
-const handleUpdateBaseInformation = (value: string) => {
-    state.baseInfoFormData = value;
-};
-const handleUpdateUserType = (value: RoleType) => {
-    state.roleTypeData = value;
-};
-const handleUpdatePageAccessForm = (value) => {
-    state.pageAccessFormData = value;
-};
-const handleUpdatePolicy = (value: string[]) => {
-    state.permissionsData = value;
+const handleUpdateForm = (formData: RoleFormData) => {
+    if (formData.name) state.baseInfoFormData = formData.name;
+    if (formData.role_type) {
+        state.roleTypeData = formData.role_type;
+        if (state.roleTypeData === ROLE_TYPE.DOMAIN_ADMIN) {
+            state.pageAccessFormData = ['*'];
+        }
+    }
+    if (formData.page_access) state.pageAccessFormData = formData.page_access;
+    if (formData.permissions) state.permissionsData = formData.permissions;
 };
 
+/* Watcher */
 watch(() => state.isAllValid, (after) => {
     emit('update-validation', after);
 });
@@ -78,6 +80,7 @@ watch(() => state.formData, (after) => {
     emit('update-form-data', after);
 });
 watch(() => props.initialRoleData, (initialRoleData) => {
+    if (!initialRoleData) return;
     const isObjectEmpty = !Object.keys(initialRoleData).length;
     if (isObjectEmpty) return;
     state.baseInfoFormData = initialRoleData?.name;
@@ -94,15 +97,15 @@ watch(() => props.initialRoleData, (initialRoleData) => {
     <div class="role-update-form">
         <role-update-form-base-information :initial-data="state.baseInfoFormData"
                                            @update-validation="handleBaseInfoValidate"
-                                           @update-form="handleUpdateBaseInformation"
+                                           @update-form="handleUpdateForm"
         />
         <role-update-form-role-type :initial-data="state.roleTypeData"
-                                    @update-form="handleUpdateUserType"
+                                    @update-form="handleUpdateForm"
         />
-        <role-update-form-permission-form :initial-page-permissions="state.pageAccessFormData"
+        <role-update-form-permission-form :initial-page-access="state.pageAccessFormData"
+                                          :initial-permissions="state.pageAccessFormData"
                                           :role-type="state.roleTypeData"
-                                          @update-form="handleUpdatePageAccessForm"
-                                          @update-editor="handleUpdatePolicy"
+                                          @update-form="handleUpdateForm"
         />
     </div>
 </template>

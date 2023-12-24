@@ -9,6 +9,8 @@ import { i18n } from '@/translations';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
+import type { RoleFormData } from '@/services/administration/types/role-type';
+
 interface Props {
     initialData?: string;
 }
@@ -18,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update-validation', after: boolean): void,
-    (e: 'update-form', name: string): void,
+    (e: 'update-form', formData: RoleFormData): void,
 }>();
 
 const {
@@ -39,7 +41,7 @@ const {
 
 /* Watcher */
 watch(() => roleName.value, (value) => {
-    emit('update-form', value);
+    emit('update-form', { name: value });
     if (!invalidState.roleName) {
         emit('update-validation', true);
     }
