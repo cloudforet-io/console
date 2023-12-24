@@ -9,11 +9,10 @@ import dayjs from 'dayjs';
 import { range } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
-import type { JobStatus } from '@/schema/inventory/job/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -31,7 +30,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     extraParams: () => ({}),
 });
-const STATUS_FILTER: JobStatus[] = ['IN_PROGRESS'];
 interface JobItem extends JobModel {
     progress: string;
     color?: string;
@@ -85,12 +83,15 @@ const timeFormatter = (value) => {
 };
 
 /* api */
-const collectorApiQuery = new ApiQueryHelper();
-const fetchCollectors = async (collectorIds: string[]) => {
+const fetchCollectors = async () => {
     try {
-        collectorApiQuery.setFilters([{ k: 'collector_id', v: collectorIds, o: '=' }]);
         const res = await SpaceConnector.clientV2.inventory.collector.list({
-            query: collectorApiQuery.data,
+            query: {
+                page: {
+                    start: 1,
+                    limit: 5,
+                },
+            },
         });
         state.collectors = res.results;
     } catch (e) {
@@ -98,18 +99,37 @@ const fetchCollectors = async (collectorIds: string[]) => {
         state.collectors = [];
     }
 };
-
-const jobApiQuery = new ApiQueryHelper();
-const fetchJobs = async () => {
+const fetchJobs = async (collectorIdList: string[]) => {
     try {
-        jobApiQuery.setSort('created_at')
-            .setPage(1, 5)
-            .setFilters([{ k: 'status', v: STATUS_FILTER, o: '=' }]);
-        const res = await SpaceConnector.clientV2.inventory.collector.list({
+        const { results }: AnalyzeResponse<JobModel> = await SpaceConnector.clientV2.inventory.job.analyze({
             ...props.extraParams,
-            query: jobApiQuery.data,
+            query: {
+                filter: [
+                    {
+                        k: 'collector_id',
+                        v: collectorIdList,
+                        o: 'in',
+                    },
+                    {
+                        k: 'status',
+                        v: ['IN_PROGRESS'],
+                        o: 'in',
+                    },
+                ],
+                group_by: ['collector_id'],
+                fields: {
+                    job_status: {
+                        operator: 'push',
+                        fields: {
+                            job_id: 'job_id',
+                            total_tasks: 'total_tasks',
+                            remained_tasks: 'remained_tasks',
+                        },
+                    },
+                },
+            },
         });
-        state.jobs = res.results;
+        state.jobs = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.jobs = [];
@@ -119,8 +139,8 @@ const fetchJobs = async () => {
 const getData = async () => {
     state.loading = true;
     try {
-        await fetchJobs();
-        await fetchCollectors(state.items.map((item) => item.collector_id));
+        await fetchCollectors();
+        await fetchJobs(state.collectors.map((d) => d.collector_id));
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
