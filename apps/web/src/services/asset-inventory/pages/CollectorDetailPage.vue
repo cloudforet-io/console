@@ -114,6 +114,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
 import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
@@ -211,9 +212,9 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => SpaceConnector.clientV2.inventory.collector.delete({
-    collectors: [collectorFormStore.collectorId],
-});
+const fetchDeleteCollector = async () => (collectorFormStore.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+    collector_id: collectorFormStore.collectorId,
+}) : undefined);
 
 const goBackToMainPage = () => {
     SpaceRouter.router.push({
