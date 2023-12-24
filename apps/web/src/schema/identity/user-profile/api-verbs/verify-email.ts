@@ -1,3 +1,3 @@
 export interface UserProfileVerifyEmailParameters {
-    email: string;
+    email?: string;
 }
