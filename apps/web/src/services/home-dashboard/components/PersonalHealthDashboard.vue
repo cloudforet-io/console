@@ -207,7 +207,7 @@ export default {
         })();
 
         /* Watcher */
-        watch(() => store.state.reference.project.items, async (projects) => {
+        watch(() => allReferenceStore.getters.project, async (projects) => {
             if (projects) {
                 const rawData = await getData();
                 state.data = getConvertedData(rawData, projects);
