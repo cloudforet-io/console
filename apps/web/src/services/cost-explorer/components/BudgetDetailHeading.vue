@@ -5,12 +5,13 @@ import { useRouter } from 'vue-router/composables';
 import { PDivider, PHeading, PIconButton } from '@spaceone/design-system';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import BudgetDetailDeleteModal from '@/services/cost-explorer/components/BudgetDetailDeleteModal.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
@@ -25,15 +26,18 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const router = useRouter();
+const appContextStore = useAppContextStore();
 const budgetPageStore = useBudgetDetailPageStore();
 const budgetPageState = budgetPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isWorkspaceOwner: () => store.state.user.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    hasManagePermission: useManagePermissionState(),
+    isProjectTarget: computed(() => state.budgetData?.resource_group === 'PROJECT'),
     dataSourceName: computed(() => {
         if (!state.budgetData) return '';
         return storeState.dataSourceMap[state.budgetData.data_source_id]?.label;
@@ -63,9 +67,10 @@ const handleConfirmDelete = () => {
             <template v-if="!props.loading"
                       #title-right-extra
             >
-                <div class="title-button-group">
+                <div v-if="storeState.isAdminMode || (state.isProjectTarget && storeState.isWorkspaceOwner)"
+                     class="title-button-group"
+                >
                     <p-icon-button name="ic_delete"
-                                   :disabled="!state.hasManagePermission"
                                    @click="handleClickDelete"
                     />
                 </div>

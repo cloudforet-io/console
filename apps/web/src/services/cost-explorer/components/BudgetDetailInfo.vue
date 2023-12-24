@@ -43,7 +43,7 @@ const storeState = reactive({
 });
 const state = reactive({
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    isProjectTarget: computed(() => !!state.budgetData?.project_id),
+    isProjectTarget: computed(() => state.budgetData?.resource_group === 'PROJECT'),
     providerListText: computed<string>(() => {
         if (!budgetPageState.budgetData) return '';
         const providerFilter = budgetPageState.budgetData?.provider_filter;
@@ -51,7 +51,7 @@ const state = reactive({
         return changeToLabelList(providerFilter?.providers ?? []);
     }),
     targetLabel: computed<{ group?: string, name: string }>(() => {
-        const targetId = state.budgetData?.project_id ?? state.budgetData?.workspace_id;
+        const targetId = state.isProjectTarget ? state.budgetData?.project_id : state.budgetData?.workspace_id;
         if (state.isProjectTarget) {
             const project = storeState.projects[targetId];
             return {
