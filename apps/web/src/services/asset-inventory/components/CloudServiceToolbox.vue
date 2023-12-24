@@ -55,6 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): void;
+    (event: 'refresh'): void;
 }>();
 
 const cloudServicePageStore = useCloudServicePageStore();
@@ -214,6 +215,9 @@ const handleChange = (options: ToolboxOptions = {}) => {
         emit('update-pagination', options);
     }
 };
+const handleRefresh = () => {
+    emit('refresh');
+};
 const handleClickSet = () => {
     state.visibleSetFilterModal = true;
 };
@@ -270,7 +274,7 @@ const handleExport = () => {
                    :value-handler-map="props.handlers?.valueHandlerMap ?? {}"
                    :page-size="props.pageSize"
                    @change="handleChange"
-                   @refresh="handleChange()"
+                   @refresh="handleRefresh"
                    @export="handleExport"
         />
         <cloud-service-filter-modal :visible.sync="state.visibleSetFilterModal" />
