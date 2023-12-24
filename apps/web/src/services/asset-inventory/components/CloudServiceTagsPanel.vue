@@ -51,6 +51,8 @@ import { PBadge, PSelectStatus } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -146,7 +148,7 @@ export default {
 
         const getCloudServiceTags = async () => {
             try {
-                const { tags } = await SpaceConnector.clientV2.inventory.cloudService.get({
+                const { tags } = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({
                     cloud_service_id: props.resourceId,
                 });
                 state.cloudServiceTags = tags;

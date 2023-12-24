@@ -20,6 +20,10 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceGetParameters } from '@/schema/inventory/cloud-service/api-verbs/get';
+import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -209,7 +213,7 @@ const getData = async () => {
         state.data = res.results;
     } else if (state.isTableTypeInDynamicLayout) {
         try {
-            const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams(state.currentLayout.type));
+            const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>(getListApiParams(state.currentLayout.type));
             if (res.total_count !== undefined) state.totalCount = res.total_count;
             if (res.results) state.data = state.isTableTypeInDynamicLayout ? res.results : res.results[0];
         } catch (e) {
@@ -219,7 +223,7 @@ const getData = async () => {
         }
     } else {
         try {
-            const res = await SpaceConnector.clientV2.inventory.cloudService.get({ cloud_service_id: props.cloudServiceId });
+            const res = await SpaceConnector.clientV2.inventory.cloudService.get<CloudServiceGetParameters, CloudServiceModel>({ cloud_service_id: props.cloudServiceId });
             if (res) state.data = res;
         } catch (e) {
             ErrorHandler.handleError(e);
