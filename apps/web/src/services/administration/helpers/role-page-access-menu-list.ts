@@ -1,6 +1,8 @@
+import { find } from 'lodash';
+
 import type { RoleType } from '@/schema/identity/role/type';
 
-import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-permission-helper';
+import { getDefaultPageAccessPermissionList } from '@/lib/access-control/page-access-helper';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
@@ -45,4 +47,27 @@ export const getPageAccessMenuListByRoleType = (defaultItems: PageAccessMenuItem
         }
     });
     return defaultItems.concat(results);
+};
+
+export const getPageAccessList = (menuItems: PageAccessMenuItem[]): string[] => {
+    // all case
+    const allItem = find(menuItems, { id: 'all' });
+    if (allItem && allItem.isAccessible) return ['*'];
+
+    const results: string[] = [];
+    menuItems.forEach((menu) => {
+        // accessible permission for menu group
+        if (menu.isAccessible) {
+            results.push(`${menu.id}.*`);
+            return;
+        }
+
+        // each individual menu case
+        menu.subMenuList?.forEach((subMenu) => {
+            if (!subMenu.isAccessible) return;
+            results.push(`${menu.id}.${subMenu.id}`);
+        });
+    });
+
+    return results;
 };

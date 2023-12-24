@@ -1,6 +1,3 @@
-// TODO: change file name to page-access-helper.ts
-
-
 import type { RoleType } from '@/schema/identity/role/type';
 
 import type {
@@ -16,9 +13,6 @@ import { MENU_LIST } from '@/lib/menu/menu-architecture';
 
 import type { LNBItem, LNBMenu } from '@/common/modules/navigations/lnb/type';
 
-
-
-
 export const getDefaultPageAccessPermissionList = (roleType?: RoleType): MenuId[] => {
     if (roleType === 'SYSTEM_ADMIN') return SYSTEM_USER_DEFAULT_PERMISSIONS;
     if (roleType === 'DOMAIN_ADMIN') return DOMAIN_ADMIN_DEFAULT_PERMISSIONS;
@@ -32,16 +26,8 @@ export const flattenMenu = (menuList: Menu[]): Menu[] => menuList.flatMap((menu)
     ...(menu.subMenuList ? flattenMenu(menu.subMenuList) : []),
 ]);
 
-// const filterMenuByPermission = (menuList: Menu[]): Menu[] => menuList.filter((menu) => menu.needPermissionByRole)
-//     .map((menu) => ({
-//         ...menu,
-//         subMenuList: menu.subMenuList ? filterMenuByPermission(menu.subMenuList) : [],
-//     }));
-
-
 export const getPageAccessPermissionMapFromRawData = (pageAccessPermissions: string[]): PageAccessPermissionMap => {
     const result = {} as PageAccessPermissionMap;
-    // const filterdMenuListByRequiredPermission = filterMenuByPermission(MENU_LIST);
     const flattendPermissionRequiredMenuList = flattenMenu(MENU_LIST);
 
     pageAccessPermissions.forEach((page) => {
@@ -58,7 +44,6 @@ export const getPageAccessPermissionMapFromRawData = (pageAccessPermissions: str
             flattenMenu([foundServiceMenuById]).forEach(({ id }) => {
                 result[id] = true;
             });
-
             // general case -  asset_inventory.service_account
         } else {
             const endMenuIdByPageName = page.split('.').reverse()[0];

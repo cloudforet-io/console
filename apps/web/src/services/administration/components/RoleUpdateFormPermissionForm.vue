@@ -11,14 +11,14 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 import {
     getPageAccessPermissionMapFromRawData,
-} from '@/lib/access-control/page-access-permission-helper';
+} from '@/lib/access-control/page-access-helper';
 
 import RoleUpdateFormAccess from '@/services/administration/components/RoleUpdateFormAccess.vue';
 import RoleUpdateFormPolicy from '@/services/administration/components/RoleUpdateFormPolicy.vue';
 import {
     getPageAccessMenuListByRoleType,
-} from '@/services/administration/helpers/page-access-menu-list';
-import { getPageAccessList } from '@/services/administration/helpers/role-page-permission-helper';
+    getPageAccessList,
+} from '@/services/administration/helpers/role-page-access-menu-list';
 import type { PageAccessMenuItem, UpdateFormDataType, RoleFormData } from '@/services/administration/types/role-type';
 
 interface Props {

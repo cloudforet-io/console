@@ -23,7 +23,7 @@ import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-sou
 
 import {
     filterLNBMenuByAccessPermission,
-} from '@/lib/access-control/page-access-permission-helper';
+} from '@/lib/access-control/page-access-helper';
 import {
     getCompoundKeyWithManagedCostQuerySetFavoriteKey,
 } from '@/lib/helper/config-data-helper';

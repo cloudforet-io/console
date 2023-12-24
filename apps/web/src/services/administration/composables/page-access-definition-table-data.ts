@@ -10,7 +10,7 @@ import { i18n } from '@/translations';
 import type { PageAccessPermissionMap } from '@/lib/access-control/config';
 import {
     getPageAccessPermissionMapFromRawData,
-} from '@/lib/access-control/page-access-permission-helper';
+} from '@/lib/access-control/page-access-helper';
 import type { Menu } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';

@@ -21,7 +21,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import {
     filterLNBMenuByAccessPermission,
-} from '@/lib/access-control/page-access-permission-helper';
+} from '@/lib/access-control/page-access-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 

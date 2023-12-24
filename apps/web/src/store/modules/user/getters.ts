@@ -7,7 +7,7 @@ import { languages } from '@/store/modules/user/config';
 import {
     getDefaultPageAccessPermissionList,
     getPageAccessPermissionMapFromRawData,
-} from '@/lib/access-control/page-access-permission-helper';
+} from '@/lib/access-control/page-access-helper';
 import type { MenuId } from '@/lib/menu/config';
 
 import type { RoleInfo, UserState } from './type';
