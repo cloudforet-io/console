@@ -13,8 +13,9 @@ import { cloneDeep, range } from 'lodash';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { arrayToQueryString } from '@/lib/router-query-string';
@@ -71,8 +72,9 @@ const CATEGORY_KEY = 'rank';
 const chartContext = ref<HTMLElement|null>(null);
 const chartHelper = useAmcharts5(chartContext);
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    projectItems: computed(() => store.state.reference.project.items),
+    projectItems: computed(() => allReferenceStore.getters.project),
     loading: true,
     data: [] as Data[],
     tableData: computed(() => getRefinedTableData(state.data)),
