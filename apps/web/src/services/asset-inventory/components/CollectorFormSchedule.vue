@@ -100,11 +100,12 @@ const updateSelectedHours = () => {
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is not defined');
-    const schedule = collectorFormState.originCollector?.schedule ?? {};
+    const hours = collectorFormState.originCollector?.schedule?.hours ?? [];
+    if (hours.length === 0) hours.push(new Date().getHours());
     const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         schedule: {
-            ...schedule,
+            hours,
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
         },
     };

@@ -21,6 +21,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { JobListParameters } from '@/schema/inventory/job/api-verbs/list';
+import type { JobModel } from '@/schema/inventory/job/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -160,9 +163,9 @@ const handleChangePagination = () => {
 const getJobs = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.inventory.job.list({ query: getQuery() });
-        state.totalCount = res.total_count;
-        state.items = res.results.map((job) => {
+        const res = await SpaceConnector.clientV2.inventory.job.list<JobListParameters, ListResponse<JobModel>>({ query: getQuery() });
+        state.totalCount = res.total_count ?? 0;
+        state.items = (res.results ?? []).map((job) => {
             const collector = storeState.collectors[job.collector_id];
             const plugin = storeState.plugins[job.plugin_id];
             return {
@@ -174,13 +177,13 @@ const getJobs = async () => {
                         icon: plugin?.icon,
                     },
                 },
-                progress: job.total_tasks === 0 ? { succeededPercentage: 100, failedPercentage: 0 } : {
+                progress: (job.total_tasks === 0) ? { succeededPercentage: 100, failedPercentage: 0 } : {
                     succeededPercentage: (job.success_tasks / job.total_tasks) * 100,
                     failedPercentage: (job.failure_tasks / job.total_tasks) * 100,
                     isCanceled: job.status === JOB_STATE.CANCELED,
                 },
-                created_at: iso8601Formatter(job.created_at, storeState.timezone),
-                duration: durationFormatter(job.created_at, job.finished_at, storeState.timezone) || '--',
+                created_at: job.created_at ? iso8601Formatter(job.created_at, storeState.timezone) : '--',
+                duration: job.created_at ? durationFormatter(job.created_at, job.finished_at, storeState.timezone) : '--',
             };
         });
     } catch (e) {
