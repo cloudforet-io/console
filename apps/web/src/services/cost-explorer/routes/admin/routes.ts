@@ -54,7 +54,7 @@ const adminCostExplorerRoutes: RouteConfig = {
                                     name: makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME),
                                     params: {
                                         dataSourceId: results[0].data_source_id,
-                                        costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_WORKSPACE,
+                                        costQuerySetId: MANAGED_COST_QUERY_SET_IDS.MONTHLY_PRODUCT,
                                     },
                                 });
                             }

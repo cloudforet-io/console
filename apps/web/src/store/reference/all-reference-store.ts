@@ -40,7 +40,8 @@ import { useWorkspaceReferenceStore } from '@/store/reference/workspace-referenc
 import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 
 
-export type ReferenceType = VuexStoreReferenceType|'project'|'projectGroup'|'user'|'costDataSource'|'cloudServiceQuerySet'|'workspace';
+export type ReferenceType = VuexStoreReferenceType|'project'|'project_group'|'projectGroup'|'user'
+    |'costDataSource'|'cost_data_source'|'cloud_service_query_set'|'cloudServiceQuerySet'|'workspace';
 
 export interface ReferenceTypeInfo {
     type: ReferenceType;
@@ -61,6 +62,7 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
     const getters = reactive({
         allReferenceTypeInfo: computed<AllReferenceTypeInfo>(() => ({
             projectGroup: projectGroupReferenceStore.getters.projectGroupTypeInfo,
+            project_group: projectGroupReferenceStore.getters.projectGroupTypeInfo,
             project: projectReferenceStore.getters.projectTypeInfo,
             //
             protocol: {
@@ -122,7 +124,9 @@ export const useAllReferenceStore = defineStore('all-reference-store', () => {
             },
             //
             costDataSource: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
+            cost_data_source: costDataSourceReferenceStore.getters.costDataSourceTypeInfo,
             cloudServiceQuerySet: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
+            cloud_service_query_set: cloudServiceQuerySetReferenceStore.getters.cloudServiceQuerySetTypeInfo,
             workspace: workspaceReferenceStore.getters.workspaceTypeInfo,
         })),
         projectGroup: computed<ProjectGroupReferenceMap>(() => projectGroupReferenceStore.getters.projectGroupItems),
