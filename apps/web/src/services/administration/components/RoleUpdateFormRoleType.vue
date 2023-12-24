@@ -59,6 +59,10 @@ const state = reactive({
 watch(() => state.selectedRoleType, (value) => {
     emit('update-form', { role_type: value });
 });
+watch(() => props.initialData, (initialData) => {
+    if (!initialData) return;
+    state.selectedRoleType = initialData as RoleType;
+});
 </script>
 
 <template>

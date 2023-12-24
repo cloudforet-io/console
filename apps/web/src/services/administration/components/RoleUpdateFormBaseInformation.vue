@@ -31,7 +31,7 @@ const {
     invalidState,
     invalidTexts,
 } = useFormValidator({
-    roleName: props.initialData ?? '',
+    roleName: '',
 }, {
     roleName(value?: string) {
         if (value === undefined) return '';
@@ -45,6 +45,10 @@ watch(() => roleName.value, (value) => {
     if (!invalidState.roleName) {
         emit('update-validation', true);
     }
+});
+watch(() => props.initialData, (initialData) => {
+    if (!initialData) return;
+    setForm('roleName', initialData);
 });
 </script>
 

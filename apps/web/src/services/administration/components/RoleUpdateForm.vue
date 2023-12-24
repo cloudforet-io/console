@@ -3,11 +3,13 @@ import {
     computed, reactive, watch,
 } from 'vue';
 
+import { isEmpty } from 'lodash';
+
 import type { RoleCreateParameters } from '@/schema/identity/role/api-verbs/create';
 import type { RoleUpdateParameters } from '@/schema/identity/role/api-verbs/update';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
-import type { Policy, RoleType } from '@/schema/identity/role/type';
+import type { RoleType } from '@/schema/identity/role/type';
 
 import RoleUpdateFormBaseInformation from '@/services/administration/components/RoleUpdateFormBaseInformation.vue';
 import RoleUpdateFormPermissionForm from '@/services/administration/components/RoleUpdateFormPermissionForm.vue';
@@ -34,9 +36,7 @@ const state = reactive({
     baseInfoFormData: '' as string,
     roleTypeData: ROLE_TYPE.DOMAIN_ADMIN as RoleType,
     pageAccessFormData: ['*'] as string[],
-    permissionsData: [] as string[],
-    //
-    initialSelectedPolicyList: [] as Policy[],
+    permissionsData: undefined as string[]|undefined,
     isAllValid: computed<boolean>(() => state.isBaseInformationValid),
     formData: computed<RoleCreateParameters|RoleUpdateParameters>(() => {
         const baseData = {
@@ -62,12 +62,7 @@ const handleBaseInfoValidate = (value: boolean) => {
 };
 const handleUpdateForm = (formData: RoleFormData) => {
     if (formData.name) state.baseInfoFormData = formData.name;
-    if (formData.role_type) {
-        state.roleTypeData = formData.role_type;
-        if (state.roleTypeData === ROLE_TYPE.DOMAIN_ADMIN) {
-            state.pageAccessFormData = ['*'];
-        }
-    }
+    if (formData.role_type) state.roleTypeData = formData.role_type;
     if (formData.page_access) state.pageAccessFormData = formData.page_access;
     if (formData.permissions) state.permissionsData = formData.permissions;
 };
@@ -80,16 +75,11 @@ watch(() => state.formData, (after) => {
     emit('update-form-data', after);
 });
 watch(() => props.initialRoleData, (initialRoleData) => {
-    if (!initialRoleData) return;
-    const isObjectEmpty = !Object.keys(initialRoleData).length;
-    if (isObjectEmpty) return;
+    if (isEmpty(initialRoleData)) return;
     state.baseInfoFormData = initialRoleData?.name;
     state.roleTypeData = initialRoleData?.role_type;
-    state.pageAccessFormData = props.initialRoleData?.page_access;
-    if (initialRoleData?.permissions?.length) {
-        state.initialSelectedPolicyList = initialRoleData.permissions;
-        // setForm('selectedApiPermissionList', initialRoleData.permission_scopes);
-    }
+    state.pageAccessFormData = initialRoleData?.page_access;
+    state.permissionsData = initialRoleData?.permissions;
 });
 </script>
 
@@ -103,7 +93,7 @@ watch(() => props.initialRoleData, (initialRoleData) => {
                                     @update-form="handleUpdateForm"
         />
         <role-update-form-permission-form :initial-page-access="state.pageAccessFormData"
-                                          :initial-permissions="state.pageAccessFormData"
+                                          :initial-permissions="state.permissionsData"
                                           :role-type="state.roleTypeData"
                                           @update-form="handleUpdateForm"
         />
