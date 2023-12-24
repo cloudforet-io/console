@@ -6,6 +6,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
 import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -39,10 +41,10 @@ export const useCloudServiceDetailPageStore = defineStore('cloud-service-detail-
     actions: {
         async listCloudServiceTypeData() {
             try {
-                const { results } = await SpaceConnector.client.inventory.cloudServiceType.list({
+                const { results } = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>({
                     query: _getCloudServiceTypeQuery(this.provider, this.group),
                 });
-                this.cloudServiceTypeList = results;
+                this.cloudServiceTypeList = results ?? [];
                 await this.setSelectedCloudServiceType(this.name);
             } catch (e) {
                 ErrorHandler.handleError(e);
