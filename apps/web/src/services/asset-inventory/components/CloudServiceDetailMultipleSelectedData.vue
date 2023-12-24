@@ -19,6 +19,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -169,7 +172,7 @@ const getData = async () => {
     state.loading = true;
     state.data = dataMap[state.fetchOptionKey];
     try {
-        const res = await SpaceConnector.clientV2.inventory.cloudService.list(getListApiParams());
+        const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>(getListApiParams());
         state.totalCount = res.total_count;
         state.data = res.results;
     } catch (e) {

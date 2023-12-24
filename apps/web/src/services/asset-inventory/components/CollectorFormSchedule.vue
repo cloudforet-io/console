@@ -108,7 +108,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
         },
     };
-    return SpaceConnector.clientV2.inventory.collector.update(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 
 const handleChangeToggle = async (value: boolean) => {

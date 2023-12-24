@@ -55,6 +55,7 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -164,7 +165,7 @@ export default defineComponent<Props>({
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema, idx: number): Promise<Data> => {
             let _fetcher = fetcherList[idx];
             if (!_fetcher) {
-                const cancellableFetcher = getCancellableFetcher(SpaceConnector.client.inventory.cloudService.analyze);
+                const cancellableFetcher = getCancellableFetcher<CloudServiceAnalyzeParameters>(SpaceConnector.client.inventory.cloudService.analyze);
                 fetcherList[idx] = cancellableFetcher;
                 _fetcher = cancellableFetcher;
             }
