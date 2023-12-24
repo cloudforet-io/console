@@ -89,10 +89,15 @@ export const useUserReferenceStore = defineStore('user-reference', () => {
         };
     };
 
+    const flush = () => {
+        state.items = null;
+        lastLoadedTime = 0;
+    };
+
     const actions = {
         load,
         sync,
-        flush: () => { state.items = null; },
+        flush,
     };
 
     return {

@@ -122,10 +122,15 @@ export const useProjectGroupReferenceStore = defineStore('project-group-referenc
         })),
     });
 
+    const flush = () => {
+        state.items = null;
+        lastLoadedTime = 0;
+    };
+
     const actions = {
         load,
         sync,
-        flush: () => { state.items = null; },
+        flush,
     };
 
     return {
