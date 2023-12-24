@@ -60,11 +60,11 @@ const state = reactive({
         if (!targetId) return [];
 
         const targetNameList: string[] = [];
-        if (props.budgetUsage.project_id) { // for project
+        if (state.isProjectTarget) {
             const targetProject: ProjectReferenceItem|undefined = storeState.projects[targetId];
             if (targetProject?.data?.groupInfo?.name) targetNameList.push(targetProject.data.groupInfo.name);
             targetNameList.push(targetProject?.name ?? targetId);
-        } else if (props.budgetUsage.workspace_id) { // for workspace
+        } else { // for workspace
             const targetWorkspace = storeState.workspaces[targetId];
             if (targetWorkspace) {
                 targetNameList.push(targetWorkspace?.name ?? targetId);

@@ -58,7 +58,7 @@ export const getBudgetUsageAnalyzeRequestQuery = (sort: Query['sort'], period?: 
                 ],
             },
         },
-        sort: [sort],
+        sort,
     };
 
     if (!isEmpty(period)) {

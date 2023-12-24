@@ -45,8 +45,6 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
     });
 
     const load = async (options?: ReferenceLoadOptions) => {
-        if (!_state.isAdminMode) return;
-
         const currentTime = new Date().getTime();
 
         if (
@@ -60,7 +58,15 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
                 only: ['name', 'workspace_id', 'state'],
             },
         };
-        const { results } = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>(params);
+
+        let results: WorkspaceModel[] | undefined;
+        if (_state.isAdminMode) {
+            const res = await SpaceConnector.clientV2.identity.workspace.list<WorkspaceListParameters, ListResponse<WorkspaceModel>>(params);
+            results = res.results;
+        } else {
+            const res = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<undefined, ListResponse<WorkspaceModel>>();
+            results = res.results;
+        }
 
         const workspaceReferenceMap: WorkspaceReferenceMap = {};
 
@@ -80,7 +86,6 @@ export const useWorkspaceReferenceStore = defineStore('workspace-reference', () 
     };
 
     const sync = async (workspace: WorkspaceModel) => {
-        if (!_state.isAdminMode) return;
         state.items = {
             ...state.items,
             [workspace.workspace_id]: {
