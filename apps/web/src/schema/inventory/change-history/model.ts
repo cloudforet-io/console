@@ -1,6 +1,6 @@
 import type { DiffType, ChangeHistoryAction, UpdatedBy } from '@/schema/inventory/change-history/type';
 
-export interface RecordModel {
+export interface ChangeHistoryModel {
     record_id: string;
     cloud_service_id: string;
     action: ChangeHistoryAction;

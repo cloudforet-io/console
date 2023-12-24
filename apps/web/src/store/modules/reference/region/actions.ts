@@ -21,7 +21,7 @@ export const load: Action<RegionReferenceState, any> = async ({ state, commit },
     ) return;
 
     try {
-        const response = await SpaceConnector.client.inventory.region.list({
+        const response = await SpaceConnector.clientV2.inventory.region.list({
             query: {
                 only: ['name', 'region_code', 'tags', 'provider'],
             },
