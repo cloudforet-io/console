@@ -2010,6 +2010,15 @@
 			},
 			"REMOVE": "Remove",
 			"TITLE": "User"
+		},
+		"WORKSPACES": {
+			"ACTION": "Action",
+			"CREATE": "Create",
+			"DELETE": "Delete",
+			"DISABLE": "Disable",
+			"EDIT": "Edit",
+			"ENABLE": "Enable",
+			"WORKSPACES": "Workspaces"
 		}
 	},
 	"IDENTITY": {
@@ -2634,6 +2643,7 @@
 		"ADMINISTRATION_PREFERENCE": "Preference",
 		"ADMINISTRATION_ROLE": "Role",
 		"ADMINISTRATION_USER": "User",
+		"ADMINISTRATION_WORKSPACES": "Workspaces",
 		"ALERT_MANAGER": "Alert Manager",
 		"ALERT_MANAGER_ALERT": "Alert",
 		"ALERT_MANAGER_DASHBOARD": "Dashboard",
