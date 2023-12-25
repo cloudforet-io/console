@@ -22,6 +22,7 @@ import { downloadExcel } from '@/lib/helper/file-download-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
+import WorkspacesDeleteModal from '@/services/administration/components/WorkspacesDeleteModal.vue';
 import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import {
     EXCEL_TABLE_FIELDS,
@@ -29,7 +30,6 @@ import {
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/administration/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
-
 
 
 interface Props {
@@ -51,7 +51,7 @@ const storeState = reactive({
 });
 
 const modalState = reactive({
-    modalVisible: false,
+    deleteModalVisible: false,
 });
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
@@ -59,13 +59,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'edit',
         label: i18n.t('IAM.WORKSPACES.EDIT'),
-        disabled: workspacePageState.selectedIndices.length === 0,
+        disabled: workspacePageState.selectedIndices.length !== 1,
     },
     {
         type: 'item',
         name: 'delete',
         label: i18n.t('IAM.WORKSPACES.DELETE'),
-        disabled: workspacePageState.selectedIndices.length === 0,
+        disabled: workspacePageState.selectedIndices.length !== 1,
     },
     {
         type: 'divider',
@@ -74,13 +74,13 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
         type: 'item',
         name: 'enable',
         label: i18n.t('IAM.WORKSPACES.ENABLE'),
-    // disabled: rolePageState.selectedIndices.length === 0,
+        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'ENABLED'),
     },
     {
         type: 'item',
         name: 'disable',
         label: i18n.t('IAM.WORKSPACES.DISABLE'),
-    // disabled: rolePageState.selectedIndices.length === 0,
+        disabled: workspacePageState.selectedIndices.length !== 1 || (workspacePageState.selectedIndices.length === 1 && workspacePageStore.selectedWorkspaces[0].state === 'DISABLED'),
     },
 ]));
 
@@ -96,7 +96,7 @@ const handleSelectDropdown = (name) => {
         handleEditWorkspace(workspacePageStore.selectedWorkspaces[0].workspace_id);
         break;
     case 'delete':
-        modalState.modalVisible = true;
+        modalState.deleteModalVisible = true;
         break;
     case 'enable':
         // enable
@@ -197,6 +197,9 @@ const handleExport = async () => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
         </p-toolbox-table>
+        <workspaces-delete-modal :visible.sync="modalState.deleteModalVisible"
+                                 @refresh="handleChange()"
+        />
     </section>
 </template>
 
