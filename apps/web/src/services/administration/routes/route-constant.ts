@@ -27,6 +27,9 @@ export const ADMINISTRATION_ROUTE = {
         },
         WORKSPACES: {
             _NAME: `${MENU_ID.ADMINISTRATION}.${MENU_ID.PREFERENCE}.${MENU_ID.WORKSPACES}`,
+            CREATE: {
+                _NAME: `${MENU_ID.ADMINISTRATION}.${MENU_ID.PREFERENCE}.${MENU_ID.WORKSPACES}.create`,
+            },
         },
     },
 } as const;
