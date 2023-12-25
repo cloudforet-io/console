@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PFieldGroup, PEmpty, PSelectDropdown, PFieldTitle, PToggleButton, PDivider, PButton,
@@ -33,6 +34,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     isSetAdminRole: true,
 });
+
+const router = useRouter();
 
 const emit = defineEmits<{(e: 'change-input', formState): void,
 }>();
@@ -187,6 +190,7 @@ watch(() => state.proxyIsSetAdminRole, () => {
                         <p-empty v-if="workspaceState.menuItems.length === 0 && !workspaceState.loading"
                                  image-size="sm"
                                  show-image
+                                 show-button
                                  class="no-data-wrapper"
                         >
                             <template #image>
@@ -194,15 +198,14 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                      alt="empty-options"
                                 >
                             </template>
-                            <!--                            TODO: will be update next version-->
-                            <!--                            <template #button>-->
-                            <!--                                <p-button style-type="substitutive"-->
-                            <!--                                          icon-left="ic_plus_bold"-->
-                            <!--                                          @click="router.push({ name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME })"-->
-                            <!--                                >-->
-                            <!--                                    {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}-->
-                            <!--                                </p-button>-->
-                            <!--                            </template>-->
+                            <template #button>
+                                <p-button style-type="substitutive"
+                                          icon-left="ic_plus_bold"
+                                          @click="router.push({ name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME })"
+                                >
+                                    {{ $t('IAM.USER.FORM.CREATE_WORKSPACE') }}
+                                </p-button>
+                            </template>
                             {{ $t('IAM.USER.FORM.NO_WORKSPACE') }}
                         </p-empty>
                     </template>
