@@ -24,10 +24,7 @@ import UserAccountModuleContainer
 
 const state = reactive({
     userId: computed(() => store.state.user.userId),
-    userRole: computed(() => {
-        const roleArray = store.getters['user/roleNames'];
-        return roleArray.join(', ');
-    }),
+    userRole: computed(() => store.getters['user/getCurrentRoleInfo'].roleType || 'USER'),
     languages: map(languages, (d, k) => ({
         type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
     })) as MenuItem[],

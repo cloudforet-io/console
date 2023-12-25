@@ -4,13 +4,6 @@ import type { AuthType, UserType } from '@/schema/identity/user/type';
 export type LanguageCode = 'ko' | 'en' | string;
 // export type Timezone = 'UTC' | 'Asia/Seoul' | string;
 
-export interface UserRole {
-    roleId?: string;
-    name: string;
-    roleType: RoleType;
-    pagePermissions: string[];
-}
-
 export interface RoleInfo {
     roleType: RoleType;
     roleId: string;
@@ -27,7 +20,6 @@ export interface UserState {
     email?: string;
     language?: string;
     timezone?: string;
-    roles?: Array<UserRole>;
     currentRoleInfo?: RoleInfo;
     requiredActions?: string[];
     emailVerified?: boolean;
@@ -59,5 +51,3 @@ export interface UpdateUserRequest {
     mfa?: any
 }
 
-
-export type PageAccessType = 'SYSTEM'|'USER';

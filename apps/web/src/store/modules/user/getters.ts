@@ -17,41 +17,6 @@ export const isDomainAdmin = (state: UserState): boolean => state.roleType === R
 export const isSystemAdmin = (state: UserState): boolean => state.roleType === ROLE_TYPE.SYSTEM_ADMIN;
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 
-// TODO: to be refactored by new planning
-export const roleNames = (state: UserState): Array<string> => {
-    const systemRoleNames: Array<string> = [];
-    const domainRoleNames: Array<string> = [];
-    const workspaceOwnerRoleNames: Array<string> = [];
-    const workspaceMemberRoleNames: Array<string> = [];
-
-    if (state.roles) {
-        state.roles.forEach((role) => {
-            if (role.roleType === 'SYSTEM_ADMIN') {
-                systemRoleNames.push(role.name);
-            } else if (role.roleType === 'DOMAIN_ADMIN') {
-                domainRoleNames.push(role.name);
-            } else if (role.roleType === 'WORKSPACE_OWNER') {
-                workspaceOwnerRoleNames.push(role.name);
-            } else {
-                workspaceMemberRoleNames.push(role.name);
-            }
-        });
-    }
-
-    if (systemRoleNames.length > 0) {
-        return systemRoleNames;
-    }
-    if (domainRoleNames.length > 0) {
-        return domainRoleNames;
-    }
-    if (workspaceOwnerRoleNames.length > 0) {
-        return workspaceOwnerRoleNames;
-    }
-    if (workspaceMemberRoleNames.length > 0) {
-        return workspaceMemberRoleNames;
-    }
-    return ['No Role'];
-};
 export const isNoRoleUser = (state: UserState): boolean => !state.currentRoleInfo;
 
 export const hasSystemRole = (state: UserState): boolean => state.roleType === 'SYSTEM_ADMIN';

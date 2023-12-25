@@ -1,6 +1,6 @@
 import type { Mutation } from 'vuex';
 
-import type { UserState, UserRole, RoleInfo } from './type';
+import type { UserState, RoleInfo } from './type';
 
 export const setUser = (state: UserState, userInfo: UserState): void => {
     state.userId = userInfo.userId;
@@ -25,10 +25,6 @@ export const setLanguage = (state: UserState, language: string): void => {
 
 export const setTimezone = (state: UserState, timezone: string): void => {
     state.timezone = timezone;
-};
-
-export const setRoles = (state: UserState, roles: Array<UserRole>): void => {
-    state.roles = roles;
 };
 
 export const setCurrentRoleInfo = (state: UserState, currentRoleInfo?: RoleInfo): void => {
