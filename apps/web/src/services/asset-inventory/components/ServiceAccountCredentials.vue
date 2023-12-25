@@ -83,7 +83,7 @@ const state = reactive({
 const deleteGeneralSecret = async (): Promise<void> => {
     try {
         await SpaceConnector.clientV2.identity.serviceAccount.deleteSecretData<ServiceAccountDeleteSecretDataParameters>({
-            service_account_id: props.serviceAccountId,
+            service_account_id: props.serviceAccountId ?? '',
         });
         state.credentialData = undefined;
     } catch (e) {
@@ -137,7 +137,7 @@ const updateGeneralSecret = async () => {
 
         await SpaceConnector.clientV2.identity.serviceAccount.updateSecretData<ServiceAccountUpdateSecretDataParameters, ServiceAccountModel>({
             secret_data: data,
-            service_account_id: props.serviceAccountId,
+            service_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             trusted_account_id: state.credentialForm.attachedTrustedAccountId,
         });
@@ -158,7 +158,7 @@ const updateTrustedSecret = async (): Promise<boolean> => {
         return false;
     }
 };
-const updateDataTrustedSecret = async () => {
+const updateTrustedSecretData = async () => {
     if (!state.credentialData?.trusted_secret_id) return;
     try {
         let data;
@@ -169,7 +169,7 @@ const updateDataTrustedSecret = async () => {
         }
 
         await SpaceConnector.clientV2.identity.trustedAccount.updateSecretData<TrustedAccountUpdateSecretDataParameters, TrustedAccountModel>({
-            trusted_account_id: props.serviceAccountId,
+            trusted_account_id: props.serviceAccountId ?? '',
             secret_schema_id: state.credentialForm.selectedSecretSchema.schema_id,
             secret_data: data,
         });
@@ -196,7 +196,7 @@ const handleClickSaveButton = async () => {
     if (props.serviceAccountType === ACCOUNT_TYPE.GENERAL) {
         if (!state.credentialForm.hasCredentialKey) {
             if (!isEmpty(state.credentialData)) await deleteGeneralSecret();
-        } else if (state.credentialData) {
+        } else if (!state.credentialData) {
             await createGeneralSecret();
         } else {
             await updateGeneralSecret();
@@ -207,7 +207,7 @@ const handleClickSaveButton = async () => {
         if (state.credentialForm.selectedSecretSchema.schema_id !== state.credentialData?.schema_id) {
             isValid = await updateTrustedSecret();
         }
-        if (isValid) await updateDataTrustedSecret();
+        if (isValid) await updateTrustedSecretData();
     }
     state.mode = 'READ';
     emit('refresh');
@@ -233,6 +233,7 @@ const getSecretSchema = async () => {
 };
 
 const getSecretData = async () => {
+    if (!props.serviceAccountData) return;
     try {
         if ((state.isTrustedAccount || state.hasTrustedSecret) && 'trusted_secret_id' in props.serviceAccountData) {
             state.credentialData = await SpaceConnector.clientV2.secret.trustedSecret.get<TrustedSecretGetParameters, TrustedSecretModel>({
