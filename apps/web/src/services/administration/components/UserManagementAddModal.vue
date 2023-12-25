@@ -99,6 +99,7 @@ const handleClose = () => {
     state.role = {};
     state.resetPasswordVisible = false;
     state.isResetPassword = true;
+    state.isSetAdminRole = false;
     userPageStore.$patch((_state) => {
         _state.modal.visible.add = false;
         _state.modal = cloneDeep(_state.modal);
@@ -108,6 +109,7 @@ const handleClose = () => {
 const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
     const userInfoParams = {
         user_id: item.user_id || '',
+        email: item.user_id || '',
         auth_type: item.auth_type || 'LOCAL',
         password: state.password || '',
         reset_password: item.auth_type === 'LOCAL' && state.isResetPassword,
@@ -158,6 +160,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
                     :theme-color="userPageState.modal.themeColor"
                     :fade="true"
                     :backdrop="true"
+                    :loading="state.loading"
                     :visible="userPageState.modal.visible.add"
                     :disabled="state.disabled"
                     @confirm="handleConfirm"
