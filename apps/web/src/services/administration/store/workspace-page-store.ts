@@ -27,7 +27,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
         pageLimit: 15,
     }),
     getters: {
-        selectedWorkspaces: (state) => state.selectedIndices.reduce((refined: WorkspaceModel[], idx: number) => {
+        selectedWorkspaces: (state) => state.selectedIndices.reduce((refined: WorkspaceModel[], idx: number) : WorkspaceModel[] => {
             refined.push(state.workspaces[idx]);
             return refined;
         }, []),

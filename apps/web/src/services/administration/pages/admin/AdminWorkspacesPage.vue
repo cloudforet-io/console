@@ -1,12 +1,24 @@
 <script setup lang="ts">
 
+import { reactive } from 'vue';
+
 import { PButton, PHeading, PHorizontalLayout } from '@spaceone/design-system';
 
 import WorkspaceManagementTable from '@/services/administration/components/WorkspaceManagementTable.vue';
+import WorkspacesCreateModal from '@/services/administration/components/WorkspacesCreateModal.vue';
+import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
 
+const workspacePageStore = useWorkspacePageStore();
 
+const state = reactive({
+    createModalVisible: false,
+});
 const handleCreateWorkspace = () => {
-    // create workspace modal
+    state.createModalVisible = true;
+};
+
+const handleUpdateList = async () => {
+    await workspacePageStore.listWorkspaces({});
 };
 </script>
 
@@ -27,6 +39,9 @@ const handleCreateWorkspace = () => {
                 <workspace-management-table :table-height="height" />
             </template>
         </p-horizontal-layout>
+        <workspaces-create-modal :visible.sync="state.createModalVisible"
+                                 @refresh="handleUpdateList"
+        />
     </section>
 </template>
 
