@@ -161,8 +161,7 @@ const getComponentWidth = (componentRef: Ref<InstanceType<any>>) => componentRef
 const getAvailableGNBMenuWidth = (gnbWidth: number): number => {
     const gnbToolsetWidth = getComponentWidth(gnbToolsetRef);
     const gnbHeaderWidth = getComponentWidth(gnbHeaderRef);
-    const invisibleMenuWidth = state.isInvisibleMenuExists ? DEFAULT_INVISIBLE_MENU_WIDTH : 0;
-    return gnbWidth - (gnbToolsetWidth + gnbHeaderWidth + invisibleMenuWidth + MINIMAL_GAP_BETWEEN_MENU_N_TOOLSET);
+    return gnbWidth - (gnbToolsetWidth + gnbHeaderWidth + DEFAULT_INVISIBLE_MENU_WIDTH + MINIMAL_GAP_BETWEEN_MENU_N_TOOLSET);
 };
 const getVisibleMenuCountWithinWidth = (availableWidth: number): number => {
     let visibleMenuCount = 0;
