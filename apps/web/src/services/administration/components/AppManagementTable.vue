@@ -36,6 +36,9 @@ import {
 } from '@/services/administration/constants/app-constant';
 import { useAppPageStore } from '@/services/administration/store/app-page-store';
 
+interface ApiKeyModalItemState extends AppModel {
+    user_id: string;
+}
 interface Props {
     tableHeight?: number;
 }
@@ -54,6 +57,8 @@ const appListApiQueryHelper = new ApiQueryHelper()
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+    userId: computed(() => store.state.user.userId),
+    domainId: computed(() => store.state.domain.domainId),
 });
 const state = reactive({
     loading: false,
@@ -85,7 +90,7 @@ const state = reactive({
 });
 const modalState = reactive({
     apiKeyModalVisible: false,
-    item: {} as AppModel,
+    item: {} as ApiKeyModalItemState,
 });
 const dropdownMenu = computed<MenuItem[]>(() => ([
     {
@@ -189,9 +194,15 @@ const handleChangeModalVisible = (value) => {
         _state.modal = cloneDeep(_state.modal);
     });
 };
-const handleConfirmButton = (value: string) => {
+const handleConfirmButton = (value: AppModel) => {
     if (value) {
-        modalState.item.api_key_id = value;
+        modalState.item.api_key_id = value.api_key_id;
+        modalState.item.api_key = value.api_key;
+        modalState.item.state = value.state;
+        modalState.item.user_id = storeState.userId;
+        modalState.item.domain_id = storeState.domainId;
+        modalState.item.last_accessed_at = value.last_accessed_at;
+        modalState.item.created_at = value.created_at;
         return;
     }
     handleClickModalConfirm();
