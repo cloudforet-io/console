@@ -2014,10 +2014,20 @@
 		"WORKSPACES": {
 			"ACTION": "작업",
 			"CREATE": "생성",
+			"CREATE_WORKSPACE": "",
 			"DELETE": "삭",
+			"DELETE_WORKSPACE": "",
+			"DELETE_WORKSPACE_DESC": "",
 			"DISABLE": "",
 			"EDIT": "수정",
 			"ENABLE": "",
+			"FORM": {
+				"LABEL_DESC": "",
+				"LABEL_NAME": "이름",
+				"PLACEHOLDER_DESC": "",
+				"PLACEHOLDER_NAME": "",
+				"REQUIRED_NAME": ""
+			},
 			"WORKSPACES": ""
 		}
 	},

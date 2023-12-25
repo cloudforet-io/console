@@ -2014,10 +2014,20 @@
 		"WORKSPACES": {
 			"ACTION": "作業",
 			"CREATE": "作成",
+			"CREATE_WORKSPACE": "",
 			"DELETE": "削除",
+			"DELETE_WORKSPACE": "",
+			"DELETE_WORKSPACE_DESC": "",
 			"DISABLE": "",
 			"EDIT": "編集",
 			"ENABLE": "",
+			"FORM": {
+				"LABEL_DESC": "",
+				"LABEL_NAME": "",
+				"PLACEHOLDER_DESC": "",
+				"PLACEHOLDER_NAME": "",
+				"REQUIRED_NAME": ""
+			},
 			"WORKSPACES": ""
 		}
 	},
