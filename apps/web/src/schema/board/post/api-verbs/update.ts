@@ -1,8 +1,12 @@
-import type { PostModel } from '@/schema/board/post/model';
-
-export interface PostUpdateParameters extends Pick<PostModel, 'title'|'writer'|'contents'|'options'> {
-    board_id: string;
+export interface PostUpdateParameters {
     post_id: string;
-    files: string[];
-    domain_id?: string|null;
+    title?: string;
+    contents?: string;
+    category?: string;
+    options?: {
+        is_popup: boolean;
+        is_pinned: boolean;
+    };
+    writer?: string;
+    files?: string[];
 }

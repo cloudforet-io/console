@@ -11,6 +11,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
+import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
 import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
 import type { DomainModel } from '@/schema/identity/domain/model';
@@ -83,7 +84,7 @@ const {
     },
 });
 
-const formData = computed<Omit<PostUpdateParameters, 'board_id'|'post_id'>>(() => ({
+const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     title: noticeTitle.value,
     writer: writerName.value,
     contents: contents.value,
@@ -103,11 +104,18 @@ const handleConfirm = () => {
 
 const handleCreateNotice = async () => {
     try {
-        const params = {
-            ...formData.value,
-            domain_id: state.isAllDomainSelected ? null : state.selectedDomain[0].name,
-        };
-        await noticeDetailStore.createNoticePost(params);
+        const data = formData.value;
+        if (!data.title || !data.contents) throw new Error('Invalid form data');
+        await noticeDetailStore.createNoticePost({
+            board_type: POST_BOARD_TYPE.NOTICE,
+            title: data.title,
+            contents: data.contents,
+            category: data.category,
+            files: data.files,
+            options: data.options,
+            writer: data.writer,
+            resource_group: 'DOMAIN',
+        });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
         await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
     } catch (e) {

@@ -1,6 +1,5 @@
-import { asyncComputed } from '@vueuse/core';
 import {
-    computed, reactive, ref,
+    computed, reactive,
 } from 'vue';
 
 import { defineStore } from 'pinia';
@@ -8,22 +7,20 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { BoardListParameters, BoardListResponse } from '@/schema/board/board/api-verbs/list';
-import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
+import type { PostModel } from '@/schema/board/post/model';
+import type { NoticeConfigData } from '@/schema/board/post/type';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface UserConfig {
-    name: string;
-    data?: NoticeConfigData;
-    user_id?: string;
-}
-interface NoticeConfigData {
-    is_read?: boolean,
-    show_popup?: boolean,
-}
+type UserConfig = UserConfigModel<NoticeConfigData>;
 type NoticeConfigMap = Record<string, NoticeConfigData>;
 
 export const useNoticeStore = defineStore('notice', () => {
@@ -33,34 +30,8 @@ export const useNoticeStore = defineStore('notice', () => {
         totalNoticeCount: 0,
     });
 
-    const _boardId = ref<string|undefined>();
-    let _boardLoading = false;
-    let _boardErrorCount = 0;
-    const _fetchNoticeBoardId = async () => {
-        try {
-            if (_boardId.value) return;
-            if (_boardLoading) return;
-            _boardLoading = true;
-            const { results } = await SpaceConnector.clientV2.board.board.list<BoardListParameters, BoardListResponse>({
-                name: 'Notice',
-            });
-            _boardId.value = results?.[0]?.board_id;
-            _boardErrorCount = 0;
-        } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-            _boardErrorCount++;
-        } finally {
-            _boardLoading = false;
-        }
-    };
     const getters = reactive({
         userId: computed<string>(() => store.state.user.userId),
-        boardId: asyncComputed<string|undefined>(async () => {
-            if (_boardLoading) return undefined;
-            if (_boardErrorCount > 5) return undefined;
-            if (!_boardId.value) await _fetchNoticeBoardId();
-            return _boardId.value;
-        }, undefined, { lazy: true }),
         isReadMap: computed<{ [key: string]: boolean }>(() => {
             const readMap = {};
             Object.keys(state.noticeConfigMap).forEach((postId) => {
@@ -89,7 +60,6 @@ export const useNoticeStore = defineStore('notice', () => {
 
     const actions = {
         fetchNoticeReadState: async () => {
-            if (!getters.boardId) throw new Error('Notice board not found');
             const userConfigApiQuery = new ApiQueryHelper()
                 .setFilters([{
                     k: 'user_id',
@@ -98,15 +68,15 @@ export const useNoticeStore = defineStore('notice', () => {
                 },
                 {
                     k: 'name',
-                    v: `console:board:${getters.boardId}:`,
+                    v: `console:board:${POST_BOARD_TYPE.NOTICE}:`,
                     o: '',
                 }])
                 .setOnly('data', 'user_id');
             try {
-                const { results } = await SpaceConnector.client.config.userConfig.list({
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<NoticeConfigData>>>({
                     query: userConfigApiQuery.data,
                 });
-                state.noticeConfigMap = convertUserConfigToNoticeConfigMap(results);
+                state.noticeConfigMap = convertUserConfigToNoticeConfigMap(results ?? []);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.noticeConfigMap = {};
@@ -114,10 +84,8 @@ export const useNoticeStore = defineStore('notice', () => {
         },
         updateNoticeReadState: async (postId: string, showPopup?: boolean) => {
             try {
-                if (!getters.boardId) throw new Error('Notice board not found');
-                const result = await SpaceConnector.client.config.userConfig.set({
-                    user_id: store.state.user.userId,
-                    name: `console:board:${getters.boardId}:${postId}`,
+                const result = await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters<NoticeConfigData>, UserConfigModel>({
+                    name: `console:board:${POST_BOARD_TYPE.NOTICE}:${postId}`,
                     data: { is_read: true, show_popup: showPopup },
                 });
                 state.noticeConfigMap = { ...state.noticeConfigMap, [postId]: result.data };
@@ -127,11 +95,9 @@ export const useNoticeStore = defineStore('notice', () => {
         },
         fetchNoticeCount: async () => {
             try {
-                if (!getters.boardId) throw new Error('Notice board not found');
-                const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-                    board_id: getters.boardId,
+                const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
                     query: { only: ['post_id'] },
-                    domain_id: null,
+                    board_type: POST_BOARD_TYPE.NOTICE,
                 });
                 state.totalNoticeIdList = results?.map((post) => post.post_id) ?? [];
                 state.totalNoticeCount = total_count ?? 0;

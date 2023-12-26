@@ -14,11 +14,6 @@
                 {{ item.title }}
             </h1>
             <div class="notice-popup-info">
-                <p-badge badge-type="solid-outline"
-                         :style-type="noticeTypeBadgeInfo.style"
-                >
-                    {{ noticeTypeBadgeInfo.label }}
-                </p-badge>
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="!my-4" />
@@ -41,13 +36,12 @@
 </template>
 
 <script lang="ts">
-
 import { computedAsync } from '@vueuse/core';
-import { computed, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 import type { PropType } from 'vue';
 
 import {
-    PButtonModal, PBadge, PDivider, PButton,
+    PButtonModal, PDivider, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -65,14 +59,10 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
-import { getPostBadgeInfo } from '@/services/info/helpers/notice-helper';
-import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
-
 export default {
     name: 'NoticePopupItem',
     components: {
         PButtonModal,
-        PBadge,
         PDivider,
         TextEditorViewer,
         PButton,
@@ -91,7 +81,6 @@ export default {
         const noticeStore = useNoticeStore();
 
         const state = reactive({
-            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.item?.post_type)),
             popupVisible: true,
         });
         const files = computedAsync<FileInfo[]>(async () => {
@@ -99,7 +88,6 @@ export default {
             if (!notice) return [];
             try {
                 const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
-                    board_id: notice.board_id,
                     post_id: notice.post_id,
                 });
                 return result.files;

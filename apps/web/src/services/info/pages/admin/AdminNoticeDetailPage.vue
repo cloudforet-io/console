@@ -26,7 +26,6 @@ const props = defineProps<{
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
-const noticeDetailGetters = noticeDetailStore.getters;
 
 const state = reactive({
     hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
@@ -39,13 +38,13 @@ const state = reactive({
 });
 
 const handleClickEditButton = () => {
-    if (!noticeDetailGetters.boardId || !props.postId) {
-        ErrorHandler.handleError(new Error('boardId or postId is undefined'));
+    if (!props.postId) {
+        ErrorHandler.handleError(new Error('postId is undefined'));
         return;
     }
     SpaceRouter.router.push({
         name: INFO_ROUTE.NOTICE.UPDATE._NAME,
-        params: { boardId: noticeDetailGetters.boardId, postId: props.postId },
+        params: { postId: props.postId },
     });
 };
 
