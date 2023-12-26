@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, reactive } from 'vue';
+import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
