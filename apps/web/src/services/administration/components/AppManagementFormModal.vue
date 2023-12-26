@@ -14,6 +14,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
+import type { AppModel } from '@/schema/identity/app/model';
 import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { RoleModel } from '@/schema/identity/role/model';
@@ -29,7 +30,7 @@ const appContextStore = useAppContextStore();
 const appPageStore = useAppPageStore();
 const appPageState = appPageStore.$state;
 
-const emit = defineEmits<{(e: 'confirm', appKeyId?: string): void;
+const emit = defineEmits<{(e: 'confirm', value?: AppModel): void;
 }>();
 
 const storeState = reactive({
@@ -142,7 +143,7 @@ const handleConfirm = async () => {
                 tags: formState.tags,
                 resource_group: storeState.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
             });
-            emit('confirm', res.api_key_id);
+            emit('confirm', res);
             appPageStore.$patch((_state) => {
                 _state.modal.visible.apiKey = true;
                 _state.modal = cloneDeep(_state.modal);
