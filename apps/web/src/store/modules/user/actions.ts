@@ -57,7 +57,7 @@ const updateUser = async (userType: string, userRequest: UpdateUserRequest): Pro
     await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
 };
 
-export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
+export const signIn = async ({ commit, dispatch }, signInRequest: SignInRequest): Promise<void> => {
     const domainId = signInRequest.domainId;
     const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
         domain_id: domainId,
@@ -71,6 +71,12 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
     const userInfo = await getUserInfo();
     commit('setUser', userInfo);
 
+
+    const grantRequest = {
+        scope: 'USER',
+        token: response.refresh_token,
+    };
+    await dispatch('grantRole', grantRequest);
     commit('setIsSessionExpired', false);
 };
 

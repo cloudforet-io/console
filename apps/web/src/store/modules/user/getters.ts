@@ -26,8 +26,8 @@ export const hasPermission = (state: UserState): boolean => !!state.currentRoleI
 export const getCurrentRoleInfo: Getter<UserState, any> = (state: UserState): RoleInfo|undefined => state.currentRoleInfo;
 
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
-    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? [];
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['*'];
     const pagePermissionMap = getPageAccessPermissionMapFromRawData(roleBasePagePermissions);
     const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
     Object.keys(pagePermissionMap).forEach((menuId) => {
