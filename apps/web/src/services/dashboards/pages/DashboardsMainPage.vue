@@ -15,6 +15,8 @@ import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/qu
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
@@ -23,6 +25,7 @@ import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/
 import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
 import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
 
 
 const dashboardStore = useDashboardStore();
@@ -30,23 +33,24 @@ const dashboardState = dashboardStore.state;
 const dashboardGetters = dashboardStore.getters;
 const state = reactive({
     loading: computed(() => dashboardState.loading),
-    workspaceDashboardList: computed(() => {
-        if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE') return [];
-        let target = dashboardGetters.workspaceItems;
+    isWorkspaceOwner: () => store.state.user.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
+    workspaceDashboardList: computed<DashboardModel[]>(() => {
+        if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
+        let target = dashboardGetters.workspaceItems || [];
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
-        return target;
+        return target as DashboardModel[];
     }),
-    projectDashboardList: computed(() => {
+    projectDashboardList: computed<DashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'PROJECT') return [];
-        let target = dashboardGetters.projectItems;
+        let target = dashboardGetters.projectItems || [];
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
-        return target;
+        return target as DashboardModel[];
     }),
-    privateDashboardList: computed(() => {
+    privateDashboardList: computed<DashboardModel[]>(() => {
         if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
-        return dashboardGetters.privateItems;
+        return dashboardGetters.privateItems as DashboardModel[] || [];
     }),
-    dashboardTotalCount: computed(() => state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length),
+    dashboardTotalCount: computed<number>(() => state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length),
     filteredDashboardStatus: computed(() => {
         if (dashboardState.scope === 'WORKSPACE') {
             return !!(state.workspaceDashboardList.length);
