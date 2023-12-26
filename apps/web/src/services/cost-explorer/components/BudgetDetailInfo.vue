@@ -9,10 +9,14 @@ import {
 } from '@spaceone/design-system';
 import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
+import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { store } from '@/store';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
@@ -22,12 +26,14 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import { gray } from '@/styles/colors';
 
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import BudgetDetailInfoAmountPlanningTypePopover from '@/services/cost-explorer/components/BudgetDetailInfoAmountPlanningTypePopover.vue';
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
 const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => storeState.providers[provider]?.label ?? '').join(', ') || 'All';
 
+const appContextStore = useAppContextStore();
 const allReferenceStore = useAllReferenceStore();
 
 const budgetPageStore = useBudgetDetailPageStore();
@@ -36,7 +42,9 @@ const budgetPageState = budgetPageStore.$state;
 const costTypeWrapperRef = ref<HTMLElement|null>(null);
 const costTypeRef = ref<HTMLElement|null>(null);
 
+const queryHelper = new QueryHelper();
 const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -70,7 +78,16 @@ const state = reactive({
                 { resource_type: 'identity.Project' },
             );
         }
-        return undefined; // TODO: set after workspace page is ready
+        if (storeState.isAdminMode) {
+            queryHelper.setFilters([{ k: 'workspace_id', v: state.budgetData?.workspace_id, o: '=' }]);
+            return {
+                name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME),
+                query: {
+                    filters: queryHelper.rawQueryStrings,
+                },
+            };
+        }
+        return undefined;
     }),
     isTextTruncate: undefined as boolean|undefined,
     popoverVisible: false,
@@ -129,13 +146,17 @@ watch(() => costTypeRef.value, (costType) => {
                          :color="gray[400]"
                     />
                 </span>
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link v-else-if="state.targetLocation"
+                        :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         highlight
                         :to="state.targetLocation"
                 >
                     {{ state.targetLabel.name }}
                 </p-link>
+                <span v-else>
+                    {{ state.targetLabel.name }}
+                </span>
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">

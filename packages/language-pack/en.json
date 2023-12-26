@@ -472,6 +472,7 @@
 						"ALL": "All",
 						"BASE_INFORMATION": "Base Information",
 						"DATA_SOURCE": "Data Source",
+						"DATA_SOURCE_PLACEHOLDER": "Please select the target first",
 						"LABEL_COST_TYPE": "Cost Type",
 						"LABEL_CURRENCY": "Currency",
 						"LABEL_NAME": "Name",

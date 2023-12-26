@@ -22,7 +22,7 @@
                             <router-link :to="value.to"
                                          class="link-text"
                             >
-                                <span>{{ value.name }}</span>
+                                <span>{{ value?.name }}</span>
                             </router-link>
                         </span>
                         <span class="event-time"
@@ -46,7 +46,7 @@
                              :class="{ 'show-all': data[index].showAll }"
                         >
                             <div v-for="(project, pIndex) in value"
-                                 :key="`project-link-${project.name}-${pIndex}`"
+                                 :key="`project-link-${project?.name}-${pIndex}`"
                             >
                                 <p-i v-if="project.isFavorite"
                                      name="ic_favorite"
@@ -54,10 +54,10 @@
                                      width="0.625rem"
                                      height="0.625rem"
                                 />
-                                <router-link :to="project.to"
+                                <router-link :to="project?.to"
                                              class="project-link"
                                 >
-                                    {{ project.name }}
+                                    {{ project?.name }}
                                 </router-link>
                             </div>
                         </div>
@@ -168,7 +168,7 @@ export default {
                 },
                 region: state.regions[d.region_code]?.name || d.region_code,
                 affected_projects: d.affected_projects.map((projectId) => ({
-                    name: projects[projectId].name,
+                    name: projects[projectId]?.name,
                     to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
                     isFavorite: !!find(state.favoriteProjects, { id: projectId }),
                 })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),

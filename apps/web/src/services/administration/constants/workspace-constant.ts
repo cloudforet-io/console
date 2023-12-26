@@ -28,6 +28,7 @@ export const WORKSPACE_SEARCH_HANDLERS = {
     keyItemSets: [{
         title: 'Properties',
         items: [
+            { name: 'workspace_id', label: 'Workspace ID' },
             { name: 'name', label: 'Name' },
             { name: 'tags.description', label: 'Description' },
             { name: 'state', label: 'State' },
@@ -36,6 +37,7 @@ export const WORKSPACE_SEARCH_HANDLERS = {
         ],
     }] as KeyItemSet[],
     valueHandlerMap: {
+        workspace_id: makeDistinctValueHandler('identity.Workspace', 'workspace_id'),
         name: makeDistinctValueHandler('identity.Workspace', 'name'),
         'tags.description': makeDistinctValueHandler('identity.Workspace', 'tags.description'),
         state: makeEnumValueHandler(WORKSPACE_STATE),

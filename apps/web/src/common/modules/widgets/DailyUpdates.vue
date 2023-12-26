@@ -200,6 +200,10 @@ export default {
         PEmpty,
     },
     props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
         projectId: {
             type: String,
             default: undefined,
@@ -225,7 +229,10 @@ export default {
                     timezone: store.state.user.timezone,
                 };
                 if (props.projectId) params.project_id = props.projectId;
-                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService(params);
+                const { results } = await SpaceConnector.client.statistics.topic.dailyUpdateCloudService({
+                    ...props.extraParams,
+                    params,
+                });
                 state.cloudServiceData = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
