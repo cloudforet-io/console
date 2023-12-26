@@ -27,9 +27,10 @@ export const getCurrentRoleInfo: Getter<UserState, any> = (state: UserState): Ro
 
 export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
     const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
-    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['*'];
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? ['my_page.*'];
     const pagePermissionMap = getPageAccessPermissionMapFromRawData(roleBasePagePermissions);
     const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
+    console.debug('pagePermissionMap', pagePermissionMap, 'defaultPagePermissionList', defaultPagePermissionList);
     Object.keys(pagePermissionMap).forEach((menuId) => {
         if (!defaultPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = false;
     });
