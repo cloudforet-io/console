@@ -2039,6 +2039,7 @@
 				"PLACEHOLDER_NAME": "",
 				"REQUIRED_NAME": ""
 			},
+			"REQUIRED_ENABLE_WORKSPACE": "",
 			"WORKSPACES": ""
 		}
 	},

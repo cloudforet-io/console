@@ -113,8 +113,18 @@ const handleSelectDropdown = (name) => {
         modalState.setEnableModalVisible = true;
         break;
     case 'disable':
-        modalState.enableState = WORKSPACE_STATE.DISABLE;
-        modalState.setEnableModalVisible = true;
+        if (workspacePageState.workspaces.filter((workspace) => workspace.state === 'ENABLED').length === 1) {
+            Vue.notify({
+                group: 'toastTopCenter',
+                type: 'alert',
+                title: i18n.t('IAM.WORKSPACES.REQUIRED_ENABLE_WORKSPACE'),
+                duration: 2000,
+                speed: 1,
+            });
+        } else {
+            modalState.enableState = WORKSPACE_STATE.DISABLE;
+            modalState.setEnableModalVisible = true;
+        }
         break;
     default: break;
     }

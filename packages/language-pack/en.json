@@ -2039,6 +2039,7 @@
 				"PLACEHOLDER_NAME": "Workspace name",
 				"REQUIRED_NAME": "Please enter name"
 			},
+			"REQUIRED_ENABLE_WORKSPACE": "At least one workspace must be enabled.",
 			"WORKSPACES": "Workspaces"
 		}
 	},
