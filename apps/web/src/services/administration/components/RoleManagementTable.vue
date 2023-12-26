@@ -16,6 +16,8 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
 
@@ -73,7 +75,7 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
 /* Component */
 const getRowSelectable = (item) => item.role_type === ROLE_TYPE.SYSTEM_ADMIN;
 const handleEditRole = (id: string) => {
-    router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } });
+    router.push({ name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME), params: { id } });
 };
 const handleSelectDropdown = (name) => {
     switch (name) {

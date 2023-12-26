@@ -4,7 +4,7 @@ import { clone } from 'lodash';
 
 import type { AccessLevel } from '@/lib/access-control/config';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { flattenMenu, getAccessPermissionOfMenu } from '@/lib/access-control/page-access-permission-helper';
+import { flattenMenu, getAccessPermissionOfMenu } from '@/lib/access-control/page-access-helper';
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
 

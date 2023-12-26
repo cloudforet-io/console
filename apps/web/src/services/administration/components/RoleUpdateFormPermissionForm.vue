@@ -11,14 +11,14 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 import {
     getPageAccessPermissionMapFromRawData,
-} from '@/lib/access-control/page-access-permission-helper';
+} from '@/lib/access-control/page-access-helper';
 
 import RoleUpdateFormAccess from '@/services/administration/components/RoleUpdateFormAccess.vue';
 import RoleUpdateFormPolicy from '@/services/administration/components/RoleUpdateFormPolicy.vue';
 import {
     getPageAccessMenuListByRoleType,
-} from '@/services/administration/helpers/page-access-menu-list';
-import { getPageAccessList } from '@/services/administration/helpers/role-page-permission-helper';
+    getPageAccessList,
+} from '@/services/administration/helpers/role-page-access-menu-list';
 import type { PageAccessMenuItem, UpdateFormDataType, RoleFormData } from '@/services/administration/types/role-type';
 
 interface Props {
@@ -52,13 +52,11 @@ const updateMenuItems = (item: PageAccessMenuItem, val: boolean, parentItem?: Pa
     }
 };
 const handleUpdateForm = (value: UpdateFormDataType) => {
-    const { id: menuId, val, isHideMenu } = value;
+    const { id: menuId, val } = value;
     const item = find(menuItems.value, { id: menuId });
     const allItem = find(menuItems.value, { id: 'all' }) as PageAccessMenuItem;
     if (item) {
-        if (isHideMenu) {
-            item.hideMenu = val;
-        } else if (item.id === 'all') {
+        if (item.id === 'all') {
             menuItems.value.forEach((menu) => {
                 updateMenuItems(menu, val);
             });
@@ -93,14 +91,6 @@ watch(() => state.pageAccessPermissions, (pageAccessPermissions, prevPageAccessP
     if (isEqual(pageAccessPermissions, prevPageAccessPermissions)) return;
     emit('update-form', { page_access: pageAccessPermissions });
 });
-watch(() => props.initialPagePermissions, (initialPagePermissions) => {
-    // init formState.menuItems
-    const pageAccessPermissionMap = getPageAccessPermissionMapFromRawData(initialPagePermissions);
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
-        handleUpdateForm({ id: itemId, val: accessible });
-    }
-}, { immediate: true });
 watchEffect(() => {
     menuItems.value = getPageAccessMenuListByRoleType([{
         id: 'all',
@@ -108,6 +98,13 @@ watchEffect(() => {
         isAccessible: false,
         hideMenu: false,
     }], props.roleType);
+
+    if (!props.initialPageAccess) return;
+    const pageAccessPermissionMap = getPageAccessPermissionMapFromRawData(props.initialPageAccess);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [itemId, accessible] of Object.entries(pageAccessPermissionMap)) {
+        handleUpdateForm({ id: itemId, val: accessible });
+    }
 });
 </script>
 
@@ -118,7 +115,6 @@ watchEffect(() => {
         />
         <role-update-form-access :menu-items="menuItems"
                                  :role-type="props.roleType"
-                                 :initial-page-access="props.initialPageAccess"
                                  @update="handleUpdateForm"
         />
         <role-update-form-policy :role-type="props.roleType"

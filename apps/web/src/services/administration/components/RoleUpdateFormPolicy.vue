@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 
 import {
     PButton, PFieldTitle, PI, PTextEditor,
@@ -22,12 +22,13 @@ const emit = defineEmits<{(e: 'update', value: string): void,
 }>();
 
 const state = reactive({
-    code: '*',
+    code: '',
     isEdit: false,
 });
 
 /* Component */
 const handleCodeUpdate = (modifiedCode: string) => {
+    if (!modifiedCode) return;
     state.code = modifiedCode;
     emit('update', modifiedCode);
 };
@@ -37,12 +38,12 @@ const handleClickEdit = () => {
 
 /* Watcher */
 watch(() => props.initialPermissions, (value) => {
-    state.code = JSON.stringify(value, null, 4);
-});
-
-onMounted(() => {
-    emit('update', state.code);
-});
+    if (value) {
+        state.code = value.join('\n');
+        return;
+    }
+    state.code = '*';
+}, { immediate: true });
 </script>
 
 <template>
