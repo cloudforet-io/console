@@ -11,7 +11,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 import { workspaceRoutes } from '@/router/workspace-routes';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
@@ -54,9 +54,9 @@ export const integralRoutes: RouteConfig[] = [
                 path: '/:workspaceId',
                 name: ROOT_ROUTE.WORKSPACE._NAME,
                 redirect: (to) => {
-                    const workspaceStore = useWorkspaceStore();
-                    const workspaceList = workspaceStore.getters.workspaceList;
-                    const currentWorkspaceId = workspaceStore.getters.currentWorkspaceId;
+                    const userWorkspaceStore = useUserWorkspaceStore();
+                    const workspaceList = userWorkspaceStore.getters.workspaceList;
+                    const currentWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
                     const isValidWorkspace = workspaceList.some((workspace) => workspace.workspace_id === currentWorkspaceId);
                     if (currentWorkspaceId && isValidWorkspace) {
                         return ({
@@ -69,7 +69,7 @@ export const integralRoutes: RouteConfig[] = [
                     }
                     if (workspaceList.length) {
                         const defaultWorkspaceId = workspaceList[0].workspace_id;
-                        workspaceStore.setCurrentWorkspace(defaultWorkspaceId);
+                        userWorkspaceStore.setCurrentWorkspace(defaultWorkspaceId);
                         return ({
                             name: HOME_DASHBOARD_ROUTE._NAME,
                             params: {

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, reactive } from 'vue';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import DailyUpdates from '@/common/modules/widgets/DailyUpdates.vue';
@@ -17,9 +17,9 @@ import TopProjects from '@/services/home-dashboard/components/TopProjects.vue';
 import TrustedAdvisor from '@/services/home-dashboard/components/TrustedAdvisor.vue';
 
 
-const workspaceStore = useWorkspaceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const storeState = reactive({
-    currentWorkspaceId: computed(() => workspaceStore.getters.currentWorkspaceId),
+    currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
 });
 </script>
 

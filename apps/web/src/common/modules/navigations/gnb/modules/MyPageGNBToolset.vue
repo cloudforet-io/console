@@ -19,13 +19,13 @@ import {
 
 import { store } from '@/store';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import GNBProfile from '@/common/modules/navigations/gnb/modules/gnb-profile/GNBProfile.vue';
 
-const workspaceStore = useWorkspaceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const state = reactive({
-    hasRole: computed(() => workspaceStore.getters.workspaceList.length > 0),
+    hasRole: computed(() => userWorkspaceStore.getters.workspaceList.length > 0),
     timezone: computed(() => store.state.user.timezone),
     profileMenuVisible: false,
 });

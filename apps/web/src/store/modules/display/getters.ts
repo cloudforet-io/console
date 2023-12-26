@@ -12,7 +12,7 @@ import { makeAdminRouteName } from '@/router/helpers/route-helper';
 // eslint-disable-next-line import/no-cycle
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 // eslint-disable-next-line import/no-cycle
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type {
     DisplayState, DisplayMenu, SidebarProps,
@@ -56,8 +56,8 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
 };
 
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
-    const workspaceStore = useWorkspaceStore();
-    const tagetWorkspaceId = workspaceStore.getters.currentWorkspaceId;
+    const userWorkspaceStore = useUserWorkspaceStore();
+    const tagetWorkspaceId = userWorkspaceStore.getters.currentWorkspaceId;
     const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);

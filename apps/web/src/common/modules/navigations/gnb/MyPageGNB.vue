@@ -9,18 +9,18 @@ import { PButton } from '@spaceone/design-system';
 import { ROOT_ROUTE } from '@/router/constant';
 
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
 import MyPageGNBHeader from '@/common/modules/navigations/gnb/modules/MyPageGNBHeader.vue';
 import MyPageGNBToolset from '@/common/modules/navigations/gnb/modules/MyPageGNBToolset.vue';
 
-const workspaceStore = useWorkspaceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const router = useRouter();
 
 const state = reactive({
     workspaceLink: computed(() => (state.hasRole ? { name: ROOT_ROUTE._NAME } : null)),
-    hasRole: computed(() => workspaceStore.getters.workspaceList.length > 0),
+    hasRole: computed(() => userWorkspaceStore.getters.workspaceList.length > 0),
 });
 
 const handleBackToWorkspace = () => {

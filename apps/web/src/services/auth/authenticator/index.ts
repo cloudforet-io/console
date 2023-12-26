@@ -4,19 +4,19 @@ import { SpaceRouter } from '@/router';
 import type { AuthType } from '@/schema/identity/user/type';
 import { store } from '@/store';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 
 abstract class Authenticator {
     static async signIn(credentials: Record<string, any>, authType: AuthType, verifyCode?: string): Promise<void> {
-        const workspaceStore = useWorkspaceStore();
+        const userWorkspaceStore = useUserWorkspaceStore();
         await store.dispatch('user/signIn', {
             domainId: store.state.domain.domainId,
             credentials,
             authType,
             verify_code: verifyCode,
         });
-        await workspaceStore.load(store.state.user.userId);
+        await userWorkspaceStore.load(store.state.user.userId);
         await store.dispatch('display/hideSignInErrorMessage');
         await store.dispatch('error/resetErrorState');
     }

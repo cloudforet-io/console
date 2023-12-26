@@ -24,7 +24,7 @@ import { useRoute, useRouter } from 'vue-router/composables';
 import { store } from '@/store';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
@@ -43,7 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
     nextPath: undefined,
 });
 const appContextStore = useAppContextStore();
-const workspaceStore = useWorkspaceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -68,7 +68,7 @@ const state = reactive({
 const onSignIn = async (userId:string) => {
     try {
         const isSameUserAsPreviouslyLoggedInUser = state.beforeUser === userId;
-        const hasBoundWorkspace = workspaceStore.getters.workspaceList.length > 0;
+        const hasBoundWorkspace = userWorkspaceStore.getters.workspaceList.length > 0;
         const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
 
         if (!props.nextPath || !isSameUserAsPreviouslyLoggedInUser) {

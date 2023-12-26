@@ -7,13 +7,13 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-interface WorkspaceStoreState {
+interface UserWorkspaceStoreState {
     items: WorkspaceModel[];
     currentItem?: WorkspaceModel;
 }
 
-export const useWorkspaceStore = defineStore('workspace-store', () => {
-    const state = reactive<WorkspaceStoreState>({
+export const useUserWorkspaceStore = defineStore('user-workspace-store', () => {
+    const state = reactive<UserWorkspaceStoreState>({
         items: [],
         currentItem: undefined,
     });
