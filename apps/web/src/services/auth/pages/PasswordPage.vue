@@ -99,6 +99,8 @@ import jwtDecode from 'jwt-decode';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { UserProfileResetPasswordParameters } from '@/schema/identity/user-profile/api-verbs/reset-password';
+import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -181,9 +183,7 @@ const handleClickButton = () => {
         }
         sendResetEmail(userIdInput.value, state.domainId);
     } else {
-        const { userId } = state.userInfo;
         const request = {
-            user_id: userId,
             password: passwordInput.value,
         };
         postResetPassword(request);
@@ -218,7 +218,10 @@ const resetInputs = () => {
 const sendResetEmail = async (userId, domainId) => {
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.identity.user.resetPassword({ user_id: userId, domain_id: domainId });
+        await SpaceConnector.clientV2.identity.userProfile.resetPassword<UserProfileResetPasswordParameters>({
+            user_id: userId,
+            domain_id: domainId,
+        });
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { userId, status: 'done' } }).catch(() => {});
     } catch (e: any) {
         if (e.code === 'ERROR_UNABLE_TO_RESET_PASSWORD_IN_EXTERNAL_AUTH' && passwordFormEl.value) {
@@ -235,7 +238,7 @@ const sendResetEmail = async (userId, domainId) => {
 const postResetPassword = async (request) => {
     state.loading = true;
     try {
-        const userInfo = await SpaceConnector.clientV2.identity.user.update(request);
+        const userInfo = await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
         await store.commit('user/setUser', userInfo);
         await SpaceRouter.router.replace({ name: AUTH_ROUTE.EMAIL._NAME, query: { status: 'done' } }).catch(() => {});
     } catch (e: any) {
