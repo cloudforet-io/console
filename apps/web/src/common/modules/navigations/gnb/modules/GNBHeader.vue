@@ -152,6 +152,11 @@ const selectWorkspace = (workspaceId: string): void => {
         width: 8.75rem;
     }
 
+    @screen mobile {
+        width: 16.25rem;
+        box-shadow: none;
+    }
+
     .title-wrapper {
         @apply inline-block;
 
@@ -186,10 +191,18 @@ const selectWorkspace = (workspaceId: string): void => {
         }
 
         .selected-workspace {
-            @apply text-label-lg text-gray-800;
+            @apply text-label-lg text-gray-800 inline-block;
+            max-width: 8.4375rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
 
             @screen tablet {
                 @apply hidden;
+            }
+
+            @screen mobile {
+                @apply inline-block;
             }
         }
         .tablet-selected {
@@ -197,6 +210,10 @@ const selectWorkspace = (workspaceId: string): void => {
 
             @screen tablet {
                 @apply inline-block;
+            }
+
+            @screen mobile {
+                @apply hidden;
             }
         }
         .menu-wrapper {
