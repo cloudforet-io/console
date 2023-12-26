@@ -54,10 +54,7 @@ const state = reactive({
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
     // TODO: to be refactored by new planning
-    role: computed(() => {
-        const roleArray = store.getters['user/roleNames'];
-        return roleArray.join(', ');
-    }),
+    role: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType || 'USER'),
     language: computed(() => store.getters['user/languageLabel']),
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
