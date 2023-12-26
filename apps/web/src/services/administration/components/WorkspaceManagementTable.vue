@@ -27,10 +27,11 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
 import WorkspacesDeleteModal from '@/services/administration/components/WorkspacesDeleteModal.vue';
+import WorkspacesSetEnableModal from '@/services/administration/components/WorkspacesSetEnableModal.vue';
 import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import {
     EXCEL_TABLE_FIELDS,
-    WORKSPACE_SEARCH_HANDLERS,
+    WORKSPACE_SEARCH_HANDLERS, WORKSPACE_STATE,
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/administration/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
@@ -59,6 +60,8 @@ const storeState = reactive({
 
 const modalState = reactive({
     deleteModalVisible: false,
+    setEnableModalVisible: false,
+    enableState: undefined as undefined| typeof WORKSPACE_STATE[keyof typeof WORKSPACE_STATE],
 });
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
@@ -106,10 +109,12 @@ const handleSelectDropdown = (name) => {
         modalState.deleteModalVisible = true;
         break;
     case 'enable':
-        // enable
+        modalState.enableState = WORKSPACE_STATE.ENABLE;
+        modalState.setEnableModalVisible = true;
         break;
     case 'disable':
-        // disable
+        modalState.enableState = WORKSPACE_STATE.DISABLE;
+        modalState.setEnableModalVisible = true;
         break;
     default: break;
     }
@@ -205,6 +210,10 @@ const handleExport = async () => {
         </p-toolbox-table>
         <workspaces-delete-modal :visible.sync="modalState.deleteModalVisible"
                                  @refresh="handleChange()"
+        />
+        <workspaces-set-enable-modal :visible.sync="modalState.setEnableModalVisible"
+                                     :enable-modal-type="modalState.enableState"
+                                     @refresh="handleChange()"
         />
     </section>
 </template>
