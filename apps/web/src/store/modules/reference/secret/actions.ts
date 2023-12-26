@@ -25,7 +25,7 @@ export const load: Action<SecretReferenceState, any> = async ({ state, commit },
     ) return;
 
     try {
-        const response = await SpaceConnector.client.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
+        const response = await SpaceConnector.clientV2.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
             query: {
                 only: ['secret_id', 'name'],
             },
