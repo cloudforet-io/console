@@ -1,8 +1,8 @@
 import type { Tags } from '@/schema/_common/model';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
     BudgetNotification, BudgetPlannedLimit, BudgetTimeUnit, ProviderFilter,
 } from '@/schema/cost-analysis/budget/type';
-import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 export interface BudgetCreateParameters {
     data_source_id: string;
@@ -15,7 +15,7 @@ export interface BudgetCreateParameters {
     end: string;
     notifications?: BudgetNotification[];
     tags?: Tags;
-    resource_group: ResourceGroup;
+    resource_group: ResourceGroupType;
     workspace_id?: string;
     project_id?: string;
 }

@@ -1,4 +1,4 @@
-export type FILE_STATE = 'PENDING'|'DONE';
+export type FileState = 'PENDING'|'DONE';
 
 export interface FileReference {
     resource_id: string;

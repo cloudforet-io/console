@@ -9,10 +9,11 @@ export interface CreatePublicDashboardParameters {
     name: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
-    variables_schema?: DashboardVariablesSchema;
     settings?: DashboardSettings;
+    variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
     resource_group: ResourceGroupType;
+    workspace_id?: string;
     project_id?: string;
 }

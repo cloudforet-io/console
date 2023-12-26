@@ -124,7 +124,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async (params?: ListDashboardParameters) => {
+    const load = async () => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
@@ -145,9 +145,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
 
         const _publicDashboardParams = {
-            ...params,
             query: {
-                ...(params?.query || {}),
                 ...publicDashboardApiQueryHelper.data,
             },
         };
@@ -156,7 +154,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             await fetchDashboard('PUBLIC', _publicDashboardParams);
         } else {
             await Promise.allSettled([
-                fetchDashboard('PRIVATE', params),
+                fetchDashboard('PRIVATE'),
                 fetchDashboard('PUBLIC', _publicDashboardParams),
             ]);
         }

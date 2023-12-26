@@ -4,12 +4,12 @@ export interface PostCreateParameters {
     board_type: PostBoardType;
     title: string;
     contents: string;
-    resource_group: PostResourceGroup;
     category?: string;
+    files?: string[];
     options?: {
         is_popup: boolean;
         is_pinned: boolean;
     };
     writer?: string;
-    files?: string[];
+    resource_group: PostResourceGroup;
 }

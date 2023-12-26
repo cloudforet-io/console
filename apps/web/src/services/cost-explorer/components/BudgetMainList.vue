@@ -16,6 +16,7 @@ import type { Sort, Query } from '@cloudforet/core-lib/space-connector/type';
 import { SpaceRouter } from '@/router';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
 import type {
+    BudgetUsageAnalyzeParameters,
     BudgetUsageAnalyzeResult,
 } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
@@ -73,7 +74,7 @@ const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeRe
             });
         }
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
-        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze({
+        return await SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze<BudgetUsageAnalyzeParameters, AnalyzeResponse<BudgetUsageAnalyzeResult>>({
             query: {
                 ...budgetUsageApiQueryHelper.data,
                 ..._query,

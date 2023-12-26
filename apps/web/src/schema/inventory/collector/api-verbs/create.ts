@@ -1,5 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
-import type { ResourceGroup } from '@/schema/identity/role-binding/type';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type { CollectorPluginModel } from '@/schema/inventory/collector/model';
 import type { Schedule, SecretFilter } from '@/schema/inventory/collector/type';
 
@@ -10,6 +10,6 @@ export interface CollectorCreateParameters {
     secret_filter?: SecretFilter; // backend api will replace whole schedule object
     provider?: string;
     tags?: Tags;
-    resource_group: Extract<ResourceGroup, 'DOMAIN'|'WORKSPACE'>;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     workspace_id?: string;
 }

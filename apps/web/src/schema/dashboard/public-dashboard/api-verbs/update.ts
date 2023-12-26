@@ -9,8 +9,8 @@ export interface UpdatePublicDashboardParameters {
     name?: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;
-    variables_schema?: DashboardVariablesSchema;
     settings?: DashboardSettings;
+    variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
 }

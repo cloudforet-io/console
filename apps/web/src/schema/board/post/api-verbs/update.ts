@@ -3,10 +3,10 @@ export interface PostUpdateParameters {
     title?: string;
     contents?: string;
     category?: string;
+    files?: string[];
     options?: {
         is_popup: boolean;
         is_pinned: boolean;
     };
     writer?: string;
-    files?: string[];
 }
