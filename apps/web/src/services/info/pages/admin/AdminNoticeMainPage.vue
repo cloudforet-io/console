@@ -2,7 +2,7 @@
     <div class="notice-page">
         <p-heading :title="$t('INFO.NOTICE.MAIN.NOTICE_TITLE')">
             <template #extra>
-                <p-button v-if="hasDomainRoleUser || hasSystemRoleUser"
+                <p-button v-if="hasDomainRoleUser"
                           style-type="secondary"
                           icon-left="ic_plus_bold"
                           @click="handleCreateNotice"
@@ -38,7 +38,6 @@ export default {
     setup() {
         const state = reactive({
             hasDomainRoleUser: computed(() => store.getters['user/isDomainAdmin']),
-            hasSystemRoleUser: computed(() => store.getters['user/hasSystemRole']),
         });
         const handleCreateNotice = () => {
             SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.CREATE._NAME });

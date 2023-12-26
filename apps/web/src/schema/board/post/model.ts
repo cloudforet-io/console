@@ -1,6 +1,5 @@
 import type { PostBoardType, PostResourceGroup } from '@/schema/board/post/type';
-
-import type { FileInfo } from '@/lib/file-manager/type';
+import type { FileModel } from '@/schema/file-manager/model';
 
 export interface PostModel {
     post_id: string;
@@ -8,7 +7,7 @@ export interface PostModel {
     category: string;
     title: string;
     contents: string;
-    files: FileInfo[];
+    files: FileModel[];
     options: {
         is_popup: boolean;
         is_pinned: boolean;

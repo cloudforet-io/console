@@ -49,10 +49,10 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
 import type { PostModel } from '@/schema/board/post/model';
+import type { FileModel } from '@/schema/file-manager/model';
 
 import { useNoticeStore } from '@/store/notice';
 
-import type { FileInfo } from '@/lib/file-manager/type';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
@@ -83,7 +83,7 @@ export default {
         const state = reactive({
             popupVisible: true,
         });
-        const files = computedAsync<FileInfo[]>(async () => {
+        const files = computedAsync<FileModel[]>(async () => {
             const notice = props.item;
             if (!notice) return [];
             try {
