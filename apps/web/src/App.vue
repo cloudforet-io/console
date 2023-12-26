@@ -14,6 +14,9 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { store } from '@/store';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -22,6 +25,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 import config from '@/lib/config';
 import { supportsBrowser } from '@/lib/helper/cross-browsing-helper';
 
+import HasNoWorkspaceModal from '@/common/components/modals/HasNoWorkspaceModal.vue';
 import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
@@ -30,6 +34,7 @@ import MyPageGNB from '@/common/modules/navigations/gnb/MyPageGNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
+import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
@@ -47,8 +52,10 @@ const state = reactive({
     domainId: computed<string>(() => store.state.domain.domainId),
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    hasNoWorkspace: false,
 });
 
+const workspaceStore = useWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -73,6 +80,13 @@ const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAcce
 watch(() => route, (value) => {
     state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
 });
+
+
+watch(() => route.name, (routeName) => {
+    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME)) {
+        state.hasNoWorkspace = workspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
+    }
+}, { immediate: true });
 
 watch(() => state.userId, (userId) => {
     if (userId) {
@@ -153,6 +167,7 @@ watch(() => state.userId, (userId) => {
                           button-type="primary"
                           @clickButton="goToSignIn"
             />
+            <has-no-workspace-modal :visible.sync="state.hasNoWorkspace" />
             <notification-email-modal
                 v-if="state.smtpEnabled"
                 :domain-id="state.domainId"

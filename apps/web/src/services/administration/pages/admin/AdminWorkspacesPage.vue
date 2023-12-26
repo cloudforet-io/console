@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
-import { reactive } from 'vue';
+import { onMounted, reactive } from 'vue';
+import { useRoute } from 'vue-router/composables';
 
 import { PButton, PHeading, PHorizontalLayout } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
@@ -17,6 +18,8 @@ import { useWorkspacePageStore } from '@/services/administration/store/workspace
 
 const workspacePageStore = useWorkspacePageStore();
 const userPageStore = useUserPageStore();
+
+const route = useRoute();
 
 const state = reactive({
     createModalVisible: false,
@@ -40,6 +43,12 @@ const handleConfirm = () => {
         _state.modal = cloneDeep(_state.modal);
     });
 };
+
+onMounted(() => {
+    if (route.query.hasNoWorkpspace === 'true') {
+        handleCreateWorkspace();
+    }
+});
 
 </script>
 

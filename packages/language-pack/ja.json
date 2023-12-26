@@ -22,6 +22,10 @@
 				"DO_NOT_SHOW_AGAIN": "再表示しない",
 				"EDGE": "エッジ",
 				"HEADER": "このサイトでは、ChromeまたはEdgeブラウザを使用することをお勧めします。"
+			},
+			"WORKSPACE": {
+				"CREATE_WORKSPACE_BUTTON": "",
+				"CREATE_WORKSPACE_DESC": ""
 			}
 		},
 		"TOP_NOTI": {
