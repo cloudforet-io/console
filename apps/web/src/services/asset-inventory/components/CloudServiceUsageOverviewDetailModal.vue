@@ -74,7 +74,6 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
 import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -248,13 +247,8 @@ export default defineComponent<Props>({
             { immediate: true },
         );
 
-        let initiated = false;
         watch(() => props.visible, async (visible) => {
             if (visible !== state.proxyVisible) state.proxyVisible = visible;
-            if (!initiated) {
-                await store.dispatch('reference/loadAll');
-                initiated = true;
-            }
         }, { immediate: true });
 
         return {

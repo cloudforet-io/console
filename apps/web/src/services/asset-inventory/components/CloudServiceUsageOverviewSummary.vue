@@ -36,7 +36,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     reactive, toRefs,
 } from 'vue';
@@ -44,13 +43,12 @@ import {
 import { PDataLoader, PDynamicWidget, PSkeleton } from '@spaceone/design-system';
 import type { DynamicWidgetFieldHandler } from '@spaceone/design-system/types/data-display/dynamic/dynamic-widget/type';
 
-import { store } from '@/store';
-
 import getRandomId from '@/lib/random-id-generator';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import type { Reference } from '@/lib/reference/type';
 
 import { gray } from '@/styles/colors';
+
 
 export default {
     name: 'CloudServiceUsageOverviewSummary',
@@ -92,11 +90,6 @@ export default {
             }
             return {};
         };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/loadAll');
-        })();
 
         return {
             ...toRefs(state),
