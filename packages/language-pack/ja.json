@@ -2028,8 +2028,10 @@
 			"DELETE_WORKSPACE": "",
 			"DELETE_WORKSPACE_DESC": "",
 			"DISABLE": "",
+			"DISABLE_WORKSPACE": "",
 			"EDIT": "編集",
 			"ENABLE": "",
+			"ENABLE_WORKSPACE": "",
 			"FORM": {
 				"LABEL_DESC": "",
 				"LABEL_NAME": "",
