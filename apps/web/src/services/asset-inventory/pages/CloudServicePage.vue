@@ -15,6 +15,7 @@
                                :period="cloudServicePageState.period"
                                :page-size="pageLimit"
                                @update-pagination="handlePaginationUpdate"
+                               @refresh="handleRefresh"
         />
 
         <p-data-loader class="flex-grow"
@@ -241,6 +242,10 @@ export default {
             listCloudServiceType();
         };
 
+        const handleRefresh = () => {
+            listCloudServiceType();
+        };
+
         /* Init */
         let urlQueryStringWatcherStop;
         const init = async () => {
@@ -295,6 +300,7 @@ export default {
             cloudServicePageState,
             assetUrlConverter,
             handlePaginationUpdate,
+            handleRefresh,
             ASSET_INVENTORY_ROUTE,
             BACKGROUND_COLOR,
         };
