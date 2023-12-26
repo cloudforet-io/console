@@ -24,7 +24,7 @@ import { useNoticeStore } from '@/store/notice';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import ListItem from '@/services/info/components/NoticeListItem.vue';
+import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 const NOTICE_ITEM_LIMIT = 10;
@@ -86,7 +86,7 @@ const loadSearchListSet = async () => {
 
 /* event */
 const handleToolboxChange = (options: ToolboxOptions = {}) => {
-    state.searchText = options?.searchText;
+    if (options?.searchText !== undefined) state.searchText = options?.searchText;
     loadSearchListSet();
 };
 const handleClickNotice = (postId: string) => {
@@ -122,15 +122,18 @@ const handlePageChange = (page: number) => {
         <p-divider />
         <p-data-loader :data="state.noticeItems"
                        :loading="state.loading"
+                       :min-loading-time="1000"
+                       class="notice-list-loader"
         >
             <ul class="list-wrapper">
-                <list-item v-for="(item, index) in state.noticeItems"
-                           :key="`notice-${item.post_id}-${index}`"
-                           class="list-item"
-                           :post="item"
-                           :is-new="!noticeGetters.isReadMap[item.post_id]"
-                           :input-text="state.searchText"
-                           @click.native="handleClickNotice(item.post_id)"
+                <notice-list-item v-for="(item, index) in state.noticeItems"
+                                  :key="`notice-${item.post_id}-${index}`"
+                                  class="list-item"
+                                  :post="item"
+                                  :is-new="!noticeGetters.isReadMap[item.post_id]"
+                                  :input-text="state.searchText"
+                                  :loading="false"
+                                  @click.native="handleClickNotice(item.post_id)"
                 />
             </ul>
             <template #no-data>
@@ -185,8 +188,12 @@ const handlePageChange = (page: number) => {
         padding: 0.75rem 0 1rem 0;
     }
 
+    .notice-list-loader {
+        min-height: 10rem;
+    }
+
     /* custom design-system component - p-data-loader */
-    :deep(.p-data-loader .no-data-wrapper) {
+    :deep(.notice-list-loader.p-data-loader .no-data-wrapper) {
         max-height: none;
     }
 

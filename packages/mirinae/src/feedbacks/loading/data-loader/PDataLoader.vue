@@ -305,13 +305,14 @@ export default defineComponent<Props>({
             @apply justify-center items-center flex w-full text-gray-300 text-center;
             line-height: 120%;
             font-size: 1rem;
-            height: calc(100% - 2rem);
+            height: 100%;
             max-height: 16.875rem;
             min-height: inherit;
         }
 
         > .data-wrapper {
             @apply overflow-y-auto h-full;
+            min-height: inherit;
         }
     }
 }
