@@ -6,10 +6,10 @@ import {
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-
-import type { DataSourceModel } from '@/schema/cost-analysis/data-source/model';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CostDataSourceListParameters } from '@/schema/cost-analysis/data-source/api-verbs/list';
+import type { CostDataSourceModel } from '@/schema/cost-analysis/data-source/model';
 
 import type {
     ReferenceItem,
@@ -23,9 +23,9 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'|'workspace_id'>;
-export type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
-export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
+type PickedCostDataSourceModel = Pick<CostDataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'|'workspace_id'>;
+export type CostDataSourceItems = Required<Pick<ReferenceItem<PickedCostDataSourceModel>, 'key'|'label'|'name'|'data'>>;
+export type CostDataSourceReferenceMap = ReferenceMap<CostDataSourceItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
 let lastLoadedTime = 0;
@@ -55,32 +55,33 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
                     || (options?.lazyLoad && state.items)
                 ) && !options?.force
             ) return;
-            lastLoadedTime = currentTime;
 
-            const fetcher = getCancellableFetcher(SpaceConnector.clientV2.costAnalysis.dataSource.list);
             try {
-                const { status, response } = await fetcher({
+                const res = await SpaceConnector.clientV2.costAnalysis.dataSource.list<CostDataSourceListParameters, ListResponse<CostDataSourceModel>>({
                     query: {
                         only: ['data_source_id', 'name', 'plugin_info', 'cost_additional_info_keys', 'cost_tag_keys', 'workspace_id'],
                     },
                 });
-                if (status === 'succeed') {
-                    const items: CostDataSourceReferenceMap = {};
-                    response.results.forEach((item: DataSourceModel) => {
-                        items[item.data_source_id] = {
-                            key: item.data_source_id,
-                            label: item.name,
-                            name: item.name,
-                            data: item,
-                        };
-                    });
-                    state.items = items;
-                }
+                const items: CostDataSourceReferenceMap = {};
+                res.results?.forEach((item: CostDataSourceModel) => {
+                    items[item.data_source_id] = {
+                        key: item.data_source_id,
+                        label: item.name,
+                        name: item.name,
+                        data: item,
+                    };
+                });
+                state.items = items;
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                lastLoadedTime = currentTime;
             }
         },
-        flush() { state.items = null; },
+        flush() {
+            state.items = null;
+            lastLoadedTime = 0;
+        },
     };
 
     return {
