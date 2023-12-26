@@ -26,7 +26,7 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
-import ListItem from '@/services/info/components/NoticeListItem.vue';
+import NoticeListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
@@ -176,16 +176,18 @@ watch(() => props.postId, (postId) => {
         </p-pane-layout>
         <p-pane-layout class="post-router">
             <div class="post-router-item">
-                <list-item :post-direction="state.nextNoticePost ? 'next' : undefined"
-                           :post="state.nextNoticePost"
-                           @click.native="handlePostClick('next')"
+                <notice-list-item post-direction="next"
+                                  :post="state.nextNoticePost"
+                                  :loading="state.loading"
+                                  @click.native="handlePostClick('next')"
                 />
             </div>
             <p-divider />
             <div class="post-router-item">
-                <list-item :post-direction="state.prevNoticePost ? 'prev' : undefined"
-                           :post="state.prevNoticePost"
-                           @click.native="handlePostClick('prev')"
+                <notice-list-item post-direction="prev"
+                                  :post="state.prevNoticePost"
+                                  :loading="state.loading"
+                                  @click.native="handlePostClick('prev')"
                 />
             </div>
         </p-pane-layout>
@@ -203,6 +205,10 @@ watch(() => props.postId, (postId) => {
 <style scoped lang="postcss">
 .notice-detail-layout {
     padding: 1.25rem 1.5rem;
+    min-height: calc(100vh - 35rem);
+    >.p-data-loader {
+        min-height: inherit;
+    }
 
     .post-title {
         @apply flex flex-wrap gap-2 items-center text-gray-600;

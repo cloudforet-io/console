@@ -15,6 +15,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export const useNoticeDetailStore = defineStore('notice-detail', () => {
     const state = reactive({
         post: undefined as undefined | PostModel,
+        loading: false,
     });
 
     const getters = reactive({});
@@ -22,6 +23,7 @@ export const useNoticeDetailStore = defineStore('notice-detail', () => {
     const actions = {
         getNoticePost: async (postId: string) => {
             try {
+                state.loading = true;
                 const result = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
                     post_id: postId,
                 });
@@ -29,24 +31,41 @@ export const useNoticeDetailStore = defineStore('notice-detail', () => {
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.post = undefined;
+            } finally {
+                state.loading = false;
             }
         },
         deleteNoticePost: async (postId: string) => {
-            await SpaceConnector.clientV2.board.post.delete<PostDeleteParameters>({
-                post_id: postId,
-            });
-            state.post = undefined;
+            try {
+                state.loading = true;
+                await SpaceConnector.clientV2.board.post.delete<PostDeleteParameters>({
+                    post_id: postId,
+                });
+                state.post = undefined;
+            } finally {
+                state.loading = false;
+            }
         },
         updateNoticePost: async (params: Omit<PostUpdateParameters, 'post_id'>) => {
-            if (!state.post) throw new Error('Notice post not found');
-            const post = await SpaceConnector.clientV2.board.post.update<PostUpdateParameters, PostModel>({
-                ...params,
-                post_id: state.post.post_id,
-            });
-            state.post = post;
+            try {
+                state.loading = true;
+                if (!state.post) throw new Error('Notice post not found');
+                const post = await SpaceConnector.clientV2.board.post.update<PostUpdateParameters, PostModel>({
+                    ...params,
+                    post_id: state.post.post_id,
+                });
+                state.post = post;
+            } finally {
+                state.loading = false;
+            }
         },
         createNoticePost: async (params: Omit<PostCreateParameters, 'post_id'>) => {
-            await SpaceConnector.clientV2.board.post.create(params);
+            try {
+                state.loading = true;
+                await SpaceConnector.clientV2.board.post.create(params);
+            } finally {
+                state.loading = false;
+            }
         },
         reset: () => {
             state.post = undefined;

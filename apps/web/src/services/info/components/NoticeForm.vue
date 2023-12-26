@@ -4,7 +4,7 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PCheckbox, PButton,
+    PPaneLayout, PFieldGroup, PTextInput, PCheckbox, PButton, PDataLoader,
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
@@ -38,7 +38,6 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 
 const state = reactive({
-    hasDomainRole: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
@@ -118,16 +117,16 @@ const handleEditNotice = async () => {
 };
 
 
-watch(() => noticeDetailState.post, async (notice) => {
-    if (!notice || !Object.keys(notice).length) return;
+watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([notice, loading]) => {
+    if (loading) return;
 
     // INIT STATES
-    state.isPinned = notice.options?.is_pinned ?? false;
-    state.isPopup = notice.options?.is_popup ?? false;
-    state.attachments = notice.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
-    setForm('writerName', notice.writer);
-    setForm('noticeTitle', notice.title);
-    setForm('contents', notice.contents);
+    state.isPinned = notice?.options?.is_pinned ?? false;
+    state.isPopup = notice?.options?.is_popup ?? false;
+    state.attachments = notice?.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
+    setForm('writerName', notice?.writer ?? store.state.user.name);
+    setForm('noticeTitle', notice?.title ?? '');
+    setForm('contents', notice?.contents ?? '');
 });
 
 </script>
@@ -135,57 +134,59 @@ watch(() => noticeDetailState.post, async (notice) => {
 <template>
     <div class="notice-form">
         <p-pane-layout class="notice-form-wrapper">
-            <p-field-group class="notice-label-wrapper writer-name-input"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')"
-                           required
+            <p-data-loader :loading="noticeDetailState.loading"
+                           :data="noticeDetailState.post"
             >
-                <template #default="{invalid}">
-                    <p-text-input :value="writerName"
-                                  :invalid="invalid"
-                                  :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
-                                  @update:value="setForm('writerName', $event)"
-                    />
-                </template>
-            </p-field-group>
-            <p-field-group class="notice-label-wrapper"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
-                           required
-                           :invalid="invalidState.noticeTitle"
-                           :invalid-text="invalidTexts.noticeTitle"
-            >
-                <template #default="{invalid}">
-                    <p-text-input :value="noticeTitle"
-                                  :invalid="invalid"
-                                  class="!w-full"
-                                  @update:value="setForm('noticeTitle', $event)"
-                    />
-                </template>
-            </p-field-group>
-            <p-field-group class="notice-label-wrapper"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')"
-                           required
-                           :invalid="invalidState.contents"
-                           :invalid-text="invalidTexts.contents"
-            >
-                <template #default="{invalid}">
-                    <text-editor :value="contents"
-                                 :attachments.sync="state.attachments"
-                                 :image-uploader="fileUploader"
-                                 :invalid="invalid"
-                                 @update:value="(d) => setForm('contents', d)"
-                    />
-                </template>
-            </p-field-group>
-            <div v-if=" state.hasDomainRole"
-                 class="notice-create-options-wrapper"
-            >
-                <p-checkbox v-model="state.isPinned">
-                    <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
-                </p-checkbox>
-                <p-checkbox v-model="state.isPopup">
-                    <span>{{ $t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
-                </p-checkbox>
-            </div>
+                <p-field-group class="notice-label-wrapper writer-name-input"
+                               :label="$t('INFO.NOTICE.FORM.LABEL_WRITER_NAME')"
+                               required
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="writerName"
+                                      :invalid="invalid"
+                                      :placeholder="$store.state.user.name || $t('INFO.NOTICE.FORM.PLACEHOLDER_REQUIRED')"
+                                      @update:value="setForm('writerName', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group class="notice-label-wrapper"
+                               :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
+                               required
+                               :invalid="invalidState.noticeTitle"
+                               :invalid-text="invalidTexts.noticeTitle"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="noticeTitle"
+                                      :invalid="invalid"
+                                      class="!w-full"
+                                      @update:value="setForm('noticeTitle', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group class="notice-label-wrapper"
+                               :label="$t('INFO.NOTICE.FORM.LABEL_CONTENT')"
+                               required
+                               :invalid="invalidState.contents"
+                               :invalid-text="invalidTexts.contents"
+                >
+                    <template #default="{invalid}">
+                        <text-editor :value="contents"
+                                     :attachments.sync="state.attachments"
+                                     :image-uploader="fileUploader"
+                                     :invalid="invalid"
+                                     @update:value="(d) => setForm('contents', d)"
+                        />
+                    </template>
+                </p-field-group>
+                <div class="notice-create-options-wrapper">
+                    <p-checkbox v-model="state.isPinned">
+                        <span>{{ $t('INFO.NOTICE.FORM.PIN_NOTICE') }}</span>
+                    </p-checkbox>
+                    <p-checkbox v-model="state.isPopup">
+                        <span>{{ $t('INFO.NOTICE.FORM.IN_POP_UP') }}</span>
+                    </p-checkbox>
+                </div>
+            </p-data-loader>
         </p-pane-layout>
         <div class="notice-create-buttons-wrapper">
             <p-button style-type="tertiary"
