@@ -66,6 +66,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NoteCreateParameters } from '@/schema/inventory/note/api-verbs/create';
+import type { NoteDeleteParameters } from '@/schema/inventory/note/api-verbs/delete';
+import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
 import type { NoteModel } from '@/schema/inventory/note/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -122,10 +126,10 @@ export default {
             try {
                 state.loading = true;
                 apiQuery.setFilters([{ k: 'record_id', v: props.recordId, o: '=' }]).setSort('created_at');
-                const res = await SpaceConnector.client.inventory.note.list({
+                const res = await SpaceConnector.clientV2.inventory.note.list<NoteListParameters, ListResponse<NoteModel>>({
                     query: apiQuery.data,
                 });
-                state.noteList = res.results.map((d) => ({
+                state.noteList = (res.results ?? []).map((d) => ({
                     title: d.created_by,
                     data: {
                         note: d.note,
@@ -133,7 +137,7 @@ export default {
                     },
                     ...d,
                 }));
-                state.totalCount = res.total_count;
+                state.totalCount = res.total_count ?? 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.noteList = [];
@@ -144,9 +148,8 @@ export default {
 
         const handleCreateNote = async () => {
             try {
-                await SpaceConnector.client.inventory.note.create({
+                await SpaceConnector.clientV2.inventory.note.create<NoteCreateParameters, NoteModel>({
                     record_id: props.recordId,
-                    user_id: state.userId,
                     note: state.noteInput,
                 });
             } catch (e) {
@@ -176,7 +179,7 @@ export default {
         const handleDeleteNote = async () => {
             checkDeleteState.loading = true;
             try {
-                await SpaceConnector.client.inventory.note.delete({
+                await SpaceConnector.clientV2.inventory.note.delete<NoteDeleteParameters>({
                     note_id: state.selectedNoteIdForDelete,
                 });
             } catch (e) {

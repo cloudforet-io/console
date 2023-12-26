@@ -117,6 +117,7 @@ import { SpaceRouter } from '@/router';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ChangeHistoryListParameters } from '@/schema/inventory/change-history/api-verbs/list';
 import type { ChangeHistoryModel } from '@/schema/inventory/change-history/model';
+import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
 import type { NoteModel } from '@/schema/inventory/note/model';
 import { store } from '@/store';
 
@@ -274,10 +275,10 @@ export default {
         const getNoteData = async (recordIdList) => {
             try {
                 noteApiQueryHelper.setFilters([{ k: 'record_id', v: recordIdList, o: '=' }]);
-                const { results } = await SpaceConnector.client.inventory.note.list({
+                const { results } = await SpaceConnector.clientV2.inventory.note.list<NoteListParameters, ListResponse<NoteModel>>({
                     query: noteApiQueryHelper.data,
                 });
-                return results;
+                return results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
