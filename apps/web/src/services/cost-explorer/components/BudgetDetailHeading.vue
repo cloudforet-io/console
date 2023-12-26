@@ -32,7 +32,7 @@ const budgetPageState = budgetPageStore.$state;
 const allReferenceStore = useAllReferenceStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: computed(() => store.state.user.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({

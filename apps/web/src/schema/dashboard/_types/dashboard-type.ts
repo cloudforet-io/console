@@ -62,12 +62,12 @@ export interface DateRange {
 // dashboard template types
 export interface DashboardTemplate {
     name: string;
+    version: number|string;
     layouts: DashboardLayoutWidgetInfo[][];
-    settings: DashboardSettings;
     variables: DashboardVariables;
+    settings: DashboardSettings;
     variables_schema: DashboardVariablesSchema;
     labels: (DashboardLabel|string)[];
-    version: number|string;
 }
 
 export interface DashboardLayoutWidgetInfo {

@@ -5,9 +5,9 @@ import { defineStore } from 'pinia';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CreateDomainConfigParameters } from '@/schema/config/domain-config/api-verbs/create';
-import type { GetDomainConfigParameters } from '@/schema/config/domain-config/api-verbs/get';
-import type { UpdateDomainConfigParameters } from '@/schema/config/domain-config/api-verbs/update';
+import type { DomainConfigCreateParameters } from '@/schema/config/domain-config/api-verbs/create';
+import type { DomainConfigListParameters } from '@/schema/config/domain-config/api-verbs/list';
+import type { DomainConfigUpdateParameters } from '@/schema/config/domain-config/api-verbs/update';
 import type { DomainConfigModel } from '@/schema/config/domain-config/model';
 
 import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
@@ -43,7 +43,7 @@ export const useDomainSettingsStore = defineStore('domain-config', () => {
     /* Actions */
     const fetchDomainSettings = async () => {
         try {
-            const res = await SpaceConnector.client.config.domainConfig.list<GetDomainConfigParameters, ListResponse<DomainConfigModel>>({
+            const res = await SpaceConnector.client.config.domainConfig.list<DomainConfigListParameters, ListResponse<DomainConfigModel>>({
                 name: DOMAIN_CONFIG_TYPE.SETTINGS,
             });
             state.domainConfig = res.results?.[0] ?? null;
@@ -54,7 +54,7 @@ export const useDomainSettingsStore = defineStore('domain-config', () => {
     };
     const createDomainSettings = async (data: DomainSettingsData) => {
         try {
-            state.domainConfig = await SpaceConnector.client.config.domainConfig.create<CreateDomainConfigParameters, DomainConfigModel>({
+            state.domainConfig = await SpaceConnector.client.config.domainConfig.create<DomainConfigCreateParameters, DomainConfigModel>({
                 name: DOMAIN_CONFIG_TYPE.SETTINGS,
                 data,
             });
@@ -69,7 +69,7 @@ export const useDomainSettingsStore = defineStore('domain-config', () => {
             return;
         }
         try {
-            state.domainConfig = await SpaceConnector.client.config.domainConfig.update<UpdateDomainConfigParameters, DomainConfigModel>({
+            state.domainConfig = await SpaceConnector.client.config.domainConfig.update<DomainConfigUpdateParameters, DomainConfigModel>({
                 name: DOMAIN_CONFIG_TYPE.SETTINGS,
                 data: {
                     ...state.domainConfig.data,

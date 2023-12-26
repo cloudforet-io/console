@@ -1,6 +1,6 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { ResourceGroup } from '@/schema/identity/role-binding/type';
+import type { ResourceGroupType } from '@/schema/_common/type';
 
 
 export interface BudgetUsageAnalyzeParameters {
@@ -22,5 +22,5 @@ export interface BudgetUsageAnalyzeResult {
         state?: string;
         providers?: string[];
     };
-    resource_group: Extract<ResourceGroup, 'WORKSPACE' | 'PROJECT'>;
+    resource_group: Extract<ResourceGroupType, 'WORKSPACE' | 'PROJECT'>;
 }

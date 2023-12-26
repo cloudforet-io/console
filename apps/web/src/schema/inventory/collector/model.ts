@@ -1,5 +1,5 @@
 import type { Tags } from '@/schema/_common/model';
-import type { ResourceGroup } from '@/schema/identity/role-binding/type';
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
     CollectorMetadata, CollectorOptions, Schedule, SecretFilter,
 } from '@/schema/inventory/collector/type';
@@ -31,7 +31,7 @@ export interface CollectorModel {
     secret_filter: SecretFilter;
     plugin_info: CollectorPluginModel;
     workspace_id: string;
-    resource_group: ResourceGroup;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     created_at: string;
     last_collected_at: string;
     tags: Tags;

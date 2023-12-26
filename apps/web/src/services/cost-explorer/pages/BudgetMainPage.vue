@@ -18,7 +18,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 const appContextStore = useAppContextStore();
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-    isWorkspaceOwner: () => store.state.user.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
+    isWorkspaceOwner: () => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
 });
 
 const handleCreateBudgetSelect = () => {

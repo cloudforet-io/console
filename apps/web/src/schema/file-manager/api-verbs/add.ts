@@ -4,9 +4,9 @@ import type { FileReference } from '@/schema/file-manager/type';
 
 export interface FileAddParameters {
     name: string;
-    resource_group: ResourceGroupType;
     tags?: Tags;
     reference?: FileReference;
-    workspace_id?: string;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'SYSTEM'>;
     domain_id?: string;
+    workspace_id?: string;
 }

@@ -1,3 +1,5 @@
+import type { ResourceGroupType } from '@/schema/_common/type';
+
 import type { Currency } from '@/store/modules/settings/type';
 
 
@@ -14,9 +16,10 @@ export interface BudgetUsageModel {
     limit: number;
     currency: Currency;
     provider_filter?: ProviderFilter;
-    project_id?: string;
-    project_group_id?: string;
     data_source_id: string;
+    resource_group: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
+    project_id: string;
+    workspace_id: string;
     domain_id: string;
     updated_at: string;
 }

@@ -1,3 +1,3 @@
-export interface GetUserConfigParameters {
+export interface UserConfigGetParameters {
     name: string;
 }

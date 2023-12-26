@@ -73,7 +73,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     });
 
     /* Mutations */
-    const setScope = (scope?: ResourceGroupType) => {
+    const setScope = (scope?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>) => {
         state.scope = scope;
     };
     const setSearchFilters = (filters: ConsoleFilter[]) => {
@@ -124,7 +124,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
     };
     const publicDashboardApiQueryHelper = new ApiQueryHelper();
-    const load = async (params?: ListDashboardParameters) => {
+    const load = async () => {
         publicDashboardApiQueryHelper.setFilters([]);
         if (_state.isAdminMode) {
             publicDashboardApiQueryHelper.addFilter({
@@ -145,9 +145,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
         }
 
         const _publicDashboardParams = {
-            ...params,
             query: {
-                ...(params?.query || {}),
                 ...publicDashboardApiQueryHelper.data,
             },
         };
@@ -156,7 +154,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
             await fetchDashboard('PUBLIC', _publicDashboardParams);
         } else {
             await Promise.allSettled([
-                fetchDashboard('PRIVATE', params),
+                fetchDashboard('PRIVATE'),
                 fetchDashboard('PUBLIC', _publicDashboardParams),
             ]);
         }

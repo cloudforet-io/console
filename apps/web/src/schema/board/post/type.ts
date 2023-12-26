@@ -6,5 +6,3 @@ export interface NoticeConfigData {
     is_read?: boolean,
     show_popup?: boolean,
 }
-
-export type PostResourceGroup = 'SYSTEM' | 'DOMAIN';

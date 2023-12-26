@@ -6,6 +6,6 @@ export interface AppCreateParameters {
     role_id: string;
     tags?: Tags;
     expired_at?: string;
-    resource_group: ResourceGroupType;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     workspace_id?: string;
 }

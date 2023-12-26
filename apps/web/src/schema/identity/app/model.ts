@@ -11,7 +11,7 @@ export interface AppModel {
     role_type: RoleType;
     api_key_id: string;
     role_id: string;
-    resource_group: ResourceGroupType;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     workspace_id: string;
     domain_id: string;
     created_at: string;
