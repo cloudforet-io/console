@@ -57,6 +57,7 @@ const handleConfirm = () => {
     >
         <template #body>
             <div>
+                <slot name="middle-contents" />
                 <p-field-group
                     :required="true"
                     :invalid-text="$t('COMPONENT.DOUBLE_CHECK_MODAL.INVALID_TEXT', { text: props.verificationText })"
@@ -79,7 +80,7 @@ const handleConfirm = () => {
                     </template>
                 </p-field-group>
 
-                <slot />
+                <slot name="bottom-contents" />
             </div>
         </template>
     </p-button-modal>

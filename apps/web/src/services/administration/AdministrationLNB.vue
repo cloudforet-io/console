@@ -74,6 +74,12 @@ export default defineComponent({
                     id: MENU_ID.DOMAIN_SETTINGS,
                     to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME) },
                 },
+                {
+                    type: 'item',
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.WORKSPACES].translationId),
+                    id: MENU_ID.WORKSPACES,
+                    to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) },
+                },
             ]),
             menuSet: computed<LNBMenu[]>(() => {
                 if (state.isAdminMode) return state.adminModeMenuSet;

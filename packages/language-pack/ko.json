@@ -2010,6 +2010,25 @@
 			},
 			"REMOVE": "",
 			"TITLE": "사용자"
+		},
+		"WORKSPACES": {
+			"ACTION": "작업",
+			"CREATE": "생성",
+			"CREATE_WORKSPACE": "",
+			"DELETE": "삭",
+			"DELETE_WORKSPACE": "",
+			"DELETE_WORKSPACE_DESC": "",
+			"DISABLE": "",
+			"EDIT": "수정",
+			"ENABLE": "",
+			"FORM": {
+				"LABEL_DESC": "",
+				"LABEL_NAME": "이름",
+				"PLACEHOLDER_DESC": "",
+				"PLACEHOLDER_NAME": "",
+				"REQUIRED_NAME": ""
+			},
+			"WORKSPACES": ""
 		}
 	},
 	"IDENTITY": {
@@ -2634,6 +2653,7 @@
 		"ADMINISTRATION_PREFERENCE": "",
 		"ADMINISTRATION_ROLE": "역할",
 		"ADMINISTRATION_USER": "사용자",
+		"ADMINISTRATION_WORKSPACES": "",
 		"ALERT_MANAGER": "얼럿 매니저",
 		"ALERT_MANAGER_ALERT": "얼럿",
 		"ALERT_MANAGER_DASHBOARD": "대시보드",

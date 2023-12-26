@@ -2010,6 +2010,25 @@
 			},
 			"REMOVE": "Remove",
 			"TITLE": "User"
+		},
+		"WORKSPACES": {
+			"ACTION": "Action",
+			"CREATE": "Create",
+			"CREATE_WORKSPACE": "Create Workspace",
+			"DELETE": "Delete",
+			"DELETE_WORKSPACE": "Delete",
+			"DELETE_WORKSPACE_DESC": "You cannot undo this action.",
+			"DISABLE": "Disable",
+			"EDIT": "Edit",
+			"ENABLE": "Enable",
+			"FORM": {
+				"LABEL_DESC": "Description",
+				"LABEL_NAME": "Name",
+				"PLACEHOLDER_DESC": "Workspace description",
+				"PLACEHOLDER_NAME": "Workspace name",
+				"REQUIRED_NAME": "Please enter name"
+			},
+			"WORKSPACES": "Workspaces"
 		}
 	},
 	"IDENTITY": {
@@ -2634,6 +2653,7 @@
 		"ADMINISTRATION_PREFERENCE": "Preference",
 		"ADMINISTRATION_ROLE": "Role",
 		"ADMINISTRATION_USER": "User",
+		"ADMINISTRATION_WORKSPACES": "Workspaces",
 		"ALERT_MANAGER": "Alert Manager",
 		"ALERT_MANAGER_ALERT": "Alert",
 		"ALERT_MANAGER_DASHBOARD": "Dashboard",

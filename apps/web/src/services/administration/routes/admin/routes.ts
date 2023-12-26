@@ -16,6 +16,8 @@ const RoleUpdatePage = () => import('@/services/administration/pages/admin/RoleU
 
 const DomainSettingsPage = () => import('@/services/administration/pages/admin/AdminDomainSettingsPage.vue');
 
+const WorkspacesPage = () => import('@/services/administration/pages/admin/AdminWorkspacesPage.vue');
+
 const adminAdministrationRoutes: RouteConfig = {
     path: 'administration',
     name: makeAdminRouteName(ADMINISTRATION_ROUTE._NAME),
@@ -94,7 +96,7 @@ const adminAdministrationRoutes: RouteConfig = {
                     path: 'workspaces',
                     name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME),
                     meta: { lnbVisible: true, menuId: MENU_ID.WORKSPACES },
-                    component: { template: '<router-view />' },
+                    component: WorkspacesPage,
                 },
             ],
         },

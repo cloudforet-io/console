@@ -2010,6 +2010,25 @@
 			},
 			"REMOVE": "",
 			"TITLE": "ユーザー"
+		},
+		"WORKSPACES": {
+			"ACTION": "作業",
+			"CREATE": "作成",
+			"CREATE_WORKSPACE": "",
+			"DELETE": "削除",
+			"DELETE_WORKSPACE": "",
+			"DELETE_WORKSPACE_DESC": "",
+			"DISABLE": "",
+			"EDIT": "編集",
+			"ENABLE": "",
+			"FORM": {
+				"LABEL_DESC": "",
+				"LABEL_NAME": "",
+				"PLACEHOLDER_DESC": "",
+				"PLACEHOLDER_NAME": "",
+				"REQUIRED_NAME": ""
+			},
+			"WORKSPACES": ""
 		}
 	},
 	"IDENTITY": {
@@ -2634,6 +2653,7 @@
 		"ADMINISTRATION_PREFERENCE": "",
 		"ADMINISTRATION_ROLE": "役割",
 		"ADMINISTRATION_USER": "ユーザー",
+		"ADMINISTRATION_WORKSPACES": "",
 		"ALERT_MANAGER": "アラートマネージャー",
 		"ALERT_MANAGER_ALERT": "アラート",
 		"ALERT_MANAGER_DASHBOARD": "ダッシュボード",
