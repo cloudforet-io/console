@@ -3,6 +3,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { UserProfileConfirmMfaParameters } from '@/schema/identity/user-profile/api-verbs/confirm-mfa';
 import type { UserProfileDisableMfaParameters } from '@/schema/identity/user-profile/api-verbs/disable-mfa';
 import type { UserProfileEnableMfaParameters } from '@/schema/identity/user-profile/api-verbs/enable-mfa';
+import type { UserDisableMfaParameters } from '@/schema/identity/user/api-verbs/disable-mfa';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -24,7 +25,7 @@ export const postEnableMfa = async (body: UserProfileEnableMfaParameters): Promi
     }
 };
 
-export const postDisableMfa = async (params: UserProfileDisableMfaParameters): Promise<UserState|Error> => {
+export const postUserProfileDisableMfa = async (params: UserProfileDisableMfaParameters): Promise<UserState|Error> => {
     try {
         const response = await SpaceConnector.clientV2.identity.userProfile.disableMfa<UserProfileDisableMfaParameters>(params);
         await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
@@ -46,6 +47,19 @@ export const postValidationMfaCode = async (body: UserProfileConfirmMfaParameter
             },
         });
     } catch (e: any) {
+        ErrorHandler.handleError(e);
+        throw e;
+    }
+};
+
+
+export const postUserDisableMfa = async (params: UserDisableMfaParameters): Promise<UserState|Error> => {
+    try {
+        const response = await SpaceConnector.clientV2.identity.user.disableMfa<UserDisableMfaParameters>(params);
+        await showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
+        return response;
+    } catch (e: any) {
+        showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);
         throw e;
     }

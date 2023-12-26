@@ -9,7 +9,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
-import { postValidationEmail } from '@/lib/helper/verify-email-helper';
+import { postUserProfileValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -45,7 +45,7 @@ const handleClickVerifyButton = async (type: string) => {
     state.loading = true;
     try {
         if (state.verified) return;
-        await postValidationEmail({
+        await postUserProfileValidationEmail({
             email: notificationEmail.value,
         });
         await store.dispatch('user/setUser', { email: notificationEmail });

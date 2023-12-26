@@ -5,7 +5,7 @@ import { PTextButton, PCollapsibleToggle } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
-import { postDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
+import { postUserProfileDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
 
 import { useProxyValue } from '@/common/composables/proxy-state';
 
@@ -34,7 +34,7 @@ const state = reactive({
 
 const handleClickSendEmailButton = async () => {
     if (props.type === 'disabled' || props.type === 'change') {
-        const response = await postDisableMfa({
+        const response = await postUserProfileDisableMfa({
             user_id: state.userId,
         });
         await store.dispatch('user/setUser', response);

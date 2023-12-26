@@ -117,7 +117,7 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { postValidationCode, postValidationEmail } from '@/lib/helper/verify-email-helper';
+import { postValidationCode, postUserProfileValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
@@ -176,7 +176,7 @@ const resetFormData = () => {
 const handleClickSendEmailButton = async () => {
     state.loading = true;
     try {
-        await postValidationEmail({
+        await postUserProfileValidationEmail({
             email: formState.newNotificationEmail,
         });
         if (state.loginUserId === props.userId) {

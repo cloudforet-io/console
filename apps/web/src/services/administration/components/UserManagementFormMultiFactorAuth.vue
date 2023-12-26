@@ -35,7 +35,7 @@ const handleUpdateToggle = async () => {
 
 watch(() => state.data.mfa?.state, (value) => {
     state.isToggleActive = value === 'ENABLED';
-});
+}, { immediate: true });
 </script>
 
 <template>

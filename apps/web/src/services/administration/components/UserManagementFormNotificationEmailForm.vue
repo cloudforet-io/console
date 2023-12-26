@@ -11,7 +11,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
-import { postValidationEmail } from '@/lib/helper/verify-email-helper';
+import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -67,7 +67,8 @@ const handleClickBadge = () => {
 const handleClickSend = async () => {
     state.loading = true;
     try {
-        await postValidationEmail({
+        await postUserValidationEmail({
+            user_id: state.data.user_id || '',
             email: email.value || '',
         });
         state.isEdit = false;

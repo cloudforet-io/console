@@ -15,7 +15,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
-import { postValidationEmail } from '@/lib/helper/verify-email-helper';
+import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -48,7 +48,7 @@ const tableState = reactive({
         const additionalFields: DefinitionField[] = [];
         const additionalRoleFields: DefinitionField[] = [];
         if (userPageStore.isAdminMode) {
-            if (!storeState.smtpEnabled) {
+            if (storeState.smtpEnabled) {
                 additionalFields.push(
                     { name: 'email', label: i18n.t('IAM.USER.MAIN.NOTIFICATION_EMAIL'), block: true },
                 );
@@ -84,7 +84,8 @@ const handleClickVerifyButton = async () => {
     state.verifyEmailLoading = true;
     try {
         if (tableState.refinedUserItems.email_verified) return;
-        await postValidationEmail({
+        await postUserValidationEmail({
+            user_id: tableState.refinedUserItems.user_id || '',
             email: tableState.refinedUserItems.email || '',
         });
         await emit('refresh', tableState.refinedUserItems.user_id || '');

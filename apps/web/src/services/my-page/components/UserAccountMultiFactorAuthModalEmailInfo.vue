@@ -8,7 +8,7 @@ import {
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { postDisableMfa, postEnableMfa } from '@/lib/helper/multi-factor-auth-helper';
+import { postEnableMfa, postUserProfileDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
 import { emailValidator } from '@/lib/helper/user-validation-helper';
 
 import { useFormValidator } from '@/common/composables/form-validator';
@@ -62,7 +62,7 @@ const handleClickSendCodeButton = async () => {
                 },
             });
         } else {
-            const response = await postDisableMfa({
+            const response = await postUserProfileDisableMfa({
                 user_id: state.userId,
             });
             await store.dispatch('user/setUser', response);
