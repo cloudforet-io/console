@@ -85,11 +85,16 @@ watch(() => state.dataSourceItems, async (val) => {
         >
             <template #dropdown-button="item">
                 <div class="selected-input">
-                    <p-lazy-img :src="item?.imageUrl"
-                                class="left-icon"
-                                width="1rem"
-                                height="1rem"
-                    /><span>{{ item?.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item?.name) }})</span>
+                    <template v-if="!(storeState.isAdminMode && !props.workspaceId)">
+                        <p-lazy-img :src="item?.imageUrl"
+                                    class="left-icon"
+                                    width="1rem"
+                                    height="1rem"
+                        /><span>{{ item?.label }}</span> <span class="selected-item-postfix">(Currency: {{ getCurrencyFromDataSource(item?.name) }})</span>
+                    </template>
+                    <template v-else>
+                        <span class="placeholder">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.DATA_SOURCE_PLACEHOLDER') }}</span>
+                    </template>
                 </div>
             </template>
             <template #menu-item--format="{item}">
@@ -109,6 +114,9 @@ watch(() => state.dataSourceItems, async (val) => {
         width: 100%;
         .selected-input {
             @apply flex items-center gap-1;
+        }
+        .placeholder {
+            @apply text-gray-600;
         }
         .selected-item-postfix {
             @apply text-gray-400;
