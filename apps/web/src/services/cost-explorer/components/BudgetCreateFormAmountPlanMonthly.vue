@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap, DataSourceItems } from '@/store/reference/cost-data-source-reference-store';
+import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 
 import BudgetCreateFormAmountPlanAutofillModal
     from '@/services/cost-explorer/components/BudgetCreateFormAmountPlanAutofillModal.vue';
@@ -59,7 +59,7 @@ const state = reactive({
     }),
     currencyText: computed<string>(() => {
         if (!props.dataSourceId) return '';
-        const dataSourceItem:DataSourceItems = storeState.costDataSource[props.dataSourceId];
+        const dataSourceItem:CostDataSourceItems = storeState.costDataSource[props.dataSourceId];
         const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
         return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
     }),

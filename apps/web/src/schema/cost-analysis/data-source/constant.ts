@@ -1,0 +1,14 @@
+export const COST_DATA_SOURCE_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+
+export const COST_DATA_SOURCE_TYPE = {
+    LOCAL: 'LOCAL',
+    EXTERNAL: 'EXTERNAL',
+} as const;
+
+export const COST_DATA_SOURCE_SECRET_TYPE = {
+    MANUAL: 'MANUAL',
+    USE_SERVICE_ACCOUNT_SECRET: 'USE_SERVICE_ACCOUNT_SECRET',
+} as const;

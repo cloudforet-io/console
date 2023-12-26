@@ -10,7 +10,7 @@ import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
-import type { CostDataSourceReferenceMap, DataSourceItems } from '@/store/reference/cost-data-source-reference-store';
+import type { CostDataSourceReferenceMap, CostDataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
@@ -61,7 +61,7 @@ watch([() => selectedDataSource.value, () => isAllValid.value], ([dataSource, is
 
 const getCurrencyFromDataSource = (dataSourceId: string) => {
     if (!storeState.costDataSource) return '';
-    const dataSourceItem:DataSourceItems = storeState.costDataSource[dataSourceId];
+    const dataSourceItem:CostDataSourceItems = storeState.costDataSource[dataSourceId];
     const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
     return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
 };
