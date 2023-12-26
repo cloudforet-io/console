@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
+
+import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
@@ -17,10 +19,24 @@ const handleToggleAdminMode = () => {
     if (state.isAdminMode) {
         appContextStore.switchToWorkspaceMode();
         router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        Vue.notify({
+            group: 'toastTopCenter',
+            type: 'info',
+            title: i18n.t('COMMON.GNB.ADMIN.SWITCH_WORKSPACE'),
+            duration: 2000,
+            speed: 1,
+        });
         return;
     }
     appContextStore.switchToAdminMode();
     router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+    Vue.notify({
+        group: 'toastTopCenter',
+        type: 'info',
+        title: i18n.t('COMMON.GNB.ADMIN.SWITCH_ADMIN'),
+        duration: 2000,
+        speed: 1,
+    });
 };
 </script>
 

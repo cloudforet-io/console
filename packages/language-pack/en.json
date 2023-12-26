@@ -913,6 +913,10 @@
 				"ROLE_DOMAIN_ADMIN": "Domain Admin",
 				"ROLE_ROOT_ADMIN": "Root Admin"
 			},
+			"ADMIN": {
+				"SWITCH_ADMIN": "Switched to admin mode.",
+				"SWITCH_WORKSPACE": "Exited admin mode."
+			},
 			"DASHBOARDS": {
 				"CREATE_DASHBOARDS": "Create New Dashboard",
 				"NO_ITEMS": "No Items",

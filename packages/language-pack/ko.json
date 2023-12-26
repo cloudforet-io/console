@@ -913,6 +913,10 @@
 				"ROLE_DOMAIN_ADMIN": "도메인 관리자",
 				"ROLE_ROOT_ADMIN": "Root 관리자"
 			},
+			"ADMIN": {
+				"SWITCH_ADMIN": "",
+				"SWITCH_WORKSPACE": ""
+			},
 			"DASHBOARDS": {
 				"CREATE_DASHBOARDS": "새 대시보드 생성",
 				"NO_ITEMS": "아이템이 없습니다",
