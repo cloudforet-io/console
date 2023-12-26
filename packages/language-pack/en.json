@@ -22,6 +22,10 @@
 				"DO_NOT_SHOW_AGAIN": "Do not show again",
 				"EDGE": "Edge",
 				"HEADER": "Recommend using Chrome or Edge browser for this site."
+			},
+			"WORKSPACE": {
+				"CREATE_WORKSPACE_BUTTON": "Create a Workspace",
+				"CREATE_WORKSPACE_DESC": "There is no Workspace created in this domain yet."
 			}
 		},
 		"TOP_NOTI": {

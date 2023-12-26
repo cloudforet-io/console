@@ -22,6 +22,10 @@
 				"DO_NOT_SHOW_AGAIN": "다시 보지 않기",
 				"EDGE": "엣지",
 				"HEADER": "본 사이트는 크롬 및 엣지 브라우저에 최적화 되어 있습니다."
+			},
+			"WORKSPACE": {
+				"CREATE_WORKSPACE_BUTTON": "",
+				"CREATE_WORKSPACE_DESC": ""
 			}
 		},
 		"TOP_NOTI": {
