@@ -317,7 +317,6 @@ const handleClickSignOut = async () => {
         right: -0.5rem;
         left: auto;
         z-index: 1000;
-        margin-top: -0.5rem;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
     }
     .profile-menu-wrapper {

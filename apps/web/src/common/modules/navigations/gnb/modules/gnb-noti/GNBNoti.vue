@@ -205,7 +205,6 @@ export default defineComponent<Props>({
         right: 0;
         z-index: 1000;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
-        margin-top: -0.5rem;
         margin-right: -0.5rem;
         .tab-pane {
             padding-bottom: 0;

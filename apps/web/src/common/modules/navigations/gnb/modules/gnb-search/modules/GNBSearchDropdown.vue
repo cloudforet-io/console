@@ -227,7 +227,6 @@ export default defineComponent<Props>({
     padding-top: 1rem;
     top: 100%;
     right: 0;
-    margin-top: 0.25rem;
     box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
     z-index: 1000;
 
@@ -262,7 +261,6 @@ export default defineComponent<Props>({
 
 @screen laptop {
     .gnb-search-dropdown {
-        margin-top: -0.5rem;
         margin-right: -0.5rem;
     }
 }
@@ -274,7 +272,7 @@ export default defineComponent<Props>({
         top: $gnb-height;
         width: 100vw;
         height: calc(100vh - $gnb-height - 0.5rem);
-        margin-top: -0.375rem;
+        margin-top: -0.5rem;
 
         /* custom design-system component - p-data-loader */
         :deep(.p-data-loader) {
