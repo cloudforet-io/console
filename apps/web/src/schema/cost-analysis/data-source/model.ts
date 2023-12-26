@@ -1,5 +1,6 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
+import type { CostDataSourceSecretType, CostDataSourceState, CostDataSourceType } from '@/schema/cost-analysis/data-source/type';
 import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 
@@ -24,13 +25,13 @@ interface TemplateModel {
         schema: JsonSchema;
     };
 }
-export interface DataSourceModel {
+export interface CostDataSourceModel {
     data_source_id: string;
     name: string;
-    state: 'ENABLED' | 'DISABLED';
-    data_source_type: 'LOCAL' | 'MANAGED' | 'CUSTOM';
+    state: CostDataSourceState;
+    data_source_type: CostDataSourceType;
     provider: string;
-    secret_type: 'MANUAL'| 'USE_SERVICE_ACCOUNT_SECRET';
+    secret_type: CostDataSourceSecretType;
     secret_filter: SecretFilterModel;
     plugin_info: PluginInfoModel;
     template: TemplateModel;
