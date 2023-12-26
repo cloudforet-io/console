@@ -88,7 +88,7 @@ export class SpaceRouter {
             const isGrantRoleSkipLogic = isContinuedAdminRoute || isWorkspaceIdUnchanged;
             if (refreshToken && isTokenAlive && !isGrantRoleSkipLogic && isNotErrorRoute) {
                 let scope: GrantScope;
-                if (beforeRoutePathByRawUrl.startsWith('/admin') || isAdminMode) {
+                if (to.name?.startsWith('admin.') || isAdminMode) {
                     scope = 'DOMAIN';
                 } else if (to.params.workspaceId) {
                     scope = 'WORKSPACE';
