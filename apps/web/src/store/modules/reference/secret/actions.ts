@@ -2,11 +2,16 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list';
+import type { SecretModel } from '@/schema/secret/secret/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { SecretReferenceMap, SecretReferenceState } from '@/store/modules/reference/secret/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 let lastLoadedTime = 0;
 
@@ -20,14 +25,14 @@ export const load: Action<SecretReferenceState, any> = async ({ state, commit },
     ) return;
 
     try {
-        const response = await SpaceConnector.client.secret.secret.list({
+        const response = await SpaceConnector.client.secret.secret.list<SecretListParameters, ListResponse<SecretModel>>({
             query: {
                 only: ['secret_id', 'name'],
             },
         }, { timeout: 3000 });
         const secrets: SecretReferenceMap = {};
 
-        response.results.forEach((secretInfo: any): void => {
+        response.results?.forEach((secretInfo: any): void => {
             secrets[secretInfo.secret_id] = {
                 key: secretInfo.secret_id,
                 label: secretInfo.name,
