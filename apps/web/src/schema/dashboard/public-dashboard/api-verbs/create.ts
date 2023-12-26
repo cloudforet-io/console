@@ -5,7 +5,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
-export interface CreatePublicDashboardParameters {
+export interface PublicDashboardCreateParameters {
     name: string;
     layouts?: DashboardLayoutWidgetInfo[][];
     variables?: DashboardVariables;

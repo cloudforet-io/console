@@ -4,7 +4,7 @@ import type {
 } from '@/schema/dashboard/_types/dashboard-type';
 
 
-export interface UpdatePrivateDashboardParameters {
+export interface PrivateDashboardUpdateParameters {
     private_dashboard_id: string;
     name?: string;
     layouts?: DashboardLayoutWidgetInfo[][];

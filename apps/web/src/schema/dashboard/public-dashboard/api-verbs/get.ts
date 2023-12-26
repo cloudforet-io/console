@@ -1,3 +1,3 @@
-export interface GetPublicDashboardParameters {
+export interface PublicDashboardGetParameters {
     public_dashboard_id: string;
 }

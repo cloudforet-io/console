@@ -26,7 +26,7 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import type { CreatePublicDashboardParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -109,10 +109,10 @@ const createDashboard = async () => {
             tags: { created_by: store.state.user.userId },
         };
         if (dashboardDetailState.dashboardScope !== 'PRIVATE') {
-            (apiParam as CreatePublicDashboardParameters).resource_group = dashboardDetailState.dashboardScope;
+            (apiParam as PublicDashboardCreateParameters).resource_group = dashboardDetailState.dashboardScope;
         }
         if (dashboardDetailState.dashboardScope === 'PROJECT') {
-            (apiParam as CreatePublicDashboardParameters).project_id = dashboardDetailState.projectId;
+            (apiParam as PublicDashboardCreateParameters).project_id = dashboardDetailState.projectId;
         }
 
         const createdDashboard = await dashboardDetailStore.createDashboard(apiParam);

@@ -27,7 +27,7 @@ import {
 
 import { SpaceRouter } from '@/router';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { CreatePublicDashboardParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
+import type { PublicDashboardCreateParameters } from '@/schema/dashboard/public-dashboard/api-verbs/create';
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -86,7 +86,7 @@ const createDashboard = async () => {
     try {
         state.loading = true;
 
-        const apiParam: CreatePublicDashboardParameters = {
+        const apiParam: PublicDashboardCreateParameters = {
             name: dashboardDetailState.name,
             labels: dashboardDetailState.labels,
             settings: dashboardDetailState.settings,
