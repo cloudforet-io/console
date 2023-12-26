@@ -7,7 +7,6 @@ export interface ProviderUpdateParameters {
     color?: string;
     icon?: string;
     order?: number;
-    options?: any;
+    options?: Record<string, any>;
     tags?: Tags;
-    domain_id?: string;
 }

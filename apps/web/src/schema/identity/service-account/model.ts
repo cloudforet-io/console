@@ -1,11 +1,11 @@
+import type { Tags } from '@/schema/_common/model';
+
 export interface ServiceAccountModel {
     service_account_id: string;
     name: string;
-    data: {
-        [key: string]: string;
-    },
+    data: Record<string, any>;
     provider: string;
-    tags: { [key: string]: unknown; };
+    tags: Tags;
     secret_schema_id: string;
     secret_id: string;
     trusted_account_id: string;

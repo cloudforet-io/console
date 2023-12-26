@@ -62,9 +62,7 @@ const handleClickSendCodeButton = async () => {
                 },
             });
         } else {
-            const response = await postUserProfileDisableMfa({
-                user_id: state.userId,
-            });
+            const response = await postUserProfileDisableMfa();
             await store.dispatch('user/setUser', response);
         }
         state.proxyIsSentCode = true;

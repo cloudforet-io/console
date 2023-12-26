@@ -1,5 +1,7 @@
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
+
 export interface ServiceAccountListParameters {
-    query?: any;
+    query?: Query;
     service_account_id?: string;
     name?: string;
     provider?: string;

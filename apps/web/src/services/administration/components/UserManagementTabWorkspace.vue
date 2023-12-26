@@ -18,8 +18,9 @@ import { iso8601Formatter } from '@cloudforet/utils';
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { TimeStamp } from '@/schema/_common/model';
+import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
-import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
+import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceListParameters } from '@/schema/identity/workspace/api-verbs/list';
@@ -170,7 +171,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
+        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
             role_binding_id: state.items[rowIndex].role_binding_id,
             role_id: value.name || '',
         });
@@ -182,7 +183,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
 };
 const handleClickButton = async (value: RoleBindingModel) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.delete({
+        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
             role_binding_id: value,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');

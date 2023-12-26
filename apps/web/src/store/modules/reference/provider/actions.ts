@@ -33,7 +33,6 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
             query: {
                 only: ['provider', 'name', 'icon', 'alias', 'color'],
             },
-            workspace_id: undefined,
         }, { timeout: 3000 });
         const providers: ProviderReferenceMap = {};
 

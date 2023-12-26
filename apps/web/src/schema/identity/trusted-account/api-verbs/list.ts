@@ -1,5 +1,7 @@
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
+
 export interface TrustedAccountListParameters {
-    query?: any;
+    query?: Query;
     trusted_account_id?: string;
     name?: string;
     provider?: string;

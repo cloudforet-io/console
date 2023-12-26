@@ -6,7 +6,6 @@ import { PDataTable, PHeading } from '@spaceone/design-system';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { TimeStamp } from '@/schema/_common/model';
 import type { ProjectListParameters } from '@/schema/identity/project/api-verbs/list';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { i18n } from '@/translations';
@@ -16,7 +15,7 @@ import { useUserPageStore } from '@/services/administration/store/user-page-stor
 interface TableItem {
     project_id?: string;
     name?: string;
-    date?: TimeStamp;
+    date?: string;
     key?: string;
     value?: string;
 }

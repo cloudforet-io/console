@@ -1,4 +1,4 @@
-import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { Tags } from '@/schema/_common/model';
 import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 export interface SecretModel {
@@ -12,5 +12,5 @@ export interface SecretModel {
     resource_group: ResourceGroup;
     project_id: string;
     workspace_id?: string;
-    created_at: TimeStamp;
+    created_at: string;
 }

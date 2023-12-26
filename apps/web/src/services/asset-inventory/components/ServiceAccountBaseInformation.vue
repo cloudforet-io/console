@@ -124,7 +124,6 @@ const getBaseInformationSchema = async () => {
     try {
         state.baseInformationSchema = await SpaceConnector.clientV2.identity.schema.get<SchemaGetParameters, SchemaModel>({
             schema_id: `${props.provider}-service-account`,
-            workspace_id: undefined,
         });
     } catch (e) {
         ErrorHandler.handleError(e);

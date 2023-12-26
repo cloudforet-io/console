@@ -1,4 +1,4 @@
-import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { Tags } from '@/schema/_common/model';
 import type { RoleType } from '@/schema/identity/role/type';
 import type {
     AuthType, UserState, UserMfaState, UserMfaType,
@@ -7,20 +7,20 @@ import type {
 export interface UserModel {
     user_id: string;
     name: string;
+    state: UserState;
     email: string;
     email_verified: boolean;
-    state: UserState;
     auth_type: AuthType; // backend
     role_type: RoleType;
-    mfa?: UserMfa;
-    required_actions: string[];
+    mfa: UserMfa;
     language: string;
     timezone: string;
+    api_key_count: number;
+    required_actions: string[];
     tags: Tags;
     domain_id: string;
-    last_accessed_at: TimeStamp;
-    created_at: TimeStamp;
-    api_key_count?: number;
+    created_at: string;
+    last_accessed_at: string;
 }
 
 export interface UserMfa {

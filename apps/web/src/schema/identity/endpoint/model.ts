@@ -2,6 +2,6 @@ export interface EndpointModel {
     name: string;
     service: string;
     endpoint: string;
-    state?: 'ACTIVE';
+    state?: 'ACTIVE'|'INACTIVE';
     version?: string;
 }

@@ -10,9 +10,9 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
 import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
-import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
+import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
 import type { UserModel } from '@/schema/identity/user/model';
@@ -147,7 +147,7 @@ const fetchRoleBinding = async (item?: AddModalMenuItem) => {
                 resource_group: RESOURCE_GROUP.DOMAIN,
             });
         } else {
-            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
+            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
                 ...roleParams,
                 role_binding_id: roleBindingItem?.role_binding_id || '',
             });
@@ -177,7 +177,7 @@ const fetchPostDisableMfa = async () => {
     }
 };
 const fetchListRoleBindingInfo = async () => {
-    const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListParameters, ListResponse<RoleBindingModel>>({
+    const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
         user_id: state.data.user_id || '',
         query: {
             filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'eq' }],
