@@ -122,6 +122,7 @@ const handlePageChange = (page: number) => {
         <p-divider />
         <p-data-loader :data="state.noticeItems"
                        :loading="state.loading"
+                       :min-loading-time="1000"
                        class="notice-list-loader"
         >
             <ul class="list-wrapper">
@@ -185,6 +186,10 @@ const handlePageChange = (page: number) => {
     .pagination-wrapper {
         @apply flex justify-center border-t border-gray-200;
         padding: 0.75rem 0 1rem 0;
+    }
+
+    .notice-list-loader {
+        min-height: 10rem;
     }
 
     /* custom design-system component - p-data-loader */
