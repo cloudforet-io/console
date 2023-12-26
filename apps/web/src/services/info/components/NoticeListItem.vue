@@ -1,60 +1,9 @@
-<template>
-    <component :is="postDirection ? 'div' : 'li'"
-               class="list-item"
-               :class="{ 'pointer': !!post }"
-    >
-        <div v-if="postDirection"
-             class="post-direction"
-        >
-            <span>{{ postDirectionLabel }}</span><p-i :name="postDirectionIcon"
-                                                      width="1rem"
-            />
-        </div>
-        <div v-if="isPostExist">
-            <div class="title">
-                <p-i v-if="isPinned"
-                     class="pin"
-                     name="ic_pin-filled"
-                     width="1.125rem"
-                />
-                <text-highlighting class="title"
-                                   :term="inputText"
-                                   :text="post.title"
-                />
-                <new-mark v-if="isNew"
-                          class="new-mark"
-                />
-            </div>
-            <div class="info">
-                <span>{{ date }}</span><p-i width="0.125rem"
-                                            name="ic_dot"
-                />
-                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser"
-                                                   width="0.125rem"
-                                                   name="ic_dot"
-                />
-                <span v-if="hasDomainRoleUser"
-                      class="view-count"
-                ><p-i name="ic_eye"
-                      width="1.125rem"
-                /> {{ post.view_count }}</span>
-            </div>
-        </div>
-        <div v-else
-             class="not-exist-item"
-        >
-            {{ $t('INFO.NOTICE.MAIN.NO_NEXT_LIST') }}
-        </div>
-    </component>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
-import type { PropType } from 'vue';
 
-import { PBadge, PI } from '@spaceone/design-system';
+import { PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
 import type { PostModel } from '@/schema/board/post/model';
@@ -64,58 +13,81 @@ import { i18n } from '@/translations';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
 
-interface Props {
-    inputText: string;
-    isNew: boolean;
-    postDirection: 'prev' | 'next' | undefined;
-    post: PostModel;
-}
 
-export default defineComponent<Props>({
-    name: 'ListItem',
-    components: {
-        PBadge,
-        PI,
-        NewMark,
-        TextHighlighting,
-    },
-    props: {
-        post: {
-            type: Object as PropType<PostModel|undefined>,
-            default: undefined,
-        },
-        inputText: {
-            type: String,
-            default: '',
-        },
-        isNew: {
-            type: Boolean,
-            default: false,
-        },
-        postDirection: {
-            type: String as PropType<'prev' | 'next' | undefined>,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-            postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
-            date: computed(() => dateFormatter(props.post?.created_at)),
-            isPinned: computed(() => props.post?.options?.is_pinned),
-            isPostExist: computed(() => props.post),
-            postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),
-        });
-
-        const dateFormatter = (date) => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
-
-        return {
-            ...toRefs(state),
-        };
-    },
+const props = withDefaults(defineProps<{
+    inputText?: string;
+    isNew?: boolean;
+    postDirection?: 'prev' | 'next' | undefined;
+    post?: PostModel;
+}>(), {
+    inputText: '',
+    isNew: false,
+    postDirection: undefined,
+    post: undefined,
 });
+const state = reactive({
+    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
+    postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
+    timezone: computed(() => store.state.user.timezone || 'UTC'),
+    date: computed(() => dateFormatter(props.post?.created_at)),
+    isPinned: computed(() => props.post?.options?.is_pinned),
+    isPostExist: computed(() => props.post),
+    postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),
+});
+
+const dateFormatter = (date) => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
+
 </script>
+
+<template>
+    <component :is="props.postDirection ? 'div' : 'li'"
+               class="list-item"
+               :class="{ 'pointer': !!props.post }"
+    >
+        <div v-if="props.postDirection"
+             class="post-direction"
+        >
+            <span>{{ state.postDirectionLabel }}</span><p-i :name="state.postDirectionIcon"
+                                                            width="1rem"
+            />
+        </div>
+        <div v-if="state.isPostExist">
+            <div class="title">
+                <p-i v-if="state.isPinned"
+                     class="pin"
+                     name="ic_pin-filled"
+                     width="1.125rem"
+                />
+                <text-highlighting class="title"
+                                   :term="state.inputText"
+                                   :text="post.title"
+                />
+                <new-mark v-if="props.isNew"
+                          class="new-mark"
+                />
+            </div>
+            <div class="info">
+                <span>{{ state.date }}</span><p-i width="0.125rem"
+                                                  name="ic_dot"
+                />
+                <span>{{ props.post?.writer }}</span><p-i v-if="state.hasDomainRoleUser"
+                                                          width="0.125rem"
+                                                          name="ic_dot"
+                />
+                <span v-if="state.hasDomainRoleUser"
+                      class="view-count"
+                ><p-i name="ic_eye"
+                      width="1.125rem"
+                /> {{ props.post?.view_count }}</span>
+            </div>
+        </div>
+        <div v-else
+             class="not-exist-item"
+        >
+            {{ $t('INFO.NOTICE.MAIN.NO_NEXT_LIST') }}
+        </div>
+    </component>
+</template>
 
 <style scoped lang="postcss">
 .list-item {

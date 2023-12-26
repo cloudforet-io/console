@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { PHeading } from '@spaceone/design-system';
+
+import NoticeForm from '@/services/info/components/NoticeForm.vue';
+</script>
+
 <template>
     <div class="notice-create-page">
         <p-heading :title="$t('INFO.NOTICE.FORM.CREATE_NOTICE')"
@@ -7,17 +13,3 @@
         <notice-form type="CREATE" />
     </div>
 </template>
-
-<script lang="ts">
-import { PHeading } from '@spaceone/design-system';
-
-import NoticeForm from '@/services/info/components/NoticeForm.vue';
-
-export default {
-    name: 'NoticeCreatePage',
-    components: {
-        NoticeForm,
-        PHeading,
-    },
-};
-</script>
