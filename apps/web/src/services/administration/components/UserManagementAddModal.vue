@@ -123,7 +123,7 @@ const fetchCreateUser = async (item: AddModalMenuItem): Promise<void> => {
         }
     };
 
-    if (userPageState.isAdminMode) {
+    if (userPageState.isAdminMode || (userPageState.afterWorkspaceCreated && item.isNew)) {
         await SpaceConnector.clientV2.identity.user.create<UserCreateParameters, UserModel>({
             ...userInfoParams,
             tags: state.tags,
