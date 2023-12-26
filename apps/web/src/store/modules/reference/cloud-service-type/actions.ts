@@ -2,6 +2,10 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceTypeListParameters } from '@/schema/inventory/cloud-service-type/api-verbs/list';
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
+
 import type { CloudServiceTypeReferenceMap, CloudServiceTypeReferenceState } from '@/store/modules/reference/cloud-service-type/type';
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
@@ -22,14 +26,14 @@ export const load: Action<CloudServiceTypeReferenceState, any> = async ({ state,
     ) return;
 
     try {
-        const response = await SpaceConnector.client.inventory.cloudServiceType.list({
+        const response = await SpaceConnector.clientV2.inventory.cloudServiceType.list<CloudServiceTypeListParameters, ListResponse<CloudServiceTypeModel>>({
             query: {
                 only: ['cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'cloud_service_type_key'],
             },
         }, { timeout: 3000 });
         const cloudServiceTypes: CloudServiceTypeReferenceMap = {};
 
-        response.results.forEach((cloudServiceTypeInfo: any): void => {
+        (response.results ?? []).forEach((cloudServiceTypeInfo: any): void => {
             cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
                 key: cloudServiceTypeInfo.cloud_service_type_id,
                 label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,

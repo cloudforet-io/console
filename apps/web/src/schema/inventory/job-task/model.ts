@@ -14,6 +14,7 @@ export interface JobTaskModel {
     provider: string;
     service_account_id: string;
     project_id: string;
+    workspace_id: string;
     domain_id: string;
     created_at: string;
     started_at: string;

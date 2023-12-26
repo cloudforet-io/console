@@ -14,6 +14,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { durationFormatter, iso8601Formatter } from '@cloudforet/utils';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { JobTaskListParameters } from '@/schema/inventory/job-task/api-verbs/list';
+import type { JobTaskModel } from '@/schema/inventory/job-task/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -75,7 +78,7 @@ const storeState = reactive({
 const state = reactive({
     loading: false,
     timezone: computed(() => store.state.user.timezone),
-    items: [],
+    items: [] as ({duration: string} & JobTaskModel)[],
     selectedStatus: 'ALL',
     //
     selectIndex: [],
@@ -159,12 +162,12 @@ const handleChange = async (options: any = {}) => {
 const getJobTasks = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.client.inventory.jobTask.list({
+        const res = await SpaceConnector.clientV2.inventory.jobTask.list<JobTaskListParameters, ListResponse<JobTaskModel>>({
             query: getQuery(),
             job_id: props.jobId,
         });
-        state.totalCount = res.total_count;
-        state.items = res.results.map((jobTask) => ({
+        state.totalCount = res.total_count ?? 0;
+        state.items = (res.results ?? []).map((jobTask) => ({
             ...jobTask,
             started_at: iso8601Formatter(jobTask.started_at, state.timezone) || '--',
             duration: durationFormatter(jobTask.started_at, jobTask.finished_at, state.timezone) || '--',
@@ -279,7 +282,22 @@ onDeactivated(() => {
             />
         </template>
         <template #col-errors-format="{ value }">
-            {{ value.length }}
+            {{ value ? value.length : 0 }}
+        </template>
+        <template #col-created_count-format="{ value }">
+            {{ value ?? 0 }}
+        </template>
+        <template #col-updated_count-format="{ value }">
+            {{ value ?? 0 }}
+        </template>
+        <template #col-failure_count-format="{ value }">
+            {{ value ?? 0 }}
+        </template>
+        <template #col-disconnected_count-format="{ value }">
+            {{ value ?? 0 }}
+        </template>
+        <template #col-deleted_count-format="{ value }">
+            {{ value ?? 0 }}
         </template>
     </p-toolbox-table>
 </template>
