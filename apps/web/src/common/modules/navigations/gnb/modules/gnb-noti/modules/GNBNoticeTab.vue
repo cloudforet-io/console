@@ -11,8 +11,9 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
-import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
-import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -50,7 +51,6 @@ const state = reactive({
         const filteredData = state.noticeData.filter((d) => d.options.is_pinned);
         return convertNoticeItem(filteredData);
     }),
-    domainName: computed<string>(() => store.state.domain.name),
 });
 
 /* Util */
@@ -68,17 +68,12 @@ const noticeGetters = noticeStore.getters;
 /* Api */
 const noticeApiHelper = new ApiQueryHelper()
     .setPage(1, NOTICE_ITEM_LIMIT)
-    .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
-if (state.domainName === 'root') {
-    noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
-}
+    .setMultiSort([{ key: 'is_pinned', desc: true }, { key: 'created_at', desc: true }]);
 const listNotice = async () => {
     try {
-        if (!noticeGetters.boardId) throw new Error('boardId is undefined');
-        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-            board_id: noticeGetters.boardId,
+        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
             query: noticeApiHelper.data,
-            domain_id: null,
+            board_type: POST_BOARD_TYPE.NOTICE,
         });
         state.proxyCount = total_count ?? 0;
         state.noticeData = results ?? [];
@@ -92,10 +87,9 @@ const listNotice = async () => {
 /* Event */
 const handleSelectNotice = (postId: string) => {
     emit('close');
-    if (!noticeGetters.boardId) return;
     SpaceRouter.router.push({
         name: INFO_ROUTE.NOTICE.DETAIL._NAME,
-        params: { boardId: noticeGetters.boardId, postId },
+        params: { postId },
     }).catch(() => {});
 };
 const handleClickViewAllNotice = () => {

@@ -5,7 +5,7 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import type { CreateUserConfigParameters } from '@/schema/config/user-config/api-verbs/create';
+import type { UserConfigCreateParameters } from '@/schema/config/user-config/api-verbs/create';
 import type { GetUserConfigParameters } from '@/schema/config/user-config/api-verbs/get';
 import type { UpdateUserConfigParameters } from '@/schema/config/user-config/api-verbs/update';
 import type { UserConfigModel } from '@/schema/config/user-config/model';
@@ -45,7 +45,7 @@ export const updateCustomTableSchema = async (userData:{userType:string, userId:
                 data,
             });
         } else {
-            await client.userConfig.create<CreateUserConfigParameters, UserConfigModel>({
+            await client.userConfig.create<UserConfigCreateParameters, UserConfigModel>({
                 name: getCustomTableSchemaKey(userData, resourceType, provider),
                 data,
             });

@@ -19,16 +19,17 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
+import type { NoticeConfigData } from '@/schema/board/post/type';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
-
-import { useNoticeStore } from '@/store/notice';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import NoticePopupItem from '@/common/modules/popup/notice/modules/NoticePopupItem.vue';
-
-
 
 export default {
     name: 'NoticePopup',
@@ -36,9 +37,6 @@ export default {
         NoticePopupItem,
     },
     setup() {
-        const noticeStore = useNoticeStore();
-        const noticeGetters = noticeStore.getters;
-
         const state = reactive({
             isSessionExpired: computed<boolean>(() => store.state.user.isSessionExpired),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
@@ -48,7 +46,7 @@ export default {
         // helper
         const apiQueryForPostIdList = new ApiQueryHelper().setFilters([{
             k: 'name',
-            v: 'console:board',
+            v: `console:board:${POST_BOARD_TYPE.NOTICE}:`,
             o: '',
         }, {
             k: 'data.show_popup',
@@ -56,7 +54,7 @@ export default {
             o: '=',
         }]).data;
         const apiQueryForPostList = new ApiQueryHelper().setFilters([{
-            k: 'options.is_popup',
+            k: 'is_popup',
             v: true,
             o: '=',
         }]).setSort('created_at', false).data;
@@ -64,12 +62,10 @@ export default {
         // API
         const getUserConfigBoardPostIdList = async (): Promise<Array<string>> => {
             try {
-                const { results } = await SpaceConnector.client.config.userConfig.list({
-                    user_id: store.state.user.userId,
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<NoticeConfigData>>>({
                     query: apiQueryForPostIdList,
                 });
-                // console:board:{boardId}:{postId}
-                return results.map((d) => d.name.split(':')[3]);
+                return results ? results.map((d) => d.name.split(':')[3]) : [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
@@ -78,11 +74,9 @@ export default {
 
         const getPostList = async (): Promise<void> => {
             try {
-                if (!noticeGetters.boardId) throw new Error('Notice board not found');
-                const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-                    domain_id: null,
-                    board_id: noticeGetters.boardId,
+                const { results } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
                     query: apiQueryForPostList,
+                    board_type: POST_BOARD_TYPE.NOTICE,
                 });
                 const postIdList = await getUserConfigBoardPostIdList();
                 state.popupList = results?.filter((d) => !postIdList.includes(d.post_id)) ?? [];

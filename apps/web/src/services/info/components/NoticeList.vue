@@ -1,14 +1,11 @@
 <script setup lang="ts">
 
-import {
-    computed, reactive,
-} from 'vue';
+import { reactive } from 'vue';
 
 import {
     PDataLoader, PDivider,
-    PPagination, PSelectDropdown, PToolbox,
+    PPagination, PToolbox,
 } from '@spaceone/design-system';
-import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { getPageStart } from '@cloudforet/core-lib/component-util/pagination';
@@ -17,11 +14,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
-import type { PostListParameters, PostListResponse } from '@/schema/board/post/api-verbs/list';
-import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
-import type { NoticePostType } from '@/schema/board/post/type';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useNoticeStore } from '@/store/notice';
@@ -31,27 +27,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import ListItem from '@/services/info/components/NoticeListItem.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
-
-
 const NOTICE_ITEM_LIMIT = 10;
 
 const state = reactive({
-    domainName: computed<string|undefined>(() => store.state.domain.name),
-    dropdownItems: computed<SelectDropdownMenuItem[]>(() => [
-        {
-            label: i18n.t('INFO.NOTICE.MAIN.LABEL_ALL_NOTI'),
-            name: 'ALL',
-        },
-        {
-            label: i18n.t('INFO.NOTICE.MAIN.LABEL_SYSTEM_NOTI'),
-            name: NOTICE_POST_TYPE.SYSTEM,
-        },
-        {
-            label: i18n.t('INFO.NOTICE.MAIN.LABEL_DOMAIN_NOTI'),
-            name: NOTICE_POST_TYPE.INTERNAL,
-        },
-    ]),
-    selectedPostType: 'ALL' as NoticePostType | 'ALL',
     loading: false,
     noticeItems: [] as PostModel[],
     noticeItemTotalCount: 0,
@@ -65,21 +43,16 @@ const noticeGetters = noticeStore.getters;
 const initNoticeApiHelper = () => {
     const initApiHelper = new ApiQueryHelper()
         .setPage(1, NOTICE_ITEM_LIMIT)
-        .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
-    if (state.domainName === 'root') {
-        return initApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
-    }
+        .setMultiSort([{ key: 'is_pinned', desc: true }, { key: 'created_at', desc: true }]);
     return initApiHelper;
 };
 let noticeApiHelper = initNoticeApiHelper();
 const listNotice = async () => {
     state.loading = true;
     try {
-        if (!noticeGetters.boardId) throw new Error('boardId is undefined');
-        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, PostListResponse>({
-            board_id: noticeGetters.boardId,
+        const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
             query: noticeApiHelper.data,
-            domain_id: null,
+            board_type: POST_BOARD_TYPE.NOTICE,
         });
         state.noticeItems = results ?? [];
         state.noticeItemTotalCount = total_count ?? 0;
@@ -94,23 +67,21 @@ const listNotice = async () => {
 
 /* Util */
 const getSearchFilter = () => {
-    const filterHelper = new ApiQueryHelper()
+    const apiHelper = new ApiQueryHelper()
         .setPage(1, NOTICE_ITEM_LIMIT)
         .setSort('created_at', true);
     const filter = [] as ConsoleFilter[];
-    if (state.selectedPostType !== 'ALL') filter.push({ k: 'post_type', v: state.selectedPostType, o: '=' });
     if (state.searchText) filter.push({ k: 'title', v: state.searchText, o: '' });
-    filterHelper.setFilters(filter);
-    return filterHelper;
+    apiHelper.setFilters(filter);
+    return apiHelper;
 };
 const loadSearchListSet = async () => {
     if (!state.searchText) {
         noticeApiHelper = initNoticeApiHelper();
-        if (state.selectedPostType !== 'ALL') noticeApiHelper.setFilters([{ k: 'post_type', v: state.selectedPostType, o: '=' }]);
     } else {
         noticeApiHelper = getSearchFilter();
     }
-    if (noticeGetters.boardId) await listNotice();
+    await listNotice();
 };
 
 /* event */
@@ -118,29 +89,22 @@ const handleToolboxChange = (options: ToolboxOptions = {}) => {
     state.searchText = options?.searchText;
     loadSearchListSet();
 };
-const handleSearchPostTypeChange = (searchScope: NoticePostType|'ALL') => {
-    state.selectedPostType = searchScope;
-    loadSearchListSet();
-};
 const handleClickNotice = (postId: string) => {
     SpaceRouter.router.push({
         name: INFO_ROUTE.NOTICE.DETAIL._NAME,
         params: {
-            boardId: noticeGetters.boardId ?? '',
             postId,
         },
     });
 };
 const handlePageChange = (page: number) => {
     noticeApiHelper.setPage(getPageStart(page, NOTICE_ITEM_LIMIT), NOTICE_ITEM_LIMIT);
-    if (noticeGetters.boardId) listNotice();
+    listNotice();
 };
 
 (async () => {
     state.loading = true;
-    if (noticeGetters.boardId) {
-        await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
-    }
+    await Promise.allSettled([noticeStore.fetchNoticeReadState(), listNotice()]);
     state.loading = false;
 })();
 
@@ -153,15 +117,7 @@ const handlePageChange = (page: number) => {
                        :page-size-changeable="false"
                        :refreshable="false"
                        @change="handleToolboxChange"
-            >
-                <template #left-area>
-                    <p-select-dropdown v-if="state.domainName !== 'root'"
-                                       :menu="state.dropdownItems"
-                                       :selected="state.selectedPostType"
-                                       @update:selected="handleSearchPostTypeChange"
-                    />
-                </template>
-            </p-toolbox>
+            />
         </div>
         <p-divider />
         <p-data-loader :data="state.noticeItems"

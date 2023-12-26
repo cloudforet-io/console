@@ -6,7 +6,6 @@ import {
 import { PButton, PHeading } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -26,26 +25,20 @@ const props = defineProps<{
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
-const noticeDetailGetters = noticeDetailStore.getters;
 
 const state = reactive({
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-    hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
-    hasPermissionToEditOrDelete: computed<boolean>(() => {
-        if (state.postType === NOTICE_POST_TYPE.SYSTEM) return state.hasSystemRoleUser;
-        return state.hasDomainRoleUser || state.hasSystemRoleUser;
-    }),
+    hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
 });
 
 const handleClickEditButton = () => {
-    if (!noticeDetailGetters.boardId || !props.postId) {
-        ErrorHandler.handleError(new Error('boardId or postId is undefined'));
+    if (!props.postId) {
+        ErrorHandler.handleError(new Error('postId is undefined'));
         return;
     }
     SpaceRouter.router.push({
         name: INFO_ROUTE.NOTICE.UPDATE._NAME,
-        params: { boardId: noticeDetailGetters.boardId, postId: props.postId },
+        params: { postId: props.postId },
     });
 };
 

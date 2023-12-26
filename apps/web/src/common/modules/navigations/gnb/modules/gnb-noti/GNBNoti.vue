@@ -56,10 +56,8 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
-import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -99,7 +97,6 @@ export default defineComponent<Props>({
     setup(props, { emit }: SetupContext) {
         const state = reactive({
             hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || noticeGetters.unreadNoticeCount > 0),
-            domainName: computed(() => store.state.domain.name),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
@@ -130,11 +127,6 @@ export default defineComponent<Props>({
         };
 
         /* Api */
-        const noticeApiHelper = new ApiQueryHelper().setCountOnly();
-        if (state.domainName === 'root') {
-            noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
-        }
-
         const noticeStore = useNoticeStore();
         const noticeGetters = noticeStore.getters;
 
