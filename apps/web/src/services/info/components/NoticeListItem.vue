@@ -80,8 +80,8 @@ const dateFormatter = (date?: string): string => {
                      width="1.125rem"
                 />
                 <text-highlighting class="title-text"
-                                   :term="state.inputText"
-                                   :text="props.post?.title"
+                                   :term="props.inputText"
+                                   :text="props.post.title"
                 />
                 <new-mark v-if="props.isNew"
                           class="new-mark"

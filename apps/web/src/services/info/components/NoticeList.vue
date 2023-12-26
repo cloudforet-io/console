@@ -86,7 +86,7 @@ const loadSearchListSet = async () => {
 
 /* event */
 const handleToolboxChange = (options: ToolboxOptions = {}) => {
-    state.searchText = options?.searchText;
+    if (options?.searchText !== undefined) state.searchText = options?.searchText;
     loadSearchListSet();
 };
 const handleClickNotice = (postId: string) => {
