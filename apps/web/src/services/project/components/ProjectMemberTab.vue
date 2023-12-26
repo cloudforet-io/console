@@ -118,8 +118,7 @@ const fetchProjectUsers = async () => {
 const fetchWorkspaceUserList = async () => {
     state.loading = true;
     try {
-        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-        });
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
         state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
         state.totalCount = res.total_count ?? 0;
     } catch (e) {

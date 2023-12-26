@@ -13,7 +13,8 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
-import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
+import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
+import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
 import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
@@ -144,7 +145,7 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
+        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
             role_binding_id: state.refinedUserItems[rowIndex].role_binding_info?.role_binding_id || '',
             role_id: value.name || '',
         });
@@ -171,7 +172,7 @@ const handleChange = async (options: any = {}) => {
 };
 const handleClickButton = async (value: RoleBindingModel) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.delete({
+        await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
             role_binding_id: value.role_binding_id,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');

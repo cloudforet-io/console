@@ -10,5 +10,4 @@ export interface UserListParameters {
     state?: UserState;
     email?: string;
     auth_type?: AuthType;
-    workspace_id?: string;
 }

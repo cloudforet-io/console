@@ -4,11 +4,10 @@ import type { AuthType } from '@/schema/identity/user/type';
 
 export interface UserCreateParameters {
     user_id: string;
-    auth_type: AuthType;
-    //
     password?: string;
     name?: string;
     email?: string;
+    auth_type: AuthType;
     language?: string;
     timezone?: string;
     tags?: Tags;

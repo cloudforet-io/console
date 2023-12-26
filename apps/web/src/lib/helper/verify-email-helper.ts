@@ -13,7 +13,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export const postUserProfileValidationEmail = async (params: UserProfileVerifyEmailParameters): Promise<void|Error> => {
     try {
         await SpaceConnector.clientV2.identity.userProfile.verifyEmail<UserProfileVerifyEmailParameters>(params);
-        await showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
+        showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
         return undefined;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
@@ -35,7 +35,7 @@ export const postValidationCode = async (params: UserProfileConfirmEmailParamete
 export const postUserValidationEmail = async (params: UserVerifyEmailParameters): Promise<void|Error> => {
     try {
         await SpaceConnector.clientV2.identity.user.verifyEmail<UserVerifyEmailParameters>(params);
-        await showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
+        showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
         return undefined;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);

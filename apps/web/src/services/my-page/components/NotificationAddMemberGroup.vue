@@ -56,8 +56,7 @@ const emitChange = () => {
 
 const fetchWorkspaceUserList = async () => {
     try {
-        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
-        });
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>();
         state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);

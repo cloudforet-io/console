@@ -67,7 +67,7 @@ const handleClickResend = async () => {
         validationState.verificationCode = '';
     } catch (e: any) {
         if (e.message.includes('MFA')) {
-            await showSuccessMessage(_i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
+            showSuccessMessage(_i18n.t('COMMON.MFA_MODAL.SUCCESS'), '');
         } else {
             showErrorMessage(e.message, e);
             ErrorHandler.handleError(e);

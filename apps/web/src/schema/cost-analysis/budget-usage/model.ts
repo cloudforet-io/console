@@ -1,5 +1,3 @@
-import type { TimeStamp } from '@/schema/_common/model';
-
 import type { Currency } from '@/store/modules/settings/type';
 
 
@@ -20,5 +18,5 @@ export interface BudgetUsageModel {
     project_group_id?: string;
     data_source_id: string;
     domain_id: string;
-    updated_at: TimeStamp;
+    updated_at: string;
 }

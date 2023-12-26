@@ -3,10 +3,11 @@ import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 export interface TrustedAccountCreateParameters {
     name: string;
-    data: any;
+    data: Record<string, any>;
     provider: string;
     secret_schema_id: string;
-    secret_data: any;
+    secret_data: Record<string, any>;
     tags?: Tags;
     resource_group: Extract<ResourceGroup, 'DOMAIN' | 'WORKSPACE'>;
+    workspace_id?: string;
 }
