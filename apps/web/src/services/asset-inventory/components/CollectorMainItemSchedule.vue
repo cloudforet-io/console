@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, reactive } from 'vue';
+
 import { PToggleButton, PI } from '@spaceone/design-system';
 
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
@@ -6,27 +8,34 @@ import { useCollectorPageStore } from '@/services/asset-inventory/stores/collect
 interface Props {
     collectorId?: string;
     isScheduleActivated?: boolean;
+    mode: 'view' | 'edit';
 }
 
 const props = withDefaults(defineProps<Props>(), {
     collectorId: '',
     isScheduleActivated: false,
+    mode: 'view',
 });
 
 const collectorPageStore = useCollectorPageStore();
+const collectorPageState = collectorPageStore.state;
 
 const emit = defineEmits<{(e: 'change-toggle', boolean): void}>();
 
+const state = reactive({
+    isEditMode: computed(() => props.mode === 'edit'),
+});
+
 /* Components */
 const handleChangeToggle = async (value) => {
+    if (!state.isEditMode) return;
     if (Object.keys(value).length > 0) return;
     emit('change-toggle', value);
 };
 const handleClickSchedule = () => {
     collectorPageStore.setSelectedCollector(props.collectorId);
-    collectorPageStore.$patch((_state) => {
-        _state.visible.scheduleModal = true;
-    });
+    collectorPageState.visible.scheduleModal = true;
+    collectorPageState.scheduleModalMode = props.mode;
 };
 </script>
 
@@ -39,13 +48,13 @@ const handleClickSchedule = () => {
             <button class="schedule-button"
                     @click.stop="handleClickSchedule"
             >
-                <p-i name="ic_edit"
+                <p-i :name="state.isEditMode ? 'ic_edit' : 'ic_eye'"
                      height="0.75rem"
                      width="0.75rem"
                      color="inherit"
                      class="icon-schedule"
                 />
-                {{ $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') }}
+                {{ state.isEditMode ? $t('INVENTORY.COLLECTOR.MAIN.EDIT_SCHEDULE') : $t('INVENTORY.COLLECTOR.MAIN.VIEW_SCHEDULE') }}
             </button>
         </div>
         <div @click.stop="handleChangeToggle">
@@ -53,6 +62,7 @@ const handleClickSchedule = () => {
                 :value="props.isScheduleActivated"
                 :class="props.isScheduleActivated ? 'toggle-active' : ''"
                 show-state-text
+                :read-only="!state.isEditMode"
                 position="left"
                 @change-toggle="handleChangeToggle"
             />

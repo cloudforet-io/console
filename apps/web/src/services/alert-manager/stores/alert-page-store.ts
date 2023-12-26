@@ -2,14 +2,16 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { AlertGetParameters } from '@/schema/monitoring/alert/api-verbs/get';
+import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
 import type { AlertModel } from '@/schema/monitoring/alert/model';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export interface UpdateAlertParams {
+interface UpdateAlertPayload {
     alertId: string;
-    updateParams: any;
+    updateParams: AlertUpdateParameters;
 }
 
 export const useAlertPageStore = defineStore('alert-page', {
@@ -19,7 +21,7 @@ export const useAlertPageStore = defineStore('alert-page', {
     actions: {
         async getAlertData(alertId: string): Promise<void|Error> {
             try {
-                this.alertData = await SpaceConnector.client.monitoring.alert.get({
+                this.alertData = await SpaceConnector.clientV2.monitoring.alert.get<AlertGetParameters, AlertModel>({
                     alert_id: alertId,
                 });
             } catch (e: any) {
@@ -27,9 +29,9 @@ export const useAlertPageStore = defineStore('alert-page', {
                 throw e;
             }
         },
-        async updateAlertData({ alertId, updateParams }: UpdateAlertParams): Promise<void|Error> {
+        async updateAlertData({ alertId, updateParams }: UpdateAlertPayload): Promise<void|Error> {
             try {
-                this.alertData = await SpaceConnector.client.monitoring.alert.update({
+                this.alertData = await SpaceConnector.clientV2.monitoring.alert.update<AlertUpdateParameters, AlertModel>({
                     ...updateParams,
                     alert_id: alertId,
                 });

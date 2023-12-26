@@ -5,7 +5,7 @@ export const GRANULARITY = {
 } as const;
 
 export const GROUP_BY = {
-    PROJECT_GROUP: 'project_group_id',
+    // WORKSPACE: 'workspace_id',
     PROJECT: 'project_id',
     PROVIDER: 'provider',
     SERVICE_ACCOUNT: 'service_account_id',
@@ -25,8 +25,8 @@ export const ADDITIONAL_GROUP_BY_ITEM_MAP = {
 } as const;
 
 export const GROUP_BY_ITEM_MAP = {
-    [GROUP_BY.PROJECT_GROUP]: { name: GROUP_BY.PROJECT_GROUP, label: 'Project Group' },
     [GROUP_BY.PROJECT]: { name: GROUP_BY.PROJECT, label: 'Project' },
+    // [GROUP_BY.WORKSPACE]: { name: GROUP_BY.WORKSPACE, label: 'Workspace' },
     [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
     [GROUP_BY.SERVICE_ACCOUNT]: { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
     [GROUP_BY.PRODUCT]: { name: GROUP_BY.PRODUCT, label: 'Product' },

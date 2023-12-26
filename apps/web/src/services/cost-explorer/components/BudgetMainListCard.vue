@@ -3,26 +3,27 @@ import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 
 import {
-    PDivider, PI,
+    PDivider, PI, PBadge,
 } from '@spaceone/design-system';
 
 import type { BudgetUsageAnalyzeResult } from '@/schema/cost-analysis/budget-usage/api-verbs/analyze';
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import type { Currency } from '@/store/modules/settings/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 import BudgetMainUsageProgressBar from '@/services/cost-explorer/components/BudgetMainUsageProgressBar.vue';
 import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-constant';
-
 
 
 interface Props {
@@ -35,12 +36,16 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 const storeState = reactive({
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+    costDataSource: computed(() => allReferenceStore.getters.costDataSource),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
 });
 const state = reactive({
     linkLocation: computed<Location>(() => ({
@@ -49,27 +54,29 @@ const state = reactive({
             budgetId: props.budgetUsage.budget_id,
         },
     })),
-    isProject: computed<boolean>(() => !!props.budgetUsage.project_id),
-    projects: computed(() => {
-        const projects: string[] = [];
-        if (state.isProject) {
-            const projectId = props.budgetUsage.project_id as string;
-            const project: ProjectReferenceItem|undefined = storeState.projects[projectId];
-            if (project?.data?.groupInfo.name) projects.push(project.data.groupInfo.name);
-            projects.push(project?.name ?? projectId);
-        } else {
-            const projectGroupId = props.budgetUsage.project_group_id as string;
-            const projectGroup: ProjectGroupReferenceItem|undefined = storeState.projectGroups[projectGroupId];
-            if (projectGroup?.data?.parentGroupInfo?.name) projects.push(projectGroup.data.parentGroupInfo.name);
-            projects.push(projectGroup?.name ?? projectGroupId);
+    isProjectTarget: computed(() => props.budgetUsage.resource_group === 'PROJECT'),
+    targetLabelList: computed<string[]>(() => {
+        const targetId = state.isProjectTarget ? props.budgetUsage.project_id : props.budgetUsage.workspace_id;
+        if (!targetId) return [];
+
+        const targetNameList: string[] = [];
+        if (state.isProjectTarget) {
+            const targetProject: ProjectReferenceItem|undefined = storeState.projects[targetId];
+            if (targetProject?.data?.groupInfo?.name) targetNameList.push(targetProject.data.groupInfo.name);
+            targetNameList.push(targetProject?.name ?? targetId);
+        } else { // for workspace
+            const targetWorkspace = storeState.workspaces[targetId];
+            if (targetWorkspace) {
+                targetNameList.push(targetWorkspace?.name ?? targetId);
+            }
         }
-        return projects;
+        return targetNameList;
     }),
     cost: computed<number>(() => props.budgetUsage.total_spent ?? 0),
     limit: computed<number>(() => props.budgetUsage.total_budget ?? 0),
     percentage: computed<number>(() => props.budgetUsage.budget_usage ?? 0),
     currency: computed<Currency>(() => {
-        const targetDataSource = allReferenceStore.getters.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        const targetDataSource = storeState.costDataSource[props.budgetUsage.data_source_id ?? ''];
         if (!targetDataSource) return CURRENCY.USD;
         const currentCurrency = targetDataSource.data.plugin_info.metadata.currency;
         return currentCurrency ?? CURRENCY.USD;
@@ -81,7 +88,7 @@ const state = reactive({
         return 'common';
     }),
     dataSourceText: computed<string>(() => {
-        const targetDataSource = allReferenceStore.getters.costDataSource[props.budgetUsage.data_source_id ?? ''];
+        const targetDataSource = storeState.costDataSource[props.budgetUsage.data_source_id ?? ''];
         return targetDataSource?.label ?? '';
     }),
     providerText: computed<string>(() => {
@@ -106,8 +113,6 @@ const state = reactive({
 (async () => {
     await Promise.allSettled([
         store.dispatch('reference/serviceAccount/load'),
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
         store.dispatch('reference/region/load'),
         store.dispatch('reference/provider/load'),
     ]);
@@ -120,30 +125,41 @@ const state = reactive({
                  class="budget-main-list-card"
     >
         <div class="card-header">
-            <div class="flex items-center mb-1">
-                <span v-for="(name, index) in state.projects"
-                      :key="name"
-                      class="project-info"
-                      :class="{target: index === state.projects.length - 1}"
-                >
-                    <p-i v-if="index === state.projects.length - 1"
-                         :name="state.isProject ? 'ic_document-filled' : 'ic_folder-filled'"
-                         color="inherit"
-                         width="1em"
-                         height="1em"
-                         class="mr-1"
-                    />
-                    {{ name }}
-                    <p-i v-if="index < state.projects.length - 1"
-                         name="ic_chevron-right-thin"
-                         width="1em"
-                         height="1em"
-                    />
-                </span>
+            <div class="left-part">
+                <div class="flex items-center mb-1">
+                    <span v-for="(targetName, index) in state.targetLabelList"
+                          :key="`${targetName}-${index}`"
+                          class="target-info"
+                          :class="{target: index === state.targetLabelList.length - 1}"
+                    >
+                        <p-i v-if="state.isProjectTarget && index === state.targetLabelList.length - 1"
+                             name="ic_document-filled"
+                             color="inherit"
+                             width="1em"
+                             height="1em"
+                             class="mr-1"
+                        />
+                        {{ targetName }}
+                        <p-i v-if="index < state.targetLabelList.length - 1"
+                             name="ic_chevron-right-thin"
+                             width="1em"
+                             height="1em"
+                        />
+                    </span>
+                </div>
+                <p class="budget-name">
+                    {{ props.budgetUsage.name }}
+                </p>
             </div>
-            <p class="budget-name">
-                {{ props.budgetUsage.name }}
-            </p>
+            <div v-if="!state.isProjectTarget && !storeState.isAdminMode"
+                 class="right-part"
+            >
+                <p-badge style-type="indigo100"
+                         badge-type="subtle"
+                >
+                    {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.MANAGED_BY_ADMIN') }}
+                </p-badge>
+            </div>
         </div>
         <p-divider />
         <div class="card-body">
@@ -198,11 +214,14 @@ const state = reactive({
     }
     line-height: 1.2;
     .card-header {
+        display: flex;
+        align-content: center;
+        justify-content: space-between;
         padding: 1rem;
         .budget-name {
             @apply text-gray-900 font-bold;
         }
-        .project-info {
+        .target-info {
             @apply text-gray-400;
             display: inline-flex;
             flex-wrap: wrap;
@@ -211,6 +230,10 @@ const state = reactive({
             &.target {
                 @apply text-gray-700;
             }
+        }
+        .right-part {
+            display: flex;
+            align-items: center;
         }
     }
     .card-body {

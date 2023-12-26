@@ -1,253 +1,188 @@
+<script lang="ts" setup>
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import { PDataTable } from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { RoleDeleteParameters } from '@/schema/identity/role/api-verbs/delete';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+
+import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
+import {
+    ROLE_DELETE_TABLE_FIELDS,
+    ROLE_UN_DELETABLE_TABLE_FIELDS,
+} from '@/services/administration/constants/role-constant';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
+interface UnDeletableRole {
+    roleName: string;
+    roleId: string;
+    roleType: string;
+    assignTo: { resource_id: string; resource_type: string };
+}
+
+interface Props {
+    visible?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+});
+
+const rolePageStore = useRolePageStore();
+
+const emit = defineEmits<{(e: ':update:visible'): void,
+    (e: 'refresh'): void,
+}>();
+
+const allReferenceStore = useAllReferenceStore();
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone ?? 'UTC'),
+});
+const state = reactive({
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+    loading: true,
+    proxyVisible: useProxyValue('visible', props, emit),
+    unDeletableRoles: [] as UnDeletableRole[],
+    isDeletable: computed(() => state.unDeletableRoles.length === 0),
+    headerTitle: computed(() => (state.isDeletable ? i18n.t('IAM.ROLE.MODAL.DELETE_TITLE') : i18n.t('IAM.ROLE.MODAL.DELETE_TITLE_CANNOT'))),
+});
+
+/* API */
+const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
+    state.loading = true;
+    try {
+        const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleBindingListParameters, ListResponse<RoleBindingModel>>({
+            role_id: role.role_id,
+        });
+        const results = response.results || [];
+        const roleBindingList: UnDeletableRole[] = results?.map((roleBinding: RoleBindingModel) => ({
+            roleName: role.name,
+            roleId: role.role_id,
+            roleType: role.role_type,
+            assignTo: { resource_id: roleBinding.user_id, resource_type: 'identity.User' },
+        })) ?? [];
+        state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.unDeletableRoles = [];
+    } finally {
+        state.loading = false;
+    }
+}));
+const handleDelete = async () => {
+    let isAllSucceed = true;
+    await Promise.all(rolePageStore.selectedRoles.map(async (role) => {
+        try {
+            await SpaceConnector.clientV2.identity.role.delete<RoleDeleteParameters>({ role_id: role.role_id });
+        } catch (e: any) {
+            isAllSucceed = false;
+            ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
+        }
+    }));
+    if (isAllSucceed) {
+        showSuccessMessage(i18n.t('IAM.ROLE.ALT_S_DELETE_ROLE'), '');
+        state.proxyVisible = false;
+        emit('refresh');
+    }
+};
+
+/* Watcher */
+watch(() => state.proxyVisible, async (after) => {
+    if (after) {
+        state.unDeletableRoles = [];
+        await getRoleBindingList();
+    }
+}, { immediate: true });
+</script>
+
 <template>
-    <delete-modal :visible.sync="proxyVisible"
-                  size="lg"
-                  :header-title="headerTitle"
-                  :hide-footer="!isDeletable"
-                  :loading="loading"
+    <delete-modal v-if="state.proxyVisible && !state.loading"
+                  :visible.sync="state.proxyVisible"
+                  size="md"
+                  :header-title="state.headerTitle"
+                  :hide-footer="!state.isDeletable"
+                  :loading="state.loading"
                   :enable-scroll="true"
+                  class="role-delete-modal"
                   @confirm="handleDelete"
     >
         <template #delete-modal-body>
-            <div v-if="!isDeletable"
+            <div v-if="!state.isDeletable"
                  class="mb-4"
             >
                 {{ $t('IAM.ROLE.MODAL.DELETE_HELP_TEXT') }}
             </div>
-            <p-data-table v-if="isDeletable"
+            <p-data-table v-if="state.isDeletable"
                           class="role-data-table"
                           :items="rolePageStore.selectedRoles"
-                          :fields="fields"
-                          :loading="loading"
+                          :fields="ROLE_DELETE_TABLE_FIELDS"
+                          :loading="state.loading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 17.5rem)' }"
             >
                 <template #col-role_type-format="{ value }">
-                    <p-badge v-if="value"
-                             badge-type="solid-outline"
-                             :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
-                    >
-                        {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
-                    </p-badge>
+                    <span class="role-type">
+                        <img :src="useRoleFormatter(value).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span>{{ useRoleFormatter(value).name }}</span>
+                    </span>
                 </template>
-                <template #col-tags.description-format="{ value }">
-                    {{ value ? value : '--' }}
+                <template #col-created_at-format="{ value }">
+                    {{ iso8601Formatter(value, storeState.timezone) }}
                 </template>
             </p-data-table>
             <p-data-table v-else
-                          :items="unDeletableRoles"
-                          :fields="unDeletableRoleFields"
-                          :loading="loading"
+                          :items="state.unDeletableRoles"
+                          :fields="ROLE_UN_DELETABLE_TABLE_FIELDS"
+                          :loading="state.loading"
                           :table-custom-style="{ maxHeight: 'calc(100vh - 19.5rem)' }"
             >
-                <template #col-roleDescription-format="{ value }">
-                    {{ value ? value : '--' }}
-                </template>
                 <template #col-roleType-format="{ value }">
-                    <p-badge v-if="value"
-                             badge-type="solid-outline"
-                             :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
-                    >
-                        {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
-                    </p-badge>
+                    <span class="role-type">
+                        <img :src="useRoleFormatter(value).image"
+                             alt="role-type-icon"
+                             class="role-type-icon"
+                        >
+                        <span>{{ useRoleFormatter(value).name }}</span>
+                    </span>
                 </template>
                 <template #col-assignTo-format="{ value }">
-                    {{ users[value.resource_id] ? users[value.resource_id].label : '--' }}
-                </template>
-                <template #col-project-format="{ value }">
-                    <p-link v-if="value"
-                            :action-icon="ACTION_ICON.INTERNAL_LINK"
-                            new-tab
-                            highlight
-                            :href="getProjectLink(value)"
-                    >
-                        {{ projectFieldHandler(value, projects) }}
-                    </p-link>
+                    {{ state.users[value.resource_id] ? state.users[value.resource_id].label : '--' }}
                 </template>
             </p-data-table>
         </template>
     </delete-modal>
 </template>
 
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import { PDataTable, PBadge, PLink } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import type { ListResponse } from '@/schema/_common/model';
-import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
-import type { ProjectModel } from '@/schema/identity/project/model';
-import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
-
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
-import { useRolePageStore } from '@/services/administration/store/role-page-store';
-
-
-interface UnDeletableRole {
-    roleName: string;
-    roleDescription: string;
-    roleType: string;
-    assignTo: { resource_id: string; resource_type: string };
-    project?: {
-        project_info: ProjectModel | undefined;
-        project_group_info: ProjectGroupModel | undefined;
-    };
+<style scoped lang="postcss">
+.role-delete-modal {
+    .role-type {
+        @apply flex items-center;
+        gap: 0.5rem;
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    }
 }
-
-export default {
-    name: 'RoleDeleteModal',
-    components: {
-        DeleteModal,
-        PDataTable,
-        PBadge,
-        PLink,
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }) {
-        const rolePageStore = useRolePageStore();
-
-        const state = reactive({
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            projects: computed(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-            loading: true,
-            proxyVisible: useProxyValue('visible', props, emit),
-            fields: [
-                { name: 'name', label: 'Name' },
-                { name: 'tags.description', label: 'Description' },
-                { name: 'role_type', label: 'Role Type' },
-                { name: 'created_at', label: 'Created' },
-            ] as DataTableField[],
-            unDeletableRoles: [] as UnDeletableRole[],
-            unDeletableRoleFields: [
-                { name: 'roleName', label: 'Role Name' },
-                { name: 'roleDescription', label: 'Role Description' },
-                { name: 'roleType', label: 'Role Type' },
-                { name: 'assignTo', label: 'Assigned To' },
-                { name: 'project', label: ' ' },
-            ] as DataTableField[],
-            isDeletable: computed(() => state.unDeletableRoles.length === 0),
-            headerTitle: computed(() => (state.isDeletable ? i18n.t('IAM.ROLE.MODAL.DELETE_TITLE') : i18n.t('IAM.ROLE.MODAL.DELETE_TITLE_CANNOT'))),
-        });
-
-        const handleDelete = async () => {
-            let isAllSucceed = true;
-            await Promise.all(rolePageStore.selectedRoles.map(async (role) => {
-                try {
-                    await SpaceConnector.client.identity.role.delete({
-                        role_id: role.role_id,
-                    });
-                } catch (e) {
-                    ErrorHandler.handleRequestError(e, i18n.t('IAM.ROLE.ALT_E_DELETE_ROLE'));
-                    isAllSucceed = false;
-                }
-            }));
-            if (isAllSucceed) {
-                showSuccessMessage(i18n.t('IAM.ROLE.ALT_S_DELETE_ROLE'), '');
-                state.proxyVisible = false;
-                emit('refresh');
-            }
-        };
-
-        const projectFieldHandler = (value, projects) => {
-            if (value) {
-                const projectId = value.project_info?.project_id;
-                if (projectId) {
-                    return projects[projectId] ? projects[projectId].label : projectId;
-                }
-                const projectGroupId = value.project_group_info?.project_group_id;
-                return state.projectGroups[projectGroupId] ? state.projectGroups[projectGroupId].label : projectGroupId;
-            }
-            return '--';
-        };
-
-        const getProjectLink = (value) => {
-            const projectId = value?.project_info?.project_id;
-            let link;
-            if (projectId) {
-                link = SpaceRouter.router.resolve(referenceRouter(projectId, {
-                    resource_type: 'identity.Project',
-                }));
-            } else {
-                const projectGroupId = value?.project_group_info?.project_group_id;
-                link = SpaceRouter.router.resolve(referenceRouter(projectGroupId, {
-                    resource_type: 'identity.ProjectGroup',
-                }));
-            }
-            return link.href;
-        };
-        const getRoleBindingList = () => Promise.all(rolePageStore.selectedRoles.map(async (role) => {
-            try {
-                const { results }: ListResponse<RoleBindingModel> = await SpaceConnector.client.identity.roleBinding.list({ role_id: role.role_id });
-                const roleBindingList: UnDeletableRole[] = results.map((roleBinding) => {
-                    const {
-                        // eslint-disable-next-line @typescript-eslint/naming-convention
-                        resource_id, resource_type, role_info, project_info, project_group_info,
-                    } = roleBinding;
-                    return {
-                        roleName: role_info?.name,
-                        roleDescription: role_info?.tags?.description,
-                        roleType: role_info?.role_type,
-                        assignTo: { resource_id, resource_type },
-                        project: (project_info || project_group_info) ? { project_info, project_group_info } : undefined,
-                    };
-                });
-                state.unDeletableRoles = state.unDeletableRoles.concat(roleBindingList);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.unDeletableRoles = [];
-            }
-        }));
-
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-                store.dispatch('reference/user/load'),
-            ]);
-        })();
-
-        /* Watcher */
-        watch(() => state.proxyVisible, async (after) => {
-            state.loading = true;
-            if (after) {
-                state.unDeletableRoles = [];
-                await getRoleBindingList();
-                state.loading = false;
-            }
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            rolePageStore,
-            handleDelete,
-            projectFieldHandler,
-            getProjectLink,
-            ROLE_TYPE_BADGE_OPTION,
-            ACTION_ICON,
-        };
-    },
-};
-</script>
+</style>

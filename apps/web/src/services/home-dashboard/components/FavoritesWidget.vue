@@ -68,14 +68,16 @@ import { i18n } from '@/translations';
 import type { FavoriteItem, FavoriteType } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import {
     convertCloudServiceConfigToReferenceData,
     convertProjectConfigToReferenceData, convertProjectGroupConfigToReferenceData,
 } from '@/lib/helper/config-data-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+
 
 type Item = Record<string, {label: TranslateResult; favorites: FavoriteItem[]}>;
 
@@ -84,9 +86,10 @@ export default {
     name: 'FavoritesWidget',
     components: { PI },
     setup() {
+        const allReferenceStore = useAllReferenceStore();
         const state = reactive({
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
             favoriteProjects: computed<FavoriteItem[]>(() => {
                 const favoriteProjectItems = convertProjectConfigToReferenceData(store.state.favorite.projectItems, state.projects);
@@ -127,8 +130,6 @@ export default {
         /* Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/cloudServiceType/load'),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT_GROUP),

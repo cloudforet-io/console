@@ -35,6 +35,8 @@ import {
 } from 'vue';
 import type { Vue } from 'vue/types/vue';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useBreadcrumbs } from '@/common/composables/breadcrumbs';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -58,7 +60,8 @@ export default defineComponent({
         const vm = getCurrentInstance()?.proxy as Vue;
         const { breadcrumbs } = useBreadcrumbs();
         const handbookState = reactive({
-            isVisible: computed((): boolean => (vm?.$route.name === ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME || vm?.$route.name === ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME)),
+            isVisible: computed((): boolean => (vm?.$route.name === makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME)
+                    || vm?.$route.name === makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME))),
         });
         return {
             breadcrumbs,

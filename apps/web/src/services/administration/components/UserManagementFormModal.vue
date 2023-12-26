@@ -1,33 +1,41 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
-import { PButtonModal, PBoxTab } from '@spaceone/design-system';
+import { PButtonModal } from '@spaceone/design-system';
+import { cloneDeep, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { Tags } from '@/schema/_common/model';
-import { USER_TYPE } from '@/schema/identity/user/constant';
+import type { RoleCreateParameters } from '@/schema/identity/role-binding/api-verbs/create';
+import type { RoleUpdateParameters } from '@/schema/identity/role-binding/api-verbs/update';
+import type { RoleBindingModel } from '@/schema/identity/role-binding/model';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { UserUpdateParameters } from '@/schema/identity/user/api-verbs/update';
+import type { UserModel } from '@/schema/identity/user/model';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import config from '@/lib/config';
+import { postUserDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import UserManagementAddTag from '@/services/administration/components/UserManagementAddTag.vue';
 import UserManagementFormAdminRole from '@/services/administration/components/UserManagementFormAdminRole.vue';
 import UserManagementFormInfoForm from '@/services/administration/components/UserManagementFormInfoForm.vue';
+import UserManagementFormMultiFactorAuth
+    from '@/services/administration/components/UserManagementFormMultiFactorAuth.vue';
 import UserManagementFormNotificationEmailForm
     from '@/services/administration/components/UserManagementFormNotificationEmailForm.vue';
 import UserManagementFormPasswordForm from '@/services/administration/components/UserManagementFormPasswordForm.vue';
-import UserManagementFormTags from '@/services/administration/components/UserManagementFormTags.vue';
 import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
-
-
-interface Props {
-    headerTitle: string;
-    item?: User;
-}
+import type { AddModalMenuItem, UserListItemType } from '@/services/administration/types/user-type';
 
 interface UserManagementData {
     user_id: string;
@@ -40,229 +48,201 @@ interface UserManagementData {
     user_type?: string;
 }
 
-const USER_BACKEND_TYPE = {
-    LOCAL: 'LOCAL',
-    EXTERNAL: 'EXTERNAL',
-    API: 'API',
-} as const;
-
-
-const props = withDefaults(defineProps<Props>(), {
-    headerTitle: '',
-    item: undefined,
-});
-
 const userPageStore = useUserPageStore();
 const userPageState = userPageStore.$state;
 
+const emit = defineEmits<{(e: 'confirm'): void; }>();
+
 const state = reactive({
-    data: {} as User,
-    selectedId: computed(() => props.item?.user_id),
+    loading: false,
+    mfaLoading: false,
+    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
+    mfa: computed(() => store.state.user.mfa),
+    loginUserId: computed(() => store.state.user.userId),
+    isChangedToggle: false,
+    roleBindingList: [] as RoleBindingModel[],
 });
-
-const emit = defineEmits<{(e: 'confirm', data: UserManagementData, roleId: string|null): void; }>();
-
 const formState = reactive({
-    tabs: [
-        { name: 'local', label: 'Local' },
-        { name: 'apiOnly', label: 'API Only' },
-    ],
-    activeTab: '',
-    userId: '',
     name: '',
     email: '',
-    domainRole: '',
-    roleId: '',
+    // password
     password: '',
     passwordType: '',
     passwordManual: false,
-    tags: {},
-});
-
-const validationState = reactive({
-    isUserIdValid: undefined as undefined | boolean,
+    // role
+    role: {} as AddModalMenuItem,
+    // tag
+    tags: {} as Tags,
 });
 
 /* Components */
-const handleChangeInputs = (value) => {
-    if (value.userId) {
-        formState.userId = value.userId;
-        formState.email = value.userId;
-    }
-    if (value.tags) formState.tags = value.tags;
-    if (value.name) formState.name = value.name;
-    if (value.email) formState.email = value.email;
-    if (value.domainRoleList) {
-        formState.domainRole = value.domainRole;
-        formState.roleId = value.roleId;
-    }
-    if (value.password) {
-        formState.password = value.password || '';
-    }
-    if (value.passwordType) {
-        formState.passwordType = value.passwordType;
-    }
-};
 const handleClose = () => {
-    userPageStore.$patch({ visibleCreateModal: false, visibleUpdateModal: false });
+    userPageStore.$patch((_state) => {
+        _state.modal.visible.form = false;
+        _state.modal = cloneDeep(_state.modal);
+    });
 };
 const setForm = () => {
-    formState.userId = state.data.user_id;
-    formState.name = state.data.name;
+    formState.name = state.data.name || '';
     formState.email = state.data.email || '';
-    formState.domainRole = props.item.domain_role || '';
-    formState.password = props.item.password || '';
-    formState.passwordManual = false;
     formState.tags = state.data.tags || {};
+};
+const handleChangeInputs = (value) => {
+    if (value.email) formState.email = value.email;
+    if (value.password) formState.password = value.password || '';
+    if (value.passwordType) formState.passwordType = value.passwordType;
+    if (value.role) formState.role = value.role;
 };
 const handleChangeVerify = (status) => {
     state.data.email_verified = status;
 };
+const buildUserInfoParams = (): UserManagementData => ({
+    user_id: state.data.user_id || '',
+    name: formState.name,
+    email: formState.email || '',
+    tags: formState.tags || {},
+    password: formState.password || '',
+    reset_password: state.data.auth_type === 'LOCAL' && formState.passwordType === PASSWORD_TYPE.RESET,
+});
 
 /* API */
-const getUserDetailData = async (userId) => {
-    if (userId === undefined) return;
+const handleConfirm = async () => {
+    state.loading = true;
+
     try {
-        state.data = await SpaceConnector.client.identity.user.get({
-            user_id: userId,
-        });
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
-const confirm = async () => {
-    const data: UserManagementData = {
-        user_id: formState.userId,
-        name: formState.name,
-        email: formState.email || formState.userId,
-        tags: formState.tags || {},
-        password: formState.password || '',
-    };
-    if (userPageState.visibleCreateModal) {
-        if (formState.activeTab === 'local') {
-            data.backend = USER_BACKEND_TYPE.LOCAL;
-        } else if (formState.activeTab === 'apiOnly') {
-            data.backend = USER_BACKEND_TYPE.LOCAL;
-            data.user_type = USER_TYPE.API_USER;
-        } else {
-            data.backend = USER_BACKEND_TYPE.EXTERNAL;
+        if (state.isChangedToggle) {
+            await fetchPostDisableMfa();
         }
-    }
-    if (formState.activeTab === 'local' || userPageState.visibleUpdateModal) {
-        data.reset_password = formState.passwordType === PASSWORD_TYPE.RESET;
-    }
 
-    if (formState.domainRole !== undefined) {
-        emit('confirm', data, formState.roleId);
-    } else {
-        emit('confirm', data, null);
+        await fetchRoleBinding();
+
+        const userInfoParams = buildUserInfoParams();
+        await SpaceConnector.clientV2.identity.user.update<UserUpdateParameters, UserModel>(userInfoParams);
+
+        showSuccessMessage(i18n.t('IAM.USER.MAIN.MODAL.ALT_S_UPDATE_USER'), '');
+        handleClose();
+        emit('confirm');
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, i18n.t('IAM.USER.MAIN.MODAL.ALT_E_UPDATE_USER'));
+    } finally {
+        state.loading = false;
     }
 };
+const fetchRoleBinding = async (item?: AddModalMenuItem) => {
+    if (isEmpty(formState.role)) return;
 
-/* init */
-const initAuthTypeList = async () => {
-    if (store.state.domain.extendedAuthType !== undefined) {
-        formState.tabs = [
-            { name: 'external', label: store.getters['domain/extendedAuthTypeLabel'] },
-            ...formState.tabs,
-        ];
-        formState.activeTab = 'external';
-    } else {
-        formState.activeTab = 'local';
+    const roleParams = {
+        role_id: formState.role.name || '',
+    };
+
+    const roleBindingItem = state.roleBindingList.find((r) => r.role_id === formState.role.name);
+
+    try {
+        if (isEmpty(roleBindingItem)) {
+            await SpaceConnector.clientV2.identity.roleBinding.create<RoleCreateParameters, RoleBindingModel>({
+                ...roleParams,
+                workspace_id: item?.name || '',
+                user_id: state.data.user_id || '',
+                resource_group: RESOURCE_GROUP.DOMAIN,
+            });
+        } else {
+            await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleUpdateParameters, RoleBindingModel>({
+                ...roleParams,
+                role_binding_id: roleBindingItem?.role_binding_id || '',
+            });
+        }
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
     }
 };
-(async () => {
-    await Promise.allSettled([
-        initAuthTypeList(),
-        getUserDetailData(state.selectedId),
-        // LOAD REFERENCE STORE
-        store.dispatch('reference/user/load'),
-    ]);
-    if (userPageState.visibleUpdateModal) {
+const fetchPostDisableMfa = async () => {
+    state.mfaLoading = true;
+    try {
+        await postUserDisableMfa({
+            user_id: state.data.user_id || '',
+        });
+        if (state.loginUserId === state.data.user_id) {
+            await store.dispatch('user/setUser', {
+                mfa: {
+                    ...state.data?.mfa,
+                    state: 'DISABLED',
+                },
+            });
+        }
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
+    } finally {
+        state.mfaLoading = false;
+    }
+};
+const fetchListRoleBindingInfo = async () => {
+    const response = await SpaceConnector.clientV2.identity.roleBinding.list<RoleListParameters, ListResponse<RoleBindingModel>>({
+        user_id: state.data.user_id || '',
+        query: {
+            filter: [{ k: 'role_type', v: ROLE_TYPE.DOMAIN_ADMIN, o: 'eq' }],
+        },
+    });
+    const results = response.results || [];
+    if (results?.length > 0) {
+        const matchingRole = userPageState.roles.find((r) => r.role_id === results[0].role_id);
+        formState.role = matchingRole ? {
+            label: matchingRole.name,
+            name: matchingRole.role_id,
+            role_type: matchingRole.role_type,
+        } : {};
+    }
+
+    state.roleBindingList = results || [];
+};
+
+/* Watcher */
+watch(() => userPageState.modal.visible.form, async (visible) => {
+    if (visible) {
         await setForm();
+        await fetchListRoleBindingInfo();
+    } else {
+        formState.password = '';
+        formState.passwordType = '';
+        formState.passwordManual = false;
+        formState.role = {} as AddModalMenuItem;
     }
-})();
+});
 </script>
 
 <template>
     <p-button-modal class="user-management-modal"
-                    :header-title="headerTitle"
+                    :header-title="userPageState.modal.title"
                     size="md"
                     :fade="true"
                     :backdrop="true"
-                    :visible="userPageState.visibleUpdateModal || userPageState.visibleCreateModal"
-                    :disabled="formState.userId === ''
-                        || (formState.passwordManual && formState.password === '')
-                        || (userPageState.visibleCreateModal && !validationState.isUserIdValid)"
-                    :loading="userPageState.modalLoading"
-                    @confirm="confirm"
+                    :visible="userPageState.modal.visible.form"
+                    :disabled="formState.passwordManual && formState.password === ''"
+                    @confirm="handleConfirm"
                     @cancel="handleClose"
                     @close="handleClose"
     >
         <template #body>
-            <p-box-tab v-if="userPageState.visibleCreateModal"
-                       v-model="formState.activeTab"
-                       :tabs="formState.tabs"
-                       style-type="gray"
-                       class="auth-type-tab"
-            >
-                <div class="input-form-wrapper">
-                    <user-management-form-info-form
-                        :is-user-id-valid.sync="validationState.isUserIdValid"
-                        :active-tab="formState.activeTab"
-                        @change-input="handleChangeInputs"
-                    />
-                    <user-management-form-notification-email-form
-                        v-if="formState.activeTab !== 'apiOnly' && state.smtpEnabled"
-                        :email="formState.email"
-                        @change-input="handleChangeInputs"
-                    />
-                    <user-management-form-password-form
-                        v-if="formState.activeTab === 'local'"
-                        @change-input="handleChangeInputs"
-                    />
-                    <user-management-form-admin-role
-                        :active-tab="formState.activeTab"
-                        @change-input="handleChangeInputs"
-                    />
-                </div>
-                <div class="input-form-wrapper tags">
-                    <user-management-form-tags @change-input="handleChangeInputs" />
-                </div>
-            </p-box-tab>
-            <div v-else>
-                <div class="input-form-wrapper">
-                    <user-management-form-info-form
-                        :is-user-id-valid.sync="validationState.isUserIdValid"
-                        :active-tab="formState.activeTab"
-                        :item="item"
-                        @change-input="handleChangeInputs"
-                    />
-                    <user-management-form-notification-email-form
-                        v-if="state.smtpEnabled"
-                        :is-valid-email="state.data.email_verified"
-                        :email="formState.email"
-                        :item="state.data"
-                        @change-input="handleChangeInputs"
-                        @change-verify="handleChangeVerify"
-                    />
-                    <user-management-form-password-form
-                        v-if="state.data.backend === USER_BACKEND_TYPE.LOCAL && state.data.user_type !== USER_TYPE.API_USER"
-                        :item="state.data"
-                        :is-valid-email="state.data.email_verified"
-                        @change-input="handleChangeInputs"
-                    />
-                    <user-management-form-admin-role
-                        :item="item"
-                        @change-input="handleChangeInputs"
-                    />
-                </div>
-                <div class="input-form-wrapper tags">
-                    <user-management-form-tags :item="item"
-                                               @change-input="handleChangeInputs"
-                    />
-                </div>
+            <div class="input-form-wrapper">
+                <user-management-form-info-form :name.sync="formState.name" />
+                <user-management-form-notification-email-form
+                    v-if="state.smtpEnabled"
+                    @change-input="handleChangeInputs"
+                    @change-verify="handleChangeVerify"
+                />
+                <user-management-form-password-form
+                    v-if="state.data.auth_type === 'LOCAL'"
+                    @change-input="handleChangeInputs"
+                />
+                <user-management-form-multi-factor-auth :is-changed-toggle.sync="state.isChangedToggle" />
+                <user-management-form-admin-role v-if="userPageState.isAdminMode"
+                                                 :role.sync="formState.role"
+                />
+                <user-management-add-tag v-if="userPageState.isAdminMode"
+                                         :tags.sync="formState.tags"
+                                         is-edit
+                                         is-form-visible
+                />
             </div>
         </template>
     </p-button-modal>
@@ -278,20 +258,9 @@ const initAuthTypeList = async () => {
             margin-top: 1.5rem;
         }
     }
-    .auth-type-tab {
-        margin-bottom: 1.5rem;
-        overflow-y: hidden;
-        .input-form-wrapper {
-            &.tags {
-                padding-top: 1.125rem;
-                padding-bottom: 0.25rem;
-                gap: 0.75rem;
-            }
-        }
-    }
 }
-.tooltip {
-    @apply text-paragraph-md;
-    width: 14rem;
+
+.p-field-group {
+    margin-bottom: 0;
 }
 </style>

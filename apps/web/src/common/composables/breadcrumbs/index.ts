@@ -47,7 +47,10 @@ export const useBreadcrumbs = () => {
                     const translationId = d.meta.translationId;
                     if (typeof translationId === 'function') {
                         const translationIdResult = translationId(vm.$route);
-                        if (translationIdResult) results.push({ name: i18n.t(translationIdResult), to: location, copiable });
+                        if (Array.isArray(translationIdResult)) {
+                            const [id, values] = translationIdResult;
+                            results.push({ name: i18n.t(id, values), to: location, copiable });
+                        } else if (translationIdResult) results.push({ name: i18n.t(translationIdResult), to: location, copiable });
                     } else results.push({ name: i18n.t(translationId), to: location, copiable });
                 } else if (d.meta.menuId) {
                     const menuInfo = MENU_INFO_MAP[d.meta.menuId];

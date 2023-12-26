@@ -13,6 +13,8 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { getRGBFromHex, numberFormatter } from '@cloudforet/utils';
 
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
+
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
@@ -85,7 +87,7 @@ const state = reactive({
 
 /* API */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchCloudServiceAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+const fetchCloudServiceAnalyze = getCancellableFetcher<CloudServiceAnalyzeParameters, {results: Data[]}>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 const fetchRealtimeData = async (): Promise<Data> => {
     try {
         state.loading = true;

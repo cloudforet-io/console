@@ -14,7 +14,7 @@ import type { ProtocolReferenceMap } from '@/store/modules/reference/protocol/ty
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
-import type { ChannelItem } from '@/services/administration/types/user-notification-type';
+import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
 
 
 const getBadgeColor = (level: string) => {
@@ -50,14 +50,14 @@ const state = reactive({
         { name: 'notification_level', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.NOTIFICATIONS_LEVEL') },
         { name: 'schedule', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.FIELD.SCHEDULE') },
     ]),
-    items: [] as ChannelItem[],
+    items: [] as NotiChannelItem[],
     timezone: computed(() => store.state.user.timezone),
     protocols: computed<ProtocolReferenceMap>(() => store.getters['reference/protocolItems']),
 });
 
 const apiQueryHelper = new ApiQueryHelper();
 apiQueryHelper
-    .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }])
+    .setFilters([{ k: 'project_id', v: props.projectId ?? '', o: '=' }])
     .setOrFilters([{ k: 'is_subscribe', v: false, o: '=' }, { k: 'subscriptions', v: 'cost_analysis.Budget', o: '=' }]);
 
 const listNotificationsChannel = async () => {

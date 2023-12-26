@@ -4,7 +4,7 @@ import { reactive, computed, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import {
-    PHorizontalLayout, PDynamicLayout, PHeading, PButton,
+    PHorizontalLayout, PDynamicLayout, PHeading, PButton, PDivider,
 } from '@spaceone/design-system';
 import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
 import type {
@@ -26,6 +26,9 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { QueryType } from '@/schema/_common/api-verbs/export';
 import type { ExportParameter } from '@/schema/_common/api-verbs/export';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceListParameters } from '@/schema/inventory/cloud-service/api-verbs/list';
+import type { CloudServiceModel } from '@/schema/inventory/cloud-service/model';
 import { store } from '@/store';
 
 import { dynamicFieldsToExcelDataFields } from '@/lib/excel-export';
@@ -220,7 +223,7 @@ const getQuery = (schema?) => {
 const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
     typeOptionState.loading = true;
     try {
-        const res = await SpaceConnector.client.inventory.cloudService.list({
+        const res = await SpaceConnector.clientV2.inventory.cloudService.list<CloudServiceListParameters, ListResponse<CloudServiceModel>>({
             query: getQuery(schema),
             ...(overviewState.period && {
                 date_range: {
@@ -231,9 +234,9 @@ const listCloudServiceTableData = async (schema?): Promise<{items: any[]; totalC
         });
 
         // filtering select index
-        typeOptionState.selectIndex = typeOptionState.selectIndex.filter((d) => !!res.results[d]);
+        typeOptionState.selectIndex = typeOptionState.selectIndex.filter((d) => !!(res.results ?? [])[d]);
 
-        return { items: res.results, totalCount: res.total_count };
+        return { items: res.results ?? [], totalCount: res.total_count ?? 0 };
     } catch (e) {
         ErrorHandler.handleError(e);
         return { items: [], totalCount: 0 };
@@ -336,6 +339,9 @@ const handlePeriodUpdate = (period?: Period) => {
     overviewState.period = period;
     replaceUrlQuery('period', objectToQueryString(period));
 };
+const handleCustomFieldModalVisibleUpdate = (visible) => {
+    tableState.visibleCustomFieldModal = visible;
+};
 
 const checkIsEmpty = (data) => isEmpty(data);
 
@@ -416,8 +422,9 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                                       @click-settings="handleClickSettings"
                     >
                         <template #toolbox-left>
-                            <p-button style-type="primary"
+                            <p-button style-type="secondary"
                                       :disabled="!tableState.consoleLink || tableState.selectedItems.length > 1"
+                                      icon-right="ic_external-link"
                                       @click="handleClickConnectToConsole"
                             >
                                 {{ $t('INVENTORY.SERVER.MAIN.CONSOLE') }}
@@ -426,6 +433,9 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                         <template v-if="!props.isServerPage"
                                   #toolbox-bottom
                         >
+                            <div class="mb-3">
+                                <p-divider />
+                            </div>
                             <cloud-service-usage-overview :cloud-service-type-info="cloudServiceDetailPageState.selectedCloudServiceType"
                                                           :filters="searchFilters"
                                                           :hidden-filters="hiddenFilters"
@@ -445,10 +455,11 @@ debouncedWatch([() => props.group, () => props.name], async () => {
                                    :selected-index="typeOptionState.selectIndex.length ?? 0"
                                    :timezone="typeOptionState.timezone ?? 'UTC'"
         />
-        <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+        <custom-field-modal :visible="tableState.visibleCustomFieldModal"
                             resource-type="inventory.CloudService"
                             :options="{provider: props.provider, cloudServiceGroup: props.group, cloudServiceType: props.name}"
                             :is-server-page="props.isServerPage"
+                            @update:visible="handleCustomFieldModalVisibleUpdate"
                             @complete="reloadTable"
         />
         <excel-export-option-modal :visible="excelState.visible"

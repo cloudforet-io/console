@@ -4,7 +4,6 @@ import {
     computed, reactive, onMounted,
 } from 'vue';
 
-
 import { PButton, PHeading, PDataLoader } from '@spaceone/design-system';
 
 import { QueryHelper } from '@cloudforet/core-lib/query';
@@ -13,9 +12,12 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CollectorListParameters } from '@/schema/inventory/collector/api-verbs/list';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { primitiveToQueryString, queryStringToString } from '@/lib/router-query-string';
 
@@ -31,12 +33,12 @@ import type {
     CollectorMainPageQueryValue,
 } from '@/services/asset-inventory/types/collector-main-page-type';
 
+
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
-const allReferenceStore = useAllReferenceStore();
+const collectorPageState = collectorPageStore.state;
 
 const storeState = reactive({
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
 });
 const state = reactive({
     initLoading: true,
@@ -51,15 +53,11 @@ const setValuesFromUrlQueryString = () => {
     const currentRoute = SpaceRouter.router.currentRoute;
     const query: CollectorMainPageQuery = currentRoute.query;
     // set provider
-    collectorPageStore.$patch({
-        selectedProvider: queryStringToString(query.provider) ?? 'all',
-    });
+    collectorPageState.selectedProvider = queryStringToString(query.provider) ?? 'all';
     // set search filters
     if (query.filters) {
         const filters: ConsoleFilter[] = urlFilterConverter.setFiltersAsRawQueryString(query.filters).filters;
-        collectorPageStore.$patch({
-            searchFilters: filters,
-        });
+        collectorPageState.searchFilters = filters;
     }
 };
 
@@ -81,9 +79,7 @@ watchDebounced(collectorMainPageQueryValue, async (queryValue) => {
 
 /* Event Listeners */
 const handleSelectedProvider = (providerName: string) => {
-    collectorPageStore.$patch({
-        selectedProvider: providerName,
-    });
+    collectorPageState.selectedProvider = providerName;
 };
 
 
@@ -91,10 +87,10 @@ const handleSelectedProvider = (providerName: string) => {
 const collectorCountApiQueryHelper = new ApiQueryHelper().setCountOnly();
 const fetchCollectorCount = async () => {
     try {
-        const { total_count } = await SpaceConnector.client.inventory.collector.list({
+        const { total_count } = await SpaceConnector.clientV2.inventory.collector.list<CollectorListParameters, ListResponse<CollectorModel>>({
             query: collectorCountApiQueryHelper.data,
         });
-        state.hasCollectorList = total_count > 0;
+        state.hasCollectorList = (total_count ?? 0) > 0;
     } catch (e) {
         ErrorHandler.handleError(e);
     } finally {
@@ -104,7 +100,7 @@ const fetchCollectorCount = async () => {
 
 /* INIT */
 onMounted(async () => {
-    await collectorPageStore.$reset();
+    collectorPageStore.reset();
     setValuesFromUrlQueryString();
     await fetchCollectorCount();
 });

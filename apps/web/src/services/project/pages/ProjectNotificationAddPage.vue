@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onActivated, reactive,
 } from 'vue';
@@ -11,20 +11,28 @@ import {
 
 import { i18n } from '@/translations';
 
+import { queryStringToString } from '@/lib/router-query-string';
+
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import NotificationAddForm from '@/services/my-page/components/NotificationAddForm.vue';
-
+import type {
+    ProjectNotificationAddPageUrlQueryValue,
+} from '@/services/project/types/project-notification-add-page-url-query-type';
 
 const route = useRoute();
 const state = reactive({
     pageTitle: '' as TranslateResult,
     //
-    userId: decodeURIComponent(route.params.userId),
-    projectId: computed(() => route.query.projectId),
-    protocolId: computed(() => route.params.protocolId),
-    protocolType: computed(() => route.query.protocolType),
-    supportedSchema: computed(() => route.query.supported_schema),
+    projectId: computed<string>(() => route.params.id),
+    protocolId: computed<string>(() => route.params.protocolId),
+    protocolType: computed<ProjectNotificationAddPageUrlQueryValue['protocolType']>(() => {
+        const protocolType = route.query.protocolType;
+        if (protocolType) {
+            return queryStringToString(protocolType);
+        }
+        return undefined;
+    }),
 });
 
 const routeState = reactive({
@@ -60,8 +68,6 @@ onActivated(() => {
         <notification-add-form :project-id="state.projectId"
                                :protocol-id="state.protocolId"
                                :protocol-type="state.protocolType"
-                               :supported-schema="state.supportedSchema"
-                               :user-id="state.userId"
         />
     </general-page-layout>
 </template>

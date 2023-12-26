@@ -1,20 +1,3 @@
-<template>
-    <div class="dashboard-control-buttons">
-        <p-button icon-left="ic_dashboard-customize"
-                  style-type="tertiary"
-                  @click="handleClickCustomize"
-        >
-            {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
-        </p-button>
-        <p-button icon-left="ic_duplicate"
-                  style-type="tertiary"
-                  @click="handleVisibleCloneModal"
-        >
-            {{ $t('DASHBOARDS.DETAIL.CLONE') }}
-        </p-button>
-    </div>
-</template>
-
 <script setup lang="ts">
 import { PButton } from '@spaceone/design-system';
 
@@ -35,11 +18,30 @@ const props = defineProps<{
 }>();
 
 const handleClickCustomize = () => {
-    const routeName = props.dashboardId.startsWith('project') ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME;
-    SpaceRouter.router.push({ name: routeName, params: { dashboardId: props.dashboardId } });
+    SpaceRouter.router.push({
+        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+        params: { dashboardId: props.dashboardId },
+    });
 };
 
 </script>
+
+<template>
+    <div class="dashboard-control-buttons">
+        <p-button icon-left="ic_dashboard-customize"
+                  style-type="tertiary"
+                  @click="handleClickCustomize"
+        >
+            {{ $t('DASHBOARDS.DETAIL.CUSTOMIZE') }}
+        </p-button>
+        <p-button icon-left="ic_duplicate"
+                  style-type="tertiary"
+                  @click="handleVisibleCloneModal"
+        >
+            {{ $t('DASHBOARDS.DETAIL.CLONE') }}
+        </p-button>
+    </div>
+</template>
 
 <style lang="postcss">
 .dashboard-control-buttons {

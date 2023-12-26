@@ -2,6 +2,10 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProviderListParameters } from '@/schema/identity/provider/api-verbs/list';
+import type { ProviderModel } from '@/schema/identity/provider/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ProviderReferenceMap, ProviderReferenceState } from '@/store/modules/reference/provider/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
@@ -24,21 +28,22 @@ export const load: Action<ProviderReferenceState, any> = async ({ commit, state 
     ) return;
 
     try {
-        const response = await SpaceConnector.client.identity.provider.list({
+        const response: ListResponse<ProviderModel> = await SpaceConnector.clientV2.identity.provider.list<ProviderListParameters>({
             query: {
-                only: ['provider', 'name', 'tags'],
+                only: ['provider', 'name', 'icon', 'alias', 'color'],
             },
+            workspace_id: undefined,
         }, { timeout: 3000 });
         const providers: ProviderReferenceMap = {};
 
-        response.results.forEach((providerInfo: any): void => {
+        (response.results ?? []).forEach((providerInfo): void => {
             providers[providerInfo.provider] = {
                 key: providerInfo.provider,
-                label: providerInfo.tags.label || providerInfo.name,
+                label: providerInfo.alias || providerInfo.name,
                 name: providerInfo.name,
-                icon: assetUrlConverter(providerInfo.tags.icon),
-                color: providerInfo.tags.color || indigo[400],
-                linkTemplate: providerInfo.tags.external_link_template,
+                icon: assetUrlConverter(providerInfo.icon),
+                color: providerInfo.color || indigo[400],
+                linkTemplate: providerInfo.tags?.external_link_template,
             };
         });
 
@@ -54,11 +59,11 @@ export const sync: Action<ProviderReferenceState, any> = ({ state, commit }, pro
         ...state.items,
         [providerInfo.provider]: {
             key: providerInfo.provider,
-            label: providerInfo.tags.label || providerInfo.name,
+            label: providerInfo.alias || providerInfo.name,
             name: providerInfo.name,
-            icon: assetUrlConverter(providerInfo.tags.icon),
-            color: providerInfo.tags.color || indigo[400],
-            linkTemplate: providerInfo.tags.external_link_template,
+            icon: assetUrlConverter(providerInfo.icon),
+            color: providerInfo.color || indigo[400],
+            linkTemplate: providerInfo.tags?.external_link_template,
         },
     };
     commit('setProviders', providers);

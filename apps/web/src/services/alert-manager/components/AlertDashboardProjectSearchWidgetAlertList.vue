@@ -1,32 +1,6 @@
-<template>
-    <p-list-card class="project-alert-list-item"
-                 :items="items"
-                 :loading="loading"
-    >
-        <template #header>
-            {{ $t('MONITORING.ALERT.DASHBOARD.OPEN_ALERT') }} ({{ totalCount > 15 ? '15+' : totalCount }})
-        </template>
-        <template #item="{item, index}">
-            <alert-list-item v-if="index < 15"
-                             :item="item"
-                             :show-status-message="true"
-                             :user-reference="users[item.assignee]"
-            />
-            <div v-else
-                 class="view-all-text"
-            >
-                <p-link :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
-                        :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
-                        highlight
-                />
-            </div>
-        </template>
-    </p-list-card>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, watch,
 } from 'vue';
 
 import {
@@ -36,82 +10,89 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { AlertListParameters } from '@/schema/monitoring/alert/api-verbs/list';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { store } from '@/store';
+import type { AlertModel } from '@/schema/monitoring/alert/model';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AlertListItem from '@/services/alert-manager/components/AlertListItem.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
+const props = defineProps<{
+    projectId: string;
+}>();
 
-export default {
-    name: 'AlertDashboardProjectSearchWidgetAlertList',
-    components: {
-        PListCard,
-        PLink,
-        AlertListItem,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            loading: true,
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            items: [],
-            totalCount: 0,
-        });
+const allReferenceStore = useAllReferenceStore();
+const state = reactive({
+    loading: true,
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+    items: [] as AlertModel[],
+    totalCount: 0,
+});
 
-        /* api */
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery
-                .setSort('created_at', true)
-                .setPage(1, 16)
-                .setFilters([{ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' }]);
-            return apiQuery.data;
-        };
-        const listAlerts = async () => {
-            try {
-                state.loading = true;
-                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
-                    project_id: props.projectId,
-                    query: getQuery(),
-                });
-                state.items = results;
-                state.totalCount = total_count;
-            } catch (e) {
-                state.items = [];
-                state.totalCount = 0;
-                ErrorHandler.handleError(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/user/load'),
-            ]);
-        })();
-
-        watch(() => props.projectId, async (projectId) => {
-            if (projectId) await listAlerts();
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            PROJECT_ROUTE,
-        };
-    },
+/* api */
+const apiQuery = new ApiQueryHelper();
+const getQuery = () => {
+    apiQuery
+        .setSort('created_at', true)
+        .setPage(1, 16)
+        .setFilters([{ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' }]);
+    return apiQuery.data;
 };
+const listAlerts = async () => {
+    try {
+        state.loading = true;
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.alert.list<AlertListParameters, ListResponse<AlertModel>>({
+            project_id: props.projectId,
+            query: getQuery(),
+        });
+        state.items = results ?? [];
+        state.totalCount = total_count ?? 0;
+    } catch (e) {
+        state.items = [];
+        state.totalCount = 0;
+        ErrorHandler.handleError(e);
+    } finally {
+        state.loading = false;
+    }
+};
+
+watch(() => props.projectId, async (projectId) => {
+    if (projectId) await listAlerts();
+}, { immediate: true });
+
 </script>
+
+<template>
+    <p-list-card class="project-alert-list-item"
+                 :items="state.items"
+                 :loading="state.loading"
+    >
+        <template #header>
+            {{ $t('MONITORING.ALERT.DASHBOARD.OPEN_ALERT') }} ({{ state.totalCount > 15 ? '15+' : state.totalCount }})
+        </template>
+        <template #item="{item, index}">
+            <alert-list-item v-if="index < 15"
+                             :item="item"
+                             :show-status-message="true"
+                             :user-reference="state.users[item.assignee]"
+            />
+            <div v-else
+                 class="view-all-text"
+            >
+                <p-link :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: props.projectId } }"
+                        :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
+                        highlight
+                />
+            </div>
+        </template>
+    </p-list-card>
+</template>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-list-card */

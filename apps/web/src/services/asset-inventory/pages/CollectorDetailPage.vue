@@ -1,5 +1,13 @@
 <template>
     <div class="collector-detail-page">
+        <portal to="page-top-notification">
+            <scoped-notification v-if="state.isNotiVisible"
+                                 :title="i18n.t('INVENTORY.COLLECTOR.DETAIL.PAGE_NOTIFICATION')"
+                                 title-icon="ic_info-circle"
+                                 type="info"
+                                 hide-header-close-button
+            />
+        </portal>
         <p-heading :title="state.collectorName"
                    show-back-button
                    @click-back-button="handleClickBackButton"
@@ -106,11 +114,14 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
+import type { CollectorDeleteParameters } from '@/schema/inventory/collector/api-verbs/delete';
+import type { CollectorGetParameters } from '@/schema/inventory/collector/api-verbs/get';
 import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
+import ScopedNotification from '@/common/components/scoped-notification/ScopedNotification.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useGoBack } from '@/common/composables/go-back';
 import { useManagePermissionState } from '@/common/composables/page-manage-permission';
@@ -132,6 +143,7 @@ import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-c
 import {
     useCollectorDataModalStore,
 } from '@/services/asset-inventory/stores/collector-data-modal-store';
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
@@ -148,6 +160,8 @@ const collectorJobState = collectorJobStore.$state;
 
 const collectorDataModalStore = useCollectorDataModalStore();
 
+const collectorDetailPageStore = useCollectorDetailPageStore();
+
 watch(() => collectorFormState.originCollector, async (collector) => {
     if (collector) {
         collectorJobStore.$patch({
@@ -158,6 +172,7 @@ watch(() => collectorFormState.originCollector, async (collector) => {
 
 const queryHelper = new QueryHelper();
 const state = reactive({
+    isNotiVisible: computed(() => !collectorDetailPageStore.getters.isEditableCollector),
     hasManagePermission: useManagePermissionState(),
     loading: true,
     collector: computed<CollectorModel|null>(() => collectorFormState.originCollector),
@@ -186,10 +201,9 @@ defineExpose({ setPathFrom });
 const getCollector = async (): Promise<CollectorModel|null> => {
     state.loading = true;
     try {
-        const result = await SpaceConnector.client.inventory.collector.get({
+        return await SpaceConnector.clientV2.inventory.collector.get<CollectorGetParameters, CollectorModel>({
             collector_id: props.collectorId,
         });
-        return result;
     } catch (e) {
         ErrorHandler.handleError(e);
         return null;
@@ -198,9 +212,9 @@ const getCollector = async (): Promise<CollectorModel|null> => {
     }
 };
 
-const fetchDeleteCollector = async () => SpaceConnector.client.inventory.collector.delete({
-    collectors: [collectorFormStore.collectorId],
-});
+const fetchDeleteCollector = async () => (collectorFormStore.collectorId ? SpaceConnector.clientV2.inventory.collector.delete<CollectorDeleteParameters>({
+    collector_id: collectorFormStore.collectorId,
+}) : undefined);
 
 const goBackToMainPage = () => {
     SpaceRouter.router.push({
@@ -269,13 +283,15 @@ onMounted(async () => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
+    collectorDetailPageStore.reset();
     const collector = await getCollector();
     collectorJobStore.$patch((_state) => {
         _state.collector = collector;
     });
     if (collector) {
         collectorJobStore.getAllJobsCount();
-        collectorFormStore.setOriginCollector(collector);
+        await collectorFormStore.setOriginCollector(collector);
+        collectorDetailPageStore.state.collector = collector;
         resume();
     }
 });
@@ -284,6 +300,7 @@ onUnmounted(() => {
     collectorJobStore.$reset();
     collectorFormStore.$reset();
     collectorDataModalStore.$reset();
+    collectorDetailPageStore.reset();
 });
 
 

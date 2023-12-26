@@ -21,13 +21,12 @@ import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
-
 type ProviderFilter = BudgetModel['provider_filter'];
 type BudgetTimeUnit = BudgetModel['time_unit'];
 
 interface Props {
     projectId?: string;
-    projectGroupId?: string;
+    workspaceId?: string;
     providerFilter?: ProviderFilter;
     dataSourceId?: string;
     timeUnit: BudgetTimeUnit;
@@ -52,7 +51,7 @@ const allReferenceStore = useAllReferenceStore();
 
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
-    projectGroupId: undefined,
+    workspaceId: undefined,
     providerFilter: undefined,
     dataSourceId: undefined,
     timeUnit: 'TOTAL',
@@ -63,6 +62,9 @@ const recentBudgetApiQueryHelper = new ApiQueryHelper().setPage(1, 3);
 
 const { i18nDayjs } = useI18nDayjs();
 
+const storeState = reactive({
+    costDataSource: computed(() => allReferenceStore.getters.costDataSource),
+});
 const state = reactive({
     last3MonthsBudgets: [] as BudgetModel[],
     months: computed(() => {
@@ -80,12 +82,13 @@ const state = reactive({
             cost: data ? data.value_sum : 0,
         };
     })),
-    showList: computed(() => (props.projectId || props.projectGroupId) && props.dataSourceId),
+    showList: computed(() => (props.projectId || props.workspaceId) && props.dataSourceId),
     // api request params
     budgetListParams: computed(() => {
         let filters: ConsoleFilter[] = [];
 
         if (props.projectId) filters.push({ k: 'project_id', v: props.projectId, o: '=' });
+        if (props.workspaceId) filters.push({ k: 'workspace_id', v: props.workspaceId, o: '=' });
         if (props.providerFilter) filters = filters.concat(getConvertedFilter(props.providerFilter));
         recentBudgetApiQueryHelper.setFilters(filters);
 
@@ -112,7 +115,7 @@ const state = reactive({
     }),
     currency: computed<Currency>(() => {
         if (props.dataSourceId) {
-            const targetDataSource = allReferenceStore.getters.costDataSource[props.dataSourceId];
+            const targetDataSource = storeState.costDataSource[props.dataSourceId];
             return targetDataSource?.data?.plugin_info?.metadata?.currency ?? 'USD';
         }
         return 'USD';
@@ -142,14 +145,9 @@ const getRecentBudgets = async () => {
     }
 };
 
-watch([() => props.projectId, () => props.dataSourceId, () => props.projectGroupId], () => {
+watch([() => props.projectId, () => props.dataSourceId, () => props.workspaceId], () => {
     if (state.showList) getRecentBudgets();
 }, { immediate: true });
-
-(async () => {
-    await allReferenceStore.load('costDataSource');
-})();
-
 </script>
 
 <template>

@@ -1,6 +1,6 @@
 import type { Tags } from '@/schema/_common/model';
 
-export interface CloudServiceTypeInfo {
+export interface CloudServiceTypeModel {
     cloud_service_type_id: string;
     cloud_service_type_key: string;
     name: string;

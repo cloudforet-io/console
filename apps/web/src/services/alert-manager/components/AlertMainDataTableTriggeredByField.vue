@@ -1,22 +1,6 @@
-<template>
-    <span>
-        <p-link v-if="link"
-                :action-icon="ACTION_ICON.INTERNAL_LINK"
-                new-tab
-                :to="link"
-        >
-            {{ label }}
-        </p-link>
-        <template v-else>
-            {{ label }}
-        </template>
-    </span>
-</template>
-
-<script lang="ts">
-import type { PropType } from 'vue';
+<script setup lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, reactive,
 } from 'vue';
 import type { Location } from 'vue-router';
 
@@ -30,71 +14,59 @@ import type { ReferenceItem } from '@/store/modules/reference/type';
 
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-export default {
-    name: 'AlertMainDataTableTriggeredByField',
-    components: {
-        PLink,
-    },
-    props: {
-        value: {
-            type: String,
-            default: '',
-        },
-        projectId: {
-            type: String,
-            default: '',
-        },
-        disableLink: {
-            type: Boolean,
-            default: false,
-        },
-        webhookReference: {
-            type: Object as PropType<ReferenceItem>,
-            default: undefined,
-        },
-        userReference: {
-            type: Object as PropType<ReferenceItem>,
-            default: undefined,
-        },
-    },
-    setup(props) {
-        const queryHelper = new QueryHelper();
+const props = defineProps<{
+    value?: string;
+    projectId?: string;
+    disableLink?: boolean;
+    webhookReference?: ReferenceItem;
+    userReference?: ReferenceItem;
+}>();
 
-        const state = reactive({
-            webhookLabel: computed<string|undefined>(() => props.webhookReference?.label),
-            userLabel: computed<string|undefined>(() => props.userReference?.label),
-            label: computed(() => state.webhookLabel || state.userLabel || props.value),
-            link: computed<Location|undefined>(() => {
-                if (props.disableLink) return undefined;
-                if (props.webhookReference) {
-                    return {
-                        name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
-                        params: {
-                            id: props.projectId,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([{ k: 'webhook_id', v: props.value, o: '=' }]).rawQueryStrings,
-                        },
-                    };
-                } if (state.userReference) {
-                    return {
-                        name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-                        params: {
-                            id: props.projectId,
-                        },
-                        query: {
-                            filters: queryHelper.setFilters([{ v: props.value }]).rawQueryStrings,
-                        },
-                    };
-                }
-                return undefined;
-            }),
-        });
+const queryHelper = new QueryHelper();
 
-        return {
-            ...toRefs(state),
-            ACTION_ICON,
-        };
-    },
-};
+const state = reactive({
+    webhookLabel: computed<string|undefined>(() => props.webhookReference?.label),
+    userLabel: computed<string|undefined>(() => props.userReference?.label),
+    label: computed(() => state.webhookLabel || state.userLabel || props.value),
+    link: computed<Location|undefined>(() => {
+        if (props.disableLink) return undefined;
+        if (props.webhookReference) {
+            return {
+                name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
+                params: {
+                    id: props.projectId ?? '',
+                },
+                query: {
+                    filters: queryHelper.setFilters([{ k: 'webhook_id', v: props.value ?? '', o: '=' }]).rawQueryStrings,
+                },
+            };
+        } if (state.userReference) {
+            return {
+                name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+                params: {
+                    id: props.projectId ?? '',
+                },
+                query: {
+                    filters: queryHelper.setFilters([{ v: props.value ?? '' }]).rawQueryStrings,
+                },
+            };
+        }
+        return undefined;
+    }),
+});
 </script>
+
+<template>
+    <span>
+        <p-link v-if="state.link"
+                :action-icon="ACTION_ICON.INTERNAL_LINK"
+                new-tab
+                :to="state.link"
+        >
+            {{ state.label }}
+        </p-link>
+        <template v-else>
+            {{ state.label }}
+        </template>
+    </span>
+</template>

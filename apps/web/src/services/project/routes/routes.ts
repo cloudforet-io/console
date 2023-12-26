@@ -8,18 +8,15 @@ import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 const ProjectPage = () => import('@/services/project/pages/ProjectPage.vue');
 const ProjectDetailPage = () => import('@/services/project/pages/ProjectDetailPage.vue');
 
-const ProjectDashboardPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
+const ProjectSummaryPage = () => import('@/services/project/pages/ProjectSummaryPage.vue');
 const ProjectMemberPage = () => import('@/services/project/pages/ProjectMemberPage.vue');
 const ProjectAlertPage = () => import('@/services/project/pages/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import('@/services/project/pages/ProjectNotificationPage.vue');
 const ProjectTagPage = () => import('@/services/project/pages/ProjectTagPage.vue');
-// eslint-disable-next-line max-len
 const ProjectAlertEventRulePage = () => import('@/services/project/pages/ProjectAlertEventRulePage.vue');
 const ProjectNotificationAddPage = () => import('@/services/project/pages/ProjectNotificationAddPage.vue');
 
 const ProjectAlertListPage = () => import('@/services/project/pages/ProjectAlertListPage.vue');
-// eslint-disable-next-line max-len
-const ProjectMaintenanceWindowPage = () => import('@/services/project/pages/ProjectMaintenanceWindowPage.vue');
 const ProjectWebhookPage = () => import('@/services/project/pages/ProjectWebhookPage.vue');
 const ProjectAlertSettingsPage = () => import('@/services/project/pages/ProjectAlertSettingsPage.vue');
 
@@ -31,22 +28,22 @@ export default {
         {
             path: '/',
             name: PROJECT_ROUTE._NAME,
-            meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
+            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
             props: true,
             component: ProjectPage,
         },
         {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
-            meta: { accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-            redirect: ':id/summary',
+            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+            redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
             props: true,
             component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
                     path: '/',
                     name: PROJECT_ROUTE.DETAIL.TAB._NAME,
-                    redirect: 'summary',
+                    redirect: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDetailPage,
                     children: [
@@ -54,7 +51,7 @@ export default {
                             path: 'summary',
                             name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                             props: true,
-                            component: ProjectDashboardPage,
+                            component: ProjectSummaryPage,
                         },
                         {
                             path: 'member',
@@ -74,12 +71,6 @@ export default {
                                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
                                     props: true,
                                     component: ProjectAlertListPage,
-                                },
-                                {
-                                    path: 'maintenance-window',
-                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME,
-                                    props: true,
-                                    component: ProjectMaintenanceWindowPage,
                                 },
                                 {
                                     path: 'webhook',

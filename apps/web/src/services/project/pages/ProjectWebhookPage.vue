@@ -26,8 +26,14 @@ import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-ut
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { WebhookDeleteParameters } from '@/schema/monitoring/webhook/api-verbs/delete';
+import type { WebhookDisableParameters } from '@/schema/monitoring/webhook/api-verbs/disable';
+import type { WebhookEnableParameters } from '@/schema/monitoring/webhook/api-verbs/enable';
+import type { WebhookListParameters } from '@/schema/monitoring/webhook/api-verbs/list';
+import type { WebhookModel } from '@/schema/monitoring/webhook/model';
 import { store } from '@/store';
-import { i18n } from '@/translations';
+import { i18n as _i18n } from '@/translations';
 
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 
@@ -38,9 +44,8 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
+import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import ProjectAlertWebhookAddModal from '@/services/project/components/ProjectAlertWebhookAddModal.vue';
 import ProjectAlertWebhookUpdateModal from '@/services/project/components/ProjectAlertWebhookUpdateModal.vue';
 
@@ -80,7 +85,6 @@ const webhookListApiQueryHelper = new ApiQueryHelper()
     .setSort('created_at', true)
     .setFiltersAsRawQueryString(route.query.filters);
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
     loading: true,
     timezone: computed(() => store.state.user.timezone),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
@@ -88,25 +92,25 @@ const state = reactive({
         {
             type: 'item',
             name: 'enable',
-            label: i18n.t('PROJECT.DETAIL.WEBHOOK_ENABLE'),
+            label: _i18n.t('PROJECT.DETAIL.WEBHOOK_ENABLE'),
             disabled: state.selectedItem[0]?.state === WEBHOOK_STATE.ENABLED,
         },
         {
             type: 'item',
             name: 'disable',
-            label: i18n.t('PROJECT.DETAIL.WEBHOOK_DISABLE'),
+            label: _i18n.t('PROJECT.DETAIL.WEBHOOK_DISABLE'),
             disabled: state.selectedItem[0]?.state === WEBHOOK_STATE.DISABLED,
         },
         { type: 'divider' },
         {
             type: 'item',
             name: 'update',
-            label: i18n.t('PROJECT.DETAIL.WEBHOOK_UPDATE'),
+            label: _i18n.t('PROJECT.DETAIL.WEBHOOK_UPDATE'),
         },
         {
             type: 'item',
             name: 'delete',
-            label: i18n.t('PROJECT.DETAIL.WEBHOOK_DELETE'),
+            label: _i18n.t('PROJECT.DETAIL.WEBHOOK_DELETE'),
         },
     ] as MenuItem[])),
     fields: [
@@ -149,7 +153,7 @@ let webhookListApiQuery = webhookListApiQueryHelper.data;
 const listWebhooks = async () => {
     state.loading = true;
     try {
-        const { results, total_count } = await SpaceConnector.client.monitoring.webhook.list({
+        const { results, total_count } = await SpaceConnector.clientV2.monitoring.webhook.list<WebhookListParameters, ListResponse<WebhookModel>>({
             project_id: props.id,
             query: webhookListApiQuery,
         });
@@ -166,13 +170,12 @@ const listWebhooks = async () => {
 };
 const enableWebhook = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.enable({
-            // eslint-disable-next-line camelcase
+        await SpaceConnector.clientV2.monitoring.webhook.enable<WebhookEnableParameters>({
             webhook_id: state.selectedItem[0].webhook_id,
         });
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '');
+        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'));
+        ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'));
     } finally {
         state.selectedIndex = [];
         await listWebhooks();
@@ -181,13 +184,12 @@ const enableWebhook = async () => {
 };
 const disableWebhook = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.disable({
-            // eslint-disable-next-line camelcase
+        await SpaceConnector.clientV2.monitoring.webhook.disable<WebhookDisableParameters>({
             webhook_id: state.selectedItem[0].webhook_id,
         });
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '');
+        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '');
     } catch (e) {
-        ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'));
+        ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'));
     } finally {
         state.selectedIndex = [];
         await listWebhooks();
@@ -196,10 +198,10 @@ const disableWebhook = async () => {
 };
 const deleteWebhookConfirm = async () => {
     try {
-        await SpaceConnector.client.monitoring.webhook.delete({
+        await SpaceConnector.clientV2.monitoring.webhook.delete<WebhookDeleteParameters>({
             webhook_id: state.selectedItem[0].webhook_id,
         });
-        showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '');
+        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, 'PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK');
     } finally {
@@ -219,15 +221,15 @@ const checkModalConfirm = async () => {
 const onClickEnable = () => {
     checkModalState.visible = true;
     checkModalState.mode = WEBHOOK_STATE.ENABLED;
-    checkModalState.title = i18n.t('PROJECT.DETAIL.MODAL_ENABLE_WEBHOOK_TITLE');
-    checkModalState.subTitle = i18n.t('PROJECT.DETAIL.MODAL_ENABLE_WEBHOOK_DESC');
+    checkModalState.title = _i18n.t('PROJECT.DETAIL.MODAL_ENABLE_WEBHOOK_TITLE');
+    checkModalState.subTitle = _i18n.t('PROJECT.DETAIL.MODAL_ENABLE_WEBHOOK_DESC');
     checkModalState.themeColor = 'safe';
 };
 const onClickDisable = () => {
     checkModalState.visible = true;
     checkModalState.mode = WEBHOOK_STATE.DISABLED;
-    checkModalState.title = i18n.t('PROJECT.DETAIL.MODAL_DISABLE_WEBHOOK_TITLE');
-    checkModalState.subTitle = i18n.t('PROJECT.DETAIL.MODAL_DISABLE_WEBHOOK_DESC');
+    checkModalState.title = _i18n.t('PROJECT.DETAIL.MODAL_DISABLE_WEBHOOK_TITLE');
+    checkModalState.subTitle = _i18n.t('PROJECT.DETAIL.MODAL_DISABLE_WEBHOOK_DESC');
     checkModalState.themeColor = 'alert';
 };
 const onClickUpdate = () => {
@@ -315,14 +317,13 @@ onActivated(() => {
                 <p-button class="mr-4 add-btn"
                           style-type="primary"
                           icon-left="ic_plus_bold"
-                          :disabled="!state.hasManagePermission"
                           @click="onClickAdd"
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-button>
                 <p-select-dropdown
                     :menu="state.dropdown"
-                    :disabled="!state.hasManagePermission || !state.isSelectedItem"
+                    :disabled="!state.isSelectedItem"
                     :placeholder="$t('PROJECT.DETAIL.WEBHOOK_ACTION')"
                     @select="onSelectDropdown"
                 />

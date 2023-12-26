@@ -15,6 +15,7 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ExportParameter, ExportOption } from '@/schema/_common/api-verbs/export';
 import { QueryType } from '@/schema/_common/api-verbs/export';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
@@ -54,6 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(event: 'update-pagination', value: ToolboxOptions): void;
+    (event: 'refresh'): void;
 }>();
 
 const cloudServicePageStore = useCloudServicePageStore();
@@ -101,7 +103,7 @@ interface CloudServiceResource {
 
 const getCloudServiceResources = async (): Promise<CloudServiceResource[]> => {
     try {
-        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze({
+        const { results } = await SpaceConnector.clientV2.inventory.cloudService.analyze<CloudServiceAnalyzeParameters>({
             query: getCloudServiceAnalyzeQuery(
                 cloudServicePageStore.allFilters,
                 undefined,
@@ -213,6 +215,9 @@ const handleChange = (options: ToolboxOptions = {}) => {
         emit('update-pagination', options);
     }
 };
+const handleRefresh = () => {
+    emit('refresh');
+};
 const handleClickSet = () => {
     state.visibleSetFilterModal = true;
 };
@@ -269,7 +274,7 @@ const handleExport = () => {
                    :value-handler-map="props.handlers?.valueHandlerMap ?? {}"
                    :page-size="props.pageSize"
                    @change="handleChange"
-                   @refresh="handleChange()"
+                   @refresh="handleRefresh"
                    @export="handleExport"
         />
         <cloud-service-filter-modal :visible.sync="state.visibleSetFilterModal" />

@@ -114,6 +114,10 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { SpaceRouter } from '@/router';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ChangeHistoryListParameters } from '@/schema/inventory/change-history/api-verbs/list';
+import type { ChangeHistoryModel } from '@/schema/inventory/change-history/model';
+import type { NoteListParameters } from '@/schema/inventory/note/api-verbs/list';
 import type { NoteModel } from '@/schema/inventory/note/model';
 import { store } from '@/store';
 
@@ -271,10 +275,10 @@ export default {
         const getNoteData = async (recordIdList) => {
             try {
                 noteApiQueryHelper.setFilters([{ k: 'record_id', v: recordIdList, o: '=' }]);
-                const { results } = await SpaceConnector.client.inventory.note.list({
+                const { results } = await SpaceConnector.clientV2.inventory.note.list<NoteListParameters, ListResponse<NoteModel>>({
                     query: noteApiQueryHelper.data,
                 });
-                return results;
+                return results ?? [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return [];
@@ -303,7 +307,7 @@ export default {
                     { k: 'created_at', v: endDate.format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
                     ...searchQueryHelper.filters,
                 ]);
-                const { results, total_count } = await SpaceConnector.client.inventory.changeHistory.list({
+                const { results = [], total_count } = await SpaceConnector.clientV2.inventory.changeHistory.list<ChangeHistoryListParameters, ListResponse<ChangeHistoryModel>>({
                     cloud_service_id: props.cloudServiceItem.cloud_service_id,
                     query: {
                         ...apiQueryHelper.data,
@@ -313,7 +317,7 @@ export default {
                 state.noteItemMap = groupNoteByHistoryRecordId(noteList);
                 const convertedData = getConvertedHistoryData(results);
                 state.items = state.items.concat(convertedData);
-                state.totalCount = total_count;
+                state.totalCount = total_count ?? 0;
             } catch (e) {
                 state.items = [];
                 state.totalCount = 0;

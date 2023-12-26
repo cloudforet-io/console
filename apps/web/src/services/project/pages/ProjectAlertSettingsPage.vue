@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, onActivated, reactive, watch,
 } from 'vue';
@@ -11,15 +11,26 @@ import { get } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
+import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
+import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
+import type { ProjectAlertConfigGetParameters } from '@/schema/monitoring/project-alert-config/api-verbs/get';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type {
+    ProjectAlertConfigNotiUrgency,
+    ProjectAlertConfigRecoveryMode,
+} from '@/schema/monitoring/project-alert-config/type';
 import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 
 import { red } from '@/styles/colors';
 
 import EscalationPolicyFormModal from '@/services/alert-manager/components/EscalationPolicyFormModal.vue';
-import { ACTION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
+import { ACTION } from '@/services/alert-manager/constants/alert-constant';
 import ProjectAlertSettingsAutoRecoveryUpdateModal
     from '@/services/project/components/ProjectAlertSettingsAutoRecoveryUpdateModal.vue';
 import ProjectAlertSettingsEscalationPolicy
@@ -30,15 +41,11 @@ import ProjectAlertSettingsNotificationPolicyUpdateModal
     from '@/services/project/components/ProjectAlertSettingsNotificationPolicyUpdateModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-
-const NOTIFICATION_URGENCY = Object.freeze({
-    ALL: 'ALL',
-    HIGH_ONLY: 'HIGH_ONLY',
-});
-const RECOVERY_MODE = Object.freeze({
-    MANUAL: 'MANUAL',
-    AUTO: 'AUTO',
-});
+interface NotificationUrgencyOption {
+    name: ProjectAlertConfigNotiUrgency;
+    label: string;
+    icon?: string;
+}
 
 interface Props {
     id?: string;
@@ -47,23 +54,22 @@ const props = defineProps<Props>();
 const router = useRouter();
 
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-    notificationUrgencyList: computed(() => ([
+    notificationUrgencyList: computed<NotificationUrgencyOption[]>(() => ([
         {
-            name: NOTIFICATION_URGENCY.ALL,
-            label: i18n.t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS'),
+            name: 'ALL',
+            label: i18n.t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS') as string,
         },
         {
-            name: NOTIFICATION_URGENCY.HIGH_ONLY,
-            label: i18n.t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS'),
+            name: 'HIGH_ONLY',
+            label: i18n.t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS') as string,
             icon: 'ic_error-filled',
         },
     ])),
-    projectAlertConfig: {},
-    escalationPolicy: {},
-    notificationUrgency: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
-    recoveryMode: computed(() => get(state.projectAlertConfig, 'options.recovery_mode')),
-    escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
+    projectAlertConfig: undefined as ProjectAlertConfigModel|undefined,
+    escalationPolicy: undefined as EscalationPolicyModel|undefined,
+    notificationUrgency: computed<ProjectAlertConfigNotiUrgency|undefined>(() => get(state.projectAlertConfig, 'options.notification_urgency')),
+    recoveryMode: computed<ProjectAlertConfigRecoveryMode|undefined>(() => get(state.projectAlertConfig, 'options.recovery_mode')),
+    escalationPolicyId: computed<string|undefined>(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
     eventRuleTotalCount: 0,
     //
     updateNotificationPolicyModalVisible: false,
@@ -78,20 +84,21 @@ const notificationOptionFormatter = (option) => state.notificationUrgencyList.fi
 /* api */
 const getProjectAlertConfig = async () => {
     try {
-        state.projectAlertConfig = await SpaceConnector.client.monitoring.projectAlertConfig.get({
+        if (!props.id) throw new Error('Project ID is required');
+        state.projectAlertConfig = await SpaceConnector.clientV2.monitoring.projectAlertConfig.get<ProjectAlertConfigGetParameters, ProjectAlertConfigModel>({
             project_id: props.id,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.projectAlertConfig = {};
+        state.projectAlertConfig = undefined;
     }
 };
 const getEventRuleCount = async () => {
     try {
-        const { total_count } = await SpaceConnector.client.monitoring.eventRule.list({
+        const { total_count } = await SpaceConnector.clientV2.monitoring.eventRule.list<EventRuleListParameters, ListResponse<EventRuleModel>>({
             project_id: props.id,
         });
-        state.eventRuleTotalCount = total_count;
+        state.eventRuleTotalCount = total_count ?? 0;
     } catch (e) {
         ErrorHandler.handleError(e);
         state.eventRuleTotalCount = 0;
@@ -99,12 +106,12 @@ const getEventRuleCount = async () => {
 };
 const getEscalationPolicy = async () => {
     try {
-        state.escalationPolicy = await SpaceConnector.client.monitoring.escalationPolicy.get({
+        state.escalationPolicy = await SpaceConnector.clientV2.monitoring.escalationPolicy.get<EscalationPolicyGetParameters, EscalationPolicyModel>({
             escalation_policy_id: state.escalationPolicyId,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
-        state.escalationPolicy = {};
+        state.escalationPolicy = undefined;
     }
 };
 
@@ -152,14 +159,13 @@ onActivated(() => {
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}</span>
                 <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
                                @click="onClickUpdateNotificationPolicy"
                 />
             </div>
             <div class="content-wrapper">
                 <p-i v-if="state.notificationUrgency"
-                     :name="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_gnb_bell' : 'ic_error-filled'"
-                     :color="state.notificationUrgency === NOTIFICATION_URGENCY.ALL ? undefined : red[400]"
+                     :name="state.notificationUrgency === 'ALL' ? 'ic_gnb_bell' : 'ic_error-filled'"
+                     :color="state.notificationUrgency === 'ALL' ? undefined : red[400]"
                 />
                 <span class="text">{{ notificationOptionFormatter(state.notificationUrgency) }}</span>
             </div>
@@ -168,22 +174,20 @@ onActivated(() => {
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}</span>
                 <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
                                @click="onClickUpdateAutoRecovery"
                 />
             </div>
             <div class="content-wrapper">
-                <p-i v-if="state.recoveryMode === RECOVERY_MODE.AUTO"
+                <p-i v-if="state.recoveryMode === 'AUTO'"
                      name="ic_service_automation"
                 />
-                <span class="text">{{ (state.recoveryMode === RECOVERY_MODE.AUTO) ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
+                <span class="text">{{ (state.recoveryMode === 'AUTO') ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
             </div>
         </section>
         <section class="section event-rule-wrapper">
             <div class="section-wrapper">
                 <span class="text">{{ $t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}</span>
                 <p-icon-button name="ic_edit"
-                               :disabled="!state.hasManagePermission"
                                @click="onClickEditEventRule"
                 />
             </div>
@@ -198,7 +202,7 @@ onActivated(() => {
                     <p-button class="text-button"
                               style-type="tertiary"
                               size="sm"
-                              :disabled="!state.hasManagePermission || (state.escalationPolicy.scope === SCOPE.DOMAIN)"
+                              :disabled="state.escalationPolicy?.resource_group === ESCALATION_POLICY_RESOURCE_GROUP.WORKSPACE"
                               @click="onClickUpdateEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
@@ -206,7 +210,6 @@ onActivated(() => {
                     <p-button class="text-button"
                               style-type="tertiary"
                               size="sm"
-                              :disabled="!state.hasManagePermission"
                               @click="onClickChangeEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}

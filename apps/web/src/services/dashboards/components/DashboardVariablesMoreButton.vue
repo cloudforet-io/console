@@ -1,66 +1,3 @@
-<template>
-    <div ref="containerRef"
-         class="dashboard-variables-more-button"
-         :class="{'open-menu': visibleMenu}"
-    >
-        <p-button ref="targetRef"
-                  icon-left="ic_plus_bold"
-                  style-type="highlight"
-                  :disabled="props.disabled"
-                  @click="handleClickButton"
-        >
-            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
-        </p-button>
-        <p-context-menu v-show="visibleMenu"
-                        ref="contextMenuRef"
-                        class="variables-menu"
-                        searchable
-                        :search-text="state.searchText"
-                        :style="contextMenuStyle"
-                        :menu="refinedMenu"
-                        :selected="state.selected"
-                        multi-selectable
-                        show-select-marker
-                        show-clear-selection
-                        @click-show-more="showMoreMenu"
-                        @keyup:down:end="focusOnContextMenu()"
-                        @update:selected="handleSelectVariable"
-                        @update:search-text="handleUpdateSearchText"
-        >
-            <template #bottom>
-                <p-button class="manage-variable-button"
-                          style-type="secondary"
-                          icon-left="ic_settings-filled"
-                          :disabled="!props.isManageable"
-                          @click="handleOpenOverlay"
-                >
-                    {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
-                </p-button>
-            </template>
-        </p-context-menu>
-        <delete-modal :header-title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_TITLE')"
-                      :visible.sync="state.uncheckConfirmModalVisible"
-                      @confirm="handleConfirmUncheckModal"
-                      @cancel="handleCancelUncheckModal"
-                      @close="handleCancelUncheckModal"
-        >
-            <p>
-                <b>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_1') }} </b>
-                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_2') }}</span>
-            </p>
-            <div class="affected-widget-wrapper">
-                <ul>
-                    <li v-for="(title, idx) in state.affectedWidgetTitlesByCustomVariable"
-                        :key="`affected-widget-${idx}`"
-                    >
-                        • {{ title }}
-                    </li>
-                </ul>
-            </div>
-        </delete-modal>
-    </div>
-</template>
-
 <script lang="ts" setup>
 import { onClickOutside } from '@vueuse/core';
 import {
@@ -92,7 +29,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const route = useRoute();
 const router = useRouter();
@@ -167,9 +104,7 @@ const getAffectedWidgetTitlesByCustomVariable = (targetProperty: string): string
 const updateVariablesUse = (property: string, isChecked: boolean) => {
     const _variablesSchema = cloneDeep(state.variableSchema);
     _variablesSchema.properties[property].use = isChecked;
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = _variablesSchema;
-    });
+    dashboardDetailStore.setVariablesSchema(_variablesSchema);
 };
 const _toggleDashboardVariableUse = (_selected: MenuItem[]) => {
     /*
@@ -239,7 +174,7 @@ const handleOpenOverlay = () => {
         });
     } else {
         router.push({
-            name: dashboardDetailStore.isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME : DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
+            name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
             params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
             hash: `#${MANAGE_VARIABLES_HASH_NAME}`,
         });
@@ -276,9 +211,7 @@ const handleConfirmUncheckModal = () => {
 };
 const handleCancelUncheckModal = () => {
     /* This $patch() is for initiating context menu items (state.selected) */
-    dashboardDetailStore.$patch((_state) => {
-        _state.variablesSchema = { ..._state.variablesSchema };
-    });
+    dashboardDetailStore.setVariablesSchema(cloneDeep(dashboardDetailState.variablesSchema));
     state.isClearSelectionCaseWithCustomVariableAffectingWidgets = false;
     state.uncheckConfirmModalVisible = false;
 };
@@ -293,6 +226,69 @@ const {
 } = toRefs(state);
 
 </script>
+
+<template>
+    <div ref="containerRef"
+         class="dashboard-variables-more-button"
+         :class="{'open-menu': visibleMenu}"
+    >
+        <p-button ref="targetRef"
+                  icon-left="ic_plus_bold"
+                  style-type="highlight"
+                  :disabled="props.disabled"
+                  @click="handleClickButton"
+        >
+            {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.MORE') }}
+        </p-button>
+        <p-context-menu v-show="visibleMenu"
+                        ref="contextMenuRef"
+                        class="variables-menu"
+                        searchable
+                        :search-text="state.searchText"
+                        :style="contextMenuStyle"
+                        :menu="refinedMenu"
+                        :selected="state.selected"
+                        multi-selectable
+                        show-select-marker
+                        show-clear-selection
+                        @click-show-more="showMoreMenu"
+                        @keyup:down:end="focusOnContextMenu()"
+                        @update:selected="handleSelectVariable"
+                        @update:search-text="handleUpdateSearchText"
+        >
+            <template #bottom>
+                <p-button class="manage-variable-button"
+                          style-type="secondary"
+                          icon-left="ic_settings-filled"
+                          :disabled="!props.isManageable"
+                          @click="handleOpenOverlay"
+                >
+                    {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.TITLE') }}
+                </p-button>
+            </template>
+        </p-context-menu>
+        <delete-modal :header-title="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_TITLE')"
+                      :visible.sync="state.uncheckConfirmModalVisible"
+                      @confirm="handleConfirmUncheckModal"
+                      @cancel="handleCancelUncheckModal"
+                      @close="handleCancelUncheckModal"
+        >
+            <p>
+                <b>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_1') }} </b>
+                <span>{{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.UNCHECK_MODAL_HELP_TEXT_2') }}</span>
+            </p>
+            <div class="affected-widget-wrapper">
+                <ul>
+                    <li v-for="(title, idx) in state.affectedWidgetTitlesByCustomVariable"
+                        :key="`affected-widget-${idx}`"
+                    >
+                        • {{ title }}
+                    </li>
+                </ul>
+            </div>
+        </delete-modal>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-variables-more-button {

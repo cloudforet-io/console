@@ -3,12 +3,11 @@ import { computed } from 'vue';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import { setI18nLocale } from '@/translations';
 
 import { ERROR_ROUTE } from '@/router/constant';
 import { errorRoutes } from '@/router/error-routes';
-import { serviceRoutes } from '@/router/service-routes';
+import { integralRoutes } from '@/router/integral-routes';
 
 import config from '@/lib/config';
 import { initRequestIdleCallback } from '@/lib/request-idle-callback-polyfill';
@@ -18,27 +17,34 @@ import { initGtag, initGtm } from '@/lib/site-initializer/analysis';
 import { initApiClient } from '@/lib/site-initializer/api-client';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initDomain } from '@/lib/site-initializer/domain';
+import { initDomainSettings } from '@/lib/site-initializer/domain-settings';
 import { initErrorHandler } from '@/lib/site-initializer/error-handler';
+import { initModeSetting } from '@/lib/site-initializer/mode-setting';
 import { prefetchResources } from '@/lib/site-initializer/resource-prefetch';
 import { checkSsoAccessToken } from '@/lib/site-initializer/sso';
+import { initUserAndAuth } from '@/lib/site-initializer/user-auth';
+import { initWorkspace } from '@/lib/site-initializer/workspace';
+
 
 const initConfig = async () => {
     await config.init();
 };
 
-const initQueryHelper = () => {
+const initQueryHelper = (store) => {
     QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
-const initRouter = (domainName?: string) => {
-    if (!domainName) {
+let isRouterInitialized = false;
+const initRouter = (domainId?: string) => {
+    if (!domainId) {
         SpaceRouter.init(errorRoutes);
     } else {
-        SpaceRouter.init(serviceRoutes);
+        SpaceRouter.init(integralRoutes);
     }
+    isRouterInitialized = true;
 };
 
-const initI18n = () => {
+const initI18n = (store) => {
     setI18nLocale(store.state.user.language);
 };
 
@@ -47,33 +53,36 @@ const removeInitializer = () => {
     if (el?.parentElement) el.parentElement.removeChild(el);
 };
 
-const init = async () => {
+const init = async (store) => {
     /* Init SpaceONE Console */
-    await initConfig();
-    await initApiClient(store, config);
-    const domainName = await initDomain(store, config);
-
-    if (domainName) {
+    try {
+        await initConfig();
+        await initApiClient(store, config);
+        const domainId = await initDomain(store, config);
+        const userId = await initUserAndAuth(store, config);
+        initDomainSettings(store);
+        initModeSetting();
+        await initWorkspace(userId);
+        initRouter(domainId);
         prefetchResources();
-        initI18n();
+        initI18n(store);
         initDayjs();
-        initQueryHelper();
+        initQueryHelper(store);
         initGtag(store, config);
         initGtm(config);
         initAmcharts(config);
         initAmcharts5(config);
-        initRouter(domainName);
         initErrorHandler(store);
         initRequestIdleCallback();
         await checkSsoAccessToken(store);
-    } else {
-        initRouter();
-        throw new Error('Site initialization failed: No matched domain');
+    } catch (e) {
+        if (!isRouterInitialized) initRouter();
+        throw e;
     }
 };
 
 const MIN_LOADING_TIME = 1000;
-export const siteInit = async () => {
+export const siteInit = async (store) => {
     store.dispatch('display/startInitializing');
 
     store.watch((state) => state.display.isInitialized, (isInitialized) => {
@@ -95,7 +104,7 @@ export const siteInit = async () => {
     }, MIN_LOADING_TIME);
 
     try {
-        await init();
+        await init(store);
     } catch (e) {
         console.error(e);
         store.dispatch('display/finishInitializing');

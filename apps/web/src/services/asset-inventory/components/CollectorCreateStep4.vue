@@ -50,7 +50,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import type { ComputedRef } from 'vue';
+import { computed, reactive } from 'vue';
 
 import {
     PButton, PTextButton, PButtonModal,
@@ -59,8 +60,14 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { CollectorCreateParameter, CollectorModel } from '@/schema/inventory/collector/model';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
+import type { CollectorCollectParameters } from '@/schema/inventory/collector/api-verbs/collect';
+import type { CollectorCreateParameters } from '@/schema/inventory/collector/api-verbs/create';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { JobModel } from '@/schema/inventory/job/model';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
@@ -76,6 +83,7 @@ import {
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
+const appContextStore = useAppContextStore();
 
 const emit = defineEmits([
     'update:currentStep',
@@ -88,6 +96,7 @@ const state = reactive<{
     createLoading: boolean;
     collectLoading: boolean;
     createdCollectorId?: string;
+    isAdminMode: ComputedRef<boolean>;
 }>({
     deleteModalVisible: false,
     isAbleToCreateCollector: true,
@@ -95,6 +104,7 @@ const state = reactive<{
     createLoading: false,
     collectLoading: false,
     createdCollectorId: undefined,
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const handleClickPrevButton = () => {
@@ -104,7 +114,7 @@ const handleClickPrevButton = () => {
 const handleClickCreateButton = async () => {
     try {
         state.createLoading = true;
-        const params: CollectorCreateParameter = {
+        const params: CollectorCreateParameters = {
             name: collectorFormState.name,
             provider: collectorFormState.provider ?? collectorFormState.repositoryPlugin?.provider,
             plugin_info: {
@@ -121,6 +131,7 @@ const handleClickCreateButton = async () => {
                 hours: collectorFormState.scheduleHours,
             },
             tags: collectorFormState.tags,
+            resource_group: state.isAdminMode ? RESOURCE_GROUP.DOMAIN : RESOURCE_GROUP.WORKSPACE,
         };
         const serviceAccountParams = collectorFormState.selectedServiceAccountFilterOption === 'include' ? {
             service_accounts: collectorFormStore.serviceAccounts,
@@ -128,7 +139,7 @@ const handleClickCreateButton = async () => {
             exclude_service_accounts: collectorFormStore.serviceAccounts,
         };
         Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-        const res:CollectorModel = await SpaceConnector.client.inventory.collector.create(params);
+        const res:CollectorModel = await SpaceConnector.clientV2.inventory.collector.create<CollectorCreateParameters, CollectorModel>(params);
         state.createdCollectorId = res?.collector_id;
         state.visibleCreateCompleteModal = true;
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_CREATE_COLLECTOR'), '');
@@ -152,9 +163,13 @@ const handleConfirmCreateCollector = async () => {
     try {
         state.collectLoading = true;
         // After the collector created, if the user clicks the collect button, the collector will be executed.
-        await SpaceConnector.client.inventory.collector.collect({
-            collector_id: state.createdCollectorId,
-        });
+        if (state.createdCollectorId) {
+            await SpaceConnector.clientV2.inventory.collector.collect<CollectorCollectParameters, JobModel>({
+                collector_id: state.createdCollectorId,
+            });
+        } else {
+            throw new Error('createdCollectorId is undefined');
+        }
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_S_COLLECT_EXECUTION'), '');
         goToCollectorDetailPage();
     } catch (e) {

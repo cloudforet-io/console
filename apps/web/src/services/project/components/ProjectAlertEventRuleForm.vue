@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     reactive, watch,
 } from 'vue';
@@ -9,6 +9,16 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { EventRuleCreateParameters } from '@/schema/monitoring/event-rule/api-verbs/create';
+import type { EventRuleGetParameters } from '@/schema/monitoring/event-rule/api-verbs/get';
+import type { EventRuleUpdateParameters } from '@/schema/monitoring/event-rule/api-verbs/update';
+import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
+import type {
+    EventRuleActions,
+    EventRuleCondition,
+    EventRuleConditionsPolicy,
+    EventRuleOptions,
+} from '@/schema/monitoring/event-rule/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -19,48 +29,11 @@ import ProjectAlertEventRuleActionForm from '@/services/project/components/Proje
 import ProjectAlertEventRuleConditionForm from '@/services/project/components/ProjectAlertEventRuleConditionForm.vue';
 
 
-const CONDITIONS_POLICY = Object.freeze({
-    ALL: 'ALL',
-    ANY: 'ANY',
-});
-type ConditionsPolicy = typeof CONDITIONS_POLICY[keyof typeof CONDITIONS_POLICY];
-
-const OPERATOR = Object.freeze({
-    eq: 'eq',
-    contain: 'contain',
-    not: 'not',
-    not_contain: 'not_contain',
-});
-type Operator = typeof OPERATOR[keyof typeof OPERATOR];
-
-interface Condition {
-    key: string;
-    value: string;
-    operator: Operator;
-}
-
-const EDIT_MODE = {
-    CREATE: 'CREATE',
-    UPDATE: 'UPDATE',
-} as const;
-
-type Responder = {
-    resource_type: string;
-    resource_id: string;
-};
-interface Actions {
-    change_assignee: string;
-    change_urgency?: string;
-    change_project: string;
-    add_project_dependency: string[];
-    add_responder: Responder[];
-    add_additional_info: Record<string, string>;
-    no_notification: boolean;
-}
+type EditMode = 'CREATE' | 'UPDATE';
 
 interface Props {
     projectId?: string;
-    mode?: string;
+    mode?: EditMode;
     eventRuleId?: string;
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -73,33 +46,30 @@ const emit = defineEmits<{(e: 'cancel'): void;
 }>();
 
 const state = reactive({
-    conditionsPolicy: CONDITIONS_POLICY.ALL as ConditionsPolicy,
+    conditionsPolicy: 'ALL' as EventRuleConditionsPolicy,
     conditions: [
         {
             key: '',
             value: '',
-            operator: OPERATOR.contain,
+            operator: 'contain',
         },
-    ] as Condition[],
+    ] as EventRuleCondition[],
     actions: {
-        change_assignee: '',
+        change_assignee: undefined,
         change_urgency: undefined,
-        change_project: '',
-        add_project_dependency: [],
-        add_responder: [],
-        add_additional_info: {},
-        no_notification: false,
-    } as Actions,
+        add_additional_info: undefined,
+        no_notification: undefined,
+    } as EventRuleActions,
     options: {
-        stop_processing: false,
-    },
+        stop_processing: undefined,
+    } as EventRuleOptions,
     isAllValid: false,
 });
 
 /* api */
 const getEventRule = async () => {
     try {
-        const res = await SpaceConnector.client.monitoring.eventRule.get({
+        const res = await SpaceConnector.clientV2.monitoring.eventRule.get<EventRuleGetParameters, EventRuleModel>({
             event_rule_id: props.eventRuleId,
         });
         state.conditionsPolicy = res.conditions_policy;
@@ -112,12 +82,13 @@ const getEventRule = async () => {
 };
 const createEventRule = async () => {
     try {
-        await SpaceConnector.client.monitoring.eventRule.create({
+        await SpaceConnector.clientV2.monitoring.eventRule.create<EventRuleCreateParameters>({
             conditions: state.conditions,
             conditions_policy: state.conditionsPolicy,
             actions: state.actions,
             options: state.options,
             project_id: props.projectId,
+            resource_group: 'PROJECT',
         });
         showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '');
     } catch (e) {
@@ -126,7 +97,7 @@ const createEventRule = async () => {
 };
 const updateEventRule = async () => {
     try {
-        await SpaceConnector.client.monitoring.eventRule.update({
+        await SpaceConnector.clientV2.monitoring.eventRule.update<EventRuleUpdateParameters>({
             event_rule_id: props.eventRuleId,
             conditions: state.conditions,
             conditions_policy: state.conditionsPolicy,
@@ -141,7 +112,7 @@ const updateEventRule = async () => {
 
 /* event */
 const onClickConfirm = async () => {
-    if (props.mode === EDIT_MODE.CREATE) {
+    if (props.mode === 'CREATE') {
         await createEventRule();
     } else {
         await updateEventRule();
@@ -183,7 +154,7 @@ watch(() => state.conditions, (conditions) => {
                       style-type="primary"
                       @click="onClickConfirm"
             >
-                {{ props.mode === EDIT_MODE.CREATE ? $t('PROJECT.EVENT_RULE.ADD') : $t('PROJECT.EVENT_RULE.SAVE') }}
+                {{ props.mode === 'CREATE' ? $t('PROJECT.EVENT_RULE.ADD') : $t('PROJECT.EVENT_RULE.SAVE') }}
             </p-button>
         </div>
     </div>

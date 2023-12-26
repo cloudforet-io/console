@@ -17,7 +17,12 @@ import { store } from '@/store';
 
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { pinia } from '@/store/pinia';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
+
+useAllReferenceStore(pinia);
+const allReferenceStore = useAllReferenceStore();
 
 const getKeyItemSets = (searchKeyGroups: SearchSchema, storeState): KeyItemSet[] => {
     const keyItemSets: KeyItemSet[] = [];
@@ -84,8 +89,8 @@ export function useQuerySearchPropsWithSearchSchema(
         await store.dispatch('reference/loadAll');
     })();
     const storeState = reactive({
-        Project: computed(() => store.getters['reference/projectItems']),
-        ProjectGroup: computed(() => store.getters['reference/projectGroupItems']),
+        Project: computed(() => allReferenceStore.getters.project),
+        ProjectGroup: computed(() => allReferenceStore.getters.projectGroup),
         ServiceAccount: computed(() => store.getters['reference/serviceAccountItems']),
         CloudServiceType: computed(() => store.getters['reference/cloudServiceTypeItems']),
         Secret: computed(() => store.getters['reference/secretItems']),
@@ -93,7 +98,7 @@ export function useQuerySearchPropsWithSearchSchema(
         Provider: computed(() => store.getters['reference/providerItems']),
         Region: computed(() => store.getters['reference/regionItems']),
         Plugin: computed(() => store.getters['reference/pluginItems']),
-        User: computed(() => store.getters['reference/userItems']),
+        User: computed(() => allReferenceStore.getters.user),
         Protocol: computed(() => store.getters['reference/protocolItems']),
         Webhook: computed(() => store.getters['reference/webhookItems']),
     });

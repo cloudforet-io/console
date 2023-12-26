@@ -13,9 +13,9 @@
         <template #body>
             <div class="modal-content-wrapper">
                 <p class="help-text">
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.HELP_TEXT') }}
+                    {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.HELP_TEXT') }}
                 </p>
-                <p-field-group :label="$t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.TITLE')"
+                <p-field-group :label="$t('IDENTITY.USER.NOTIFICATION_EMAIL.TITLE')"
                                :invalid="validationState.isEmailValid"
                                required
                 >
@@ -31,7 +31,7 @@
             </div>
         </template>
         <template #confirm-button>
-            {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SEND_MAIL') }}
+            {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.SEND_MAIL') }}
         </template>
     </p-button-modal>
     <p-button-modal
@@ -117,15 +117,15 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { postValidationCode, postValidationEmail } from '@/lib/helper/verify-email-helper';
+import { postValidationCode, postUserProfileValidationEmail } from '@/lib/helper/verify-email-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 
 interface Props {
-    domainId: string
-    userId: string
+    domainId?: string
+    userId?: string
     visible: boolean
     email?: string
     modalType?: string
@@ -176,9 +176,7 @@ const resetFormData = () => {
 const handleClickSendEmailButton = async () => {
     state.loading = true;
     try {
-        await postValidationEmail({
-            user_id: props.userId,
-            domain_id: props.domainId,
+        await postUserProfileValidationEmail({
             email: formState.newNotificationEmail,
         });
         if (state.loginUserId === props.userId) {
@@ -196,10 +194,8 @@ const handleClickConfirmButton = async () => {
     state.loading = true;
     try {
         await postValidationCode({
-            user_id: props.userId,
-            domain_id: props.domainId,
-            code: formState.verificationCode,
-        }, state.loginUserId === props.userId);
+            verify_code: formState.verificationCode,
+        });
         emit('refresh-user');
         state.proxyVisible = false;
         resetFormData();

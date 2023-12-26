@@ -1,54 +1,6 @@
-<template>
-    <div class="alert-history-widget">
-        <div class="title-wrapper">
-            <span class="title">
-                {{ $t('MONITORING.ALERT.DASHBOARD.ALERT_HISTORY') }}
-            </span>
-            <p-date-pagination :date.sync="currentDate" />
-        </div>
-        <div class="content-wrapper">
-            <div class="summary-wrapper">
-                <p-card v-for="(item, idx) in [createdSummaryData, resolvedSummaryData]"
-                        :key="`p-card-${idx}`"
-                >
-                    <template #header>
-                        <span class="text">{{ item.name === ALERT_STATE.CREATED ? $t('MONITORING.ALERT.DASHBOARD.CREATED') : $t('MONITORING.ALERT.DASHBOARD.RESOLVED') }}</span>
-                        <span v-if="item.increase"
-                              class="increase-text"
-                              :class="[item.increase > 0 ? 'increase' : item.increase < 0 ? 'decrease' : '']"
-                        >
-                            <span>{{ numberFormatter(Math.abs(item.increase)) }}</span>
-                            <p-i v-if="item.increase !== 0"
-                                 :name="item.increase > 0 ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
-                                 height="0.75rem"
-                                 width="0.75rem"
-                                 color="inherit"
-                            />
-                        </span>
-                    </template>
-                    <div class="count-wrapper">
-                        <span>{{ numberFormatter(item.dailyAverage) }}</span>
-                        <span>{{ numberFormatter(item.monthlyTotal) }}</span>
-                    </div>
-                    <div class="label-wrapper">
-                        <span>{{ $t('MONITORING.ALERT.DASHBOARD.DAILY_AVERAGE') }}</span>
-                        <span class="text-right">{{ $t('MONITORING.ALERT.DASHBOARD.MONTHLY_TOTAL') }}</span>
-                    </div>
-                </p-card>
-            </div>
-            <div class="chart-wrapper col-span-9">
-                <alert-dashboard-alert-history-widget-chart
-                    :current-date="currentDate"
-                    :activated-projects="activatedProjects"
-                />
-            </div>
-        </div>
-    </div>
-</template>
-
-<script lang="ts">
+<script setup lang="ts">
 import {
-    reactive, toRefs, watch, watchEffect,
+    reactive, watch, watchEffect,
 } from 'vue';
 
 import {
@@ -72,111 +24,141 @@ const ALERT_STATE = {
 interface SummaryData {
     name: string;
     increase: number;
-    dailyAverage: number | string;
+    dailyAverage?: number | string;
     monthlyTotal: number;
 }
 
-export default {
-    name: 'AlertDashboardAlertHistoryWidget',
-    components: {
-        AlertDashboardAlertHistoryWidgetChart,
-        PCard,
-        PI,
-        PDatePagination,
-    },
-    props: {
-        activatedProjects: {
-            type: Array,
-            default: () => ([]),
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            currentDate: dayjs.utc(),
-            createdSummaryData: {
-                name: ALERT_STATE.CREATED,
-                increase: 0,
-                dailyAverage: 0,
-                monthlyTotal: 0,
-            } as SummaryData,
-            resolvedSummaryData: {
-                name: ALERT_STATE.RESOLVED,
-                increase: 0,
-                dailyAverage: 0,
-                monthlyTotal: 0,
-            } as SummaryData,
-        });
+const props = defineProps<{
+    activatedProjects: string[];
+}>();
 
-        /* util */
-        const initSummaryData = () => {
-            state.createdSummaryData.increase = 0;
-            state.createdSummaryData.dailyAverage = 0;
-            state.createdSummaryData.monthlyTotal = 0;
+const state = reactive({
+    currentDate: dayjs.utc(),
+    createdSummaryData: {
+        name: ALERT_STATE.CREATED,
+        increase: 0,
+        dailyAverage: 0,
+        monthlyTotal: 0,
+    } as SummaryData,
+    resolvedSummaryData: {
+        name: ALERT_STATE.RESOLVED,
+        increase: 0,
+        dailyAverage: 0,
+        monthlyTotal: 0,
+    } as SummaryData,
+});
 
-            state.resolvedSummaryData.increase = 0;
-            state.resolvedSummaryData.dailyAverage = 0;
-            state.resolvedSummaryData.monthlyTotal = 0;
-        };
-        const setSummaryData = (current, results) => {
-            initSummaryData();
-            const currentMonthData = find(results, { date: current.format('YYYY-MM') });
-            if (!currentMonthData) {
-                return;
-            }
+/* util */
+const initSummaryData = () => {
+    state.createdSummaryData.increase = 0;
+    state.createdSummaryData.dailyAverage = 0;
+    state.createdSummaryData.monthlyTotal = 0;
 
-            const daysInMonth = current.daysInMonth();
-            state.createdSummaryData.monthlyTotal = currentMonthData.total_count;
-            state.createdSummaryData.dailyAverage = numberFormatter(currentMonthData.total_count / daysInMonth);
-            state.resolvedSummaryData.monthlyTotal = currentMonthData.resolved_count;
-            state.resolvedSummaryData.dailyAverage = numberFormatter(currentMonthData.resolved_count / daysInMonth);
-
-            // get increase/decrease count if not this month
-            if (current.format('YYYY-MM') !== dayjs.utc().format('YYYY-MM')) {
-                const prevMonthData = find(results, { date: current.subtract(1, 'month').format('YYYY-MM') });
-                if (prevMonthData) {
-                    state.createdSummaryData.increase = currentMonthData.total_count - prevMonthData.total_count;
-                    state.resolvedSummaryData.increase = currentMonthData.resolved_count - prevMonthData.resolved_count;
-                } else {
-                    state.createdSummaryData.increase = currentMonthData.total_count;
-                    state.resolvedSummaryData.increase = currentMonthData.resolved_count;
-                }
-            }
-        };
-
-        /* api */
-        const getAlertHistorySummary = async () => {
-            try {
-                const current = state.currentDate.startOf('month');
-                const { results } = await SpaceConnector.client.monitoring.dashboard.alertHistorySummary({
-                    start: current.subtract(1, 'month').format('YYYY-MM-01'),
-                    end: current.add(1, 'month').format('YYYY-MM-01'),
-                    activated_projects: props.activatedProjects,
-                });
-                setSummaryData(current, results);
-            } catch (e) {
-                initSummaryData();
-                ErrorHandler.handleError(e);
-            }
-        };
-
-        watchEffect(async () => {
-            if (props.activatedProjects.length) {
-                await getAlertHistorySummary();
-            }
-        });
-
-        watch(() => state.currentDate, async () => {
-            await getAlertHistorySummary();
-        });
-
-        return {
-            ...toRefs(state),
-            ALERT_STATE,
-            numberFormatter,
-        };
-    },
+    state.resolvedSummaryData.increase = 0;
+    state.resolvedSummaryData.dailyAverage = 0;
+    state.resolvedSummaryData.monthlyTotal = 0;
 };
+const setSummaryData = (current, results) => {
+    initSummaryData();
+    const currentMonthData = find(results, { date: current.format('YYYY-MM') });
+    if (!currentMonthData) {
+        return;
+    }
+
+    const daysInMonth = current.daysInMonth();
+    state.createdSummaryData.monthlyTotal = currentMonthData.total_count;
+    state.createdSummaryData.dailyAverage = numberFormatter(currentMonthData.total_count / daysInMonth);
+    state.resolvedSummaryData.monthlyTotal = currentMonthData.resolved_count;
+    state.resolvedSummaryData.dailyAverage = numberFormatter(currentMonthData.resolved_count / daysInMonth);
+
+    // get increase/decrease count if not this month
+    if (current.format('YYYY-MM') !== dayjs.utc().format('YYYY-MM')) {
+        const prevMonthData = find(results, { date: current.subtract(1, 'month').format('YYYY-MM') });
+        if (prevMonthData) {
+            state.createdSummaryData.increase = currentMonthData.total_count - prevMonthData.total_count;
+            state.resolvedSummaryData.increase = currentMonthData.resolved_count - prevMonthData.resolved_count;
+        } else {
+            state.createdSummaryData.increase = currentMonthData.total_count;
+            state.resolvedSummaryData.increase = currentMonthData.resolved_count;
+        }
+    }
+};
+
+/* api */
+const getAlertHistorySummary = async () => {
+    try {
+        const current = state.currentDate.startOf('month');
+        const { results } = await SpaceConnector.client.monitoring.dashboard.alertHistorySummary({
+            start: current.subtract(1, 'month').format('YYYY-MM-01'),
+            end: current.add(1, 'month').format('YYYY-MM-01'),
+            activated_projects: props.activatedProjects,
+        });
+        setSummaryData(current, results);
+    } catch (e) {
+        initSummaryData();
+        ErrorHandler.handleError(e);
+    }
+};
+
+watchEffect(async () => {
+    if (props.activatedProjects.length) {
+        await getAlertHistorySummary();
+    }
+});
+
+watch(() => state.currentDate, async () => {
+    await getAlertHistorySummary();
+});
+
 </script>
+
+<template>
+    <div class="alert-history-widget">
+        <div class="title-wrapper">
+            <span class="title">
+                {{ $t('MONITORING.ALERT.DASHBOARD.ALERT_HISTORY') }}
+            </span>
+            <p-date-pagination :date.sync="state.currentDate" />
+        </div>
+        <div class="content-wrapper">
+            <div class="summary-wrapper">
+                <p-card v-for="(item, idx) in [state.createdSummaryData, state.resolvedSummaryData]"
+                        :key="`p-card-${idx}`"
+                >
+                    <template #header>
+                        <span class="text">{{ item.name === ALERT_STATE.CREATED ? $t('MONITORING.ALERT.DASHBOARD.CREATED') : $t('MONITORING.ALERT.DASHBOARD.RESOLVED') }}</span>
+                        <span v-if="item.increase"
+                              class="increase-text"
+                              :class="[item.increase > 0 ? 'increase' : item.increase < 0 ? 'decrease' : '']"
+                        >
+                            <span>{{ numberFormatter(Math.abs(item.increase)) }}</span>
+                            <p-i v-if="item.increase !== 0"
+                                 :name="item.increase > 0 ? 'ic_caret-up-filled-alt' : 'ic_caret-down-filled-alt'"
+                                 height="0.75rem"
+                                 width="0.75rem"
+                                 color="inherit"
+                            />
+                        </span>
+                    </template>
+                    <div class="count-wrapper">
+                        <span>{{ item.dailyAverage }}</span>
+                        <span>{{ numberFormatter(item.monthlyTotal) }}</span>
+                    </div>
+                    <div class="label-wrapper">
+                        <span>{{ $t('MONITORING.ALERT.DASHBOARD.DAILY_AVERAGE') }}</span>
+                        <span class="text-right">{{ $t('MONITORING.ALERT.DASHBOARD.MONTHLY_TOTAL') }}</span>
+                    </div>
+                </p-card>
+            </div>
+            <div class="chart-wrapper col-span-9">
+                <alert-dashboard-alert-history-widget-chart
+                    :current-date="state.currentDate"
+                    :activated-projects="props.activatedProjects"
+                />
+            </div>
+        </div>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .alert-history-widget {

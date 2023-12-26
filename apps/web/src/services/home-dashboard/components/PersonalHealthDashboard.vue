@@ -112,9 +112,10 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -139,9 +140,10 @@ export default {
         },
     },
     setup(props) {
+        const allReferenceStore = useAllReferenceStore();
         const state = reactive({
             loading: false,
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
             regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
             timezone: computed(() => store.state.user.timezone),
@@ -199,14 +201,13 @@ export default {
 
         (async () => {
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 store.dispatch('reference/region/load'),
             ]);
         })();
 
         /* Watcher */
-        watch(() => store.state.reference.project.items, async (projects) => {
+        watch(() => allReferenceStore.getters.project, async (projects) => {
             if (projects) {
                 const rawData = await getData();
                 state.data = getConvertedData(rawData, projects);

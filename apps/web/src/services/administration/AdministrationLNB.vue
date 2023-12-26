@@ -9,13 +9,19 @@
 <script lang="ts">
 import {
     computed,
-    defineComponent,
+    defineComponent, reactive, toRefs,
 } from 'vue';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
+import {
+    filterLNBMenuByAccessPermission,
+} from '@/lib/access-control/page-access-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -30,34 +36,60 @@ export default defineComponent({
         LNB,
     },
     setup() {
-        return {
-            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION].translationId)),
-            menuSet: computed<LNBMenu[]>(() => [
-                ...filterLNBMenuByPermission([
-                    {
-                        type: 'title', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_IAM].translationId), id: MENU_ID.ADMINISTRATION_IAM, foldable: false,
-                    },
-                    {
-                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_USER].translationId), id: MENU_ID.ADMINISTRATION_USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
-                    },
-                    {
-                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_ROLE].translationId), id: MENU_ID.ADMINISTRATION_ROLE, to: { name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME },
-                    },
-                    {
-                        type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION_POLICY].translationId), id: MENU_ID.ADMINISTRATION_POLICY, to: { name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME },
-                    },
-                ], store.getters['user/pagePermissionList']),
-                // TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
-                // { type: 'divider' },
-                // ...filterLNBMenuByPermission([
-                //     {
-                //         type: 'title', label: 'Additional Settings', id: MENU_ID.ADMINISTRATION_SETTINGS, foldable: false,
-                //     },
-                //     {
-                //         type: 'item', label: 'Provider', id: MENU_ID.ADMINISTRATION_PROVIDER, to: { name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME },
-                //     },
-                // ], store.getters['user/pagePermissionList']),
+        const appContextStore = useAppContextStore();
+        const state = reactive({
+            isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+            header: computed(() => (state.isAdminMode ? i18n.t(MENU_INFO_MAP[MENU_ID.ADMINISTRATION].translationId) : i18n.t(MENU_INFO_MAP[MENU_ID.IAM].translationId))),
+            userModeMenuSet: computed<LNBMenu[]>(() => [
+                {
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.USER].translationId), id: MENU_ID.USER, to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME },
+                },
+                {
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.APP].translationId), id: MENU_ID.APP, to: { name: ADMINISTRATION_ROUTE.IAM.APP._NAME },
+                },
             ]),
+            adminModeMenuSet: computed<LNBMenu[]>(() => [
+                {
+                    type: 'title', label: i18n.t(MENU_INFO_MAP[MENU_ID.IAM].translationId), id: MENU_ID.IAM, foldable: false,
+                },
+                {
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.USER].translationId), id: MENU_ID.USER, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.USER._NAME) },
+                },
+                {
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ROLE].translationId), id: MENU_ID.ROLE, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME) },
+                },
+                {
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.APP].translationId), id: MENU_ID.APP, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.APP._NAME) },
+                },
+                { type: 'divider' },
+                {
+                    type: 'title',
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.PREFERENCE].translationId),
+                    id: MENU_ID.PREFERENCE,
+                    foldable: false,
+                },
+                {
+                    type: 'item',
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.DOMAIN_SETTINGS].translationId),
+                    id: MENU_ID.DOMAIN_SETTINGS,
+                    to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.DOMAIN_SETTINGS._NAME) },
+                },
+                {
+                    type: 'item',
+                    label: i18n.t(MENU_INFO_MAP[MENU_ID.WORKSPACES].translationId),
+                    id: MENU_ID.WORKSPACES,
+                    to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) },
+                },
+            ]),
+            menuSet: computed<LNBMenu[]>(() => {
+                if (state.isAdminMode) return state.adminModeMenuSet;
+                return [
+                    ...filterLNBMenuByAccessPermission(state.userModeMenuSet, store.getters['user/pageAccessPermissionList']),
+                ];
+            }),
+        });
+        return {
+            ...toRefs(state),
         };
     },
 });

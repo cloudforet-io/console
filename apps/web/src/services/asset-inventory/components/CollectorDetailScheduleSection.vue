@@ -1,14 +1,14 @@
 <template>
     <p-pane-layout>
-        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
-                        :edit-mode="state.isEditMode"
-                        :hide-edit-button="!collectorFormState.schedulePower"
-                        :total-count="state.totalCount"
-                        @click-edit="handleClickEdit"
+        <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
+                                         :edit-mode="state.isEditMode"
+                                         :hide-edit-button="!collectorFormState.schedulePower"
+                                         @click-edit="handleClickEdit"
         />
 
         <div class="schedule-wrapper">
             <collector-schedule-form :hours-readonly="!state.isEditMode"
+                                     :readonly="!state.isEditableCollector"
                                      reset-on-collector-id-change
                                      call-api-on-power-change
             />
@@ -37,7 +37,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, watch } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PPaneLayout,
@@ -45,16 +45,18 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorUpdateParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
+import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorScheduleForm
     from '@/services/asset-inventory/components/CollectorFormSchedule.vue';
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
@@ -62,22 +64,23 @@ import {
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
-
+const collectorDetailPageStore = useCollectorDetailPageStore();
 const state = reactive({
     isEditMode: false,
+    isEditableCollector: computed(() => collectorDetailPageStore.getters.isEditableCollector),
     updateLoading: false,
 });
 
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         schedule: {
             state: collectorFormState.schedulePower ? 'ENABLED' : 'DISABLED',
             hours: collectorFormState.scheduleHours,
         },
     };
-    return SpaceConnector.client.inventory.collector.update(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 
 const handleClickEdit = () => {
@@ -93,7 +96,7 @@ const handleClickSave = async () => {
     try {
         state.updateLoading = true;
         const collector = await fetchCollectorUpdate();
-        collectorFormStore.setOriginCollector(collector);
+        await collectorFormStore.setOriginCollector(collector);
         showSuccessMessage(i18n.t('INVENTORY.COLLECTOR.ALT_S_UPDATE_SCHEDULE'), '');
         state.isEditMode = false;
     } catch (error) {

@@ -116,7 +116,7 @@ const [recentSpentPeriod] = useDateRangeFormatter({
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchBudgetUsageAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchBudgetUsageAnalyze = getCancellableFetcher<object, {results: Data[]}>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Data[]> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);

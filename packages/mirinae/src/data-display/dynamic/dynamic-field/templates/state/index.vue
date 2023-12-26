@@ -2,6 +2,7 @@
     <span>
         <p-link v-if="options.link"
                 :href="options.link"
+                action-icon="internal-link"
                 new-tab
         >
             <p-status v-bind="statusProps" />

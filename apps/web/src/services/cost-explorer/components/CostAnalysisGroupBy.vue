@@ -30,7 +30,8 @@ interface GroupBySelectButtonItem {
 }
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
     selectedGroupByItems: computed<SelectDropdownMenuItem[]>(() => costAnalysisPageState.groupBy.map((d) => {
@@ -38,12 +39,12 @@ const state = reactive({
         return { name: d, label: d.split('.')[1] };
     })),
     selectedTagsMenu: [] as SelectDropdownMenuItem[],
-    dataSourceId: computed<string>(() => costAnalysisPageStore.selectedDataSourceId ?? ''),
+    dataSourceId: computed<string>(() => costAnalysisPageGetters.selectedDataSourceId ?? ''),
 });
 
 /* fetcher */
 const resourceQueryHelper = new QueryHelper();
-const fetchSearchResources = getCancellableFetcher<{results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
+const fetchSearchResources = getCancellableFetcher<object, {results: {name: string; key: string}[]}>(SpaceConnector.client.addOns.autocomplete.distinct);
 const getResources = async (inputText: string, distinctKey: string): Promise<{name: string; key: string}[]|undefined> => {
     try {
         resourceQueryHelper.setFilters([{ k: 'data_source_id', v: [state.dataSourceId], o: '=' }]);
@@ -85,14 +86,10 @@ const handleChangeDefaultGroupBy = async (selectedItems: GroupBySelectButtonItem
     }
     if (isSelected) {
         const addedGroupByName: string = xor(costAnalysisPageState.groupBy, selectedItems.map((d) => d.name))[0];
-        costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = [addedGroupByName, ..._state.groupBy];
-            _state.chartGroupBy = addedGroupByName;
-        });
+        costAnalysisPageStore.setGroupBy([addedGroupByName, ...costAnalysisPageState.groupBy]);
+        costAnalysisPageStore.setChartGroupBy(addedGroupByName);
     } else {
-        costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = selectedItems.map((d) => d.name);
-        });
+        costAnalysisPageStore.setGroupBy(selectedItems.map((d) => d.name));
     }
 };
 const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelected: boolean) => {
@@ -102,20 +99,14 @@ const handleSelectTagsGroupBy = (selectedItem: SelectDropdownMenuItem, isSelecte
             state.selectedTagsMenu = state.selectedTagsMenu.filter((d) => d.name !== selectedItem.name);
             return;
         }
-        costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = [selectedItem.name as string, ..._state.groupBy];
-            _state.chartGroupBy = selectedItem.name;
-        });
+        costAnalysisPageStore.setGroupBy([selectedItem.name, ...costAnalysisPageState.groupBy]);
+        costAnalysisPageStore.setChartGroupBy(selectedItem.name);
     } else {
-        costAnalysisPageStore.$patch((_state) => {
-            _state.groupBy = _state.groupBy.filter((d) => d !== selectedItem.name);
-        });
+        costAnalysisPageStore.setGroupBy(costAnalysisPageState.groupBy.filter((d) => d !== selectedItem.name));
     }
 };
 const handleClearTagsGroupBy = () => {
-    costAnalysisPageStore.$patch((_state) => {
-        _state.groupBy = _state.groupBy.filter((d) => !d.startsWith('tags.'));
-    });
+    costAnalysisPageStore.setGroupBy(costAnalysisPageState.groupBy.filter((d) => !d.startsWith('tags.')));
 };
 
 watch(() => costAnalysisPageState.groupBy, (groupBy) => {
@@ -130,7 +121,7 @@ watch(() => costAnalysisPageState.groupBy, (groupBy) => {
             <span class="selected-group-by-items-count">{{ state.selectedGroupByItems.length }}</span>
             <span>/3</span>
         </p>
-        <p-select-button v-for="defaultGroupByItem in costAnalysisPageStore.defaultGroupByItems"
+        <p-select-button v-for="defaultGroupByItem in costAnalysisPageGetters.defaultGroupByItems"
                          :key="defaultGroupByItem.name"
                          :value="defaultGroupByItem"
                          :selected="state.selectedGroupByItems"

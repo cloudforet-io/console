@@ -1,8 +1,8 @@
 <template>
     <p-pane-layout>
-        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
-                        :edit-mode="state.isEditMode"
-                        @click-edit="handleClickEdit"
+        <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
+                                         :edit-mode="state.isEditMode"
+                                         @click-edit="handleClickEdit"
         />
 
         <div v-if="!state.isEditMode"
@@ -63,15 +63,17 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import { UPGRADE_MODE } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
+import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
 import type {
     CollectorModel,
     CollectorPluginModel,
-    CollectorUpdateParameter,
-    CollectorUpdatePluginParameter,
+
 
 } from '@/schema/inventory/collector/model';
 import type { JobModel } from '@/schema/inventory/job/model';
+import { UPGRADE_MODE } from '@/schema/plugin/plugin/constant';
+import type { PluginGetParameters } from '@/schema/repository/plugin/api-verbs/get';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { i18n } from '@/translations';
 
@@ -81,7 +83,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import CollectorPluginInfo from '@/services/asset-inventory/components/CollectorDetailPluginInfo.vue';
 import PluginSummaryCards from '@/services/asset-inventory/components/CollectorDetailPluginSummaryCards.vue';
-import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
+import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorTags from '@/services/asset-inventory/components/CollectorDetailTags.vue';
 import CollectorTagForm from '@/services/asset-inventory/components/CollectorFormTag.vue';
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
@@ -130,24 +132,24 @@ const state = reactive({
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdatePluginParameter = {
+    const params: CollectorUpdatePluginParameters = {
         collector_id: collectorFormStore.collectorId,
         version: collectorFormState.version,
         upgrade_mode: collectorFormState.autoUpgrade ? 'AUTO' : 'MANUAL',
     };
-    return SpaceConnector.client.inventory.collector.updatePlugin(params);
+    return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
 };
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         tags: collectorFormState.tags,
     };
-    return SpaceConnector.client.inventory.collector.update(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 const getRepositoryPlugin = async (pluginId: string) => {
     try {
-        state.repositoryPlugin = await SpaceConnector.client.repository.plugin.get({
+        state.repositoryPlugin = await SpaceConnector.clientV2.repository.plugin.get<PluginGetParameters, PluginModel>({
             plugin_id: pluginId,
         });
     } catch (e) {

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import type { ComputedRef } from 'vue';
 import {
     computed, reactive, watch,
 } from 'vue';
@@ -11,7 +10,11 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
+import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
+import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
+import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
+import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -25,12 +28,10 @@ import { useFileUploader } from '@/common/composables/file-uploader';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
-
+import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
 interface Props {
-    boardId?: string;
     type?: NoticeFormType;
-    noticePostData?: Partial<NoticePostModel>;
 }
 interface DomainItem {
     name: string;
@@ -40,25 +41,24 @@ interface DomainItem {
 type NoticeFormType = 'CREATE' | 'EDIT';
 
 const props = withDefaults(defineProps<Props>(), {
-    boardId: undefined,
     type: 'CREATE',
-    noticePostData: undefined,
 });
+
+const noticeDetailStore = useNoticeDetailStore();
+const noticeDetailState = noticeDetailStore.state;
 
 const state = reactive({
     hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
-    hasDomainRole: computed<boolean>(() => store.getters['user/hasDomainRole']),
+    hasDomainRole: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
     attachments: [] as Attachment[],
     isAllDomainSelected: !!store.getters['user/hasSystemRole'], // It's active only in root domain case
-    boardIdState: '',
     domainList: [] as Array<DomainItem>,
     selectedDomain: store.getters['user/hasSystemRole']
         ? []
         : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
-    postId: '',
     domainName: '',
 });
 
@@ -73,9 +73,9 @@ const {
     invalidTexts,
     isAllValid,
 } = useFormValidator({
-    noticeTitle: props.noticePostData?.title ?? '',
-    writerName: props.noticePostData?.writer || state.userName || '',
-    contents: props.noticePostData?.contents || '',
+    noticeTitle: noticeDetailState.post?.title ?? '',
+    writerName: noticeDetailState.post?.writer || state.userName || '',
+    contents: noticeDetailState.post?.contents || '',
 }, {
     noticeTitle(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.TITLE_REQUIRED'); },
     writerName(value: string) { return value.trim().length ? '' : i18n.t('INFO.NOTICE.FORM.WRITER_REQUIRED'); },
@@ -84,8 +84,7 @@ const {
     },
 });
 
-const formData:ComputedRef = computed(() => ({
-    board_id: state.boardIdState,
+const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     title: noticeTitle.value,
     writer: writerName.value,
     contents: contents.value,
@@ -105,9 +104,17 @@ const handleConfirm = () => {
 
 const handleCreateNotice = async () => {
     try {
-        await SpaceConnector.client.board.post.create({
-            ...formData.value,
-            domain_id: state.isAllDomainSelected ? null : state.selectedDomain[0].name,
+        const data = formData.value;
+        if (!data.title || !data.contents) throw new Error('Invalid form data');
+        await noticeDetailStore.createNoticePost({
+            board_type: POST_BOARD_TYPE.NOTICE,
+            title: data.title,
+            contents: data.contents,
+            category: data.category,
+            files: data.files,
+            options: data.options,
+            writer: data.writer,
+            resource_group: 'DOMAIN',
         });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_CREATE_NOTICE'), '');
         await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME, query: {} });
@@ -117,20 +124,17 @@ const handleCreateNotice = async () => {
 };
 const handleEditNotice = async () => {
     try {
-        await SpaceConnector.client.board.post.update(
-            state.isAllDomainSelected
-                ? {
-                    ...formData.value,
-                    post_id: state.postId,
-                }
-                : {
-                    ...formData.value,
-                    domain_id: state.selectedDomain[0].name,
-                    post_id: state.postId,
-                },
-        );
+        const params = state.isAllDomainSelected
+            ? {
+                ...formData.value,
+            }
+            : {
+                ...formData.value,
+                domain_id: state.selectedDomain[0].name,
+            };
+        await noticeDetailStore.updateNoticePost(params);
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
-        await SpaceRouter.router.back();
+        SpaceRouter.router.back();
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_UPDATE_NOTICE'));
     }
@@ -147,7 +151,7 @@ const handleSelectDomain = (domain: Array<DomainItem>) => {
 
 const getDomainList = async () => {
     try {
-        const { results } = await SpaceConnector.client.identity.domain.list();
+        const { results } = await SpaceConnector.clientV2.identity.domain.list<DomainListParameters, DomainListResponse>();
         state.domainList = results.map((d) => ({
             name: d.domain_id,
             label: d.name,
@@ -158,48 +162,33 @@ const getDomainList = async () => {
     }
 };
 
-const getBoardList = async () => {
-    try {
-        const { results } = await SpaceConnector.client.board.board.list({
-            domain_id: state.domainList.length ? state.domainList.map((d) => d.name)
-                : store.state.domain.domainId,
-        });
-        state.boardIdState = results.filter((d) => d.name === 'Notice')[0]?.board_id ?? '';
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.boardIdState = '';
-    }
-};
 
 watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
     if (isAllDomain) state.selectedDomain = [];
 });
 
-watch(() => props.noticePostData, async (d: Partial<NoticePostModel>) => {
-    if (!Object.keys(d).length) return;
-    if (d?.domain_id) {
-        const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: d.domain_id });
+watch(() => noticeDetailState.post, async (notice) => {
+    if (!notice || !Object.keys(notice).length) return;
+    if (notice?.domain_id) {
+        const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: notice.domain_id });
         state.domainName = name;
     }
 
     // INIT STATES
-    state.isPinned = d.options?.is_pinned ?? false;
-    state.isPopup = d.options?.is_popup ?? false;
-    state.attachments = d.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
-    state.isAllDomainSelected = !d?.domain_id;
-    state.boardIdState = d?.board_id ?? '';
-    state.selectedDomain = d?.domain_id
-        ? [{ name: d.domain_id, label: state.domainName || d.domain_id }]
+    state.isPinned = notice.options?.is_pinned ?? false;
+    state.isPopup = notice.options?.is_popup ?? false;
+    state.attachments = notice.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
+    state.isAllDomainSelected = !notice?.domain_id;
+    state.selectedDomain = notice?.domain_id
+        ? [{ name: notice.domain_id, label: state.domainName || notice.domain_id }]
         : [];
-    state.postId = d.post_id ?? '';
-    setForm('writerName', d.writer);
-    setForm('noticeTitle', d.title);
-    setForm('contents', d.contents);
+    setForm('writerName', notice.writer);
+    setForm('noticeTitle', notice.title);
+    setForm('contents', notice.contents);
 });
 
 (async () => {
     if (state.hasSystemRole) await getDomainList();
-    await getBoardList();
 })();
 </script>
 

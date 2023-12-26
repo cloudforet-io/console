@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import {
     computed, reactive,
 } from 'vue';
@@ -8,10 +8,11 @@ import {
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
+import { i18n as _i18n } from '@/translations';
 
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
 
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import type { Tag } from '@/common/components/forms/tags-input-group/type';
@@ -25,8 +26,8 @@ const URGENCY = Object.freeze({
 });
 
 interface Props {
-    actions?: any; // TODO: use Action type
-    options?: any; // TODO: use Options type
+    actions?: EventRuleActions;
+    options?: EventRuleOptions;
 }
 const props = withDefaults(defineProps<Props>(), {
     actions: () => ({}),
@@ -34,8 +35,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const emit = defineEmits(['update:actions', 'update:options']);
 
+const allReferenceStore = useAllReferenceStore();
 const state = reactive({
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
     userItems: computed(() => Object.keys(state.users).map((k) => ({
         name: k,
         label: state.users[k]?.label || k,
@@ -43,21 +45,23 @@ const state = reactive({
     urgencyList: computed(() => ([
         {
             name: URGENCY.NO_SET,
-            label: i18n.t('PROJECT.EVENT_RULE.NO_SET'),
+            label: _i18n.t('PROJECT.EVENT_RULE.NO_SET'),
         },
         {
             name: URGENCY.HIGH,
-            label: i18n.t('PROJECT.EVENT_RULE.HIGH'),
+            label: _i18n.t('PROJECT.EVENT_RULE.HIGH'),
         },
         {
             name: URGENCY.LOW,
-            label: i18n.t('PROJECT.EVENT_RULE.LOW'),
+            label: _i18n.t('PROJECT.EVENT_RULE.LOW'),
         },
     ])),
-    proxyActions: useProxyValue('actions', props, emit),
-    proxyOptions: useProxyValue('options', props, emit),
+    proxyActions: useProxyValue<EventRuleActions>('actions', props, emit),
+    proxyOptions: useProxyValue<EventRuleOptions>('options', props, emit),
     routingProjects: computed<string[]>({
-        get() { return props.actions.change_project ? [props.actions.change_project] : []; },
+        get() {
+            return props.actions?.change_project ? [props.actions.change_project] : [];
+        },
         set(projectIds) {
             state.proxyActions = {
                 ...state.proxyActions,
@@ -65,18 +69,9 @@ const state = reactive({
             };
         },
     }),
-    dependentProjects: computed<string[]>({
-        get() { return props.actions.add_project_dependency || []; },
-        set(projectIds) {
-            state.proxyActions = {
-                ...state.proxyActions,
-                add_project_dependency: projectIds,
-            };
-        },
-    }),
     selectedUrgency: computed({
         get() {
-            if (props.actions.change_urgency) {
+            if (props.actions?.change_urgency) {
                 return props.actions.change_urgency;
             }
             return URGENCY.NO_SET;
@@ -88,41 +83,33 @@ const state = reactive({
             };
         },
     }),
-    selectedAssignee: computed<MenuItem[]|undefined>({
+    selectedAssignee: computed<MenuItem[]>({
         get() {
-            const assignee: string = props.actions.change_assignee;
-            return assignee ? [{ name: assignee, label: assignee }] : undefined;
+            const assignee = props.actions?.change_assignee;
+            return assignee ? [{ name: assignee, label: assignee }] : [];
         },
         set(items) {
             state.proxyActions = {
                 ...state.proxyActions,
-                change_assignee: items && items[0]?.name,
-            };
-        },
-    }),
-    selectedResponder: computed<MenuItem[]>({
-        get() {
-            return props.actions.add_responder.map((d) => ({
-                name: d.resource_id,
-                label: d.resource_id,
-            }));
-        },
-        set(items) {
-            state.proxyActions = {
-                ...state.proxyActions,
-                add_responder: items.map((item) => ({
-                    resource_type: 'identity.User',
-                    resource_id: item.name,
-                })),
+                change_assignee: items[0]?.name,
             };
         },
     }),
     additionalInfoTags: computed({
-        get() { return props.actions.add_additional_info; },
+        get() { return props.actions?.add_additional_info; },
         set(tags) {
             state.proxyActions = {
                 ...state.proxyActions,
                 add_additional_info: tags,
+            };
+        },
+    }),
+    stopProcessing: computed<boolean>({
+        get() { return props.options?.stop_processing ?? false; },
+        set(value) {
+            state.proxyOptions = {
+                ...state.proxyOptions,
+                stop_processing: value,
             };
         },
     }),
@@ -137,6 +124,9 @@ const onToggleChange = (value) => {
 };
 const handleUpdateAdditionalInformation = (tags: Tag) => {
     state.additionalInfoTags = tags;
+};
+const handleStopProcessingChange = (value: boolean) => {
+    state.stopProcessing = value;
 };
 </script>
 
@@ -167,16 +157,8 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}
                 </p>
                 <project-select-dropdown project-selectable
+                                         :project-group-selectable="false"
                                          :selected-project-ids.sync="state.routingProjects"
-                />
-            </div>
-            <div class="form-box mobile-block">
-                <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCY') }}
-                </p>
-                <project-select-dropdown multi-selectable
-                                         project-selectable
-                                         :selected-project-ids.sync="state.dependentProjects"
                 />
             </div>
             <div class="form-box urgency">
@@ -207,22 +189,7 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
                                    :selected.sync="state.selectedAssignee"
                                    is-filterable
                                    show-delete-all-button
-                                   index-mode
                                    reset-selected-on-unmounted
-                />
-            </div>
-            <div class="form-box mobile-block">
-                <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') }}
-                </p>
-                <p-select-dropdown class="user-search-dropdown"
-                                   :menu="state.userItems"
-                                   :selected.sync="state.selectedResponder"
-                                   multi-selectable
-                                   appearance-type="stack"
-                                   show-select-marker
-                                   is-filterable
-                                   show-delete-all-button
                 />
             </div>
             <div class="form-box additional-information">
@@ -245,9 +212,10 @@ const handleUpdateAdditionalInformation = (tags: Tag) => {
                 </tags-input-group>
             </div>
         </div>
-        <p-checkbox v-model="state.proxyOptions.stop_processing"
+        <p-checkbox :selected="state.stopProcessing"
                     :value="true"
                     class="stop-processing-input"
+                    @change="handleStopProcessingChange"
         >
             {{ $t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') }}
         </p-checkbox>

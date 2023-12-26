@@ -1,6 +1,6 @@
 <template>
     <section class="notification-wrapper">
-        <p-heading :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
+        <p-heading :title="$t('MY_PAGE.NOTIFICATION.NOTIFICATION')" />
         <p-pane-layout>
             <notification-channel-list />
         </p-pane-layout>

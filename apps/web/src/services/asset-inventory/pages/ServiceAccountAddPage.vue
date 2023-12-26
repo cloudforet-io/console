@@ -1,26 +1,204 @@
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+
+import {
+    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { SpaceRouter } from '@/router';
+import type { SchemaModel } from '@/schema/identity/schema/model';
+import type { ServiceAccountCreateParameters } from '@/schema/identity/service-account/api-verbs/create';
+import type { ServiceAccountDeleteParameters } from '@/schema/identity/service-account/api-verbs/detele';
+import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
+import type { ServiceAccountModel } from '@/schema/identity/service-account/model';
+import type { AccountType } from '@/schema/identity/service-account/type';
+import type { TrustedAccountCreateParameters } from '@/schema/identity/trusted-account/api-verbs/create';
+import type { TrustedAccountDeleteParameters } from '@/schema/identity/trusted-account/api-verbs/detele';
+import type { TrustedAccountModel } from '@/schema/identity/trusted-account/model';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import type { TrustedAccountReferenceMap } from '@/store/modules/reference/trusted-account/type';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import InfoButton from '@/common/modules/portals/InfoButton.vue';
+
+import ServiceAccountBaseInformationForm
+    from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
+import ServiceAccountCredentialsForm
+    from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
+import { ACCOUNT_TYPE_BADGE_OPTION } from '@/services/asset-inventory/constants/service-account-constant';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+import type { BaseInformationForm, CredentialForm } from '@/services/asset-inventory/types/service-account-page-type';
+
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+const props = defineProps<{
+    provider?: string;
+    serviceAccountType?: AccountType;
+}>();
+
+const storeState = reactive({
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    trustedAccounts: computed<TrustedAccountReferenceMap>(() => store.getters['reference/trustedAccountItems']),
+});
+
+const state = reactive({
+    isTrustedAccount: computed(() => props.serviceAccountType === ACCOUNT_TYPE.TRUSTED),
+    providerSchemaLoading: true,
+    providerSchemaData: computed<Partial<SchemaModel|undefined>>(
+        () => (state.isTrustedAccount ? serviceAccountSchemaStore.getters.trustedAccountSchema : serviceAccountSchemaStore.getters.generalAccountSchema),
+    ),
+    providerIcon: computed(() => (props.provider ? storeState.providers[props.provider]?.icon : '')),
+    description: computed(() => state.providerSchemaData?.options?.help),
+    enableCredentialInput: computed<boolean>(() => (state.providerSchemaData?.related_schemas ?? []).length),
+    baseInformationSchema: computed(() => (state.providerSchemaData?.schema)),
+});
+
+const formState = reactive({
+    baseInformationForm: {} as BaseInformationForm,
+    isBaseInformationFormValid: false,
+    accountType: props.serviceAccountType ?? ACCOUNT_TYPE.GENERAL,
+    credentialForm: {} as CredentialForm,
+    isCredentialFormValid: false,
+    isValid: computed(() => {
+        if (!formState.isBaseInformationFormValid) return false;
+        if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
+        if (state.isTrustedAccount) return true;
+        return true;
+    }),
+    formLoading: false,
+});
+
+const createAccount = async (): Promise<string|undefined> => {
+    if (!props.provider) throw new Error('Invalid parameter');
+    const data = formState.baseInformationForm.customSchemaForm;
+
+    let res: TrustedAccountModel|ServiceAccountModel;
+    if (formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
+        // preprocessing for Google Cloud form
+        if (formState.credentialForm.customSchemaForm?.private_key) {
+            formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
+        }
+    }
+    let secretData;
+    if (formState.credentialForm.activeDataType === 'json') {
+        secretData = JSON.parse(formState.credentialForm.credentialJson);
+    } else if (formState.credentialForm.activeDataType === 'input') {
+        secretData = formState.credentialForm.customSchemaForm;
+    }
+
+    const attachedTrustedAccountId = formState.credentialForm.attachedTrustedAccountId;
+    if (state.isTrustedAccount) {
+        res = await SpaceConnector.clientV2.identity.trustedAccount.create<TrustedAccountCreateParameters, TrustedAccountModel>({
+            provider: props.provider,
+            name: formState.baseInformationForm.accountName,
+            data,
+            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id ?? '',
+            secret_data: secretData,
+            resource_group: 'WORKSPACE',
+            tags: formState.baseInformationForm.tags,
+        });
+    } else {
+        res = await SpaceConnector.clientV2.identity.serviceAccount.create<ServiceAccountCreateParameters, ServiceAccountModel>({
+            provider: props.provider,
+            name: formState.baseInformationForm.accountName.trim(),
+            data,
+            secret_schema_id: formState.credentialForm?.selectedSecretSchema?.schema_id,
+            secret_data: secretData,
+            tags: formState.baseInformationForm.tags,
+            trusted_account_id: attachedTrustedAccountId,
+            project_id: formState.baseInformationForm.projectForm.selectedProjectId,
+        });
+    }
+
+    return (!state.isTrustedAccount && ('service_account_id' in res)) ? res.service_account_id : res.trusted_account_id;
+};
+
+const deleteServiceAccount = async (serviceAccountId: string) => {
+    if (state.isTrustedAccount) {
+        await SpaceConnector.clientV2.identity.trustedAccount.delete<TrustedAccountDeleteParameters>({
+            trusted_account_id: serviceAccountId,
+        });
+    } else {
+        await SpaceConnector.clientV2.identity.serviceAccount.delete<ServiceAccountDeleteParameters>({
+            service_account_id: serviceAccountId,
+        });
+    }
+};
+
+/* Event */
+const handleSave = async () => {
+    if (!formState.isValid) {
+        ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+        return;
+    }
+    let accountId:string|undefined;
+    try {
+        formState.formLoading = true;
+        accountId = await createAccount();
+        showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
+        SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
+        if (accountId) await deleteServiceAccount(accountId);
+    } finally {
+        formState.formLoading = false;
+    }
+};
+const handleGoBack = () => {
+    const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;
+    if (nextPath) SpaceRouter.router.push(nextPath);
+    else SpaceRouter.router.back();
+};
+const handleChangeBaseInformationForm = (baseInformationForm) => {
+    formState.baseInformationForm = baseInformationForm;
+};
+const handleChangeCredentialForm = (credentialForm) => {
+    formState.credentialForm = credentialForm;
+};
+
+/* Init */
+(async () => {
+    state.providerSchemaLoading = true;
+    await serviceAccountSchemaStore.setProviderSchema(props.provider ?? '');
+    await Promise.allSettled([
+        store.dispatch('reference/provider/load'),
+        store.dispatch('reference/trustedAccount/load'),
+    ]);
+    state.providerSchemaLoading = false;
+})();
+
+</script>
+
 <template>
     <div class="service-account-add-page">
         <p-heading class="mb-6"
                    show-back-button
-                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE')"
+                   :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.TITLE', { type: ACCOUNT_TYPE_BADGE_OPTION[props.serviceAccountType].label })"
                    @click-back-button="handleGoBack"
         >
             <template #title-left-extra>
                 <p-lazy-img class="icon"
-                            :src="providerIcon"
+                            :src="state.providerIcon"
                             :alt="provider"
-                            :loading="providerLoading"
+                            :loading="state.providerSchemaLoading"
                             error-icon="ic_cloud-filled"
                 />
             </template>
             <template #extra>
-                <info-button v-if="description"
-                             :visible="!!description"
+                <info-button v-if="state.description"
+                             :visible="!!state.description"
                              class="info-button"
                 >
                     <template #contents>
-                        <p-markdown :markdown="description.options.markdown"
-                                    :data="description.options.markdown"
+                        <p-markdown :markdown="state.description"
+                                    :data="state.description"
                                     :language="$store.state.user.language"
                                     class="!p-0"
                         />
@@ -30,41 +208,26 @@
         </p-heading>
 
         <div class="content-wrapper">
-            <service-account-account-type :provider="provider"
-                                          :account-type.sync="accountType"
-                                          :show-trusted-account="showTrustedAccount"
-                                          @change="handleChangeAccountType"
-            />
             <p-pane-layout class="form-wrapper">
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_TITLE')"
                 />
-                <service-account-base-information-form :schema="baseInformationSchema"
-                                                       :is-valid.sync="isBaseInformationFormValid"
+                <service-account-base-information-form :schema="state.baseInformationSchema"
+                                                       :is-valid.sync="formState.isBaseInformationFormValid"
+                                                       :account-type="formState.accountType"
                                                        @change="handleChangeBaseInformationForm"
                 />
             </p-pane-layout>
-            <p-pane-layout v-if="accountType === ACCOUNT_TYPE.GENERAL"
-                           class="form-wrapper"
-            >
-                <p-heading heading-type="sub"
-                           :title="$t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE')"
-                />
-                <service-account-project-form
-                    :is-valid.sync="isProjectFormValid"
-                    @change="handleChangeProjectForm"
-                />
-            </p-pane-layout>
-            <p-pane-layout v-if="enableCredentialInput"
+            <p-pane-layout v-if="state.enableCredentialInput"
                            class="form-wrapper"
             >
                 <p-heading heading-type="sub"
                            :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_CREDENTIALS')"
                 />
                 <service-account-credentials-form
-                    :service-account-type="accountType"
-                    :provider="provider"
-                    :is-valid.sync="isCredentialFormValid"
+                    :service-account-type="formState.accountType"
+                    :provider="props.provider ?? ''"
+                    :is-valid.sync="formState.isCredentialFormValid"
                     @change="handleChangeCredentialForm"
                 />
             </p-pane-layout>
@@ -74,8 +237,8 @@
             <p-button class="text-button"
                       style-type="primary"
                       size="lg"
-                      :disabled="!isValid"
-                      :loading="formLoading"
+                      :disabled="!formState.isValid"
+                      :loading="formState.formLoading"
                       @click="handleSave"
             >
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
@@ -90,233 +253,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PButton, PLazyImg, PMarkdown, PHeading, PPaneLayout,
-} from '@spaceone/design-system';
-import { get } from 'lodash';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { SpaceRouter } from '@/router';
-import type { ProviderModel } from '@/schema/identity/provider/model';
-import { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-import type { AccountType } from '@/schema/identity/service-account/model';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import InfoButton from '@/common/modules/portals/InfoButton.vue';
-
-import ServiceAccountAccountType
-    from '@/services/asset-inventory/components/ServiceAccountAccountType.vue';
-import ServiceAccountBaseInformationForm
-    from '@/services/asset-inventory/components/ServiceAccountBaseInformationForm.vue';
-import ServiceAccountCredentialsForm
-    from '@/services/asset-inventory/components/ServiceAccountCredentialsForm.vue';
-import ServiceAccountProjectForm from '@/services/asset-inventory/components/ServiceAccountProjectForm.vue';
-import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
-import type {
-    BaseInformationForm, CredentialForm, ProjectForm,
-} from '@/services/asset-inventory/types/service-account-page-type';
-
-export default {
-    name: 'AddServiceAccountPage',
-    components: {
-        ServiceAccountBaseInformationForm,
-        ServiceAccountCredentialsForm,
-        ServiceAccountProjectForm,
-        ServiceAccountAccountType,
-        InfoButton,
-        PLazyImg,
-        PMarkdown,
-        PHeading,
-        PButton,
-        PPaneLayout,
-    },
-    props: {
-        provider: {
-            type: String,
-            default: null,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            providerLoading: true,
-            providerData: {} as ProviderModel,
-            providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
-            providerIcon: computed(() => state.providers[state.providerData?.provider]?.icon),
-            description: computed(() => get(state.providerData, 'metadata.view.layouts.help:service_account:create', undefined)),
-            enableCredentialInput: computed<boolean>(() => {
-                const secretTypes = state.providerData?.capability?.supported_schema ?? [];
-                return secretTypes.length > 0;
-            }),
-            baseInformationSchema: computed(() => state.providerData.template?.service_account?.schema),
-            showTrustedAccount: computed(() => state.providerData?.capability?.support_trusted_service_account ?? false),
-        });
-
-        const formState = reactive({
-            baseInformationForm: {} as BaseInformationForm,
-            isBaseInformationFormValid: false,
-            accountType: 'GENERAL' as AccountType,
-            credentialForm: {} as CredentialForm,
-            isCredentialFormValid: false,
-            projectForm: {} as ProjectForm,
-            isProjectFormValid: undefined,
-            isValid: computed(() => {
-                if (!formState.isBaseInformationFormValid) return false;
-                if (!formState.isCredentialFormValid && state.enableCredentialInput) return false;
-                if (formState.accountType === ACCOUNT_TYPE.TRUSTED) return true;
-                if (!formState.isProjectFormValid) return false;
-                return true;
-            }),
-            formLoading: false,
-        });
-
-        /* Api */
-        const getProvider = async () => {
-            try {
-                state.providerData = await SpaceConnector.client.identity.provider.get({
-                    provider: props.provider,
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.providerData = {};
-            }
-        };
-
-        const deleteServiceAccount = async (serviceAccountId: string) => {
-            await SpaceConnector.client.identity.serviceAccount.delete({
-                service_account_id: serviceAccountId,
-            });
-        };
-        const createServiceAccount = async (): Promise<string|undefined> => {
-            try {
-                formState.formLoading = true;
-                const res = await SpaceConnector.client.identity.serviceAccount.create({
-                    provider: props.provider,
-                    name: formState.baseInformationForm.accountName.trim(),
-                    data: formState.baseInformationForm.customSchemaForm,
-                    tags: formState.baseInformationForm.tags,
-                    service_account_type: formState.accountType,
-                    trusted_service_account_id: formState.credentialForm.attachedTrustedAccountId,
-                    project_id: formState.projectForm.selectedProjectId,
-                });
-                return res.service_account_id;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-                return undefined;
-            } finally {
-                formState.formLoading = false;
-            }
-        };
-        const createSecret = async (serviceAccountId: string): Promise<boolean> => {
-            let isSucceed: boolean;
-            try {
-                let data;
-                if (formState.credentialForm.activeDataType === 'json') {
-                    data = JSON.parse(formState.credentialForm.credentialJson);
-                } else if (formState.credentialForm.activeDataType === 'input') {
-                    data = formState.credentialForm.customSchemaForm;
-                }
-
-                let createApi = SpaceConnector.client.secret.secret.create;
-                if (formState.accountType === ACCOUNT_TYPE.TRUSTED) {
-                    createApi = SpaceConnector.client.secret.trustedSecret.create;
-                }
-                await createApi({
-                    name: formState.baseInformationForm.accountName + serviceAccountId,
-                    data,
-                    schema: formState.credentialForm.selectedSecretType,
-                    secret_type: 'CREDENTIALS',
-                    service_account_id: serviceAccountId,
-                    project_id: formState.projectForm.selectedProjectId,
-                    trusted_secret_id: formState.credentialForm.attachedTrustedSecretId,
-                });
-
-                showSuccessMessage(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '');
-                isSucceed = true;
-            } catch (e) {
-                isSucceed = false;
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-                await deleteServiceAccount(serviceAccountId);
-            }
-
-            return isSucceed;
-        };
-
-        /* Event */
-        const handleSave = async () => {
-            if (!formState.isValid) {
-                ErrorHandler.handleRequestError(i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), i18n.t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'));
-                return;
-            }
-
-            const serviceAccountId = await createServiceAccount();
-            if (serviceAccountId && formState.credentialForm.hasCredentialKey && state.enableCredentialInput) {
-                // preprocessing for Google Cloud form
-                if (formState.credentialForm.customSchemaForm?.private_key) {
-                    formState.credentialForm.customSchemaForm.private_key = formState.credentialForm.customSchemaForm.private_key.replace(/\\n/g, '\n');
-                }
-                const isSecretCreationSuccess = await createSecret(serviceAccountId);
-                if (!isSecretCreationSuccess) return;
-            }
-            SpaceRouter.router.push({ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: props.provider } });
-        };
-        const handleGoBack = () => {
-            const nextPath = SpaceRouter.router.currentRoute.query.nextPath as string|undefined;
-            if (nextPath) SpaceRouter.router.push(nextPath);
-            else SpaceRouter.router.back();
-        };
-        const handleChangeAccountType = (accountType: AccountType) => {
-            formState.accountType = accountType;
-            if (accountType === ACCOUNT_TYPE.TRUSTED) {
-                formState.projectForm = { selectedProjectId: null };
-            }
-        };
-        const handleChangeBaseInformationForm = (baseInformationForm) => {
-            formState.baseInformationForm = baseInformationForm;
-        };
-        const handleChangeCredentialForm = (credentialForm) => {
-            formState.credentialForm = credentialForm;
-        };
-        const handleChangeProjectForm = (projectForm) => {
-            formState.projectForm = projectForm;
-        };
-
-        /* Init */
-        (async () => {
-            state.providerLoading = true;
-            await Promise.allSettled([
-                store.dispatch('reference/provider/load'),
-                getProvider(),
-            ]);
-            state.providerLoading = false;
-        })();
-
-        return {
-            ...toRefs(state),
-            ...toRefs(formState),
-            ACCOUNT_TYPE,
-            handleSave,
-            handleGoBack,
-            handleChangeAccountType,
-            handleChangeBaseInformationForm,
-            handleChangeCredentialForm,
-            handleChangeProjectForm,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .service-account-add-page {

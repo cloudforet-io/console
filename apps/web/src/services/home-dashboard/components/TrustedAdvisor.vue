@@ -87,7 +87,7 @@
                 >
                     <template #image>
                         <img alt="illust_planet"
-                             src="../../../assets/images/illust_planet.svg"
+                             src="@/assets/images/illust_planet.svg"
                         >
                     </template>
                     {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA_DESC') }}
@@ -119,14 +119,16 @@ import { i18n } from '@/translations';
 
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import WidgetLayout from '@/common/components/layouts/WidgetLayout.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import TrustedAdvisorOverall from '@/services/home-dashboard/components/TrustedAdvisorOverall.vue';
+
 
 enum STATUS {
     error = 'error',
@@ -170,6 +172,7 @@ export default {
     },
     setup(props) {
         const queryHelper = new QueryHelper();
+        const allReferenceStore = useAllReferenceStore();
         const state = reactive({
             loading: true,
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
@@ -284,13 +287,12 @@ export default {
             await Promise.allSettled([
                 store.dispatch('favorite/load', FAVORITE_TYPE.PROJECT),
                 // LOAD REFERENCE STORE
-                store.dispatch('reference/project/load'),
                 store.dispatch('reference/provider/load'),
             ]);
         };
         asyncInit();
 
-        watch(() => store.state.reference.project.items, (projects) => {
+        watch(() => allReferenceStore.getters.project, (projects) => {
             if (projects) getProjectSummary(projects);
         }, { immediate: true });
 

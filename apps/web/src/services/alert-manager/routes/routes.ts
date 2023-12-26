@@ -11,15 +11,15 @@ import { ALERT_MANAGER_ROUTE } from '@/services/alert-manager/routes/route-const
 const AlertManagerContainer = () => import('@/services/alert-manager/AlertManagerContainer.vue');
 
 const AlertDashboardPage = () => import('@/services/alert-manager/pages/AlertDashboardPage.vue');
-const AlertPage = () => import('@/services/alert-manager/pages/AlertPage.vue');
+const AlertMainPage = () => import('@/services/alert-manager/pages/AlertMainPage.vue');
 const EscalationPolicyPage = () => import('@/services/alert-manager/pages/EscalationPolicyPage.vue');
 const AlertDetailPage = () => import('@/services/alert-manager/pages/AlertDetailPage.vue');
 
 const alertManagerRoutes: RouteConfig = {
     path: 'alert-manager',
     name: ALERT_MANAGER_ROUTE._NAME,
-    meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionMap']),
+    meta: { menuId: MENU_ID.ALERT_MANAGER, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AlertManagerContainer,
     children: [
         {
@@ -30,14 +30,14 @@ const alertManagerRoutes: RouteConfig = {
         },
         {
             path: 'alert',
-            meta: { menuId: MENU_ID.ALERT_MANAGER_ALERT },
+            meta: { menuId: MENU_ID.ALERT },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: ALERT_MANAGER_ROUTE.ALERT._NAME,
                     meta: { lnbVisible: true },
-                    component: AlertPage as any,
+                    component: AlertMainPage as any,
                 },
                 {
                     path: ':id?',
@@ -51,7 +51,7 @@ const alertManagerRoutes: RouteConfig = {
         {
             path: 'escalation-policy',
             name: ALERT_MANAGER_ROUTE.ESCALATION_POLICY._NAME,
-            meta: { lnbVisible: true, menuId: MENU_ID.ALERT_MANAGER_ESCALATION_POLICY },
+            meta: { lnbVisible: true, menuId: MENU_ID.ESCALATION_POLICY },
             component: EscalationPolicyPage as any,
         },
     ],

@@ -1,24 +1,7 @@
-<template>
-    <fragment>
-        <p-field-group :label="$t('IDENTITY.USER.NOTIFICATION.FORM.NOTIFICATION_LEVEL')"
-                       required
-                       class="level-dropdown"
-        >
-            <template #default>
-                <p-select-dropdown :selected="proxyNotificationLevel"
-                                   :menu="LEVEL_LIST"
-                                   @select="onChangeLevel"
-                />
-            </template>
-        </p-field-group>
-    </fragment>
-</template>
-
-<script lang="ts">
-
-import { reactive, toRefs } from 'vue';
-
+<script setup lang="ts">
 import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
+
+import type { NotificationLevel } from '@/schema/notification/notification/type';
 
 const LEVEL_LIST = Object.freeze([
     { label: 'Level 1', name: 'LV1', type: 'item' },
@@ -28,39 +11,34 @@ const LEVEL_LIST = Object.freeze([
     { label: 'Level 5', name: 'LV5', type: 'item' },
 ]);
 
-export default {
-    name: 'NotificationAddLevel',
-    components: {
-        PFieldGroup,
-        PSelectDropdown,
-    },
-    props: {
-        notificationLevel: {
-            type: String,
-            default: null,
-        },
-    },
-    setup(props, { emit }) {
-        const state = reactive({
-            proxyNotificationLevel: props.notificationLevel ? props.notificationLevel : 'LV1',
-        });
-        const emitChange = () => {
-            emit('change', {
-                level: state.proxyNotificationLevel,
-            });
-        };
-        const onChangeLevel = (value) => {
-            state.proxyNotificationLevel = value;
-            emitChange();
-        };
-        return {
-            LEVEL_LIST,
-            ...toRefs(state),
-            onChangeLevel,
-        };
-    },
+const props = withDefaults(defineProps<{
+    notificationLevel?: NotificationLevel;
+}>(), {
+    notificationLevel: 'LV1',
+});
+const emit = defineEmits<{(event: 'change', level: NotificationLevel): void;
+}>();
+
+const onChangeLevel = (value: NotificationLevel) => {
+    emit('change', value);
 };
 </script>
+
+<template>
+    <fragment>
+        <p-field-group :label="$t('IDENTITY.USER.NOTIFICATION.FORM.NOTIFICATION_LEVEL')"
+                       required
+                       class="level-dropdown"
+        >
+            <template #default>
+                <p-select-dropdown :selected="props.notificationLevel"
+                                   :menu="LEVEL_LIST"
+                                   @select="onChangeLevel"
+                />
+            </template>
+        </p-field-group>
+    </fragment>
+</template>
 
 <style lang="postcss" scoped>
 .level-dropdown {

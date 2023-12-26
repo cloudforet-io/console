@@ -1,23 +1,118 @@
+<script setup lang="ts">
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+
+import {
+    PBadge, PButton, PDataTable, PHeading,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
+import type { ProtocolModel } from '@/schema/notification/protocol/model';
+import type { UserChannelListParameters } from '@/schema/notification/user-channel/api-verbs/list';
+import type { UserChannelModel } from '@/schema/notification/user-channel/model';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+
+const props = withDefaults(defineProps<{
+    userId: string;
+    manageDisabled: boolean;
+}>(), {
+    manageDisabled: false,
+});
+
+const state = reactive({
+    title: computed<TranslateResult>(() => i18n.t('IAM.USER.NOTIFICATION.NOTIFICATION_CHANNEL')),
+    loading: true,
+    fields: computed(() => [
+        { name: 'protocol_type', label: i18n.t('IAM.USER.NOTIFICATION.TYPE') },
+        { name: 'name', label: i18n.t('IAM.USER.NOTIFICATION.CHANNEL_NAME') },
+        { name: 'data', label: i18n.t('IAM.USER.NOTIFICATION.CHANNEL_INFO') },
+        { name: 'schedule', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') },
+        { name: 'subscriptions', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') },
+    ]),
+    items: [] as (UserChannelModel & {protocol_type?: string})[],
+    protocolList: [] as ProtocolModel[],
+    manageLink: {
+        name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
+        params: { userId: computed(() => encodeURIComponent(props.userId)) },
+    },
+    timezone: computed<string>(() => store.state.user.timezone),
+});
+
+const apiQuery = new ApiQueryHelper();
+const listProtocol = async () => {
+    try {
+        apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
+        const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
+            query: apiQuery.data,
+        });
+        state.protocolList = res.results ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.protocolList = [];
+    }
+};
+
+const injectProtocolName = (channel: UserChannelModel): string|undefined => state.protocolList.find((i) => i.protocol_id === channel.protocol_id)?.name;
+
+const channelApiQuery = new ApiQueryHelper();
+const listUserChannel = async () => {
+    state.loading = true;
+    try {
+        channelApiQuery.setFilters([{ k: 'user_id', v: props.userId, o: '=' }]);
+        const { results } = await SpaceConnector.clientV2.notification.userChannel.list<UserChannelListParameters, ListResponse<UserChannelModel>>({
+            query: channelApiQuery.data,
+        });
+        state.items = results?.map((d) => ({
+            ...d,
+            protocol_type: injectProtocolName(d),
+        })) ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.items = [];
+    } finally {
+        state.loading = false;
+    }
+};
+
+watch(() => props.userId, async () => {
+    await listProtocol();
+    await listUserChannel();
+}, { immediate: true });
+
+</script>
+
 <template>
     <section class="user-notifications-tab">
         <p-heading heading-type="sub"
-                   :title="title"
+                   :title="state.title"
         >
             <template #extra>
-                <router-link :to="manageLink">
+                <router-link :to="state.manageLink">
                     <p-button style-type="primary"
                               :disabled="manageDisabled"
                     >
-                        {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
+                        {{ $t('IAM.USER.NOTIFICATION.MANAGE') }}
                     </p-button>
                 </router-link>
             </template>
         </p-heading>
 
         <p-data-table
-            :items="items"
-            :loading="loading"
-            :fields="fields"
+            :items="state.items"
+            :loading="state.loading"
+            :fields="state.fields"
             :striped="false"
         >
             <template #col-data-format="{ item }">
@@ -67,114 +162,6 @@
         </p-data-table>
     </section>
 </template>
-<script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PBadge, PButton, PDataTable, PHeading,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { utcToTimezoneFormatter } from '@/services/administration/helpers/user-notification-timezone-helper';
-import type { ChannelItem, ProtocolItem } from '@/services/administration/types/user-notification-type';
-import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
-
-export default {
-    name: 'UserNotifications',
-    components: {
-        PDataTable,
-        PHeading,
-        PBadge,
-        PButton,
-    },
-    props: {
-        userId: {
-            type: String,
-            required: true,
-            default: undefined,
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            title: i18n.t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL'),
-            loading: true,
-            fields: computed(() => [
-                { name: 'protocol_type', label: i18n.t('IDENTITY.USER.NOTIFICATION.TYPE') },
-                { name: 'name', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_NAME') },
-                { name: 'data', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_INFO') },
-                { name: 'schedule', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') },
-                { name: 'subscriptions', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') },
-            ]),
-            items: [] as ChannelItem[],
-            protocolList: [] as ProtocolItem[],
-            manageLink: {
-                name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
-                params: { userId: computed(() => encodeURIComponent(props.userId)) },
-            },
-            timezone: computed(() => store.state.user.timezone),
-        });
-
-        const apiQuery = new ApiQueryHelper();
-        const listProtocol = async () => {
-            try {
-                apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
-                const res = await SpaceConnector.client.notification.protocol.list({
-                    query: apiQuery.data,
-                });
-                state.protocolList = res.results;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.protocolList = [];
-            }
-        };
-
-        const injectProtocolName = (channel: ChannelItem) => (state.protocolList as any).find((i) => i.protocol_id === channel.protocol_id).name;
-
-        const channelApiQuery = new ApiQueryHelper();
-        const listUserChannel = async () => {
-            state.loading = true;
-            try {
-                channelApiQuery.setFilters([{ k: 'user_id', v: props.userId, o: '=' }]);
-                const res = await SpaceConnector.client.notification.userChannel.list({
-                    query: channelApiQuery.data,
-                });
-                state.items = res.results.map((d) => ({
-                    ...d,
-                    protocol_type: injectProtocolName(d),
-                }));
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.items = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        watch(() => props.userId, async () => {
-            await listProtocol();
-            await listUserChannel();
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            utcToTimezoneFormatter,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .tab-header {

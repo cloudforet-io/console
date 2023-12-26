@@ -1,15 +1,113 @@
+<script setup lang="ts">
+import { reactive } from 'vue';
+
+import {
+    PBadge, PButton, PI,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type {
+    ProjectChannelSetSubscriptionParameters,
+} from '@/schema/notification/project-channel/api-verbs/set-subscriptiokn';
+import type { UserChannelSetSubscriptionParameters } from '@/schema/notification/user-channel/api-verbs/set-subscriptiokn';
+import { i18n } from '@/translations';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
+import { useNotificationItem } from '@/services/my-page/composables/notification-item';
+import type { NotificationAddFormTopicPayload } from '@/services/my-page/types/notification-add-form-type';
+import type { NotiChannelItem } from '@/services/my-page/types/notification-channel-item-type';
+
+
+const props = withDefaults(defineProps<{
+    channelData: NotiChannelItem;
+    projectId?: string;
+    disableEdit?: boolean;
+}>(), {
+    projectId: undefined,
+    disableEdit: false,
+});
+const emit = defineEmits<{(event: 'change'): void;
+    (event: 'edit'): void;
+}>();
+
+const state = reactive({
+    topicModeForEdit: false,
+    topicForEdit: props.channelData.subscriptions,
+    isTopicValid: false,
+});
+const {
+    state: notificationItemState,
+    cancelEdit,
+    startEdit,
+} = useNotificationItem<undefined>({
+    userChannelId: props.channelData.user_channel_id,
+    projectChannelId: props.channelData.project_channel_id,
+    isEditMode: false,
+}, emit);
+
+const setUserChannelSubscription = async () => {
+    try {
+        if (!notificationItemState.userChannelId) throw new Error('User channel id is not defined');
+        await SpaceConnector.clientV2.notification.userChannel.setSubscription<UserChannelSetSubscriptionParameters>({
+            user_channel_id: notificationItemState.userChannelId,
+            is_subscribe: state.topicModeForEdit,
+            subscriptions: state.topicForEdit,
+        });
+        showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
+        notificationItemState.isEditMode = false;
+        emit('edit');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
+    }
+};
+const setProjectChannelSubscription = async () => {
+    try {
+        if (!notificationItemState.projectChannelId) throw new Error('Project channel id is not defined');
+        await SpaceConnector.clientV2.notification.projectChannel.setSubscription<ProjectChannelSetSubscriptionParameters>({
+            project_channel_id: notificationItemState.projectChannelId,
+            is_subscribe: state.topicModeForEdit,
+            subscriptions: state.topicForEdit,
+        });
+        showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
+        notificationItemState.isEditMode = false;
+        emit('edit');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
+    }
+};
+const onChangeTopic = (value: NotificationAddFormTopicPayload) => {
+    state.topicModeForEdit = value.topicMode;
+    state.topicForEdit = value.selectedTopic;
+    state.isTopicValid = value.isTopicValid;
+};
+const saveChangedTopic = async () => {
+    if (props.projectId) await setProjectChannelSubscription();
+    else await setUserChannelSubscription();
+};
+
+const onClickSave = async () => {
+    await saveChangedTopic();
+    emit('change');
+};
+</script>
+
 <template>
     <li class="content-wrapper"
-        :class="{'edit-mode': isEditMode}"
+        :class="{'edit-mode': notificationItemState.isEditMode}"
     >
         <span class="content-title">
             {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
         </span>
-        <div v-if="isEditMode"
+        <div v-if="notificationItemState.isEditMode"
              class="content"
         >
-            <notification-add-topic :topic="channelData.subscriptions"
-                                    :topic-mode="channelData.is_subscribe"
+            <notification-add-topic :topic="props.channelData.subscriptions"
+                                    :topic-mode="props.channelData.is_subscribe"
                                     @change="onChangeTopic"
             />
             <div class="button-group">
@@ -22,7 +120,7 @@
                 </p-button>
                 <p-button style-type="primary"
                           size="sm"
-                          :disabled="!isTopicValid"
+                          :disabled="!state.isTopicValid"
                           @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
@@ -32,8 +130,8 @@
         <div v-else
              class="content"
         >
-            <ul v-if="channelData.subscriptions.length > 0">
-                <li v-for="(item, index) in channelData.subscriptions"
+            <ul v-if="Array.isArray(props.channelData.subscriptions) && props.channelData.subscriptions.length > 0">
+                <li v-for="(item, index) in props.channelData.subscriptions"
                     :key="`topic-${index}`"
                 >
                     <p-badge style-type="gray200"
@@ -48,8 +146,8 @@
             </ul>
             <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}</span>
             <button class="edit-button"
-                    :class="{'edit-disable':disableEdit}"
-                    @click="startEdit(EDIT_TYPE.TOPIC)"
+                    :class="{'edit-disable': props.disableEdit}"
+                    @click="startEdit('topic')"
             >
                 <p-i name="ic_edit"
                      width="1rem"
@@ -62,130 +160,6 @@
         </div>
     </li>
 </template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import { reactive, toRefs } from 'vue';
-
-import {
-    PBadge, PButton, PI,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import NotificationAddTopic from '@/services/my-page/components/NotificationAddTopic.vue';
-import { useNotificationItem } from '@/services/my-page/composables/notification-item';
-import {
-    EDIT_TYPE,
-    PROTOCOL_TYPE,
-} from '@/services/my-page/types/notification-item-type';
-
-export default {
-    name: 'NotificationChannelItemTopic',
-    components: {
-        PButton,
-        PI,
-        PBadge,
-        NotificationAddTopic,
-    },
-    props: {
-        channelData: {
-            type: Object,
-            default: () => ({}),
-        },
-        projectId: {
-            type: String,
-            default: null,
-        },
-        disableEdit: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            topicModeForEdit: undefined,
-            topicForEdit: props.channelData?.subscriptions,
-            isTopicValid: false,
-        });
-        const {
-            state: notificationItemState,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-        } = useNotificationItem({
-            userChannelId: props.channelData?.user_channel_id,
-            projectChannelId: props.channelData?.project_channel_id,
-            isEditMode: false,
-
-        });
-
-        const setUserChannelSubscription = async () => {
-            try {
-                await SpaceConnector.client.notification.userChannel.setSubscription({
-                    user_channel_id: notificationItemState.userChannelId,
-                    is_subscribe: state.topicModeForEdit,
-                    subscriptions: state.topicForEdit,
-                });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
-                notificationItemState.isEditMode = false;
-                emit('edit', undefined);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
-            }
-        };
-        const setProjectChannelSubscription = async () => {
-            try {
-                await SpaceConnector.client.notification.projectChannel.setSubscription({
-                    project_channel_id: notificationItemState.projectChannelId,
-                    is_subscribe: state.topicModeForEdit,
-                    subscriptions: state.topicForEdit,
-                });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '');
-                notificationItemState.isEditMode = false;
-                emit('edit', undefined);
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'));
-            }
-        };
-        const onChangeTopic = (value) => {
-            state.topicModeForEdit = value.topicMode;
-            state.topicForEdit = value.selectedTopic;
-            state.isTopicValid = value.isTopicValid;
-        };
-        const saveChangedTopic = async () => {
-            if (props.projectId) await setProjectChannelSubscription();
-            else await setUserChannelSubscription();
-        };
-
-        const onClickSave = async () => {
-            await saveChangedTopic();
-            emit('change');
-        };
-
-        return {
-            EDIT_TYPE,
-            PROTOCOL_TYPE,
-            ...toRefs(state),
-            ...toRefs(notificationItemState),
-            onClickSave,
-            cancelEdit,
-            startEdit,
-            updateUserChannel,
-            updateProjectChannel,
-            onChangeTopic,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 @import '../styles/NotificationChannelItem.pcss';

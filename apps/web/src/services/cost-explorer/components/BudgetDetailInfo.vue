@@ -2,6 +2,7 @@
 import {
     computed, reactive, ref, watch,
 } from 'vue';
+import type { Location } from 'vue-router/types/router';
 
 import {
     PPaneLayout, PLink, PI, PTextButton, PPopover,
@@ -10,11 +11,12 @@ import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
 
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
+import { store } from '@/store';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+import type { WorkspaceReferenceMap } from '@/store/reference/workspace-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
@@ -24,8 +26,7 @@ import BudgetDetailInfoAmountPlanningTypePopover from '@/services/cost-explorer/
 import { useBudgetDetailPageStore } from '@/services/cost-explorer/stores/budget-detail-page-store';
 
 
-
-const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => state.providers[provider]?.label ?? '').join(', ') || 'All';
+const changeToLabelList = (providerList: string[]): string => providerList.map((provider) => storeState.providers[provider]?.label ?? '').join(', ') || 'All';
 
 const allReferenceStore = useAllReferenceStore();
 
@@ -35,41 +36,45 @@ const budgetPageState = budgetPageStore.$state;
 const costTypeWrapperRef = ref<HTMLElement|null>(null);
 const costTypeRef = ref<HTMLElement|null>(null);
 
-const state = reactive({
+const storeState = reactive({
+    workspaces: computed<WorkspaceReferenceMap>(() => allReferenceStore.getters.workspace),
     projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
-    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
-    providers: computed<ProviderReferenceMap>(() => allReferenceStore.getters.provider),
+    providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+});
+const state = reactive({
     budgetData: computed<BudgetModel|null>(() => budgetPageState.budgetData),
-    processedProviderValue: computed<string>(() => {
+    isProjectTarget: computed(() => state.budgetData?.resource_group === 'PROJECT'),
+    providerListText: computed<string>(() => {
         if (!budgetPageState.budgetData) return '';
         const providerFilter = budgetPageState.budgetData?.provider_filter;
         if (providerFilter?.state === 'DISABLED') return 'All';
         return changeToLabelList(providerFilter?.providers ?? []);
     }),
+    targetLabel: computed<{ group?: string, name: string }>(() => {
+        const targetId = state.isProjectTarget ? state.budgetData?.project_id : state.budgetData?.workspace_id;
+        if (state.isProjectTarget) {
+            const project = storeState.projects[targetId];
+            return {
+                group: project?.data?.groupInfo?.name ?? '',
+                name: project?.name ?? targetId,
+            };
+        }
+        return {
+            name: storeState.workspaces[targetId]?.name ?? targetId,
+        };
+    }),
+    targetLocation: computed<Location|undefined>(() => {
+        if (state.isProjectTarget) {
+            return referenceRouter(
+                state.budgetData?.project_id,
+                { resource_type: 'identity.Project' },
+            );
+        }
+        return undefined; // TODO: set after workspace page is ready
+    }),
     isTextTruncate: undefined as boolean|undefined,
     popoverVisible: false,
 });
-
-const getTargetLabel = (projects: ProjectReferenceMap): { group?: string; name: string } => {
-    let project;
-    if (budgetPageState.budgetData?.project_id) {
-        project = projects[budgetPageState.budgetData.project_id];
-        return {
-            group: project?.data?.groupInfo?.name ?? '',
-            name: project?.name ?? '',
-        };
-    }
-    if (budgetPageState.budgetData?.project_group_id) {
-        project = state.projectGroups[budgetPageState.budgetData.project_group_id];
-        return {
-            name: project?.name ?? '',
-        };
-    }
-    return {
-        name: 'No Item',
-    };
-};
-
 
 /* Watcher */
 watch(() => costTypeRef.value, (costType) => {
@@ -79,15 +84,6 @@ watch(() => costTypeRef.value, (costType) => {
         state.isTextTruncate = costTypeWrapperWidth <= (costTypeWidth + 60);
     }
 });
-
-// LOAD REFERENCE STORE
-(async () => {
-    await Promise.allSettled([
-        allReferenceStore.load('project'),
-        allReferenceStore.load('projectGroup'),
-        allReferenceStore.load('plugin'),
-    ]);
-})();
 </script>
 
 <template>
@@ -111,9 +107,7 @@ watch(() => costTypeRef.value, (costType) => {
                 >
                     <b>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.MONTHLY_PLANNING') }}</b> ({{ state.budgetData?.start }} ~ {{ state.budgetData?.end }})
                 </p>
-                <budget-detail-info-amount-planning-type-popover class="summary-content"
-                                                                 :budget-data="state.budgetData"
-                >
+                <budget-detail-info-amount-planning-type-popover class="summary-content">
                     <span class="view-all">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.DETAIL.DETAILS') }}</span>
                 </budget-detail-info-amount-planning-type-popover>
             </div>
@@ -123,11 +117,11 @@ watch(() => costTypeRef.value, (costType) => {
             <p v-if="!budgetPageState.loading"
                class="summary-content target"
             >
-                <span v-if="budgetPageState.budgetData?.project_id"
+                <span v-if="state.targetLabel.group"
                       class="target-project-group"
                 >
                     <span>
-                        {{ getTargetLabel(state.projects).group }}
+                        {{ state.targetLabel.group }}
                     </span>
                     <p-i name="ic_chevron-right-thin"
                          width="0.75rem"
@@ -135,15 +129,12 @@ watch(() => costTypeRef.value, (costType) => {
                          :color="gray[400]"
                     />
                 </span>
-                <p-link v-if="state.budgetData?.project_group_id || state.budgetData?.project_id"
-                        :action-icon="ACTION_ICON.INTERNAL_LINK"
+                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                         new-tab
                         highlight
-                        :to="referenceRouter(
-                            (state.budgetData?.project_id || state.budgetData?.project_group_id) ?? '',
-                            { resource_type: state.budgetData?.project_id ? 'identity.Project' : 'identity.ProjectGroup' })"
+                        :to="state.targetLocation"
                 >
-                    {{ getTargetLabel(state.projects).name }}
+                    {{ state.targetLabel.name }}
                 </p-link>
             </p>
         </p-pane-layout>
@@ -156,7 +147,7 @@ watch(() => costTypeRef.value, (costType) => {
                 <span ref="costTypeRef"
                       class="summary-content cost-type"
                 >
-                    <span class="cost-type-content">{{ state.processedProviderValue }}</span>
+                    <span class="cost-type-content">{{ state.providerListText }}</span>
                 </span>
                 <p-popover :is-visible="state.popoverVisible">
                     <p-text-button v-if="state.isTextTruncate"
@@ -166,7 +157,7 @@ watch(() => costTypeRef.value, (costType) => {
                     </p-text-button>
                     <template #content>
                         <div class="content-wrapper">
-                            {{ state.processedProviderValue }}
+                            {{ state.providerListText }}
                         </div>
                     </template>
                 </p-popover>

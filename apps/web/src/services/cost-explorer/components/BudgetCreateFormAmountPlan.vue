@@ -27,7 +27,7 @@ type BudgetTimeUnit = BudgetModel['time_unit'];
 
 interface Props {
     projectId?: string;
-    projectGroupId?: string;
+    workspaceId?: string;
     providerFilter?: BudgetModel['provider_filter'];
     dataSourceId?: string;
 }
@@ -118,7 +118,7 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
                 <template #last-3-months>
                     <budget-create-form-amount-plan-last-months-cost
                         :project-id="props.projectId"
-                        :project-group-id="props.projectGroupId"
+                        :workspace-id="props.workspaceId"
                         :provider-filter="props.providerFilter"
                         :data-source-id="props.dataSourceId"
                         :time-unit="state.timeUnit"
@@ -133,7 +133,7 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
                 <template #last-3-months>
                     <budget-create-form-amount-plan-last-months-cost
                         :project-id="props.projectId"
-                        :project-group-id="props.projectGroupId"
+                        :workspace-id="props.workspaceId"
                         :provider-filter="props.providerFilter"
                         :data-source-id="props.dataSourceId"
                         :time-unit="state.timeUnit"

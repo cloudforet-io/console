@@ -7,8 +7,6 @@ import {
     PButton, PSidebar, PButtonModal, PI,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import getRandomId from '@/lib/random-id-generator';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -37,7 +35,7 @@ const emit = defineEmits<{(e: 'close', save: boolean): void;
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 const widgetFormStore = useWidgetFormStore();
 const widgetFormState = widgetFormStore.state;
 const widgetFormGetters = widgetFormStore.getters;
@@ -64,17 +62,9 @@ const updateDashboardWidgetStore = () => {
 /* Api */
 const updateWidgetInfo = async () => {
     try {
-        if (dashboardDetailStore.isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: dashboardDetailState.dashboardId,
-                layouts: [dashboardDetailState.dashboardWidgetInfoList],
-            });
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: dashboardDetailState.dashboardId,
-                layouts: [dashboardDetailState.dashboardWidgetInfoList],
-            });
-        }
+        await dashboardDetailStore.updateDashboard(dashboardDetailState.dashboardId as string, {
+            layouts: [dashboardDetailState.dashboardWidgetInfoList],
+        });
     } catch (e) {
         ErrorHandler.handleError(e);
     }

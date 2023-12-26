@@ -2,6 +2,7 @@ import { reactive } from 'vue';
 
 import { cloneDeep } from 'lodash';
 
+import type { AlertUpdateParameters } from '@/schema/monitoring/alert/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -16,14 +17,6 @@ interface AlertDetailItemState {
 	alertId: string;
 	projectChannelId?: string;
 	dataForUpdate?: any;
-}
-
-interface ParamType {
-	alert_id: string;
-	description?: string;
-	status_message?: string;
-	project_id?: string;
-	reset_description?: boolean;
 }
 
 type EditMode = typeof EDIT_MODE[keyof typeof EDIT_MODE];
@@ -57,7 +50,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
     };
 
     const getParams = (editMode: EditMode) => {
-        const param = {} as ParamType;
+        const param: Omit<AlertUpdateParameters, 'alert_id'> = {};
 
         if (editMode === EDIT_MODE.DESCRIPTION) {
             const isEmptyInput = state.dataForUpdate.trim().length === 0;

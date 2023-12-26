@@ -1,3 +1,122 @@
+<script setup lang="ts">
+import {
+    computed, reactive, ref,
+} from 'vue';
+import type { Location } from 'vue-router';
+
+import {
+    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
+} from '@spaceone/design-system';
+
+import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
+
+import { ADMIN_DASHBOARD_TEMPLATES, DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
+
+
+const emit = defineEmits(['set-template']);
+
+type DashboardTemplateBoardSet = DashboardTemplate & { value: string };
+
+const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
+type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
+interface Props {
+    dashboardScope?: DashboardScope;
+}
+
+const props = defineProps<Props>();
+
+const templateContainerRef = ref<HTMLElement | null>(null);
+
+const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
+const dashboardStore = useDashboardStore();
+const dashboardGetters = dashboardStore.getters;
+const storeState = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+});
+const state = reactive({
+    selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
+    searchValue: '',
+});
+
+const defaultTemplateState = reactive({
+    thisPage: 1,
+    allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => {
+        const regex = getTextHighlightRegex(state.searchValue);
+        const templates = storeState.isAdminMode ? ADMIN_DASHBOARD_TEMPLATES : DASHBOARD_TEMPLATES;
+        return Object.values(templates)
+            .map((d: DashboardTemplate) => ({
+                ...d,
+                // below values are used only for render
+                value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
+            }))
+            .filter((d) => regex.test(d.name))
+            .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1);
+    }),
+});
+const existingTemplateState = reactive({
+    thisPage: 1,
+    allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
+    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards
+        .map((d: DashboardModel) => ({
+            ...d,
+            // below values are used only for render
+            value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${d.public_dashboard_id || d.private_dashboard_id}`,
+            groupLabel: storeState.projects[d.project_id ?? '']?.label || existingTemplateState.groupLabel,
+        }))
+        .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
+    groupLabel: computed<string>(() => {
+        if (props.dashboardScope === 'WORKSPACE') return 'Workspace';
+        return '';
+    }),
+    dashboards: computed<DashboardModel[]>(() => {
+        let dashboardItems: DashboardModel[] = [];
+        if (storeState.isAdminMode) dashboardItems = dashboardGetters.domainItems;
+        else if (props.dashboardScope === 'WORKSPACE') dashboardItems = dashboardGetters.workspaceItems;
+        else if (props.dashboardScope === 'PROJECT') dashboardItems = dashboardGetters.projectItems;
+
+        return dashboardItems.filter((d) => d.name.includes(state.searchValue));
+    }),
+
+});
+
+const getDashboardLocation = (board: DashboardModel): Location => ({
+    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+    params: {
+        dashboardId: board.public_dashboard_id || board.private_dashboard_id,
+    },
+});
+
+const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
+    state.selectedTemplateName = selectedTemplate.value;
+    const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
+    emit('set-template', _selectedTemplate as DashboardModel);
+};
+
+const handleChangePagination = (page: number, type: TemplateType): void => {
+    if (type === TEMPLATE_TYPE.DEFAULT) defaultTemplateState.thisPage = page;
+    if (type === TEMPLATE_TYPE.EXISTING) existingTemplateState.thisPage = page;
+};
+
+const handleInputSearch = () => {
+    existingTemplateState.thisPage = 1;
+};
+
+(async () => {
+    handleSelectTemplate(defaultTemplateState.boardSets[0]);
+})();
+</script>
+
 <template>
     <div class="dashboard-template-wrapper">
         <p-search
@@ -115,131 +234,6 @@
         </div>
     </div>
 </template>
-
-<script setup lang="ts">
-import {
-    computed, nextTick, reactive, ref,
-} from 'vue';
-import type { Location } from 'vue-router';
-
-import {
-    PBoard, PLabel, PTextPagination, PSearch, PEmpty, PI, getTextHighlightRegex, PLink,
-} from '@spaceone/design-system';
-
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DashboardScope, DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
-import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
-import { store } from '@/store';
-
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-
-import { DASHBOARD_TEMPLATES } from '@/services/dashboards/dashboard-template/template-list';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-import type {
-    DashboardModel,
-} from '@/services/dashboards/types/dashboard-model-type';
-
-const DOMAIN_SCOPE_NAME = 'Workspace';
-const emit = defineEmits(['set-template']);
-
-type DashboardTemplateBoardSet = DashboardTemplate & { value: string };
-
-const TEMPLATE_TYPE = { DEFAULT: 'DEFAULT', EXISTING: 'EXISTING' };
-type TemplateType = typeof TEMPLATE_TYPE[keyof typeof TEMPLATE_TYPE];
-interface Props {
-    dashboardScope: DashboardScope;
-}
-
-const props = defineProps<Props>();
-
-const templateContainerRef = ref<HTMLElement | null>(null);
-const state = reactive({
-    selectedTemplateName: `${TEMPLATE_TYPE.DEFAULT}-${DASHBOARD_TEMPLATES.monthlyCostSummary.name}`,
-    searchValue: '',
-});
-
-const defaultTemplateState = reactive({
-    thisPage: 1,
-    allPage: computed<number>(() => Math.ceil(Object.values(DASHBOARD_TEMPLATES).length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => {
-        const regex = getTextHighlightRegex(state.searchValue);
-        return Object.values(DASHBOARD_TEMPLATES)
-            .map((d: DashboardTemplate) => ({
-                ...d,
-                // below values are used only for render
-                value: `${TEMPLATE_TYPE.DEFAULT}-${d.name}`,
-            }))
-            .filter((d) => regex.test(d.name))
-            .slice(10 * (defaultTemplateState.thisPage - 1), 10 * defaultTemplateState.thisPage - 1);
-    }),
-});
-const existingTemplateState = reactive({
-    thisPage: 1,
-    allPage: computed<number>(() => Math.ceil(existingTemplateState.dashboards.length / 10) || 1),
-    boardSets: computed<DashboardTemplateBoardSet[]>(() => existingTemplateState.dashboards
-        .map((d: DomainDashboardModel & ProjectDashboardModel) => {
-            const isProjectDashboard = Object.prototype.hasOwnProperty.call(d, 'project_dashboard_id');
-            return {
-                ...d,
-                // below values are used only for render
-                value: `${TEMPLATE_TYPE.EXISTING}-${d.name}-${isProjectDashboard ? d.project_dashboard_id : d.domain_dashboard_id}`,
-                groupLabel: existingTemplateState.projectItems[d.project_id]?.label || existingTemplateState.groupLabel,
-            };
-        })
-        .slice(10 * (existingTemplateState.thisPage - 1), 10 * existingTemplateState.thisPage)),
-    projectItems: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-    groupLabel: computed<string>(() => {
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) return DOMAIN_SCOPE_NAME;
-        return '';
-    }),
-    dashboards: computed<DashboardModel[]>(() => {
-        let dashboardItems;
-        if (props.dashboardScope === DASHBOARD_SCOPE.DOMAIN) dashboardItems = store.state.dashboard.domainItems;
-        else dashboardItems = store.state.dashboard.projectItems;
-
-        return dashboardItems.filter((d) => d.name.includes(state.searchValue));
-    }),
-
-});
-
-const getDashboardLocation = (board: DashboardModel): Location => {
-    const isProjectDashboard = Object.prototype.hasOwnProperty.call(board, 'project_dashboard_id');
-    const routeName = isProjectDashboard ? DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME : DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME;
-    return {
-        name: routeName,
-        params: {
-            dashboardId: isProjectDashboard
-                ? (board as ProjectDashboardModel).project_dashboard_id
-                : (board as DomainDashboardModel).domain_dashboard_id,
-        },
-    };
-};
-
-const handleSelectTemplate = (selectedTemplate: DashboardTemplateBoardSet) => {
-    state.selectedTemplateName = selectedTemplate.value;
-    const _selectedTemplate: Partial<DashboardTemplateBoardSet> = { ...selectedTemplate };
-    emit('set-template', _selectedTemplate as DashboardModel);
-};
-
-const handleChangePagination = (page: number, type: TemplateType): void => {
-    if (type === TEMPLATE_TYPE.DEFAULT) defaultTemplateState.thisPage = page;
-    if (type === TEMPLATE_TYPE.EXISTING) existingTemplateState.thisPage = page;
-};
-
-const handleInputSearch = () => {
-    existingTemplateState.thisPage = 1;
-};
-
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('dashboard/loadProjectDashboard'),
-        store.dispatch('dashboard/loadDomainDashboard'),
-    ]);
-    await nextTick();
-    handleSelectTemplate(defaultTemplateState.boardSets[0]);
-})();
-</script>
 
 <style lang="postcss" scoped>
 .dashboard-template-wrapper {

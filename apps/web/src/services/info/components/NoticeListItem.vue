@@ -26,25 +26,18 @@
                 />
             </div>
             <div class="info">
-                <p-badge badge-type="solid-outline"
-                         :style-type="noticeTypeBadge.style"
-                >
-                    {{ noticeTypeBadge.label }}
-                </p-badge><span>{{ date }}</span><p-i width="0.125rem"
-                                                      name="ic_dot"
+                <span>{{ date }}</span><p-i width="0.125rem"
+                                            name="ic_dot"
                 />
-                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser || hasSystemRoleUser"
+                <span>{{ post.writer }}</span><p-i v-if="hasDomainRoleUser"
                                                    width="0.125rem"
                                                    name="ic_dot"
                 />
-                <span v-if="hasDomainRoleUser || hasSystemRoleUser"
+                <span v-if="hasDomainRoleUser"
                       class="view-count"
                 ><p-i name="ic_eye"
                       width="1.125rem"
                 /> {{ post.view_count }}</span>
-                <span v-if="hasSystemRoleUser"
-                      class="view-count"
-                >| {{ domainName }}</span>
             </div>
         </div>
         <div v-else
@@ -56,7 +49,6 @@
 </template>
 
 <script lang="ts">
-
 import {
     computed, defineComponent, reactive, toRefs,
 } from 'vue';
@@ -65,24 +57,18 @@ import type { PropType } from 'vue';
 import { PBadge, PI } from '@spaceone/design-system';
 import dayjs from 'dayjs';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import type { NoticePostModel } from '@/schema/board/post/model';
+import type { PostModel } from '@/schema/board/post/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import TextHighlighting from '@/common/components/text/text-highlighting/TextHighlighting.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import { getPostBadgeInfo } from '@/services/info/helpers/notice-helper';
-import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
 
 interface Props {
     inputText: string;
     isNew: boolean;
     postDirection: 'prev' | 'next' | undefined;
-    post: NoticePostModel;
+    post: PostModel;
 }
 
 export default defineComponent<Props>({
@@ -95,7 +81,7 @@ export default defineComponent<Props>({
     },
     props: {
         post: {
-            type: Object as PropType<NoticePostModel|undefined>,
+            type: Object as PropType<PostModel|undefined>,
             default: undefined,
         },
         inputText: {
@@ -113,38 +99,16 @@ export default defineComponent<Props>({
     },
     setup(props) {
         const state = reactive({
-            noticeTypeBadge: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.post?.post_type)),
-            hasDomainRoleUser: computed<boolean>(() => store.getters['user/hasDomainRole']),
-            hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
+            hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
             postDirectionLabel: computed(() => ((props.postDirection === 'prev') ? i18n.t('INFO.NOTICE.MAIN.PREV') : i18n.t('INFO.NOTICE.MAIN.NEXT'))),
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             date: computed(() => dateFormatter(props.post?.created_at)),
             isPinned: computed(() => props.post?.options?.is_pinned),
             isPostExist: computed(() => props.post),
             postDirectionIcon: computed(() => ((props.postDirection === 'prev') ? 'ic_arrow-down' : 'ic_arrow-up')),
-            domainName: '',
         });
 
         const dateFormatter = (date) => dayjs.tz(dayjs.utc(date), state.timezone).format('YYYY-MM-DD');
-
-        const getDomainName = async () => {
-            if (!Object.keys(props.post ?? {}).length || !state.hasSystemRoleUser) return;
-            if (!props.post.domain_id) {
-                state.domainName = 'All Domains';
-                return;
-            }
-            try {
-                const { name } = await SpaceConnector.client.identity.domain.get({ domain_id: props.post.domain_id });
-                state.domainName = name;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.domainName = '';
-            }
-        };
-
-        (async () => {
-            if (props.post && state.hasSystemRoleUser) await getDomainName();
-        })();
 
         return {
             ...toRefs(state),

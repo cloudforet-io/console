@@ -13,7 +13,6 @@ import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/canc
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { COST_DATA_FIELD_MAP } from '@/schema/dashboard/_constants/widget-constant';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -80,7 +79,7 @@ const targetTextFormatter = (value: string): string => {
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchBudgetUsageAnalyze = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Response> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);
@@ -160,13 +159,6 @@ const handleUpdateThisPage = (_thisPage: number) => {
     thisPage.value = _thisPage;
     refreshWidget(_thisPage);
 };
-
-(async () => {
-    await Promise.allSettled([
-        store.dispatch('reference/project/load'),
-        store.dispatch('reference/projectGroup/load'),
-    ]);
-})();
 
 useWidgetLifecycle({
     disposeWidget: undefined,

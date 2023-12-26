@@ -1,45 +1,12 @@
-<template>
-    <div class="dashboard-customize">
-        <dashboard-customize-page-name :name.sync="state.name"
-                                       :dashboard-id="props.dashboardId"
-                                       @update:name="handleUpdateDashboardName"
-                                       @click-back-button="goBack"
-        />
-        <div class="filters-box">
-            <dashboard-labels editable />
-            <dashboard-toolset />
-        </div>
-        <p-divider />
-        <div class="dashboard-selectors">
-            <dashboard-variables class="variable-selector-wrapper"
-                                 disable-save-button
-                                 is-manageable
-            />
-            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
-                                        refresh-disabled
-            />
-        </div>
-        <dashboard-widget-container edit-mode />
-        <dashboard-customize-sidebar :loading="props.loading"
-                                     :save-button-text="props.saveButtonText"
-                                     :hide-cancel-button="props.hideCancelButton"
-                                     @save="handleSave"
-                                     @cancel="goBack"
-        />
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
-    computed, onBeforeUnmount, onMounted, reactive, watch,
+    onBeforeUnmount, onMounted, reactive, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
 
 import { PDivider } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import type { DashboardTemplate } from '@/schema/dashboard/_types/dashboard-type';
-import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -65,20 +32,10 @@ const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'go-back'): void,
     (e: 'save'): void}>();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     name: dashboardDetailState.name,
-    apiParam: computed<Partial<DashboardTemplate>>(() => ({
-        name: dashboardDetailState.name,
-        labels: dashboardDetailState.labels,
-        settings: dashboardDetailState.settings,
-        layouts: [dashboardDetailState.dashboardWidgetInfoList],
-        variables: dashboardDetailState.variables,
-        variables_schema: dashboardDetailState.variablesSchema,
-        tags: { created_by: store.state.user.userId },
-    })),
-    isCreateMode: computed(() => !props.dashboardId),
 });
 
 /* Api */
@@ -98,7 +55,7 @@ const handleUpdateDashboardName = (name: string) => {
     state.name = name;
 };
 const handleSave = async () => {
-    dashboardDetailStore.$patch({ name: state.name });
+    dashboardDetailStore.setName(state.name);
     emit('save');
 };
 const goBack = () => {
@@ -123,6 +80,38 @@ onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleUnload);
 });
 </script>
+
+<template>
+    <div class="dashboard-customize">
+        <dashboard-customize-page-name :name.sync="state.name"
+                                       :dashboard-id="props.dashboardId"
+                                       @update:name="handleUpdateDashboardName"
+                                       @click-back-button="goBack"
+        />
+        <div class="filters-box">
+            <dashboard-labels editable />
+            <dashboard-toolset />
+        </div>
+        <p-divider />
+        <div class="dashboard-selectors">
+            <dashboard-variables class="variable-selector-wrapper"
+                                 disable-save-button
+                                 is-manageable
+            />
+            <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
+                                        :loading="props.loading"
+                                        refresh-disabled
+            />
+        </div>
+        <dashboard-widget-container edit-mode />
+        <dashboard-customize-sidebar :loading="props.loading"
+                                     :save-button-text="props.saveButtonText"
+                                     :hide-cancel-button="props.hideCancelButton"
+                                     @save="handleSave"
+                                     @cancel="goBack"
+        />
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .dashboard-customize {

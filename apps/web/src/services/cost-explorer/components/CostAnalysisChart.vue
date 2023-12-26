@@ -42,7 +42,8 @@ type CostAnalyzeRawData = {
 };
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
     loading: true,
@@ -52,15 +53,15 @@ const state = reactive({
 });
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisData = async (period:Period): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
-        analyzeApiQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        analyzeApiQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         let dateFormat = 'YYYY-MM';
         if (costAnalysisPageState.granularity === GRANULARITY.YEARLY) dateFormat = 'YYYY';
         const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 granularity: costAnalysisPageState.granularity,
                 group_by: costAnalysisPageState.chartGroupBy ? [costAnalysisPageState.chartGroupBy] : [],
@@ -108,8 +109,8 @@ const handleAllSeries = (type) => {
 
 watch([
     () => costAnalysisPageState,
-    () => costAnalysisPageStore.selectedDataSourceId,
-    () => costAnalysisPageStore.selectedQueryId,
+    () => costAnalysisPageGetters.selectedDataSourceId,
+    () => costAnalysisPageGetters.selectedQueryId,
 ], ([, selectedDataSourceId]) => {
     if (costAnalysisPageState.period && selectedDataSourceId) setChartData(costAnalysisPageState.period);
 }, { immediate: true, deep: true });

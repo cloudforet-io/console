@@ -5,8 +5,6 @@ import { computed, getCurrentInstance, reactive } from 'vue';
 import { PI, PTextButton, PDivider } from '@spaceone/design-system';
 import { isEqual, xor } from 'lodash';
 
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -20,8 +18,9 @@ import { MANAGE_VARIABLES_HASH_NAME } from '@/services/dashboards/constants/mana
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import type { DashboardVariables, DashboardVariablesSchema } from '@/services/dashboards/types/dashboard-model-type';
 
+
 interface Props {
-    isManageable: boolean;
+    isManageable?: boolean;
     disableSaveButton?: boolean;
     originVariables?: DashboardVariables;
     originVariablesSchema?: DashboardVariablesSchema;
@@ -32,7 +31,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const allReferenceStore = useAllReferenceStore();
 
@@ -64,25 +63,9 @@ const state = reactive({
 const updateDashboardVariables = async () => {
     state.saveLoading = true;
     try {
-        const isProjectDashboard = props.dashboardId?.startsWith('project');
-        if (isProjectDashboard) {
-            await SpaceConnector.clientV2.dashboard.projectDashboard.update({
-                project_dashboard_id: props.dashboardId,
-                variables: dashboardDetailState.variables,
-                variables_schema: dashboardDetailState.variablesSchema,
-            });
-        } else {
-            await SpaceConnector.clientV2.dashboard.domainDashboard.update({
-                domain_dashboard_id: props.dashboardId,
-                variables: dashboardDetailState.variables,
-                variables_schema: dashboardDetailState.variablesSchema,
-            });
-        }
-        dashboardDetailStore.$patch((_state) => {
-            if (_state.dashboardInfo) {
-                _state.dashboardInfo.variables = dashboardDetailState.variables;
-                _state.dashboardInfo.variables_schema = dashboardDetailState.variablesSchema;
-            }
+        await dashboardDetailStore.updateDashboard(props.dashboardId as string, {
+            variables: dashboardDetailState.variables,
+            variables_schema: dashboardDetailState.variablesSchema,
         });
     } catch (e) {
         ErrorHandler.handleError(e);

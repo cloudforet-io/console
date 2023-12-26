@@ -39,20 +39,18 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
 import { store } from '@/store';
 
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import { RECENT_TYPE } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { isUserAccessibleToMenu } from '@/lib/access-control';
 import {
@@ -76,6 +74,7 @@ import GNBSuggestionList from '@/common/modules/navigations/gnb/modules/GNBSugge
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
+
 const RECENT_LIMIT = 30;
 
 export default defineComponent({
@@ -93,20 +92,14 @@ export default defineComponent({
     },
     setup(props, { emit }: SetupContext) {
         const allReferenceStore = useAllReferenceStore();
+        const dashboardStore = useDashboardStore();
+        const dashboardGetters = dashboardStore.getters;
 
         const storeState = reactive({
             menuItems: computed<DisplayMenu[]>(() => store.getters['display/allMenuList']),
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+            projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             cloudServiceTypes: computed<CloudServiceTypeReferenceMap>(() => store.getters['reference/cloudServiceTypeItems']),
-            domainDashboardItems: computed<DomainDashboardModel[]>(() => {
-                const isUserAccessibleToDomainDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_WORKSPACE, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToDomainDashboards ? store.getters['dashboard/getDomainItems'] : [];
-            }),
-            projectDashboardItems: computed<ProjectDashboardModel[]>(() => {
-                const isUserAccessibleToProjectDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS_PROJECT, store.getters['user/pagePermissionList']);
-                return isUserAccessibleToProjectDashboards ? store.getters['dashboard/getProjectItems'] : [];
-            }),
             dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
             recents: computed<RecentConfig[]>(() => store.state.recent.allItems),
         });
@@ -126,43 +119,35 @@ export default defineComponent({
                 storeState.menuItems,
             )),
             recentCloudServiceItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.ASSET_INVENTORY_CLOUD_SERVICE, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.CLOUD_SERVICE),
                     storeState.cloudServiceTypes,
                 ) : [];
             }),
             recentProjectItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertProjectConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.PROJECT),
                     storeState.projects,
                 ) : [];
             }),
             recentProjectGroupItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertProjectGroupConfigToReferenceData(
                     storeState.recents.filter((d) => d.itemType === RECENT_TYPE.PROJECT_GROUP),
                     storeState.projectGroups,
                 ) : [];
             }),
             recentDashboardItems: computed<FavoriteItem[]>(() => {
-                const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionList']);
-                if (!isUserAccessibleToDashboards) return [];
-                const domainDashboardReferenceData = convertDashboardConfigToReferenceData(
-                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith(DASHBOARD_SCOPE.DOMAIN)),
-                    storeState.domainDashboardItems,
-                    DASHBOARD_SCOPE.DOMAIN,
-                );
-                const projectDashboardReferenceData = convertDashboardConfigToReferenceData(
-                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD && d.itemId.startsWith(DASHBOARD_SCOPE.PROJECT)),
-                    storeState.projectDashboardItems,
-                    DASHBOARD_SCOPE.PROJECT,
-                );
-                return [...domainDashboardReferenceData, ...projectDashboardReferenceData];
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
+                return isUserAccessible ? convertDashboardConfigToReferenceData(
+                    storeState.recents.filter((d) => d.itemType === RECENT_TYPE.DASHBOARD),
+                    dashboardGetters.allItems,
+                ) : [];
             }),
             recentCostAnalysisItems: computed<RecentItem[]>(() => {
-                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_EXPLORER_COST_ANALYSIS, store.getters['user/pagePermissionList']);
+                const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible
                     ? convertCostAnalysisConfigToReferenceData(
                         storeState.recents.filter((d) => d.itemType === RECENT_TYPE.COST_ANALYSIS),
@@ -223,7 +208,10 @@ export default defineComponent({
         watch(() => props.visible, async (visible) => {
             if (visible) {
                 state.loading = true;
-                await store.dispatch('recent/load', { limit: RECENT_LIMIT });
+                await Promise.allSettled([
+                    store.dispatch('recent/load', { limit: RECENT_LIMIT }),
+                    dashboardStore.load(),
+                ]);
                 await getAllCostQuerySetList();
                 state.loading = false;
             }

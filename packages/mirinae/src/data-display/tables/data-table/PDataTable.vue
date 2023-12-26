@@ -38,7 +38,7 @@
                                         width: field.width || undefined,
                                     }"
                                     :class="{'fix-width': colCopy}"
-                                    @click="onTheadClick(field, fieldColIndex, $event)"
+                                    @click="onTheadClick(field)"
                                 >
                                     <slot :name="`th-${field.name}`"
                                           v-bind="getHeadSlotProps(field, fieldColIndex, fieldRowIdx)"
@@ -228,7 +228,7 @@ export default defineComponent<DataTableProps>({
             default: false,
         },
         fields: {
-            type: Array,
+            type: Array as PropType<DataTableFieldType[]>,
             required: true,
             default: () => [],
         },
@@ -416,10 +416,7 @@ export default defineComponent<DataTableProps>({
             item, index: rowIndex, field, value: getValue(item, field), colIndex, rowIndex,
         });
 
-        const getSelectedState = (item, index) => {
-            if (props.getRowSelectable) return props.getRowSelectable(item, index);
-            return props.multiSelect ? proxyState.proxySelectIndex.some((d) => index === d) : proxyState.proxySelectIndex[0] === index;
-        };
+        const getSelectedState = (item, index) => (props.multiSelect ? proxyState.proxySelectIndex.some((d) => index === d) : proxyState.proxySelectIndex[0] === index);
 
         const checkboxToggle = (item, index) => {
             const newSelected = [...proxyState.proxySelectIndex];
@@ -450,7 +447,7 @@ export default defineComponent<DataTableProps>({
             proxyState.proxySelectIndex = [index];
         };
 
-        const onTheadClick = (field) => {
+        const onTheadClick = (field: DataTableFieldType) => {
             if (isFieldSortable(field.sortable)) {
                 const clickedKey = field.sortKey || field.name;
                 let sortBy = proxyState.proxySortBy;

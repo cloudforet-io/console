@@ -62,7 +62,7 @@ export function useBaseWidgetState(props: WidgetProps): UnwrapRef<BaseWidgetStat
         parsedDataField: computed<string>(() => parseDotFromDataField(state.dataField)),
         parsedSecondaryDataField: computed<string>(() => parseDotFromDataField(state.secondaryDataField)),
         currency: computed<Currency|undefined>(() => {
-            const dataSources = props.allReferenceTypeInfo.cost_data_source.referenceMap;
+            const dataSources = props.allReferenceTypeInfo.costDataSource.referenceMap;
             if (mergedState.widgetConfig.labels?.includes('Cost')) {
                 if (!mergedState.options?.cost_data_source) return CURRENCY.USD;
                 return dataSources[mergedState.options.cost_data_source]?.data?.plugin_info?.metadata?.currency;

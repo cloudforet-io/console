@@ -1,25 +1,16 @@
-import type { TimeStamp } from '@/schema/_common/model';
-
-export interface CredentialModel {
-    secret_id?: string;
-    name?: string;
-    secret_type?: string;
-    schema?: string;
-    provider?: string;
-    service_account_id?: string;
-    trusted_secret_id?: string;
-    trusted_service_account_id?: string;
-    project_id?: string;
-    domain_id?: string;
-    created_at?: TimeStamp;
-    tags?: { [key: string]: any; };
-}
+import type { Tags, TimeStamp } from '@/schema/_common/model';
+import type { ResourceGroup } from '@/schema/identity/role-binding/type';
 
 export interface SecretModel {
     secret_id: string;
+    name: string;
+    tags: Tags;
+    schema_id: string;
     provider: string;
     service_account_id: string;
+    trusted_secret_id?: string;
+    resource_group: ResourceGroup;
     project_id: string;
-    created_at: string;
-    name: string;
+    workspace_id?: string;
+    created_at: TimeStamp;
 }

@@ -10,6 +10,8 @@ import {
 import type { BudgetModel } from '@/schema/cost-analysis/budget/model';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import BudgetCreateDataSourceSelect from '@/services/cost-explorer/components/BudgetCreateDataSourceSelect.vue';
@@ -18,11 +20,11 @@ import BudgetCreateTargetSelect from '@/services/cost-explorer/components/Budget
 
 
 
-type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'project_group_id'|'project_id'|'data_source_id'>;
+type BudgetBaseInfo = Pick<BudgetModel, 'name'|'provider_filter'|'workspace_id'|'project_id'|'data_source_id'>;
 
 type ProviderFilter = BudgetModel['provider_filter'];
 
-const emit = defineEmits<{(e: 'update', budgetInfo:BudgetBaseInfo, isAllvalid: boolean): void; }>();
+const emit = defineEmits<{(e: 'update', budgetInfo:BudgetBaseInfo, isAllValid: boolean): void; }>();
 
 const {
     forms: {
@@ -38,6 +40,10 @@ const {
     name(value: string) { return value.trim().length ? '' : i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REQUIRED_NAME'); },
 });
 
+const appContextStore = useAppContextStore();
+const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
+});
 const state = reactive({
     target: undefined as string|undefined,
     isTargetValid: false,
@@ -45,15 +51,16 @@ const state = reactive({
     dataSourceId: undefined as string|undefined,
     isCostTypesValid: false,
     budgetInfo: computed<BudgetBaseInfo>(() => {
-        const isProjectGroup = state.target?.startsWith('pg-');
-
         const budgetInfo: BudgetBaseInfo = {
             name: name.value,
-            [isProjectGroup ? 'project_group_id' : 'project_id']: state.target,
             provider_filter: state.providerFilter,
             data_source_id: state.dataSourceId,
         };
-
+        if (storeState.isAdminMode) {
+            budgetInfo.workspace_id = state.target;
+        } else {
+            budgetInfo.project_id = state.target;
+        }
         return budgetInfo;
     }),
     isAllValid: computed<boolean>(() => isNameValid.value && state.isCostTypesValid && state.isTargetValid),

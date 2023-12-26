@@ -4,6 +4,17 @@ import type { DashboardVariablesSchema } from '@/services/dashboards/types/dashb
 
 export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
     properties: {
+        [MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key]: {
+            name: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.name,
+            variable_type: 'MANAGED',
+            use: true,
+            selection_type: 'MULTI',
+            description: 'DASHBOARDS.CUSTOMIZE.VARIABLES.DESCRIPTION_WORKSPACE',
+            options: [{
+                type: 'MANAGED',
+                key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
+            }],
+        },
         [MANAGED_VARIABLE_MODEL_CONFIGS.project.key]: {
             name: MANAGED_VARIABLE_MODEL_CONFIGS.project.name,
             variable_type: 'MANAGED',
@@ -100,6 +111,7 @@ export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
     order: [
         MANAGED_VARIABLE_MODEL_CONFIGS.cost_data_source.key,
         MANAGED_VARIABLE_MODEL_CONFIGS.cloud_service_query_set.key,
+        MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
         MANAGED_VARIABLE_MODEL_CONFIGS.project.key,
         MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
         MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key,
@@ -108,5 +120,3 @@ export const MANAGED_DASH_VAR_SCHEMA: DashboardVariablesSchema = {
         MANAGED_VARIABLE_MODEL_CONFIGS.asset_account.key,
     ],
 };
-
-export const managedVariablesPropertiesMap = new Map(Object.entries(MANAGED_DASH_VAR_SCHEMA.properties));

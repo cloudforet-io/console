@@ -1,64 +1,3 @@
-<template>
-    <user-account-module-container
-        class="notification-email-wrapper"
-    >
-        <template #headline>
-            <div class="headline-wrapper">
-                <p class="form-title">
-                    {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.TITLE') }}
-                </p>
-                <div class="verify-status-wrapper">
-                    <div v-if="state.verified"
-                         class="verified"
-                    >
-                        <p-i name="ic_verified"
-                             height="1rem"
-                             width="1rem"
-                             class="verified-icon"
-                             color="#60B731"
-                        />
-                        <span>
-                            {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFIED') }}
-                        </span>
-                    </div>
-                    <span v-else
-                          class="not-verified"
-                    >
-                        {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
-                    </span>
-                </div>
-            </div>
-        </template>
-        <span class="help-text">
-            {{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.HELP_TEXT') }}
-        </span>
-        <form class="form"
-              onsubmit="return false"
-        >
-            <p-field-group
-                :invalid="invalidState.notificationEmail"
-                :invalid-text="invalidTexts.notificationEmail"
-                required
-                class="field-group"
-            >
-                <p-text-input v-model="notificationEmail"
-                              :placeholder="state.userId"
-                              :disabled="state.verified"
-                              :invalid="invalidState.notificationEmail"
-                              block
-                              @update:value="setForm('notificationEmail', $event)"
-                />
-            </p-field-group>
-            <verify-button
-                :email="notificationEmail"
-                :user-id="state.userId"
-                :domain-id="state.domainId"
-                :verified="state.verified"
-            />
-        </form>
-    </user-account-module-container>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive, watch,
@@ -70,18 +9,24 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
+import { postUserProfileValidationEmail } from '@/lib/helper/verify-email-helper';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import VerifyButton from '@/common/modules/button/verify-button/VerifyButton.vue';
+import NotificationEmailModal from '@/common/modules/modals/notification-email-modal/NotificationEmailModal.vue';
 
-import UserAccountModuleContainer
-    from '@/services/my-page/components/UserAccountModuleContainer.vue';
+import UserAccountModuleContainer from '@/services/my-page/components/UserAccountModuleContainer.vue';
+
 
 const state = reactive({
     userType: computed(() => store.state.user.backend),
     verified: computed(() => store.state.user.emailVerified),
     userId: computed(() => store.state.user.userId),
     domainId: computed(() => store.state.domain.domainId),
+    loading: false,
+    isModalVisible: false,
+    modalType: '',
 });
 const {
     forms: {
@@ -93,8 +38,25 @@ const {
 } = useFormValidator({
     notificationEmail: '',
 }, {
-    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
+    notificationEmail(value: string) { return !emailValidator(value) ? '' : i18n.t('MY_PAGE.NOTIFICATION_EMAIL.EMAIL_INVALID'); },
 });
+
+const handleClickVerifyButton = async (type: string) => {
+    state.loading = true;
+    try {
+        if (state.verified) return;
+        await postUserProfileValidationEmail({
+            email: notificationEmail.value,
+        });
+        await store.dispatch('user/setUser', { email: notificationEmail });
+    } catch (e: any) {
+        ErrorHandler.handleError(e);
+    } finally {
+        state.isModalVisible = true;
+        state.modalType = type;
+        state.loading = false;
+    }
+};
 
 /* Watcher */
 watch(() => store.state.user.email, (value) => {
@@ -109,6 +71,75 @@ watch(() => store.state.user.email, (value) => {
     setForm('notificationEmail', result);
 }, { immediate: true });
 </script>
+
+<template>
+    <user-account-module-container
+        class="notification-email-wrapper"
+    >
+        <template #headline>
+            <div class="headline-wrapper">
+                <p class="form-title">
+                    {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.TITLE') }}
+                </p>
+                <div class="verify-status-wrapper">
+                    <div v-if="state.verified"
+                         class="verified"
+                    >
+                        <p-i name="ic_verified"
+                             height="1rem"
+                             width="1rem"
+                             class="verified-icon"
+                             color="#60B731"
+                        />
+                        <span>
+                            {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFIED') }}
+                        </span>
+                    </div>
+                    <span v-else
+                          class="not-verified"
+                    >
+                        {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.NOT_VERIFIED') }}
+                    </span>
+                </div>
+            </div>
+        </template>
+        <span class="help-text">
+            {{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.HELP_TEXT') }}
+        </span>
+        <form class="form"
+              onsubmit="return false"
+        >
+            <p-field-group
+                :invalid="invalidState.notificationEmail"
+                :invalid-text="invalidTexts.notificationEmail"
+                required
+                class="field-group"
+            >
+                <p-text-input :value="notificationEmail"
+                              :placeholder="state.userId"
+                              :disabled="state.verified"
+                              :invalid="invalidState.notificationEmail"
+                              block
+                              @update:value="setForm('notificationEmail', $event)"
+                />
+            </p-field-group>
+            <verify-button
+                :loading="state.loading"
+                :email="notificationEmail"
+                :verified="state.verified"
+                @click-button="handleClickVerifyButton"
+            >
+                <notification-email-modal
+                    :domain-id="state.domainId"
+                    :user-id="state.userId"
+                    :email="notificationEmail"
+                    :modal-type="state.modalType"
+                    :visible.sync="state.isModalVisible"
+                />
+            </verify-button>
+        </form>
+    </user-account-module-container>
+</template>
 
 <style lang="postcss" scoped>
 .notification-email-wrapper {

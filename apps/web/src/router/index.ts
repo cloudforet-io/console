@@ -5,7 +5,12 @@ import VueRouter from 'vue-router';
 import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accessor';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { GrantScope } from '@/schema/identity/token/type';
+
 import { ERROR_ROUTE } from '@/router/constant';
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import type { RoleInfo } from '@/store/modules/user/type';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -18,6 +23,20 @@ import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-con
 const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
+const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
+    const grantRequest = {
+        scope,
+        token,
+        workspace_id: workspaceId,
+    };
+    await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
+    return SpaceRouter.router.app?.$store.getters['user/getCurrentRoleInfo'];
+};
+const loadAllReferencesByGrantedRoleInfo = async (grantedRoleInfo?: RoleInfo) => {
+    if (grantedRoleInfo) {
+        await SpaceRouter.router.app?.$store.dispatch('reference/initializeAllReference');
+    }
+};
 
 export class SpaceRouter {
     static router: VueRouter;
@@ -55,12 +74,61 @@ export class SpaceRouter {
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
+            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
             const isTokenAlive = SpaceConnector.isTokenAlive;
-            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pagePermissionList'];
+            const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
+            const beforeRoutePathByRawUrl = window.location.pathname;
+
+
+
+            // Grant Refresh Token
+            const refreshToken = SpaceConnector.getRefreshToken();
+            const isContinuedAdminRoute = to.name?.startsWith('admin.') && beforeRoutePathByRawUrl.startsWith('/admin');
+            const isWorkspaceIdUnchanged = (to.params.workspaceId && from.params.workspaceId) && to.params.workspaceId === from.params.workspaceId;
+            const isGrantRoleSkipLogic = isContinuedAdminRoute || isWorkspaceIdUnchanged;
+            if (refreshToken && isTokenAlive && !isGrantRoleSkipLogic && isNotErrorRoute) {
+                let scope: GrantScope;
+                if (to.name?.startsWith('admin.') || isAdminMode) {
+                    scope = 'DOMAIN';
+                } else if (to.params.workspaceId) {
+                    scope = 'WORKSPACE';
+                } else scope = 'USER';
+
+                const grantedRoleInfo = await grantCurrentScope(scope, refreshToken, to.params.workspaceId);
+                await loadAllReferencesByGrantedRoleInfo(grantedRoleInfo);
+            }
+
+
+            const userPagePermissions = SpaceRouter.router.app?.$store.getters['user/pageAccessPermissionList'];
             const routeAccessLevel = getRouteAccessLevel(to);
-            const userAccessLevel = getUserAccessLevel(to.name, userPagePermissions, isTokenAlive, to.meta?.accessInfo?.referenceMenuIds);
+            const userAccessLevel = getUserAccessLevel(to, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
+
+            /* Redirect Logic for Workspace and Admin Modes
+            * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent
+            * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
+             */
+            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && isAdminMode && to.name && !to.name?.startsWith('admin.') && isNotErrorRoute) {
+                const adminRouteName = makeAdminRouteName(to.name);
+                const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
+                const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
+                const adminUserAccessLevel = getUserAccessLevel(resolved.route, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+
+                if (adminRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
+                    nextLocation = {
+                        ...to,
+                        name: adminRouteName,
+                    };
+                } else {
+                    nextLocation = {
+                        name: ERROR_ROUTE._NAME,
+                        params: { statusCode: '404' },
+                    };
+                }
+            }
+
 
             // When a user is authenticated
             if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
@@ -87,6 +155,7 @@ export class SpaceRouter {
             if (SpaceRouter.router.app?.$store.state.error.visibleAuthorizationError) {
                 SpaceRouter.router.app?.$store.commit('error/setVisibleAuthorizationError', false);
             }
+
             next(nextLocation);
         });
 
@@ -97,8 +166,8 @@ export class SpaceRouter {
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
 
-            const isDomainOwner = store.getters['user/isDomainOwner'];
-            if (!isDomainOwner) {
+            const isDomainAdmin = store.getters['user/isDomainAdmin'];
+            if (!isDomainAdmin) {
                 const recent = getRecentConfig(to);
                 if (recent) {
                     store.dispatch('recent/addItem', {

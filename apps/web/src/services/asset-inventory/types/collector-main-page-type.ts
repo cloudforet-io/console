@@ -1,9 +1,10 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
 import type {
-    CollectorPluginModel, Schedule,
+    CollectorPluginModel,
 
 } from '@/schema/inventory/collector/model';
+import type { Schedule } from '@/schema/inventory/collector/type';
 import type { JobStatus } from '@/schema/inventory/job/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
@@ -19,7 +20,6 @@ export const COLLECTOR_QUERY_HELPER_SET = {
     PROVIDER: 'provider',
     TAGS: 'tags',
     PLUGIN_INFO: 'plugin_info',
-    STATE: 'state',
     SCHEDULE: 'schedule',
     SECRET_FILTER: 'secret_filter',
 } as const;
@@ -47,6 +47,7 @@ interface CollectorDetailLinkQuery {
 
 export interface CollectorItemInfo {
     collectorId: string;
+    workspaceId: string;
     name: string;
     plugin: CollectorPlugin;
     historyLink: CollectorLink,

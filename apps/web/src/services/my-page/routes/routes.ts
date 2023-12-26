@@ -11,7 +11,6 @@ import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
 const MyPageContainer = () => import('@/services/my-page/MyPageContainer.vue');
 
 const UserAccountPage = () => import('@/services/my-page/pages/UserAccountPage.vue');
-const UserAPIKeyPage = () => import('@/services/my-page/pages/UserAPIKeyPage.vue');
 const UserNotificationPage = () => import('@/services/my-page/pages/UserNotificationPage.vue');
 const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotificationAddPage.vue');
 
@@ -19,34 +18,28 @@ const UserNotificationAddPage = () => import('@/services/my-page/pages/UserNotif
 // const UserManageNotificationPage = () => import('@/services/administration/iam/user/user-manage-notification/UserManageNotificationPage.vue');
 
 const myPageRoutes: RouteConfig = {
-    path: 'my-page',
+    path: '/my-page',
     name: MY_PAGE_ROUTE._NAME,
-    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.MY_PAGE, store.getters['user/pagePermissionMap']),
+    meta: { menuId: MENU_ID.MY_PAGE, accessLevel: ACCESS_LEVEL.AUTHENTICATED },
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: MyPageContainer,
     children: [
         {
             path: 'account',
             name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
-            meta: { menuId: MENU_ID.MY_PAGE_ACCOUNT },
-            redirect: () => getRedirectRouteByPagePermission(MENU_ID.MY_PAGE_ACCOUNT, store.getters['user/pagePermissionMap']),
+            meta: { menuId: MENU_ID.ACCOUNT },
+            redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
             component: { template: '<router-view />' },
             children: [
                 {
                     path: 'profile',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME,
-                    meta: { lnbVisible: true, menuId: MENU_ID.MY_PAGE_ACCOUNT_PROFILE },
+                    name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT_PROFILE._NAME,
+                    meta: { lnbVisible: true, menuId: MENU_ID.ACCOUNT_PROFILE },
                     component: UserAccountPage as any,
                 },
                 {
-                    path: 'api-key',
-                    name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME,
-                    meta: { lnbVisible: true, menuId: MENU_ID.MY_PAGE_API_KEY },
-                    component: UserAPIKeyPage as any,
-                },
-                {
                     path: 'notification',
-                    meta: { lnbVisible: true, menuId: MENU_ID.MY_PAGE_NOTIFICATIONS },
+                    meta: { lnbVisible: true, menuId: MENU_ID.NOTIFICATIONS },
                     component: { template: '<router-view />' },
                     children: [
                         {
@@ -55,13 +48,6 @@ const myPageRoutes: RouteConfig = {
                             meta: { lnbVisible: true },
                             component: UserNotificationPage as any,
                         },
-                        // {
-                        //     path: ':userId',
-                        //     name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.MANAGE._NAME,
-                        //     meta: { label: ({ params }) => params.userId },
-                        //     component: ManageUserNotificationPage as any,
-                        //     props: true,
-                        // },
                         {
                             path: ':protocol/:protocolId/:userId',
                             name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION.ADD._NAME,

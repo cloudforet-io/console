@@ -2,10 +2,11 @@
     <div class="service-account-project-form">
         <project-select-dropdown
             class="project-select-dropdown"
-            project-selectable
             :selected-project-ids="selectedProjects"
             :use-fixed-menu-style="false"
             :invalid="proxyIsValid === false"
+            project-selectable
+            :project-group-selectable="false"
             @update:selected-project-ids="handleSelectedProject"
         />
     </div>
@@ -16,12 +17,11 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 
-import { store } from '@/store';
-
 import { useProxyValue } from '@/common/composables/proxy-state';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import type { ProjectForm } from '@/services/asset-inventory/types/service-account-page-type';
+
 
 export default {
     name: 'ServiceAccountProjectForm',
@@ -41,23 +41,16 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             selectedProjects: [] as Array<string>,
-            formData: { selectedProjectId: null } as ProjectForm,
+            formData: { selectedProjectId: undefined } as Partial<ProjectForm>,
             proxyIsValid: useProxyValue('is-valid', props, emit),
         });
 
         /* Event */
         const handleSelectedProject = (selectedProject: string[]) => {
             state.selectedProjects = selectedProject;
-            state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0] : null };
+            state.formData = { selectedProjectId: selectedProject.length ? selectedProject[0] : undefined };
             state.proxyIsValid = !!selectedProject.length;
         };
-
-        /* Init */
-        (async () => {
-            await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-            ]);
-        })();
 
         /* Watcher */
         watch(() => props.projectId, (projectId) => {
@@ -66,7 +59,7 @@ export default {
                 state.selectedProjects = [projectId];
             }
         }, { immediate: true });
-        watch(() => state.formData, (formData: ProjectForm) => {
+        watch(() => state.formData, (formData: Partial<ProjectForm>) => {
             emit('change', formData);
         });
 

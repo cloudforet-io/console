@@ -21,17 +21,15 @@ export interface ReferenceItem<Data = Record<string, any>> {
 export type ReferenceMap<Item extends ReferenceItem = ReferenceItem> = Record<string, Item>;
 
 export type VuexStoreReferenceType =
-    'projectGroup'|'project_group' // supports both camel case and snake case
-    |'project'
     |'cloudServiceType'|'cloud_service_type'
     |'provider'
     |'region'
-    | 'serviceAccount'|'service_account'
+    |'serviceAccount'|'service_account'
+    |'trustedAccount'
     |'collector'
     |'protocol'
     |'plugin'
     |'secret'
-    |'user'
     |'webhook';
 
 interface VuexStoreReferenceTypeInfo {

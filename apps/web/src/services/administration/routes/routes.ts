@@ -10,128 +10,28 @@ import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-con
 
 const AdministrationContainer = () => import('@/services/administration/AdministrationContainer.vue');
 
-const UserPage = () => import('@/services/administration/pages/UserPage.vue');
-const RolePage = () => import('@/services/administration/pages/RolePage.vue');
-const RoleCreatePage = () => import('@/services/administration/pages/RoleCreatePage.vue');
-const RoleUpdatePage = () => import('@/services/administration/pages/RoleUpdatePage.vue');
-const PolicyPage = () => import('@/services/administration/pages/PolicyPage.vue');
-const PolicyCreatePage = () => import('@/services/administration/pages/PolicyCreatePage.vue');
-const PolicyDetailPage = () => import('@/services/administration/pages/PolicyDetailPage.vue');
-// TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
-// const ProviderPage = () => import('@/services/administration/additional-settings/provider/ProviderPage.vue');
-// const ProviderAddPage = () => import('@/services/administration/additional-settings/provider/provider-add/ProviderAddPage.vue');
+const UserMainPage = () => import('@/services/administration/pages/UserMainPage.vue');
+const AppMainPage = () => import('@/services/administration/pages/AppMainPage.vue');
 
 const administrationRoutes: RouteConfig = {
-    path: 'administration',
-    name: ADMINISTRATION_ROUTE._NAME,
-    meta: { menuId: MENU_ID.ADMINISTRATION, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.ADMINISTRATION, store.getters['user/pagePermissionMap']),
+    path: 'iam',
+    name: ADMINISTRATION_ROUTE.IAM._NAME,
+    meta: { menuId: MENU_ID.IAM, lnbVisible: true, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: AdministrationContainer,
     children: [
         {
-            path: 'iam',
-            name: ADMINISTRATION_ROUTE.IAM._NAME,
-            meta: { menuId: MENU_ID.ADMINISTRATION_IAM },
-            redirect: () => getRedirectRouteByPagePermission(MENU_ID.ADMINISTRATION_IAM, store.getters['user/pagePermissionMap']),
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: 'user',
-                    name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
-                    meta: { lnbVisible: true, menuId: MENU_ID.ADMINISTRATION_USER },
-                    component: UserPage as any,
-                },
-                {
-                    path: 'role',
-                    meta: { menuId: MENU_ID.ADMINISTRATION_ROLE },
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: '/',
-                            name: ADMINISTRATION_ROUTE.IAM.ROLE._NAME,
-                            meta: { lnbVisible: true },
-                            props: true,
-                            component: RolePage,
-                        },
-                        {
-                            path: 'create',
-                            name: ADMINISTRATION_ROUTE.IAM.ROLE.CREATE._NAME,
-                            meta: { translationId: 'IAM.ROLE.FORM.CREATE_TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            component: RoleCreatePage,
-                        },
-                        {
-                            path: 'edit/:id',
-                            name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME,
-                            meta: { translationId: 'IAM.ROLE.FORM.EDIT_TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            props: true,
-                            component: RoleUpdatePage,
-                        },
-                    ],
-                },
-                {
-                    path: 'policy',
-                    meta: { menuId: MENU_ID.ADMINISTRATION_POLICY },
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: '/',
-                            name: ADMINISTRATION_ROUTE.IAM.POLICY._NAME,
-                            meta: { lnbVisible: true },
-                            props: true,
-                            component: PolicyPage,
-                        },
-                        {
-                            path: 'create',
-                            name: ADMINISTRATION_ROUTE.IAM.POLICY.CREATE._NAME,
-                            meta: { lnbVisible: false, translationId: 'IAM.POLICY.FORM.CREATE_TITLE', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
-                            props: true,
-                            component: PolicyCreatePage,
-                        },
-                        {
-                            path: ':id?',
-                            name: ADMINISTRATION_ROUTE.IAM.POLICY.DETAIL._NAME,
-                            meta: { lnbVisible: true, label: ({ params }) => params.id, copiable: true },
-                            props: true,
-                            component: PolicyDetailPage,
-                        },
-                    ],
-                },
-            ],
+            path: 'user',
+            name: ADMINISTRATION_ROUTE.IAM.USER._NAME,
+            meta: { lnbVisible: true, menuId: MENU_ID.USER },
+            component: UserMainPage as any,
         },
-        // TODO: provider 부분이 1.10.2 스프린트에서 제외되어 주석 처리
-        // {
-        //     path: 'settings',
-        //     name: ADMINISTRATION_ROUTE.SETTINGS._NAME,
-        //     meta: { menuId: MENU_ID.ADMINISTRATION_SETTINGS },
-        //     redirect: () => getRedirectRouteByPagePermission(MENU_ID.ADMINISTRATION_SETTINGS, store.getters['user/pagePermissionMap']),
-        //     component: { template: '<router-view />' },
-        //     children: [
-        //         {
-        //             path: 'provider',
-        //             name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME,
-        //             meta: { lnbVisible: true, menuId: MENU_ID.ADMINISTRATION_PROVIDER },
-        //             component: { template: '<router-view/>' },
-        //             children: [
-        //                 {
-        //                     path: '/',
-        //                     name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER._NAME,
-        //                     meta: { lnbVisible: true },
-        //                     props: true,
-        //                     component: ProviderPage,
-        //                 },
-        //                 {
-        //                     path: 'add',
-        //                     name: ADMINISTRATION_ROUTE.SETTINGS.PROVIDER.ADD._NAME,
-        //                     // song-lang  => Add Provider
-        //                     meta: { lnbVisible: false, translationId: 'Add Provider' }, // TODO: access level 확인 필요
-        //                     props: true,
-        //                     component: ProviderAddPage,
-        //                 },
-        //             ],
-        //         },
-        //
-        //     ],
-        // },
+        {
+            path: 'app',
+            name: ADMINISTRATION_ROUTE.IAM.APP._NAME,
+            meta: { lnbVisible: true, menuId: MENU_ID.APP },
+            component: AppMainPage as any,
+        },
     ],
 };
 export default administrationRoutes;

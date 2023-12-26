@@ -35,21 +35,22 @@ const DeleteModal = () => import('@/common/components/modals/DeleteModal.vue');
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
 
 const state = reactive({
     hasManagePermission: useManagePermissionState(),
     defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
-    title: computed<string>(() => costAnalysisPageStore.selectedQuerySet?.name ?? state.defaultTitle),
-    dataSourceImage: computed(() => costAnalysisPageStore.dataSourceImageUrl),
-    managedCostQuerySetList: computed(() => costAnalysisPageStore.managedCostQuerySetList),
-    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageStore.selectedQueryId
-        ? state.managedCostQuerySetList.some((item) => item.cost_query_set_id === costAnalysisPageStore.selectedQueryId)
+    title: computed<string>(() => costAnalysisPageGetters.selectedQuerySet?.name ?? state.defaultTitle),
+    dataSourceImage: computed(() => costAnalysisPageGetters.dataSourceImageUrl),
+    managedCostQuerySetList: computed(() => costAnalysisPageGetters.managedCostQuerySetList),
+    isManagedCostQuerySet: computed<boolean>(() => (costAnalysisPageGetters.selectedQueryId
+        ? state.managedCostQuerySetList.some((item) => item.cost_query_set_id === costAnalysisPageGetters.selectedQueryId)
         : false)),
     itemIdForDeleteQuery: '',
     selectedQuerySetId: undefined as string|undefined,
     queryFormModalVisible: false,
     queryDeleteModalVisible: false,
-    isEditableQuerySet: computed<boolean>(() => costAnalysisPageStore.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
+    isEditableQuerySet: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId !== DYNAMIC_COST_QUERY_SET_PARAMS),
 });
 
 /* Event Handlers */
@@ -76,8 +77,8 @@ const handleDeleteQueryConfirm = async () => {
         await SpaceRouter.router.push({
             name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
             params: {
-                dataSourceId: costAnalysisPageStore.selectedDataSourceId as string,
-                costQuerySetId: costAnalysisPageStore.managedCostQuerySetList[0].cost_query_set_id,
+                dataSourceId: costAnalysisPageGetters.selectedDataSourceId as string,
+                costQuerySetId: costAnalysisPageGetters.managedCostQuerySetList[0].cost_query_set_id,
             },
         });
     } catch (e) {
@@ -105,11 +106,11 @@ const handleDeleteQueryConfirm = async () => {
                     </div>
                 </template>
                 <template #title-right-extra>
-                    <div v-if="costAnalysisPageStore.selectedQueryId"
+                    <div v-if="costAnalysisPageGetters.selectedQueryId"
                          class="title-right-extra icon-wrapper"
                     >
                         <div class="favorite-button-wrapper">
-                            <favorite-button :item-id="getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageStore.selectedDataSourceId,costAnalysisPageStore.selectedQueryId)"
+                            <favorite-button :item-id="getCompoundKeyWithManagedCostQuerySetFavoriteKey(costAnalysisPageGetters.selectedDataSourceId,costAnalysisPageGetters.selectedQueryId)"
                                              :favorite-type="FAVORITE_TYPE.COST_ANALYSIS"
                                              scale="0.8"
                             />
@@ -117,17 +118,17 @@ const handleDeleteQueryConfirm = async () => {
                         <template v-if="state.hasManagePermission && state.isEditableQuerySet && !state.isManagedCostQuerySet">
                             <p-icon-button name="ic_edit-text"
                                            size="md"
-                                           @click.stop="handleClickEditQuery(costAnalysisPageStore.selectedQueryId)"
+                                           @click.stop="handleClickEditQuery(costAnalysisPageGetters.selectedQueryId)"
                             />
                             <p-icon-button name="ic_delete"
                                            size="md"
-                                           @click.stop="handleClickDeleteQuery(costAnalysisPageStore.selectedQueryId)"
+                                           @click.stop="handleClickDeleteQuery(costAnalysisPageGetters.selectedQueryId)"
                             />
                         </template>
                     </div>
                     <div class="title-right-extra currency-wrapper">
                         <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CURRENCY') }}:</span>
-                        <span>{{ CURRENCY_SYMBOL[costAnalysisPageStore.currency] }}{{ costAnalysisPageStore.currency }}</span>
+                        <span>{{ CURRENCY_SYMBOL[costAnalysisPageGetters.currency] }}{{ costAnalysisPageGetters.currency }}</span>
                     </div>
                 </template>
             </p-heading>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { useResizeObserver } from '@vueuse/core';
 import {
-    computed, getCurrentInstance, reactive, watch,
+    computed, reactive, watch, ref,
 } from 'vue';
 import type { Location } from 'vue-router';
-import type { Vue } from 'vue/types/vue';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar,
@@ -13,6 +14,7 @@ import { LocalStorageAccessor } from '@cloudforet/core-lib/local-storage-accesso
 
 import { store } from '@/store';
 
+import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 import { getRouteAccessLevel } from '@/lib/access-control';
@@ -24,17 +26,20 @@ import NotificationEmailModal from '@/common/modules/modals/notification-email-m
 import { MODAL_TYPE } from '@/common/modules/modals/notification-email-modal/type';
 import RecommendedBrowserModal from '@/common/modules/modals/RecommendedBrowserModal.vue';
 import GNB from '@/common/modules/navigations/gnb/GNB.vue';
+import MyPageGNB from '@/common/modules/navigations/gnb/MyPageGNB.vue';
 import NoticePopup from '@/common/modules/popup/notice/NoticePopup.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 
 import MobileGuideModal from '@/services/auth/components/MobileGuideModal.vue';
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
-const vm = getCurrentInstance()?.proxy as Vue;
+const router = useRouter();
+const route = useRoute();
 
 const state = reactive({
-    showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
-    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(vm.$route) >= ACCESS_LEVEL.AUTHENTICATED),
+    showGNB: computed(() => route.matched[0]?.name === 'root' || state.isMyPage),
+    isMyPage: computed(() => route.matched[0]?.name === 'my_page'),
+    isExpired: computed(() => !state.isRoutingToSignIn && store.state.error.visibleSessionExpiredError && getRouteAccessLevel(route) >= ACCESS_LEVEL.AUTHENTICATED),
     isRoutingToSignIn: false,
     isEmailVerified: computed(() => store.state.user.emailVerified),
     userId: computed<string>(() => store.state.user.userId),
@@ -44,19 +49,28 @@ const state = reactive({
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
 
+const globalUIStore = useGlobalUIStore();
+const globalUIGetters = globalUIStore.getters;
+
+const topNotiRef = ref(null);
+useResizeObserver(topNotiRef, (entries) => {
+    const rect = entries[0].contentRect;
+    globalUIStore.setTopNotificationHeight(rect.height);
+});
+
 const goToSignIn = async () => {
     state.isRoutingToSignIn = true;
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
-        query: { nextPath: vm.$route.fullPath },
+        query: { nextPath: route.fullPath },
     };
     store.commit('error/setVisibleSessionExpiredError', false);
-    await vm.$router.push(res);
+    await router.push(res);
     state.isRoutingToSignIn = false;
 };
 const showsBrowserRecommendation = () => !supportsBrowser() && !LocalStorageAccessor.getItem('showBrowserRecommendation');
 
-watch(() => vm.$route, (value) => {
+watch(() => route, (value) => {
     state.notificationEmailModalVisible = !state.isEmailVerified && !LocalStorageAccessor.getItem('hideNotificationEmailModal') && getRouteAccessLevel(value) >= ACCESS_LEVEL.AUTHENTICATED;
 });
 
@@ -79,8 +93,15 @@ watch(() => state.userId, (userId) => {
             <p-toast-alert group="toastTopCenter" />
             <top-notification />
             <template v-if="state.showGNB">
-                <g-n-b class="gnb" />
-                <div class="app-body">
+                <my-page-g-n-b v-if="state.isMyPage"
+                               class="gnb"
+                />
+                <g-n-b v-else
+                       class="gnb"
+                />
+                <div class="app-body"
+                     :style="{ height: globalUIGetters.appBodyHeight }"
+                >
                     <p-sidebar :visible="store.state.display.visibleSidebar"
                                :style-type="store.getters['display/sidebarProps'].styleType"
                                :size="store.getters['display/sidebarProps'].size"
@@ -90,7 +111,8 @@ watch(() => state.userId, (userId) => {
                                @close="store.dispatch('display/hideSidebar')"
                     >
                         <main class="main">
-                            <portal-target name="top-notification"
+                            <portal-target ref="topNotiRef"
+                                           name="top-notification"
                                            :slot-props="{hasDefaultMessage: true}"
                             />
                             <router-view />
@@ -170,7 +192,6 @@ watch(() => state.userId, (userId) => {
         flex-direction: column;
         overflow-y: hidden;
         width: 100%;
-        height: calc(100vh - $(gnb-height));
         margin-top: $gnb-height;
         flex-grow: 1;
         .p-sidebar .non-sidebar-wrapper {
@@ -182,7 +203,7 @@ watch(() => state.userId, (userId) => {
             height: 100%;
             margin: 0;
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: hidden;
         }
     }
 }

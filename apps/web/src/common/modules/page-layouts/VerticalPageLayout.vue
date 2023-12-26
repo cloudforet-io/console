@@ -11,7 +11,9 @@
         <template #default>
             <div ref="containerRef"
                  class="right-container"
+                 :style="{ height: globalUIGetters.appBodyHeight }"
             >
+                <portal-target name="page-top-notification" />
                 <div class="header">
                     <p-breadcrumbs v-if="breadcrumbs.length"
                                    :routes="breadcrumbs"
@@ -38,6 +40,8 @@ import { computed, ref, watch } from 'vue';
 
 import { PBreadcrumbs, PVerticalLayout } from '@spaceone/design-system';
 
+import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
+
 import FNB from '@/common/modules/navigations/FNB.vue';
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
 
@@ -45,10 +49,6 @@ export default {
     name: 'VerticalPageLayout',
     components: { PVerticalLayout, PBreadcrumbs, FNB },
     props: {
-        height: {
-            type: String,
-            default: '100%',
-        },
         initWidth: {
             type: Number,
             default: 260,
@@ -76,8 +76,12 @@ export default {
             }
         });
 
+        const globalUIStore = useGlobalUIStore();
+        const globalUIGetters = globalUIStore.getters;
+
         return {
             containerRef,
+            globalUIGetters,
             copiable: computed(() => {
                 const last = props.breadcrumbs?.[props.breadcrumbs.length - 1];
                 return last?.copiable;
@@ -89,7 +93,6 @@ export default {
 
 <style lang="postcss" scoped>
 .right-container {
-    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: stretch;

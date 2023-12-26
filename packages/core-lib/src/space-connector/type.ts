@@ -44,11 +44,6 @@ interface PostResponse {
 
 export type AxiosPostResponse = AxiosResponse<PostResponse>;
 
-export interface ServerListResponse<T> {
-    results: T[];
-    total_count: number;
-}
-
 export type ApiFilterOperator =
     | 'lt' | 'lte' | 'gt' | 'gte' | 'exists' | 'regex'
     | 'eq' | 'contain' | 'not' | 'not_contain'
@@ -74,12 +69,7 @@ export interface Query {
         start?: number;
         limit?: number;
     };
-    sort?: {
-        key?: string;
-        keys?: Sort[];
-        name?: string;
-        desc?: boolean;
-    } | Sort[];
+    sort?: Sort[];
     only?: Array<string>;
     keyword?: string;
     minimal?: boolean;
@@ -91,6 +81,7 @@ export interface MockConfig {
     endpoints?: string[]; // [v1_endpoint, v2_endpoint]
     reflection?: boolean[]; // [v1_reflection, v2_reflection]
     apiList?: string[][]; // [[v1_api_1, v1_api_2], [v2_api_1, v2_api_2, v2_api_3]]
+    apiKey?: string;
 }
 export interface AuthConfig {
     enabled?: boolean;

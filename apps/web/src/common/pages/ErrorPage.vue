@@ -21,9 +21,15 @@ import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { store } from '@/store';
 
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+import { ROOT_ROUTE } from '@/router/constant';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 interface Props {
     statusCode: string;
@@ -32,6 +38,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     statusCode: '404',
 });
+const appContextStore = useAppContextStore();
 
 const domainName = computed(() => store.state.domain.name);
 
@@ -47,7 +54,10 @@ const handleClickBack = () => {
     }
 };
 const handleClickHome = () => {
-    router.push({ name: HOME_DASHBOARD_ROUTE._NAME });
+    const isTokenAlive = SpaceConnector.isTokenAlive;
+    if (props.statusCode === '403') appContextStore.switchToWorkspaceMode();
+    if (isTokenAlive) router.push({ name: ROOT_ROUTE._NAME });
+    else router.push({ name: AUTH_ROUTE.SIGN_OUT._NAME });
 };
 </script>
 

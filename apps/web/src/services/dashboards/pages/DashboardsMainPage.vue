@@ -1,11 +1,164 @@
+<script lang="ts" setup>
+import {
+    computed, onUnmounted, reactive, watch,
+} from 'vue';
+
+import {
+    PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
+} from '@spaceone/design-system';
+import type {
+    HandlerResponse, KeyDataType, KeyItem, KeyItemSet, ValueHandler, ValueMenuItem,
+} from '@spaceone/design-system/types/inputs/search/query-search/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+
+import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
+import { QueryHelper } from '@cloudforet/core-lib/query';
+
+import { SpaceRouter } from '@/router';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
+
+import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
+
+import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
+import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
+import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+
+
+const dashboardStore = useDashboardStore();
+const dashboardState = dashboardStore.state;
+const dashboardGetters = dashboardStore.getters;
+const state = reactive({
+    loading: computed(() => dashboardState.loading),
+    isWorkspaceOwner: () => store.state.user.currentRoleInfo?.roleType === ROLE_TYPE.WORKSPACE_OWNER,
+    workspaceDashboardList: computed<DashboardModel[]>(() => {
+        if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
+        let target = dashboardGetters.workspaceItems || [];
+        if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
+        return target as DashboardModel[];
+    }),
+    projectDashboardList: computed<DashboardModel[]>(() => {
+        if (dashboardState.scope && dashboardState.scope !== 'PROJECT') return [];
+        let target = dashboardGetters.projectItems || [];
+        if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
+        return target as DashboardModel[];
+    }),
+    privateDashboardList: computed<DashboardModel[]>(() => {
+        if (dashboardState.scope && dashboardState.scope !== 'PRIVATE') return [];
+        return dashboardGetters.privateItems as DashboardModel[] || [];
+    }),
+    dashboardTotalCount: computed<number>(() => state.workspaceDashboardList.length + state.projectDashboardList.length + state.privateDashboardList.length),
+    filteredDashboardStatus: computed(() => {
+        if (dashboardState.scope === 'WORKSPACE') {
+            return !!(state.workspaceDashboardList.length);
+        }
+        if (dashboardState.scope === 'PROJECT') {
+            return !!(state.projectDashboardList.length);
+        }
+        if (dashboardState.scope === 'PRIVATE') {
+            return !!(state.privateDashboardList.length);
+        }
+        return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
+    }),
+});
+
+const searchQueryHelper = new QueryHelper();
+const queryState = reactive({
+    searchFilters: computed(() => dashboardState.searchFilters),
+    urlQueryString: computed(() => ({
+        scope: dashboardState.scope ? primitiveToQueryString(dashboardState.scope) : null,
+        filters: searchQueryHelper.setFilters(queryState.searchFilters).rawQueryStrings,
+    })),
+    keyItemSets: computed<KeyItemSet[]>(() => [{
+        title: 'Properties',
+        items: [
+            { name: 'label', label: 'Label' },
+        ],
+    }]),
+    valueHandlerMap: computed(() => ({
+        label: getDashboardValueHandler(),
+    })),
+    queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(dashboardState.searchFilters).queryTags),
+});
+
+const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };
+const handleQueryChange = (options: ToolboxOptions = {}) => {
+    if (options.queryTags !== undefined) {
+        searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
+        dashboardStore.setSearchFilters(searchQueryHelper.filters);
+        dashboardStore.load();
+    }
+};
+
+/* init */
+let urlQueryStringWatcherStop;
+const init = async () => {
+    const currentQuery = SpaceRouter.router.currentRoute.query;
+    const useQueryValue = {
+        scope: queryStringToString(currentQuery.scope),
+        filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
+    };
+
+    dashboardStore.setScope(useQueryValue.scope);
+    dashboardStore.setSearchFilters(useQueryValue.filters);
+
+    urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
+        replaceUrlQuery(urlQueryString);
+    });
+};
+
+const getDashboardValueHandler = (): ValueHandler | undefined => {
+    const publicLabelsValueHandler = makeDistinctValueHandler('dashboard.PublicDashboard', 'labels');
+    const privateLabelsValueHandler = makeDistinctValueHandler('dashboard.PrivateDashboard', 'labels');
+    if (!publicLabelsValueHandler && !privateLabelsValueHandler) return undefined;
+
+    return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
+        const results = [] as ValueMenuItem[];
+        const promises = [] as (HandlerResponse | Promise<HandlerResponse>)[];
+
+        if (publicLabelsValueHandler) promises.push(publicLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+        if (privateLabelsValueHandler) promises.push(privateLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
+        const responses = await Promise.allSettled(promises);
+
+        // combine both of results and sort
+        responses.forEach((res) => {
+            if (res.status === 'fulfilled') {
+                res.value.results.forEach((item) => {
+                    if (results.some((d) => d.name === item.name)) return;
+                    results.push(item);
+                });
+            }
+        });
+        results.sort((a, b) => (a.label > b.label ? 1 : -1));
+
+        return {
+            results,
+            totalCount: results.length ?? 0,
+        };
+    };
+};
+
+(async () => {
+    await init();
+})();
+
+onUnmounted(() => {
+    // urlQueryString watcher is referencing dashboardStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
+    if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
+});
+</script>
+
 <template>
     <div class="dashboards-main-page">
         <p-heading :title="$t('DASHBOARDS.ALL_DASHBOARDS.DASHBOARDS_TITLE')"
                    use-total-count
-                   :total-count="dashboardTotalCount"
+                   :total-count="state.dashboardTotalCount"
         >
             <template #extra>
-                <p-button v-if="!hasOnlyViewPermission && (workspaceDashboardList || projectDashboardList)"
+                <p-button v-if="state.workspaceDashboardList || state.projectDashboardList"
                           icon-left="ic_plus_bold"
                           @click="handleCreateDashboard"
                 >
@@ -26,8 +179,8 @@
                    @change="handleQueryChange"
                    @refresh="handleQueryChange()"
         />
-        <p-data-loader :loading="loading"
-                       :data="filteredDashboardStatus"
+        <p-data-loader :loading="state.loading"
+                       :data="state.filteredDashboardStatus"
                        class="dashboard-list-wrapper"
         >
             <template #no-data>
@@ -37,12 +190,11 @@
                 >
                     <template #image>
                         <img alt="empty-default-image"
-                             src="../../../assets/images/illust_jellyocto-with-a-telescope.svg"
+                             src="@/assets/images/illust_jellyocto-with-a-telescope.svg"
                         >
                     </template>
                     <template #button>
                         <p-button icon-left="ic_plus_bold"
-                                  :disabled="hasOnlyViewPermission"
                                   @click="handleCreateDashboard"
                         >
                             {{ $t('DASHBOARDS.ALL_DASHBOARDS.CREAT_NEW_DASHBOARD') }}
@@ -51,199 +203,30 @@
                     {{ $t('DASHBOARDS.ALL_DASHBOARDS.HELP_TEXT_CREATE') }}
                 </p-empty>
             </template>
-            <dashboard-main-board-list v-if="(scopeStatus !== SCOPE_TYPE.PROJECT) && workspaceDashboardList.length"
-                                       :scope-type="DASHBOARD_SCOPE.DOMAIN"
+            <dashboard-main-board-list v-if="state.workspaceDashboardList.length"
+                                       scope-type="WORKSPACE"
                                        class="dashboard-list"
-                                       :class="{'full-mode': scopeStatus === SCOPE_TYPE.DOMAIN}"
-                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE')"
-                                       :dashboard-list="workspaceDashboardList"
+                                       :class="{'full-mode': dashboardState.scope === 'WORKSPACE'}"
+                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE')"
+                                       :dashboard-list="state.workspaceDashboardList"
             />
-            <dashboard-main-board-list v-if="scopeStatus !== SCOPE_TYPE.DOMAIN && projectDashboardList.length"
-                                       :scope-type="DASHBOARD_SCOPE.PROJECT"
+            <dashboard-main-board-list v-if="state.projectDashboardList.length"
+                                       scope-type="PROJECT"
                                        class="dashboard-list"
-                                       :class="{'full-mode': scopeStatus === SCOPE_TYPE.PROJECT}"
+                                       :class="{'full-mode': dashboardState.scope === 'PROJECT'}"
                                        :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT')"
-                                       :dashboard-list="projectDashboardList"
+                                       :dashboard-list="state.projectDashboardList"
+            />
+            <dashboard-main-board-list v-if="state.privateDashboardList.length"
+                                       scope-type="PRIVATE"
+                                       class="dashboard-list"
+                                       :class="{'full-mode': dashboardState.scope === 'PRIVATE'}"
+                                       :field-title="$t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE')"
+                                       :dashboard-list="state.privateDashboardList"
             />
         </p-data-loader>
     </div>
 </template>
-
-<script lang="ts">
-import {
-    computed, onUnmounted,
-    reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PHeading, PDivider, PButton, PToolbox, PEmpty, PDataLoader,
-} from '@spaceone/design-system';
-import type {
-    HandlerResponse,
-    KeyDataType,
-    KeyItem,
-    KeyItemSet,
-    ValueHandler, ValueMenuItem,
-} from '@spaceone/design-system/types/inputs/search/query-search/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-
-import { makeDistinctValueHandler } from '@cloudforet/core-lib/component-util/query-search';
-import { QueryHelper } from '@cloudforet/core-lib/query';
-
-import { SpaceRouter } from '@/router';
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import { store } from '@/store';
-
-import { DASHBOARD_SCOPE_TYPE } from '@/store/modules/dashboard/type';
-
-import { MENU_ID } from '@/lib/menu/config';
-import { primitiveToQueryString, queryStringToString, replaceUrlQuery } from '@/lib/router-query-string';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-
-import DashboardMainBoardList from '@/services/dashboards/components/DashboardMainBoardList.vue';
-import DashboardMainSelectFilter from '@/services/dashboards/components/DashboardMainSelectFilter.vue';
-import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
-
-export default {
-    name: 'DashboardMainPage',
-    components: {
-        DashboardMainBoardList,
-        DashboardMainSelectFilter,
-        PDataLoader,
-        PEmpty,
-        PToolbox,
-        PButton,
-        PHeading,
-        PDivider,
-    },
-    setup() {
-        const state = reactive({
-            viewersStatus: computed(() => store.state.dashboard.viewers),
-            scopeStatus: computed(() => store.state.dashboard.scope),
-            loading: computed(() => store.state.dashboard.loading),
-            workspaceDashboardList: computed(() => (state.pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] ? store.getters['dashboard/getDomainItems'] : [])),
-            projectDashboardList: computed(() => (state.pagePermission[MENU_ID.DASHBOARDS_PROJECT] ? store.getters['dashboard/getProjectItems'] : [])),
-            dashboardTotalCount: computed(() => {
-                const domainDashboardCount = state.pagePermission[MENU_ID.DASHBOARDS_WORKSPACE] ? store.getters['dashboard/getDomainDashboardCount'] : 0;
-                const projectDashboardCount = state.pagePermission[MENU_ID.DASHBOARDS_PROJECT] ? store.getters['dashboard/getProjectDashboardCount'] : 0;
-                return domainDashboardCount + projectDashboardCount;
-            }),
-            filteredDashboardStatus: computed(() => {
-                if (state.scopeStatus === DASHBOARD_SCOPE_TYPE.DOMAIN) {
-                    return !!(state.workspaceDashboardList.length);
-                }
-                if (state.scopeStatus === DASHBOARD_SCOPE_TYPE.PROJECT) {
-                    return !!(state.projectDashboardList.length);
-                }
-                return !!(state.dashboardTotalCount && (state.projectDashboardList.length || state.workspaceDashboardList.length));
-            }),
-            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
-            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
-            hasOnlyViewPermission: computed(() => !(state.projectManagePermission || state.workspaceManagePermission)),
-            pagePermission: computed(() => store.getters['user/pagePermissionMap']),
-        });
-
-        const searchQueryHelper = new QueryHelper();
-        const queryState = reactive({
-            searchFilters: computed(() => store.state.dashboard.searchFilters),
-            urlQueryString: computed(() => ({
-                viewers: store.state.dashboard.viewers === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.viewers),
-                scope: store.state.dashboard.scope === 'ALL' ? null : primitiveToQueryString(store.state.dashboard.scope),
-                filters: searchQueryHelper.setFilters(queryState.searchFilters).rawQueryStrings,
-            })),
-            keyItemSets: computed<KeyItemSet[]>(() => [{
-                title: 'Properties',
-                items: [
-                    { name: 'label', label: 'Label' },
-                ],
-            }]),
-            valueHandlerMap: computed(() => ({
-                label: combinedDashboardLabelsAutoCompleteHandler(),
-            })),
-            queryTags: computed(() => searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFilters(store.state.dashboard.searchFilters).queryTags),
-        });
-
-        const handleCreateDashboard = () => { SpaceRouter.router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME }); };
-        const handleQueryChange = (options: ToolboxOptions = {}) => {
-            if (options.queryTags !== undefined) {
-                searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsQueryTag(options.queryTags);
-                store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
-            }
-        };
-
-        /* init */
-        let urlQueryStringWatcherStop;
-        const init = async () => {
-            const currentQuery = SpaceRouter.router.currentRoute.query;
-            const useQueryValue = {
-                viewers: queryStringToString(currentQuery.viewers) ?? 'ALL',
-                scope: queryStringToString(currentQuery.scope) ?? 'ALL',
-                filters: searchQueryHelper.setKeyItemSets(queryState.keyItemSets).setFiltersAsRawQueryString(currentQuery.filters).filters,
-            };
-
-            /* TODO: init states from url query */
-            store.dispatch('dashboard/setSelectedViewers', useQueryValue.viewers);
-            store.dispatch('dashboard/setSelectedScope', useQueryValue.scope);
-            store.dispatch('dashboard/setSearchFilters', searchQueryHelper.filters);
-
-            /* TODO: implementation */
-            urlQueryStringWatcherStop = watch(() => queryState.urlQueryString, (urlQueryString) => {
-                replaceUrlQuery(urlQueryString);
-            });
-        };
-
-        const combinedDashboardLabelsAutoCompleteHandler = (): ValueHandler | undefined => {
-            const projectLabelsValueHandler = makeDistinctValueHandler('dashboard.ProjectDashboard', 'labels');
-            const domainLabelsValueHandler = makeDistinctValueHandler('dashboard.DomainDashboard', 'labels');
-            if (!projectLabelsValueHandler && !domainLabelsValueHandler) return undefined;
-
-            return async (inputText: string|number, keyItem: KeyItem, currentDataType?: KeyDataType, subPath?: string) => {
-                const results = [] as ValueMenuItem[];
-                const promises = [] as (HandlerResponse | Promise<HandlerResponse>)[];
-
-                if (projectLabelsValueHandler) promises.push(projectLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
-                if (domainLabelsValueHandler) promises.push(domainLabelsValueHandler(inputText, keyItem, currentDataType, subPath));
-                const responses = await Promise.allSettled(promises);
-
-                // combine both of results and sort
-                responses.forEach((res) => {
-                    if (res.status === 'fulfilled') {
-                        res.value.results.forEach((item) => {
-                            if (results.some((d) => d.name === item.name)) return;
-                            results.push(item);
-                        });
-                    }
-                });
-                results.sort((a, b) => (a.label > b.label ? 1 : -1));
-
-                return {
-                    results,
-                    totalCount: results.length ?? 0,
-                };
-            };
-        };
-
-        (async () => {
-            await init();
-        })();
-
-        onUnmounted(() => {
-            // urlQueryString watcher is referencing dashboardStore which is destroyed on unmounted. so urlQueryString watcher must be destroyed on unmounted too.
-            if (urlQueryStringWatcherStop) urlQueryStringWatcherStop();
-        });
-
-        return {
-            ...toRefs(state),
-            handleCreateDashboard,
-            handleQueryChange,
-            queryState,
-            SCOPE_TYPE: DASHBOARD_SCOPE_TYPE,
-            DASHBOARD_SCOPE,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .dashboards-main-page {

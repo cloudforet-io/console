@@ -23,8 +23,6 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-
-
 type PickedDataSourceModel = Pick<DataSourceModel, 'data_source_id'|'name'|'plugin_info'|'cost_additional_info_keys'|'cost_tag_keys'>;
 export type DataSourceItems = Required<Pick<ReferenceItem<PickedDataSourceModel>, 'key'|'label'|'name'|'data'>>;
 export type CostDataSourceReferenceMap = ReferenceMap<DataSourceItems>;
@@ -39,7 +37,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
 
     const getters = reactive({
         costDataSourceItems: asyncComputed<CostDataSourceReferenceMap>(async () => {
-            await actions.load();
+            if (state.items === null) await actions.load();
             return state.items ?? {};
         }, {}, { lazy: true }),
         costDataSourceTypeInfo: computed<ReferenceTypeInfo>(() => ({
@@ -82,6 +80,7 @@ export const useCostDataSourceReferenceStore = defineStore('cost-data-source-ref
                 ErrorHandler.handleError(e);
             }
         },
+        flush() { state.items = null; },
     };
 
     return {

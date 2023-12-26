@@ -1,3 +1,128 @@
+<script setup lang="ts">
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+
+import {
+    PFieldGroup, PRadio, PTextInput, PLink,
+} from '@spaceone/design-system';
+import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
+
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
+import type { EscalationPolicyFinishCondition, EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import EscalationPolicyFormRulesInput from '@/services/alert-manager/components/EscalationPolicyFormRulesInput.vue';
+import { ACTION } from '@/services/alert-manager/constants/alert-constant';
+import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form-store';
+import type { ActionMode } from '@/services/alert-manager/types/alert-type';
+import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
+import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+
+const props = withDefaults(defineProps<{
+    mode: ActionMode;
+    showResourceGroup?: boolean;
+    escalationPolicyData?: EscalationPolicyModel;
+}>(), {
+    mode: ACTION.create,
+    showResourceGroup: true,
+    escalationPolicyData: undefined,
+});
+
+const allReferenceStore = useAllReferenceStore();
+const escalationPolicyFormStore = useEscalationPolicyFormStore();
+const escalationPolicyFormState = escalationPolicyFormStore.$state;
+const state = reactive({
+    projects: computed(() => allReferenceStore.getters.project),
+    //
+    resourceGroupLabels: computed<Record<EscalationPolicyResourceGroup, TranslateResult>>(() => ({
+        WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'),
+        PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
+    })),
+    resourceGroups: computed<{label: TranslateResult; value: EscalationPolicyResourceGroup}[]>(() => {
+        const currentRoleType = store.getters['user/getCurrentRoleInfo'].roleType;
+        const resGroup: {label: TranslateResult; value: EscalationPolicyResourceGroup}[] = [
+            { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: 'PROJECT' },
+        ];
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
+            resGroup.splice(0, 0, { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.WORKSPACE'), value: 'WORKSPACE' });
+        }
+        return resGroup;
+    }),
+    finishConditions: computed<{label: TranslateResult; value: EscalationPolicyFinishCondition}[]>(() => [
+        { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: ESCALATION_POLICY_FINISH_CONDITION.acknowledged },
+        { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: ESCALATION_POLICY_FINISH_CONDITION.resolved },
+    ]),
+});
+
+const {
+    forms: { name },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    name: undefined as string|undefined,
+    projectId: undefined as string|undefined,
+}, {
+    name(value) {
+        if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+        if (value.length > 40) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+        return true;
+    },
+    projectId(value) {
+        if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
+        return true;
+    },
+});
+
+/* event */
+const handleChangeResourceGroup = (value: EscalationPolicyModel['resource_group']) => {
+    escalationPolicyFormStore.$patch({ resourceGroup: value });
+    if (value === 'WORKSPACE') {
+        escalationPolicyFormStore.$patch({ projectId: undefined });
+    }
+};
+const handleChangeFinishCondition = (value) => {
+    escalationPolicyFormStore.$patch({ finishCondition: value });
+};
+const handleUpdateName = (_name) => {
+    setForm('name', _name);
+    escalationPolicyFormStore.$patch({ name: _name });
+};
+const handleSelectProject = (selected: ProjectTreeNodeData[]) => {
+    setForm('projectId', selected[0]?.id);
+    escalationPolicyFormStore.$patch({ projectId: selected[0]?.id });
+};
+
+watch([() => props.mode, () => props.escalationPolicyData], ([mode, escalationPolicyData]) => {
+    if (mode === ACTION.create) {
+        escalationPolicyFormStore.$reset();
+    } else if (escalationPolicyData?.escalation_policy_id) {
+        escalationPolicyFormStore.initEscalationPolicyFormData(escalationPolicyData);
+        setForm('name', escalationPolicyFormState.name);
+        setForm('projectId', escalationPolicyFormState.projectId);
+    }
+}, { immediate: true });
+watch([() => escalationPolicyFormState.resourceGroup, () => invalidState.name, () => invalidState.projectId], ([resourceGroup, isNameInvalid, isProjectIdInvalid]) => {
+    if (resourceGroup === 'WORKSPACE' || !props.showResourceGroup) {
+        escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: isNameInvalid === false });
+    } else {
+        escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: isNameInvalid === false && isProjectIdInvalid === false });
+    }
+}, { immediate: true });
+</script>
+
 <template>
     <div class="escalation-policy-form">
         <p-field-group required
@@ -13,39 +138,39 @@
                 />
             </template>
         </p-field-group>
-        <p-field-group v-if="showScope"
-                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE_LABEL')"
+        <p-field-group v-if="props.showResourceGroup"
+                       :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOURCE_GROUP')"
                        required
         >
             <template #default>
-                <div v-if="mode === ACTION.create">
-                    <p-radio v-for="(item, idx) in scopes"
+                <div v-if="props.mode === ACTION.create">
+                    <p-radio v-for="(item, idx) in state.resourceGroups"
                              :key="idx"
                              :selected="item.value"
-                             :value="escalationPolicyFormState.scope"
-                             @change="handleChangeScope(item.value)"
+                             :value="escalationPolicyFormState.resourceGroup"
+                             @change="handleChangeResourceGroup(item.value)"
                     >
                         {{ item.label }}
                     </p-radio>
                 </div>
             </template>
             <template #label-extra>
-                <span v-if="mode === ACTION.update"
-                      class="scope-text"
+                <span v-if="props.mode === ACTION.update"
+                      class="resource-group-text"
                 >
-                    <span>{{ scopeLabels[escalationPolicyFormState.scope] || escalationPolicyFormState.scope }}</span>
-                    <span v-if="escalationPolicyFormState.scope === SCOPE.PROJECT">
+                    <span>{{ state.resourceGroupLabels[escalationPolicyFormState.resourceGroup] }}</span>
+                    <span v-if="escalationPolicyFormState.resourceGroup === 'PROJECT'">
                         (<p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
                                  new-tab
                                  :to="referenceRouter(escalationPolicyFormState.projectId,{ resource_type: 'identity.Project' })"
-                                 :text="projects[escalationPolicyFormState.projectId] ? projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
+                                 :text="state.projects[escalationPolicyFormState.projectId] ? state.projects[escalationPolicyFormState.projectId].label : escalationPolicyFormState.projectId"
                                  highlight
                         />)
                     </span>
                 </span>
             </template>
         </p-field-group>
-        <p-field-group v-if="showScope && escalationPolicyFormState.scope === SCOPE.PROJECT && mode === ACTION.create"
+        <p-field-group v-if="props.showResourceGroup && escalationPolicyFormState.resourceGroup === 'PROJECT' && props.mode === ACTION.create"
                        class="project-field"
                        required
                        :invalid="invalidState.projectId"
@@ -73,7 +198,7 @@
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
             required
         >
-            <p-radio v-for="(item, idx) in finishConditions"
+            <p-radio v-for="(item, idx) in state.finishConditions"
                      :key="idx"
                      :selected="item.value"
                      :value="escalationPolicyFormState.finishCondition"
@@ -96,165 +221,12 @@
     </div>
 </template>
 
-<script lang="ts">
-
-import type { PropType } from 'vue';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PLink, PFieldGroup, PRadio, PTextInput,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import { useFormValidator } from '@/common/composables/form-validator';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-
-import EscalationPolicyFormRulesInput from '@/services/alert-manager/components/EscalationPolicyFormRulesInput.vue';
-import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/alert-manager/constants/alert-constant';
-import { useEscalationPolicyFormStore } from '@/services/alert-manager/stores/escalation-policy-form';
-import type { EscalationPolicyDataModel } from '@/services/alert-manager/types/alert-type';
-import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
-
-
-export default {
-    name: 'EscalationPolicyForm',
-    components: {
-        EscalationPolicyFormRulesInput,
-        ProjectSelectDropdown,
-        PFieldGroup,
-        PTextInput,
-        PRadio,
-        PLink,
-    },
-    props: {
-        mode: {
-            type: String,
-            default: ACTION.create,
-        },
-        showScope: {
-            type: Boolean,
-            default: true,
-        },
-        escalationPolicyData: {
-            type: Object as PropType<EscalationPolicyDataModel>,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
-        const escalationPolicyFormStore = useEscalationPolicyFormStore();
-        const escalationPolicyFormState = escalationPolicyFormStore.$state;
-        const state = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
-            //
-            scopeLabels: computed(() => ({
-                [SCOPE.DOMAIN]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
-                [SCOPE.PROJECT]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
-            })),
-            scopes: computed(() => [
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.DOMAIN },
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.PROJECT },
-            ]),
-            finishConditions: computed(() => [
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged },
-                { label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved },
-            ]),
-        });
-
-        const {
-            forms: {
-                name,
-                projectId,
-            },
-            setForm,
-            invalidState,
-            invalidTexts,
-            isAllValid,
-        } = useFormValidator({
-            name: undefined as string|undefined,
-            projectId: undefined as string|undefined,
-        }, {
-            name(value) {
-                if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
-                if (value.length > 40) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
-                return true;
-            },
-            projectId(value) {
-                if (escalationPolicyFormState.scope === SCOPE.DOMAIN) return true;
-                if (!value) return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
-                return true;
-            },
-        });
-
-        /* event */
-        const handleChangeScope = (value) => {
-            escalationPolicyFormStore.$patch({ scope: value });
-            if (value === SCOPE.DOMAIN) {
-                escalationPolicyFormStore.$patch({ projectId: undefined });
-            }
-        };
-        const handleChangeFinishCondition = (value) => {
-            escalationPolicyFormStore.$patch({ finishCondition: value });
-        };
-        const handleUpdateName = (_name) => {
-            setForm('name', _name);
-            escalationPolicyFormStore.$patch({ name: _name });
-        };
-        const handleSelectProject = (selected) => {
-            setForm('projectId', selected[0]?.id);
-            escalationPolicyFormStore.$patch({ projectId: selected[0]?.id });
-        };
-
-        watch([() => props.mode, () => props.escalationPolicyData], ([mode, escalationPolicyData]) => {
-            if (mode === ACTION.create) {
-                escalationPolicyFormStore.$reset();
-            } else if (props.escalationPolicyData?.escalation_policy_id) {
-                escalationPolicyFormStore.initEscalationPolicyFormData(escalationPolicyData);
-                setForm('name', escalationPolicyFormState.name);
-                setForm('projectId', escalationPolicyFormState.projectId);
-            }
-        }, { immediate: true });
-        watch(() => isAllValid.value, (_isAllValid) => {
-            escalationPolicyFormStore.$patch({ isNameProjectIdFormValid: _isAllValid });
-        }, { immediate: true });
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
-
-        return {
-            ...toRefs(state),
-            escalationPolicyFormState,
-            referenceRouter,
-            SCOPE,
-            ACTION,
-            ACTION_ICON,
-            PROJECT_ROUTE,
-            handleChangeScope,
-            handleChangeFinishCondition,
-            handleUpdateName,
-            handleSelectProject,
-            //
-            name,
-            projectId,
-            invalidState,
-            invalidTexts,
-            isAllValid,
-            setForm,
-        };
-    },
-};
-</script>
-
 <style lang="postcss" scoped>
 .escalation-policy-form {
+    .p-field-group {
+        margin-bottom: 1rem;
+    }
+
     /* custom design-system component - p-field-group */
     :deep(.project-field) {
         .label-box {
@@ -286,7 +258,7 @@ export default {
             margin-right: 1.125rem;
         }
     }
-    .scope-text {
+    .resource-group-text {
         text-transform: capitalize;
         font-weight: normal;
         padding-left: 0.5rem;

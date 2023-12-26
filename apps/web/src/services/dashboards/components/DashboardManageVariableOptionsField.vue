@@ -1,72 +1,4 @@
-<template>
-    <p-field-group class="dashboard-manage-variable-options-field"
-                   :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DATA_SOURCE')"
-                   required
-    >
-        <!--        <p-radio-group>-->
-        <!--            <p-radio :selected="state.proxyOptionsType === 'ENUM'"-->
-        <!--                     @change="handleSelectOptionsType('ENUM')"-->
-        <!--            >-->
-        <!--                {{ $t('Manual Entry') }}-->
-        <!--            </p-radio>-->
-        <!--            <p-radio :selected="state.proxyOptionsType === 'SEARCH_RESOURCE'"-->
-        <!--                     @change="handleSelectOptionsType('SEARCH_RESOURCE')"-->
-        <!--            >-->
-        <!--                {{ $t('Search Data Source') }}-->
-        <!--            </p-radio>-->
-        <!--        </p-radio-group>-->
-        <div v-if="state.proxyOptionsType === 'ENUM'"
-             class="maunal-entry-options-wrapper"
-        >
-            <p-button class="option-add-button"
-                      icon-left="ic_plus_bold"
-                      style-type="secondary"
-                      @click="handleAddOption"
-            >
-                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD_OPTIONS') }}
-            </p-button>
-            <draggable :list="state.proxyOptions"
-                       class="draggable-wrapper"
-                       ghost-class="ghost"
-            >
-                <div v-for="(option, index) in state.proxyOptions"
-                     :key="`drag-item-${option.draggableItemId}`"
-                     class="draggable-item"
-                >
-                    <div class="grab-area">
-                        <p-i name="ic_drag-handle"
-                             width="1rem"
-                             height="1rem"
-                        />
-                    </div>
-                    <p-text-input :value="option.key"
-                                  class="option-input"
-                                  :placeholder="$t('Key')"
-                                  :invalid="state.manualOptionValidations[index]"
-                                  @update:value="handleChangeOptionValue(index, $event)"
-                    />
-                    <span class="option-colon">:</span>
-                    <p-text-input :value="option.label"
-                                  class="option-input"
-                                  :placeholder="$t('Label name')"
-                                  :invalid="state.manualOptionValidations[index]"
-                                  @update:value="handleChangeOptionLabel(index, $event)"
-                    />
-                    <div class="option-delete-area">
-                        <p-icon-button v-if="options.length > 1"
-                                       name="ic_delete"
-                                       @click="handleDeleteOption(option.draggableItemId)"
-                        />
-                    </div>
-                </div>
-            </draggable>
-        </div>
-        <!--        <dashboard-manage-variable-data-source-options-selector v-if="state.proxyOptionsType === 'DATA_SOURCE'" />-->
-    </p-field-group>
-</template>
-
 <script setup lang="ts">
-
 import { computed, reactive, watch } from 'vue';
 import draggable from 'vuedraggable';
 
@@ -134,6 +66,73 @@ watch(() => state.manualOptionValidations, (updated) => {
 });
 
 </script>
+
+<template>
+    <p-field-group class="dashboard-manage-variable-options-field"
+                   :label="$t('DASHBOARDS.CUSTOMIZE.VARIABLES.LABEL_DATA_SOURCE')"
+                   required
+    >
+        <!--        <p-radio-group>-->
+        <!--            <p-radio :selected="state.proxyOptionsType === 'ENUM'"-->
+        <!--                     @change="handleSelectOptionsType('ENUM')"-->
+        <!--            >-->
+        <!--                {{ $t('Manual Entry') }}-->
+        <!--            </p-radio>-->
+        <!--            <p-radio :selected="state.proxyOptionsType === 'SEARCH_RESOURCE'"-->
+        <!--                     @change="handleSelectOptionsType('SEARCH_RESOURCE')"-->
+        <!--            >-->
+        <!--                {{ $t('Search Data Source') }}-->
+        <!--            </p-radio>-->
+        <!--        </p-radio-group>-->
+        <div v-if="state.proxyOptionsType === 'ENUM'"
+             class="maunal-entry-options-wrapper"
+        >
+            <p-button class="option-add-button"
+                      icon-left="ic_plus_bold"
+                      style-type="secondary"
+                      @click="handleAddOption"
+            >
+                {{ $t('DASHBOARDS.CUSTOMIZE.VARIABLES.ADD_OPTIONS') }}
+            </p-button>
+            <draggable :list="state.proxyOptions"
+                       class="draggable-wrapper"
+                       ghost-class="ghost"
+            >
+                <div v-for="(option, index) in state.proxyOptions"
+                     :key="`drag-item-${option.draggableItemId}`"
+                     class="draggable-item"
+                >
+                    <div class="grab-area">
+                        <p-i name="ic_drag-handle"
+                             width="1rem"
+                             height="1rem"
+                        />
+                    </div>
+                    <p-text-input :value="option.key"
+                                  class="option-input"
+                                  :placeholder="$t('Key')"
+                                  :invalid="state.manualOptionValidations[index]"
+                                  @update:value="handleChangeOptionValue(index, $event)"
+                    />
+                    <span class="option-colon">:</span>
+                    <p-text-input :value="option.label"
+                                  class="option-input"
+                                  :placeholder="$t('Label name')"
+                                  :invalid="state.manualOptionValidations[index]"
+                                  @update:value="handleChangeOptionLabel(index, $event)"
+                    />
+                    <div class="option-delete-area">
+                        <p-icon-button v-if="options.length > 1"
+                                       name="ic_delete"
+                                       @click="handleDeleteOption(option.draggableItemId)"
+                        />
+                    </div>
+                </div>
+            </draggable>
+        </div>
+        <!--        <dashboard-manage-variable-data-source-options-selector v-if="state.proxyOptionsType === 'DATA_SOURCE'" />-->
+    </p-field-group>
+</template>
 
 <style scoped lang="postcss">
 .dashboard-manage-variable-options-field {

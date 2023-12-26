@@ -3,12 +3,15 @@
 </template>
 
 <script lang="ts">
+import type Vue from 'vue';
 import {
     defineComponent, getCurrentInstance, onMounted,
 } from 'vue';
 
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 
 import { isUserAccessibleToRoute } from '@/lib/access-control';
 
@@ -17,7 +20,7 @@ import { getDefaultRouteAfterSignIn } from '@/services/auth/helpers/default-rout
 
 
 export default defineComponent({
-    name: 'KB_SSOPage',
+    name: 'KBSSOPage',
     components: {
     },
     props: {
@@ -40,9 +43,12 @@ export default defineComponent({
     },
     setup(props) {
         const vm = getCurrentInstance()?.proxy as Vue;
+        const workspaceStore = useWorkspaceStore();
+
 
         const onSignIn = async () => {
-            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/isDomainOwner'], store.getters['user/hasSystemRole'], store.getters['user/hasPermission']);
+            const hasBoundWorkspace = workspaceStore.getters.workspaceList.length > 0;
+            const defaultRoute = getDefaultRouteAfterSignIn(store.getters['user/hasSystemRole'], store.getters['user/hasPermission'] || hasBoundWorkspace);
 
             if (!props.nextPath) {
                 await vm.$router.push(defaultRoute);
@@ -50,7 +56,7 @@ export default defineComponent({
             }
 
             const resolvedRoute = SpaceRouter.router.resolve(props.nextPath);
-            const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/pagePermissionList']);
+            const isAccessible = isUserAccessibleToRoute(resolvedRoute.route, store.getters['user/isDomainAdmin'], store.getters['user/pageAccessPermissionList']);
             if (isAccessible) {
                 await vm.$router.push(props.nextPath);
             } else {

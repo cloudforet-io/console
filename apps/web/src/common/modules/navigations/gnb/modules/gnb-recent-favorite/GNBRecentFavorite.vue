@@ -4,7 +4,7 @@
          @click.stop
          @keydown.esc="hideRecentFavoriteMenu"
     >
-        <span class="menu-button"
+        <span :class="{'menu-button': true, 'opened': visible}"
               tabindex="0"
               role="button"
               @keydown.enter="showRecentFavoriteMenu"
@@ -12,8 +12,8 @@
         >
             <p-i class="menu-icon"
                  name="ic_gnb_recent-favorite"
-                 height="1.5rem"
-                 width="1.5rem"
+                 height="1.375rem"
+                 width="1.375rem"
                  color="inherit"
             />
         </span>
@@ -99,8 +99,6 @@ export default defineComponent<Props>({
         /* Init */
         (async () => {
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/cloudServiceType/load'),
             ]);
         })();
@@ -119,19 +117,18 @@ export default defineComponent<Props>({
     @apply relative;
 
     .menu-button {
-        @apply text-gray-500;
+        @apply inline-flex items-center justify-center text-gray-500 rounded-full;
+        width: 2rem;
+        height: 2rem;
         line-height: $gnb-height;
         cursor: pointer;
-        margin-left: 1.25rem;
 
-        &.opened {
-            @apply text-violet-400;
+        &:hover {
+            @apply text-blue-600 bg-blue-100;
         }
 
-        @media (hover: hover) {
-            &:hover {
-                @apply text-violet-400;
-            }
+        &.opened {
+            @apply text-blue-600 bg-blue-200;
         }
     }
 
@@ -145,8 +142,8 @@ export default defineComponent<Props>({
         top: 100%;
         right: 0;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
-        margin-top: -0.5rem;
         margin-right: -0.5rem;
+        z-index: 1000;
         .tab-pane {
             padding-bottom: 0;
         }

@@ -136,7 +136,7 @@ const state = reactive({
 
 /* API */
 const trendDataApiQueryHelper = new ApiQueryHelper();
-const fetchTrendDataAnalyze = getCancellableFetcher<{results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchTrendDataAnalyze = getCancellableFetcher<object, {results: Data[]}>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchTrendData = async (): Promise<Data[]> => {
     try {
         state.loading = true;

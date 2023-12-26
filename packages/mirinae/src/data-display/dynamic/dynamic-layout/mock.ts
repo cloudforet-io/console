@@ -117,14 +117,6 @@ export default {
                                     },
                                 },
                             },
-                            MAINTENANCE: {
-                                type: 'state',
-                                options: {
-                                    icon: {
-                                        color: 'yellow.500',
-                                    },
-                                },
-                            },
                             CLOSED: {
                                 type: 'state',
                                 options: {

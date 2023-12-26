@@ -5,8 +5,10 @@ import {
     PButton, PCard, PLazyImg,
 } from '@spaceone/design-system';
 
-import type { CollectorUpdateParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import { i18n } from '@/translations';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
 
@@ -31,9 +33,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const collectorPageStore = useCollectorPageStore();
-const collectorPageState = collectorPageStore.$state;
+const collectorPageState = collectorPageStore.state;
 const collectorDataModalStore = useCollectorDataModalStore();
 const collectorFormStore = useCollectorFormStore();
+
+const appContextStore = useAppContextStore();
 
 const state = reactive({
     plugin: computed<{name?: string; version: string}|null>(() => {
@@ -43,15 +47,21 @@ const state = reactive({
     }),
     recentJob: computed<JobAnalyzeStatus|undefined>(() => {
         if (!props.item) return undefined;
-        return props.item.recentJobAnalyze?.filter((rj) => rj.job_id === collectorPageStore.recentJobForAllAccounts?.job_id)[0];
+        return props.item.recentJobAnalyze?.filter((rj) => rj.job_id === collectorPageStore.getters.recentJobForAllAccounts?.job_id)[0];
     }),
     isScheduleActivated: false,
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    isScheduleEditable: computed(() => {
+        if (state.isAdminMode) return true;
+        if (props.item.workspaceId === '*') return false;
+        return true;
+    }),
 });
 
 const handleChangeToggle = async () => {
     try {
         state.isScheduleActivated = !state.isScheduleActivated;
-        const params: CollectorUpdateParameter = {
+        const params: CollectorUpdateParameters = {
             collector_id: props.item.collectorId,
             schedule: {
                 ...props.item.schedule,
@@ -59,17 +69,17 @@ const handleChangeToggle = async () => {
             },
         };
         const response = await collectorPageStore.updateCollectorSchedule(params);
-        await collectorFormStore.setOriginCollector(response);
+        if (response) await collectorFormStore.setOriginCollector(response);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.ALT_E_UPDATE_SCHEDULE'));
     }
 };
 
 /* API */
-const handleClickCollectData = async () => {
+const handleClickCollectData = () => {
     if (!props.item) return;
-    await collectorPageStore.setSelectedCollector(props.item.collectorId);
-    await collectorDataModalStore.$patch((_state) => {
+    collectorPageStore.setSelectedCollector(props.item.collectorId);
+    collectorDataModalStore.$patch((_state) => {
         if (!props.item) return;
         _state.visible = true;
         _state.selectedCollector = collectorPageState.selectedCollector;
@@ -91,11 +101,18 @@ watch(() => props.item.schedule, (schedule) => {
                 class="collector-item"
         >
             <div class="collector-item-wrapper">
-                <span class="collector-item-name">{{ props.item.name }}</span>
+                <div class="collector-title-wrapper">
+                    <span class="collector-item-name">{{ props.item.name }}</span>
+                    <div v-if="props.item.workspaceId === '*' && !state.isAdminMode"
+                         class="managed-item-label"
+                    >
+                        {{ $t('INVENTORY.COLLECTOR.MAIN.MANAGED_ITEM_LABEL') }}
+                    </div>
+                </div>
                 <div class="collector-plugin">
                     <p-lazy-img :src="props.item.plugin.icon"
-                                width="1.5rem"
-                                height="1.5rem"
+                                width="1.75rem"
+                                height="1.75rem"
                                 class="plugin-icon"
                     />
                     <div class="title-wrapper">
@@ -118,6 +135,7 @@ watch(() => props.item.schedule, (schedule) => {
                     </div>
                     <collector-item-schedule :collector-id="props.item.collectorId"
                                              :is-schedule-activated="state.isScheduleActivated"
+                                             :mode="state.isScheduleEditable ? 'edit' : 'view'"
                                              @change-toggle="handleChangeToggle"
                     />
                 </div>
@@ -178,11 +196,23 @@ watch(() => props.item.schedule, (schedule) => {
         }
         .collector-item-wrapper {
             @apply flex flex-col;
-            gap: 0.875rem;
             padding: 0.5rem 0.625rem;
-            .collector-item-name {
-                @apply text-label-xl font-bold;
+            .collector-title-wrapper {
+                height: 2.625rem;
+                margin-bottom: 0.75rem;
+                .collector-item-name {
+                    @apply text-label-xl font-bold;
+                    display: inline-block;
+                    line-height: 1.40625rem;
+                    height: 1.5rem;
+                }
+                .managed-item-label {
+                    @apply text-label-sm text-indigo-600;
+                    line-height: 1.125rem;
+                    height: 1.125rem;
+                }
             }
+
             .collector-plugin {
                 @apply flex items-center;
                 width: 100%;

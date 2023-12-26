@@ -36,7 +36,7 @@ export const monthlyCostSummaryDashboardPreview: DefaultDashboardPreviewTemplate
     },
 };
 
-export const monthlyCostSummaryDashboard: DashboardTemplate = {
+const getDashboardTemplate = (isAdminMode: boolean): DashboardTemplate => ({
     ...monthlyCostSummaryDashboardPreview,
     settings: {
         date_range: {
@@ -44,9 +44,12 @@ export const monthlyCostSummaryDashboard: DashboardTemplate = {
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST),
+    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST, isAdminMode),
     variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
     ],
-};
+});
+
+export const monthlyCostSummaryDashboard: DashboardTemplate = getDashboardTemplate(false);
+export const adminMonthlyCostSummaryDashboard: DashboardTemplate = getDashboardTemplate(true);

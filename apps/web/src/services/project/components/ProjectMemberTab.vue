@@ -1,14 +1,192 @@
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
+
+import {
+    PButton, PHeading, PI, PTableCheckModal, PToolboxTable,
+} from '@spaceone/design-system';
+import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
+import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
+import type { ProjectModel } from '@/schema/identity/project/model';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { i18n as _i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { UserReferenceMap } from '@/store/reference/user-reference-store';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import ProjectMemberInviteModal from '@/services/project/components/ProjectMemberInviteModal.vue';
+import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
+import type { ProjectMemberItem } from '@/services/project/types/project-member-type';
+
+
+interface MemberDataTableItem extends ProjectMemberItem {
+    user_id: string;
+}
+interface UserItem {
+    user_id: string;
+    user_name: string;
+}
+
+interface Props {
+    projectId?: string;
+    filters?: { k: string; v: string }[];
+}
+const props = withDefaults(defineProps<Props>(), {
+    projectId: '',
+    filters: () => ([]),
+});
+const emit = defineEmits<{(e: 'update-filters', filters: any): void;
+}>();
+
+const allReferenceStore = useAllReferenceStore();
+const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
+const projectDetailPageStore = useProjectDetailPageStore();
+const projectDetailPageGetters = projectDetailPageStore.getters;
+const storeState = reactive({
+    users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
+});
+const state = reactive({
+    searchText: props.filters.map((d) => d.v).join(' ') || '',
+    selectIndex: [] as number[],
+    fields: [
+        { label: 'User ID', name: 'user_id' },
+        { label: 'User Name', name: 'user_name' },
+    ] as DataTableField[],
+    workspaceUserIdList: [] as string[],
+    projectUserIdList: [] as string[],
+    refinedItems: computed<UserItem[]>(() => {
+        const users: UserItem[] = state.projectUserIdList.map((d) => ({
+            user_id: d,
+            user_name: storeState.users[d]?.name ?? d,
+        }));
+        const filteredUsers = users.filter((d) => {
+            const searchText = state.searchText.toLowerCase();
+            return d.user_id.toLowerCase().includes(searchText)
+                || d.user_name.toLowerCase().includes(searchText);
+        });
+        return filteredUsers.slice(state.pageStart - 1, state.pageStart + state.pageLimit - 1);
+    }),
+    items: [] as MemberDataTableItem[],
+    loading: true,
+    totalCount: 0,
+    pageLimit: 15,
+    pageStart: 1,
+    selectedItems: computed(() => state.selectIndex.map((i) => state.refinedItems[i])),
+    memberInviteFormVisible: false,
+    memberDeleteModalVisible: false,
+});
+
+/* Util */
+const fetchUserList = () => {
+    if (projectDetailPageGetters.projectType === 'PUBLIC') {
+        fetchWorkspaceUserList();
+    } else {
+        fetchProjectUsers();
+    }
+};
+
+/* Api */
+const fetchProjectUsers = async () => {
+    state.loading = true;
+    state.selectIndex = [];
+    try {
+        const res = await SpaceConnector.clientV2.identity.project.get<ProjectGetParameters, ProjectModel>({
+            project_id: props.projectId,
+        });
+        state.projectUserIdList = res.users ?? [];
+        state.totalCount = res.users?.length ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.projectUserIdList = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+const fetchWorkspaceUserList = async () => {
+    state.loading = true;
+    try {
+        const res = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>({
+        });
+        state.projectUserIdList = res.results?.map((d) => d.user_id) ?? [];
+        state.totalCount = res.total_count ?? 0;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.projectUserIdList = [];
+        state.totalCount = 0;
+    } finally {
+        state.loading = false;
+    }
+};
+const deleteProjectUser = async (items) => {
+    try {
+        await SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters>({
+            project_id: props.projectId,
+            users: items.map((it) => it.user_id),
+        });
+        showSuccessMessage(_i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, _i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
+    }
+};
+
+/* Event */
+const handleChangeTable = async (options: ToolboxOptions = {}) => {
+    state.selectIndex = [];
+    if (options.searchText !== undefined) {
+        state.searchText = options.searchText;
+        const filters = [{ v: options.searchText }];
+        emit('update-filters', filters);
+    }
+    if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+    if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+};
+const handleClickRemoveMember = () => {
+    state.memberDeleteModalVisible = true;
+};
+const handleClickInviteMember = () => {
+    state.memberInviteFormVisible = true;
+};
+
+const handleConfirmDeleteMember = async (items) => {
+    await deleteProjectUser(items);
+
+    state.memberDeleteModalVisible = false;
+    fetchUserList();
+};
+const handleConfirmInvite = () => {
+    fetchUserList();
+};
+
+/* Watcher */
+(async () => {
+    fetchUserList();
+})();
+</script>
+
 <template>
     <div class="project-member-tab">
         <p-toolbox-table :excel-visible="false"
-                         selectable
+                         :selectable="projectDetailPageGetters.projectType === 'PRIVATE'"
                          sortable
-                         :fields="fields"
-                         :items="items"
-                         :select-index.sync="selectIndex"
-                         :loading="loading"
-                         :total-count="totalCount"
-                         :search-text="searchText"
+                         :fields="state.fields"
+                         :items="state.refinedItems"
+                         :select-index.sync="state.selectIndex"
+                         :loading="state.loading"
+                         :total-count="state.totalCount"
+                         :search-text.sync="state.searchText"
                          @change="handleChangeTable"
                          @refresh="handleChangeTable()"
         >
@@ -16,347 +194,74 @@
                 <p-heading heading-type="sub"
                            :title="$t('PROJECT.DETAIL.MEMBER_TITLE')"
                            use-total-count
-                           :total-count="totalCount"
-                />
-            </template>
-            <template #toolbox-left>
-                <p-button style-type="primary"
-                          class="mr-4 add-btn"
-                          icon-left="ic_plus_bold"
-                          :disabled="manageDisabled"
-                          @click="handleClickInviteMember"
+                           :total-count="state.totalCount"
                 >
-                    {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
-                </p-button>
-                <p-select-dropdown :menu="dropdownMenu"
-                                   :disabled="manageDisabled"
-                                   :placeholder="$t('IDENTITY.USER.MAIN.ACTION')"
-                                   @select="handleSelectDropdown"
-                />
-            </template>
-            <template #col-resource_id-format="{ value }">
-                {{ storeState.users[value] ? storeState.users[value].name : value }}
-            </template>
-            <template #col-assigned-format="{ value }">
-                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                        new-tab
-                        :to="projectLinkFormatter(value)"
+                    <template v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
+                              #title-right-extra
+                    >
+                        <div class="action-button-wrapper">
+                            <p-button style-type="primary"
+                                      class="mr-4 add-btn"
+                                      :disabled="!state.selectedItems.length"
+                                      @click="handleClickRemoveMember"
+                            >
+                                {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
+                            </p-button>
+                            <p-button style-type="primary"
+                                      class="mr-4 add-btn"
+                                      @click="handleClickInviteMember"
+                            >
+                                {{ $t('PROJECT.DETAIL.MEMBER.INVITE') }}
+                            </p-button>
+                        </div>
+                    </template>
+                </p-heading>
+                <div class="description-wrapper"
+                     :class="[projectDetailPageGetters.projectType === 'PRIVATE' ? 'private' : 'public']"
                 >
-                    {{ value }}
-                </p-link>
-            </template>
-            <template #col-labels-format="{ value }">
-                <p v-if="value.length === 0" />
-                <p-badge v-for="(label, idx) in value"
-                         :key="idx"
-                         style-type="gray200"
-                         badge-type="subtle"
-                         class="mr-2"
-                >
-                    {{ label }}
-                </p-badge>
+                    <span class="icon">
+                        <p-i :name="projectDetailPageGetters.projectType === 'PRIVATE' ? 'ic_lock-filled' : 'ic_globe-filled'"
+                             color="inherit"
+                             width="1rem"
+                             height="1rem"
+                        />
+                    </span>
+                    <span class="text">
+                        <i18n :path="projectDetailPageGetters.projectType === 'PRIVATE' ? 'PROJECT.DETAIL.MEMBER.PRIVATE_MEMBER_DESC' : 'PROJECT.DETAIL.MEMBER.PUBLIC_MEMBER_DESC'">
+                            <template #settings>
+                                <span v-if="projectPageState.isWorkspaceOwner"
+                                      class="link-text"
+                                      @click="projectPageStore.openProjectFormModal()"
+                                >
+                                    {{ $t('PROJECT.DETAIL.MEMBER.PROJECT_SETTINGS') }}
+                                </span>
+                                <span v-else>
+                                    {{ $t('PROJECT.DETAIL.MEMBER.PROJECT_SETTINGS') }}
+                                </span>
+                            </template>
+                        </i18n>
+                    </span>
+                </div>
             </template>
         </p-toolbox-table>
 
-        <project-member-add-modal v-if="memberAddFormVisible"
-                                  :visible.sync="memberAddFormVisible"
-                                  :is-project-group="isProjectGroup"
-                                  :project-id="projectId"
-                                  :project-group-id="projectGroupId"
-                                  @confirm="handleConfirm"
+        <project-member-invite-modal
+            v-if="state.memberInviteFormVisible"
+            :visible.sync="state.memberInviteFormVisible"
+            :project-id="projectId"
+            @confirm="handleConfirmInvite"
         />
-        <project-member-update-modal v-if="memberUpdateFormVisible"
-                                     :visible.sync="memberUpdateFormVisible"
-                                     :selected-member="selectedItems[0]"
-                                     :project-id="projectId"
-                                     :is-project-group="isProjectGroup"
-                                     :project-group-id="projectGroupId"
-                                     @confirm="handleConfirm"
-        />
-        <p-table-check-modal :visible.sync="checkMemberDeleteState.visible"
+        <p-table-check-modal :visible.sync="state.memberDeleteModalVisible"
                              theme-color="alert"
                              modal-size="md"
-                             :fields="checkMemberDeleteState.fields"
-                             :items="selectedItems"
+                             :fields="state.fields"
+                             :items="state.selectedItems"
                              :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE')"
                              :sub-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT')"
                              @confirm="handleConfirmDeleteMember"
         />
     </div>
 </template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    computed, reactive, toRefs, watch,
-} from 'vue';
-
-import {
-    PLink,
-    PBadge,
-    PButton,
-    PHeading,
-    PSelectDropdown,
-    PTableCheckModal,
-    PToolboxTable,
-} from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
-import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
-
-import { setApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import ProjectMemberAddModal from '@/services/project/components/ProjectMemberAddModal.vue';
-import ProjectMemberUpdateModal
-    from '@/services/project/components/ProjectMemberUpdateModal.vue';
-import type { ProjectMemberItem } from '@/services/project/types/project-member-type';
-
-
-interface MemberDataTableItem extends ProjectMemberItem {
-    user_id: string;
-    assigned: string;
-}
-
-export default {
-    name: 'ProjectMemberTab',
-    components: {
-        PLink,
-        PToolboxTable,
-        PHeading,
-        PButton,
-        PSelectDropdown,
-        PBadge,
-        PTableCheckModal,
-        ProjectMemberAddModal,
-        ProjectMemberUpdateModal,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: '',
-        },
-        isProjectGroup: {
-            type: Boolean,
-            default: false,
-        },
-        projectGroupId: {
-            type: String,
-            default: '',
-        },
-        filters: {
-            type: Array,
-            default: () => [],
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const apiQueryHelper = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
-        const storeState = reactive({
-            users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-            projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-        });
-        const state = reactive({
-            searchText: apiQueryHelper.filters.map((d) => d.v).join(' ') || '',
-            selectIndex: [] as number[],
-            fields: [
-                { label: 'User ID', name: 'user_id' },
-                { label: 'User Name', name: 'resource_id' },
-                { label: 'Role', name: 'role_info.name' },
-                { label: 'Assigned', name: 'assigned', sortable: false },
-                { label: 'Label', name: 'labels' },
-            ] as DataTableField[],
-            items: [] as MemberDataTableItem[],
-            loading: true,
-            totalCount: 0,
-            selectedItems: computed(() => state.selectIndex.map((i) => state.items[i])),
-            dropdownMenu: computed(() => ([
-                {
-                    type: 'item',
-                    name: 'update',
-                    label: i18n.t('IDENTITY.USER.MAIN.UPDATE'),
-                    disabled: state.selectIndex.length !== 1 || (
-                        props.isProjectGroup
-                            ? props.projectGroupId !== state.selectedItems[0]?.project_group_info?.project_group_id
-                            : !!state.selectedItems[0]?.project_group_info
-                    ),
-                },
-                {
-                    type: 'item',
-                    name: 'delete',
-                    label: i18n.t('IDENTITY.USER.MAIN.DELETE'),
-                    disabled: !state.selectedItems.length
-                        || (
-                            props.isProjectGroup
-                                ? !!state.selectedItems.find((d) => props.projectGroupId !== d.project_group_info?.project_group_id)
-                                : !!state.selectedItems.find((d) => !!d.project_group_info)
-                        ),
-                },
-            ] as MenuItem[])),
-            memberAddFormVisible: false,
-            memberUpdateFormVisible: false,
-        });
-        const checkMemberDeleteState = reactive({
-            fields: computed(() => [
-                { name: 'resource_id', label: 'User ID' },
-                { name: 'role_info.name', label: 'Role' },
-            ]),
-            visible: false,
-        });
-
-        /* Util */
-        const projectLinkFormatter = (data) => {
-            if (data.project_id) {
-                return referenceRouter(data.project_id, { resource_type: 'identity.Project' });
-            }
-            return referenceRouter(data.project_group_id, { resource_type: 'identity.ProjectGroup' });
-        };
-
-        /* Api */
-        const listMembers = async (projects: ProjectReferenceMap) => {
-            state.loading = true;
-            state.selectIndex = [];
-            try {
-                let res;
-                if (props.isProjectGroup) {
-                    res = await SpaceConnector.client.identity.projectGroup.member.list({
-                        project_group_id: props.projectGroupId,
-                        query: apiQueryHelper.data,
-                    });
-                } else {
-                    res = await SpaceConnector.client.identity.project.member.list({
-                        project_id: props.projectId,
-                        query: apiQueryHelper.data,
-                        include_parent_member: true,
-                    });
-                }
-                state.items = res.results.map((d) => {
-                    let assigned;
-                    if (d.project_info) assigned = projects[d.project_info?.project_id]?.label;
-                    else if (d.project_group_info) assigned = storeState.projectGroups[d.project_group_info.project_group_id]?.label;
-                    return {
-                        ...d,
-                        user_id: d.resource_id,
-                        assigned,
-                    };
-                });
-                state.totalCount = res.total_count;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.items = [];
-                state.totalCount = 0;
-            } finally {
-                state.loading = false;
-            }
-        };
-        const deleteProjectMember = async (items) => {
-            try {
-                await SpaceConnector.client.identity.project.member.remove({
-                    project_id: props.projectId,
-                    users: items.map((it) => it.resource_id),
-                });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
-            }
-        };
-        const deleteProjectGroupMember = async (items) => {
-            try {
-                await SpaceConnector.client.identity.projectGroup.member.remove({
-                    project_group_id: props.projectGroupId,
-                    users: items.map((it) => it.resource_id),
-                });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '');
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'));
-            }
-        };
-
-        /* Event */
-        const handleChangeTable = async (options: ToolboxOptions = {}) => {
-            setApiQueryWithToolboxOptions(apiQueryHelper, options);
-            if (options.searchText !== undefined) {
-                const filters = [{ v: options.searchText }];
-                emit('update-filters', filters);
-            }
-            await listMembers(storeState.projects);
-        };
-        const handleClickInviteMember = () => {
-            state.memberAddFormVisible = true;
-        };
-
-        const clickDeleteMember = () => {
-            checkMemberDeleteState.visible = true;
-        };
-        const clickUpdateMember = () => {
-            state.memberUpdateFormVisible = true;
-        };
-        const handleSelectDropdown = (name) => {
-            switch (name) {
-            case 'delete': clickDeleteMember(); break;
-            case 'update': clickUpdateMember(); break;
-            default: break;
-            }
-        };
-        const handleConfirmDeleteMember = async (items) => {
-            if (props.isProjectGroup) await deleteProjectGroupMember(items);
-            else await deleteProjectMember(items);
-
-            checkMemberDeleteState.visible = false;
-            await listMembers(storeState.projects);
-        };
-        const handleConfirm = () => {
-            listMembers(storeState.projects);
-        };
-
-        /* Init */
-        (async () => {
-            // LOAD REFERENCE STORE
-            await Promise.allSettled([
-                store.dispatch('reference/user/load'),
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
-            ]);
-        })();
-
-        /* Watcher */
-        watch(() => store.state.reference.project.items, (projects) => {
-            if (projects) listMembers(projects);
-        }, { immediate: true });
-
-        return {
-            ...toRefs(state),
-            storeState,
-            checkMemberDeleteState,
-            ACTION_ICON,
-            handleClickInviteMember,
-            handleSelectDropdown,
-            handleConfirmDeleteMember,
-            handleChangeTable,
-            handleConfirm,
-            projectLinkFormatter,
-        };
-    },
-};
-</script>
 
 <style lang="postcss" scoped>
 .project-member-tab {
@@ -368,6 +273,44 @@ export default {
             line-height: 1.6;
             margin-bottom: 0.5rem;
         }
+    }
+
+    .description-wrapper {
+        @apply rounded-md text-gray-900;
+        display: flex;
+        align-content: center;
+        padding: 0.75rem 1rem;
+        margin: 1rem 1rem 0 1rem;
+        &.public {
+            @apply bg-indigo-100;
+            .icon {
+                @apply text-indigo-600;
+            }
+        }
+        &.private {
+            @apply bg-gray-100;
+            .icon {
+                @apply text-gray-900;
+            }
+        }
+        .text {
+            @apply text-label-md;
+            padding-left: 0.25rem;
+            .link-text {
+                @apply text-blue-700;
+                cursor: pointer;
+                &:hover {
+                    @apply text-secondary;
+                    .text {
+                        text-decoration: underline;
+                    }
+                }
+            }
+        }
+    }
+    .action-button-wrapper {
+        display: inline-flex;
+        float: right;
     }
 }
 </style>

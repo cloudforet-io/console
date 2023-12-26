@@ -1,47 +1,44 @@
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { UserProfileConfirmEmailParameters } from '@/schema/identity/user-profile/api-verbs/confirm-email';
+import type { UserProfileVerifyEmailParameters } from '@/schema/identity/user-profile/api-verbs/verify-email';
+import type { UserVerifyEmailParameters } from '@/schema/identity/user/api-verbs/verify-email';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-export const postValidationEmail = async (body): Promise<void|Error> => {
-    const {
-        email, user_id, domain_id, force,
-    } = body;
+export const postUserProfileValidationEmail = async (params: UserProfileVerifyEmailParameters): Promise<void|Error> => {
     try {
-        await SpaceConnector.clientV2.identity.user.verifyEmail({
-            user_id,
-            email,
-            domain_id,
-            force,
-        });
-        if (!force) {
-            await showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
-        }
+        await SpaceConnector.clientV2.identity.userProfile.verifyEmail<UserProfileVerifyEmailParameters>(params);
+        await showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
         return undefined;
     } catch (e: any) {
-        showErrorMessage(e.message, e);
+        ErrorHandler.handleRequestError(e, e.message);
         throw e;
     }
 };
 
-export const postValidationCode = async (body, setUser): Promise<void|Error> => {
-    const { user_id, code, domain_id } = body;
+export const postValidationCode = async (params: UserProfileConfirmEmailParameters): Promise<void|Error> => {
     try {
-        const response = await SpaceConnector.clientV2.identity.user.confirmEmail({
-            user_id,
-            verify_code: code,
-            domain_id,
-        });
-        if (setUser) {
-            await store.dispatch('user/setUser', { email: response.email, email_verified: response.email_verified });
-        }
-        showSuccessMessage(i18n.t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.SUCCESS'), '');
+        const response = await SpaceConnector.clientV2.identity.userProfile.confirmEmail<UserProfileConfirmEmailParameters>(params);
+        await store.dispatch('user/setUser', { email: response.email, email_verified: response.email_verified });
+        showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION_EMAIL.SUCCESS'), '');
     } catch (e: any) {
-        ErrorHandler.handleError(e);
+        ErrorHandler.handleRequestError(e, e.message);
+        throw e;
+    }
+};
+
+export const postUserValidationEmail = async (params: UserVerifyEmailParameters): Promise<void|Error> => {
+    try {
+        await SpaceConnector.clientV2.identity.user.verifyEmail<UserVerifyEmailParameters>(params);
+        await showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
+        return undefined;
+    } catch (e: any) {
+        ErrorHandler.handleRequestError(e, e.message);
         throw e;
     }
 };

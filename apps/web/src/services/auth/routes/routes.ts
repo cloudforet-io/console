@@ -4,6 +4,7 @@ import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
+const SignInContainer = () => import('@/services/auth/components/SignInContainer.vue');
 const SignOutPage = () => import('@/services/auth/pages/SignOutPage.vue');
 const SignInPage = () => import('@/services/auth/pages/SignInPage.vue');
 const DomainAdminSignInPage = () => import('@/services/auth/pages/DomainAdminSignInPage.vue');
@@ -11,6 +12,7 @@ const KeycloakPage = () => import('@/services/auth/pages/KeycloakPage.vue');
 const KB_SSO = () => import('@/services/auth/pages/KB_SSOPage.vue');
 const PasswordPage = () => import('@/services/auth/pages/PasswordPage.vue');
 const ValidationEmailPage = () => import('@/services/auth/pages/ValidationEmailPage.vue');
+const MultiFactorAuthPage = () => import('@/services/auth/pages/MultiFactorAuthPage.vue');
 
 export default [
     {
@@ -27,7 +29,7 @@ export default [
             isSignInPage: true,
             accessLevel: ACCESS_LEVEL.EXCLUDE_AUTH,
         },
-        component: { template: '<router-view />' },
+        component: SignInContainer,
         children: [
             {
                 path: '/',
@@ -62,6 +64,17 @@ export default [
                     nextPath: route.query.nextPath,
                 }),
                 component: KeycloakPage,
+            },
+            {
+                path: 'mfa',
+                name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
+                meta: {
+                    isSignInPage: true,
+                },
+                props: (route) => ({
+                    nextPath: route.query.nextPath,
+                }),
+                component: MultiFactorAuthPage,
             },
         ],
     },

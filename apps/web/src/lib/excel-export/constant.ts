@@ -4,6 +4,7 @@ export const FILE_NAME_PREFIX = Object.freeze({
     serviceAccount: 'service_account',
     user: 'user',
     role: 'role',
+    workspace: 'workspace',
     collector: 'collector',
     projectWebhook: 'project_webhook',
     alert: 'alert',

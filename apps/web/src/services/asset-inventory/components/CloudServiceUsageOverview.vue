@@ -54,7 +54,8 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CloudServiceTypeInfo } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -65,7 +66,7 @@ import CloudServiceUsageOverviewSummary
 import type { Period } from '@/services/asset-inventory/types/type';
 
 interface Props {
-    cloudServiceTypeInfo: CloudServiceTypeInfo;
+    cloudServiceTypeInfo: CloudServiceTypeModel;
     filters?: ConsoleFilter[];
     period?: Period;
     hiddenFilters?: ConsoleFilter[];
@@ -86,7 +87,7 @@ export default defineComponent<Props>({
     },
     props: {
         cloudServiceTypeInfo: {
-            type: Object as () => CloudServiceTypeInfo,
+            type: Object as () => CloudServiceTypeModel,
             default: () => ({}),
         },
         filters: {
@@ -141,7 +142,7 @@ export default defineComponent<Props>({
 
         const fetchSchemaList = async (): Promise<DynamicWidgetSchema[]> => {
             try {
-                const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeInfo;
+                const { provider, group, name } = props.cloudServiceTypeInfo as CloudServiceTypeModel;
                 const { widget } = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: 'inventory.CloudService',
                     schema: 'widget',
@@ -164,7 +165,7 @@ export default defineComponent<Props>({
         const fetchDataWithSchema = async (schema: DynamicWidgetSchema, idx: number): Promise<Data> => {
             let _fetcher = fetcherList[idx];
             if (!_fetcher) {
-                const cancellableFetcher = getCancellableFetcher(SpaceConnector.client.inventory.cloudService.analyze);
+                const cancellableFetcher = getCancellableFetcher<CloudServiceAnalyzeParameters>(SpaceConnector.client.inventory.cloudService.analyze);
                 fetcherList[idx] = cancellableFetcher;
                 _fetcher = cancellableFetcher;
             }

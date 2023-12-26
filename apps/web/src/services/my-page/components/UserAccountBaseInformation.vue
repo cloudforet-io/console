@@ -24,10 +24,7 @@ import UserAccountModuleContainer
 
 const state = reactive({
     userId: computed(() => store.state.user.userId),
-    userRole: computed(() => {
-        const roleArray = store.getters['user/roleNames'];
-        return roleArray.join(', ');
-    }),
+    userRole: computed(() => store.getters['user/getCurrentRoleInfo'].roleType || 'USER'),
     languages: map(languages, (d, k) => ({
         type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
     })) as MenuItem[],
@@ -42,7 +39,7 @@ const formState = reactive({
 });
 const validationState = reactive({
     timezoneInvalidText: computed(() => {
-        if (!formState.timezone.length) return i18n.t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
+        if (!formState.timezone.length) return i18n.t('MY_PAGE.ACCOUNT.TIMEZONE_INVALID');
         return '';
     }),
     showValidation: false,
@@ -93,7 +90,7 @@ watch(() => store.state.user.language, (language) => {
 
 <template>
     <user-account-module-container
-        :title="$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')"
+        :title="$t('MY_PAGE.ACCOUNT.BASE_INFORMATION')"
         class="base-information-wrapper"
     >
         <p-field-group required
@@ -113,7 +110,8 @@ watch(() => store.state.user.language, (language) => {
                           class="text-input"
             />
         </p-field-group>
-        <p-field-group required
+        <p-field-group v-if="state.userRole === 'DOMAIN_ADMIN'"
+                       required
                        :label="$t('COMMON.PROFILE.ROLE')"
                        class="input-form"
         >
@@ -152,7 +150,7 @@ watch(() => store.state.user.language, (language) => {
             <p-button style-type="primary"
                       @click="handleClickProfileConfirm"
             >
-                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
+                {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
             </p-button>
         </div>
     </user-account-module-container>

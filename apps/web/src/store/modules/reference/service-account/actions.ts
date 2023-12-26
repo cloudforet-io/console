@@ -20,7 +20,7 @@ export const load: Action<ServiceAccountReferenceState, any> = async ({ state, c
     ) return;
 
     try {
-        const response = await SpaceConnector.client.identity.serviceAccount.list({
+        const response = await SpaceConnector.clientV2.identity.serviceAccount.list({
             query: {
                 only: ['service_account_id', 'name'],
             },

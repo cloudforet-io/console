@@ -23,14 +23,15 @@ const emit = defineEmits<{(e: 'disable-filter', value: string): void;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
     menuItems: computed<MenuItem[]>(() => {
         const tagsMenuItems = state.tagsMenuItems;
-        if (!tagsMenuItems.length) return costAnalysisPageStore.defaultGroupByItems;
+        if (!tagsMenuItems.length) return costAnalysisPageGetters.defaultGroupByItems;
         return [
-            ...costAnalysisPageStore.defaultGroupByItems,
+            ...costAnalysisPageGetters.defaultGroupByItems,
             { type: 'header', label: 'Tags', name: 'tags' },
             ...tagsMenuItems,
         ];
@@ -39,7 +40,7 @@ const state = reactive({
     tagsMenuItems: [] as MenuItem[],
     selectedItems: [] as MenuItem[],
     searchText: '',
-    dataSourceId: computed<string>(() => costAnalysisPageStore.selectedDataSourceId ?? ''),
+    dataSourceId: computed<string>(() => costAnalysisPageGetters.selectedDataSourceId ?? ''),
 });
 
 const containerRef = ref<HTMLElement|null>(null);
@@ -92,20 +93,21 @@ const handleClickAddMore = () => {
     }
 };
 const handleSelectAddMoreMenuItem = (item: MenuItem, _, isSelected: boolean) => {
-    costAnalysisPageStore.$patch((_state) => {
-        if (isSelected) {
-            _state.enabledFiltersProperties = [...(_state.enabledFiltersProperties ?? []), item.name as string];
-        } else {
-            _state.enabledFiltersProperties = _state.enabledFiltersProperties?.filter((d) => d !== item.name);
-            emit('disable-filter', item.name as string);
-        }
-    });
+    if (isSelected) {
+        costAnalysisPageStore.setEnabledFiltersProperties([
+            ...(costAnalysisPageState.enabledFiltersProperties ?? []),
+            item.name as string,
+        ]);
+    } else {
+        costAnalysisPageStore.setEnabledFiltersProperties(
+            costAnalysisPageState.enabledFiltersProperties?.filter((d) => d !== item.name) ?? [],
+        );
+        emit('disable-filter', item.name as string);
+    }
 };
 const handleClearAddMoreMenuItems = () => {
-    costAnalysisPageStore.$patch((_state) => {
-        _state.enabledFiltersProperties = [];
-        emit('disable-all-filters');
-    });
+    costAnalysisPageStore.setEnabledFiltersProperties([]);
+    emit('disable-all-filters');
 };
 const handleUpdateSearchText = debounce((text: string) => {
     state.searchText = text;

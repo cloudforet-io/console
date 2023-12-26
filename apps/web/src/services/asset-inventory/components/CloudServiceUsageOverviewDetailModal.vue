@@ -73,7 +73,7 @@ import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { ApiFilter } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CloudServiceTypeInfo } from '@/schema/inventory/cloud-service-type/model';
+import type { CloudServiceTypeModel } from '@/schema/inventory/cloud-service-type/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -97,7 +97,7 @@ interface Props {
     visible: boolean;
     schemaList: DynamicWidgetSchema[];
     summaryDataList: Data[][];
-    cloudServiceTypeInfo: CloudServiceTypeInfo;
+    cloudServiceTypeInfo: CloudServiceTypeModel;
     filters: ConsoleFilter[];
     period?: Period;
     hiddenFilters: ConsoleFilter[];
@@ -132,7 +132,7 @@ export default defineComponent<Props>({
             default: () => [],
         },
         cloudServiceTypeInfo: {
-            type: Object as () => CloudServiceTypeInfo,
+            type: Object as () => CloudServiceTypeModel,
             default: () => ({}),
         },
         filters: {

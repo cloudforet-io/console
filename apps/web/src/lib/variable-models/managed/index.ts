@@ -30,6 +30,7 @@ import SecretVariableModel from './secret-variable-model';
 import ServiceAccountVariableModel from './service-account-variable-model';
 import UserVariableModel from './user-variable-model';
 import WebhookVariableModel from './webhook-variable-model';
+import WorkspaceVariableModel from './workspace-variable-model';
 
 const MANAGED_VARIABLE_MODELS = {
     // enum variable model
@@ -50,6 +51,7 @@ const MANAGED_VARIABLE_MODELS = {
     service_account: ServiceAccountVariableModel,
     user: UserVariableModel,
     webhook: WebhookVariableModel,
+    workspace: WorkspaceVariableModel,
     // resource value variable model
     asset_account: AssetAccountVariableModel,
     cost_product: CostProductVariableModel,

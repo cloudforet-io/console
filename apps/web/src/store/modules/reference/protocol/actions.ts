@@ -2,6 +2,10 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
+import type { ProtocolModel } from '@/schema/notification/protocol/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import type { ProtocolReferenceMap, ProtocolReferenceState } from '@/store/modules/reference/protocol/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
@@ -20,14 +24,14 @@ export const load: Action<ProtocolReferenceState, any> = async ({ state, commit 
     ) return;
 
     try {
-        const response = await SpaceConnector.client.notification.protocol.list({
+        const response = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
             query: {
                 only: ['protocol_id', 'name'],
             },
         }, { timeout: 3000 });
         const protocols: ProtocolReferenceMap = {};
 
-        response.results.forEach((protocolInfo: any): void => {
+        response.results?.forEach((protocolInfo): void => {
             protocols[protocolInfo.protocol_id] = {
                 key: protocolInfo.protocol_id,
                 label: protocolInfo.name,

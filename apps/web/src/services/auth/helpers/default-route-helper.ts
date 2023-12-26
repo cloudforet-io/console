@@ -1,21 +1,25 @@
 import type { Location } from 'vue-router/types/router';
 
-import { MENU_ID } from '@/lib/menu/config';
+import { ROOT_ROUTE } from '@/router/constant';
 
-const GENERAL_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MENU_ID.HOME_DASHBOARD,
+// import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
+import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
+
+// TODO: need to refactor with admin mode
+const GENERAL_DEFAULT_ROUTE = Object.freeze({
+    name: ROOT_ROUTE.WORKSPACE._NAME,
 });
 
 const NO_ROLE_USER_DEFAULT_ROUTE = Object.freeze({
-    name: MENU_ID.MY_PAGE_ACCOUNT,
+    name: MY_PAGE_ROUTE.MY_ACCOUNT._NAME,
 });
 
-const DOMAIN_OWNER_DEFAULT_ROUTE = Object.freeze({
-    name: MENU_ID.ADMINISTRATION_USER,
-});
+// const SYTEM_DEFAULT_ROUTE = Object.freeze({
+//     name: ADMINISTRATION_ROUTE.IAM._NAME,
+// });
 
-export const getDefaultRouteAfterSignIn = (isDomainOwner: boolean, hasSystemRole: boolean, hasAnyPermissions: boolean): Location => {
-    if (isDomainOwner || hasSystemRole) return DOMAIN_OWNER_DEFAULT_ROUTE;
-    if (hasAnyPermissions) return GENERAL_USER_DEFAULT_ROUTE;
+export const getDefaultRouteAfterSignIn = (hasSystemRole: boolean, hasAnyPermissions: boolean): Location => {
+    // TODO: need to decide SYSTEM ROLE
+    if (hasAnyPermissions) return GENERAL_DEFAULT_ROUTE;
     return NO_ROLE_USER_DEFAULT_ROUTE;
 };

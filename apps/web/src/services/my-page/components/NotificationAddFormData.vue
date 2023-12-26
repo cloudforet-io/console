@@ -1,38 +1,176 @@
+<script setup lang="ts">
+import {
+    computed, reactive, watch,
+} from 'vue';
+import type { TranslateResult } from 'vue-i18n';
+import { useRoute } from 'vue-router/composables';
+
+import {
+    PFieldGroup, PTextInput, PJsonSchemaForm,
+} from '@spaceone/design-system';
+import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NotificationLevel } from '@/schema/notification/notification/type';
+import type { ProtocolListParameters } from '@/schema/notification/protocol/api-verbs/list';
+import type { ProtocolModel } from '@/schema/notification/protocol/model';
+import { i18n } from '@/translations';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
+import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
+import type { NotificationAddFormDataPayload } from '@/services/my-page/types/notification-add-form-type';
+
+
+const CHANNEL_TYPE = {
+    AWS_SNS: 'AWSSNS',
+    SLACK: 'Slack',
+    SPACEONE_USER: 'SpaceONEUser',
+} as const;
+
+const PROTOCOL_TYPE = {
+    INTERNAL: 'INTERNAL',
+    EXTERNAL: 'EXTERNAL',
+} as const;
+
+const props = withDefaults(defineProps<{
+    projectId: string;
+    protocolType: string;
+    protocolId: string;
+}>(), {
+    projectId: '',
+    protocolType: '',
+    protocolId: '',
+});
+const emit = defineEmits<{(event: 'change', payload: NotificationAddFormDataPayload): void;
+}>();
+
+const route = useRoute();
+
+const state = reactive({
+    channelName: undefined as string|undefined,
+    notificationLevel: 'LV1' as NotificationLevel,
+    schemaForm: {} as Record<string, any>,
+    schema: null as null|JsonSchema,
+    isSchemaFormValid: false,
+    nameInvalidText: computed<TranslateResult|undefined>(() => {
+        if (state.channelName !== undefined && state.channelName.length === 0) {
+            return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+        }
+        if (state.channelName !== undefined && state.channelName.length > 40) {
+            return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+        }
+        return undefined;
+    }),
+    isNameInvalid: computed<boolean>(() => !!state.nameInvalidText),
+    //
+    isJsonSchema: computed<boolean>(() => (state.schema ? Object.keys(state.schema).length !== 0 : false)),
+    isInputNotEmpty: computed<boolean>(() => state.channelName !== undefined && Object.keys(state.schemaForm).length !== 0),
+    isInputValid: computed<boolean>(() => state.isInputNotEmpty && (state.isSchemaFormValid && !state.isNameInvalid)),
+    isDataValid: computed<boolean>(() => (!state.isJsonSchema && !state.isNameInvalid) || (state.isJsonSchema && state.isInputValid)),
+    selectedMember: [] as string[],
+});
+
+const apiQuery = new ApiQueryHelper();
+const getSchema = async (): Promise<JsonSchema|null> => {
+    try {
+        apiQuery.setFilters([{ k: 'protocol_id', v: props.protocolId, o: '=' }]);
+        const res = await SpaceConnector.clientV2.notification.protocol.list<ProtocolListParameters, ListResponse<ProtocolModel>>({
+            query: apiQuery.data,
+        });
+        return res.results?.[0]?.plugin_info.metadata.data.schema ?? {};
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return null;
+    }
+};
+
+const emitChange = () => {
+    emit('change', {
+        channelName: state.channelName,
+        data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL) ? state.schemaForm : { users: state.selectedMember },
+        level: state.notificationLevel,
+        isValid: state.isDataValid,
+    });
+};
+
+const onChangeChannelName = (value: string) => {
+    state.channelName = value;
+    emitChange();
+};
+
+const handleSchemaFormChange = (isValid, form) => {
+    state.isSchemaFormValid = isValid;
+    state.schemaForm = form;
+    emitChange();
+};
+
+const onChangeMember = (value) => {
+    state.selectedMember = value.users;
+    emitChange();
+};
+
+const onChangeLevel = (level: NotificationLevel) => {
+    state.notificationLevel = level;
+    emitChange();
+};
+
+const initStates = () => {
+    state.channelName = undefined;
+    state.notificationLevel = 'LV1';
+    state.schemaForm = {};
+    state.isSchemaFormValid = false;
+    state.selectedMember = [];
+    state.schema = null;
+};
+
+watch([() => props.protocolId, () => props.protocolType], async ([protocolId, protocolType]) => {
+    if (!protocolId) return;
+    initStates();
+    if (protocolType !== PROTOCOL_TYPE.EXTERNAL) return;
+    state.schema = await getSchema();
+}, { immediate: true });
+</script>
+
 <template>
     <div>
         <p-field-group
             :label="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
             required
-            :invalid-text="nameInvalidText"
-            :invalid="isNameInvalid"
+            :invalid-text="state.nameInvalidText"
+            :invalid="state.isNameInvalid"
             class="base-info-input"
         >
             <template #default>
-                <p-text-input v-model="channelName"
+                <p-text-input :value="state.channelName"
                               class="block w-full"
-                              :invalid="isNameInvalid"
+                              :invalid="state.isNameInvalid"
                               :placeholder="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
                               @update:value="onChangeChannelName"
                 />
             </template>
         </p-field-group>
-        <notification-add-level v-if="projectId"
+        <notification-add-level v-if="props.projectId"
                                 @change="onChangeLevel"
         />
-        <p-json-schema-form v-if="isJsonSchema"
-                            :key="protocolId"
-                            :form-data="schemaForm"
-                            :schema="schema"
+        <p-json-schema-form v-if="state.isJsonSchema"
+                            :key="props.protocolId"
+                            :form-data="state.schemaForm"
+                            :schema="state.schema"
                             :language="$store.state.user.language"
                             class="schema-form"
                             @change="handleSchemaFormChange"
         />
-        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER && protocolType === PROTOCOL_TYPE.INTERNAL">
+        <div v-if="props.projectId && route.params.protocol === CHANNEL_TYPE.SPACEONE_USER && props.protocolType === PROTOCOL_TYPE.INTERNAL">
             <p-field-group :label="$t('MENU.ADMINISTRATION_USER')"
                            required
             >
                 <template #default>
-                    <notification-add-member-group :project-id="projectId"
+                    <notification-add-member-group :project-id="props.projectId"
                                                    @change="onChangeMember"
                     />
                 </template>
@@ -40,169 +178,6 @@
         </div>
     </div>
 </template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import {
-    computed, getCurrentInstance, reactive, toRefs, watch,
-} from 'vue';
-import type { Vue } from 'vue/types/vue';
-
-import {
-    PFieldGroup, PTextInput, PJsonSchemaForm,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-import NotificationAddLevel from '@/services/my-page/components/NotificationAddLevel.vue';
-import NotificationAddMemberGroup from '@/services/my-page/components/NotificationAddMemberGroup.vue';
-
-const CHANNEL_TYPE = {
-    AWS_SNS: 'AWSSNS',
-    SLACK: 'Slack',
-    SPACEONE_USER: 'SpaceONEUser',
-} as const;
-// type ChannelType = typeof CHANNEL_TYPE[keyof typeof CHANNEL_TYPE];
-
-const PROTOCOL_TYPE = {
-    INTERNAL: 'INTERNAL',
-    EXTERNAL: 'EXTERNAL',
-} as const;
-// type ProtocolType = typeof PROTOCOL_TYPE[keyof typeof PROTOCOL_TYPE];
-
-export default {
-    name: 'AddNotificationData',
-    components: {
-        NotificationAddLevel,
-        NotificationAddMemberGroup,
-        PFieldGroup,
-        PTextInput,
-        PJsonSchemaForm,
-    },
-    props: {
-        projectId: {
-            type: String,
-            default: '',
-        },
-        supportedSchema: {
-            type: [String, Array],
-            default: null,
-        },
-        protocolType: {
-            type: String,
-            default: '',
-        },
-        protocolId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const vm = getCurrentInstance()?.proxy as Vue;
-        const protocol = vm.$route.params.protocol;
-
-        const state = reactive({
-            channelName: undefined,
-            notificationLevel: 'LV1',
-            schemaForm: {},
-            schema: null as null|object,
-            isSchemaFormValid: false,
-            nameInvalidText: computed(() => {
-                if (state.channelName !== undefined && state.channelName.length === 0) {
-                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
-                }
-                if (state.channelName !== undefined && state.channelName.length > 40) {
-                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
-                }
-                return undefined;
-            }),
-            isNameInvalid: computed(() => !!state.nameInvalidText),
-            //
-            isJsonSchema: computed(() => (state.schema ? Object.keys(state.schema).length !== 0 : false)),
-            isInputNotEmpty: computed(() => state.channelName !== undefined && Object.keys(state.schemaForm).length !== 0),
-            isInputValid: computed(() => state.isInputNotEmpty && (state.isSchemaFormValid && !state.isNameInvalid)),
-            isDataValid: computed(() => (!state.isJsonSchema && !state.isNameInvalid) || (state.isJsonSchema && state.isInputValid)),
-            selectedMember: [],
-        });
-
-        const apiQuery = new ApiQueryHelper();
-        const getSchema = async (): Promise<object|null> => {
-            try {
-                apiQuery.setFilters([{ k: 'protocol_id', v: props.protocolId, o: '=' }]);
-                const res = await SpaceConnector.client.notification.protocol.list({
-                    query: apiQuery.data,
-                });
-                return res.results[0]?.plugin_info.metadata.data.schema ?? {};
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                return null;
-            }
-        };
-
-        const emitChange = () => {
-            emit('change', {
-                channelName: state.channelName,
-                data: (props.protocolType === PROTOCOL_TYPE.EXTERNAL) ? state.schemaForm : { users: state.selectedMember },
-                level: state.notificationLevel,
-                isValid: state.isDataValid,
-            });
-        };
-
-        const onChangeChannelName = (value) => {
-            state.channelName = value;
-            emitChange();
-        };
-
-        const handleSchemaFormChange = (isValid, form) => {
-            state.isSchemaFormValid = isValid;
-            state.schemaForm = form;
-            emitChange();
-        };
-
-        const onChangeMember = (value) => {
-            state.selectedMember = value.users;
-            emitChange();
-        };
-
-        const onChangeLevel = (value) => {
-            state.notificationLevel = value.level;
-            emitChange();
-        };
-
-        const initStates = () => {
-            state.channelName = undefined;
-            state.notificationLevel = 'LV1';
-            state.schemaForm = {};
-            state.isSchemaFormValid = false;
-            state.selectedMember = [];
-            state.schema = null;
-        };
-
-        watch([() => props.protocolId, () => props.supportedSchema, () => props.protocolType], async ([protocolId, supportedSchema, protocolType]) => {
-            if (!protocolId) return;
-            initStates();
-            if (!supportedSchema || protocolType !== PROTOCOL_TYPE.EXTERNAL) return;
-            state.schema = await getSchema();
-        }, { immediate: true });
-
-        return {
-            protocol,
-            CHANNEL_TYPE,
-            PROTOCOL_TYPE,
-            ...toRefs(state),
-            onChangeChannelName,
-            handleSchemaFormChange,
-            onChangeMember,
-            onChangeLevel,
-        };
-    },
-
-};
-</script>
 
 <style lang="postcss" scoped>
 .base-info-input {

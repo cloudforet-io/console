@@ -1,9 +1,9 @@
 <template>
     <p-pane-layout>
-        <section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
-                        :edit-mode="state.isEditMode"
-                        :hide-edit-button="state.isCollectorOptionsSchemaEmpty"
-                        @click-edit="handleClickEdit"
+        <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.ADDITIONAL_OPTIONS')"
+                                         :edit-mode="state.isEditMode"
+                                         :hide-edit-button="state.isCollectorOptionsSchemaEmpty"
+                                         @click-edit="handleClickEdit"
         />
         <p-definition-table v-if="!state.isEditMode"
                             :fields="state.fields"
@@ -68,14 +68,16 @@ import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { CollectorModel, CollectorOptions, CollectorUpdatePluginParameter } from '@/schema/inventory/collector/model';
+import type { CollectorUpdatePluginParameters } from '@/schema/inventory/collector/api-verbs/update-plugin';
+import type { CollectorModel } from '@/schema/inventory/collector/model';
+import type { CollectorOptions } from '@/schema/inventory/collector/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
+import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import CollectorOptionsForm from '@/services/asset-inventory/components/CollectorFormOptions.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
@@ -116,11 +118,11 @@ const state = reactive({
 
 const fetchCollectorPluginUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
-    const params: CollectorUpdatePluginParameter = {
+    const params: CollectorUpdatePluginParameters = {
         collector_id: collectorFormStore.collectorId,
         options: collectorFormState.options,
     };
-    return SpaceConnector.client.inventory.collector.updatePlugin(params);
+    return SpaceConnector.clientV2.inventory.collector.updatePlugin<CollectorUpdatePluginParameters, CollectorModel>(params);
 };
 const handleClickEdit = () => {
     state.isEditMode = true;

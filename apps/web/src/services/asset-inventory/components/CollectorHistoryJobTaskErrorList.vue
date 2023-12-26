@@ -102,13 +102,13 @@ export default {
         },
     },
     setup(props: Props) {
-        const initErrorItemsToggleList = (): boolean[] => props.selectedItem?.errors.map(() => true);
+        const initErrorItemsToggleList = (): boolean[] => (props.selectedItem?.errors ?? []).map(() => true);
 
         const state = reactive({
             errorItemsToggleList: initErrorItemsToggleList(),
             errorItems: computed<JobTaskError[]>(() => {
                 if (Array.isArray(props?.selectedItem?.errors)) {
-                    return props.selectedItem.errors.map((d, idx) => ({
+                    return (props.selectedItem.errors ?? []).map((d, idx) => ({
                         ...d,
                         sequence: idx + 1,
                         message: errorMessageFormatter(d.message),

@@ -119,19 +119,22 @@ import {
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RepositoryListParameters } from '@/schema/repository/repository/api-verbs/list';
+import type { RepositoryModel } from '@/schema/repository/repository/model';
 import { store } from '@/store';
 
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import type { RepositoryInfo } from '@/services/asset-inventory/collector/model';
 import { repositoryColorMap, repositoryIconMap } from '@/services/asset-inventory/constants/collector-constant';
 import {
     useCollectorFormStore,
 } from '@/services/asset-inventory/stores/collector-form-store';
+
+
 
 const collectorFormStore = useCollectorFormStore();
 const collectorFormState = collectorFormStore.$state;
@@ -156,7 +159,7 @@ const state = reactive({
         {
             name: 'all', label: 'All Repository', icon: null, color: null,
         },
-        ...state.repositories.map((repo: RepositoryInfo) => ({
+        ...state.repositories.map((repo: RepositoryModel) => ({
             label: repo.name,
             name: repo.repository_id,
             icon: repositoryIconMap[repo.repository_type],
@@ -168,13 +171,9 @@ const state = reactive({
     isLaptopView: computed<boolean>(() => width.value > screens.tablet.max),
 });
 
-const repoApiQuery = new ApiQueryHelper();
 const getRepositories = async () => {
     try {
-        repoApiQuery.setSort('repository_type', true);
-        const res = await SpaceConnector.client.repository.repository.list({
-            query: repoApiQuery.data,
-        });
+        const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>();
         state.repositories = res.results;
     } catch (e) {
         ErrorHandler.handleError(e);

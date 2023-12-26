@@ -19,11 +19,11 @@ import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { RegionReferenceMap } from '@/store/modules/reference/region/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { FILE_NAME_PREFIX } from '@/lib/excel-export/constant';
 import { downloadExcel } from '@/lib/helper/file-download-helper';
@@ -61,8 +61,10 @@ type CostAnalyzeRawData = {
     _total_value_sum?: number;
 };
 
+const allReferenceStore = useAllReferenceStore();
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
     component: computed(() => PToolboxTable),
@@ -73,14 +75,12 @@ const state = reactive({
         return 'YYYY-MM-DD';
     }),
     //
-    projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
-    projects: computed<ProjectReferenceMap>(() => store.getters['reference/projectItems']),
+    projects: computed<ProjectReferenceMap>(() => allReferenceStore.getters.project),
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
     regions: computed<RegionReferenceMap>(() => store.getters['reference/regionItems']),
     serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
     //
     groupByStoreMap: computed(() => ({
-        [GROUP_BY.PROJECT_GROUP]: state.projectGroups,
         [GROUP_BY.PROJECT]: state.projects,
         [GROUP_BY.PROVIDER]: state.providers,
         [GROUP_BY.REGION]: state.regions,
@@ -131,7 +131,6 @@ const tableState = reactive({
         return fields.map((d) => {
             const field: ExcelDataField = { key: d.name, name: (d.label) ?? '' };
             if (d.name === GROUP_BY.PROJECT) field.reference = { reference_key: 'project_id', resource_type: 'identity.Project' };
-            if (d.name === GROUP_BY.PROJECT_GROUP) field.reference = { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' };
             if (d.name === GROUP_BY.SERVICE_ACCOUNT) field.reference = { reference_key: 'service_account_id', resource_type: 'identity.ServiceAccount' };
             if (d.name === GROUP_BY.REGION) field.reference = { reference_key: 'region_code', resource_type: 'inventory.Region' };
             if (d.name === GROUP_BY.PROVIDER) field.reference = { reference_key: 'provider', resource_type: 'identity.Provider' };
@@ -262,22 +261,27 @@ const fieldDescriptionFormatter = (field: DataTableFieldType): string => {
     }
     return '';
 };
-
 const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Granularity, period: Period) => {
     const timeUnit = getTimeUnitByGranularity(granularity);
     let dateFormat = 'YYYY-MM-DD';
     if (timeUnit === 'month') dateFormat = 'YYYY-MM';
     else if (timeUnit === 'year') dateFormat = 'YYYY';
 
+    // HACK: will be removed after refactoring period
+    const _period = cloneDeep(period);
+    if (granularity === GRANULARITY.DAILY) {
+        _period.start = dayjs.utc(period.start).format('YYYY-MM-01');
+        _period.end = dayjs.utc(period.end).endOf('month').format('YYYY-MM-DD');
+    }
+
     const _results: CostAnalyzeRawData[] = cloneDeep(results);
     const refinedTableData: CostAnalyzeRawData[] = [];
     const today = dayjs.utc();
     _results.forEach((d) => {
         let target = cloneDeep(d.value_sum);
-        let now = dayjs.utc(period.start).clone();
-        while (now.isSameOrBefore(dayjs.utc(period.end), timeUnit)) {
-            if (now.isAfter(today, timeUnit)) break;
-            if (!find(target, { date: now.format(dateFormat) })) {
+        let now = dayjs.utc(_period.start).clone();
+        while (now.isSameOrBefore(dayjs.utc(_period.end), timeUnit)) {
+            if (!now.isAfter(today, timeUnit) && !find(target, { date: now.format(dateFormat) })) {
                 target?.push({ date: now.format(dateFormat), value: 0 });
             }
             now = now.add(1, timeUnit);
@@ -293,16 +297,16 @@ const getRefinedChartTableData = (results: CostAnalyzeRawData[], granularity: Gr
 
 
 /* api */
-const fetchCostAnalyze = getCancellableFetcher<CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
+const fetchCostAnalyze = getCancellableFetcher<object, CostAnalyzeResponse<CostAnalyzeRawData>>(SpaceConnector.clientV2.costAnalysis.cost.analyze);
 const analyzeApiQueryHelper = new ApiQueryHelper().setPage(1, 15);
 const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnalyzeRawData>> => {
     try {
         tableState.loading = true;
         analyzeApiQueryHelper
-            .setFilters(costAnalysisPageStore.consoleFilters)
+            .setFilters(costAnalysisPageGetters.consoleFilters)
             .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
         const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 ...analyzeApiQueryHelper.data,
@@ -317,20 +321,12 @@ const listCostAnalysisTableData = async (): Promise<CostAnalyzeResponse<CostAnal
         tableState.loading = false;
     }
 };
-
-/* event */
-const handleChange = async (options: any = {}) => {
-    setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
-    const { results, more } = await listCostAnalysisTableData();
-    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
-    tableState.more = more ?? false;
-};
 const costAnalyzeExportQueryHelper = new QueryHelper();
 const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
     try {
-        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageStore.consoleFilters);
+        costAnalyzeExportQueryHelper.setFilters(costAnalysisPageGetters.consoleFilters);
         const { status, response } = await fetchCostAnalyze({
-            data_source_id: costAnalysisPageStore.selectedDataSourceId,
+            data_source_id: costAnalysisPageGetters.selectedDataSourceId,
             query: {
                 ...state.analyzeQuery,
                 filter: costAnalyzeExportQueryHelper.apiQuery.filter,
@@ -342,6 +338,14 @@ const listCostAnalysisExcelData = async (): Promise<CostAnalyzeRawData[]> => {
         ErrorHandler.handleError(e);
         return [];
     }
+};
+
+/* event */
+const handleChange = async (options: any = {}) => {
+    setApiQueryWithToolboxOptions(analyzeApiQueryHelper, options, { queryTags: true });
+    const { results, more } = await listCostAnalysisTableData();
+    if (costAnalysisPageState.period) tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period);
+    tableState.more = more ?? false;
 };
 const handleExcelDownload = async () => {
     try {
@@ -367,12 +371,15 @@ const handleUpdateThisPage = async () => {
     tableState.items = getRefinedChartTableData(results, costAnalysisPageState.granularity, costAnalysisPageState.period ?? {});
     tableState.more = more ?? false;
 };
+const handleUpdateSelectedDisplayDataType = (selected: DisplayDataType) => {
+    state.selectedDisplayDataType = selected;
+};
 
 watch(
     [
         () => costAnalysisPageState,
-        () => costAnalysisPageStore.selectedDataSourceId,
-        () => costAnalysisPageStore.selectedQueryId,
+        () => costAnalysisPageGetters.selectedDataSourceId,
+        () => costAnalysisPageGetters.selectedQueryId,
         () => state.selectedDisplayDataType,
     ],
     async ([, selectedDataSourceId]) => {
@@ -388,15 +395,9 @@ watch(
     { immediate: true, deep: true },
 );
 
-const handleUpdateselectedDisplayDataType = (selected: DisplayDataType) => {
-    state.selectedDisplayDataType = selected;
-};
-
 // LOAD REFERENCE STORE
 (async () => {
     await Promise.allSettled([
-        store.dispatch('reference/projectGroup/load'),
-        store.dispatch('reference/project/load'),
         store.dispatch('reference/provider/load'),
         store.dispatch('reference/region/load'),
         store.dispatch('reference/serviceAccount/load'),
@@ -426,7 +427,7 @@ const handleUpdateselectedDisplayDataType = (selected: DisplayDataType) => {
                 />
             </template>
             <template #toolbox-left>
-                <cost-analysis-data-table-data-type-dropdown @update-display-data-type="handleUpdateselectedDisplayDataType" />
+                <cost-analysis-data-table-data-type-dropdown @update-display-data-type="handleUpdateSelectedDisplayDataType" />
                 <div class="toggle-wrapper">
                     <span class="label">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ORIGINAL_DATA') }}</span>
                     <p-collapsible-toggle :toggle-type="'switch'"
@@ -443,9 +444,6 @@ const handleUpdateselectedDisplayDataType = (selected: DisplayDataType) => {
                 <span v-if="tableState.loading" />
                 <span v-else-if="Object.values(GROUP_BY).includes(field.name) && !value">
                     Unknown
-                </span>
-                <span v-else-if="field.name === GROUP_BY.PROJECT_GROUP">
-                    {{ state.projectGroups[value] ? state.projectGroups[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY.PROJECT">
                     {{ state.projects[value] ? state.projects[value].label : value }}

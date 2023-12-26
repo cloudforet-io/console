@@ -1,11 +1,51 @@
+<script lang="ts" setup>
+import {
+    computed, reactive,
+} from 'vue';
+
+import {
+    PEmpty, PTab, PDataTable,
+} from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import RoleManagementTabDetail from '@/services/administration/components/RoleManagementTabDetail.vue';
+import { useRoleFormatter } from '@/services/administration/composables/refined-table-data';
+import { ROLE_TAB_TABLE_FIELDS } from '@/services/administration/constants/role-constant';
+import { useRolePageStore } from '@/services/administration/store/role-page-store';
+
+const rolePageStore = useRolePageStore();
+const rolePageState = rolePageStore.$state;
+
+const storeState = reactive({
+    timezone: computed(() => store.state.user.timezone),
+});
+const singleItemTabState = reactive({
+    tabs: computed<TabItem[]>(() => ([
+        { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
+    ])),
+    activeTab: 'detail',
+});
+const multiItemTabState = reactive({
+    tabs: computed<TabItem[]>(() => ([
+        { name: 'data', label: i18n.t('IAM.ROLE.DETAIL.SELECTED_DATA'), keepAlive: true },
+    ])),
+    activeTab: 'data',
+});
+</script>
+
 <template>
-    <section>
+    <section class="role-management-tab">
         <p-tab v-if="rolePageState.selectedIndices.length === 1"
                :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <role-management-tab-detail :role-id="selectedRoleId" />
+                <role-management-tab-detail />
             </template>
         </p-tab>
         <p-tab v-else-if="rolePageState.selectedIndices.length > 1"
@@ -13,35 +53,24 @@
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table :fields="fields"
+                <p-data-table :fields="ROLE_TAB_TABLE_FIELDS"
                               :sortable="false"
                               :selectable="false"
                               :items="rolePageStore.selectedRoles"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
-                    <template #th-edit_button>
-                        <span />
-                    </template>
                     <template #col-role_type-format="{ value }">
-                        <p-badge v-if="value"
-                                 badge-type="solid-outline"
-                                 :style-type="ROLE_TYPE_BADGE_OPTION[value].styleType"
-                        >
-                            {{ ROLE_TYPE_BADGE_OPTION[value] ? ROLE_TYPE_BADGE_OPTION[value].label : '' }}
-                        </p-badge>
+                        <span class="role-type">
+                            <img :src="useRoleFormatter(value).image"
+                                 alt="role-type-icon"
+                                 class="role-type-icon"
+                            >
+                            <span>{{ useRoleFormatter(value).name }}</span>
+                        </span>
                     </template>
-                    <template #[`col-tags.description-format`]="{ value }">
-                        {{ value ? value : '--' }}
-                    </template>
-                    <template #col-edit_button-format="{ item }">
-                        <p-button size="sm"
-                                  style-type="tertiary"
-                                  icon-left="ic_edit"
-                                  @click="handleEditRole(item.role_id)"
-                        >
-                            {{ $t('IAM.ROLE.EDIT') }}
-                        </p-button>
+                    <template #col-created_at-format="{value}">
+                        {{ iso8601Formatter(value, storeState.timezone) }}
                     </template>
                 </p-data-table>
             </template>
@@ -49,94 +78,31 @@
         <div v-else
              id="empty-space"
         >
-            <p-empty>{{ $t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
+            <p-empty>{{ $t('IAM.USER.MAIN.NO_SELECTED') }}</p-empty>
         </div>
     </section>
 </template>
 
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PEmpty, PTab, PDataTable, PBadge, PButton,
-} from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { SpaceRouter } from '@/router';
-import { i18n } from '@/translations';
-
-import RoleManagementTabDetail from '@/services/administration/components/RoleManagementTabDetail.vue';
-import { ROLE_TYPE_BADGE_OPTION } from '@/services/administration/constants/role-constant';
-import { ADMINISTRATION_ROUTE } from '@/services/administration/routes/route-constant';
-import { useRolePageStore } from '@/services/administration/store/role-page-store';
-
-
-export default {
-    name: 'RoleManagementTab',
-    components: {
-        PEmpty,
-        PTab,
-        PDataTable,
-        PBadge,
-        PButton,
-        RoleManagementTabDetail,
-    },
-    setup() {
-        const rolePageStore = useRolePageStore();
-        const rolePageState = rolePageStore.$state;
-
-        const state = reactive({
-            fields: computed<DataTableField[]>(() => ([
-                { name: 'name', label: 'Name' },
-                { name: 'tags.description', label: 'Description', sortable: false },
-                { name: 'role_type', label: 'Role Type' },
-                { name: 'created_at', label: 'Created', sortable: false },
-                { name: 'edit_button', label: ' ', sortable: false },
-            ])),
-            selectedRoleId: computed(() => rolePageStore.selectedRoles[0]?.role_id),
-        });
-
-        const singleItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => ([
-                { label: i18n.t('IAM.ROLE.DETAIL.DETAILS'), name: 'detail', keepAlive: true },
-            ])),
-            activeTab: 'detail',
-        });
-
-        const multiItemTabState = reactive({
-            tabs: computed<TabItem[]>(() => ([
-                { name: 'data', label: i18n.t('IAM.ROLE.DETAIL.SELECTED_DATA'), keepAlive: true },
-            ])),
-            activeTab: 'data',
-        });
-
-        const handleEditRole = (id: string) => { SpaceRouter.router.push({ name: ADMINISTRATION_ROUTE.IAM.ROLE.EDIT._NAME, params: { id } }); };
-
-        return {
-            ...toRefs(state),
-            singleItemTabState,
-            multiItemTabState,
-            rolePageStore,
-            rolePageState,
-            handleEditRole,
-            ROLE_TYPE_BADGE_OPTION,
-        };
-    },
-
-};
-</script>
-
 <style lang="postcss" scoped>
-#empty-space {
-    @apply text-primary2 mt-6;
-    text-align: center;
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
+.role-management-tab {
+    #empty-space {
+        @apply text-primary2 mt-6;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+    }
+    .selected-data-tab {
+        @apply mt-8;
+    }
+    .role-type {
+        @apply flex items-center;
+        gap: 0.5rem;
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1rem;
+            height: 1rem;
+        }
+    }
 }
-.selected-data-tab {
-    @apply mt-8;
-}
+
 </style>

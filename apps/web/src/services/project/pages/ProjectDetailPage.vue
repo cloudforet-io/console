@@ -6,42 +6,37 @@ import type { TranslateResult } from 'vue-i18n';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PTab, PHeading, PButtonModal,
-    PButton, PCopyButton, PBreadcrumbs, PIconButton, PBadge, PDataLoader,
+    PBadge, PBreadcrumbs, PButtonModal, PCopyButton, PDataLoader, PHeading, PIconButton, PTab, PI,
 } from '@spaceone/design-system';
+import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 import { find } from 'lodash';
 
-import { QueryHelper } from '@cloudforet/core-lib/query';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
 
+import type { ProjectDeleteParameters } from '@/schema/identity/project/api-verbs/delete';
 import type { ProjectModel } from '@/schema/identity/project/model';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
-import type { UserReferenceMap } from '@/store/modules/reference/user/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
-import { isUserAccessibleToMenu } from '@/lib/access-control';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { MENU_ID } from '@/lib/menu/config';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
-import { NoResourceError } from '@/common/composables/error/error';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
-import MaintenanceHappeningList from '@/services/project/components/ProjectDetailMaintenanceHappeningList.vue';
-import MaintenanceWindowFormModal from '@/services/project/components/ProjectDetailMaintenanceWindowFormModal.vue';
-import ProjectDetailProjectFormModal from '@/services/project/components/ProjectDetailProjectFormModal.vue';
+import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
+import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
 interface Props {
@@ -51,50 +46,33 @@ const props = defineProps<Props>();
 const route = useRoute();
 const router = useRouter();
 
+const allReferenceStore = useAllReferenceStore();
+const projectPageStore = useProjectPageStore();
+const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
-const projectDetailPageState = projectDetailPageStore.$state;
+const projectDetailPageState = projectDetailPageStore.state;
+const projectDetailPageGetters = projectDetailPageStore.getters;
+const storeState = reactive({
+    projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
+});
 const state = reactive({
-    hasManagePermission: useManagePermissionState(),
-    hasAlertPermission: computed<boolean>(() => isUserAccessibleToMenu(MENU_ID.ALERT_MANAGER, store.getters['user/pagePermissionList'])),
-    loading: true,
-    item: null as null|ProjectModel,
-    projectId: computed(() => projectDetailPageState.projectId),
-    projectName: computed(() => state.item?.name || ''),
-    projectGroupId: computed(() => state.item?.project_group_info?.project_group_id || ''),
-    projectGroupName: computed(() => state.item?.project_group_info?.name || ''),
-    projectGroupNames: [],
-    pageNavigation: computed(() => [
-        { name: i18n.t('MENU.PROJECT'), path: '/project' },
-        { name: state.projectGroupName, path: `/project?select_pg=${state.projectGroupId}` },
-        // ...state.projectGroupNames.map(d => ({
-        //     name: d.name,
-        //     path: `/project?select_pg=${d.project_group_id}`,
-        // })),
-        { name: state.projectName },
-    ]),
-    users: computed<UserReferenceMap>(() => store.getters['reference/userItems']),
-    maintenanceWindowFormVisible: false,
+    item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
+    projectGroupId: computed<string>(() => state.item?.project_group_id || ''),
+    projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
+    pageNavigation: computed<Route[]>(() => {
+        const results: Route[] = [
+            { name: i18n.t('MENU.PROJECT') as string, path: '/project' },
+        ];
+        if (state.projectGroupId?.length) {
+            results.push({ name: state.projectGroupInfo?.name || '', path: `/project?select_pg=${state.projectGroupId}` });
+        }
+        results.push({ name: state.item?.name || '' });
+        return results;
+    }),
     counts: computed(() => ({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
     })),
 });
-
-/* api */
-const getProject = async (id) => {
-    state.loading = true;
-    try {
-        const resp = await SpaceConnector.client.identity.project.get({
-            project_id: id,
-        });
-        state.item = resp;
-    } catch (e) {
-        state.item = null;
-        ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
-        // forceRouteToProjectPage();
-    } finally {
-        state.loading = false;
-    }
-};
 
 /** Tabs */
 const singleItemTabState = reactive({
@@ -108,10 +86,10 @@ const singleItemTabState = reactive({
             name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
         },
-        ...(state.hasAlertPermission) ? [{
+        {
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-        }] : [],
+        },
         {
             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
             label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
@@ -146,8 +124,8 @@ const projectDeleteFormConfirm = async () => {
 
     formState.modalLoading = true;
     try {
-        await SpaceConnector.client.identity.project.delete({
-            project_id: state.projectId,
+        await SpaceConnector.clientV2.identity.project.delete<ProjectDeleteParameters>({
+            project_id: projectDetailPageState.projectId as string,
         });
         // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
         showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '');
@@ -160,12 +138,8 @@ const projectDeleteFormConfirm = async () => {
     }
 };
 
-const openProjectEditForm = () => {
-    formState.projectEditFormVisible = true;
-};
-
-const onProjectFormComplete = async (data) => {
-    state.item = data || null;
+const handleConfirmProjectForm = (data: ProjectModel) => {
+    projectDetailPageStore.setProject(data);
 };
 
 const onChangeTab = (activeTab) => {
@@ -173,19 +147,12 @@ const onChangeTab = (activeTab) => {
     router.replace({ name: activeTab });
 };
 
-const urlQueryHelper = new QueryHelper();
-const onCreateMaintenanceWindow = (maintenanceWindowId: string) => {
-    singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME;
-    urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
-    router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
-};
-
 /* Watchers */
-watch(() => state.projectId, async (projectId) => {
+watch(() => projectDetailPageState.projectId, async (projectId) => {
     if (projectId) {
         await Promise.allSettled([
-            getProject(projectId),
-            projectDetailPageStore.getAlertCounts(),
+            projectDetailPageStore.getProject(projectId),
+            projectDetailPageStore.getAlertCounts(projectId),
         ]);
     }
 }, { immediate: true });
@@ -197,73 +164,74 @@ watch(() => route.name, () => {
 
 watch(() => props.id, (after, before) => {
     if (after !== before) {
-        projectDetailPageStore.$patch({ projectId: after });
+        projectDetailPageStore.setProjectId(after);
     }
 }, { immediate: true });
 
 onUnmounted(() => {
-    projectDetailPageStore.$reset();
-    projectDetailPageStore.$dispose();
+    projectDetailPageStore.reset();
 });
 </script>
 
 <template>
     <general-page-layout overflow="scroll">
         <p-data-loader class="page-inner"
-                       :loading="state.loading"
+                       :loading="projectDetailPageState.loading"
                        :loader-backdrop-color="BACKGROUND_COLOR"
         >
             <p-breadcrumbs :routes="state.pageNavigation" />
             <div v-if="state.item"
                  class="top-wrapper"
             >
-                <p-heading :title="state.item.name"
+                <p-heading :title="state.item?.name"
                            show-back-button
                            @click-back-button="$router.go(-1)"
                 >
                     <template #title-right-extra>
                         <div class="button-wrapper">
                             <span class="favorite-button-wrapper">
-                                <favorite-button :item-id="state.projectId"
+                                <favorite-button :item-id="projectDetailPageState.projectId"
                                                  :favorite-type="FAVORITE_TYPE.PROJECT"
                                 />
                             </span>
-                            <p-icon-button name="ic_delete"
-                                           class="delete-btn"
-                                           :disabled="!state.hasManagePermission"
-                                           @click="openProjectDeleteForm"
-                            />
-                            <p-icon-button name="ic_edit-text"
-                                           class="edit-btn"
-                                           :disabled="!state.hasManagePermission"
-                                           @click="openProjectEditForm"
-                            />
+                            <template v-if="projectPageState.isWorkspaceOwner">
+                                <p-icon-button name="ic_settings"
+                                               class="edit-btn"
+                                               size="md"
+                                               @click="projectPageStore.openProjectFormModal()"
+                                />
+                                <p-icon-button name="ic_delete"
+                                               class="delete-btn"
+                                               size="md"
+                                               @click="openProjectDeleteForm"
+                                />
+                            </template>
+                            <p-badge v-if="projectDetailPageGetters.projectType === 'PRIVATE'"
+                                     style-type="gray200"
+                                     badge-type="subtle"
+                            >
+                                <div class="badge-content-wrapper">
+                                    <p-i name="ic_lock-filled"
+                                         width="0.75rem"
+                                         height="0.75rem"
+                                         color="inherit"
+                                    />
+                                    <span>{{ $t('PROJECT.DETAIL.INVITE_ONLY') }}</span>
+                                </div>
+                            </p-badge>
                         </div>
                         <div class="top-right-group">
                             <p class="copy-project-id">
                                 <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                                {{ state.projectId }}
+                                {{ projectDetailPageState.projectId }}
                                 <p-copy-button class="icon"
-                                               :value="state.projectId"
+                                               :value="projectDetailPageState.projectId"
                                 />
                             </p>
-                            <p-button v-if="state.hasAlertPermission"
-                                      style-type="tertiary"
-                                      icon-left="ic_spanner-filled"
-                                      class="ml-3"
-                                      :disabled="!state.hasManagePermission"
-                                      @click="state.maintenanceWindowFormVisible = true"
-                            >
-                                {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
-                            </p-button>
                         </div>
                     </template>
                 </p-heading>
             </div>
-
-            <maintenance-happening-list class="maintenance-happening-list"
-                                        :project-id="state.projectId"
-            />
 
             <p-tab v-if="state.item"
                    :tabs="singleItemTabState.tabs"
@@ -280,7 +248,7 @@ onUnmounted(() => {
                     >
                         {{ numberFormatter(state.counts[ALERT_STATE.TRIGGERED]) }}
                     </p-badge>
-                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
+                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications'" />
                 </template>
             </p-tab>
         </p-data-loader>
@@ -302,16 +270,13 @@ onUnmounted(() => {
             </template>
         </p-button-modal>
 
-        <project-detail-project-form-modal
-            v-if="formState.projectEditFormVisible"
-            :visible.sync="formState.projectEditFormVisible"
+        <project-form-modal
+            v-if="projectPageState.projectFormModalVisible"
+            :visible="projectPageState.projectFormModalVisible"
             :project-group-id="state.projectGroupId"
             :project="state.item"
-            @complete="onProjectFormComplete"
-        />
-        <maintenance-window-form-modal :visible.sync="state.maintenanceWindowFormVisible"
-                                       :project-id="state.projectId"
-                                       @confirm="onCreateMaintenanceWindow"
+            @confirm="handleConfirmProjectForm"
+            @update:visible="projectPageStore.setProjectFormModalVisible"
         />
     </general-page-layout>
 </template>
@@ -332,8 +297,11 @@ onUnmounted(() => {
         .favorite-button-wrapper {
             @apply inline-flex ml-2;
         }
-        .p-icon-text-button {
-            @apply flex-shrink-0 ml-4;
+        .badge-content-wrapper {
+            @apply text-gray-900;
+            display: flex;
+            align-content: center;
+            gap: 0.25rem;
         }
     }
     .top-right-group {
@@ -357,11 +325,7 @@ onUnmounted(() => {
     @apply rounded-lg;
 }
 
-.delete-btn {
-    @apply ml-3 cursor-pointer;
-}
-
-.maintenance-happening-list {
-    margin-bottom: 1.875rem;
+.edit-btn {
+    @apply ml-3;
 }
 </style>

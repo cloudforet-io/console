@@ -31,7 +31,7 @@ const emit = defineEmits<{(e: 'toggle-series', index: number): void;
 }>();
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
     filtersLength: computed<number>(() => {
@@ -86,15 +86,15 @@ const handleToggleAllLegends = () => {
     state.proxyLegends = _legends;
 };
 const handleChartGroupByItem = (groupBy?: string) => {
-    costAnalysisPageStore.$patch({ chartGroupBy: groupBy });
+    costAnalysisPageStore.setChartGroupBy(groupBy);
 };
 
 /* Watcher */
 watch(() => state.groupByMenuItems, (after) => {
     if (!after.length) {
-        costAnalysisPageStore.$patch({ chartGroupBy: undefined });
+        costAnalysisPageStore.setChartGroupBy(undefined);
     } else if (!after.filter((d) => d.name === costAnalysisPageState.chartGroupBy).length) {
-        costAnalysisPageStore.$patch({ chartGroupBy: after[0].name });
+        costAnalysisPageStore.setChartGroupBy(after[0].name);
     }
 });
 </script>

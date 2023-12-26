@@ -4,7 +4,7 @@
                        :routes="routeState.routes"
         />
         <p-heading show-back-button
-                   :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')"
+                   :title="$t('IAM.USER.MAIN.NOTIFICATION')"
                    @click-back-button="goToUserManagement"
         />
         <notification-channel-list :manage-disabled="!isManageable" />
@@ -35,14 +35,14 @@ export default {
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
-            isManageable: computed(() => store.getters['user/isDomainOwner'] || store.getters['user/hasDomainRole']),
+            isManageable: computed(() => store.getters['user/isDomainAdmin']),
         });
         const routeState = reactive({
             routes: computed(() => ([
                 { name: 'Administration', to: { name: ADMINISTRATION_ROUTE._NAME } },
                 { name: 'IAM', to: { name: ADMINISTRATION_ROUTE.IAM._NAME } },
                 { name: 'User Management', to: { name: ADMINISTRATION_ROUTE.IAM.USER._NAME } },
-                { name: i18n.t('IDENTITY.USER.NOTIFICATION.MANAGE_CHANNEL') },
+                { name: i18n.t('IAM.USER.NOTIFICATION.MANAGE_CHANNEL') },
             ])),
         });
         const goToUserManagement = () => {

@@ -21,7 +21,9 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
 
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import {
+    filterLNBMenuByAccessPermission,
+} from '@/lib/access-control/page-access-helper';
 import {
     getCompoundKeyWithManagedCostQuerySetFavoriteKey,
 } from '@/lib/helper/config-data-helper';
@@ -53,7 +55,8 @@ const DATA_SOURCE_MENU_ID = 'data-source-dropdown';
 const SHOW_MORE_MENU_ID = 'show-more';
 
 const costQuerySetStore = useCostQuerySetStore();
-const costQuerySetState = costQuerySetStore.$state;
+const costQuerySetGetters = costQuerySetStore.getters;
+const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const allReferenceStore = useAllReferenceStore();
@@ -65,20 +68,20 @@ const state = reactive({
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
     menuSet: computed<LNBMenu[]>(() => [
         ...filterCostAnalysisLNBMenuByPagePermission(state.costAnalysisMenuSet),
-        ...filterLNBMenuByPermission([
+        ...filterLNBMenuByAccessPermission([
             {
                 type: 'item',
-                id: MENU_ID.COST_EXPLORER_BUDGET,
-                label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_BUDGET].translationId),
+                id: MENU_ID.BUDGET,
+                label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
                 to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
             },
-        ], store.getters['user/pagePermissionList']),
+        ], store.getters['user/pageAccessPermissionList']),
     ]),
     costAnalysisMenuSet: computed<LNBMenu[]>(() => [
         { type: MENU_ITEM_TYPE.FAVORITE_ONLY },
         {
             type: MENU_ITEM_TYPE.TOP_TITLE,
-            label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER_COST_ANALYSIS].translationId),
+            label: i18n.t(MENU_INFO_MAP[MENU_ID.COST_ANALYSIS].translationId),
         },
         {
             type: MENU_ITEM_TYPE.SLOT,
@@ -155,8 +158,8 @@ const state = reactive({
 });
 
 const dataSourceState = reactive({
-    plugins: computed<PluginReferenceMap>(() => allReferenceStore.getters.plugin),
-    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.allReferenceTypeInfo.costDataSource.referenceMap),
+    plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
+    dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
     items: computed<MenuItem[]>(() => {
         const dataSourceMap: CostDataSourceReferenceMap = dataSourceState.dataSourceMap;
         const dataSourceMenuItemList = Object.entries(dataSourceMap).map(([key, value]) => ({
@@ -211,8 +214,8 @@ const getCurrentCurrencySet = (dataSourceKey: string): string => {
 };
 
 const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[] => {
-    const pagePermission = store.getters['user/pagePermissionMap'];
-    const routeName = MENU_ID.COST_EXPLORER_COST_ANALYSIS;
+    const pagePermission = store.getters['user/pageAccessPermissionMap'];
+    const routeName = MENU_ID.COST_ANALYSIS;
 
     if (pagePermission[routeName]) return [...menuSet];
     return [];
@@ -220,12 +223,12 @@ const filterCostAnalysisLNBMenuByPagePermission = (menuSet: LNBItem[]): LNBItem[
 
 const handleSelectDataSource = (selected: string) => {
     if (!selected) return;
-    costQuerySetStore.$patch({ selectedDataSourceId: selected });
+    costQuerySetStore.setSelectedDataSourceId(selected);
     router.push({
         name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
-            costQuerySetId: costQuerySetStore.managedCostQuerySets[0].cost_query_set_id,
+            costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
         },
     }).catch(() => {});
 };
@@ -241,8 +244,6 @@ const handleDismissRelocateNotification = () => {
     });
     relocateNotificationState.isBannerVisible = false;
 };
-
-
 
 onMounted(() => {
     // Relocate dashboard notification

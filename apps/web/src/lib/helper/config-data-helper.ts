@@ -1,21 +1,19 @@
 import { find } from 'lodash';
 
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
-
 import type { DisplayMenu } from '@/store/modules/display/type';
 import type { FavoriteConfig, FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import type { RecentConfig, RecentItem } from '@/store/modules/recent/type';
 import type { CloudServiceTypeReferenceMap } from '@/store/modules/reference/cloud-service-type/type';
-import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
-import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/modules/reference/project/type';
 import type { CostDataSourceReferenceMap } from '@/store/reference/cost-data-source-reference-store';
+import type { ProjectGroupReferenceItem, ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
+import type { ProjectReferenceItem, ProjectReferenceMap } from '@/store/reference/project-reference-store';
 
 import { getAllSuggestionMenuList } from '@/lib/helper/menu-suggestion-helper';
 
 import type { CostQuerySetModel } from '@/services/cost-explorer/types/cost-explorer-query-type';
-import type { DashboardModel } from '@/services/dashboards/types/dashboard-model-type';
+import type { DashboardModel } from '@/services/dashboards/types/dashboard-api-schema-type';
+
 
 type Config = FavoriteConfig & RecentConfig;
 
@@ -168,17 +166,17 @@ export const convertCostAnalysisConfigToReferenceData = (config: ConfigData[]|nu
     return results;
 };
 
-export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, dashboardList: DashboardModel[], type: DashboardScope): ReferenceData[] => {
+export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null, dashboardList: DashboardModel[]): ReferenceData[] => {
     const results: ReferenceData[] = [];
-    const dashboardId = type === DASHBOARD_SCOPE.DOMAIN ? 'domain_dashboard_id' : 'project_dashboard_id';
     if (!config) return results;
 
     config.forEach((d) => {
-        const resource: DashboardModel|undefined = find(dashboardList, { [dashboardId]: d.itemId });
+        const resource: DashboardModel|undefined = find(dashboardList, { public_dashboard_id: d.itemId })
+            || find(dashboardList, { private_dashboard_id: d.itemId });
         if (resource) {
             results.push({
                 ...d,
-                name: resource[dashboardId],
+                name: resource.public_dashboard_id || resource.private_dashboard_id,
                 label: resource.name,
                 updatedAt: d.updatedAt,
                 icon: 'ic_service_dashboard',
@@ -189,8 +187,8 @@ export const convertDashboardConfigToReferenceData = (config: ConfigData[]|null,
 };
 
 export const getCompoundKeyWithManagedCostQuerySetFavoriteKey = (dataSourceId:string, costQuerySetId: string): string => `managed_${dataSourceId}_${costQuerySetId}`;
-export const getParsedKeysWithManagedCostQueryFavoriteKey = (managedCostQuerySetId: string): [string, string]|undefined => {
-    if (!managedCostQuerySetId.startsWith('managed_')) return undefined;
+export const getParsedKeysWithManagedCostQueryFavoriteKey = (managedCostQuerySetId?: string): [string, string]|undefined => {
+    if (!managedCostQuerySetId?.startsWith('managed_')) return undefined;
     const [, dataSourceId, costQuerySetId] = managedCostQuerySetId.split('_');
     return [dataSourceId, costQuerySetId];
 };

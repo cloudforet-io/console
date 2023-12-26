@@ -30,7 +30,9 @@ import { PI } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { filterLNBMenuByPermission } from '@/lib/access-control/page-permission-helper';
+import {
+    filterLNBMenuByAccessPermission,
+} from '@/lib/access-control/page-access-helper';
 import { MENU_ID } from '@/lib/menu/config';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
@@ -47,52 +49,44 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isDomainOwner: computed(() => store.getters['user/isDomainAdmin']),
             hasPermission: computed(() => store.getters['user/hasPermission']),
-            hasDomainRole: computed(() => store.getters['user/hasDomainRole']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
             icon: computed(() => {
                 if (state.isDomainOwner) return 'img_avatar_root-account';
-                if (state.hasDomainRole) return 'img_avatar_admin';
                 return 'img_avatar_user';
             }),
             memberType: computed(() => {
-                if (state.isDomainOwner) return i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT');
-                return i18n.t('IDENTITY.USER.MAIN.SPACEONE_USER');
+                if (state.isDomainOwner) return i18n.t('MY_PAGE.ROOT_ACCOUNT');
+                return i18n.t('MY_PAGE.SPACEONE_USER');
             }),
-            header: computed(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId)),
+            header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId) as string),
             menuSet: computed<LNBMenu[]>(() => {
                 const allLnbMenu: LNBMenu[] = [
                     {
                         type: 'title',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT].translationId),
-                        id: MENU_ID.MY_PAGE_ACCOUNT,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT].translationId),
+                        id: MENU_ID.ACCOUNT,
                         foldable: false,
                     },
                     {
                         type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_ACCOUNT_PROFILE].translationId),
-                        id: MENU_ID.MY_PAGE_ACCOUNT_PROFILE,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT._NAME },
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId),
+                        id: MENU_ID.ACCOUNT_PROFILE,
+                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT_PROFILE._NAME },
                     },
                     {
                         type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_API_KEY].translationId),
-                        id: MENU_ID.MY_PAGE_API_KEY,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME },
-                    },
-                    {
-                        type: 'item',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE_NOTIFICATIONS].translationId),
-                        id: MENU_ID.MY_PAGE_NOTIFICATIONS,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.NOTIFICATIONS].translationId),
+                        id: MENU_ID.NOTIFICATIONS,
                         to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
                         hightlightTag: 'beta',
                     },
                 ];
-                return filterLNBMenuByPermission(allLnbMenu, store.getters['user/pagePermissionList']);
+                return filterLNBMenuByAccessPermission(allLnbMenu, store.getters['user/pageAccessPermissionList']);
             }),
         });
 

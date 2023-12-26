@@ -7,6 +7,8 @@ import { PButton, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
+import type { TokenIssueModel } from '@/schema/identity/token/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -82,10 +84,11 @@ const handleClickPasswordConfirm = async () => {
 /* API */
 const checkCurrentPassword = async () => {
     try {
-        const response = await SpaceConnector.client.identity.token.issue({
+        const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
             domain_id: state.domainId,
-            user_id: state.userId,
+            auth_type: 'LOCAL',
             credentials: {
+                user_id: state.userId,
                 password: currentPassword.value,
             },
         }, { skipAuthRefresh: true });
@@ -175,7 +178,7 @@ const updateUser = async (userParam: UpdateUserRequest) => {
                       :disabled="currentPassword === '' || password === '' || passwordCheck === ''"
                       @click="handleClickPasswordConfirm"
             >
-                {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
+                {{ $t('MY_PAGE.ACCOUNT.SAVE_CHANGES') }}
             </p-button>
         </div>
     </user-account-module-container>

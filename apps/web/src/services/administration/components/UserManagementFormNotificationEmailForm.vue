@@ -1,79 +1,3 @@
-<template>
-    <div class="notification-email-form-wrapper">
-        <p-field-group :label="$t('IDENTITY.USER.FORM.NOTIFICATION_EMAIL')"
-                       :invalid="invalidState.email"
-                       :invalid-text="invalidTexts.email"
-                       class="input-form-view"
-        >
-            <template #default="{invalid}">
-                <div class="input-form">
-                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
-                    <p-text-input :value="email"
-                                  :invalid="invalid"
-                                  placeholder="user@spaceone.io"
-                                  :disabled="userPageState.visibleUpdateModal && !state.isEdit"
-                                  class="text-input"
-                                  @update:value="handleChangeInput($event)"
-                    >
-                        <div v-if="userPageState.visibleUpdateModal && (!state.isEdit || !state.isFocused)"
-                             class="email-status-badge"
-                             @click="handleClickBadge"
-                        >
-                            <span>{{ email }}</span>
-                            <p-badge class="selected-text"
-                                     badge-type="subtle"
-                                     :style-type="isValidEmail ? 'green200' : 'yellow200'"
-                            >
-                                {{ isValidEmail
-                                    ? $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY')
-                                    : $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.NOT_VERIFIED')
-                                }}
-                            </p-badge>
-                        </div>
-                    </p-text-input>
-                    <div v-if="userPageState.visibleUpdateModal">
-                        <p-button v-if="!state.isEdit"
-                                  style-type="tertiary"
-                                  @click="handleClickChange"
-                        >
-                            <p-i name="ic_edit"
-                                 height="1rem"
-                                 width="1rem"
-                                 class="edit-icon"
-                                 color="inherit transparent"
-                            />
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.CHANGE') }}</span>
-                        </p-button>
-                        <p-button v-else
-                                  style-type="tertiary"
-                                  class="send-mail-button"
-                                  :disabled="!email || invalidTexts.email !== ''"
-                                  :loading="state.loading"
-                                  @click="handleClickSend"
-                        >
-                            <span>{{ $t('IDENTITY.USER.ACCOUNT.NOTIFICATION_EMAIL.VERIFY') }}</span>
-                        </p-button>
-                    </div>
-                </div>
-            </template>
-            <template #label-extra>
-                <p-tooltip
-                    position="bottom"
-                    :contents="$t('IDENTITY.USER.FORM.NOTIFICATION_TOOLTIP')"
-                    class="tooltip"
-                >
-                    <p-i name="ic_question-mark-circle-filled"
-                         height="0.875rem"
-                         width="0.875rem"
-                         color="inherit transparent"
-                         class="tooltip-icon"
-                    />
-                </p-tooltip>
-            </template>
-        </p-field-group>
-    </div>
-</template>
-
 <script setup lang="ts">
 import {
     computed, reactive, watch,
@@ -87,35 +11,26 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { emailValidator } from '@/lib/helper/user-validation-helper';
-import { postValidationEmail } from '@/lib/helper/verify-email-helper';
+import { postUserValidationEmail } from '@/lib/helper/verify-email-helper';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
-
-interface Props {
-    item?: User;
-    email?: string;
-    isValidEmail?: boolean;
-}
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-    email: undefined,
-    isValidEmail: false,
-});
+import type { UserListItemType } from '@/services/administration/types/user-type';
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
 
-const emit = defineEmits(['change-input', 'change-verify']);
+const emit = defineEmits<{(e: 'change-input', formState): void,
+    (e: 'change-verify', value: boolean): void,
+}>();
 
 const state = reactive({
+    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
     loading: false,
     isEdit: false,
     isCollapsed: true,
     isFocused: false,
+    isValidEmail: false,
     loginUserId: computed(() => store.state.user.userId),
 });
 const {
@@ -124,18 +39,16 @@ const {
     invalidState,
     invalidTexts,
 } = useFormValidator({
-    email: '' || props.email,
+    email: state.data.email,
 }, {
-    email(value: string) { return !emailValidator(value) ? '' : i18n.t('IDENTITY.USER.FORM.EMAIL_INVALID'); },
+    email(value: string) { return !emailValidator(value) ? '' : i18n.t('IAM.USER.FORM.EMAIL_INVALID'); },
 });
 const { email } = forms;
 
 /* Components */
-const handleChangeInput = (e) => {
-    setForm('email', e);
-    if (!state.isEdit) {
-        emit('change-input', { ...forms, email: email.value });
-    }
+const handleChangeInput = (value: string) => {
+    setForm('email', value);
+    emit('change-input', { email: email.value });
 };
 const handleClickChange = () => {
     if (!state.isEdit) {
@@ -149,47 +62,119 @@ const handleClickBadge = () => {
         state.isFocused = true;
     }
 };
-const initForm = () => {
-    setForm('email', props.item.email || '');
-};
+
 /* API */
 const handleClickSend = async () => {
     state.loading = true;
     try {
-        await postValidationEmail({
-            user_id: props.item.user_id,
-            email: email.value,
-            force: true,
+        await postUserValidationEmail({
+            user_id: state.data.user_id || '',
+            email: email.value || '',
         });
         state.isEdit = false;
-        emit('change-input', { ...forms, email: email.value });
+        state.isValidEmail = true;
+        emit('change-input', { email: email.value });
         emit('change-verify', true);
 
-        if (state.loginUserId === props.item.user_id) {
+        if (state.loginUserId === state.data.user_id) {
             await store.dispatch('user/setUser', { email: email.value, email_verified: true });
         }
-    } catch (e) {
-        ErrorHandler.handleError(e);
     } finally {
         state.loading = false;
     }
 };
 
 /* Watcher */
-watch(() => props.email, (value) => {
-    setForm('email', value);
-});
-watch(() => props.isValidEmail, (value) => {
-    state.isEdit = !value;
-}, { immediate: true });
-
-/* Init */
-(async () => {
-    if (userPageState.visibleUpdateModal) {
-        await initForm();
+watch(() => state.data.email_verified, (value) => {
+    state.isValidEmail = value || false;
+    if (email.value) {
+        state.isEdit = !value;
+    } else {
+        state.isEdit = true;
+        state.isFocused = true;
     }
-})();
+}, { immediate: true });
 </script>
+
+<template>
+    <div class="notification-email-form-wrapper">
+        <p-field-group :label="$t('IAM.USER.FORM.NOTIFICATION_EMAIL')"
+                       :invalid="invalidState.email"
+                       :invalid-text="invalidTexts.email"
+                       class="input-form-view"
+        >
+            <template #default="{invalid}">
+                <div class="input-form">
+                    <!-- TODO: need to apply placeholder changes based on the distinction between open source and SaaS. -->
+                    <p-text-input :value="email"
+                                  :invalid="invalid"
+                                  placeholder="user@spaceone.io"
+                                  :disabled="!state.isEdit"
+                                  class="text-input"
+                                  block
+                                  @focusout="state.isFocused = false"
+                                  @update:value="handleChangeInput"
+                    >
+                        <div v-if="!state.isEdit || !state.isFocused"
+                             class="email-status-badge"
+                             @click="handleClickBadge"
+                        >
+                            <span>{{ email }}</span>
+                            <p-badge v-if="email"
+                                     class="selected-text"
+                                     badge-type="subtle"
+                                     :style-type="state.isValidEmail ? 'green200' : 'yellow200'"
+                            >
+                                {{ state.isValidEmail
+                                    ? $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFY')
+                                    : $t('IDENTITY.USER.NOTIFICATION_EMAIL.NOT_VERIFIED')
+                                }}
+                            </p-badge>
+                        </div>
+                    </p-text-input>
+                    <p-button v-if="!state.isEdit"
+                              style-type="tertiary"
+                              size="md"
+                              class="toolbox-button"
+                              @click="handleClickChange"
+                    >
+                        <p-i name="ic_edit"
+                             height="1rem"
+                             width="1rem"
+                             class="edit-icon"
+                             color="inherit transparent"
+                        />
+                        <span>{{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.CHANGE') }}</span>
+                    </p-button>
+                    <p-button v-else
+                              style-type="tertiary"
+                              size="md"
+                              :disabled="!email || invalidTexts.email !== ''"
+                              :loading="state.loading"
+                              class="toolbox-button send-mail-button"
+                              @click="handleClickSend"
+                    >
+                        <span>{{ $t('IDENTITY.USER.NOTIFICATION_EMAIL.VERIFY') }}</span>
+                    </p-button>
+                </div>
+            </template>
+            <template #label-extra>
+                <p-tooltip
+                    position="bottom"
+                    :contents="$t('IAM.USER.FORM.NOTIFICATION_TOOLTIP')"
+                    class="tooltip"
+                >
+                    <p-i name="ic_info-circle"
+                         class="icon-info"
+                         height="1rem"
+                         width="1rem"
+                         color="inherit"
+                    />
+                </p-tooltip>
+            </template>
+        </p-field-group>
+    </div>
+</template>
 
 <style lang="postcss" scoped>
 .notification-email-form-wrapper {
@@ -199,53 +184,37 @@ watch(() => props.isValidEmail, (value) => {
     .input-form-view {
         .input-form {
             @apply flex;
+            width: 100%;
+            height: 2rem;
             gap: 0.5rem;
-
-            .email-status-badge {
-                width: 100%;
-            }
-
-            /* custom design-system component - p-button */
-            :deep(.p-button) {
-                padding-right: 0.75rem;
-                padding-left: 0.75rem;
-                &.send-mail-button {
-                    min-width: initial;
-                    height: 2.125rem;
-                    .send-icon {
-                        @apply text-gray-900;
-                        margin-right: 0.25rem;
-                    }
+            .text-input {
+                flex: 1;
+                height: 2rem;
+                .email-status-badge {
+                    @apply flex items-center;
+                    width: 100%;
+                    gap: 0.25rem;
                 }
             }
-            .edit-icon {
-                margin-right: 0.25rem;
+            .toolbox-button {
+                width: 6rem;
+                height: 2rem;
             }
         }
         .tooltip {
             margin-left: 0.25rem;
-            .tooltip-icon {
-                @apply text-gray-300;
+            .icon-info {
+                @apply text-gray-500;
             }
         }
     }
-    .p-field-group {
-        margin-bottom: 0;
+}
 
-        /* custom design-system component - p-text-input */
-        :deep(.p-text-input) {
-            width: 100%;
-
-            .input-container {
-                height: 2.125rem;
-            }
-
-            .tag-container {
-                padding: 0;
-                .p-badge {
-                    margin-left: 0.5rem;
-                }
-            }
+/* custom design-system component - p-text-input */
+:deep(.p-text-input) {
+    .input-container {
+        .tag-container {
+            padding: 0;
         }
     }
 }

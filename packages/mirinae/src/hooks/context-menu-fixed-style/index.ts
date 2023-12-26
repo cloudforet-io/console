@@ -107,6 +107,8 @@ export const useContextMenuFixedStyle = ({
     const observeElementChanges = () => {
         if (!state.useFixedMenuStyle) return;
 
+        if (!contextMenuFixedStyleState.targetElement) return;
+
         const { x, y } = contextMenuFixedStyleState.targetElement.getBoundingClientRect();
 
         if (x !== prevX.value || y !== prevY.value) {

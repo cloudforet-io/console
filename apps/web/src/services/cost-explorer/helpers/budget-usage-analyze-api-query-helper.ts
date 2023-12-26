@@ -12,7 +12,7 @@ import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-
 
 type BudgetUsageAnalyzeRequestGroupBy = Partial<keyof BudgetUsageAnalyzeResult>;
 const BUDGET_USAGE_ANALYZE_REQUEST_GROUP_BY: BudgetUsageAnalyzeRequestGroupBy[] = [
-    'budget_id', 'name', 'project_id', 'project_group_id', 'data_source_id', 'provider_filter',
+    'budget_id', 'name', 'project_id', 'data_source_id', 'provider_filter', 'resource_group', 'workspace_id',
 ];
 
 type BudgetUsageAnalyzeRequestSelect = Record<BudgetUsageAnalyzeRequestGroupBy, any>;
@@ -20,7 +20,8 @@ const BUDGET_USAGE_ANALYZE_REQUEST_SELECT: BudgetUsageAnalyzeRequestSelect = {
     budget_id: 'budget_id',
     name: 'name',
     project_id: 'project_id',
-    project_group_id: 'project_group_id',
+    workspace_id: 'workspace_id',
+    resource_group: 'resource_group',
     data_source_id: 'data_source_id',
     provider_filter: 'provider_filter',
     total_spent: 'total_spent',
@@ -57,7 +58,7 @@ export const getBudgetUsageAnalyzeRequestQuery = (sort: Query['sort'], period?: 
                 ],
             },
         },
-        sort: [sort],
+        sort,
     };
 
     if (!isEmpty(period)) {

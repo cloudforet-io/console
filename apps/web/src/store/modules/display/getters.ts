@@ -1,17 +1,25 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+import type { RawLocation } from 'vue-router';
 import type VueRouter from 'vue-router';
 import type { Getter } from 'vuex';
 
 import { SpaceRouter } from '@/router';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+// eslint-disable-next-line import/no-cycle
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+// eslint-disable-next-line import/no-cycle
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import type {
     DisplayState, DisplayMenu, SidebarProps,
 } from '@/store/modules/display/type';
 
-import type { PagePermissionTuple } from '@/lib/access-control/config';
-import type { Menu, MenuInfo } from '@/lib/menu/config';
-import { MENU_LIST } from '@/lib/menu/menu-architecture';
+import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
+import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
@@ -48,6 +56,8 @@ export const sidebarProps: Getter<DisplayState, any> = (state): Partial<SidebarP
 };
 
 const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayMenu[] => menuList.reduce((results, _menu) => {
+    const workspaceStore = useWorkspaceStore();
+    const tagetWorkspaceId = workspaceStore.getters.currentWorkspaceId;
     const menu = { ..._menu };
     if (menu.subMenuList) {
         menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
@@ -57,43 +67,58 @@ const filterMenuByRoute = (menuList: DisplayMenu[], router: VueRouter): DisplayM
         }
     }
 
-    const link = router.resolve(menu.to);
+    const to: RawLocation = {
+        name: menu.to.name,
+        params: tagetWorkspaceId ? { workspaceId: tagetWorkspaceId } : {},
+    };
+    const link = router.resolve(to);
     if (link?.href !== '/') results.push(menu);
 
     return results;
 }, [] as DisplayMenu[]);
 
-const filterMenuByPermission = (menuList: DisplayMenu[], pagePermissionList: PagePermissionTuple[]): DisplayMenu[] => menuList.reduce((results, _menu) => {
+const filterMenuByAccessPermission = (menuList: DisplayMenu[], pagePermissionList: MenuId[]): DisplayMenu[] => menuList.reduce((results, _menu) => {
     const menu = { ..._menu };
 
     if (menu.subMenuList) {
-        menu.subMenuList = filterMenuByPermission(menu.subMenuList, pagePermissionList);
+        menu.subMenuList = filterMenuByAccessPermission(menu.subMenuList, pagePermissionList);
     }
 
     if (menu.subMenuList?.length) results.push(menu);
     else {
-        const hasPermission = pagePermissionList.some(([permissionMenuId]) => permissionMenuId === menu.id);
+        const hasPermission = pagePermissionList.some((menuId) => menuId === menu.id);
         if (hasPermission) results.push(menu);
     }
 
     return results;
 }, [] as DisplayMenu[]);
 
-const getDisplayMenuList = (menuList: Menu[]): DisplayMenu[] => menuList.map((d) => {
+const getDisplayMenuList = (menuList: Menu[], isAdminMode?: boolean): DisplayMenu[] => menuList.map((d) => {
     const menuInfo: MenuInfo = MENU_INFO_MAP[d.id];
+    const routeName = isAdminMode ? makeAdminRouteName(MENU_INFO_MAP[d.id].routeName) : MENU_INFO_MAP[d.id].routeName;
     return {
         ...d,
+        id: d.id,
         label: i18n.t(menuInfo.translationId),
         icon: menuInfo.icon,
         highlightTag: menuInfo.highlightTag,
-        to: { name: d.id },
-        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList) : [],
+        to: { name: routeName },
+        subMenuList: d.subMenuList ? getDisplayMenuList(d.subMenuList, isAdminMode) : [],
     } as DisplayMenu;
 });
 export const allMenuList: Getter<DisplayState, any> = (state, getters, rootState, rootGetters): DisplayMenu[] => {
-    let _allGnbMenuList: DisplayMenu[] = getDisplayMenuList(MENU_LIST);
+    const appContextStore = useAppContextStore();
+    const appContextState = appContextStore.$state;
+    const isAdminMode = appContextState.getters.isAdminMode;
+    const menuList = isAdminMode ? ADMIN_MENU_LIST : MENU_LIST;
+    let _allGnbMenuList: DisplayMenu[];
+
+    _allGnbMenuList = getDisplayMenuList(menuList, isAdminMode);
     _allGnbMenuList = filterMenuByRoute(_allGnbMenuList, SpaceRouter.router);
-    _allGnbMenuList = filterMenuByPermission(_allGnbMenuList, rootGetters['user/pagePermissionList']);
+    if (!isAdminMode) {
+        _allGnbMenuList = filterMenuByAccessPermission(_allGnbMenuList, rootGetters['user/pageAccessPermissionList']);
+    }
+
     return _allGnbMenuList;
 };
 

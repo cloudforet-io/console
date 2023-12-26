@@ -24,19 +24,19 @@ const BudgetDetailPage = () => import('@/services/cost-explorer/pages/BudgetDeta
 const costExplorerRoutes: RouteConfig = {
     path: 'cost-explorer',
     name: COST_EXPLORER_ROUTE._NAME,
-    meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.COST_EXPLORER, store.getters['user/pagePermissionMap']),
+    meta: { menuId: MENU_ID.COST_EXPLORER, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: CostExplorerContainer,
     children: [
         {
             path: 'landing',
-            meta: { menuId: MENU_ID.COST_EXPLORER_LANDING, centeredLayout: true },
+            meta: { centeredLayout: true },
             name: COST_EXPLORER_ROUTE.LANDING._NAME,
             component: CostExplorerHome as any,
         },
         {
             path: 'cost-analysis',
-            meta: { menuId: MENU_ID.COST_EXPLORER_COST_ANALYSIS },
+            meta: { menuId: MENU_ID.COST_ANALYSIS },
             component: { template: '<router-view />' },
             children: [
                 {
@@ -80,7 +80,7 @@ const costExplorerRoutes: RouteConfig = {
         },
         {
             path: 'budget',
-            meta: { menuId: MENU_ID.COST_EXPLORER_BUDGET },
+            meta: { menuId: MENU_ID.BUDGET },
             component: { template: '<router-view />' },
             beforeEnter: async (to, from, next) => {
                 try {
@@ -105,7 +105,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: 'create',
                     name: COST_EXPLORER_ROUTE.BUDGET.CREATE._NAME,
-                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION },
+                    meta: { translationId: 'BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET', accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
                     component: BudgetCreatePage as any,
                 },
                 {

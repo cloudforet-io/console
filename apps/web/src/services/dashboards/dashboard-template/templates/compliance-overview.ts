@@ -40,7 +40,7 @@ export const complianceOverviewDashboardPreview: DefaultDashboardPreviewTemplate
     },
 };
 
-export const complianceOverviewDashboard: DashboardTemplate = {
+const getDashboardTemplate = (isAdminMode: boolean): DashboardTemplate => ({
     ...complianceOverviewDashboardPreview,
     settings: {
         date_range: {
@@ -48,9 +48,12 @@ export const complianceOverviewDashboard: DashboardTemplate = {
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.ASSET),
+    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.ASSET, isAdminMode),
     variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
     ],
-};
+});
+
+export const complianceOverviewDashboard: DashboardTemplate = getDashboardTemplate(false);
+export const adminComplianceOverviewDashboard: DashboardTemplate = getDashboardTemplate(true);

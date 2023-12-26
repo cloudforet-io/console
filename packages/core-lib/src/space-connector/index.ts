@@ -1,5 +1,6 @@
-import type { AxiosRequestConfig } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
+import type { CustomAxiosRequestConfig } from 'axios-auth-refresh/dist/utils';
 import { camelCase } from 'lodash';
 
 import type {
@@ -14,13 +15,12 @@ const API_REFLECTION_URL_V2 = '/console-api/api/reflection';
 
 const CHECK_TOKEN_TIME = 1000 * 30;
 
-interface MockRequestConfig extends AxiosRequestConfig {
+interface MockRequestConfig extends CustomAxiosRequestConfig {
     mockMode?: boolean;
     mockPath?: string;
 }
 
 interface AfterCallApi {
-    // eslint-disable-next-line no-unused-vars
     (data?: any): Promise<void>|void
 }
 
@@ -28,7 +28,7 @@ type AfterCallApiMap = Record<string, AfterCallApi>;
 
 
 interface ApiHandler {
-    <Params = any, Response = any>(params?: Params, config?: AxiosRequestConfig): Promise<Response>;
+    <Params = any, Response = any>(params?: Params, config?: CustomAxiosRequestConfig): Promise<Response>;
     [key: string]: ApiHandler;
 }
 const DEFAULT_MOCK_CONFIG: MockRequestConfig = Object.freeze({ mockMode: false });
@@ -54,6 +54,8 @@ export class SpaceConnector {
     private static isDevMode = false;
 
     private readonly afterCallApiMap: AfterCallApiMap;
+
+    private static interceptorIds: number[] = []; // [v1 id, v2 id]
 
     constructor(
         endpoints: string[],
@@ -109,9 +111,13 @@ export class SpaceConnector {
         throw new Error('Not initialized client V2!');
     }
 
-    static setToken(accessToken: string, refreshToken: string): void {
+    static setToken(accessToken: string, refreshToken?: string): void {
         SpaceConnector.instance.tokenApi.setToken(accessToken, refreshToken);
         SpaceConnector.instance.setApiTokenCheckInterval();
+    }
+
+    static getRefreshToken(): string|undefined|null {
+        return SpaceConnector.instance.tokenApi.getRefreshToken();
     }
 
     static flushToken(): void {
@@ -126,6 +132,17 @@ export class SpaceConnector {
     static get isTokenAlive(): boolean {
         if (SpaceConnector.isDevMode && SpaceConnector.authConfig.enabled && SpaceConnector.authConfig.skipTokenCheck) return true;
         return TokenAPI.checkToken();
+    }
+
+    static setRequestInterceptor(interceptor: (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig): void {
+        if (SpaceConnector.interceptorIds[0] !== undefined) {
+            SpaceConnector.instance.serviceApi.instance.interceptors.request.eject(SpaceConnector.interceptorIds[0]);
+        }
+        if (SpaceConnector.interceptorIds[1] !== undefined) {
+            SpaceConnector.instance.serviceApiV2.instance.interceptors.request.eject(SpaceConnector.interceptorIds[1]);
+        }
+        SpaceConnector.interceptorIds[0] = SpaceConnector.instance.serviceApi.instance.interceptors.request.use(interceptor);
+        SpaceConnector.interceptorIds[1] = SpaceConnector.instance.serviceApiV2.instance.interceptors.request.use(interceptor);
     }
 
     protected async loadAPI(version: number): Promise<void> {
@@ -210,19 +227,19 @@ export class SpaceConnector {
                     }
                 }
 
-                const response: AxiosPostResponse = await serviceApi.instance.post(url, params, axiosConfig);
+                const response: AxiosPostResponse|undefined = await serviceApi.instance.post(url, params, axiosConfig);
 
-                if (afterCall) afterCall(response.data);
+                if (afterCall) afterCall(response?.data ?? {});
 
-                return response.data;
+                return response?.data ?? {};
             };
         }
-        return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
-            const response: AxiosPostResponse = await serviceApi.instance.post(path, params, config);
+        return async (params: object = {}, config?: CustomAxiosRequestConfig): Promise<any> => {
+            const response: AxiosPostResponse|undefined = await serviceApi.instance.post(path, params, config);
 
-            if (afterCall) afterCall(response.data);
+            if (afterCall) afterCall(response?.data ?? {});
 
-            return response.data;
+            return response?.data ?? {};
         };
     }
 }

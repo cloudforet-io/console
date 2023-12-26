@@ -10,6 +10,7 @@ import draggable from 'vuedraggable';
 import {
     PButton, PDivider, PI, PToggleButton, PFieldTitle,
 } from '@spaceone/design-system';
+import { cloneDeep } from 'lodash';
 
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
 import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
@@ -34,7 +35,8 @@ const emit = defineEmits<{(e: string, value: string): void,
 }>();
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
+const dashboardDetailGetters = dashboardDetailStore.getters;
 const state = reactive({
     widgetInfoList: computed<DashboardLayoutWidgetInfo[]>(() => dashboardDetailState.dashboardWidgetInfoList),
     widgetConfigMap: computed<Record<string, WidgetConfig>>(() => {
@@ -50,9 +52,9 @@ const state = reactive({
 
 /* Event */
 const handleChangeDateRangeToggle = () => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.settings.date_range.enabled = !_state.settings.date_range.enabled;
-    });
+    const _settings = cloneDeep(dashboardDetailState.settings);
+    _settings.date_range.enabled = !_settings.date_range.enabled;
+    dashboardDetailStore.setSettings(_settings);
 };
 const handleClickAddWidget = () => {
     state.addWidgetModalVisible = true;
@@ -65,9 +67,7 @@ const handleClickSaveButton = () => {
     emit('save');
 };
 const handleAddWidget = (newWidget: DashboardLayoutWidgetInfo) => {
-    dashboardDetailStore.$patch((_state) => {
-        _state.dashboardWidgetInfoList = _state.dashboardWidgetInfoList.concat([newWidget]);
-    });
+    dashboardDetailStore.setDashboardWidgetInfoList(dashboardDetailState.dashboardWidgetInfoList.concat([newWidget]));
 };
 
 onMounted(() => {
@@ -144,7 +144,7 @@ onUnmounted(() => {
                     {{ $t('DASHBOARDS.CUSTOMIZE.CANCEL') }}
                 </p-button>
                 <p-button style-type="primary"
-                          :disabled="!dashboardDetailStore.isWidgetLayoutValid || !dashboardDetailState.isNameValid"
+                          :disabled="!dashboardDetailGetters.isWidgetLayoutValid || !dashboardDetailState.isNameValid"
                           :loading="props.loading"
                           @click="handleClickSaveButton"
                 >

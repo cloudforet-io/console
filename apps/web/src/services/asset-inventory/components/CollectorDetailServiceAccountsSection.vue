@@ -1,9 +1,9 @@
 <template>
     <p-pane-layout>
-        <section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
-                        :edit-mode="state.isEditMode"
-                        :total-count="state.totalCount"
-                        @click-edit="handleClickEdit"
+        <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.ATTACHED_SERVICE_ACCOUNTS')"
+                                         :edit-mode="state.isEditMode"
+                                         :total-count="state.totalCount"
+                                         @click-edit="handleClickEdit"
         />
 
         <attached-service-accounts v-if="!state.isEditMode"
@@ -52,9 +52,10 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { CollectorUpdateParameters } from '@/schema/inventory/collector/api-verbs/update';
 import type {
     CollectorModel,
-    CollectorUpdateParameter,
+
 } from '@/schema/inventory/collector/model';
 import { i18n } from '@/translations';
 
@@ -64,7 +65,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import AttachedServiceAccounts
     from '@/services/asset-inventory/components/CollectorDetailAttachedServiceAccounts.vue';
-import SectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
+import CollectorDetailSectionHeader from '@/services/asset-inventory/components/CollectorDetailSectionHeader.vue';
 import AttachedServiceAccountForm from '@/services/asset-inventory/components/CollectorFormAttachedServiceAccount.vue';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 
@@ -88,7 +89,7 @@ const state = reactive({
 const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
     if (!collectorFormStore.collectorId) throw new Error('collector_id is required');
     const originSecretFilter = collectorFormState.originCollector?.secret_filter ?? {};
-    const params: CollectorUpdateParameter = {
+    const params: CollectorUpdateParameters = {
         collector_id: collectorFormStore.collectorId,
         secret_filter: {
             ...originSecretFilter,
@@ -103,7 +104,7 @@ const fetchCollectorUpdate = async (): Promise<CollectorModel> => {
         service_accounts: [],
     };
     Object.assign(params.secret_filter ?? {}, serviceAccountParams);
-    return SpaceConnector.client.inventory.collector.update(params);
+    return SpaceConnector.clientV2.inventory.collector.update<CollectorUpdateParameters, CollectorModel>(params);
 };
 
 

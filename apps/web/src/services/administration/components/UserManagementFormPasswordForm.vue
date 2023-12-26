@@ -1,80 +1,5 @@
-<template>
-    <div>
-        <p-field-group :label="userPageState.visibleUpdateModal ? $t('COMMON.PROFILE.PASSWORD') : ''"
-                       required
-                       class="password-form-wrapper"
-        >
-            <div class="password-form-view">
-                <p-radio-group :direction="userPageState.visibleUpdateModal ? 'vertical' : 'horizontal'">
-                    <p-radio v-for="(type, idx) in state.passwordTypeArr"
-                             :key="type.name"
-                             v-model="state.passwordStatus"
-                             :value="idx"
-                             :disabled="type.disabled"
-                             @change="handleClickRadio(idx)"
-                    >
-                        {{ type.label }}
-                    </p-radio>
-                </p-radio-group>
-                <p-divider />
-                <form class="form">
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD')"
-                        :required="true"
-                        :invalid="invalidState.password"
-                        :invalid-text="invalidTexts.password"
-                        class="input-form"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input :value="password"
-                                          type="password"
-                                          autocomplete="current-password"
-                                          appearance-type="masking"
-                                          class="text-input password"
-                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
-                                          :invalid="invalid"
-                                          @update:value="handleChangeInput('password', $event)"
-                            />
-                        </template>
-                    </p-field-group>
-                    <p-field-group
-                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                        :required="true"
-                        :invalid="invalidState.passwordCheck"
-                        :invalid-text="invalidTexts.passwordCheck"
-                        class="input-form"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input :value="passwordCheck"
-                                          type="password"
-                                          class="text-input password-check"
-                                          autocomplete="new-password"
-                                          appearance-type="masking"
-                                          :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
-                                          :invalid="invalid"
-                                          @update:value="handleChangeInput('passwordCheck', $event)"
-                            />
-                        </template>
-                    </p-field-group>
-                </form>
-            </div>
-        </p-field-group>
-        <div v-if="userPageState.visibleUpdateModal && !props.item.email_verified"
-             class="help-text-wrapper"
-        >
-            <p-i name="ic_info-circle"
-                 height="0.875rem"
-                 width="0.875rem"
-                 class="info-icon"
-                 color="inherit"
-            />
-            <span class="help-text">{{ $t('COMMON.PROFILE.PASSWORD_HELP_TEXT') }}</span>
-        </div>
-    </div>
-</template>
-
 <script setup lang="ts">
-import { computed, reactive } from 'vue';
+import { computed, onMounted, reactive } from 'vue';
 
 import {
     PTextInput, PFieldGroup, PRadio, PDivider, PRadioGroup, PI,
@@ -94,24 +19,14 @@ import { useFormValidator } from '@/common/composables/form-validator';
 
 import { PASSWORD_TYPE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import type { User } from '@/services/administration/types/user-type';
-
-
-interface Props {
-    item?: User;
-    isValidEmail?: boolean;
-}
-const props = withDefaults(defineProps<Props>(), {
-    item: undefined,
-    isValidEmail: false,
-});
+import type { UserListItemType } from '@/services/administration/types/user-type';
 
 const userPageStore = useUserPageStore();
-const userPageState = userPageStore.$state;
 
 const emit = defineEmits<{(e: 'change-input', formState): void}>();
 
 const state = reactive({
+    data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     passwordStatus: 0,
     passwordTypeArr: computed(() => {
@@ -120,23 +35,14 @@ const state = reactive({
             additionalItems.push({
                 name: PASSWORD_TYPE.RESET,
                 label: i18n.t('COMMON.PROFILE.SEND_LINK'),
-                disabled: userPageState.visibleUpdateModal ? !props.isValidEmail : false,
+                disabled: !state.data.email_verified,
             });
         }
-        if (userPageState.visibleUpdateModal) {
-            return [
-                {
-                    name: PASSWORD_TYPE.KEEP,
-                    label: i18n.t('COMMON.PROFILE.KEEP_PASSWORD'),
-                },
-                ...additionalItems,
-                {
-                    name: PASSWORD_TYPE.MANUALLY,
-                    label: i18n.t('COMMON.PROFILE.SET_MANUALLY'),
-                },
-            ];
-        }
         return [
+            {
+                name: PASSWORD_TYPE.KEEP,
+                label: i18n.t('COMMON.PROFILE.KEEP_PASSWORD'),
+            },
             ...additionalItems,
             {
                 name: PASSWORD_TYPE.MANUALLY,
@@ -199,12 +105,86 @@ const resetForm = () => {
 };
 
 /* Init */
-(async () => {
+onMounted(() => {
     state.passwordType = state.passwordTypeArr[0].name;
     emit('change-input', { password: '', passwordType: state.passwordType });
-})();
-
+});
 </script>
+
+<template>
+    <p-field-group :label="$t('COMMON.PROFILE.PASSWORD')"
+                   required
+                   class="password-form-wrapper"
+    >
+        <div class="password-form-view">
+            <p-radio-group :direction="'vertical'">
+                <p-radio v-for="(type, idx) in state.passwordTypeArr"
+                         :key="type.name"
+                         v-model="state.passwordStatus"
+                         :value="idx"
+                         :disabled="type.disabled"
+                         @change="handleClickRadio(idx)"
+                >
+                    {{ type.label }}
+                </p-radio>
+            </p-radio-group>
+            <p-divider />
+            <form class="form">
+                <p-field-group
+                    :label="$t('COMMON.PROFILE.PASSWORD')"
+                    :required="true"
+                    :invalid="invalidState.password"
+                    :invalid-text="invalidTexts.password"
+                    class="input-form"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="password"
+                                      type="password"
+                                      autocomplete="current-password"
+                                      appearance-type="masking"
+                                      block
+                                      class="text-input password"
+                                      :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
+                                      :invalid="invalid"
+                                      @update:value="handleChangeInput('password', $event)"
+                        />
+                    </template>
+                </p-field-group>
+                <p-field-group
+                    :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                    :required="true"
+                    :invalid="invalidState.passwordCheck"
+                    :invalid-text="invalidTexts.passwordCheck"
+                    class="input-form"
+                >
+                    <template #default="{invalid}">
+                        <p-text-input :value="passwordCheck"
+                                      type="password"
+                                      block
+                                      class="text-input password-check"
+                                      autocomplete="new-password"
+                                      appearance-type="masking"
+                                      :disabled="state.passwordType !== PASSWORD_TYPE.MANUALLY"
+                                      :invalid="invalid"
+                                      @update:value="handleChangeInput('passwordCheck', $event)"
+                        />
+                    </template>
+                </p-field-group>
+            </form>
+        </div>
+        <div v-if="!state.data.email_verified"
+             class="help-text-wrapper"
+        >
+            <p-i name="ic_info-circle"
+                 height="0.875rem"
+                 width="0.875rem"
+                 class="info-icon"
+                 color="inherit"
+            />
+            <span class="help-text">{{ $t('COMMON.PROFILE.PASSWORD_HELP_TEXT') }}</span>
+        </div>
+    </p-field-group>
+</template>
 
 <style lang="postcss" scoped>
 .password-form-wrapper {
@@ -219,27 +199,12 @@ const resetForm = () => {
             gap: 1rem;
             .p-field-group {
                 margin-bottom: 0;
-
-                /* custom design-system component - p-text-input */
-                :deep(.p-text-input) {
-                    width: 100%;
-                    .p-button {
-                        @apply font-normal;
-                    }
-                    .input-container {
-                        &.disabled {
-                            .p-button {
-                                @apply bg-transparent;
-                            }
-                        }
-                    }
-                }
             }
         }
     }
 }
 .help-text-wrapper {
-    margin-top: 0.25rem;
+    margin-top: 1rem;
     .info-icon {
         @apply text-gray-500;
         margin-right: 0.25rem;

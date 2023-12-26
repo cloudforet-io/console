@@ -1,30 +1,56 @@
+<script setup lang="ts">
+import {
+    PTextarea, PButton, PTextBeautifier, PCollapsiblePanel,
+} from '@spaceone/design-system';
+
+import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
+import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
+
+const props = defineProps<{
+    id?: string;
+    alertData?: Record<string, any>;
+    manageDisabled?: boolean;
+}>();
+const {
+    state: alertDetailItemState,
+    cancelEdit,
+    startEdit,
+    onClickSave,
+} = useAlertInfoItem({
+    alertId: props.id ?? '',
+    isEditMode: false,
+    dataForUpdate: props.alertData?.description,
+});
+</script>
+
 <template>
-    <p v-if="!isEditMode"
+    <p v-if="!alertDetailItemState.isEditMode"
        class="content-wrapper"
     >
         <p-collapsible-panel :line-clamp="10">
             <p-text-beautifier class="description"
-                               :value="alertData.description"
+                               :value="props.alertData.description"
             />&zwnj;
         </p-collapsible-panel>
-        <button class="edit-btn"
-                :class="{'disabled': manageDisabled}"
-                @click="startEdit(alertData.description)"
+        <p-button style-type="tertiary"
+                  size="sm"
+                  :disabled="props.manageDisabled"
+                  @click="startEdit(props.alertData.description)"
         >
             {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
-        </button>
+        </p-button>
     </p>
     <div v-else
          class="content-wrapper"
     >
-        <p-textarea v-model="dataForUpdate"
+        <p-textarea v-model="alertDetailItemState.dataForUpdate"
                     class="textarea"
         />
         <div class="button-group">
             <p-button style-type="secondary"
-                      class="text-button"
+                      class="text-button mr-2"
                       size="sm"
-                      @click="cancelEdit(alertData.description)"
+                      @click="cancelEdit(props.alertData.description)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CANCEL') }}
             </p-button>
@@ -40,74 +66,16 @@
     </div>
 </template>
 
-<script lang="ts">
-import { toRefs } from 'vue';
-
-import {
-    PTextarea, PButton, PTextBeautifier, PCollapsiblePanel,
-} from '@spaceone/design-system';
-
-import { useAlertInfoItem } from '@/services/alert-manager/composables/alert-info';
-import { EDIT_MODE } from '@/services/alert-manager/constants/alert-constant';
-
-export default {
-    name: 'AlertDetailInfoTableDescription',
-    components: {
-        PTextarea,
-        PButton,
-        PTextBeautifier,
-        PCollapsiblePanel,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        alertData: {
-            type: Object,
-            default: () => ({}),
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const {
-            state: alertDetailItemState,
-            cancelEdit,
-            startEdit,
-            onClickSave,
-        } = useAlertInfoItem({
-            alertId: props.id,
-            isEditMode: false,
-            dataForUpdate: props.alertData?.description,
-        });
-        return {
-            EDIT_MODE,
-            ...toRefs(alertDetailItemState),
-            cancelEdit,
-            startEdit,
-            onClickSave,
-        };
-    },
-};
-</script>
-
 <style lang="postcss" scoped>
 @import './styles/alertInfoItem.pcss';
+.p-collapsible-panel {
+    padding: 0;
+    margin-right: 0.5rem;
+}
 .description {
-    white-space: pre-wrap;
+    white-space: pre-line;
 }
 .textarea {
     min-height: 15rem;
-}
-.edit-btn {
-    &.disabled {
-        @apply cursor-not-allowed text-gray-400;
-    }
-    &.disabled:active {
-        pointer-events: none;
-    }
 }
 </style>

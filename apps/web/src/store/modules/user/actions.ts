@@ -1,37 +1,38 @@
-import type { JwtPayload } from 'jwt-decode';
+import type { Action } from 'vuex';
+
 import jwtDecode from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { TokenGrantParameters } from '@/schema/identity/token/api-verbs/grant';
+import type { TokenIssueParameters } from '@/schema/identity/token/api-verbs/issue';
+import type { TokenGrantModel, TokenIssueModel } from '@/schema/identity/token/model';
+import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
+import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
+import type { UserModel } from '@/schema/identity/user/model';
 import { setI18nLocale } from '@/translations';
 
-import { languages } from '@/store/modules/user/config';
+import { MANAGED_ROLES } from '@/store/modules/user/config';
 
 import type {
-    UserState, SignInRequest, UpdateUserRequest, UserRole,
+    UserState, SignInRequest, UpdateUserRequest, RoleInfo,
 } from './type';
 
-const getDomainOwnerInfo = async (ownerId: string): Promise<Partial<UserState>> => {
-    const response = await SpaceConnector.client.identity.domainOwner.get({ owner_id: ownerId });
-    return {
-        userId: response.owner_id,
-        userType: 'DOMAIN_OWNER',
-        backend: 'LOCAL',
-        name: response.name,
-        email: response.email,
-        language: languages[response.language] ? response.language : 'en',
-        timezone: response.timezone,
-        // email_verified : There is data only when the value is true.
-        emailVerified: !!response.email_verified,
-    };
-};
+interface JWTPayload {
+    rol: RoleType;
+}
 
-const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
-    const response = await SpaceConnector.client.identity.user.get({ user_id: userId });
+const getUserInfo = async (): Promise<Partial<UserState>> => {
+    const response = await SpaceConnector.clientV2.identity.userProfile.get<UserGetParameters, UserModel>();
+    // TODO: refactor below code with new response
     return {
         userId: response.user_id,
-        userType: 'USER',
-        backend: response.backend,
+        roleType: response.role_type,
+        authType: response.auth_type,
         name: response.name,
         email: response.email,
         language: response.language,
@@ -39,17 +40,12 @@ const getUserInfo = async (userId: string): Promise<Partial<UserState>> => {
         requiredActions: response.required_actions,
         // email_verified : There is data only when the value is true.
         emailVerified: !!response.email_verified,
+        mfa: response.mfa,
     };
 };
 
-const updateUser = async (userId: string, userType: string, userRequest: UpdateUserRequest): Promise<void> => {
+const updateUser = async (userType: string, userRequest: UpdateUserRequest): Promise<void> => {
     const request: any = {};
-
-    if (userType === 'DOMAIN_OWNER') {
-        request.owner_id = userId;
-    } else {
-        request.user_id = userId;
-    }
 
     if (userRequest.name) request.name = userRequest.name;
     if (userRequest.password) request.password = userRequest.password;
@@ -58,71 +54,22 @@ const updateUser = async (userId: string, userType: string, userRequest: UpdateU
     if (userRequest.timezone) request.timezone = userRequest.timezone;
     if (userRequest.tags) request.tags = userRequest.tags;
 
-    if (userType === 'DOMAIN_OWNER') {
-        await SpaceConnector.client.identity.domainOwner.update(request);
-    } else {
-        await SpaceConnector.clientV2.identity.user.update(request);
-    }
-};
-
-interface JWTPayload extends JwtPayload {
-    user_type: string
-}
-const getUserInfoFromToken = (token: string): string[] => {
-    const decodedToken = jwtDecode<JWTPayload>(token);
-    return [decodedToken.user_type, decodedToken.aud as string];
-};
-
-const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => {
-    try {
-        const userRoles: Record<string, UserRole> = {};
-        const { results } = await SpaceConnector.client.identity.roleBinding.list({
-            resource_type: 'identity.User',
-            resource_id: userId,
-        });
-
-        results.forEach((roleBindingInfo) => {
-            const role = roleBindingInfo.role_info;
-            const roleId = role.role_id;
-            if (!userRoles[roleId]) {
-                userRoles[roleId] = {
-                    roleId,
-                    name: role.name,
-                    roleType: role.role_type,
-                    pagePermissions: role.page_permissions,
-                };
-            }
-        });
-
-        return Object.values(userRoles);
-    } catch (e) {
-        console.error(`RoleBinding Load Error: ${e}`);
-        return [];
-    }
+    await SpaceConnector.clientV2.identity.userProfile.update<UserProfileUpdateParameters>(request);
 };
 
 export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<void> => {
-    const response = await SpaceConnector.client.identity.token.issue({
-        domain_id: signInRequest.domainId,
-        user_id: signInRequest.userId || null, // user_id is nullable
-        user_type: signInRequest.userType,
+    const domainId = signInRequest.domainId;
+    const response = await SpaceConnector.clientV2.identity.token.issue<TokenIssueParameters, TokenIssueModel>({
+        domain_id: domainId,
+        auth_type: signInRequest.authType,
         credentials: signInRequest.credentials,
+        verify_code: signInRequest.verify_code,
     }, { skipAuthRefresh: true });
+
     SpaceConnector.setToken(response.access_token, response.refresh_token);
 
-    const [userType, userId] = getUserInfoFromToken(response.access_token);
-
-    if (userType === 'DOMAIN_OWNER') {
-        const userInfo = await getDomainOwnerInfo(userId);
-        commit('setUser', userInfo);
-        commit('setRoles', [{ name: 'Root Account', roleType: 'DOMAIN' }]);
-    } else {
-        const userInfo = await getUserInfo(userId);
-        commit('setUser', userInfo);
-
-        const userRoles = await getUserRoleBindings(userId);
-        commit('setRoles', userRoles);
-    }
+    const userInfo = await getUserInfo();
+    commit('setUser', userInfo);
 
     commit('setIsSessionExpired', false);
 };
@@ -130,13 +77,80 @@ export const signIn = async ({ commit }, signInRequest: SignInRequest): Promise<
 export const signOut = (): void => {
     SpaceConnector.flushToken();
 };
+const getRoleTypeFromToken = (token: string): RoleType => {
+    const decodedToken = jwtDecode<JWTPayload>(token);
+    return decodedToken.rol;
+};
+export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+    try {
+        const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>({
+            grant_type: 'REFRESH_TOKEN',
+            scope: grantRequest.scope,
+            token: grantRequest.token,
+            workspace_id: grantRequest.workspace_id,
+        }, { skipAuthRefresh: true });
+
+        SpaceConnector.setToken(response.access_token);
+        const currentRoleType = getRoleTypeFromToken(response.access_token);
+
+        const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
+        commit('setCurrentRoleInfo', roleInfo);
+    } catch (e) {
+        commit('setCurrentRoleInfo', undefined);
+        console.error(`Role Grant Error: ${e}`);
+    }
+};
+
+const getRoleTypeByManagedRoleId = (roleId: string): RoleType => MANAGED_ROLES[roleId];
+
+const getGrantedRole = async (roleId: string, currentRoleType: RoleType, baseRoleType: RoleType): Promise<RoleInfo|undefined> => {
+    // DOMAIN_ADMIN -> enter workspace case
+    if (baseRoleType === ROLE_TYPE.DOMAIN_ADMIN && currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) {
+        return {
+            roleType: ROLE_TYPE.WORKSPACE_OWNER,
+            roleId: 'managed-workspace-owner',
+            pageAccess: ['*'],
+        };
+    }
+    // USER -> grant USER case
+    if (currentRoleType === ROLE_TYPE.USER) {
+        return undefined;
+    }
+
+    // MANAGED_ROLE case
+    const MANAGED_ROLE_IDS: string[] = Object.keys(MANAGED_ROLES);
+    const isManagedRole = MANAGED_ROLE_IDS.includes(roleId);
+    if (isManagedRole) {
+        return {
+            roleType: getRoleTypeByManagedRoleId(roleId),
+            roleId,
+            pageAccess: ['*'],
+        };
+    }
+
+    // normal case
+    try {
+        const response = await SpaceConnector.clientV2.identity.role.get<RoleGetParameters, RoleModel>({
+            role_id: roleId,
+        });
+
+        return {
+            roleType: response.role_type,
+            roleId: response.role_id,
+            pageAccess: response.page_access,
+        };
+    } catch (e) {
+        console.error(`Role Load Error: ${e}`);
+        return undefined;
+    }
+};
 
 export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
     commit('setIsSessionExpired', isExpired);
 };
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {
-    await updateUser(state.userId, state.userType, userRequest);
+    await updateUser(state.userType, userRequest);
 
     const convertRequestType = (): UserState => ({
         userId: userRequest.user_id || state.userId,
@@ -145,6 +159,7 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
         language: userRequest.language || state.language,
         timezone: userRequest.timezone || state.timezone,
         emailVerified: userRequest.email_verified !== undefined ? userRequest.email_verified : state.emailVerified,
+        mfa: userRequest.mfa || state.mfa,
     });
 
     commit('setUser', { ...state, ...convertRequestType() });
@@ -152,27 +167,6 @@ export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest)
     if (userRequest.language) {
         commit('setLanguage', userRequest.language);
         await setI18nLocale(userRequest.language);
-    }
-};
-
-export const setTimezone = async ({ commit, state }, timezone: string): Promise<void> => {
-    await updateUser(state.userId, state.userType, { timezone });
-    commit('setTimezone', timezone);
-};
-
-export const setLanguage = async ({ commit, state }, language: string): Promise<void> => {
-    await updateUser(state.userId, state.userType, { language });
-    commit('setLanguage', language);
-    await setI18nLocale(language);
-};
-
-export const getUser = async ({ commit, state }, userId): Promise<void> => {
-    if (state.userType === 'DOMAIN_OWNER') {
-        const userInfo = await getDomainOwnerInfo(userId);
-        commit('setUser', userInfo);
-    } else {
-        const userInfo = await getUserInfo(userId);
-        commit('setUser', userInfo);
     }
 };
 

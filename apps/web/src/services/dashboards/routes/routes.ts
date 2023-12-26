@@ -20,8 +20,8 @@ const DashboardDetailPage = () => import('@/services/dashboards/pages/DashboardD
 const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
-    meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.VIEW_PERMISSION },
-    redirect: () => getRedirectRouteByPagePermission(MENU_ID.DASHBOARDS, store.getters['user/pagePermissionMap']),
+    meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
     component: DashboardsContainer,
     children: [
         {
@@ -41,110 +41,48 @@ const dashboardsRoute: RouteConfig = {
                     meta: {
                         centeredLayout: true,
                         translationId: 'DASHBOARDS.CREATE.TITLE',
-                        accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
-                        accessInfo: {
-                            referenceMenuIds: [MENU_ID.DASHBOARDS_PROJECT, MENU_ID.DASHBOARDS_WORKSPACE],
-                        },
+                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
                     },
                     component: DashboardCreatePage,
                 },
                 {
-                    path: 'project',
-                    name: DASHBOARDS_ROUTE.PROJECT._NAME,
-                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.PROJECT' },
-                    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
+                    path: 'detail/:dashboardId',
+                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
                     props: true,
-                    component: { template: '<router-view/>' },
-                    children: [
-                        {
-                            path: 'detail/:dashboardId',
-                            name: DASHBOARDS_ROUTE.PROJECT.DETAIL._NAME,
-                            meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
-                            props: true,
-                            component: DashboardDetailPage,
-                        },
-                        {
-                            path: 'customize/:dashboardId?',
-                            name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
-                            meta: {
-                                accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
-                                breadcrumbs: ({ params }) => {
-                                    const breadcrumbs: Breadcrumb[] = [
-                                        {
-                                            name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
-                                            to: {
-                                                name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
-                                            },
-                                        },
-                                    ];
-                                    if (params.dashboardId) {
-                                        breadcrumbs.push({
-                                            name: params.dashboardId,
-                                            to: {
-                                                name: DASHBOARDS_ROUTE.PROJECT.CUSTOMIZE._NAME,
-                                                params: {
-                                                    dashboardId: params.dashboardId,
-                                                },
-                                            },
-                                            copiable: true,
-                                        });
-                                    }
-                                    return breadcrumbs;
-                                },
-                            },
-                            props: true,
-                            component: DashboardCustomizePage,
-                        },
-                    ],
+                    component: DashboardDetailPage,
                 },
                 {
-                    path: 'workspace',
-                    name: DASHBOARDS_ROUTE.WORKSPACE._NAME,
-                    meta: { translationId: 'DASHBOARDS.ALL_DASHBOARDS.ENTIRE_WORKSPACE' },
-                    redirect: () => ({ name: DASHBOARDS_ROUTE.ALL._NAME }),
-                    props: true,
-                    component: { template: '<router-view/>' },
-                    children: [
-                        {
-                            path: 'detail/:dashboardId',
-                            name: DASHBOARDS_ROUTE.WORKSPACE.DETAIL._NAME,
-                            meta: { lnbVisible: true, label: ({ params }) => params.dashboardId, copiable: true },
-                            props: true,
-                            component: DashboardDetailPage,
-                        },
-                        {
-                            path: 'customize/:dashboardId?',
-                            name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-                            meta: {
-                                accessLevel: ACCESS_LEVEL.MANAGE_PERMISSION,
-                                breadcrumbs: ({ params }) => {
-                                    const breadcrumbs: Breadcrumb[] = [
-                                        {
-                                            name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
-                                            to: {
-                                                name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-                                            },
-                                        },
-                                    ];
-                                    if (params.dashboardId) {
-                                        breadcrumbs.push({
-                                            name: params.dashboardId,
-                                            to: {
-                                                name: DASHBOARDS_ROUTE.WORKSPACE.CUSTOMIZE._NAME,
-                                                params: {
-                                                    dashboardId: params.dashboardId,
-                                                },
-                                            },
-                                            copiable: true,
-                                        });
-                                    }
-                                    return breadcrumbs;
+                    path: 'customize/:dashboardId?',
+                    name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                    meta: {
+                        accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION,
+                        breadcrumbs: ({ params }) => {
+                            const breadcrumbs: Breadcrumb[] = [
+                                {
+                                    name: i18n.t('DASHBOARDS.DETAIL.CUSTOMIZE'),
+                                    to: {
+                                        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                                    },
                                 },
-                            },
-                            props: true,
-                            component: DashboardCustomizePage,
+                            ];
+                            if (params.dashboardId) {
+                                breadcrumbs.push({
+                                    name: params.dashboardId,
+                                    to: {
+                                        name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
+                                        params: {
+                                            dashboardId: params.dashboardId,
+                                        },
+                                    },
+                                    copiable: true,
+                                });
+                            }
+                            return breadcrumbs;
                         },
-                    ],
+                    },
+                    props: true,
+                    component: DashboardCustomizePage,
                 },
             ],
         },

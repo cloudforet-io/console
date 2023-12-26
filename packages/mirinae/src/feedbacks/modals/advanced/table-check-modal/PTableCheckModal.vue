@@ -23,7 +23,7 @@
                     <slot v-bind="$props">
                         <p-data-table :sortable="true"
                                       :items="sortedItems"
-                                      :fields="fields"
+                                      :fields="fields || []"
                                       :sort-by.sync="sortBy"
                                       :sort-desc.sync="sortDesc"
                         >
@@ -42,13 +42,16 @@
     </p-button-modal>
 </template>
 <script lang="ts">
+import type { PropType } from 'vue';
 import {
     reactive, computed, toRefs, defineComponent,
 } from 'vue';
 
 import { orderBy } from 'lodash';
+import type { TranslateResult } from 'vue-i18n';
 
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
+import type { DataTableFieldType } from '@/data-display/tables/data-table/type';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { SizeMapping } from '@/feedbacks/modals/type';
 import { useProxyValue } from '@/hooks';
@@ -72,7 +75,7 @@ export default defineComponent({
             default: 'primary',
         },
         headerTitle: {
-            type: String,
+            type: String as PropType<string|TranslateResult>,
             default: undefined,
         },
         subTitle: {
@@ -80,7 +83,7 @@ export default defineComponent({
             default: undefined,
         },
         fields: {
-            type: Array,
+            type: Array as PropType<DataTableFieldType[]>,
             default: undefined,
         },
         items: {

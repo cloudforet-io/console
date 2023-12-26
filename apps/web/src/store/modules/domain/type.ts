@@ -6,6 +6,7 @@ export interface DomainState {
     extendedAuthType?: ExtendedAuthType;
     authOptions?: Record<string, any>;
     extraMenu?: ExtraMenuSet;
+    config?: Record<string, any>;
 }
 
 export interface ExtraMenuSet {
@@ -25,4 +26,5 @@ export interface ExtraSubMenu {
 
 export const DOMAIN_CONFIG_TYPE = {
     EXTRA_MENU: 'console:ext-menu',
+    SETTINGS: 'settings',
 } as const;

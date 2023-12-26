@@ -69,7 +69,7 @@ export const cdnAndTrafficCostDashboardPreview: DefaultDashboardPreviewTemplate 
     },
 };
 
-export const cdnAndTrafficCostDashboard: DashboardTemplate = {
+const getDashboardTemplate = (isAdminMode: boolean): DashboardTemplate => ({
     ...cdnAndTrafficCostDashboardPreview,
     settings: {
         date_range: {
@@ -77,9 +77,11 @@ export const cdnAndTrafficCostDashboard: DashboardTemplate = {
         },
         refresh_interval_option: '5m',
     },
-    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST),
+    variables_schema: getDashboardVariablesSchema(DASHBOARD_LABEL.COST, isAdminMode),
     variables: {},
     layouts: [
         getDashboardLayoutWidgetInfoList(widgetList),
     ],
-};
+});
+export const cdnAndTrafficCostDashboard: DashboardTemplate = getDashboardTemplate(false);
+export const adminCdnAndTrafficCostDashboard: DashboardTemplate = getDashboardTemplate(true);

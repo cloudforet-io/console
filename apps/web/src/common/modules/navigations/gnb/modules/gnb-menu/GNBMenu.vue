@@ -8,6 +8,7 @@
              :class="[{
                  opened: isMenuWithAdditionalMenu && isOpened,
                  selected: isSelected,
+                 'admin-button': isAdminMode,
              }]"
         >
             <span class="button-label"
@@ -57,6 +58,9 @@
                                 @navigate="hideMenu"
                 />
             </div>
+            <div v-if="isSelected"
+                 :class="{'menu-underline': true, 'is-admin': isAdminMode}"
+            />
         </div>
     </div>
 </template>
@@ -80,6 +84,7 @@ import { DOMAIN_CONFIG_TYPE } from '@/store/modules/domain/type';
 
 import type { MenuId } from '@/lib/menu/config';
 import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -122,6 +127,10 @@ export default defineComponent<Props>({
         clickOutside: vOnClickOutside as DirectiveFunction,
     },
     props: {
+        isAdminMode: {
+            type: Boolean,
+            default: false,
+        },
         show: {
             type: Boolean,
             default: true,
@@ -175,7 +184,8 @@ export default defineComponent<Props>({
             if (state.isMenuWithAdditionalMenu) {
                 emit('open-menu', props.menuId);
             } else {
-                const isDuplicatePath = SpaceRouter.router.currentRoute.name === props.menuId;
+                const routeName = MENU_INFO_MAP[props.menuId].routeName;
+                const isDuplicatePath = SpaceRouter.router.currentRoute.name === routeName;
                 if (isDuplicatePath) return;
                 hideMenu();
                 if (props.to) SpaceRouter.router.push(props.to);
@@ -196,17 +206,29 @@ export default defineComponent<Props>({
 
 <style lang="postcss" scoped>
 .gnb-menu {
-    position: relative;
-    display: inline-block;
-    margin-left: 2rem;
+    @apply inline-flex items-center relative;
 
     .menu-button {
-        @apply text-gray-900;
+        @apply text-gray-900 relative;
+        height: 2rem;
         font-size: 0.875rem;
         line-height: $gnb-height;
         cursor: pointer;
         text-decoration: none;
         text-transform: capitalize;
+        padding: 0.5rem;
+
+        &.opened, &:hover {
+            @apply bg-gray-100 rounded;
+        }
+
+        &.admin-button {
+            @apply text-violet-100;
+
+            &.opened, &:hover {
+                @apply bg-violet-900;
+            }
+        }
 
         .button-label {
             @apply inline-block flex items-center;
@@ -219,11 +241,20 @@ export default defineComponent<Props>({
             }
         }
 
-        &.opened, &:hover {
-            @apply text-violet-600;
-        }
         .arrow-button {
             margin-left: 0.25rem;
+        }
+
+        .menu-underline {
+            @apply absolute bg-violet-500 rounded-t-xs;
+            right: 0.5rem;
+            bottom: -0.625rem;
+            z-index: 999;
+            width: calc(100% - 1rem);
+            height: 0.1875rem;
+            &.is-admin {
+                @apply bg-white;
+            }
         }
     }
 
@@ -242,9 +273,10 @@ export default defineComponent<Props>({
         @apply bg-white border border-gray-200 rounded-xs;
         position: absolute;
         top: $gnb-height;
-        margin-top: -0.5rem;
-        left: -1.125rem;
+        margin-top: -1.125rem;
+        left: 0;
         min-width: 10rem;
+        z-index: 1000;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
         padding: 0.5rem;
     }
@@ -252,23 +284,12 @@ export default defineComponent<Props>({
         @apply rounded-xs;
         cursor: auto;
         position: absolute;
+        z-index: 1000;
         top: $gnb-height;
-        margin-top: -0.5rem;
-        left: -1.125rem;
+        margin-top: -1.125rem;
+        left: 0;
         min-width: 10rem;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
-    }
-}
-
-@screen laptop {
-    .gnb-menu {
-        margin-left: 1.5rem;
-    }
-}
-
-@screen tablet {
-    .gnb-menu {
-        display: none;
     }
 }
 

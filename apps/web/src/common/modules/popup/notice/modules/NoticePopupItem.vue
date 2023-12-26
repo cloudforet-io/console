@@ -14,11 +14,6 @@
                 {{ item.title }}
             </h1>
             <div class="notice-popup-info">
-                <p-badge badge-type="solid-outline"
-                         :style-type="noticeTypeBadgeInfo.style"
-                >
-                    {{ noticeTypeBadgeInfo.label }}
-                </p-badge>
                 <span class="notice-popup-author">{{ iso8601Formatter(item.updated_at, $store.state.user.timezone) }} · {{ item.writer }}</span>
             </div>
             <p-divider class="!my-4" />
@@ -41,20 +36,21 @@
 </template>
 
 <script lang="ts">
-
 import { computedAsync } from '@vueuse/core';
-import { computed, reactive, toRefs } from 'vue';
+import { reactive, toRefs } from 'vue';
 import type { PropType } from 'vue';
 
 import {
-    PButtonModal, PBadge, PDivider, PButton,
+    PButtonModal, PDivider, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { iso8601Formatter } from '@cloudforet/utils';
 
-import type { NoticePostModel } from '@/schema/board/post/model';
-import { store } from '@/store';
+import type { PostGetParameters } from '@/schema/board/post/api-verbs/get';
+import type { PostModel } from '@/schema/board/post/model';
+
+import { useNoticeStore } from '@/store/notice';
 
 import type { FileInfo } from '@/lib/file-manager/type';
 import { isMobile } from '@/lib/helper/cross-browsing-helper';
@@ -63,14 +59,10 @@ import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFileAttachments } from '@/common/composables/file-attachments';
 
-import { getPostBadgeInfo } from '@/services/info/helpers/notice-helper';
-import type { NoticePostBadgeInfo } from '@/services/info/types/notice-type';
-
 export default {
     name: 'NoticePopupItem',
     components: {
         PButtonModal,
-        PBadge,
         PDivider,
         TextEditorViewer,
         PButton,
@@ -81,40 +73,35 @@ export default {
             default: undefined,
         },
         item: {
-            type: Object as PropType<NoticePostModel>,
+            type: Object as PropType<PostModel>,
             default: undefined,
         },
     },
     setup(props) {
+        const noticeStore = useNoticeStore();
+
         const state = reactive({
-            noticeTypeBadgeInfo: computed<NoticePostBadgeInfo>(() => getPostBadgeInfo(props.item?.post_type)),
             popupVisible: true,
         });
         const files = computedAsync<FileInfo[]>(async () => {
             const notice = props.item;
             if (!notice) return [];
-            const result: NoticePostModel = await SpaceConnector.client.board.post.get({
-                board_id: notice.board_id,
-                post_id: notice.post_id,
-            });
-            return result.files;
+            try {
+                const result: PostModel = await SpaceConnector.clientV2.board.post.get<PostGetParameters, PostModel>({
+                    post_id: notice.post_id,
+                });
+                return result.files;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            }
         });
         const { attachments } = useFileAttachments(files);
 
         const handleClose = async (neverShowPopup?: boolean): Promise<void> => {
             state.popupVisible = false;
             if (neverShowPopup) {
-                try {
-                    await SpaceConnector.client.config.userConfig.set({
-                        user_id: store.state.user.userId,
-                        name: `console:board:${props.item.board_id}:${props.item.post_id}`,
-                        data: {
-                            show_popup: false,
-                        },
-                    });
-                } catch (e) {
-                    ErrorHandler.handleError(e);
-                }
+                await noticeStore.updateNoticeReadState(props.item.post_id, false);
             }
         };
 

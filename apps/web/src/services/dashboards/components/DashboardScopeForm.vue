@@ -1,3 +1,36 @@
+<script lang="ts" setup>
+import {
+    PRadio, PRadioGroup, PFieldTitle, PI,
+} from '@spaceone/design-system';
+
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
+import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
+
+
+const emit = defineEmits<{(event: 'set-project', project: ProjectTreeNodeData): void;
+}>();
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
+/* Event */
+const handleSelectScope = (scopeType: DashboardScope) => {
+    dashboardDetailStore.setDashboardScope(scopeType);
+    if (scopeType === 'PRIVATE') {
+        dashboardDetailStore.setDashboardType('PRIVATE');
+    } else {
+        dashboardDetailStore.setDashboardType('PUBLIC');
+    }
+};
+
+const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
+    emit('set-project', projects[0]);
+};
+</script>
+
 <template>
     <section class="dashboard-scope-form">
         <p-field-title>{{ $t('DASHBOARDS.CREATE.LABEL_SCOPE') }}</p-field-title>
@@ -5,104 +38,41 @@
             <p-radio-group direction="vertical"
                            class="dashboard-scope-radio-group"
             >
-                <p-radio :selected="isDomainScope"
-                         :disabled="!workspaceManagePermission"
-                         @change="handleSelectScope(DASHBOARD_SCOPE.DOMAIN)"
+                <p-radio :selected="dashboardDetailState.dashboardScope"
+                         value="WORKSPACE"
+                         @change="handleSelectScope('WORKSPACE')"
                 >
-                    {{ $t('DASHBOARDS.CREATE.ENTIRE_WORKSPACES') }}
+                    {{ $t('DASHBOARDS.CREATE.WORKSPACE') }}
                 </p-radio>
-                <p-radio :selected="!isDomainScope"
-                         :disabled="!projectManagePermission"
-                         @change="handleSelectScope(DASHBOARD_SCOPE.PROJECT)"
+                <p-radio :selected="dashboardDetailState.dashboardScope"
+                         value="PROJECT"
+                         @change="handleSelectScope('PROJECT')"
                 >
                     {{ $t('DASHBOARDS.CREATE.SINGLE_PROJECT') }}
                 </p-radio>
+                <project-select-dropdown :disabled="dashboardDetailState.dashboardScope !== 'PROJECT'"
+                                         project-selectable
+                                         :project-group-selectable="false"
+                                         @select="handleSelectProjects"
+                />
+                <p-radio :selected="dashboardDetailState.dashboardScope"
+                         value="PRIVATE"
+                         @change="handleSelectScope('PRIVATE')"
+                >
+                    <p-i name="ic_lock-filled"
+                         width="0.875rem"
+                         height="0.875rem"
+                         class="mr-1 mb-1 ml-1 gray-500"
+                    />
+                    <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
+                </p-radio>
+                <p class="viewer-description">
+                    {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
+                </p>
             </p-radio-group>
-            <project-select-dropdown v-show="!isDomainScope"
-                                     project-selectable
-                                     :project-group-selectable="false"
-                                     @select="handleSelectProjects"
-            />
         </div>
     </section>
 </template>
-
-<script lang="ts">
-import type { SetupContext } from 'vue';
-import {
-    defineComponent, onMounted, reactive, toRefs,
-} from 'vue';
-
-import {
-    PRadio, PRadioGroup, PFieldTitle,
-} from '@spaceone/design-system';
-
-import { DASHBOARD_SCOPE } from '@/schema/dashboard/_constants/dashboard-constant';
-import type { DashboardScope } from '@/schema/dashboard/_types/dashboard-type';
-import { store } from '@/store';
-
-import { MENU_ID } from '@/lib/menu/config';
-
-import { useManagePermissionState } from '@/common/composables/page-manage-permission';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-
-import type { ProjectTreeNodeData } from '@/services/project/types/project-tree-type';
-
-export default defineComponent({
-    name: 'DashboardScopeForm',
-    components: {
-        PFieldTitle,
-        ProjectSelectDropdown,
-        PRadioGroup,
-        PRadio,
-    },
-    props: {
-        dashboardProject: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        const state = reactive({
-            isDomainScope: true,
-            projectManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_PROJECT),
-            workspaceManagePermission: useManagePermissionState(MENU_ID.DASHBOARDS_WORKSPACE),
-        });
-
-        const handleSelectScope = (scopeType: DashboardScope) => {
-            updateScope(scopeType);
-        };
-
-        const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
-            // Emit projects as project.
-            emit('set-project', projects[0]);
-        };
-
-        const updateScope = (scopeType: DashboardScope) => {
-            state.isDomainScope = scopeType === DASHBOARD_SCOPE.DOMAIN;
-            emit('update:dashboardScope', scopeType);
-        };
-
-        // LOAD REFERENCE STORE
-        (async () => {
-            await store.dispatch('reference/project/load');
-        })();
-
-        onMounted(() => {
-            if (!(state.projectManagePermission || state.workspaceManagePermission)) return;
-            if (!state.projectManagePermission) updateScope(DASHBOARD_SCOPE.DOMAIN);
-            if (!state.workspaceManagePermission) updateScope(DASHBOARD_SCOPE.PROJECT);
-        });
-
-        return {
-            ...toRefs(state),
-            handleSelectScope,
-            handleSelectProjects,
-            DASHBOARD_SCOPE,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 .dashboard-scope-form {
@@ -113,8 +83,13 @@ export default defineComponent({
             @apply flex flex-col;
             gap: 0.5rem;
         }
+        .viewer-description {
+            @apply text-xs text-gray-500;
+            font-weight: 400;
+            margin-left: 1.5rem;
+        }
         .project-select-dropdown {
-            @apply mt-1 ml-6;
+            @apply ml-6;
         }
 
         @screen tablet {

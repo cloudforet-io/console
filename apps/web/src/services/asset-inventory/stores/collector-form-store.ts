@@ -3,10 +3,13 @@ import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type {
-    CollectorModel, CollectorOptions,
+    CollectorModel,
 
 } from '@/schema/inventory/collector/model';
+import type { CollectorOptions } from '@/schema/inventory/collector/type';
+import type { PluginGetVersionsParameters } from '@/schema/repository/plugin/api-verbs/get-versions';
 import type { PluginModel } from '@/schema/repository/plugin/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -37,7 +40,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
     state: () => ({
         originCollector: null as CollectorModel|null, // data from inventory.collector.get api.
         repositoryPlugin: null as PluginModel|null, // data from repository.plugin.list api. it's used when creating collector.
-        provider: null as string|null,
+        provider: undefined as string|undefined,
         tags: {} as Tag,
         name: '',
         version: '' as string,
@@ -99,7 +102,7 @@ export const useCollectorFormStore = defineStore('collector-form', {
             this.version = version;
         },
         resetVersion() {
-            this.version = this.originCollector?.plugin_info?.version ?? this.repositoryPlugin?.version ?? '';
+            this.version = this.originCollector?.plugin_info?.version ?? '';
         },
         setAutoUpgrade(autoUpgrade: boolean) {
             this.autoUpgrade = autoUpgrade;
@@ -134,10 +137,10 @@ export const useCollectorFormStore = defineStore('collector-form', {
         },
         async getVersions(pluginId: string) {
             try {
-                const res = await SpaceConnector.client.repository.plugin.getVersions({
+                const res = await SpaceConnector.clientV2.repository.plugin.getVersions<PluginGetVersionsParameters, ListResponse<string> >({
                     plugin_id: pluginId,
                 });
-                this.versions = res.results;
+                this.versions = res.results ?? [];
             } catch (e) {
                 this.versions = [];
                 ErrorHandler.handleRequestError(e, i18n.t('INVENTORY.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'));

@@ -1,69 +1,141 @@
+import { isEmpty } from 'lodash';
 import { defineStore } from 'pinia';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import { USER_TYPE } from '@/schema/identity/user/constant';
-import type { UserType } from '@/schema/identity/user/type';
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RoleListParameters } from '@/schema/identity/role/api-verbs/list';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import type { RoleModel } from '@/schema/identity/role/model';
+import type { RoleType } from '@/schema/identity/role/type';
+import type { UserGetParameters } from '@/schema/identity/user/api-verbs/get';
+import type { UserListParameters } from '@/schema/identity/user/api-verbs/list';
+import type { UserModel } from '@/schema/identity/user/model';
+import type { FindWorkspaceUserParameters } from '@/schema/identity/workspace-user/api-verbs/find';
+import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
+import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
+import type { WorkspaceUserModel, SummaryWorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-import { calculateTime } from '@/services/administration/helpers/user-management-tab-helper';
-import type { User } from '@/services/administration/types/user-type';
-
-
-const _getArrayWithNotDuplicatedItem = (array) => [...new Set(array)];
-const _getUserType = (userType: UserType) => {
-    let formattedUserType;
-    if (userType === USER_TYPE.API_USER) formattedUserType = 'API Only';
-    else formattedUserType = 'Console, API';
-    return formattedUserType;
-};
+import type { UserListItemType } from '@/services/administration/types/user-type';
 
 export const useUserPageStore = defineStore('user-page', {
     state: () => ({
-        loading: false,
-        modalLoading: false,
-        users: [] as User[],
+        isAdminMode: false,
+        loading: true,
+        users: [] as UserListItemType[],
+        selectedUser: {} as UserListItemType,
+        roles: [] as RoleModel[],
         totalCount: 0,
         selectedIndices: [],
-        visibleStatusModal: false,
-        visibleCreateModal: false,
-        visibleUpdateModal: false,
+        pageStart: 1,
+        pageLimit: 15,
+        searchFilters: [] as ConsoleFilter[],
+        modal: {
+            type: '',
+            title: '',
+            themeColor: 'primary',
+            visible: {
+                add: false,
+                form: false,
+                status: false,
+            },
+        },
     }),
     getters: {
-        timezone: () => store.state.user.timezone || 'UTC',
+        timezone: () => store.state.user.timezone,
+        isWorkspaceOwner: () => store.state.user.currentRoleInfo.roleType === ROLE_TYPE.WORKSPACE_OWNER,
         selectedUsers: (state) => {
-            const users = [] as User[];
-            state.selectedIndices.map((d) => users.push(state.users[d]));
+            if (state.selectedIndices.length === 1 && !isEmpty(state.selectedUser)) return [state.selectedUser];
+            const users: UserListItemType[] = [];
+            state.selectedIndices.forEach((d:number) => {
+                users.push(state.users[d]);
+            });
             return users ?? [];
         },
     },
     actions: {
-        async listUsers(apiQuery: Query) {
-            this.loading = true;
+        // User
+        async listUsers(params: UserListParameters) {
             try {
-                const res = await SpaceConnector.client.identity.user.list({
-                    query: apiQuery,
-                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count', 'tags'],
-                    include_role_binding: true,
-                });
-                this.users = res.results.map((d) => ({
-                    ...d,
-                    api_key_count: d.api_key_count || 0,
-                    user_type: _getUserType(d.user_type),
-                    role_name: (_getArrayWithNotDuplicatedItem(d.role_bindings.map((data) => data.role_info.name))).join(', '),
-                    last_accessed_at: calculateTime(d.last_accessed_at, this.timezone),
-                }));
-                this.totalCount = res.total_count;
+                const res = await SpaceConnector.clientV2.identity.user.list<UserListParameters, ListResponse<UserModel>>(params);
+                this.users = res.results || [];
+                this.totalCount = res.total_count ?? 0;
                 this.selectedIndices = [];
             } catch (e) {
                 ErrorHandler.handleError(e);
                 this.users = [];
                 this.totalCount = 0;
-            } finally {
-                this.loading = false;
+                throw e;
+            }
+        },
+        async getUser(params: UserGetParameters) {
+            try {
+                this.selectedUser = await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>(params);
+            } catch (e: any) {
+                ErrorHandler.handleRequestError(e, e.message);
+                throw e;
+            }
+        },
+        // Workspace User
+        async listWorkspaceUsers(params: WorkspaceUserListParameters) {
+            try {
+                const { results, total_count } = await SpaceConnector.clientV2.identity.workspaceUser.list<WorkspaceUserListParameters, ListResponse<WorkspaceUserModel>>(params);
+                this.users = (results ?? [])?.map((item) => ({
+                    ...item,
+                    role_type: item.role_binding_info.role_type,
+                    role_binding: {
+                        type: item.role_binding_info?.role_type as RoleType,
+                        name: this.roles.find((role) => role.role_id === item.role_binding_info.role_id)?.name ?? '',
+                    },
+                }));
+                this.totalCount = total_count ?? 0;
+                this.selectedIndices = [];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.users = [];
+                this.totalCount = 0;
+                throw e;
+            }
+        },
+        async getWorkspaceUser(params: WorkspaceUserGetParameters) {
+            try {
+                const res = await SpaceConnector.clientV2.identity.workspaceUser.get<WorkspaceUserGetParameters, WorkspaceUserModel>(params);
+                return {
+                    ...res,
+                    role_type: res.role_binding_info.role_type,
+                    role_binding: {
+                        type: res.role_binding_info.role_type as RoleType,
+                        name: this.roles.find((role) => role.role_id === res.role_binding_info.role_id)?.name ?? '',
+                    },
+                };
+            } catch (e: any) {
+                ErrorHandler.handleRequestError(e, e.message);
+                throw e;
+            }
+        },
+        async findWorkspaceUser(params?: FindWorkspaceUserParameters) {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.workspaceUser.find<FindWorkspaceUserParameters, ListResponse<SummaryWorkspaceUserModel>>(params);
+                return results || [];
+            } catch (e: any) {
+                ErrorHandler.handleRequestError(e, e.message);
+                throw e;
+            }
+        },
+        // Role
+        async listRoles(params?: RoleListParameters) {
+            try {
+                const { results } = await SpaceConnector.clientV2.identity.role.list<RoleListParameters, ListResponse<RoleModel>>(params);
+                this.roles = results || [];
+                return results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                this.roles = [];
+                throw e;
             }
         },
     },

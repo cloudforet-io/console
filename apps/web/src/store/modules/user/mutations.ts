@@ -1,17 +1,18 @@
 import type { Mutation } from 'vuex';
 
-import type { UserState, UserRole } from './type';
+import type { UserState, RoleInfo } from './type';
 
 export const setUser = (state: UserState, userInfo: UserState): void => {
     state.userId = userInfo.userId;
-    state.userType = userInfo.userType;
-    state.backend = userInfo.backend;
+    state.authType = userInfo.authType;
+    state.roleType = userInfo.roleType;
     state.name = userInfo.name;
     state.email = userInfo.email;
     state.language = userInfo.language;
     state.timezone = userInfo.timezone;
     state.requiredActions = userInfo.requiredActions;
     state.emailVerified = userInfo.emailVerified;
+    state.mfa = userInfo.mfa;
 };
 
 export const setIsSessionExpired = (state: UserState, isSessionExpired?: boolean): void => {
@@ -26,10 +27,9 @@ export const setTimezone = (state: UserState, timezone: string): void => {
     state.timezone = timezone;
 };
 
-export const setRoles = (state: UserState, roles: Array<UserRole>): void => {
-    state.roles = roles;
+export const setCurrentRoleInfo = (state: UserState, currentRoleInfo?: RoleInfo): void => {
+    state.currentRoleInfo = currentRoleInfo;
 };
-
 export const setIsSignInLoading: Mutation<UserState> = (state, isSignInLoading: boolean): void => {
     state.isSignInLoading = isSignInLoading;
 };

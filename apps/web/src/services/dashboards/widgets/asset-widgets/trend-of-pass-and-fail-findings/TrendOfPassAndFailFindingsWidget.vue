@@ -127,8 +127,8 @@ const { pageSize, thisPage } = useWidgetPagination(widgetState);
 /* Api */
 const chartDataApiQueryHelper = new ApiQueryHelper();
 const tableDataApiQueryHelper = new ApiQueryHelper();
-const fetchChartDataAnalyze = getCancellableFetcher<FullData['chartData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
-const fetchTableDataAnalyze = getCancellableFetcher<FullData['tableData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchChartDataAnalyze = getCancellableFetcher<object, FullData['chartData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
+const fetchTableDataAnalyze = getCancellableFetcher<object, FullData['tableData']>(SpaceConnector.clientV2.inventory.cloudServiceStats.analyze);
 const fetchChartData = async (): Promise<FullData['chartData']> => {
     state.loading = true;
     try {

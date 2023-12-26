@@ -1,42 +1,53 @@
-import type { ComputedRef } from 'vue';
 import {
-    computed, ref,
+    computed, reactive,
 } from 'vue';
+
+import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
+import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
+import type { PostModel } from '@/schema/board/post/model';
+import type { NoticeConfigData } from '@/schema/board/post/type';
+import type { UserConfigListParameters } from '@/schema/config/user-config/api-verbs/list';
+import type { UserConfigSetParameters } from '@/schema/config/user-config/api-verbs/set';
+import type { UserConfigModel } from '@/schema/config/user-config/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
-import { getNoticeBoardId } from '@/lib/helper/notice-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-interface UserConfig {
-    name: string;
-    data?: NoticeConfigData;
-    user_id?: string;
-}
-interface NoticeConfigData {
-    is_read?: boolean,
-    show_popup?: boolean,
-}
+type UserConfig = UserConfigModel<NoticeConfigData>;
 type NoticeConfigMap = Record<string, NoticeConfigData>;
 
-const boardId = ref<string>();
-const noticeConfigMap = ref<NoticeConfigMap>({});
-const isReadMap = computed<{ [key: string]: boolean }>(() => {
-    const readMap = {};
-    Object.keys(noticeConfigMap.value).forEach((postId) => {
-        readMap[postId] = noticeConfigMap.value[postId].is_read;
+export const useNoticeStore = defineStore('notice', () => {
+    const state = reactive({
+        noticeConfigMap: {} as NoticeConfigMap,
+        totalNoticeIdList: [] as string[],
+        totalNoticeCount: 0,
     });
-    return readMap;
-});
 
-export const useNoticeStore = ({ userId }: {
-    userId: ComputedRef<string>,
-}) => {
+    const getters = reactive({
+        userId: computed<string>(() => store.state.user.userId),
+        isReadMap: computed<{ [key: string]: boolean }>(() => {
+            const readMap = {};
+            Object.keys(state.noticeConfigMap).forEach((postId) => {
+                readMap[postId] = state.noticeConfigMap[postId].is_read;
+            });
+            return readMap;
+        }),
+        unreadNoticeCount: computed<number>(() => {
+            let unreadCount = 0;
+            state.totalNoticeIdList.forEach((postId) => {
+                if (!getters.isReadMap[postId]) unreadCount++;
+            });
+            return unreadCount;
+        }),
+    });
+
     const convertUserConfigToNoticeConfigMap = (userConfigs: UserConfig[]): NoticeConfigMap => {
         const configMap: NoticeConfigMap = {};
         userConfigs.forEach((config) => {
@@ -47,77 +58,59 @@ export const useNoticeStore = ({ userId }: {
         return configMap;
     };
 
-    const fetchNoticeReadState = async () => {
-        if (!boardId.value) boardId.value = await getNoticeBoardId();
-        const userConfigApiQuery = new ApiQueryHelper()
-            .setFilters([{
-                k: 'user_id',
-                v: userId.value,
-                o: '=',
-            },
-            {
-                k: 'name',
-                v: `console:board:${boardId.value}:`,
-                o: '',
-            }])
-            .setOnly('data', 'user_id');
-        try {
-            const { results } = await SpaceConnector.client.config.userConfig.list({
-                query: userConfigApiQuery.data,
-            });
-            noticeConfigMap.value = convertUserConfigToNoticeConfigMap(results);
-        } catch (e) {
-            ErrorHandler.handleError(e);
-            noticeConfigMap.value = {};
-        }
-    };
-    const updateNoticeReadState = async (postId: string, showPopup?: boolean) => {
-        try {
-            if (!boardId.value) boardId.value = await getNoticeBoardId();
-            const result = await SpaceConnector.client.config.userConfig.set({
-                user_id: store.state.user.userId,
-                name: `console:board:${boardId.value}:${postId}`,
-                data: { is_read: true, show_popup: showPopup },
-            });
-            noticeConfigMap.value = { ...noticeConfigMap.value, [postId]: result.data };
-        } catch (e) {
-            ErrorHandler.handleError(e);
-        }
-    };
-
-    const totalNoticeIdList = ref<string[]>([]);
-    const totalNoticeCount = ref(0);
-    const noticeApiHelper = new ApiQueryHelper().setOnly('post_id');
-    const fetchNoticeCount = async () => {
-        try {
-            if (!boardId.value) boardId.value = await getNoticeBoardId();
-            const { results, total_count } = await SpaceConnector.client.board.post.list({
-                board_id: boardId.value,
-                query: noticeApiHelper.data,
-                domain_id: null,
-            });
-            totalNoticeIdList.value = results.map((post) => post.post_id);
-            totalNoticeCount.value = total_count;
-        } catch (e) {
-            ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
-        }
+    const actions = {
+        fetchNoticeReadState: async () => {
+            const userConfigApiQuery = new ApiQueryHelper()
+                .setFilters([{
+                    k: 'user_id',
+                    v: getters.userId,
+                    o: '=',
+                },
+                {
+                    k: 'name',
+                    v: `console:board:${POST_BOARD_TYPE.NOTICE}:`,
+                    o: '',
+                }])
+                .setOnly('data', 'user_id');
+            try {
+                const { results } = await SpaceConnector.clientV2.config.userConfig.list<UserConfigListParameters, ListResponse<UserConfigModel<NoticeConfigData>>>({
+                    query: userConfigApiQuery.data,
+                });
+                state.noticeConfigMap = convertUserConfigToNoticeConfigMap(results ?? []);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.noticeConfigMap = {};
+            }
+        },
+        updateNoticeReadState: async (postId: string, showPopup?: boolean) => {
+            try {
+                const result = await SpaceConnector.clientV2.config.userConfig.set<UserConfigSetParameters<NoticeConfigData>, UserConfigModel>({
+                    name: `console:board:${POST_BOARD_TYPE.NOTICE}:${postId}`,
+                    data: { is_read: true, show_popup: showPopup },
+                });
+                state.noticeConfigMap = { ...state.noticeConfigMap, [postId]: result.data };
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            }
+        },
+        fetchNoticeCount: async () => {
+            try {
+                const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({
+                    query: { only: ['post_id'] },
+                    board_type: POST_BOARD_TYPE.NOTICE,
+                });
+                state.totalNoticeIdList = results?.map((post) => post.post_id) ?? [];
+                state.totalNoticeCount = total_count ?? 0;
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'));
+            }
+        },
     };
 
-    const unreadNoticeCount = computed(() => {
-        let unreadCount = 0;
-        totalNoticeIdList.value.forEach((postId) => {
-            if (!isReadMap.value[postId]) unreadCount++;
-        });
-        return unreadCount;
-    });
 
     return {
-        boardId,
-        isReadMap,
-        fetchNoticeReadState,
-        updateNoticeReadState,
-        totalNoticeCount,
-        unreadNoticeCount,
-        fetchNoticeCount,
+        state,
+        getters,
+        ...actions,
     };
-};
+});

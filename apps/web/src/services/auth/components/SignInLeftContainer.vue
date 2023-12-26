@@ -1,17 +1,17 @@
 <template>
     <div
         class="sign-in-left-container"
-        :class="{ admin: isDomainOwner }"
+        :class="{ admin: props.isDomainAdmin }"
     >
         <div class="lottie-wrapper">
             <img
-                v-if="signInImage"
-                :src="signInImage"
+                v-if="state.signInImage"
+                :src="state.signInImage"
             >
             <lottie-vue-player v-else
                                autoplay
                                loop
-                               :src="isDomainOwner ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
+                               :src="props.isDomainAdmin ? '/lottiefiles/lottie_planet_signin.json' : '/lottiefiles/lottie_floating-astronaut_signin.json'"
                                :style="{ height: '100%', backgroundColor: 'transparent' }"
             />
         </div>
@@ -20,10 +20,10 @@
                      badge-type="solid-outline"
                      shape="square"
             >
-                {{ $t('COMMON.SIGN_IN.VERSION') }} {{ version }}
+                {{ $t('COMMON.SIGN_IN.VERSION') }} {{ state.version }}
             </p-badge>
             <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
-                <a :href="contactLink ? contactLink : 'mailto:support@cloudforet.io'"
+                <a :href="state.contactLink ? state.contactLink : 'mailto:support@cloudforet.io'"
                    target="_blank"
                 >
                     <span class="text-blue-700 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
@@ -33,37 +33,35 @@
     </div>
 </template>
 
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
+<script lang="ts" setup>
+import { computed, reactive } from 'vue';
 
 import { PBadge } from '@spaceone/design-system';
 
+import { store } from '@/store';
+
 import config from '@/lib/config';
 
-export default {
-    name: 'SignInLeftContainer',
-    components: {
-        PBadge,
-    },
-    props: {
-        isDomainOwner: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const state = reactive({
-            // eslint-disable-next-line no-undef
-            version: VITE_APP_VER,
-            signInImage: computed(() => config.get('DOMAIN_IMAGE.SIGN_IN')),
-            contactLink: computed(() => config.get('CONTACT_LINK')),
-        });
+interface Props {
+    isDomainAdmin: boolean;
+}
 
-        return {
-            ...toRefs(state),
-        };
-    },
-};
+const props = withDefaults(defineProps<Props>(), {
+    isDomainAdmin: false,
+});
+
+const state = reactive({
+    // eslint-disable-next-line no-undef
+    version: VITE_APP_VER,
+    signInImage: computed(() => {
+        const domainSettings = store.state.domain.config?.settings;
+        if (domainSettings?.login_page_image_url) {
+            return domainSettings.login_page_image_url;
+        }
+        return config.get('DOMAIN_IMAGE.SIGN_IN');
+    }),
+    contactLink: computed(() => config.get('CONTACT_LINK')),
+});
 </script>
 
 <style lang="postcss" scoped>

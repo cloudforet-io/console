@@ -1,3 +1,14 @@
+import type { Query } from '@cloudforet/core-lib/space-connector/type';
+
+import type { ResourceGroup } from '@/schema/identity/role-binding/type';
+
+
+export interface BudgetUsageAnalyzeParameters {
+    budget_id?: string;
+    data_source_id?: string;
+    query?: Query;
+}
+
 export interface BudgetUsageAnalyzeResult {
     budget_id: string;
     budget_usage: number;
@@ -5,15 +16,11 @@ export interface BudgetUsageAnalyzeResult {
     total_spent: number;
     name?: string;
     project_id?: string;
-    project_group_id?: string;
+    workspace_id?: string;
     data_source_id?: string;
     provider_filter?: {
         state?: string;
         providers?: string[];
     };
-}
-
-export interface BudgetUsageAnalyzeResponse {
-    results: BudgetUsageAnalyzeResult[];
-    more?: boolean;
+    resource_group: Extract<ResourceGroup, 'WORKSPACE' | 'PROJECT'>;
 }

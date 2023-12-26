@@ -1,3 +1,6 @@
-import type { USER_TYPE } from '@/schema/identity/user/constant';
-
-export type UserType = typeof USER_TYPE[keyof typeof USER_TYPE];
+export type UserType = 'USER' | 'API_USER';
+export type UserState = 'ENABLED' | 'DISABLED' | 'PENDING';
+export type AuthType = 'EXTERNAL' | 'LOCAL';
+export type Action = 'UPDATE_PASSWORD';
+export type UserMfaState = 'ENABLED' | 'DISABLED';
+export type UserMfaType = 'EMAIL';

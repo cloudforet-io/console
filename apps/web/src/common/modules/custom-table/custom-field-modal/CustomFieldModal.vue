@@ -1,18 +1,298 @@
+<script setup lang="ts">
+
+import { computed, reactive, watch } from 'vue';
+import draggable from 'vuedraggable';
+
+import {
+    PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
+} from '@spaceone/design-system';
+import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import type { UserState } from '@/store/modules/user/type';
+
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { useProxyValue } from '@/common/composables/proxy-state';
+import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
+import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
+
+import { getServiceAccountTableSchema, updateCustomTableSchema } from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator';
+import type {
+    GetSchemaParams,
+    ResourceType,
+} from '@/services/asset-inventory/helpers/dynamic-ui-schema-generator/type';
+
+const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
+const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
+
+interface Props {
+    visible?: boolean;
+    resourceType?: ResourceType;
+    options?: {
+        provider?: string;
+        cloudServiceGroup?: string;
+        cloudServiceType?: string;
+    };
+    isServerPage?: boolean;
+}
+
+type SelectedColumnMap = Record<string, DynamicField>;
+
+/**
+ * @description Merge two field lists. Duplicate check is performed based on key, and the field list given as the first parameter takes precedence.
+ * @param fieldsA
+ * @param fieldsB
+ */
+const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicField[] => {
+    const allColumns: any[] = [...fieldsA];
+    fieldsB.forEach((d) => {
+        const isExist = fieldsA.some((c) => c.key === d.key);
+        if (!isExist) allColumns.push(d);
+    });
+    return allColumns;
+};
+
+const props = withDefaults(defineProps<Props>(), {
+    visible: false,
+    resourceType: undefined,
+    options: () => ({}),
+    isServerPage: false,
+});
+
+const emit = defineEmits<{(e: 'complete'): void;
+    (e: 'update:selected-tag-keys', tagKeys: string[]): void;
+}>();
+
+
+let schema: any = {};
+const _userConfigMap = computed<UserState>(() => store.state.user);
+
+const state = reactive({
+    proxyVisible: useProxyValue('visible', props, emit),
+    search: '',
+    isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
+    loading: true,
+    availableColumns: [] as DynamicField[], // all default fields including optional fields.
+    currentColumns: [] as DynamicField[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
+    allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
+    selectedColumnMap: {} as SelectedColumnMap,
+    selectedColumns: computed<DynamicField[]>({
+        get: () => state.allColumns.filter((d) => !!state.selectedColumnMap[d.key]),
+        set: (val: DynamicField[]) => {
+            const selectedMap: SelectedColumnMap = {};
+            const tagColumns: DynamicField[] = [];
+            val.forEach((d) => {
+                selectedMap[d.key] = d;
+                if (d.key.startsWith(TAGS_PREFIX)) tagColumns.push(d);
+            });
+
+            state.allColumns = mergeFields(state.allColumns, tagColumns)
+                .filter((d) => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
+            state.selectedColumnMap = selectedMap;
+        },
+    }),
+    selectedAllColumnKeys: computed<string[]>(() => state.selectedColumns.map((d) => d.key)),
+    selectedNonTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => !key.startsWith(TAGS_PREFIX))),
+    selectedTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => key.startsWith(TAGS_PREFIX))),
+    recommendedSequenceMap: computed<Record<string, number>>(() => {
+        const orderMap: Record<string, number> = {};
+        state.availableColumns.forEach((d, i) => {
+            orderMap[d.key] = i;
+        });
+        return orderMap;
+    }),
+    isValid: computed(() => state.loading || state.selectedColumns.length > 0),
+    isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
+    isServiceAccountTable: computed(() => ['identity.ServiceAccount', 'identity.TrustedAccount'].includes(props.resourceType)),
+});
+
+const sortByRecommendation = () => {
+    state.allColumns = state.allColumns.sort((a, b) => {
+        if (!state.selectedColumnMap[a.key]) return 1;
+        if (!state.selectedColumnMap[b.key]) return -1;
+        if (state.recommendedSequenceMap[a.key] === undefined) return 1;
+        if (state.recommendedSequenceMap[b.key] === undefined) return -1;
+        return state.recommendedSequenceMap[a.key] - (state.recommendedSequenceMap[b.key]);
+    });
+};
+
+const sortByAlphabet = () => {
+    state.allColumns = state.allColumns.sort((a, b) => {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
+        if (!state.selectedColumnMap[a.key]) return 1;
+        if (!state.selectedColumnMap[b.key]) return -1;
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        return 0;
+    });
+};
+
+const onChangeAllSelect = (val) => {
+    if (val) {
+        state.selectedColumns = [...state.allColumns];
+    } else {
+        state.selectedColumns = [];
+    }
+};
+
+const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
+    try {
+        const options: GetSchemaParams['options'] = {
+            include_optional_fields: includeOptionalFields,
+        };
+        const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+        if (provider)options.provider = provider;
+        if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
+        if (cloudServiceType) options.cloud_service_type = cloudServiceType;
+
+        let res;
+        if (state.isServiceAccountTable) {
+            res = await getServiceAccountTableSchema({
+                userData: {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+                resourceType: props.resourceType,
+                options: props.options,
+            });
+        } else {
+            res = await SpaceConnector.client.addOns.pageSchema.get({
+                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
+                schema: 'table',
+                options,
+            });
+        }
+
+
+        schema = res;
+        delete schema.options?.search;
+        return res.options?.fields || [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        schema = {};
+        return [];
+    }
+};
+
+const setColumnsDefault = async () => {
+    state.allColumns = state.availableColumns;
+    state.selectedColumns = state.availableColumns.filter((d) => !d.options?.is_optional);
+    sortByRecommendation();
+};
+
+const updatePageSchema = async () => {
+    state.loading = true;
+
+    const data = { ...schema };
+    if (!data.options) data.options = {};
+    data.options.fields = state.selectedColumns;
+
+    const options: any = {};
+    const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+    if (provider) options.provider = provider;
+    if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
+    if (cloudServiceType) options.cloud_service_type = cloudServiceType;
+
+    try {
+        if (state.isServiceAccountTable) {
+            await updateCustomTableSchema(
+                {
+                    userType: _userConfigMap.value.userType ?? 'USER',
+                    userId: _userConfigMap.value.userId ?? '',
+                },
+                props.resourceType,
+                props.options.provider ?? '',
+                data,
+            );
+        } else {
+            await SpaceConnector.client.addOns.pageSchema.update({
+                resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
+                schema: 'table',
+                data,
+                options,
+            });
+        }
+        showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
+        emit('complete');
+        state.proxyVisible = false;
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'));
+    } finally {
+        state.loading = false;
+    }
+};
+
+
+const updateSelectedKeys = (keys: string[]) => {
+    state.selectedColumns = keys.map((key) => {
+        if (key.startsWith(TAGS_PREFIX)) {
+            const name = key.slice(TAGS_PREFIX.length);
+            return {
+                key,
+                name,
+                options: {
+                    ...TAGS_OPTIONS,
+                    ...(!state.isResourceTypeCloudService && { key_depth: 1 }),
+                },
+            } as DynamicField;
+        }
+        return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
+    });
+};
+
+const handleUpdateSelectedKeys = (keys: string[]) => {
+    updateSelectedKeys(keys);
+};
+
+/* Tags */
+const clearSelectedTags = () => {
+    const tagKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
+    updateSelectedKeys(tagKeys);
+};
+const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
+    updateSelectedKeys(tagKeys.concat(state.selectedNonTagKeys));
+};
+
+/* Init */
+const initColumns = async () => {
+    state.loading = true;
+    const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
+    state.availableColumns = availableColumnRes.status === 'fulfilled' ? availableColumnRes.value : [];
+    state.currentColumns = currentColumnRes.status === 'fulfilled' ? currentColumnRes.value : [];
+    state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
+    state.selectedColumns = [...state.currentColumns];
+    state.loading = false;
+};
+watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
+    if (visible && resourceType) {
+        initColumns();
+    }
+}, { immediate: true });
+
+</script>
+
 <template>
-    <p-button-modal :visible.sync="proxyVisible"
+    <p-button-modal :visible.sync="state.proxyVisible"
                     :header-title="$t('COMMON.CUSTOM_FIELD_MODAL.TITLE')"
-                    :loading="loading"
-                    :disabled="!isValid"
+                    :loading="state.loading"
+                    :disabled="!state.isValid"
                     @confirm="updatePageSchema"
     >
         <template #body>
-            <p-data-loader :loading="loading"
+            <p-data-loader :loading="state.loading"
                            :min-loading-time="500"
             >
                 <div class="contents-wrapper">
                     <section class="attribute-column-section">
                         <h3 class="section-title">
-                            <template v-if="isValid">
+                            <template v-if="state.isValid">
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
                             </template>
                             <span v-else
@@ -25,7 +305,7 @@
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
                             </p-button>
                         </h3>
-                        <p-search v-model="search"
+                        <p-search v-model="state.search"
                                   :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')"
                         />
                         <div class="sort-wrapper">
@@ -45,7 +325,7 @@
                         </div>
 
                         <header>
-                            <p-checkbox :selected="isAllSelected"
+                            <p-checkbox :selected="state.isAllSelected"
                                         :value="true"
                                         @change="onChangeAllSelect"
                             />
@@ -53,15 +333,15 @@
                         </header>
 
                         <div class="column-items-wrapper">
-                            <draggable v-model="allColumns"
+                            <draggable v-model="state.allColumns"
                                        draggable=".draggable-item"
                                        ghost-class="ghost"
                             >
-                                <column-item v-for="(column, idx) in allColumns"
+                                <column-item v-for="(column, idx) in state.allColumns"
                                              :key="`${column.key}-${idx}`"
-                                             :selected-keys="selectedAllColumnKeys"
+                                             :selected-keys="state.selectedAllColumnKeys"
                                              :item="column"
-                                             :search-text="search"
+                                             :search-text="state.search"
                                              @update:selectedKeys="handleUpdateSelectedKeys"
                                 />
                             </draggable>
@@ -79,17 +359,17 @@
                             </p-button>
                         </h3>
                         <keep-alive>
-                            <select-cloud-service-tag-columns v-if="isResourceTypeCloudService"
+                            <select-cloud-service-tag-columns v-if="state.isResourceTypeCloudService"
                                                               :options="options"
                                                               :is-server-page="isServerPage"
-                                                              :selected-tag-keys="selectedTagKeys"
+                                                              :selected-tag-keys="state.selectedTagKeys"
                                                               @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
                             />
                             <select-tag-columns v-else
                                                 :resource-type="resourceType"
                                                 :options="options"
                                                 :is-server-page="isServerPage"
-                                                :selected-tag-keys="selectedTagKeys"
+                                                :selected-tag-keys="state.selectedTagKeys"
                                                 @update:selected-tag-keys="handleUpdatedSelectedTagKeys"
                             />
                         </keep-alive>
@@ -99,292 +379,6 @@
         </template>
     </p-button-modal>
 </template>
-
-<script lang="ts">
-
-import type { SetupContext } from 'vue';
-import {
-    computed, defineComponent, reactive, toRefs, watch,
-} from 'vue';
-import draggable from 'vuedraggable';
-
-import {
-    PButton, PButtonModal, PCheckbox, PDataLoader, PSearch,
-} from '@spaceone/design-system';
-import type { DynamicField } from '@spaceone/design-system/types/data-display/dynamic/dynamic-field/type/field-schema';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { useProxyValue } from '@/common/composables/proxy-state';
-import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
-import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
-
-const SelectCloudServiceTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectCloudServiceTagColumns.vue');
-const SelectTagColumns = () => import('@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue');
-
-interface Props {
-    visible: boolean;
-    resourceType: string;
-    options: {
-        provider?: string;
-        cloudServiceGroup?: string;
-        cloudServiceType?: string;
-    };
-    isServerPage: boolean;
-}
-
-type SelectedColumnMap = Record<string, DynamicField>;
-
-/**
- * @description Merge two field lists. Duplicate check is performed based on key, and the field list given as the first parameter takes precedence.
- * @param fieldsA
- * @param fieldsB
- */
-const mergeFields = (fieldsA: DynamicField[], fieldsB: DynamicField[]): DynamicField[] => {
-    const allColumns: any[] = [...fieldsA];
-    fieldsB.forEach((d) => {
-        const isExist = fieldsA.some((c) => c.key === d.key);
-        if (!isExist) allColumns.push(d);
-    });
-    return allColumns;
-};
-
-export default defineComponent<Props>({
-    name: 'CustomFieldModal',
-    components: {
-        SelectCloudServiceTagColumns,
-        ColumnItem,
-        SelectTagColumns,
-        PButtonModal,
-        PSearch,
-        PButton,
-        PCheckbox,
-        PDataLoader,
-        draggable,
-    },
-    model: {
-        prop: 'visible',
-        event: 'update:visible',
-    },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        resourceType: {
-            type: String,
-            default: '',
-            required: true,
-        },
-        options: {
-            type: Object,
-            default: () => ({}),
-        },
-        isServerPage: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props, { emit }: SetupContext) {
-        let schema: any = {};
-
-        const state = reactive({
-            proxyVisible: useProxyValue('visible', props, emit),
-            search: '',
-            isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
-            loading: true,
-            availableColumns: [] as DynamicField[], // all default fields including optional fields.
-            currentColumns: [] as DynamicField[], // if custom fields exist, it will be custom fields. if custom fields don't exist, it will be default fields excluding optional fields.
-            allColumns: [] as DynamicField[], // fields merged with availableColumns and currentColumns
-            selectedColumnMap: {} as SelectedColumnMap,
-            selectedColumns: computed<DynamicField[]>({
-                get: () => state.allColumns.filter((d) => !!state.selectedColumnMap[d.key]),
-                set: (val: DynamicField[]) => {
-                    const selectedMap: SelectedColumnMap = {};
-                    const tagColumns: DynamicField[] = [];
-                    val.forEach((d) => {
-                        selectedMap[d.key] = d;
-                        if (d.key.startsWith(TAGS_PREFIX)) tagColumns.push(d);
-                    });
-
-                    state.allColumns = mergeFields(state.allColumns, tagColumns)
-                        .filter((d) => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
-                    state.selectedColumnMap = selectedMap;
-                },
-            }),
-            selectedAllColumnKeys: computed<string[]>(() => state.selectedColumns.map((d) => d.key)),
-            selectedNonTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => !key.startsWith(TAGS_PREFIX))),
-            selectedTagKeys: computed<string[]>(() => state.selectedAllColumnKeys.filter((key) => key.startsWith(TAGS_PREFIX))),
-            recommendedSequenceMap: computed<Record<string, number>>(() => {
-                const orderMap: Record<string, number> = {};
-                state.availableColumns.forEach((d, i) => {
-                    orderMap[d.key] = i;
-                });
-                return orderMap;
-            }),
-            isValid: computed(() => state.loading || state.selectedColumns.length > 0),
-            isResourceTypeCloudService: computed(() => props.resourceType === 'inventory.CloudService'),
-        });
-
-        const sortByRecommendation = () => {
-            state.allColumns = state.allColumns.sort((a, b) => {
-                if (!state.selectedColumnMap[a.key]) return 1;
-                if (!state.selectedColumnMap[b.key]) return -1;
-                if (state.recommendedSequenceMap[a.key] === undefined) return 1;
-                if (state.recommendedSequenceMap[b.key] === undefined) return -1;
-                return state.recommendedSequenceMap[a.key] - (state.recommendedSequenceMap[b.key]);
-            });
-        };
-
-        const sortByAlphabet = () => {
-            state.allColumns = state.allColumns.sort((a, b) => {
-                const nameA = a.name.toUpperCase();
-                const nameB = b.name.toUpperCase();
-                if (!state.selectedColumnMap[a.key]) return 1;
-                if (!state.selectedColumnMap[b.key]) return -1;
-                if (nameA < nameB) return -1;
-                if (nameA > nameB) return 1;
-                return 0;
-            });
-        };
-
-        const onChangeAllSelect = (val) => {
-            if (val) {
-                state.selectedColumns = [...state.allColumns];
-            } else {
-                state.selectedColumns = [];
-            }
-        };
-
-        const getColumns = async (includeOptionalFields = false): Promise<DynamicField[]> => {
-            try {
-                const options: any = {
-                    include_optional_fields: includeOptionalFields,
-                };
-                const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-                if (provider)options.provider = provider;
-                if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
-                if (cloudServiceType) options.cloud_service_type = cloudServiceType;
-
-                const res = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-                    schema: 'table',
-                    options,
-                });
-
-                schema = res;
-                delete schema.options?.search;
-                return res.options?.fields || [];
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                schema = {};
-                return [];
-            }
-        };
-
-        const setColumnsDefault = async () => {
-            state.allColumns = state.availableColumns;
-            state.selectedColumns = state.availableColumns.filter((d) => !d.options?.is_optional);
-            sortByRecommendation();
-        };
-
-        const updatePageSchema = async () => {
-            state.loading = true;
-
-            const data = { ...schema };
-            if (!data.options) data.options = {};
-            data.options.fields = state.selectedColumns;
-
-            const options: any = {};
-            const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-            if (provider) options.provider = provider;
-            if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
-            if (cloudServiceType) options.cloud_service_type = cloudServiceType;
-
-            try {
-                await SpaceConnector.client.addOns.pageSchema.update({
-                    resource_type: props.isServerPage ? 'inventory.Server' : props.resourceType,
-                    schema: 'table',
-                    data,
-                    options,
-                });
-
-                showSuccessMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_S_UPDATE_COL'), '');
-                emit('complete');
-                state.proxyVisible = false;
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'));
-            } finally {
-                state.loading = false;
-            }
-        };
-
-
-        const updateSelectedKeys = (keys: string[]) => {
-            state.selectedColumns = keys.map((key) => {
-                if (key.startsWith(TAGS_PREFIX)) {
-                    const name = key.slice(TAGS_PREFIX.length);
-                    return {
-                        key,
-                        name,
-                        options: {
-                            ...TAGS_OPTIONS,
-                            ...(!state.isResourceTypeCloudService && { key_depth: 1 }),
-                        },
-                    } as DynamicField;
-                }
-                return state.availableColumns.find((col) => col.key === key) ?? { key, name: key } as DynamicField;
-            });
-        };
-
-        const handleUpdateSelectedKeys = (keys: string[]) => {
-            updateSelectedKeys(keys);
-        };
-
-        /* Tags */
-        const clearSelectedTags = () => {
-            const tagKeys = state.selectedAllColumnKeys.filter((d) => !d.startsWith(TAGS_PREFIX));
-            updateSelectedKeys(tagKeys);
-        };
-        const handleUpdatedSelectedTagKeys = (tagKeys: string[]) => {
-            updateSelectedKeys(tagKeys.concat(state.selectedNonTagKeys));
-        };
-
-        /* Init */
-        const initColumns = async () => {
-            state.loading = true;
-            const [availableColumnRes, currentColumnRes] = await Promise.allSettled([getColumns(true), getColumns(false)]);
-            state.availableColumns = availableColumnRes.status === 'fulfilled' ? availableColumnRes.value : [];
-            state.currentColumns = currentColumnRes.status === 'fulfilled' ? currentColumnRes.value : [];
-            state.allColumns = mergeFields(state.currentColumns, state.availableColumns);
-            state.selectedColumns = [...state.currentColumns];
-            state.loading = false;
-        };
-        watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
-            if (visible && resourceType) {
-                initColumns();
-            }
-        }, { immediate: true });
-        return {
-            ...toRefs(state),
-            sortByRecommendation,
-            sortByAlphabet,
-            onChangeAllSelect,
-            setColumnsDefault,
-            clearSelectedTags,
-            updatePageSchema,
-            TAGS_PREFIX,
-            handleUpdateSelectedKeys,
-            handleUpdatedSelectedTagKeys,
-        };
-    },
-});
-</script>
 
 <style lang="postcss" scoped>
 /* custom design-system component - p-button-modal */

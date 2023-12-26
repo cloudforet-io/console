@@ -1,3 +1,115 @@
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+
+import {
+    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
+} from '@spaceone/design-system';
+
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@cloudforet/utils';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { NoteCreateParameters } from '@/schema/monitoring/note/api-verbs/create';
+import type { NoteDeleteParameters } from '@/schema/monitoring/note/api-verbs/delete';
+import type { NoteListParameters } from '@/schema/monitoring/note/api-verbs/list';
+import type { NoteModel } from '@/schema/monitoring/note/model';
+import { store } from '@/store';
+import { i18n } from '@/translations';
+
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
+const props = defineProps<{
+    id: string;
+    manageDisabled?: boolean;
+}>();
+
+const state = reactive({
+    noteInput: '',
+    noteList: [] as NoteModel[],
+    timezone: computed<string>(() => store.state.user.timezone),
+    menuItems: [
+        {
+            label: 'Delete', name: 'delete',
+        },
+    ],
+    selectedNoteIdForDelete: '',
+});
+
+const handleChangeNoteInput = (e) => {
+    state.noteInput = e.target?.value;
+};
+const apiQuery = new ApiQueryHelper();
+const listNote = async () => {
+    try {
+        apiQuery.setFilters([{ k: 'alert_id', v: props.id, o: '=' }]).setSort('created_at', true);
+        const res = await SpaceConnector.clientV2.monitoring.note.list<NoteListParameters, ListResponse<NoteModel>>({
+            query: apiQuery.data,
+        });
+        state.noteList = res.results?.map((d) => ({
+            title: d.created_by,
+            data: {
+                note: d.note,
+                note_id: d.note_id,
+            },
+            ...d,
+        })) ?? [];
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        state.noteList = [];
+    }
+};
+
+const handleCreateNote = async () => {
+    try {
+        await SpaceConnector.clientV2.monitoring.note.create<NoteCreateParameters>({
+            alert_id: props.id,
+            note: state.noteInput,
+        });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to Create Note');
+    } finally {
+        state.noteInput = '';
+        await listNote();
+    }
+};
+
+const checkDeleteState = reactive({
+    headerTitle: i18n.t('MONITORING.ALERT.DETAIL.NOTE.DELETE_MODAL_TITLE'),
+    visible: false,
+    loading: false,
+});
+
+const openDeleteModal = () => {
+    checkDeleteState.visible = true;
+};
+
+const handleSelect = (noteId) => {
+    state.selectedNoteIdForDelete = noteId;
+    openDeleteModal();
+};
+
+const handleDeleteNote = async () => {
+    checkDeleteState.loading = true;
+    try {
+        await SpaceConnector.clientV2.monitoring.note.delete<NoteDeleteParameters>({
+            note_id: state.selectedNoteIdForDelete,
+        });
+    } catch (e) {
+        ErrorHandler.handleRequestError(e, 'Failed to Delete Note');
+    } finally {
+        checkDeleteState.loading = false;
+        checkDeleteState.visible = false;
+        await listNote();
+    }
+};
+
+(async () => {
+    await listNote();
+})();
+</script>
+
 <template>
     <p-pane-layout class="alert-detail-note">
         <p-heading heading-type="sub"
@@ -5,18 +117,18 @@
         />
         <article class="note-wrapper">
             <article class="add-note-wrapper">
-                <p-textarea :value="noteInput"
+                <p-textarea :value="state.noteInput"
                             @input="handleChangeNoteInput"
                 />
                 <p-button style-type="tertiary"
                           class="add-btn"
-                          :disabled="(noteInput.trim()).length === 0 || manageDisabled"
+                          :disabled="(state.noteInput.trim()).length === 0 || props.manageDisabled"
                           @click="handleCreateNote"
                 >
                     {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
                 </p-button>
             </article>
-            <p-collapsible-list :items="noteList"
+            <p-collapsible-list :items="state.noteList"
                                 toggle-position="contents"
                                 :line-clamp="2"
             >
@@ -24,13 +136,13 @@
                     <div class="title-wrapper">
                         <p>
                             <span class="author">{{ title }}</span>
-                            <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
+                            <span class="date">{{ iso8601Formatter(state.noteList[index].created_at, state.timezone) }}</span>
                         </p>
                         <p-select-dropdown style-type="icon-button"
                                            button-icon="ic_chevron-down"
-                                           :menu="menuItems"
+                                           :menu="state.menuItems"
                                            menu-position="right"
-                                           :disabled="manageDisabled"
+                                           :disabled="props.manageDisabled"
                                            @select="handleSelect(data.note_id)"
                         />
                     </div>
@@ -49,162 +161,6 @@
         />
     </p-pane-layout>
 </template>
-
-<script lang="ts">
-import { computed, reactive, toRefs } from 'vue';
-
-import {
-    PButton, PCollapsibleList, PPaneLayout, PHeading, PTextarea, PSelectDropdown, PTextBeautifier,
-} from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import { iso8601Formatter } from '@cloudforet/utils';
-
-import type { TimeStamp } from '@/schema/_common/model';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-
-
-interface NoteModel {
-    note_id: string;
-    alert_id: string;
-    note: string;
-    user_id: string;
-    project_id: string;
-    created_at: TimeStamp;
-}
-
-export default {
-    name: 'AlertDetailNote',
-    components: {
-        PPaneLayout,
-        PHeading,
-        PTextarea,
-        PButton,
-        PCollapsibleList,
-        PSelectDropdown,
-        PTextBeautifier,
-        DeleteModal,
-    },
-    props: {
-        id: {
-            type: String,
-            default: undefined,
-        },
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props) {
-        const state = reactive({
-            noteInput: '',
-            noteList: [] as NoteModel[],
-            loading: true,
-            timezone: computed(() => store.state.user.timezone),
-            userId: computed(() => store.state.user.userId),
-            menuItems: [
-                {
-                    label: 'Delete', name: 'delete',
-                },
-            ],
-            selectedNoteIdForDelete: '',
-        });
-
-        const handleChangeNoteInput = (e) => {
-            state.noteInput = e.target?.value;
-        };
-        const apiQuery = new ApiQueryHelper();
-        const listNote = async () => {
-            try {
-                state.loading = true;
-                apiQuery.setFilters([{ k: 'alert_id', v: props.id, o: '=' }]).setSort('created_at');
-                const res = await SpaceConnector.client.monitoring.note.list({
-                    query: apiQuery.data,
-                });
-                state.noteList = res.results.map((d) => ({
-                    title: d.created_by,
-                    data: {
-                        note: d.note,
-                        note_id: d.note_id,
-                    },
-                    ...d,
-                })).reverse();
-            } catch (e) {
-                ErrorHandler.handleError(e);
-                state.noteList = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        const handleCreateNote = async () => {
-            try {
-                await SpaceConnector.client.monitoring.note.create({
-                    alert_id: props.id,
-                    user_id: state.userId,
-                    note: state.noteInput,
-                });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, 'Failed to Create Note');
-            } finally {
-                state.noteInput = '';
-                await listNote();
-            }
-        };
-
-        const checkDeleteState = reactive({
-            headerTitle: i18n.t('MONITORING.ALERT.DETAIL.NOTE.DELETE_MODAL_TITLE'),
-            visible: false,
-            loading: false,
-        });
-
-        const openDeleteModal = () => {
-            checkDeleteState.visible = true;
-        };
-
-        const handleSelect = (noteId) => {
-            state.selectedNoteIdForDelete = noteId;
-            openDeleteModal();
-        };
-
-        const handleDeleteNote = async () => {
-            checkDeleteState.loading = true;
-            try {
-                await SpaceConnector.client.monitoring.note.delete({
-                    note_id: state.selectedNoteIdForDelete,
-                });
-            } catch (e) {
-                ErrorHandler.handleRequestError(e, 'Failed to Delete Note');
-            } finally {
-                checkDeleteState.loading = false;
-                checkDeleteState.visible = false;
-                await listNote();
-            }
-        };
-
-        (async () => {
-            await listNote();
-        })();
-
-        return {
-            ...toRefs(state),
-            checkDeleteState,
-            iso8601Formatter,
-            handleChangeNoteInput,
-            handleCreateNote,
-            handleSelect,
-            handleDeleteNote,
-            openDeleteModal,
-        };
-    },
-};
-
-</script>
 
 <style lang="postcss" scoped>
 .alert-detail-note {

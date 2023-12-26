@@ -1,103 +1,70 @@
+import { asyncComputed } from '@vueuse/core';
+import { computed, reactive } from 'vue';
+
 import type { TreeNode } from '@spaceone/design-system/types/data-display/tree/type';
 import { reverse } from 'lodash';
-import type { _GettersTree } from 'pinia';
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import type { ProjectGroupCreateParameters } from '@/schema/identity/project-group/api-verbs/create';
+import type { ProjectGroupDeleteParameters } from '@/schema/identity/project-group/api-verbs/delete';
+import type { ProjectGroupUpdateParameters } from '@/schema/identity/project-group/api-verbs/update';
+import type { ProjectGroupModel } from '@/schema/identity/project-group/model';
+import type { ProjectCreateParameters } from '@/schema/identity/project/api-verbs/create';
+import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
+import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import { i18n } from '@/translations';
-
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { useProjectTree } from '@/services/project/composables/use-project-tree';
+import { getWorkspaceUser } from '@/services/project/helpers/workspace-user-helper';
 import type {
-    ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectGroupTreeItem, ProjectTreeRoot,
+    ProjectGroupTreeItem, ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectTreeRoot,
 } from '@/services/project/types/project-tree-type';
 
-interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
-interface ProjectInfo {
-    project_group_id: string;
-    name: string;
-}
 
-export interface ProjectPageState {
-    isInitiated: boolean;
-
-    searchText?: string;
-
-    rootNode?: ProjectTreeRoot|null;
-    selectedItem: ProjectGroupTreeItem;
-    treeEditMode: boolean;
-    permissionInfo: Record<string, boolean>;
-
-    hasProjectGroup?: boolean;
-    projectCount?: number;
-
-    actionTargetItem: ProjectGroupTreeItem;
-    projectGroupFormVisible: boolean;
-    projectGroupFormUpdateMode: boolean;
-    projectGroupDeleteCheckModalVisible: boolean;
-    projectFormVisible: boolean;
-
-    shouldUpdateProjectList: boolean;
-}
-type ProjectStoreGetters = _GettersTree<{
-    selectedNodeData: ProjectTreeNodeData|undefined;
-    selectedNodePath: number[]|undefined;
-    groupId: string|undefined;
-    groupName: string|undefined;
-    actionTargetNodeData: ProjectTreeNodeData|undefined;
-    actionTargetNodePath: number[]|undefined;
-    parentGroups: ProjectGroupTreeNodeData[];
-}> & _GettersTree<ProjectPageState>;
-
-interface ProjectPageAction {
-    initRoot: (root: ProjectTreeRoot) => void;
-    selectNode: (groupId?: string) => Promise<TreeNode<ProjectTreeNodeData>|null>;
-    openProjectGroupCreateForm: (target?: ProjectGroupTreeItem) => void;
-    openProjectGroupUpdateForm: (target?: ProjectGroupTreeItem) => void;
-    openProjectGroupDeleteCheckModal: (target?: ProjectGroupTreeItem) => void;
-    createProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
-    updateProjectGroup: (projectGroupInfo: ProjectGroupInfo) => Promise<void>;
-    deleteProjectGroup: () => Promise<void>;
-    createProject: (projectInfo: ProjectInfo) => Promise<ProjectModel|undefined>;
-    refreshPermissionInfo: () => Promise<void>;
-    addPermissionInfo: (permissionInfo: any) => void;
-    openProjectCreateForm: (target?: ProjectGroupTreeItem) => void;
-    pushPermissionInfo: (permissionInfo: Record<string, boolean>) => void;
-    getPermissionInfo: (ids:string[]) => Promise<Record<string, boolean>>;
-}
-
-export const useProjectPageStore = defineStore<string, ProjectPageState, ProjectStoreGetters, ProjectPageAction>('project-page', {
-    state: () => ({
-        isInitiated: false,
-        searchText: undefined,
-        rootNode: null,
+const projectTreeHelper = useProjectTree();
+export const useProjectPageStore = defineStore('project-page', () => {
+    const state = reactive({
+        isInitiated: false as boolean,
+        searchText: undefined as string|undefined,
+        rootNode: null as ProjectTreeRoot|null,
         selectedItem: {} as ProjectGroupTreeItem,
-        treeEditMode: false,
-        permissionInfo: {},
-        hasProjectGroup: undefined,
-        projectCount: undefined,
+        treeEditMode: false as boolean,
+        hasProjectGroup: undefined as boolean|undefined,
+        projectCount: undefined as number|undefined,
         actionTargetItem: {} as ProjectGroupTreeItem,
-        projectGroupFormVisible: false,
-        projectGroupFormUpdateMode: false,
-        projectGroupDeleteCheckModalVisible: false,
-        projectFormVisible: false,
-        shouldUpdateProjectList: false,
-    }),
-    getters: {
-        selectedNodeData: (state) => (state.selectedItem.node ? { ...state.selectedItem.node.data } : undefined),
-        selectedNodePath: (state) => (state.selectedItem.path ? state.selectedItem.path : undefined),
-        groupId() { return this.selectedNodeData?.id; },
-        groupName() { return this.selectedNodeData ? this.selectedNodeData.name : undefined; },
-        actionTargetNodeData: (state) => (state.actionTargetItem.node ? state.actionTargetItem.node.data : undefined),
-        actionTargetNodePath: (state) => (state.actionTargetItem.path ? state.actionTargetItem.path : undefined),
-        parentGroups(state) {
+        //
+        projectGroupFormVisible: false as boolean,
+        projectGroupFormUpdateMode: false as boolean,
+        projectGroupDeleteCheckModalVisible: false as boolean,
+        projectFormModalVisible: false as boolean,
+        shouldUpdateProjectList: false as boolean,
+        //
+        workspaceUser: asyncComputed<WorkspaceUserModel|undefined>(async () => {
+            const _workspaceUser = await getWorkspaceUser(store.state.user.userId);
+            return _workspaceUser;
+        }),
+        isWorkspaceOwner: computed<boolean>(() => {
+            if (!state.workspaceUser) return false;
+            return state.workspaceUser.role_binding_info.role_type === 'WORKSPACE_OWNER';
+        }),
+    });
+
+    const getters = reactive({
+        selectedNodeData: computed<ProjectTreeNodeData|undefined>(() => (state.selectedItem.node ? { ...state.selectedItem.node.data } : undefined)),
+        selectedNodePath: computed<number[]|undefined>(() => (state.selectedItem.path ? state.selectedItem.path : undefined)),
+        groupId: computed<string|undefined>(() => getters.selectedNodeData?.id),
+        groupName: computed<string|undefined>(() => (getters.selectedNodeData ? getters.selectedNodeData.name : undefined)),
+        actionTargetNodeData: computed<ProjectTreeNodeData|undefined>(() => (state.actionTargetItem.node ? state.actionTargetItem.node.data : undefined)),
+        actionTargetNodePath: computed<number[]|undefined>(() => (state.actionTargetItem.path ? state.actionTargetItem.path : undefined)),
+        parentGroups: computed<ProjectGroupTreeNodeData[]>(() => {
             const tree = state.rootNode;
-            const path = this.selectedNodePath;
+            const path = getters.selectedNodePath;
             if (tree && path) {
                 const parentItems = path.reduce((parents, d, i) => {
                     if (i + 1 === path.length) return parents;
@@ -114,229 +81,233 @@ export const useProjectPageStore = defineStore<string, ProjectPageState, Project
                 return reverse(parentItems);
             }
             return [];
-        },
-    },
-    actions: {
-        initRoot(root) {
-            this.rootNode = root;
-        },
-        async selectNode(groupId?: string) {
-            if (!groupId) {
-                if (this.rootNode) {
-                    this.rootNode.resetSelect();
-                }
-                return null;
+        }),
+    });
+
+    /* mutation */
+    const setShouldUpdateProjectList = (val?: boolean) => {
+        state.shouldUpdateProjectList = !!val;
+    };
+    const setProjectFormModalVisible = (val?: boolean) => {
+        state.projectFormModalVisible = !!val;
+    };
+    const setProjectGroupDeleteCheckModalVisible = (val?: boolean) => {
+        state.projectGroupDeleteCheckModalVisible = !!val;
+    };
+    const setProjectGroupFormVisible = (val?: boolean) => {
+        state.projectGroupFormVisible = !!val;
+    };
+    const setTreeEditMode = (val?: boolean) => {
+        state.treeEditMode = !!val;
+    };
+    const setIsInitiated = (val?: boolean) => {
+        state.isInitiated = !!val;
+    };
+    const setSelectedItem = (item: ProjectGroupTreeItem) => {
+        state.selectedItem = item;
+    };
+    const setProjectCount = (count?: number) => {
+        state.projectCount = count || 0;
+    };
+    const setRootNode = (root: ProjectTreeRoot) => {
+        state.rootNode = root;
+    };
+
+    /* action */
+    const selectNode = async (groupId?: string): Promise<TreeNode<ProjectTreeNodeData>|null> => {
+        if (!groupId) {
+            if (state.rootNode) {
+                state.rootNode.resetSelect();
             }
-
-            try {
-                const res = await SpaceConnector.client.identity.project.tree.search({
-                    item_id: groupId,
-                    item_type: 'PROJECT_GROUP',
-                });
-                const paths = res.open_path || [];
-
-                if (this.rootNode && paths.length) {
-                    const { node } = await this.rootNode.fetchAndFindNode(paths.map((d) => ((data) => data.id === d)));
-                    return node;
-                }
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-
             return null;
-        },
-        openProjectGroupCreateForm(target: ProjectGroupTreeItem = {}) {
-            this.actionTargetItem = target;
-            this.projectGroupFormUpdateMode = false;
-            this.projectGroupFormVisible = true;
-        },
-        openProjectGroupUpdateForm(target: ProjectGroupTreeItem = {}) {
-            this.actionTargetItem = target;
-            this.projectGroupFormUpdateMode = true;
-            this.projectGroupFormVisible = true;
-        },
-        openProjectGroupDeleteCheckModal(target: ProjectGroupTreeItem = {}) {
-            this.actionTargetItem = target;
-            this.projectGroupDeleteCheckModalVisible = true;
-        },
-        pushPermissionInfo(permissionInfo) {
-            this.permissionInfo = { ...this.permissionInfo, ...permissionInfo };
-        },
-        async createProjectGroup(
-            projectGroupInfo: ProjectGroupInfo,
-        ) {
-            try {
-                const params: ProjectGroupInfo = { ...projectGroupInfo };
-                if (this.actionTargetNodeData) {
-                    params.parent_project_group_id = this.actionTargetNodeData.id;
+        }
+
+        try {
+            const res = await projectTreeHelper.getProjectTreeSearchPath({
+                item_id: groupId,
+                item_type: 'PROJECT_GROUP',
+            });
+            const paths = res.open_path || [];
+
+            if (state.rootNode && paths.length) {
+                const { node } = await state.rootNode.fetchAndFindNode(paths.map((d) => ((data) => data.id === d)));
+                return node;
+            }
+        } catch (e) {
+            ErrorHandler.handleError(e);
+        }
+
+        return null;
+    };
+    const openProjectGroupFormModal = (target: ProjectGroupTreeItem = {}, isUpdateMode?: boolean) => {
+        state.actionTargetItem = target;
+        state.projectGroupFormUpdateMode = !!isUpdateMode;
+        state.projectGroupFormVisible = true;
+    };
+    const openProjectGroupDeleteCheckModal = (target: ProjectGroupTreeItem = {}) => {
+        state.actionTargetItem = target;
+        state.projectGroupDeleteCheckModalVisible = true;
+    };
+    const openProjectFormModal = (target: ProjectGroupTreeItem = {}) => {
+        state.actionTargetItem = target;
+        state.projectFormModalVisible = true;
+    };
+    const reset = () => {
+        state.isInitiated = false;
+        state.searchText = undefined;
+        state.rootNode = null;
+        state.selectedItem = {};
+        state.treeEditMode = false;
+        state.hasProjectGroup = undefined;
+        state.projectCount = undefined;
+        state.actionTargetItem = {};
+        state.projectGroupFormVisible = false;
+        state.projectGroupFormUpdateMode = false;
+        state.projectGroupDeleteCheckModalVisible = false;
+        state.projectFormModalVisible = false;
+        state.shouldUpdateProjectList = false;
+    };
+
+    /* Project Group */
+    const createProjectGroup = async (params: ProjectGroupCreateParameters) => {
+        try {
+            const _params: ProjectGroupCreateParameters = {
+                ...params,
+            };
+            if (getters.actionTargetNodeData) {
+                _params.parent_group_id = getters.actionTargetNodeData.id;
+            }
+            const res: ProjectGroupModel = await SpaceConnector.clientV2.identity.projectGroup.create(_params);
+
+            const newData: ProjectTreeNodeData = {
+                ...params,
+                id: res.project_group_id,
+                item_type: 'PROJECT_GROUP',
+                has_child: false,
+            };
+            if (state.rootNode) {
+                if (getters.actionTargetNodeData) {
+                    const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
+                    // fetch child data to show children nodes
+                    await state.rootNode.fetchData(targetNode);
+                    state.rootNode.unfold(targetNode);
+                    // update target node's has_children to show toggle even after toggle is folded
+                    state.rootNode.updateNodeByPath(getters.actionTargetNodePath, { ...targetNode.data, has_child: true });
+                    // update selected item to prevent the case that selected node is updated by fetchData
+                    const selectedNode = state.rootNode.getNodeByPath(getters.selectedNodePath);
+                    state.rootNode.changeSelectState(selectedNode, getters.selectedNodePath);
+                } else {
+                    state.rootNode.addNode(newData);
                 }
-                const res = await SpaceConnector.client.identity.projectGroup.create(params);
-
-                const newData: ProjectTreeNodeData = {
-                    ...projectGroupInfo,
-                    id: res.project_group_id,
-                    item_type: 'PROJECT_GROUP',
-                    has_child: false,
-                };
-                if (this.rootNode) {
-                    if (this.actionTargetNodeData) {
-                        const targetNode = this.rootNode.getNodeByPath(this.actionTargetNodePath);
-                        // fetch child data to show children nodes
-                        await this.rootNode.fetchData(targetNode);
-                        this.rootNode.unfold(targetNode);
-                        // update target node's has_children to show toggle even after toggle is folded
-                        this.rootNode.updateNodeByPath(this.actionTargetNodePath, { ...targetNode.data, has_child: true });
-                        // update selected item to prevent the case that selected node is updated by fetchData
-                        const selectedNode = this.rootNode.getNodeByPath(this.selectedNodePath);
-                        this.rootNode.changeSelectState(selectedNode, this.selectedNodePath);
-                    } else {
-                        this.rootNode.addNode(newData);
-                    }
-                }
-                this.permissionInfo = { ...this.permissionInfo, [res.project_group_id]: true };
-                this.pushPermissionInfo({ [res.project_group_id]: true });
-                this.hasProjectGroup = true;
-            } catch (e: any) {
-                ErrorHandler.handleError(e);
-                throw new Error(e);
-            } finally {
-                this.actionTargetItem = {};
             }
-        },
-        async updateProjectGroup(
-            projectGroupInfo: Partial<ProjectGroupInfo>,
-        ) {
-            if (!this.rootNode || !this.actionTargetNodeData) return;
+            state.hasProjectGroup = true;
+        } catch (e: any) {
+            ErrorHandler.handleError(e);
+            throw new Error(e);
+        } finally {
+            state.actionTargetItem = {};
+        }
+    };
+    const updateProjectGroup = async (params: Partial<ProjectGroupUpdateParameters>) => {
+        if (!state.rootNode || !getters.actionTargetNodeData) return;
 
-            try {
-                const params = {
-                    project_group_id: this.actionTargetNodeData.id,
-                    ...projectGroupInfo,
-                };
-
-                await SpaceConnector.client.identity.projectGroup.update(params);
-
-                this.rootNode.updateNodeByPath(
-                    this.actionTargetNodePath,
-                    { ...this.actionTargetNodeData, ...projectGroupInfo },
-                );
-            } catch (e: any) {
-                ErrorHandler.handleError(e);
-                throw e;
-            } finally {
-                this.actionTargetItem = {};
-            }
-        },
-        async deleteProjectGroup() {
-            if (!this.rootNode || !this.actionTargetNodeData) {
-                throw new Error('No Target for deletion');
-            }
-
-            await SpaceConnector.client.identity.projectGroup.delete({
-                project_group_id: this.actionTargetNodeData.id,
+        try {
+            await SpaceConnector.clientV2.identity.projectGroup.update<ProjectGroupUpdateParameters>({
+                project_group_id: getters.actionTargetNodeData.id,
+                ...params,
             });
 
-            this.rootNode.deleteNodeByPath(this.actionTargetNodePath);
-            // fetch data to update has child info
-            const targetNode = this.rootNode.getNodeByPath(this.actionTargetNodePath);
-            await this.rootNode.fetchData(targetNode);
+            state.rootNode.updateNodeByPath(
+                getters.actionTargetNodePath,
+                { ...getters.actionTargetNodeData, ...params },
+            );
+        } catch (e: any) {
+            ErrorHandler.handleError(e);
+            throw e;
+        } finally {
+            state.actionTargetItem = {};
+        }
+    };
+    const deleteProjectGroup = async () => {
+        if (!state.rootNode || !getters.actionTargetNodeData) {
+            throw new Error('No Target for deletion');
+        }
 
-            this.actionTargetItem = {};
-        },
-        async getPermissionInfo(ids: string[]): Promise<Record<string, boolean>> {
-            const permissionApiQueryHelper = new ApiQueryHelper();
+        await SpaceConnector.clientV2.identity.projectGroup.delete<ProjectGroupDeleteParameters>({
+            project_group_id: getters.actionTargetNodeData.id,
+        });
+        state.rootNode.deleteNodeByPath(getters.actionTargetNodePath);
+        // fetch data to update has child info
+        // HACK: disable below code because it causes error when getNodeByPath
+        // const targetNode = state.rootNode.getNodeByPath(getters.actionTargetNodePath);
+        // await state.rootNode.fetchData(targetNode);
+        state.actionTargetItem = {};
+    };
 
-            const permissionInfo = {};
+    /* Project */
+    const createProject = async (params: ProjectCreateParameters): Promise<ProjectModel> => {
+        const res = await SpaceConnector.clientV2.identity.project.create<ProjectCreateParameters, ProjectModel>({
+            ...params,
+        });
+        state.shouldUpdateProjectList = true;
 
-            try {
-                permissionApiQueryHelper.setOnly('project_group_id')
-                    .setFilters([{ k: 'project_group_id', v: ids }]);
-
-                const { results } = await SpaceConnector.client.identity.projectGroup.list({
-                    query: permissionApiQueryHelper.data,
-                    author_within: true,
-                });
-
-                results.forEach((d) => {
-                    permissionInfo[d.project_group_id] = true;
-                });
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            }
-            return permissionInfo;
-        },
-        async createProject(
-            projectInfo: ProjectInfo,
-        ):Promise<ProjectModel|undefined> {
-            try {
-                const res = await SpaceConnector.client.identity.project.create({
-                    ...projectInfo,
-                });
-                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '');
-                this.shouldUpdateProjectList = true;
-
-                if (this.treeEditMode) {
-                    const newData: ProjectTreeNodeData = {
-                        name: projectInfo.name,
-                        id: res.project_id,
-                        item_type: 'PROJECT',
-                        has_child: false,
-                    };
-                    if (this.rootNode) {
-                        if (this.selectedNodeData) {
-                            this.rootNode.addChildNodeByPath(this.selectedNodePath, newData);
-                        }
-                    }
-
-                    this.pushPermissionInfo({ [res.project_id]: true });
+        if (state.treeEditMode) {
+            const newData: ProjectTreeNodeData = {
+                name: params.name,
+                id: res.project_id,
+                item_type: 'PROJECT',
+                has_child: false,
+            };
+            if (state.rootNode) {
+                if (getters.selectedNodeData) {
+                    state.rootNode.addChildNodeByPath(getters.selectedNodePath, newData);
                 }
-                return res;
-            } catch (e: any) {
-                ErrorHandler.handleRequestError(e, i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'));
-                throw new Error(e);
             }
-        },
-        async refreshPermissionInfo(ids?: string[]): Promise<void> {
-            let refreshPermissionInfoLoading;
-            if (refreshPermissionInfoLoading) return;
+        }
+        return res;
+    };
+    const updateProject = async (params: ProjectUpdateParameters): Promise<ProjectModel> => {
+        const res = await SpaceConnector.clientV2.identity.project.update<ProjectUpdateParameters, ProjectModel>({
+            ...params,
+        });
+        return res;
+    };
+    const updateProjectType = async (params: ProjectUpdateProjectTypeParameters): Promise<ProjectModel> => {
+        const res = await SpaceConnector.clientV2.identity.project.updateProjectType<ProjectUpdateProjectTypeParameters, ProjectModel>({
+            ...params,
+        });
+        return res;
+    };
 
-            const projectGroupIds = ids || Object.keys(this.permissionInfo);
-            if (!projectGroupIds.length) return;
+    const mutations = {
+        setShouldUpdateProjectList,
+        setProjectFormModalVisible,
+        setProjectGroupDeleteCheckModalVisible,
+        setProjectGroupFormVisible,
+        setTreeEditMode,
+        setIsInitiated,
+        setSelectedItem,
+        setProjectCount,
+        setRootNode,
+    };
+    const actions = {
+        reset,
+        selectNode,
+        openProjectGroupFormModal,
+        openProjectGroupDeleteCheckModal,
+        createProjectGroup,
+        updateProjectGroup,
+        deleteProjectGroup,
+        createProject,
+        updateProject,
+        updateProjectType,
+        openProjectFormModal,
+    };
 
-            refreshPermissionInfoLoading = true;
-
-            try {
-                const permissionInfo = await this.getPermissionInfo(projectGroupIds);
-
-                if (ids) this.pushPermissionInfo(permissionInfo);
-                else this.permissionInfo = permissionInfo;
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                refreshPermissionInfoLoading = false;
-            }
-        },
-        async addPermissionInfo(ids: string[]): Promise<void> {
-            let addPermissionInfoLoading;
-            if (addPermissionInfoLoading) return;
-
-            const projectGroupIds = ids.filter((id) => this.permissionInfo[id] === undefined);
-            if (!projectGroupIds.length) return;
-
-            addPermissionInfoLoading = true;
-
-            try {
-                const permissionInfo = await this.getPermissionInfo(projectGroupIds);
-                this.pushPermissionInfo(permissionInfo);
-            } catch (e) {
-                ErrorHandler.handleError(e);
-            } finally {
-                addPermissionInfoLoading = false;
-            }
-        },
-        openProjectCreateForm(projectGroup: ProjectGroupTreeItem = {}) {
-            this.actionTargetItem = projectGroup;
-            this.projectFormVisible = true;
-        },
-    },
+    return {
+        state,
+        getters,
+        ...mutations,
+        ...actions,
+    };
 });

@@ -24,11 +24,11 @@ import { GROUP_BY } from '@/services/cost-explorer/constants/cost-explorer-const
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const GROUP_BY_TO_VAR_MODELS: Record<string, VariableModel[]> = {
     [GROUP_BY.PROJECT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project.key })],
-    [GROUP_BY.PROJECT_GROUP]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key })],
     [GROUP_BY.PRODUCT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.cost_product.key })],
     [GROUP_BY.PROVIDER]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key })],
     [GROUP_BY.SERVICE_ACCOUNT]: [new VariableModel({ type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key })],
@@ -48,13 +48,13 @@ const state = reactive({
     enabledFilters: computed<SelectDropdownMenuItem[]>(() => {
         if (!costAnalysisPageState.enabledFiltersProperties) return [];
         return costAnalysisPageState.enabledFiltersProperties.map((d) => {
-            const targetItem = costAnalysisPageStore.defaultGroupByItems.find((item) => item.name === d);
+            const targetItem = costAnalysisPageGetters.defaultGroupByItems.find((item) => item.name === d);
             if (targetItem) return targetItem;
             return { name: d, label: d };
         });
     }),
     listQueryOptions: computed<Partial<Record<ManagedVariableModelKey, any>>>(() => ({
-        cost_data_source: costAnalysisPageStore.selectedDataSourceId,
+        cost_data_source: costAnalysisPageGetters.selectedDataSourceId,
     })),
     selectedItemsMap: getInitialSelectedItemsMap() as Record<string, SelectDropdownMenuItem[]>,
     handlerMap: computed(() => {
@@ -105,39 +105,32 @@ const handleUpdateFiltersDropdown = (groupBy: string, selectedItems: SelectDropd
     selectedItemsMap[groupBy] = selectedItems;
     state.selectedItemsMap = selectedItemsMap;
 
-    costAnalysisPageStore.$patch((_state) => {
-        _state.filters = {
-            ..._state.filters,
-            [groupBy]: selectedItems.map((d) => d.name as string),
-        };
+    costAnalysisPageStore.setFilters({
+        ...costAnalysisPageState.filters,
+        [groupBy]: selectedItems.map((d) => d.name as string),
     });
 };
 const handleDisabledFilters = (all?: boolean, disabledFilter?: string) => {
     if (all) {
         state.selectedItemsMap = getInitialSelectedItemsMap();
-        costAnalysisPageStore.$patch((_state) => {
-            _state.filters = {};
-        });
+        costAnalysisPageStore.setFilters({});
     } else if (disabledFilter) {
-        costAnalysisPageStore.$patch((_state) => {
-            delete _state.filters?.[disabledFilter];
-            _state.filters = { ..._state.filters };
-        });
+        const _filters = cloneDeep(costAnalysisPageState.filters);
+        delete _filters?.[disabledFilter];
+        costAnalysisPageStore.setFilters(_filters);
     }
 };
 const handleClickResetFilters = () => {
     state.selectedItemsMap = getInitialSelectedItemsMap();
 
-    const _originConsoleFilters: ConsoleFilter[]|undefined = costAnalysisPageStore.selectedQuerySet?.options?.filters;
+    const _originConsoleFilters: ConsoleFilter[]|undefined = costAnalysisPageGetters.selectedQuerySet?.options?.filters;
     const _originFilters: Record<string, string[]> = {};
     if (_originConsoleFilters?.length) {
         _originConsoleFilters.forEach((d) => {
             _originFilters[d.k as string] = d.v as string[];
         });
     }
-    costAnalysisPageStore.$patch((_state) => {
-        _state.filters = _originFilters;
-    });
+    costAnalysisPageStore.setFilters(_originFilters);
 };
 
 watch(() => props.visible, (visible) => {

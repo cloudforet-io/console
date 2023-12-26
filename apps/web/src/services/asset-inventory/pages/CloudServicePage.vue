@@ -15,6 +15,7 @@
                                :period="cloudServicePageState.period"
                                :page-size="pageLimit"
                                @update-pagination="handlePaginationUpdate"
+                               @refresh="handleRefresh"
         />
 
         <p-data-loader class="flex-grow"
@@ -74,6 +75,7 @@ import {
 import {
     PDataLoader, PDivider, PButton, PHeading, PEmpty,
 } from '@spaceone/design-system';
+import type { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/types/inputs/search/query-search/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 import { isEmpty } from 'lodash';
 
@@ -81,18 +83,19 @@ import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@cloudforet/core-lib/component-util/query-search';
-import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import { SpaceRouter } from '@/router';
+import type { CloudServiceAnalyzeParameters } from '@/schema/inventory/cloud-service/api-verbs/analyze';
 import { store } from '@/store';
 
-import type { ProjectGroupReferenceMap } from '@/store/modules/reference/project-group/type';
 import type { ProviderReferenceMap } from '@/store/modules/reference/provider/type';
 import type { ServiceAccountReferenceMap } from '@/store/modules/reference/service-account/type';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { ProjectGroupReferenceMap } from '@/store/reference/project-group-reference-store';
 
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
@@ -141,12 +144,13 @@ export default {
         PEmpty,
     },
     setup() {
+        const allReferenceStore = useAllReferenceStore();
         const cloudServicePageStore = useCloudServicePageStore();
         const cloudServicePageState = cloudServicePageStore.$state;
 
         const storeState = reactive({
-            projects: computed(() => store.getters['reference/projectItems']),
-            projectGroups: computed<ProjectGroupReferenceMap>(() => store.getters['reference/projectGroupItems']),
+            projects: computed(() => allReferenceStore.getters.project),
+            projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             serviceAccounts: computed<ServiceAccountReferenceMap>(() => store.getters['reference/serviceAccountItems']),
             providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
         });
@@ -200,7 +204,7 @@ export default {
         });
 
         /* api */
-        const fetcher = getCancellableFetcher<Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
+        const fetcher = getCancellableFetcher<CloudServiceAnalyzeParameters, Response>(SpaceConnector.clientV2.inventory.cloudService.analyze);
 
         const listCloudServiceType = async () => {
             try {
@@ -238,6 +242,10 @@ export default {
             listCloudServiceType();
         };
 
+        const handleRefresh = () => {
+            listCloudServiceType();
+        };
+
         /* Init */
         let urlQueryStringWatcherStop;
         const init = async () => {
@@ -263,8 +271,6 @@ export default {
 
             // LOAD REFERENCE STORE
             await Promise.allSettled([
-                store.dispatch('reference/project/load'),
-                store.dispatch('reference/projectGroup/load'),
                 store.dispatch('reference/serviceAccount/load'),
             ]);
 
@@ -294,6 +300,7 @@ export default {
             cloudServicePageState,
             assetUrlConverter,
             handlePaginationUpdate,
+            handleRefresh,
             ASSET_INVENTORY_ROUTE,
             BACKGROUND_COLOR,
         };

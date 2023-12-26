@@ -2,6 +2,7 @@
 import {
     computed, reactive, watch,
 } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import {
     PButtonModal, PSelectCard,
@@ -9,6 +10,9 @@ import {
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ProjectAlertConfigUpdateParameters } from '@/schema/monitoring/project-alert-config/api-verbs/update';
+import type { ProjectAlertConfigModel } from '@/schema/monitoring/project-alert-config/model';
+import type { ProjectAlertConfigRecoveryMode } from '@/schema/monitoring/project-alert-config/type';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -16,17 +20,15 @@ import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
-
-const RECOVERY_MODE = Object.freeze({
-    MANUAL: 'MANUAL',
-    AUTO: 'AUTO',
-});
-type RecoveryMode = typeof RECOVERY_MODE[keyof typeof RECOVERY_MODE];
+interface SelectOptions {
+    name: ProjectAlertConfigRecoveryMode;
+    label: TranslateResult;
+}
 
 interface Props {
     projectId?: string;
     visible?: boolean;
-    selectedOption?: RecoveryMode;
+    selectedOption?: ProjectAlertConfigRecoveryMode;
 }
 const props = withDefaults(defineProps<Props>(), {
     projectId: undefined,
@@ -39,22 +41,23 @@ const emit = defineEmits<{(e: 'confirm'): void;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    selectOptions: computed(() => ([
+    selectOptions: computed<SelectOptions[]>(() => ([
         {
-            name: RECOVERY_MODE.AUTO,
+            name: 'AUTO',
             label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_YES'),
         },
         {
-            name: RECOVERY_MODE.MANUAL,
+            name: 'MANUAL',
             label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_NO'),
         },
     ])),
-    recoveryMode: undefined as RecoveryMode | undefined,
+    recoveryMode: undefined as ProjectAlertConfigRecoveryMode | undefined,
 });
 
 const onClickConfirm = async () => {
     try {
-        await SpaceConnector.client.monitoring.projectAlertConfig.update({
+        if (!state.recoveryMode) throw new Error('recoveryMode is undefined');
+        await SpaceConnector.clientV2.monitoring.projectAlertConfig.update<ProjectAlertConfigUpdateParameters, ProjectAlertConfigModel>({
             project_id: props.projectId,
             options: {
                 recovery_mode: state.recoveryMode,

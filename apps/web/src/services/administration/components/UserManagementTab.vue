@@ -1,51 +1,105 @@
+<script lang="ts" setup>
+import {
+    computed, reactive, watch,
+} from 'vue';
+
+import {
+    PEmpty, PStatus, PTab, PDataTable, PBadge,
+} from '@spaceone/design-system';
+import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
+
+import { i18n } from '@/translations';
+
+import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
+import UserManagementTabProjects from '@/services/administration/components/UserManagementTabProjects.vue';
+import UserManagementTabTag from '@/services/administration/components/UserManagementTabTag.vue';
+import UserManagementTabWorkspace from '@/services/administration/components/UserManagementTabWorkspace.vue';
+import {
+    calculateTime,
+    useRoleFormatter,
+    userStateFormatter,
+} from '@/services/administration/composables/refined-table-data';
+import { USER_TAB_TABLE_FIELDS, USER_TABS } from '@/services/administration/constants/user-constant';
+import { useUserPageStore } from '@/services/administration/store/user-page-store';
+
+const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
+
+const singleItemTabState = reactive({
+    userTabs: computed<TabItem[]>(() => ([
+        { label: i18n.t('IAM.USER.MAIN.DETAILS'), name: USER_TABS.DETAIL },
+        { label: i18n.t('IAM.USER.MAIN.PROJECTS'), name: USER_TABS.PROJECTS },
+        { label: i18n.t('IAM.USER.MAIN.TAG'), name: USER_TABS.TAG },
+    ])),
+    adminTabs: computed<TabItem[]>(() => ([
+        { label: i18n.t('IAM.USER.MAIN.DETAILS'), name: USER_TABS.DETAIL },
+        { label: i18n.t('IAM.USER.MAIN.WORKSPACE'), name: USER_TABS.WORKSPACE },
+        { label: i18n.t('IAM.USER.MAIN.TAG'), name: USER_TABS.TAG },
+    ])),
+    activeTab: USER_TABS.DETAIL,
+    selectedIndex: computed(() => userPageState.selectedIndices[0]),
+    selectedUserId: computed(() => userPageState.users[singleItemTabState.selectedIndex].user_id),
+});
+const multiItemTabState = reactive({
+    tabs: computed<TabItem[]>(() => ([
+        { label: i18n.t('IAM.USER.MAIN.TAB_SELECTED_DATA'), name: USER_TABS.DATA },
+    ])),
+    activeTab: USER_TABS.DATA,
+    refinedUserItems: computed(() => userPageStore.selectedUsers.map((user) => ({
+        ...user,
+        last_accessed_at: calculateTime(user?.last_accessed_at, userPageStore.timezone),
+    }))),
+});
+
+/* API */
+const initUserData = async (user_id?: string) => {
+    if (!user_id) return;
+    if (userPageState.isAdminMode) {
+        await userPageStore.getUser({
+            user_id: user_id || '',
+        });
+    } else {
+        await userPageStore.getWorkspaceUser({
+            user_id: user_id || '',
+        });
+    }
+};
+
+/* Watcher */
+watch(() => userPageState.selectedIndices[0], (index) => {
+    const user_id = userPageState.users[index]?.user_id;
+    initUserData(user_id);
+});
+</script>
+
 <template>
     <section>
         <p-tab v-if="userPageState.selectedIndices.length === 1"
-               :tabs="singleItemTabState.tabs"
+               :tabs="userPageState.isAdminMode ? singleItemTabState.adminTabs : singleItemTabState.userTabs"
                :active-tab.sync="singleItemTabState.activeTab"
         >
             <template #detail>
-                <user-management-tab-detail ref="userDetail"
-                                            :user-id="userPageStore.selectedUsers[0].user_id"
-                                            :timezone="timezone"
-                />
+                <user-management-tab-detail @refresh="initUserData" />
+            </template>
+            <template #workspace>
+                <user-management-tab-workspace :active-tab="singleItemTabState.activeTab" />
+            </template>
+            <template #projects>
+                <user-management-tab-projects :active-tab="singleItemTabState.activeTab" />
             </template>
             <template #tag>
-                <p-tags-panel :resource-id="userPageStore.selectedUsers[0].user_id"
-                              resource-type="identity.User"
-                              resource-key="user_id"
-                              :disabled="manageDisabled"
-                />
+                <user-management-tab-tag :active-tab="singleItemTabState.activeTab" />
             </template>
-            <template #assigned_role>
-                <user-management-tab-assigned-role
-                    :user-id="userPageStore.selectedUsers[0].user_id"
-                />
-            </template>
-            <template #api_key>
-                <section>
-                    <p-heading heading-type="sub"
-                               :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                    />
-                    <user-a-p-i-key-table class="api-key-table"
-                                          :user-id="userPageStore.selectedUsers[0].user_id"
-                                          :disabled="manageDisabled"
-                    />
-                </section>
-            </template>
-            <!--            <template #notifications>-->
-            <!--                <user-notifications :user-id="selectedUsers[0].user_id" />-->
-            <!--            </template>-->
         </p-tab>
         <p-tab v-else-if="userPageState.selectedIndices.length > 1"
                :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table :fields="fields"
+                <p-data-table :fields="USER_TAB_TABLE_FIELDS"
                               :sortable="false"
                               :selectable="false"
-                              :items="userPageStore.selectedUsers"
+                              :items="multiItemTabState.refinedUserItems"
                               :col-copy="true"
                               class="selected-data-tab"
                 >
@@ -59,14 +113,39 @@
                             No Activity
                         </span>
                         <span v-else-if="value === 0">
-                            {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                            {{ $t('IAM.USER.MAIN.TODAY') }}
                         </span>
                         <span v-else-if="value === 1">
-                            {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                            {{ $t('IAM.USER.MAIN.YESTERDAY') }}
                         </span>
                         <span v-else>
-                            {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                            {{ value }} {{ $t('IAM.USER.MAIN.DAYS') }}
                         </span>
+                    </template>
+                    <template #col-role_type-format="{value}">
+                        <div class="role-type-wrapper">
+                            <img :src="useRoleFormatter(value).image"
+                                 alt="role-type-icon"
+                                 class="role-type-icon"
+                            >
+                            <span>{{ useRoleFormatter(value).name }}</span>
+                        </div>
+                    </template>
+                    <template #col-tags-format="{value}">
+                        <template v-if="!!Object.keys(value).length">
+                            <p-badge v-for="([key, val], idx) in Object.entries(value)"
+                                     :key="`${key}-${val}-${idx}`"
+                                     badge-type="subtle"
+                                     shape="square"
+                                     style-type="gray200"
+                                     class="mr-2"
+                            >
+                                {{ key }}: {{ val }}
+                            </p-badge>
+                        </template>
+                        <template v-else>
+                            <span />
+                        </template>
                     </template>
                 </p-data-table>
             </template>
@@ -74,102 +153,10 @@
         <div v-else
              id="empty-space"
         >
-            <p-empty>{{ $t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
+            <p-empty>{{ $t('IAM.USER.MAIN.NO_SELECTED') }}</p-empty>
         </div>
     </section>
 </template>
-
-<script lang="ts">
-import {
-    computed, reactive, toRefs,
-} from 'vue';
-
-import {
-    PEmpty, PStatus, PTab, PDataTable, PHeading,
-} from '@spaceone/design-system';
-import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-
-import { store } from '@/store';
-import { i18n } from '@/translations';
-
-import PTagsPanel from '@/common/modules/tags/tags-panel/TagsPanel.vue';
-
-import UserManagementTabAssignedRole from '@/services/administration/components/UserManagementTabAssignedRole.vue';
-import UserManagementTabDetail from '@/services/administration/components/UserManagementTabDetail.vue';
-import { userStateFormatter } from '@/services/administration/helpers/user-management-tab-helper';
-import { useUserPageStore } from '@/services/administration/store/user-page-store';
-import UserAPIKeyTable from '@/services/my-page/components/UserAPIKeyTable.vue';
-
-export default {
-    name: 'UserManagementTab',
-    components: {
-        PEmpty,
-        PStatus,
-        UserManagementTabDetail,
-        UserManagementTabAssignedRole,
-        UserAPIKeyTable,
-        // UserNotifications,
-        PTab,
-        PTagsPanel,
-        PDataTable,
-        PHeading,
-    },
-    props: {
-        manageDisabled: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup() {
-        const userPageStore = useUserPageStore();
-        const userPageState = userPageStore.$state;
-
-        const state = reactive({
-            loading: true,
-            timezone: computed(() => store.state.user.timezone || 'UTC'),
-            fields: computed(() => ([
-                { name: 'user_id', label: 'User ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'state', label: 'State' },
-                { name: 'user_type', label: 'Access Control' },
-                { name: 'api_key_count', label: 'API Key' },
-                { name: 'role_name', label: 'Role' },
-                { name: 'backend', label: 'Auth Type' },
-                { name: 'last_accessed_at', label: 'Last Activity' },
-                { name: 'timezone', label: 'Timezone' },
-            ])),
-        });
-
-        const singleItemTabState = reactive({
-            tabs: computed(() => ([
-                { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
-                { label: i18n.t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
-                { label: i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
-                { label: i18n.t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
-                // { label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'detail',
-        });
-
-        const multiItemTabState = reactive({
-            tabs: computed(() => ([
-                { name: 'data', label: i18n.t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'data',
-        });
-
-        return {
-            ...toRefs(state),
-            userPageStore,
-            userPageState,
-            userStateFormatter,
-            singleItemTabState,
-            multiItemTabState,
-        };
-    },
-
-};
-</script>
 
 <style lang="postcss" scoped>
 #empty-space {
@@ -180,13 +167,14 @@ export default {
 }
 .selected-data-tab {
     @apply mt-8;
-}
-
-/* custom user-a-p-i-key-table */
-:deep(.api-key-table) {
-    /* custom design-system component - p-pane-layout */
-    .main-table-wrapper {
-        border: 0;
+    .role-type-wrapper {
+        @apply flex items-center;
+        gap: 0.25rem;
+        .role-type-icon {
+            @apply rounded-full;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
     }
 }
 </style>

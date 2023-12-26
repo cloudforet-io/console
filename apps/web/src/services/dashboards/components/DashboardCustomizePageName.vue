@@ -1,28 +1,4 @@
-<template>
-    <p-heading show-back-button
-               @click-back-button="handleClickBackButton"
-    >
-        <p-skeleton v-if="state.loading"
-                    width="20rem"
-                    height="1.5rem"
-        />
-        <p-field-group v-else
-                       :invalid="invalidState.nameInput"
-                       :invalid-text="invalidTexts.nameInput"
-        >
-            <template #default="{invalid}">
-                <p-text-input :value="nameInput"
-                              :invalid="invalid"
-                              :placeholder="state.placeHolder"
-                              :is-focused.sync="isTextInputFocused"
-                              @update:value="handleInput"
-                />
-            </template>
-        </p-field-group>
-    </p-heading>
-</template>
 <script setup lang="ts">
-// Below directive is used. Do not remove!!!
 import {
     computed, onMounted, reactive, ref, watch,
 } from 'vue';
@@ -31,12 +7,14 @@ import {
     PFieldGroup, PHeading, PSkeleton, PTextInput,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 import { useFormValidator } from '@/common/composables/form-validator';
 
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
 
 const props = defineProps<{
     name: string;
@@ -45,8 +23,9 @@ const props = defineProps<{
 const emit = defineEmits<{(e: 'update:name', value?: string): void,
     (e: 'click-back-button'): void}>();
 
+const dashboardStore = useDashboardStore();
 const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
+const dashboardDetailState = dashboardDetailStore.state;
 
 const state = reactive({
     loading: computed<boolean>(() => {
@@ -54,7 +33,7 @@ const state = reactive({
         return !dashboardDetailState.name;
     }),
     placeHolder: dashboardDetailState.placeholder,
-    dashboardNameList: computed<string[]>(() => store.getters['dashboard/getDashboardNameList'](dashboardDetailState.projectId, dashboardDetailState.name)),
+    dashboardNameList: computed<string[]>(() => dashboardStore.getDashboardNameList(dashboardDetailState.dashboardType)),
 });
 const {
     forms: {
@@ -67,6 +46,7 @@ const {
     nameInput: props.dashboardId ? props.name : '',
 }, {
     nameInput(value: string) {
+        if (value === props.name) return '';
         if (value.length > 100) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_LENGTH');
         if (!value.trim().length) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_INPUT');
         if (state.dashboardNameList.find((d) => d === value)) return i18n.t('DASHBOARDS.FORM.VALIDATION_DASHBOARD_NAME_UNIQUE');
@@ -95,18 +75,38 @@ watch(() => props.name, (d) => {
 }, { immediate: true });
 
 watch(() => invalidState.nameInput, (invalid) => {
-    dashboardDetailStore.$patch({ isNameValid: !invalid });
+    dashboardDetailStore.setIsNameValid(!invalid);
 });
 
 onMounted(() => {
-    if (nameInput.value?.length) dashboardDetailStore.$patch({ isNameValid: true });
-    else dashboardDetailStore.$patch({ isNameValid: false });
+    if (nameInput.value?.length) dashboardDetailStore.setIsNameValid(true);
+    else dashboardDetailStore.setIsNameValid(false);
 });
-
-(async () => {
-    await store.dispatch('dashboard/loadProjectDashboard');
-})();
 </script>
+
+<template>
+    <p-heading show-back-button
+               @click-back-button="handleClickBackButton"
+    >
+        <p-skeleton v-if="state.loading"
+                    width="20rem"
+                    height="1.5rem"
+        />
+        <p-field-group v-else
+                       :invalid="invalidState.nameInput"
+                       :invalid-text="invalidTexts.nameInput"
+        >
+            <template #default="{invalid}">
+                <p-text-input :value="nameInput"
+                              :invalid="invalid"
+                              :placeholder="state.placeHolder"
+                              :is-focused.sync="isTextInputFocused"
+                              @update:value="handleInput"
+                />
+            </template>
+        </p-field-group>
+    </p-heading>
+</template>
 
 <style scoped lang="postcss">
 .title-area {

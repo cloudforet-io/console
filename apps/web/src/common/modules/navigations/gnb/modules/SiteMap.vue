@@ -5,7 +5,7 @@
          @click.stop
     >
         <div class="sitemap-button"
-             :class="visible ? 'visible' : ''"
+             :class="{'visible' : visible, 'is-admin': isAdminMode}"
              role="button"
              tabindex="0"
              @click="handleSiteMapButtonClick"
@@ -15,8 +15,8 @@
             <p-i class="sitemap-icon"
                  :name="visible ? 'ic_close' : 'ic_gnb_menu'"
                  color="inherit"
-                 width="2rem"
-                 height="2rem"
+                 width="2.5rem"
+                 height="2.5rem"
             />
         </div>
         <ul v-if="visible"
@@ -101,6 +101,10 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     props: {
+        isAdminMode: {
+            type: Boolean,
+            default: false,
+        },
         disabled: {
             type: Boolean,
             default: false,
@@ -144,13 +148,16 @@ export default {
 
 <style lang="postcss" scoped>
 .sitemap-container {
-    @apply relative;
+    @apply relative inline-flex items-center;
 
     .sitemap-button {
         @apply text-gray-900;
         position: relative;
         cursor: pointer;
         text-decoration: none;
+        &.is-admin {
+            @apply text-white;
+        }
         &:hover, &.visible {
             @apply text-violet-600;
             .sitemap-icon {
@@ -194,7 +201,7 @@ export default {
                 display: block;
                 line-height: 2rem;
                 padding-left: 1.5rem;
-                margin-top: 1.5rem;
+                margin-top: 1rem;
                 .p-i-icon {
                     @apply text-primary-dark;
                     margin-right: 0.25rem;

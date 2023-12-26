@@ -75,7 +75,7 @@ const getColor = (rowIdx: number, colIdx: number): string => {
 
 /* Api */
 const apiQueryHelper = new ApiQueryHelper();
-const fetchBudgetUsageAnalyze = getCancellableFetcher<Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
+const fetchBudgetUsageAnalyze = getCancellableFetcher<object, Response>(SpaceConnector.clientV2.costAnalysis.budgetUsage.analyze);
 const fetchData = async (): Promise<Response|undefined> => {
     try {
         apiQueryHelper.setFilters(widgetState.consoleFilters);

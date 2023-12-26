@@ -1,7 +1,3 @@
-import type { RefreshIntervalOption } from '@/schema/dashboard/_types/dashboard-type';
-import type { DomainDashboardModel } from '@/schema/dashboard/domain-dashboard/model';
-import type { ProjectDashboardModel } from '@/schema/dashboard/project-dashboard/model';
-
 import type { ManagedVariableModelConfig } from '@/lib/variable-models';
 import type { EnumVariableModelConfig, ResourceValueVariableModelConfig } from '@/lib/variable-models/_base/types';
 
@@ -41,17 +37,7 @@ interface MultiSelectDashboardVariables {
     [key: string]: string[];
 }
 
-// dashboard settings types
-export interface DashboardSettings {
-    date_range: {
-        enabled: boolean;
-    } & DateRange;
-    refresh_interval_option: RefreshIntervalOption;
-}
 export interface DateRange {
     start?: string;
     end?: string;
 }
-
-// dashboard model types
-export type DashboardModel = DomainDashboardModel | ProjectDashboardModel;

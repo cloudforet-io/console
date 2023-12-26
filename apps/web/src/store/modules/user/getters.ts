@@ -1,92 +1,46 @@
 import type { Getter } from 'vuex';
 
-import type { RoleType } from '@/schema/identity/role/type';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 
 import { languages } from '@/store/modules/user/config';
 
-import type { PagePermissionTuple, PagePermissionType } from '@/lib/access-control/config';
-import { PAGE_PERMISSION_TYPE } from '@/lib/access-control/config';
 import {
-    getDefaultPagePermissionList,
-    getPagePermissionMapFromRaw, getProperPermissionType,
-} from '@/lib/access-control/page-permission-helper';
+    getDefaultPageAccessPermissionList,
+    getPageAccessPermissionMapFromRawData,
+} from '@/lib/access-control/page-access-helper';
+import type { MenuId } from '@/lib/menu/config';
 
+import type { RoleInfo, UserState } from './type';
 
-import type { UserState } from './type';
-
-
-export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
+// TODO: temporary defence
+export const isDomainAdmin = (state: UserState): boolean => state.roleType === ROLE_TYPE.DOMAIN_ADMIN;
+export const isSystemAdmin = (state: UserState): boolean => state.roleType === ROLE_TYPE.SYSTEM_ADMIN;
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
-export const roleNames = (state: UserState): Array<string> => {
-    const systemRoleNames: Array<string> = [];
-    const domainRoleNames: Array<string> = [];
-    const projectRoleNames: Array<string> = [];
 
-    if (state.roles) {
-        state.roles.forEach((role) => {
-            if (role.roleType === 'SYSTEM') {
-                systemRoleNames.push(role.name);
-            } else if (role.roleType === 'DOMAIN') {
-                domainRoleNames.push(role.name);
-            } else {
-                projectRoleNames.push(role.name); // 'PROJECT'
-            }
-        });
-    }
+export const isNoRoleUser = (state: UserState): boolean => !state.currentRoleInfo;
 
-    if (systemRoleNames.length > 0) {
-        return systemRoleNames;
-    }
-    if (domainRoleNames.length > 0) {
-        return domainRoleNames;
-    }
-    if (projectRoleNames.length > 0) {
-        return projectRoleNames;
-    }
-    return ['No Role'];
-};
-export const isNoRoleUser = (state: UserState): boolean => !state.roles?.length;
+export const hasSystemRole = (state: UserState): boolean => state.roleType === 'SYSTEM_ADMIN';
 
-export const hasDomainRole = (state: UserState): boolean => {
-    if (state.roles) {
-        return state.roles.some((role) => role.roleType === 'DOMAIN');
-    }
+export const hasPermission = (state: UserState): boolean => !!state.currentRoleInfo;
 
-    return false;
-};
+export const getCurrentRoleInfo: Getter<UserState, any> = (state: UserState): RoleInfo|undefined => state.currentRoleInfo;
 
-export const hasSystemRole = (state: UserState): boolean => {
-    if (state.roles) {
-        return state.roles.some((role) => role.roleType === 'SYSTEM');
-    }
-
-    return false;
-};
-
-export const hasPermission = (state: UserState): boolean => !!state.roles?.length;
-
-export const pagePermissionList: Getter<UserState, any> = (state, getters): PagePermissionTuple[] => {
-    if (getters.isDomainOwner) {
-        return getDefaultPagePermissionList(true);
-    }
-    const roleBasePagePermissions = state.roles?.flatMap((role) => role.pagePermissions) ?? [];
-    const pagePermissionMap = getPagePermissionMapFromRaw(roleBasePagePermissions);
-    // merge role based page permissions and default page permissions
-    let roleType: RoleType|undefined;
-    if (getters.hasSystemRole) roleType = 'SYSTEM';
-    else if (getters.hasDomainRole) roleType = 'DOMAIN';
-    else if (getters.hasPermission) roleType = 'PROJECT';
-    getDefaultPagePermissionList(false, roleType).forEach(([page, permission]) => {
-        pagePermissionMap[page] = getProperPermissionType(permission, pagePermissionMap[page]);
+export const pageAccessPermissionList: Getter<UserState, any> = (state, getters): MenuId[] => {
+    const roleBasePagePermissions = getters.getCurrentRoleInfo?.pageAccess ?? [];
+    const roleType = getters.getCurrentRoleInfo?.roleType ?? 'USER';
+    const pagePermissionMap = getPageAccessPermissionMapFromRawData(roleBasePagePermissions);
+    const defaultPagePermissionList = getDefaultPageAccessPermissionList(roleType);
+    Object.keys(pagePermissionMap).forEach((menuId) => {
+        if (!defaultPagePermissionList.includes(menuId as MenuId)) pagePermissionMap[menuId] = false;
     });
-    return Object.entries(pagePermissionMap);
+
+    return Object.entries(pagePermissionMap).filter(([, accessible]) => accessible).map(([page]) => page as MenuId);
 };
 
-export const pagePermissionMap: Getter<UserState, any> = (state, getters): Record<string, PagePermissionType> => {
-    const result: Record<string, PagePermissionType> = {};
-    getters.pagePermissionList.forEach(([page, permission]) => {
-        if (!result[page]) result[page] = permission;
-        else if (permission === PAGE_PERMISSION_TYPE.MANAGE) result[page] = PAGE_PERMISSION_TYPE.MANAGE;
+export const pageAccessPermissionMap: Getter<UserState, any> = (state, getters): Record<string, boolean> => {
+    const result: Record<string, boolean> = {};
+    getters.pageAccessPermissionList.forEach((MenuId) => {
+        if (!result[MenuId]) result[MenuId] = true;
     });
     return result;
 };

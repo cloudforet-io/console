@@ -1,56 +1,51 @@
-<script lang="ts" setup>
-import {
-    computed, reactive, watch,
-} from 'vue';
+<script setup lang="ts">
+import { computed, reactive } from 'vue';
+import type { TranslateResult } from 'vue-i18n';
 
 import { PLink } from '@spaceone/design-system';
-import { ACTION_ICON } from '@spaceone/design-system/src/inputs/link/type';
 
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import { isNotEmpty } from '@cloudforet/utils';
+
+import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
+import type { EventRuleActions, EventRuleOptions } from '@/schema/monitoring/event-rule/type';
+import { i18n as _i18n } from '@/translations';
+
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-
 interface Props {
-    data?: any; // TODO: define type
+    data?: EventRuleModel;
 }
 const props = withDefaults(defineProps<Props>(), {
-    data: () => ({}),
+    data: undefined,
 });
 
+const allReferenceStore = useAllReferenceStore();
+
+interface Field {
+    name: keyof EventRuleOptions | keyof EventRuleActions;
+    label: TranslateResult;
+}
 const state = reactive({
-    fields: computed(() => ([
-        { name: 'no_notification', label: i18n.t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') },
-        { name: 'change_project', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_ROUTING') },
-        { name: 'add_project_dependency', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCY') },
-        { name: 'change_urgency', label: i18n.t('PROJECT.EVENT_RULE.URGENCY') },
-        { name: 'change_assignee', label: i18n.t('PROJECT.EVENT_RULE.ASSIGNEE') },
-        { name: 'add_responder', label: i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') },
-        { name: 'add_additional_info', label: i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') },
-        { name: 'stop_processing', label: i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
+    fields: computed<Field[]>(() => ([
+        { name: 'no_notification', label: _i18n.t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') },
+        { name: 'change_project', label: _i18n.t('PROJECT.EVENT_RULE.PROJECT_ROUTING') },
+        { name: 'change_urgency', label: _i18n.t('PROJECT.EVENT_RULE.URGENCY') },
+        { name: 'change_assignee', label: _i18n.t('PROJECT.EVENT_RULE.ASSIGNEE') },
+        { name: 'add_additional_info', label: _i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') },
+        { name: 'stop_processing', label: _i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
     ])),
-    items: [] as any,
-    projects: computed(() => store.getters['reference/projectItems']),
+    items: computed<EventRuleOptions & EventRuleActions>(() => {
+        if (!props.data) return {};
+        return { ...props.data.actions, ...props.data.options };
+    }),
+    projects: computed(() => allReferenceStore.getters.project),
     conditions: computed(() => ({
-        ANY: i18n.t('PROJECT.EVENT_RULE.ANY'),
-        ALL: i18n.t('PROJECT.EVENT_RULE.ALL'),
+        ANY: _i18n.t('PROJECT.EVENT_RULE.ANY'),
+        ALL: _i18n.t('PROJECT.EVENT_RULE.ALL'),
     })),
 });
-
-const getData = () => {
-    state.items = { ...props.data.change_project, ...props.data.actions, ...props.data.options };
-};
-
-watch(() => props.data, () => {
-    getData();
-}, { immediate: false });
-
-(async () => {
-    getData();
-    // LOAD REFERENCE STORE
-    await store.dispatch('reference/project/load');
-})();
 </script>
 
 <template>
@@ -78,64 +73,38 @@ watch(() => props.data, () => {
             </h4>
             <table>
                 <tbody>
-                    <template v-for="(item, index) in state.fields">
-                        <tr v-if="state.items[item.name].length ||
-                                item.name === 'stop_processing' && !!state.items[item.name] ||
-                                item.name === 'add_additional_info' && Object.values(state.items[item.name]).length ||
-                                item.name === 'no_notification' && state.items[item.name]"
-                            :key="`${item}-${index}`"
+                    <template v-for="(field, index) in state.fields">
+                        <tr v-if="isNotEmpty(state.items[field.name])"
+                            :key="`${field}-${index}`"
                         >
-                            <td>{{ item.label }}</td>
-                            <td v-if="item.name === 'no_notification'">
+                            <td>{{ field.label }}</td>
+                            <td v-if="field.name === 'no_notification'">
                                 <span class="text-secondary">{{ $t('PROJECT.EVENT_RULE.ON') }}</span>
                             </td>
-                            <td v-else-if="item.name === 'change_project'">
-                                <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
+                            <td v-else-if="field.name === 'change_project'">
+                                <p-link action-icon="internal-link"
                                         new-tab
                                         :to="referenceRouter(
-                                            state.items[item.name],
+                                            state.items[field.name] ?? '',
                                             { resource_type: 'identity.Project' })"
                                 >
-                                    {{ state.projects[state.items[item.name]] ? state.projects[state.items[item.name]].label : state.items[item.name] }}
+                                    {{ state.projects[state.items[field.name]] ? state.projects[state.items[field.name]].label : state.items[field.name] }}
                                 </p-link>
                             </td>
-                            <td v-else-if="item.name === 'add_project_dependency'">
-                                <p v-for="(projectId, idx) in state.items[item.name]"
-                                   :key="`${projectId}-${idx}`"
-                                   class="project-name"
-                                >
-                                    <p-link :action-icon="ACTION_ICON.INTERNAL_LINK"
-                                            new-tab
-                                            :to="referenceRouter(
-                                                projectId,
-                                                { resource_type: 'identity.Project' })"
-                                    >
-                                        {{ state.projects[projectId] ? state.projects[projectId].label : projectId }}
-                                    </p-link>
-                                </p>
-                            </td>
-                            <td v-else-if="item.name === 'add_responder'">
-                                <p v-for="(user, idx) in state.items[item.name]"
-                                   :key="`${user}-${idx}`"
-                                   class="user-name"
-                                >
-                                    {{ user.resource_id }}
-                                </p>
-                            </td>
-                            <td v-else-if="item.name === 'add_additional_info'">
-                                <p v-for="(info, infoIdx) in Object.entries(state.items[item.name])"
+                            <td v-else-if="field.name === 'add_additional_info'">
+                                <p v-for="(info, infoIdx) in Object.entries(state.items[field.name])"
                                    :key="`${info}-${infoIdx}`"
                                 >
                                     <span class="font-bold">{{ info[0] }}</span>: {{ info[1] }}
                                 </p>
                             </td>
-                            <td v-else-if="item.name === 'stop_processing'"
+                            <td v-else-if="field.name === 'stop_processing'"
                                 class="stop-processing"
                             >
-                                <span v-if="state.items[item.name]" />
+                                <span v-if="state.items[field.name]" />
                             </td>
                             <td v-else>
-                                {{ state.items[item.name] }}
+                                {{ state.items[field.name] }}
                             </td>
                         </tr>
                     </template>

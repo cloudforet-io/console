@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import {
-    computed, reactive, watch,
+    computed, reactive,
 } from 'vue';
-import { useRoute } from 'vue-router/composables';
 
 import {
     PSelectDropdown, PBadge,
@@ -19,13 +18,12 @@ import {
     DYNAMIC_COST_QUERY_SET_PARAMS,
 } from '@/services/cost-explorer/constants/managed-cost-analysis-query-sets';
 import { useCostAnalysisPageStore } from '@/services/cost-explorer/stores/cost-analysis-page-store';
-import type { CostQuerySetOption, Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
+import type { Granularity } from '@/services/cost-explorer/types/cost-explorer-query-type';
 
 
 const costAnalysisPageStore = useCostAnalysisPageStore();
-const costAnalysisPageState = costAnalysisPageStore.$state;
-
-const route = useRoute();
+const costAnalysisPageGetters = costAnalysisPageStore.getters;
+const costAnalysisPageState = costAnalysisPageStore.state;
 
 const state = reactive({
     granularityItems: computed<MenuItem[]>(() => ([
@@ -46,7 +44,7 @@ const state = reactive({
         },
     ])),
     granularity: undefined as Granularity|undefined,
-    showPeriodBadge: computed<boolean>(() => costAnalysisPageStore.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
+    showPeriodBadge: computed<boolean>(() => costAnalysisPageGetters.selectedQueryId === DYNAMIC_COST_QUERY_SET_PARAMS || !costAnalysisPageState.relativePeriod),
     periodBadgeText: computed<string>(() => {
         if (!costAnalysisPageState.period) return '';
         let startDateFormat = 'MMM D';
@@ -59,28 +57,13 @@ const state = reactive({
         if (costAnalysisPageState.granularity === GRANULARITY.DAILY) end = dayjs.utc(costAnalysisPageState.period.end).endOf('month');
         return `${start.format(startDateFormat)} ~ ${end.format(endDateFormat)}`;
     }),
-    optionForInitialPeriod: undefined as CostQuerySetOption|undefined,
 });
 
 /* event */
 const handleSelectGranularity = async (granularity: Granularity) => {
-    costAnalysisPageStore.$patch({ granularity });
+    costAnalysisPageStore.setGranularity(granularity);
     state.granularity = granularity;
 };
-
-
-/* NOTE: Case for changing query set(LNB, Dynamic Link) */
-watch(() => costAnalysisPageStore.selectedQueryId, (after, before) => {
-    if (!after) return;
-    if (route.params.costQuerySetId === DYNAMIC_COST_QUERY_SET_PARAMS) {
-        state.optionForInitialPeriod = {
-            granularity: costAnalysisPageState.granularity,
-            period: costAnalysisPageState.period,
-        };
-    } else if (after !== before) {
-        state.optionForInitialPeriod = costAnalysisPageStore.selectedQuerySet?.options;
-    }
-}, { immediate: true });
 </script>
 
 <template>
@@ -92,9 +75,7 @@ watch(() => costAnalysisPageStore.selectedQueryId, (after, before) => {
                            class="granularity-dropdown"
                            @select="handleSelectGranularity"
         />
-        <cost-analysis-period-select-dropdown :option-for-initial-period="state.optionForInitialPeriod"
-                                              :granularity="state.granularity"
-        />
+        <cost-analysis-period-select-dropdown />
         <p-badge v-if="state.showPeriodBadge"
                  badge-type="subtle"
                  style-type="gray200"

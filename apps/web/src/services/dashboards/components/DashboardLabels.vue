@@ -1,3 +1,81 @@
+<script setup lang="ts">
+// CAUTION: this vOnClickOutside is using !! Please do not remove.
+import { vOnClickOutside } from '@vueuse/components';
+import {
+    computed, reactive,
+} from 'vue';
+
+import {
+    PFieldGroup, PIconButton, PLabel, PTextInput,
+} from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+
+import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
+
+
+interface Props {
+    editable?: boolean;
+}
+const props = defineProps<Props>();
+const emit = defineEmits(['update-labels']);
+
+const {
+    forms: {
+        inputText,
+    },
+    setForm,
+    invalidState,
+    invalidTexts,
+} = useFormValidator({
+    inputText: '',
+}, {
+    inputText(value: string) {
+        if (value.length > 30) return i18n.t('DASHBOARDS.CUSTOMIZE.VALIDATION_LIMITED_CHAR_LABEL');
+        if (state.labelList.find((d) => d === value)) return i18n.t('DASHBOARDS.CUSTOMIZE.VALIDATION_DUPLICATED_LABEL');
+        return '';
+    },
+});
+
+const dashboardDetailStore = useDashboardDetailInfoStore();
+const dashboardDetailState = dashboardDetailStore.state;
+
+const state = reactive({
+    labelList: computed<Array<string>>({
+        get: () => dashboardDetailState.labels,
+        set(val: Array<string>) {
+            dashboardDetailStore.setLabels(val);
+        },
+    }),
+    inputMode: false,
+    isInputFocused: false,
+});
+
+const handleClickPlus = async () => {
+    state.inputMode = true;
+    state.isInputFocused = true;
+};
+const handleEscape = () => {
+    state.inputMode = false;
+    setForm('inputText', '');
+};
+const handlePushLabel = (e: KeyboardEvent) => {
+    if (e.isComposing || !inputText.value || invalidState.inputText) return;
+    state.labelList.push(inputText.value);
+    setForm('inputText', '');
+    dashboardDetailStore.setLabels(state.labelList);
+    emit('update-labels', state.labelList);
+};
+const handleDelete = (index: number) => {
+    state.labelList.splice(index, 1);
+    dashboardDetailStore.setLabels(state.labelList);
+    emit('update-labels', state.labelList);
+};
+
+</script>
+
 <template>
     <div v-on-click-outside="handleEscape"
          class="dashboard-labels"
@@ -41,83 +119,6 @@
     </div>
 </template>
 
-<script setup lang="ts">
-// CAUTION: this vOnClickOutside is using !! Please do not remove.
-import { vOnClickOutside } from '@vueuse/components';
-import {
-    computed, reactive,
-} from 'vue';
-
-import {
-    PFieldGroup, PIconButton, PLabel, PTextInput,
-} from '@spaceone/design-system';
-
-import { i18n } from '@/translations';
-
-import { useFormValidator } from '@/common/composables/form-validator';
-
-import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-
-
-interface Props {
-    editable?: boolean;
-}
-const props = defineProps<Props>();
-const emit = defineEmits(['update-labels']);
-
-const {
-    forms: {
-        inputText,
-    },
-    setForm,
-    invalidState,
-    invalidTexts,
-} = useFormValidator({
-    inputText: '',
-}, {
-    inputText(value: string) {
-        if (value.length > 30) return i18n.t('DASHBOARDS.CUSTOMIZE.VALIDATION_LIMITED_CHAR_LABEL');
-        if (state.labelList.find((d) => d === value)) return i18n.t('DASHBOARDS.CUSTOMIZE.VALIDATION_DUPLICATED_LABEL');
-        return '';
-    },
-});
-
-const dashboardDetailStore = useDashboardDetailInfoStore();
-const dashboardDetailState = dashboardDetailStore.$state;
-
-const state = reactive({
-    labelList: computed<Array<string>>({
-        get: () => dashboardDetailState.labels,
-        set(val: Array<string>) {
-            dashboardDetailStore.$patch({ labels: [...val] });
-        },
-    }),
-    inputMode: false,
-    isInputFocused: false,
-});
-
-const handleClickPlus = async () => {
-    state.inputMode = true;
-    state.isInputFocused = true;
-};
-const handleEscape = () => {
-    state.inputMode = false;
-    setForm('inputText', '');
-};
-const handlePushLabel = (e: KeyboardEvent) => {
-    if (e.isComposing || !inputText.value || invalidState.inputText) return;
-    state.labelList.push(inputText.value);
-    setForm('inputText', '');
-    dashboardDetailStore.$patch({ labels: state.labelList });
-    emit('update-labels', state.labelList);
-};
-const handleDelete = (index: number) => {
-    state.labelList.splice(index, 1);
-    dashboardDetailStore.$patch({ labels: state.labelList });
-    emit('update-labels', state.labelList);
-};
-
-</script>
 <style lang="postcss" scoped>
 .dashboard-labels {
     display: flex;

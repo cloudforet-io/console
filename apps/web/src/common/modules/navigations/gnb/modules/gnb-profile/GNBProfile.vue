@@ -12,9 +12,11 @@ import {
 } from '@spaceone/design-system';
 import ejs from 'ejs';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { languages } from '@/store/modules/user/config';
 
 import config from '@/lib/config';
@@ -33,6 +35,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
 });
+const appContextStore = useAppContextStore();
 
 const emit = defineEmits<{(e: 'update:visible', visible: boolean): void; }>();
 
@@ -40,24 +43,23 @@ const route = useRoute();
 const router = useRouter();
 
 const state = reactive({
-    userIcon: computed(() => {
-        if (state.isDomainOwner) return 'img_avatar_root-account';
-        if (state.hasDomainRole) return 'img_avatar_admin';
-        return 'img_avatar_user';
+    userIcon: computed<string>(() => {
+        if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
+        if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
+        const currentRoleType = store.getters['user/getCurrentRoleInfo']?.roleType;
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'img_avatar_workspace-owner';
+        if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'img_avatar_workspace-member';
+        return 'img_avatar_no-role';
     }),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
-    role: computed(() => {
-        const roleArray = store.getters['user/roleNames'];
-        return roleArray.join(', ');
-    }),
+    // TODO: to be refactored by new planning
+    role: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType || 'USER'),
     language: computed(() => store.getters['user/languageLabel']),
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
     userId: computed(() => store.state.user.userId),
-    hasDomainRole: computed((() => store.getters['user/hasDomainRole'])),
-    isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-    hasPermission: computed(() => store.getters['user/hasPermission']),
+    isMyPage: computed(() => route.matched.some((item) => item.name === MY_PAGE_ROUTE._NAME)),
     languageMenuVisible: false,
     supportedMenu: computed(() => {
         const docsList = config.get('DOCS') ?? [];
@@ -70,6 +72,7 @@ const state = reactive({
     languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
         label: v, name: k,
     }))),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
 
 const profileMenuRef = ref<HTMLElement|null>(null);
@@ -127,6 +130,7 @@ const handleClickSignOut = async () => {
         query: { nextPath: route.fullPath },
     };
     await router.push(res);
+    if (state.isAdminMode) appContextStore.switchToWorkspaceMode();
 };
 </script>
 
@@ -136,7 +140,7 @@ const handleClickSignOut = async () => {
          class="gnb-profile"
          @keydown.esc="hideProfileMenu"
     >
-        <span class="menu-button"
+        <span :class="{'menu-button': true, 'opened': visible}"
               role="button"
               tabindex="0"
               @click.stop="handleProfileButtonClick"
@@ -144,6 +148,8 @@ const handleClickSignOut = async () => {
         >
             <p-i :name="state.userIcon"
                  class="menu-icon"
+                 width="1.75rem"
+                 height="1.75rem"
             />
         </span>
         <div v-if="visible"
@@ -234,7 +240,7 @@ const handleClickSignOut = async () => {
                     </router-link>
                 </div>
             </div>
-            <template v-if="state.hasPermission">
+            <template v-if="!state.isMyPage">
                 <p-divider />
                 <div class="sub-menu-wrapper">
                     <router-link class="sub-menu"
@@ -242,17 +248,6 @@ const handleClickSignOut = async () => {
                                  @click.native="hideProfileMenu"
                     >
                         {{ $t('MENU.INFO_NOTICE') }}
-                    </router-link>
-                </div>
-            </template>
-            <template v-if="state.hasPermission && !state.isDomainOwner">
-                <p-divider />
-                <div class="sub-menu-wrapper">
-                    <router-link class="sub-menu"
-                                 :to="{name: MY_PAGE_ROUTE.MY_ACCOUNT.API_KEY._NAME}"
-                                 @click.native="hideProfileMenu"
-                    >
-                        {{ $t('MENU.MY_PAGE_API_KEY') }}
                     </router-link>
                 </div>
             </template>
@@ -289,7 +284,6 @@ const handleClickSignOut = async () => {
 <style lang="postcss" scoped>
 .gnb-profile {
     position: relative;
-    margin-left: 1.5rem;
     outline: none;
 
     &:first-of-type {
@@ -297,22 +291,22 @@ const handleClickSignOut = async () => {
     }
 
     .menu-button {
-        @apply text-gray-500;
+        @apply inline-flex items-center justify-center text-gray-500 rounded-full;
+        width: 2rem;
+        height: 2rem;
         cursor: pointer;
         line-height: $gnb-height;
 
+        &:hover {
+            @apply text-blue-600 bg-blue-100;
+        }
+
         &.opened {
-            @apply text-violet-400;
+            @apply text-blue-600 bg-blue-200;
         }
 
         .menu-icon {
-            @apply rounded-xl;
-        }
-
-        @media (hover: hover) {
-            &:hover {
-                @apply text-violet-400;
-            }
+            @apply rounded-full;
         }
     }
 
@@ -322,7 +316,7 @@ const handleClickSignOut = async () => {
         top: 100%;
         right: -0.5rem;
         left: auto;
-        margin-top: -0.5rem;
+        z-index: 1000;
         box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
     }
     .profile-menu-wrapper {
@@ -424,10 +418,6 @@ const handleClickSignOut = async () => {
                 }
             }
         }
-    }
-
-    @screen laptop {
-        margin-left: 1.25rem;
     }
 
     @screen tablet {

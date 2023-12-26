@@ -1,18 +1,17 @@
-import type { ACCOUNT_TYPE } from '@/schema/identity/service-account/constant';
-
 export interface ServiceAccountModel {
-    name: string;
-    provider: string;
     service_account_id: string;
-    service_account_type?: AccountType;
+    name: string;
     data: {
         [key: string]: string;
     },
+    provider: string;
     tags: { [key: string]: unknown; };
+    secret_schema_id: string;
+    secret_id: string;
+    trusted_account_id: string;
+    project_id: string;
+    workspace_id: string;
+    domain_id: string;
+    created_at: string;
 }
 
-export interface ServiceAccountModelForBinding extends Omit<ServiceAccountModel, 'service_account_type'> {
-    service_account_type?: AccountType | 'TRUSTED-MANAGED';
-}
-
-export type AccountType = typeof ACCOUNT_TYPE[keyof typeof ACCOUNT_TYPE];

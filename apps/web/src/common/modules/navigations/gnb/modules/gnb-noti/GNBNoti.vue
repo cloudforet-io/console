@@ -4,7 +4,7 @@
          @click.stop
          @keydown.esc="hideNotiMenu"
     >
-        <span class="menu-button"
+        <span :class="{'menu-button': true, 'opened': visible}"
               tabindex="0"
               role="button"
               @click.stop="handleNotiButtonClick"
@@ -14,6 +14,8 @@
                  :class="{ disabled: isNoRoleUser }"
                  :name="hasNotifications ? 'ic_gnb_bell-unread' : 'ic_gnb_bell'"
                  :color="hasNotifications ? undefined : 'inherit'"
+                 width="1.375rem"
+                 height="1.375rem"
             />
         </span>
         <p-tab v-show="visible"
@@ -54,10 +56,8 @@ import {
 } from '@spaceone/design-system';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
 
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { numberFormatter } from '@cloudforet/utils';
 
-import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -70,6 +70,11 @@ import GNBNotificationsTab from '@/common/modules/navigations/gnb/modules/gnb-no
 
 interface Props {
     visible: boolean
+}
+
+interface CountInfo {
+  notifications: number;
+  notice: number;
 }
 export default defineComponent<Props>({
     name: 'GNBNoti',
@@ -91,8 +96,7 @@ export default defineComponent<Props>({
     },
     setup(props, { emit }: SetupContext) {
         const state = reactive({
-            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || unreadNoticeCount.value > 0),
-            domainName: computed(() => store.state.domain.name),
+            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications'] || noticeGetters.unreadNoticeCount > 0),
             isNoRoleUser: computed<boolean>(() => store.getters['user/isNoRoleUser']),
             tabs: computed(() => ([
                 { label: i18n.t('COMMON.GNB.NOTIFICATION.TITLE'), name: 'notifications', keepAlive: true },
@@ -100,9 +104,9 @@ export default defineComponent<Props>({
             ] as TabItem[])),
             activeTab: 'notifications',
             notificationCount: 0,
-            count: computed(() => ({
+            count: computed<CountInfo>(() => ({
                 notifications: state.notificationCount,
-                notice: unreadNoticeCount.value,
+                notice: noticeGetters.unreadNoticeCount,
             })),
         });
 
@@ -123,16 +127,8 @@ export default defineComponent<Props>({
         };
 
         /* Api */
-        const noticeApiHelper = new ApiQueryHelper().setCountOnly();
-        if (state.domainName === 'root') {
-            noticeApiHelper.setFilters([{ k: 'post_type', v: NOTICE_POST_TYPE.SYSTEM, o: '=' }]);
-        }
-
-        const {
-            unreadNoticeCount, fetchNoticeCount, fetchNoticeReadState,
-        } = useNoticeStore({
-            userId: computed(() => store.state.user.userId),
-        });
+        const noticeStore = useNoticeStore();
+        const noticeGetters = noticeStore.getters;
 
         const documentVisibility = useDocumentVisibility();
         watch(documentVisibility, (visibility) => {
@@ -151,8 +147,8 @@ export default defineComponent<Props>({
 
         onMounted(() => {
             store.dispatch('display/startCheckNotification');
-            fetchNoticeReadState();
-            fetchNoticeCount();
+            noticeStore.fetchNoticeReadState();
+            noticeStore.fetchNoticeCount();
         });
         onUnmounted(() => {
             store.dispatch('display/stopCheckNotification');
@@ -169,7 +165,7 @@ export default defineComponent<Props>({
             hideNotiMenu,
             handleNotiButtonClick,
             numberFormatter,
-            unreadNoticeCount,
+            noticeGetters,
         };
     },
 });
@@ -179,19 +175,18 @@ export default defineComponent<Props>({
     position: relative;
 
     .menu-button {
-        @apply text-gray-500;
+        @apply inline-flex items-center justify-center text-gray-500 rounded-full;
+        width: 2rem;
+        height: 2rem;
         line-height: $gnb-height;
         cursor: pointer;
-        margin-left: 1.25rem;
 
-        &.opened {
-            @apply text-violet-400;
+        &:hover {
+            @apply text-blue-600 bg-blue-100;
         }
 
-        @media (hover: hover) {
-            &:hover {
-                @apply text-violet-400;
-            }
+        &.opened {
+            @apply text-blue-600 bg-blue-200;
         }
 
         .disabled {
@@ -208,8 +203,8 @@ export default defineComponent<Props>({
         min-height: auto;
         top: 100%;
         right: 0;
+        z-index: 1000;
         box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.08);
-        margin-top: -0.5rem;
         margin-right: -0.5rem;
         .tab-pane {
             padding-bottom: 0;
