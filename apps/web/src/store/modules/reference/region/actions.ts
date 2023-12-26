@@ -2,12 +2,17 @@ import type { Action } from 'vuex';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { RegionListParameters } from '@/schema/inventory/region/api-verbs/list';
+import type { RegionModel } from '@/schema/inventory/region/model';
+
 import { REFERENCE_LOAD_TTL } from '@/store/modules/reference/config';
 import { RegionMap } from '@/store/modules/reference/region/config';
 import type { RegionReferenceMap, RegionReferenceState } from '@/store/modules/reference/region/type';
 import type { ReferenceLoadOptions } from '@/store/modules/reference/type';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 let lastLoadedTime = 0;
 
@@ -21,14 +26,14 @@ export const load: Action<RegionReferenceState, any> = async ({ state, commit },
     ) return;
 
     try {
-        const response = await SpaceConnector.clientV2.inventory.region.list({
+        const response = await SpaceConnector.clientV2.inventory.region.list<RegionListParameters, ListResponse<RegionModel>>({
             query: {
                 only: ['name', 'region_code', 'tags', 'provider'],
             },
         }, { timeout: 3000 });
         const regions: RegionReferenceMap = {};
 
-        response.results.forEach((regionInfo: any): void => {
+        response.results?.forEach((regionInfo: any): void => {
             const regionKey = regionInfo.region_code === 'global' ? `${regionInfo.region_code}-${regionInfo.provider}` : regionInfo.region_code;
             regions[regionKey] = {
                 key: regionKey,
