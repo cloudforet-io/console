@@ -35,7 +35,6 @@ const props = withDefaults(defineProps<Props>(), {
     isSetAdminRole: true,
 });
 
-
 const router = useRouter();
 
 const emit = defineEmits<{(e: 'change-input', formState): void,

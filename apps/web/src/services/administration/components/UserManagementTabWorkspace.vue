@@ -183,7 +183,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
 const handleClickButton = async (value: RoleBindingModel) => {
     try {
         await SpaceConnector.clientV2.identity.roleBinding.delete({
-            role_binding_id: value.role_binding_id,
+            role_binding_id: value,
         });
         showSuccessMessage(i18n.t('IDENTITY.USER.MAIN.ALT_S_REMOVE_USER'), '');
         await getWorkspaceList();
@@ -267,11 +267,11 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
-            <template #col-remove_button-format="value">
+            <template #col-remove_button-format="{ item }">
                 <p-button style-type="tertiary"
                           size="sm"
                           class="remove-button"
-                          @click="handleClickButton(value.role_binding_info.role_binding_id)"
+                          @click="handleClickButton(item.role_binding_id)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
