@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onUnmounted } from 'vue';
+import { onBeforeMount } from 'vue';
 
 import { PHeading } from '@spaceone/design-system';
 
@@ -7,7 +7,8 @@ import NoticeForm from '@/services/info/components/NoticeForm.vue';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
 const noticeDetailStore = useNoticeDetailStore();
-onUnmounted(() => {
+
+onBeforeMount(() => {
     noticeDetailStore.reset();
 });
 </script>
