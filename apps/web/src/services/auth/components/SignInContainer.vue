@@ -26,12 +26,9 @@ const state = reactive({
         }
         return undefined;
     }),
-    wordTypeLogoUrl: computed(() => {
+    wordTypeLogoUrl: computed<string|undefined>(() => {
         const domainSettings = store.state.domain.config?.settings;
-        if (domainSettings?.wordtype_logo_url) {
-            return domainSettings.wordtype_logo_url;
-        }
-        return '@/assets/images/brand/spaceone-logotype-with-Service-Type.svg';
+        return domainSettings?.wordtype_logo_url;
     }),
 });
 
@@ -55,8 +52,13 @@ watch(() => route.name, (name) => {
                 <img class="logo-character"
                      src="@/assets/images/brand/brand_logo.png"
                 >
-                <img class="logo-text"
+                <img v-if="state.wordTypeLogoUrl"
+                     class="logo-text"
                      :src="state.wordTypeLogoUrl"
+                >
+                <img v-else
+                     class="logo-text"
+                     src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
                 >
             </template>
         </div>
