@@ -8,6 +8,8 @@ import { cloneDeep } from 'lodash';
 
 import { i18n } from '@/translations';
 
+import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import WorkspaceManagementTable from '@/services/administration/components/WorkspaceManagementTable.vue';
 import WorkspacesCreateModal from '@/services/administration/components/WorkspacesCreateModal.vue';
@@ -17,6 +19,7 @@ import { useWorkspacePageStore } from '@/services/administration/store/workspace
 
 
 const workspacePageStore = useWorkspacePageStore();
+const workspaceStore = useWorkspaceStore();
 const userPageStore = useUserPageStore();
 
 const route = useRoute();
@@ -33,7 +36,8 @@ const handleUpdateList = async () => {
     await workspacePageStore.listWorkspaces({});
 };
 
-const handleConfirm = () => {
+const handleConfirm = async () => {
+    await workspaceStore.load();
     userPageStore.$patch((_state) => {
         _state.modal.type = USER_MODAL_TYPE.ADD;
         _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string;

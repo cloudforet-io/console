@@ -83,7 +83,8 @@ watch(() => route, (value) => {
 
 
 watch(() => route.name, (routeName) => {
-    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME)) {
+    const routerAccessLevel = getRouteAccessLevel(route);
+    if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && routerAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
         state.hasNoWorkspace = workspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
     }
 }, { immediate: true });
