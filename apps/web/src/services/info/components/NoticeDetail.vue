@@ -17,11 +17,10 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { PostListParameters } from '@/schema/board/post/api-verbs/list';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 import type { PostModel } from '@/schema/board/post/model';
+import type { FileModel } from '@/schema/file-manager/model';
 import { store } from '@/store';
 
 import { useNoticeStore } from '@/store/notice';
-
-import type { FileInfo } from '@/lib/file-manager/type';
 
 import TextEditorViewer from '@/common/components/editor/TextEditorViewer.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -61,7 +60,7 @@ const state = reactive({
     hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
 });
 
-const files = computed<FileInfo[]>(() => state.noticePostData?.files ?? []);
+const files = computed<FileModel[]>(() => state.noticePostData?.files ?? []);
 const { attachments } = useFileAttachments(files);
 
 /* Api */

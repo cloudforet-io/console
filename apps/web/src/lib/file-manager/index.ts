@@ -2,17 +2,23 @@ import axios from 'axios';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
-import type { FileInfo } from '@/lib/file-manager/type';
+import type { ResourceGroupType } from '@/schema/_common/type';
+import type { FileAddParameters } from '@/schema/file-manager/api-verbs/add';
+import type { FileGetDownloadUrlParameters } from '@/schema/file-manager/api-verbs/get-download-url';
+import type { FileModel } from '@/schema/file-manager/model';
 
 import type { Attachment } from '@/common/components/editor/extensions/image/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const getUploadInfo = async (file: File, domainId: string|null): Promise<[fileId: string, uploadUrl: string, options: object]> => {
-    const result = await SpaceConnector.client.fileManager.file.add({
+
+const getUploadInfo = async (file: File, resourceGroup: ResourceGroupType, domainOrWorkspaceId: string): Promise<[fileId: string, uploadUrl: string, options: object]> => {
+    const params: FileAddParameters = {
         name: file.name,
-        file_type: file.type,
-        domain_id: domainId,
-    });
+        resource_group: resourceGroup,
+    };
+    if (resourceGroup === 'DOMAIN') params.domain_id = domainOrWorkspaceId;
+    else if (resourceGroup === 'WORKSPACE') params.workspace_id = domainOrWorkspaceId;
+    const result = await SpaceConnector.clientV2.fileManager.file.add<FileAddParameters, FileModel>(params);
     if (!result.upload_url || !result.upload_options) throw new Error('[File Manager] No upload info in response of add file api');
     return [result.file_id, result.upload_url, result.upload_options];
 };
@@ -27,16 +33,16 @@ const uploadFile = async (uploadUrl: string, options: object, file: File) => {
 };
 
 export const getDownloadUrl = async (fileId: string): Promise<string> => {
-    const result: FileInfo = await SpaceConnector.client.fileManager.file.getDownloadUrl({
+    const result = await SpaceConnector.clientV2.fileManager.file.getDownloadUrl<FileGetDownloadUrlParameters, FileModel>({
         file_id: fileId,
     });
     if (!result.download_url) throw new Error('[File Manager] No download url in response of update file state api');
     return result.download_url;
 };
 
-export const uploadFileAndGetFileInfo = async (file: File, domainId: string|null): Promise<Attachment> => {
+export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: ResourceGroupType, domainOrWorkspaceId: string): Promise<Attachment> => {
     try {
-        const [fileId, uploadUrl, options] = await getUploadInfo(file, domainId);
+        const [fileId, uploadUrl, options] = await getUploadInfo(file, resourceGroup, domainOrWorkspaceId);
         await uploadFile(uploadUrl, options, file);
         const downloadUrl = await getDownloadUrl(fileId);
         return { downloadUrl, fileId };

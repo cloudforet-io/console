@@ -95,11 +95,11 @@ const formData = computed<Omit<PostUpdateParameters, 'post_id'>>(() => ({
     },
 }));
 
-const { fileUploader } = useFileUploader(computed(() => (state.isAllDomainSelected ? null : state.selectedDomain[0].name)));
+const { fileUploader } = useFileUploader();
 
 const handleConfirm = () => {
     if (props.type === 'CREATE') handleCreateNotice();
-    if (props.type === 'EDIT') handleEditNotice();
+    else if (props.type === 'EDIT') handleEditNotice();
 };
 
 const handleCreateNotice = async () => {
