@@ -102,12 +102,11 @@ watch([() => state.budgetInfo, () => state.isAllValid], ([budgetInfo, isAllValid
                               @update:value="setForm('name', $event)"
                 />
             </p-field-group>
+            <budget-create-target-select @update="handleUpdateTarget" />
             <budget-create-data-source-select
                 :workspace-id="storeState.isAdminMode ? state.target : undefined"
                 @update="handleUpdateDataSource"
             />
-
-            <budget-create-target-select @update="handleUpdateTarget" />
 
             <budget-create-provider-select @update="handleUpdateProviderFilter" />
         </div>

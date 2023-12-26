@@ -68,7 +68,7 @@ const getCurrencyFromDataSource = (dataSourceId: string) => {
 
 watch(() => state.dataSourceItems, async (val) => {
     if (val.length) setForm('selectedDataSource', val[0]?.name);
-});
+}, { immediate: true });
 </script>
 
 <template>
