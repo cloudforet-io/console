@@ -6,16 +6,20 @@ import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu
 
 import { store } from '@/store';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
 import type { CostDataSourceReferenceMap, DataSourceItems } from '@/store/reference/cost-data-source-reference-store';
 
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 
+
+interface Props {
+    workspaceId?: string;
+}
+const props = defineProps<Props>();
 const emit = defineEmits<{(e: 'update', dataSource: string|null, isValid: boolean): void; }>();
-const allReferenceStore = useAllReferenceStore();
 
 const {
     forms: {
@@ -29,12 +33,26 @@ const {
     selectedDataSource(value: string|null) { return !!value; },
 });
 
+const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 const storeState = reactive({
+    isAdminMode: computed<boolean>(() => appContextStore.getters.isAdminMode),
     plugins: computed<PluginReferenceMap>(() => store.getters['reference/pluginItems']),
     costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
 });
 const state = reactive({
-    dataSourceItems: [] as MenuItem[],
+    dataSourceItems: computed<MenuItem[]>(() => {
+        if (storeState.isAdminMode && !props.workspaceId) return [];
+        let _costDataSourceList = Object.entries(storeState.costDataSource);
+        if (storeState.isAdminMode) {
+            _costDataSourceList = Object.entries(storeState.costDataSource).filter(([, v]) => v.data.workspace_id === props.workspaceId);
+        }
+        return _costDataSourceList.map(([key, dataSource]) => ({
+            name: key,
+            label: dataSource.label,
+            imageUrl: storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon ? storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon : 'error',
+        }));
+    }),
 });
 
 watch([() => selectedDataSource.value, () => isAllValid.value], ([dataSource, isValid]) => {
@@ -42,32 +60,15 @@ watch([() => selectedDataSource.value, () => isAllValid.value], ([dataSource, is
 }, { immediate: true });
 
 const getCurrencyFromDataSource = (dataSourceId: string) => {
+    if (!storeState.costDataSource) return '';
     const dataSourceItem:DataSourceItems = storeState.costDataSource[dataSourceId];
     const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
     return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
 };
 
-const fetchDataSource = async () => {
-    try {
-        const dataSourceItems: MenuItem[] = Object.entries(storeState.costDataSource).map(([key, dataSource]) => ({
-            name: key,
-            label: dataSource.label,
-            imageUrl: storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon ? storeState.plugins[dataSource.data.plugin_info.plugin_id]?.icon : 'error',
-        }));
-
-        state.dataSourceItems = dataSourceItems;
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.dataSourceItems = [];
-        setForm('selectedDataSource', null);
-    }
-};
-
-(async () => {
-    await fetchDataSource();
-    if (state.dataSourceItems.length) setForm('selectedDataSource', state.dataSourceItems[0]?.name);
-})();
-
+watch(() => state.dataSourceItems, async (val) => {
+    if (val.length) setForm('selectedDataSource', val[0]?.name);
+});
 </script>
 
 <template>

@@ -1,5 +1,7 @@
 import type { JsonSchema } from '@spaceone/design-system/types/inputs/forms/json-schema-form/type';
 
+import type { ResourceGroup } from '@/schema/identity/role-binding/type';
+
 
 interface PluginInfoModel {
     plugin_id: string;
@@ -35,6 +37,9 @@ export interface DataSourceModel {
     tags: Record<string, any>;
     cost_tag_keys: string[];
     cost_additional_info_keys: string[];
+    cost_data_keys: string[];
+    resource_group: ResourceGroup;
+    workspace_id: string;
     domain_id: string;
     created_at: string;
     last_synchronized_at: string;

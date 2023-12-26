@@ -112,6 +112,7 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
             <budget-create-form-amount-plan-monthly
                 v-if="state.timeUnit === 'MONTHLY'"
                 class="mb-6"
+                :data-source-id="props.dataSourceId"
                 :period="state.period"
                 @update="handleMonthlyInputUpdate"
             >
@@ -128,6 +129,7 @@ watch([() => state.amountPlanInfo, () => state.isAllValid], ([amountPlanInfo, is
             <budget-create-form-amount-plan-total
                 v-else
                 class="mb-6"
+                :data-source-id="props.dataSourceId"
                 @update="handleTotalAmountUpdate"
             >
                 <template #last-3-months>
