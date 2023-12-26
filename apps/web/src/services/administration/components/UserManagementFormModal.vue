@@ -20,7 +20,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import config from '@/lib/config';
-import { postDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
+import { postUserDisableMfa } from '@/lib/helper/multi-factor-auth-helper';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -159,7 +159,7 @@ const fetchRoleBinding = async (item?: AddModalMenuItem) => {
 const fetchPostDisableMfa = async () => {
     state.mfaLoading = true;
     try {
-        await postDisableMfa({
+        await postUserDisableMfa({
             user_id: state.data.user_id || '',
         });
         if (state.loginUserId === state.data.user_id) {
@@ -226,7 +226,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
             <div class="input-form-wrapper">
                 <user-management-form-info-form :name.sync="formState.name" />
                 <user-management-form-notification-email-form
-                    v-if="!state.smtpEnabled"
+                    v-if="state.smtpEnabled"
                     @change-input="handleChangeInputs"
                     @change-verify="handleChangeVerify"
                 />
