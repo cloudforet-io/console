@@ -1,5 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
+import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+
 import { store } from '@/store';
 
 import { adminRoutes } from '@/router/admin-routes';
@@ -13,6 +15,7 @@ import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
 
+import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 import authRoutes from '@/services/auth/routes/routes';
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
 import { MY_PAGE_ROUTE } from '@/services/my-page/routes/route-constant';
@@ -26,6 +29,8 @@ export const integralRoutes: RouteConfig[] = [
         name: ROOT_ROUTE._NAME,
         // TODO: need to implement with SYSTEM_ADMIN
         redirect: () => {
+            const isTokenAlive = SpaceConnector.isTokenAlive;
+            if (!isTokenAlive) return ({ name: AUTH_ROUTE.SIGN_OUT._NAME });
             const appContextStore = useAppContextStore();
             if (appContextStore.getters.isAdminMode) return { name: ROOT_ROUTE.ADMIN._NAME };
             return { name: ROOT_ROUTE.WORKSPACE._NAME };
