@@ -2028,8 +2028,10 @@
 			"DELETE_WORKSPACE": "",
 			"DELETE_WORKSPACE_DESC": "",
 			"DISABLE": "",
+			"DISABLE_WORKSPACE": "",
 			"EDIT": "수정",
 			"ENABLE": "",
+			"ENABLE_WORKSPACE": "",
 			"FORM": {
 				"LABEL_DESC": "",
 				"LABEL_NAME": "이름",
@@ -2037,6 +2039,7 @@
 				"PLACEHOLDER_NAME": "",
 				"REQUIRED_NAME": ""
 			},
+			"REQUIRED_ENABLE_WORKSPACE": "",
 			"WORKSPACES": ""
 		}
 	},

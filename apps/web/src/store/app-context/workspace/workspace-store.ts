@@ -31,7 +31,7 @@ export const useWorkspaceStore = defineStore('workspace-store', () => {
                 return;
             }
             const { results } = await SpaceConnector.clientV2.identity.userProfile.getWorkspaces<undefined, ListResponse<WorkspaceModel>>();
-            state.items = results || [];
+            state.items = results?.filter((workspace) => workspace.state === 'ENABLED') || [];
         },
         setCurrentWorkspace(workspaceId?: string) {
             const found = state.items.find((workspace) => workspace.workspace_id === workspaceId);
