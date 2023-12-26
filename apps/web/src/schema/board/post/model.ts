@@ -1,4 +1,5 @@
-import type { PostBoardType, PostResourceGroup } from '@/schema/board/post/type';
+import type { ResourceGroupType } from '@/schema/_common/type';
+import type { PostBoardType } from '@/schema/board/post/type';
 import type { FileModel } from '@/schema/file-manager/model';
 
 export interface PostModel {
@@ -14,7 +15,7 @@ export interface PostModel {
     view_count: 0;
     writer: string;
     files: FileModel[];
-    resource_group: PostResourceGroup;
+    resource_group: Extract<ResourceGroupType, 'SYSTEM'|'DOMAIN'>;
     domain_id: string;
     user_id: string;
     created_at: string;

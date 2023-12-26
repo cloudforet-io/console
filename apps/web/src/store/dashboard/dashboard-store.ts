@@ -73,7 +73,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     });
 
     /* Mutations */
-    const setScope = (scope?: ResourceGroupType) => {
+    const setScope = (scope?: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>) => {
         state.scope = scope;
     };
     const setSearchFilters = (filters: ConsoleFilter[]) => {

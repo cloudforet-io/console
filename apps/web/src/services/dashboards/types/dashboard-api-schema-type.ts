@@ -28,7 +28,7 @@ export interface ListDashboardParameters extends PublicDashboardListParameters, 
     private_dashboard_id?: string;
 }
 export interface CreateDashboardParameters extends PublicDashboardCreateParameters, PrivateDashboardCreateParameters {
-    resource_group?: ResourceGroupType;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     project_id?: string;
 }
 export interface UpdateDashboardParameters extends PublicDashboardUpdateParameters, PrivateDashboardUpdateParameters {

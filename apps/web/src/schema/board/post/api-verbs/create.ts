@@ -1,4 +1,5 @@
-import type { PostBoardType, PostResourceGroup } from '@/schema/board/post/type';
+import type { ResourceGroupType } from '@/schema/_common/type';
+import type { PostBoardType } from '@/schema/board/post/type';
 
 export interface PostCreateParameters {
     board_type: PostBoardType;
@@ -11,5 +12,5 @@ export interface PostCreateParameters {
         is_pinned: boolean;
     };
     writer?: string;
-    resource_group: PostResourceGroup;
+    resource_group: Extract<ResourceGroupType, 'SYSTEM'|'DOMAIN'>;
 }

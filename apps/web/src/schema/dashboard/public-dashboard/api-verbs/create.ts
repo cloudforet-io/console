@@ -13,7 +13,7 @@ export interface PublicDashboardCreateParameters {
     variables_schema?: DashboardVariablesSchema;
     labels?: string[];
     tags?: Tags;
-    resource_group: ResourceGroupType;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'PROJECT'>;
     workspace_id?: string;
     project_id?: string;
 }

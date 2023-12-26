@@ -13,7 +13,7 @@ export const useFileUploader = () => {
     const appContextGetters = appContextStore.getters;
     const userWorkspaceStore = useUserWorkspaceStore();
     const workspaceGetters = userWorkspaceStore.getters;
-    const resourceGroup = computed<ResourceGroupType>(() => {
+    const resourceGroup = computed<Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>>(() => {
         if (appContextGetters.isAdminMode) return 'DOMAIN';
         return 'WORKSPACE';
     });

@@ -15,7 +15,7 @@ export interface BudgetCreateParameters {
     end: string;
     notifications?: BudgetNotification[];
     tags?: Tags;
-    resource_group: ResourceGroupType;
+    resource_group: Extract<ResourceGroupType, 'WORKSPACE'|'PROJECT'>;
     workspace_id?: string;
     project_id?: string;
 }

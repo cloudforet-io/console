@@ -11,7 +11,8 @@ import type { Attachment } from '@/common/components/editor/extensions/image/typ
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-const getUploadInfo = async (file: File, resourceGroup: ResourceGroupType, domainOrWorkspaceId: string): Promise<[fileId: string, uploadUrl: string, options: object]> => {
+type FileManagerResourceGroupType = Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'|'SYSTEM'>;
+const getUploadInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, domainOrWorkspaceId: string): Promise<[fileId: string, uploadUrl: string, options: object]> => {
     const params: FileAddParameters = {
         name: file.name,
         resource_group: resourceGroup,
@@ -40,7 +41,7 @@ export const getDownloadUrl = async (fileId: string): Promise<string> => {
     return result.download_url;
 };
 
-export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: ResourceGroupType, domainOrWorkspaceId: string): Promise<Attachment> => {
+export const uploadFileAndGetFileInfo = async (file: File, resourceGroup: FileManagerResourceGroupType, domainOrWorkspaceId: string): Promise<Attachment> => {
     try {
         const [fileId, uploadUrl, options] = await getUploadInfo(file, resourceGroup, domainOrWorkspaceId);
         await uploadFile(uploadUrl, options, file);
