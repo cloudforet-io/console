@@ -1,4 +1,3 @@
-import { asyncComputed } from '@vueuse/core';
 import { computed, reactive } from 'vue';
 
 import type { TreeNode } from '@spaceone/design-system/types/data-display/tree/type';
@@ -15,13 +14,11 @@ import type { ProjectCreateParameters } from '@/schema/identity/project/api-verb
 import type { ProjectUpdateParameters } from '@/schema/identity/project/api-verbs/udpate';
 import type { ProjectUpdateProjectTypeParameters } from '@/schema/identity/project/api-verbs/update-project-type';
 import type { ProjectModel } from '@/schema/identity/project/model';
-import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
 import { store } from '@/store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { useProjectTree } from '@/services/project/composables/use-project-tree';
-import { getWorkspaceUser } from '@/services/project/helpers/workspace-user-helper';
 import type {
     ProjectGroupTreeItem, ProjectGroupTreeNodeData, ProjectTreeNodeData, ProjectTreeRoot,
 } from '@/services/project/types/project-tree-type';
@@ -29,6 +26,9 @@ import type {
 
 const projectTreeHelper = useProjectTree();
 export const useProjectPageStore = defineStore('project-page', () => {
+    const _state = reactive({
+        currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
+    });
     const state = reactive({
         isInitiated: false as boolean,
         searchText: undefined as string|undefined,
@@ -45,14 +45,7 @@ export const useProjectPageStore = defineStore('project-page', () => {
         projectFormModalVisible: false as boolean,
         shouldUpdateProjectList: false as boolean,
         //
-        workspaceUser: asyncComputed<WorkspaceUserModel|undefined>(async () => {
-            const _workspaceUser = await getWorkspaceUser(store.state.user.userId);
-            return _workspaceUser;
-        }),
-        isWorkspaceOwner: computed<boolean>(() => {
-            if (!state.workspaceUser) return false;
-            return state.workspaceUser.role_binding_info.role_type === 'WORKSPACE_OWNER';
-        }),
+        isWorkspaceOwner: computed<boolean>(() => _state.currentRoleType === 'WORKSPACE_OWNER'),
     });
 
     const getters = reactive({
