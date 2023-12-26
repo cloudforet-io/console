@@ -1,3 +1,3 @@
-export interface UserProfileConfirmEmailParams {
+export interface UserProfileConfirmEmailParameters {
     verify_code: string;
 }

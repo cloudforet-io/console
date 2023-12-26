@@ -1,3 +1,3 @@
-export interface UserProfileConfirmMfaParams {
+export interface UserProfileConfirmMfaParameters {
     verify_code: string;
 }

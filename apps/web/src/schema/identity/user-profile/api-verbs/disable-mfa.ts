@@ -1,3 +1,3 @@
-export interface UserProfileDisableMfaParams {
+export interface UserProfileDisableMfaParameters {
     user_id: string;
 }

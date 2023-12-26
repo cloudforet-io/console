@@ -99,7 +99,7 @@ import jwtDecode from 'jwt-decode';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
-import type { UserProfileResetPasswordParams } from '@/schema/identity/user-profile/api-verbs/reset-password';
+import type { UserProfileResetPasswordParameters } from '@/schema/identity/user-profile/api-verbs/reset-password';
 import type { UserProfileUpdateParameters } from '@/schema/identity/user-profile/api-verbs/update';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -218,7 +218,7 @@ const resetInputs = () => {
 const sendResetEmail = async (userId, domainId) => {
     state.loading = true;
     try {
-        await SpaceConnector.clientV2.identity.userProfile.resetPassword<UserProfileResetPasswordParams>({
+        await SpaceConnector.clientV2.identity.userProfile.resetPassword<UserProfileResetPasswordParameters>({
             user_id: userId,
             domain_id: domainId,
         });
