@@ -472,6 +472,7 @@
 						"ALL": "すべて",
 						"BASE_INFORMATION": "基本情報",
 						"DATA_SOURCE": "データソース",
+						"DATA_SOURCE_PLACEHOLDER": "",
 						"LABEL_COST_TYPE": "コストタイプ",
 						"LABEL_CURRENCY": "通貨",
 						"LABEL_NAME": "名前",
