@@ -913,6 +913,10 @@
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
 				"ROLE_ROOT_ADMIN": "ルート管理者"
 			},
+			"ADMIN": {
+				"SWITCH_ADMIN": "",
+				"SWITCH_WORKSPACE": ""
+			},
 			"DASHBOARDS": {
 				"CREATE_DASHBOARDS": "新しいダッシュボードを作成する。",
 				"NO_ITEMS": "項目なし",
