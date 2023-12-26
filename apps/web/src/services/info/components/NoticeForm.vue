@@ -191,6 +191,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
         <div class="notice-create-buttons-wrapper">
             <p-button style-type="tertiary"
                       size="lg"
+                      :disabled="noticeDetailState.loadingForCUD"
                       @click="$router.go(-1)"
             >
                 {{ $t('INFO.NOTICE.FORM.CANCEL') }}
@@ -198,6 +199,7 @@ watch([() => noticeDetailState.post, () => noticeDetailState.loading], async ([n
             <p-button style-type="primary"
                       size="lg"
                       :disabled="!isAllValid"
+                      :loading="noticeDetailState.loadingForCUD"
                       @click="handleConfirm"
             >
                 {{ $t('INFO.NOTICE.FORM.CONFIRM') }}

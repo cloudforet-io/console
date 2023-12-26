@@ -16,6 +16,7 @@ export const useNoticeDetailStore = defineStore('notice-detail', () => {
     const state = reactive({
         post: undefined as undefined | PostModel,
         loading: false,
+        loadingForCUD: false,
     });
 
     const getters = reactive({});
@@ -37,18 +38,18 @@ export const useNoticeDetailStore = defineStore('notice-detail', () => {
         },
         deleteNoticePost: async (postId: string) => {
             try {
-                state.loading = true;
+                state.loadingForCUD = true;
                 await SpaceConnector.clientV2.board.post.delete<PostDeleteParameters>({
                     post_id: postId,
                 });
                 state.post = undefined;
             } finally {
-                state.loading = false;
+                state.loadingForCUD = false;
             }
         },
         updateNoticePost: async (params: Omit<PostUpdateParameters, 'post_id'>) => {
             try {
-                state.loading = true;
+                state.loadingForCUD = true;
                 if (!state.post) throw new Error('Notice post not found');
                 const post = await SpaceConnector.clientV2.board.post.update<PostUpdateParameters, PostModel>({
                     ...params,
@@ -56,15 +57,15 @@ export const useNoticeDetailStore = defineStore('notice-detail', () => {
                 });
                 state.post = post;
             } finally {
-                state.loading = false;
+                state.loadingForCUD = false;
             }
         },
         createNoticePost: async (params: Omit<PostCreateParameters, 'post_id'>) => {
             try {
-                state.loading = true;
-                await SpaceConnector.clientV2.board.post.create(params);
+                state.loadingForCUD = true;
+                await SpaceConnector.clientV2.board.post.create<PostCreateParameters>(params);
             } finally {
-                state.loading = false;
+                state.loadingForCUD = false;
             }
         },
         reset: () => {
