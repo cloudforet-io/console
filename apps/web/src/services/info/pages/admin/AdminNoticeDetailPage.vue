@@ -6,7 +6,6 @@ import {
 import { PButton, PHeading } from '@spaceone/design-system';
 
 import { SpaceRouter } from '@/router';
-import { NOTICE_POST_TYPE } from '@/schema/board/post/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -28,12 +27,7 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 
 const state = reactive({
-    hasDomainRoleUser: computed<boolean>(() => store.getters['user/isDomainAdmin']),
-    hasSystemRoleUser: computed<boolean>(() => store.getters['user/hasSystemRole']),
-    hasPermissionToEditOrDelete: computed<boolean>(() => {
-        if (state.postType === NOTICE_POST_TYPE.SYSTEM) return state.hasSystemRoleUser;
-        return state.hasDomainRoleUser || state.hasSystemRoleUser;
-    }),
+    hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     deleteModalVisible: false,
 });
 

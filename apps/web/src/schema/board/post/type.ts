@@ -1,6 +1,4 @@
-import type { NOTICE_POST_TYPE, POST_BOARD_TYPE } from '@/schema/board/post/constant';
-
-export type NoticePostType = typeof NOTICE_POST_TYPE[keyof typeof NOTICE_POST_TYPE];
+import type { POST_BOARD_TYPE } from '@/schema/board/post/constant';
 
 export type PostBoardType = typeof POST_BOARD_TYPE[keyof typeof POST_BOARD_TYPE];
 
