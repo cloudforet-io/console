@@ -11,7 +11,7 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import config from '@/lib/config';
 
@@ -27,8 +27,8 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     isAdminMode: false,
 });
-const workspaceStore = useWorkspaceStore();
-const workspaceStoreState = workspaceStore.$state;
+const userWorkspaceStore = useUserWorkspaceStore();
+const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
 
 const state = reactive({
@@ -55,7 +55,7 @@ const state = reactive({
 const selectWorkspace = (workspaceId: string): void => {
     if (workspaceId) {
         if (workspaceId === state.selectedWorkspace?.workspace_id) return;
-        workspaceStore.setCurrentWorkspace(workspaceId);
+        userWorkspaceStore.setCurrentWorkspace(workspaceId);
         router.push({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId } });
     }
 };

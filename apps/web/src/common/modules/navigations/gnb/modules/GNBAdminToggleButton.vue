@@ -3,22 +3,26 @@ import Vue, { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const router = useRouter();
 
 const state = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
 });
-const handleToggleAdminMode = () => {
+const handleToggleAdminMode = async () => {
     if (state.isAdminMode) {
+        await userWorkspaceStore.load(store.state.user.userId);
         appContextStore.switchToWorkspaceMode();
-        router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
+        await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
         Vue.notify({
             group: 'toastTopCenter',
             type: 'info',
@@ -29,7 +33,7 @@ const handleToggleAdminMode = () => {
         return;
     }
     appContextStore.switchToAdminMode();
-    router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+    await router.push({ name: ROOT_ROUTE.ADMIN._NAME });
     Vue.notify({
         group: 'toastTopCenter',
         type: 'info',

@@ -16,7 +16,7 @@ import { store } from '@/store';
 
 import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useGlobalUIStore } from '@/store/global-ui/global-ui-store';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 
@@ -55,7 +55,7 @@ const state = reactive({
     hasNoWorkspace: false,
 });
 
-const workspaceStore = useWorkspaceStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const globalUIStore = useGlobalUIStore();
 const globalUIGetters = globalUIStore.getters;
 
@@ -85,7 +85,7 @@ watch(() => route, (value) => {
 watch(() => route.name, (routeName) => {
     const routerAccessLevel = getRouteAccessLevel(route);
     if (routeName && routeName !== makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME) && routerAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
-        state.hasNoWorkspace = workspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
+        state.hasNoWorkspace = userWorkspaceStore.getters.workspaceList.length === 0 && store.getters['user/isDomainAdmin'];
     }
 }, { immediate: true });
 

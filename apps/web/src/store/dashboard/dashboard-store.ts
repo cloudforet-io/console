@@ -14,7 +14,7 @@ import type { PrivateDashboardModel } from '@/schema/dashboard/private-dashboard
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
-import { useWorkspaceStore } from '@/store/app-context/workspace/workspace-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -47,11 +47,11 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 export const useDashboardStore = defineStore('dashboard', () => {
     const appContextStore = useAppContextStore();
-    const workspaceStore = useWorkspaceStore();
+    const userWorkspaceStore = useUserWorkspaceStore();
 
     const _state = reactive({
         isAdminMode: computed(() => appContextStore.getters.isAdminMode),
-        currentWorkspace: computed(() => workspaceStore.getters.currentWorkspace),
+        currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
     });
     const state = reactive({
         publicDashboardItems: [] as PublicDashboardModel[],
