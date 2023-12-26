@@ -6,7 +6,10 @@ import {
 import { defineStore } from 'pinia';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
+
+import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import type { CloudServiceQuerySetListParameters } from '@/schema/inventory/cloud-service-query-set/api-verbs/list';
+import type { CloudServiceQuerySetModel } from '@/schema/inventory/cloud-service-query-set/model';
 
 import type {
     ReferenceItem,
@@ -20,30 +23,12 @@ import { REFERENCE_TYPE_INFO } from '@/lib/reference/reference-config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
-export interface QuerySetModel {
-    query_set_id: string;
-    name: string;
-    provider: string;
-    state: 'ENABLED' | 'DISABLED';
-    query_options: Record<string, any>;
-    query_type: 'LOCAL' | 'MANAGED' | 'CUSTOM';
-    unit: Record<string, any>;
-    keys: string[];
-    additional_info_keys: string[];
-    cloud_service_group: string;
-    cloud_service_type: string;
-    tags: Record<string, any>;
-    domain_id: string;
-    created_at: string;
-    last_synchronized_at: string;
-}
-
-type PickedQuerySetModel = Pick<QuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
+type PickedQuerySetModel = Pick<CloudServiceQuerySetModel, 'query_set_id'|'name'|'provider'|'cloud_service_group'|'cloud_service_type'>;
 export type QuerySetItems = Required<Pick<ReferenceItem<PickedQuerySetModel>, 'key'|'label'|'name'|'data'>>;
 export type CloudServiceQuerySetReferenceMap = ReferenceMap<QuerySetItems>;
 
 const LOAD_TTL = 1000 * 60 * 60 * 3; // 3 hours
-const lastLoadedTime = 0;
+let lastLoadedTime = 0;
 
 export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-query-set-reference-store', () => {
     const state = reactive({
@@ -72,30 +57,32 @@ export const useCloudServiceQuerySetReferenceStore = defineStore('cloud-service-
             ) return;
 
 
-            const fetcher = getCancellableFetcher(SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list);
             try {
-                const { status, response } = await fetcher({
+                const res = await SpaceConnector.clientV2.inventory.cloudServiceQuerySet.list<CloudServiceQuerySetListParameters, ListResponse<CloudServiceQuerySetModel>>({
                     query: {
                         only: ['query_set_id', 'name'],
                     },
                 });
-                if (status === 'succeed') {
-                    const items: CloudServiceQuerySetReferenceMap = {};
-                    response.results.forEach((item: QuerySetModel) => {
-                        items[item.query_set_id] = {
-                            key: item.query_set_id,
-                            label: item.name,
-                            name: item.name,
-                            data: item,
-                        };
-                    });
-                    state.items = items;
-                }
+                const items: CloudServiceQuerySetReferenceMap = {};
+                res.results?.forEach((item: CloudServiceQuerySetModel) => {
+                    items[item.query_set_id] = {
+                        key: item.query_set_id,
+                        label: item.name,
+                        name: item.name,
+                        data: item,
+                    };
+                });
+                state.items = items;
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                lastLoadedTime = currentTime;
             }
         },
-        flush() { state.items = null; },
+        flush() {
+            state.items = null;
+            lastLoadedTime = 0;
+        },
     };
 
     return {
