@@ -18,7 +18,7 @@ import {
 } from '@cloudforet/core-lib/component-util/query-search';
 import type { KeyItemSet, ValueHandlerMap } from '@cloudforet/core-lib/component-util/query-search/type';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import type { Sort } from '@cloudforet/core-lib/space-connector/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{(e: 'update-filters', filters:ConsoleFilter[]): void;
     (e: 'update-pagination', pageStart: number, pageLimit: number): void;
     (e: 'update-period', period: Period): void;
-    (e: 'update-sort', sort: Query['sort']): void;
+    (e: 'update-sort', sort: Sort): void;
     (e: 'refresh'): void;
     (e: 'export'): void;
 }>();
@@ -118,7 +118,7 @@ const state = reactive({
     ])),
     sortDesc: true,
     selectedSortKey: 'budget_usage',
-    sort: computed<Query['sort']>(() => ({
+    sort: computed<Sort>(() => ({
         key: state.selectedSortKey,
         desc: state.sortDesc,
     })),

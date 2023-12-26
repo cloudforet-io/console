@@ -11,7 +11,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
-import type { Query } from '@cloudforet/core-lib/space-connector/type';
+import type { Sort, Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { SpaceRouter } from '@/router';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
@@ -156,8 +156,8 @@ const handleExport = async () => {
     });
 };
 
-const handleUpdateSort = (sort) => {
-    state.sort = sort;
+const handleUpdateSort = (sort: Sort) => {
+    state.sort = [sort];
     listBudgets();
 };
 
