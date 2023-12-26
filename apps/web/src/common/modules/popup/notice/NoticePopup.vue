@@ -54,7 +54,7 @@ export default {
             o: '=',
         }]).data;
         const apiQueryForPostList = new ApiQueryHelper().setFilters([{
-            k: 'options.is_popup',
+            k: 'is_popup',
             v: true,
             o: '=',
         }]).setSort('created_at', false).data;

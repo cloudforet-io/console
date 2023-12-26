@@ -68,7 +68,7 @@ const noticeGetters = noticeStore.getters;
 /* Api */
 const noticeApiHelper = new ApiQueryHelper()
     .setPage(1, NOTICE_ITEM_LIMIT)
-    .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+    .setMultiSort([{ key: 'is_pinned', desc: true }, { key: 'created_at', desc: true }]);
 const listNotice = async () => {
     try {
         const { results, total_count } = await SpaceConnector.clientV2.board.post.list<PostListParameters, ListResponse<PostModel>>({

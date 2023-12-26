@@ -43,7 +43,7 @@ const noticeGetters = noticeStore.getters;
 const initNoticeApiHelper = () => {
     const initApiHelper = new ApiQueryHelper()
         .setPage(1, NOTICE_ITEM_LIMIT)
-        .setMultiSort([{ key: 'options.is_pinned', desc: true }, { key: 'created_at', desc: true }]);
+        .setMultiSort([{ key: 'is_pinned', desc: true }, { key: 'created_at', desc: true }]);
     return initApiHelper;
 };
 let noticeApiHelper = initNoticeApiHelper();
