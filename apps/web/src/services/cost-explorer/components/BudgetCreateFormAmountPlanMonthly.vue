@@ -7,6 +7,10 @@ import { PButton, PDivider, PFieldTitle } from '@spaceone/design-system';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/settings/config';
+import { useAllReferenceStore } from '@/store/reference/all-reference-store';
+import type { CostDataSourceReferenceMap, DataSourceItems } from '@/store/reference/cost-data-source-reference-store';
+
 import BudgetCreateFormAmountPlanAutofillModal
     from '@/services/cost-explorer/components/BudgetCreateFormAmountPlanAutofillModal.vue';
 import BudgetCreateFormAmountPlanMonthInput
@@ -18,15 +22,20 @@ import type { Period } from '@/services/cost-explorer/types/cost-explorer-query-
 
 
 interface Props {
+    dataSourceId?: string;
     period: Period;
 }
 
 const props = withDefaults(defineProps<Props>(), {
+    dataSourceId: undefined,
     period: () => ({}),
 });
-
 const emit = defineEmits<{(e: 'update', monthAmountInputMap: MonthAmountInputMap, isAllValid: boolean): void; }>();
 
+const allReferenceStore = useAllReferenceStore();
+const storeState = reactive({
+    costDataSource: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
+});
 
 const getAllMonths = (month: Dayjs, monthEnd: Dayjs) => {
     const months: string[] = [];
@@ -47,6 +56,12 @@ const state = reactive({
         const monthEnd = dayjs.utc(end as string);
 
         return getAllMonths(month, monthEnd);
+    }),
+    currencyText: computed<string>(() => {
+        if (!props.dataSourceId) return '';
+        const dataSourceItem:DataSourceItems = storeState.costDataSource[props.dataSourceId];
+        const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY.USD;
+        return CURRENCY_SYMBOL[currency] + CURRENCY[currency];
     }),
     monthAmountInputMap: {} as MonthAmountInputMap,
     // autofill
@@ -135,7 +150,7 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
         <div class="header">
             <div class="header-text-wrapper">
                 <p class="title">
-                    <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ($USD)
+                    <p-field-title>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-field-title> ({{ state.currencyText }})
                 </p>
                 <slot name="last-3-months" />
             </div>
@@ -159,6 +174,7 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
         </div>
         <budget-create-form-amount-plan-autofill-modal
             :visible="state.visibleAutofillModal"
+            :currency-text="state.currencyText"
             @update:visible="handleUpdateVisible"
             @confirm="handleAutofillConfirm"
         />
@@ -171,7 +187,7 @@ watch(() => state.monthAmountInputMap, (monthAmountInputMap) => {
         @apply flex justify-between;
         margin-bottom: 1.5rem;
         .header-text-wrapper {
-            @apply flex flex-col;
+            @apply flex flex-col text-label-md;
             gap: 0.5rem;
             .title {
                 @apply flex;
