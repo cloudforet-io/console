@@ -70,7 +70,7 @@ const handleChangeTextInput = debounce(async (searchText: string) => {
     formState.searchText = searchText;
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
-    if (!userPageState.isAdminMode) {
+    if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
         await fetchListUsers();
     }
 }, 200);
@@ -102,9 +102,9 @@ const handleSelectDropdownItem = (selected: string) => {
     authTypeState.selectedMenuItem = selected as AuthType;
 };
 const getUserList = async () => {
-    let isNew = userPageState.isAdminMode;
+    let isNew = userPageState.isAdminMode || userPageState.afterWorkspaceCreated;
     try {
-        if (userPageState.isAdminMode) {
+        if (userPageState.isAdminMode || userPageState.afterWorkspaceCreated) {
             await fetchGetUsers(formState.searchText);
         } else {
             const isIndependentUser = state.independentUsersList.find((user) => user.user_id === formState.searchText);
@@ -190,9 +190,24 @@ const fetchGetUsers = async (userId: string) => {
     await SpaceConnector.clientV2.identity.user.get<UserGetParameters, UserModel>({
         user_id: userId,
     });
-    validationState.userIdInvalid = true;
-    validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
+    if (userPageState.afterWorkspaceCreated) {
+        state.selectedItems.push({
+            user_id: formState.searchText,
+            label: formState.searchText,
+            name: formState.searchText,
+            isNew: false,
+            auth_type: authTypeState.selectedMenuItem,
+        });
+        formState.searchText = '';
+        validationState.userIdInvalid = false;
+        validationState.userIdInvalidText = '';
+    } else {
+        validationState.userIdInvalid = true;
+        validationState.userIdInvalidText = i18n.t('IAM.USER.FORM.USER_ID_INVALID_DOMAIN', { userId });
+    }
 };
+
+
 
 onClickOutside(containerRef, clickOutside);
 
@@ -200,7 +215,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
     if (menuVisible) {
         formState.searchText = '';
         authTypeState.selectedUserAuthType = authTypeState.selectedMenuItem as AuthType;
-        if (!userPageState.isAdminMode) {
+        if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
             await fetchListUsers();
             state.independentUsersList = await userPageStore.findWorkspaceUser();
         }

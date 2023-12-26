@@ -30,6 +30,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
+    (e: 'confirm'): void;
     (e: 'refresh'): void;
 }>();
 
@@ -64,7 +65,8 @@ const handleConfirm = async () => {
         });
         state.proxyVisible = false;
         showSuccessMessage(i18n.t('Workspace successfully created'), '');
-        emit('update-list');
+        emit('refresh');
+        emit('confirm');
     } catch (e) {
         ErrorHandler.handleError(e);
     }
