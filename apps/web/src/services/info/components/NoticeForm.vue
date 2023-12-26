@@ -4,17 +4,12 @@ import {
 } from 'vue';
 
 import {
-    PPaneLayout, PFieldGroup, PTextInput, PRadio, PSelectDropdown, PCheckbox, PButton,
+    PPaneLayout, PFieldGroup, PTextInput, PCheckbox, PButton,
 } from '@spaceone/design-system';
-
-import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import { SpaceRouter } from '@/router';
 import type { PostUpdateParameters } from '@/schema/board/post/api-verbs/update';
 import { POST_BOARD_TYPE } from '@/schema/board/post/constant';
-import type { DomainGetParameters } from '@/schema/identity/domain/api-verbs/get';
-import type { DomainListParameters, DomainListResponse } from '@/schema/identity/domain/api-verbs/list';
-import type { DomainModel } from '@/schema/identity/domain/model';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -33,11 +28,6 @@ import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store
 interface Props {
     type?: NoticeFormType;
 }
-interface DomainItem {
-    name: string;
-    label: string;
-}
-
 type NoticeFormType = 'CREATE' | 'EDIT';
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,18 +38,11 @@ const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
 
 const state = reactive({
-    hasSystemRole: computed<boolean>(() => store.getters['user/hasSystemRole']),
     hasDomainRole: computed<boolean>(() => store.getters['user/isDomainAdmin']),
     userName: computed<string>(() => store.state.user.name),
     isPinned: false,
     isPopup: false,
     attachments: [] as Attachment[],
-    isAllDomainSelected: !!store.getters['user/hasSystemRole'], // It's active only in root domain case
-    domainList: [] as Array<DomainItem>,
-    selectedDomain: store.getters['user/hasSystemRole']
-        ? []
-        : [{ name: store.state.domain.domainId, label: store.state.domain.domainId }] as Array<DomainItem>,
-    domainName: '',
 });
 
 const {
@@ -124,15 +107,9 @@ const handleCreateNotice = async () => {
 };
 const handleEditNotice = async () => {
     try {
-        const params = state.isAllDomainSelected
-            ? {
-                ...formData.value,
-            }
-            : {
-                ...formData.value,
-                domain_id: state.selectedDomain[0].name,
-            };
-        await noticeDetailStore.updateNoticePost(params);
+        await noticeDetailStore.updateNoticePost({
+            ...formData.value,
+        });
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_UPDATE_NOTICE'), '');
         SpaceRouter.router.back();
     } catch (e) {
@@ -140,56 +117,19 @@ const handleEditNotice = async () => {
     }
 };
 
-const handleClickAllDomainRadio = () => { state.isAllDomainSelected = true; };
-const handleClickSelectDomainRadio = () => { state.isAllDomainSelected = false; };
-
-const handleSelectDomain = (domain: Array<DomainItem>) => {
-    if (!state.isAllDomainSelected) {
-        state.selectedDomain = domain;
-    }
-};
-
-const getDomainList = async () => {
-    try {
-        const { results } = await SpaceConnector.clientV2.identity.domain.list<DomainListParameters, DomainListResponse>();
-        state.domainList = results.map((d) => ({
-            name: d.domain_id,
-            label: d.name,
-        }));
-    } catch (e) {
-        ErrorHandler.handleError(e);
-        state.domainList = [];
-    }
-};
-
-
-watch(() => state.isAllDomainSelected, (isAllDomain: boolean) => {
-    if (isAllDomain) state.selectedDomain = [];
-});
 
 watch(() => noticeDetailState.post, async (notice) => {
     if (!notice || !Object.keys(notice).length) return;
-    if (notice?.domain_id) {
-        const { name } = await SpaceConnector.clientV2.identity.domain.get<DomainGetParameters, DomainModel>({ domain_id: notice.domain_id });
-        state.domainName = name;
-    }
 
     // INIT STATES
     state.isPinned = notice.options?.is_pinned ?? false;
     state.isPopup = notice.options?.is_popup ?? false;
     state.attachments = notice.files?.map((file) => ({ fileId: file.file_id, downloadUrl: file.download_url ?? '' })) ?? [];
-    state.isAllDomainSelected = !notice?.domain_id;
-    state.selectedDomain = notice?.domain_id
-        ? [{ name: notice.domain_id, label: state.domainName || notice.domain_id }]
-        : [];
     setForm('writerName', notice.writer);
     setForm('noticeTitle', notice.title);
     setForm('contents', notice.contents);
 });
 
-(async () => {
-    if (state.hasSystemRole) await getDomainList();
-})();
 </script>
 
 <template>
@@ -206,35 +146,6 @@ watch(() => noticeDetailState.post, async (notice) => {
                                   @update:value="setForm('writerName', $event)"
                     />
                 </template>
-            </p-field-group>
-            <p-field-group v-if="state.hasSystemRole"
-                           class="notice-label-wrapper"
-                           :label="$t('INFO.NOTICE.FORM.LABEL_VIEWER')"
-                           required
-            >
-                <p-radio :disabled="props.type === 'EDIT'"
-                         :selected="state.isAllDomainSelected"
-                         class="mr-4"
-                         @change="handleClickAllDomainRadio"
-                >
-                    <span>{{ $t('INFO.NOTICE.FORM.ALL_DOMAINS') }}</span>
-                </p-radio>
-                <p-radio :disabled="props.type === 'EDIT'"
-                         :selected="!state.isAllDomainSelected"
-                         @change="handleClickSelectDomainRadio"
-                >
-                    <span>{{ $t('INFO.NOTICE.FORM.SELECTED_DOMAIN') }}</span>
-                </p-radio>
-                <br>
-                <p-select-dropdown class="mt-2 w-1/2"
-                                   :menu="state.domainList"
-                                   :selected="state.selectedDomain"
-                                   :disabled="state.isAllDomainSelected || props.type === 'EDIT'"
-                                   :placeholder="state.isAllDomainSelected ? $t('INFO.NOTICE.FORM.PLACEHOLDER_ALL') : ''"
-                                   is-filterable
-                                   show-delete-all-button
-                                   @update:selected="handleSelectDomain"
-                />
             </p-field-group>
             <p-field-group class="notice-label-wrapper"
                            :label="$t('INFO.NOTICE.FORM.LABEL_TITLE')"
@@ -265,7 +176,7 @@ watch(() => noticeDetailState.post, async (notice) => {
                     />
                 </template>
             </p-field-group>
-            <div v-if="state.hasSystemRole || state.hasDomainRole"
+            <div v-if=" state.hasDomainRole"
                  class="notice-create-options-wrapper"
             >
                 <p-checkbox v-model="state.isPinned">
