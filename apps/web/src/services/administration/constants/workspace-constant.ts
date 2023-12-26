@@ -12,12 +12,12 @@ export const WORKSPACE_TABLE_FIELDS = [
     { name: 'created_at', label: 'Created', sortable: false },
 ] as const;
 
-export const EXCEL_TABLE_FIELDS = [
+export const EXCEL_TABLE_FIELDS: ExcelDataField[] = [
     { key: 'name', name: 'Name' },
     { key: 'state', name: 'State' },
     { key: 'users', name: 'Users' },
     { key: 'created_at', name: 'Created At' },
-] as ExcelDataField[];
+];
 
 export const WORKSPACE_STATE = {
     ENABLE: 'ENABLED',
