@@ -2,9 +2,9 @@
     <section class="user-account-page">
         <p-heading :title="$t('MY_PAGE.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <user-account-base-information />
-        <user-account-notification-email v-if="state.smtpEnabled && (state.userType === 'LOCAL' || state.userType === 'EXTERNAL')" />
+        <user-account-notification-email v-if="state.smtpEnabled && (state.authType === 'LOCAL' || state.authType === 'EXTERNAL')" />
         <user-account-multi-factor-auth />
-        <user-account-change-password v-if="state.userType === 'LOCAL'" />
+        <user-account-change-password v-if="state.authType === 'LOCAL'" />
     </section>
 </template>
 
@@ -24,7 +24,7 @@ import UserAccountNotificationEmail from '@/services/my-page/components/UserAcco
 
 
 const state = reactive({
-    userType: computed(() => store.state.user.backend),
+    authType: computed(() => store.state.user.authType),
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
 });
 </script>
