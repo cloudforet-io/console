@@ -34,6 +34,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import { BACKGROUND_COLOR } from '@/styles/colorsets';
 
 import ProjectFormModal from '@/services/project/components/ProjectFormModal.vue';
+import ProjectMainProjectGroupMoveModal from '@/services/project/components/ProjectMainProjectGroupMoveModal.vue';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 import { useProjectDetailPageStore } from '@/services/project/stores/project-detail-page-store';
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
@@ -72,6 +73,7 @@ const state = reactive({
     counts: computed(() => ({
         TRIGGERED: find(projectDetailPageState.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total ?? 0,
     })),
+    projectGroupMoveModalVisible: false,
 });
 
 /** Tabs */
@@ -118,6 +120,9 @@ const openProjectDeleteForm = () => {
     formState.themeColor = 'alert';
     formState.modalContent = i18n.t('PROJECT.DETAIL.MODAL_DELETE_PROJECT_CONTENT');
 };
+const handleOpenProjectGroupMoveModal = () => {
+    state.projectGroupMoveModalVisible = true;
+};
 
 const projectDeleteFormConfirm = async () => {
     if (formState.modalLoading) return;
@@ -140,6 +145,10 @@ const projectDeleteFormConfirm = async () => {
 
 const handleConfirmProjectForm = (data: ProjectModel) => {
     projectDetailPageStore.setProject(data);
+};
+
+const handleConfirmProjectGroupMoveModal = () => {
+    projectDetailPageStore.getProject();
 };
 
 const onChangeTab = (activeTab) => {
@@ -199,6 +208,10 @@ onUnmounted(() => {
                                                class="edit-btn"
                                                size="md"
                                                @click="projectPageStore.openProjectFormModal()"
+                                />
+                                <p-icon-button name="ic_move"
+                                               style-type="transparent"
+                                               @click="handleOpenProjectGroupMoveModal"
                                 />
                                 <p-icon-button name="ic_delete"
                                                class="delete-btn"
@@ -277,6 +290,12 @@ onUnmounted(() => {
             :project="state.item"
             @confirm="handleConfirmProjectForm"
             @update:visible="projectPageStore.setProjectFormModalVisible"
+        />
+        <project-main-project-group-move-modal v-if="state.projectGroupMoveModalVisible"
+                                               :visible.sync="state.projectGroupMoveModalVisible"
+                                               is-project
+                                               :target-id="projectDetailPageState.projectId"
+                                               @confirm="handleConfirmProjectGroupMoveModal"
         />
     </general-page-layout>
 </template>
