@@ -18,16 +18,6 @@ export interface AccessInfo {
 // export type PagePermissionMap = Record<string, PagePermissionType>;
 export type PageAccessPermissionMap = Record<string, boolean>;
 
-// export const BASIC_USER_DEFAULT_PERMISSIONS: MenuId[] = [
-//     MENU_ID.HOME_DASHBOARD,
-//     MENU_ID.MY_PAGE,
-//     MENU_ID.ACCOUNT,
-//     MENU_ID.ACCOUNT_PROFILE,
-//     MENU_ID.NOTIFICATIONS,
-//     MENU_ID.INFO,
-//     MENU_ID.NOTICE,
-// ];
-
 export const DOMAIN_ADMIN_DEFAULT_PERMISSIONS: MenuId[] = [
     ...Object.values(MENU_ID).filter((menuId) => menuId !== MENU_ID.PROJECT),
 ];
@@ -95,6 +85,15 @@ export const SYSTEM_USER_DEFAULT_PERMISSIONS: MenuId[] = [
     MENU_ID.NOTICE,
 ];
 export const NO_ROLE_USER_DEFAULT_PERMISSIONS: MenuId[] = [
+    MENU_ID.MY_PAGE,
+    MENU_ID.ACCOUNT,
+    MENU_ID.ACCOUNT_PROFILE,
+    MENU_ID.NOTIFICATIONS,
+];
+
+
+export const WORKSPACE_USER_MINIMAL_PERMISSIONS: MenuId[] = [
+    MENU_ID.HOME_DASHBOARD,
     MENU_ID.MY_PAGE,
     MENU_ID.ACCOUNT,
     MENU_ID.ACCOUNT_PROFILE,
