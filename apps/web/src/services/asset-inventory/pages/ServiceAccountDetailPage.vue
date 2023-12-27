@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PLink, PButton, PIconButton, PHeading, PLazyImg,
@@ -30,7 +31,10 @@ import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
+import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
+
+const router = useRouter();
 
 const props = defineProps<{
     serviceAccountId?: string;
@@ -98,6 +102,11 @@ const handleOpenDeleteModal = () => {
 const handleRefresh = () => {
     if (props.serviceAccountId) getAccount(props.serviceAccountId);
 };
+const handleClickBackbutton = () => {
+    router.push({
+        name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
+    });
+};
 
 /* Init */
 (async () => {
@@ -121,7 +130,7 @@ watch(() => props.serviceAccountId, async (serviceAccountId) => {
         <p-heading :title="state.item.name"
                    show-back-button
                    class="page-title"
-                   @click-back-button="$router.go(-1)"
+                   @click-back-button="handleClickBackbutton"
         >
             <template #title-left-extra>
                 <p-lazy-img :src="state.providerIcon"
