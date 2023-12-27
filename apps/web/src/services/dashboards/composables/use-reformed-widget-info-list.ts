@@ -12,7 +12,8 @@ import {
 import {
     widgetWidthAssigner,
 } from '@/services/dashboards/helpers/widget-width-helper';
-import { getWidgetComponent, getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-component-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 import type { WidgetTheme } from '@/services/dashboards/widgets/_types/widget-type';
 
 interface UseWidgetReformerOptions {

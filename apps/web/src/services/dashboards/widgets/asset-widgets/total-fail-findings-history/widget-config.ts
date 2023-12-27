@@ -5,9 +5,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const totalFailFindingsHistoryWidgetConfig: WidgetConfig = {
     widget_config_id: 'totalFailFindingsHistory',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/total-fail-findings-history/TotalFailFindingsHistoryWidget.vue'),
-    }),
     title: 'Total Fail Findings History',
     labels: ['Asset'],
     description: {

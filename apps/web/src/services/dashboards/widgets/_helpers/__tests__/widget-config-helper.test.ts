@@ -11,7 +11,7 @@ import {
 // const basePieConfigId = basePieWidgetConfig.widget_config_id;
 // const costPieSchema = costPieWidgetConfig.options_schema;
 
-describe('[Widget Helper] getWidgetConfig', () => {
+describe('[Widget Config Helper] getWidgetConfig', () => {
     // TODO: SpaceConnector must be initialized before testing
     it('dummy test', () => {
         expect(true).toBeTruthy();

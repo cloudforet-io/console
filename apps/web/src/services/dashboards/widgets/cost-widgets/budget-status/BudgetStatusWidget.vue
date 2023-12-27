@@ -18,7 +18,6 @@ import { indigo, red, yellow } from '@/styles/colors';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type {
     WidgetEmit, WidgetExpose, WidgetProps, Legend, BudgetUsageAnalyzeResponse,

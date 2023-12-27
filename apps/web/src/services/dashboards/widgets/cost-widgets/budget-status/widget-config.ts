@@ -6,9 +6,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const budgetStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetStatus',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/budget-status/BudgetStatusWidget.vue'),
-    }),
     title: 'Budget Status',
     labels: ['Cost', 'Budget'],
     description: {

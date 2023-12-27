@@ -8,7 +8,7 @@ import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 import { i18n } from '@/translations';
 
 import DashboardWidgetForm from '@/services/dashboards/components/DashboardWidgetForm.vue';
-import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-list-constant';
+import { CONSOLE_WIDGET_CONFIGS } from '@/services/dashboards/widgets/_constants/widget-config-list-constant';
 
 const state = reactive({
     widgets: computed(() => getWidgetConfigsByLabel(tabState.activeTab)),

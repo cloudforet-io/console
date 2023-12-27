@@ -5,9 +5,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const costByRegionMultiFieldsWidgetConfig: WidgetConfig = {
     widget_config_id: 'costByRegionMultiFields',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/cost-by-region-multi-fields/CostByRegionMultiFieldsWidget.vue'),
-    }),
     title: 'Cost & Usage Trend By Region',
     labels: ['Cost'],
     description: {

@@ -33,7 +33,6 @@ import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.v
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
 import { useWidgetPagination } from '@/services/dashboards/widgets/_composables/use-widget-pagination';
-// eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import {

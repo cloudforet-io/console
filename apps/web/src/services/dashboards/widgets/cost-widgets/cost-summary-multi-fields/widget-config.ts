@@ -5,9 +5,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const costSummaryMultiFieldsWidgetConfig: WidgetConfig = {
     widget_config_id: 'costSummaryMultiFields',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/cost-summary-multi-fields/CostSummaryMultiFieldsWidget.vue'),
-    }),
     title: 'Cost & Usage Trend (Bar Chart)',
     labels: ['Cost'],
     description: {

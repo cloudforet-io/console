@@ -5,9 +5,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const costMapWidgetConfig: WidgetConfig = {
     widget_config_id: 'costMap',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/cost-map/CostMapWidget.vue'),
-    }),
     title: 'Cost Map',
     labels: ['Cost'],
     description: {
