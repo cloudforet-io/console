@@ -1682,16 +1682,16 @@
 			"DOMAIN_NAME": "Domain Name",
 			"EMAIL_INVALID": "Invalid e-mail format.",
 			"LANGUAGE": "Language",
-			"LOGIN_PAGE_MAIN_IMAGE_DESCRIPTION": "Recommend using this image to strengthen your brand. It will shows up in sign-in screen.\n• Minimum 680 × 680 pixels\n• PNG, JPEG or GIF files",
 			"SAVE_CHANGE": "Save Change",
 			"SAVE_CHANGES": "Save Changes",
 			"SEND_CODE": "Send Code",
-			"SYMBOL_FAVICON_DESCRIPTION": "A symbol logo shows up in the sign-in, navigation bar and as a favicon in browser tabs.\n• Recommended 168 × 168 pixels\n• PNG, JPEG or GIF files",
+			"SIGN_IN_PAGE_MAIN_IMAGE_DESCRIPTION": "Recommend using this image to strengthen your brand. It will shows up in sign-in screen.\n• Minimum 680 × 680 pixels\n• PNG, JPEG, GIF or SVG files",
+			"SYMBOL_FAVICON_DESCRIPTION": "A symbol logo shows up in the sign-in, navigation bar and as a favicon in browser tabs.\n• Recommended 168 × 168 pixels\n• PNG, JPEG, GIF or SVG files",
 			"TIMEZONE": "Timezone",
 			"TIMEZONE_AND_LANGUAGE": "Time zone and Language",
 			"VERIFICATION_CODE": "Verification Code",
 			"VERIFICATION_CODE_INVALID": "Required field",
-			"WORDTYPE_LOGO_DESCRIPTION": "A wordtype logo shows up in your sign-in screen and represents your domain name.\n• Recommended 220 × 40 pixels\n• PNG, JPEG or GIF files"
+			"WORDTYPE_LOGO_DESCRIPTION": "A wordtype logo shows up in your sign-in screen and represents your domain name.\n• Recommended 220 × 40 pixels\n• PNG, JPEG, GIF or SVG files"
 		},
 		"POLICY": {
 			"FORM": {
