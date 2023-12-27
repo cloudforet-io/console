@@ -66,6 +66,5 @@ onMounted(() => {
 .user-info-form-wrapper {
     @apply flex flex-col bg-white rounded-lg;
     padding: 0.75rem;
-    gap: 1rem;
 }
 </style>
