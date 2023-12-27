@@ -16,7 +16,7 @@
                         width="20rem"
                         height="1.5rem"
             />
-            <template v-if="state.collectorName"
+            <template v-if="state.collectorName && collectorDetailPageStore.getters.isEditableCollector"
                       #title-right-extra
             >
                 <span class="title-right-button-wrapper">

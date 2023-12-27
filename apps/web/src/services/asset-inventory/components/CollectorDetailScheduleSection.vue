@@ -2,7 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.SCHEDULE')"
                                          :edit-mode="state.isEditMode"
-                                         :hide-edit-button="!collectorFormState.schedulePower"
+                                         :hide-edit-button="!collectorFormState.schedulePower || !state.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
