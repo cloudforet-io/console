@@ -2,8 +2,6 @@
 import { reactive, computed, watch } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { isEmpty } from 'lodash';
-
 import { store } from '@/store';
 
 import config from '@/lib/config';
@@ -15,20 +13,23 @@ const route = useRoute();
 
 const state = reactive({
     isDomainAdmin: false,
-    images: computed(() => {
-        const domainImage = config.get('DOMAIN_IMAGE');
-        if (!isEmpty(domainImage)) {
-            return {
-                ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                ciTextWithType: config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE'),
-                signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
-            };
-        }
+    logoImage: computed<string|undefined>(() => {
+        const domainSettings = store.state.domain.config?.settings;
+        if (domainSettings?.symbol_favicon_url) return domainSettings.symbol_favicon_url;
+
+        const configImage = config.get('DOMAIN_IMAGE.CI_LOGO');
+        if (configImage) return configImage;
+
         return undefined;
     }),
-    wordTypeLogoUrl: computed<string|undefined>(() => {
+    textImage: computed<string|undefined>(() => {
         const domainSettings = store.state.domain.config?.settings;
-        return domainSettings?.wordtype_logo_url;
+        if (domainSettings?.wordtype_logo_url) return domainSettings?.wordtype_logo_url;
+
+        const configImage = config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE');
+        if (configImage) return configImage;
+
+        return undefined;
     }),
 });
 
@@ -40,27 +41,24 @@ watch(() => route.name, (name) => {
 <template>
     <div class="sign-in-container">
         <div class="ci-wrapper">
-            <template v-if="state.images">
-                <img class="logo-character"
-                     :src="state.images.ciLogo"
-                >
-                <img class="logo-text"
-                     :src="state.images.ciTextWithType"
-                >
-            </template>
-            <template v-else>
-                <img class="logo-character"
-                     src="@/assets/images/brand/brand_logo.png"
-                >
-                <img v-if="state.wordTypeLogoUrl"
-                     class="logo-text"
-                     :src="state.wordTypeLogoUrl"
-                >
-                <img v-else
-                     class="logo-text"
-                     src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
-                >
-            </template>
+            <!--logo image-->
+            <img v-if="state.logoImage"
+                 class="logo-image"
+                 :src="state.logoImage"
+            >
+            <img v-else
+                 class="logo-image"
+                 src="@/assets/images/brand/brand_logo.png"
+            >
+            <!--logo text image-->
+            <img v-if="state.textImage"
+                 class="text-image"
+                 :src="state.textImage"
+            >
+            <img v-else
+                 class="text-image"
+                 src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg"
+            >
         </div>
         <div class="contents-wrapper">
             <sign-in-left-container :is-domain-admin="state.isDomainAdmin" />
@@ -75,13 +73,13 @@ watch(() => route.name, (name) => {
         @apply flex fixed;
         flex-flow: row;
         z-index: 1000;
-        .logo-character {
+        .logo-image {
             width: 56px;
             height: 56px;
             margin-top: 2rem;
             margin-left: 2rem;
         }
-        .logo-text {
+        .text-image {
             width: auto;
             height: 40px;
             margin-top: 2.5rem;
