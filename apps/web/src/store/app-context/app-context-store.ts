@@ -16,7 +16,8 @@ export const useAppContextStore = defineStore('app-context-store', () => {
     });
 
     const getters = reactive({
-        isAdminMode: computed(() => state.isAdminMode),
+        isAdminMode: computed<boolean>(() => state.isAdminMode),
+        workspaceId: computed<string|undefined>(() => userWorkspaceStore.getters.currentWorkspaceId),
     });
 
     const actions = {
