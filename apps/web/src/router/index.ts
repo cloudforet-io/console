@@ -139,7 +139,7 @@ export class SpaceRouter {
                 // When a user is already signed in and tries to go to sign in page, redirect to home-dashboard page
                 } else if (to.meta?.isSignInPage) {
                     nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME };
-                // When a user tries to go to inaccessible page, redirect to error page
+                // When a user tries to go to inaccessible page, redirect to error page (Exclude Admin Mode)
                 } else if (userAccessLevel < routeAccessLevel) {
                     // When a user tries to another available workspace without target page's access permission.
                     // e.g. In A workspace Dashboard, try to toggle B workspace without dashboard access permission.
