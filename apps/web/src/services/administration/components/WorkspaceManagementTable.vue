@@ -117,7 +117,7 @@ const handleSelectDropdown = (name) => {
             Vue.notify({
                 group: 'toastTopCenter',
                 type: 'alert',
-                title: i18n.t('IAM.WORKSPACES.REQUIRED_ENABLE_WORKSPACE'),
+                title: i18n.t('IAM.WORKSPACES.REQUIRED_ENABLE_WORKSPACE') as string,
                 duration: 2000,
                 speed: 1,
             });
@@ -157,10 +157,7 @@ const getListWorkspaces = async () => {
 const handleExport = async () => {
     try {
         await downloadExcel({
-            url: '/identity/workspace/list',
-            param: {
-                query: workspaceListApiQueryHelper.data,
-            },
+            data: workspacePageState.workspaces,
             fields: EXCEL_TABLE_FIELDS,
             file_name_prefix: FILE_NAME_PREFIX.workspace,
             timezone: storeState.timezone,
