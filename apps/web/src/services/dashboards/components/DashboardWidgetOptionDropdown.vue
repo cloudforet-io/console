@@ -156,7 +156,7 @@ const getRefinedSelectedItemByHandlers = async (
 const initSelectedInInheritCase = (inheritOption: InheritOptions[WidgetOptionKey]): SelectDropdownMenuItem[] => {
     if (!inheritOption) return [];
 
-    const variableKey = inheritOption.variable_key ?? state.schemaProperty.key;
+    const variableKey: string = inheritOption.variable_key ?? state.schemaProperty?.key ?? '';
     const variableProperty = props.variablesSchema?.properties?.[variableKey];
     if (!state.inheritanceMode || state.inheritanceMode === 'KEY_MATCHING') {
         if (!variableKey || !variableProperty?.use) return [];
