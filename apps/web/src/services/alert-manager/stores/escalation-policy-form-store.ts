@@ -3,12 +3,12 @@ import { defineStore } from 'pinia';
 
 import { ESCALATION_POLICY_FINISH_CONDITION } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
-import type { EscalationPolicyFinishCondition, EscalationPolicyRule, EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
+import type { EscalationPolicyFinishCondition, EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 
 interface EscalationPolicyFormState {
     escalationPolicyData?: EscalationPolicyModel|undefined;
     name?: string;
-    resourceGroup: EscalationPolicyResourceGroup;
+    resourceGroup: EscalationPolicyModel['resource_group'];
     rules: EscalationPolicyRule[];
     finishCondition: EscalationPolicyFinishCondition;
     repeatCount: number;

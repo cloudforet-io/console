@@ -36,5 +36,3 @@ export interface EventRuleActions {
 export interface EventRuleOptions {
     stop_processing?: boolean;
 }
-
-export type EventRuleResourceGroup = 'WORKSPACE'|'PROJECT';

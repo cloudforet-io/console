@@ -53,9 +53,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
         const param: Omit<AlertUpdateParameters, 'alert_id'> = {};
 
         if (editMode === EDIT_MODE.DESCRIPTION) {
-            const isEmptyInput = state.dataForUpdate.trim().length === 0;
             param.description = state.dataForUpdate;
-            param.reset_description = isEmptyInput;
         } else if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
         return param;
     };

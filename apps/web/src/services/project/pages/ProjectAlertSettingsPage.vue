@@ -12,8 +12,8 @@ import { get } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { EscalationPolicyGetParameters } from '@/schema/monitoring/escalation-policy/api-verbs/get';
-import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type { EventRuleListParameters } from '@/schema/monitoring/event-rule/api-verbs/list';
 import type { EventRuleModel } from '@/schema/monitoring/event-rule/model';
@@ -202,7 +202,7 @@ onActivated(() => {
                     <p-button class="text-button"
                               style-type="tertiary"
                               size="sm"
-                              :disabled="state.escalationPolicy?.resource_group === ESCALATION_POLICY_RESOURCE_GROUP.WORKSPACE"
+                              :disabled="state.escalationPolicy?.resource_group === RESOURCE_GROUP.WORKSPACE"
                               @click="onClickUpdateEscalationPolicy"
                     >
                         {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}

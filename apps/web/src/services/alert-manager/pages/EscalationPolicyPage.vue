@@ -17,6 +17,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@cloudforet/utils';
 
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { EscalationPolicyDeleteParameters } from '@/schema/monitoring/escalation-policy/api-verbs/delete';
 import type {
     EscalationPolicyListParameters,
@@ -113,7 +114,7 @@ const state = reactive({
             type: 'item',
             name: 'default',
             label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
-            disabled: state.selectedItem?.resource_group === ESCALATION_POLICY_RESOURCE_GROUP.PROJECT,
+            disabled: state.selectedItem?.resource_group === RESOURCE_GROUP.PROJECT,
         },
     ])),
     escalationPolicies: [] as EscalationPolicyModel[],
