@@ -53,8 +53,6 @@ const state = reactive({
     }),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
-    // TODO: to be refactored by new planning
-    role: computed(() => store.state.user.roleType || 'USER'),
     language: computed(() => store.getters['user/languageLabel']),
     timezone: computed(() => store.state.user.timezone),
     domainId: computed(() => store.state.domain.domainId),
@@ -164,10 +162,10 @@ const handleClickSignOut = async () => {
                     <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
                     <span class="value">{{ state.domainId }}</span>
                 </div>
-                <div class="info-menu">
-                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                    <span class="value">{{ state.role }}</span>
-                </div>
+                <!--                <div class="info-menu">-->
+                <!--                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>-->
+                <!--                    <span class="value">{{ state.role }}</span>-->
+                <!--                </div>-->
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"
                      @click.stop="handleLanguageDropdownClick"
