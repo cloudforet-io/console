@@ -40,7 +40,7 @@ export interface CollectorItemInfo {
     detailLink: CollectorLink;
     schedule?: Schedule;
     recentJobAnalyze?: JobAnalyzeStatus[];
-    resourceGroup: ResourceGroupType;
+    resourceGroup: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     hasJobList?: boolean
 }
 
