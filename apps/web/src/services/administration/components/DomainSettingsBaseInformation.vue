@@ -40,6 +40,7 @@ const handleClickSaveDisplayName = async () => {
         await domainConfigStore.updateDomainSettings({
             display_name: state.displayName,
         });
+        document.title = state.displayName;
         showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_DISPLAY_NAME'), '');
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_UPDATE_DISPLAY_NAME'));

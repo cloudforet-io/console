@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PHeading, PPaneLayout, PFieldTitle, PTextInput, PButton,
@@ -9,11 +10,10 @@ import { i18n } from '@/translations';
 
 import { useDomainSettingsStore } from '@/store/domain-settings/domain-settings-store';
 
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
+const router = useRouter();
 const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
 const state = reactive({
@@ -38,7 +38,7 @@ const handleSaveChanges = async () => {
             symbol_favicon_url: state.symbolFaviconUrl,
             login_page_image_url: state.loginPageImageUrl,
         });
-        showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_BRAND_ASSETS'), '');
+        router.go(0);
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('IAM.DOMAIN_SETTINGS.ALT_E_UPDATE_BRAND_ASSETS'));
     }
@@ -92,10 +92,10 @@ watch(() => domainConfigGetters.loginPageImageUrl, (val) => {
             </div>
             <div class="field-wrapper">
                 <div class="left-part">
-                    <p-field-title label="Login Page Main Image URL" />
+                    <p-field-title label="Sign In Page Main Image URL" />
                     <p-text-input :value.sync="state.loginPageImageUrl" />
                     <div class="description">
-                        {{ $t('IAM.DOMAIN_SETTINGS.LOGIN_PAGE_MAIN_IMAGE_DESCRIPTION') }}
+                        {{ $t('IAM.DOMAIN_SETTINGS.SIGN_IN_PAGE_MAIN_IMAGE_DESCRIPTION') }}
                     </div>
                 </div>
                 <div class="right-part">
