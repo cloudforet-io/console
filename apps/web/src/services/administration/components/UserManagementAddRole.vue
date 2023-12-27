@@ -112,7 +112,7 @@ watch(() => state.selectedItems, (selectedItems) => {
                              class="role-type-icon"
                         >
                         <span>{{ item.label }}</span>
-                        <span class="role-type">({{ item.role_type }})</span>
+                        <span class="role-type">({{ useRoleFormatter(item.role_type).name }})</span>
                     </div>
                 </template>
                 <template #no-data-area>
