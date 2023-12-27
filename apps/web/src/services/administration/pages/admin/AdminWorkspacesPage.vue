@@ -1,10 +1,12 @@
 <script setup lang="ts">
 
-import { onMounted, reactive } from 'vue';
+import Vue, { onMounted, onUnmounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
 import { PButton, PHeading, PHorizontalLayout } from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
+
+import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
 
@@ -13,7 +15,10 @@ import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-worksp
 import UserManagementAddModal from '@/services/administration/components/UserManagementAddModal.vue';
 import WorkspaceManagementTable from '@/services/administration/components/WorkspaceManagementTable.vue';
 import WorkspacesCreateModal from '@/services/administration/components/WorkspacesCreateModal.vue';
+import WorkspacesDeleteModal from '@/services/administration/components/WorkspacesDeleteModal.vue';
+import WorkspacesSetEnableModal from '@/services/administration/components/WorkspacesSetEnableModal.vue';
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
+import { WORKSPACE_STATE } from '@/services/administration/constants/workspace-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
 
@@ -24,16 +29,32 @@ const userPageStore = useUserPageStore();
 
 const route = useRoute();
 
-const state = reactive({
+const modalState = reactive({
+    createType: '' as 'CREATE'|'EDIT',
     createModalVisible: false,
-    userAddModalVisible: false,
+    deleteModalVisible: false,
+    setEnableModalVisible: false,
+    enableState: undefined as undefined| typeof WORKSPACE_STATE[keyof typeof WORKSPACE_STATE],
 });
-const handleCreateWorkspace = () => {
-    state.createModalVisible = true;
+
+const workspaceListApiQueryHelper = new ApiQueryHelper()
+    .setSort('name', true);
+
+const refreshWorkspaceList = () => {
+    workspacePageStore.$patch({ loading: true });
+    workspaceListApiQueryHelper
+        .setPageStart(workspacePageStore.$state.pageStart).setPageLimit(workspacePageStore.$state.pageLimit)
+        .setFilters(workspacePageStore.searchFilters);
+    try {
+        workspacePageStore.listWorkspaces({ query: workspaceListApiQueryHelper.data });
+    } finally {
+        workspacePageStore.$patch({ loading: false });
+    }
 };
 
-const handleUpdateList = async () => {
-    await workspacePageStore.listWorkspaces({});
+const handleCreateWorkspace = () => {
+    modalState.createType = 'CREATE';
+    modalState.createModalVisible = true;
 };
 
 const handleConfirm = async () => {
@@ -48,10 +69,47 @@ const handleConfirm = async () => {
     });
 };
 
+const handleSelectAction = (name: string) => {
+    switch (name) {
+    case 'edit':
+        modalState.createType = 'EDIT';
+        modalState.createModalVisible = true;
+        break;
+    case 'delete':
+        modalState.deleteModalVisible = true;
+        break;
+    case 'enable':
+        modalState.enableState = WORKSPACE_STATE.ENABLE;
+        modalState.setEnableModalVisible = true;
+        break;
+    case 'disable':
+        if (workspacePageStore.$state.workspaces.filter((workspace) => workspace.state === 'ENABLED').length === 1) {
+            Vue.notify({
+                group: 'toastTopCenter',
+                type: 'alert',
+                title: i18n.t('IAM.WORKSPACES.REQUIRED_ENABLE_WORKSPACE') as string,
+                duration: 2000,
+                speed: 1,
+            });
+        } else {
+            modalState.enableState = WORKSPACE_STATE.DISABLE;
+            modalState.setEnableModalVisible = true;
+        }
+        break;
+    default: break;
+    }
+};
+
 onMounted(() => {
     if (route.query.hasNoWorkpspace === 'true') {
         handleCreateWorkspace();
     }
+    refreshWorkspaceList();
+});
+
+onUnmounted(() => {
+    workspacePageStore.$dispose();
+    workspacePageStore.$reset();
 });
 
 </script>
@@ -70,12 +128,22 @@ onMounted(() => {
         </p-heading>
         <p-horizontal-layout class="workspace-toolbox-layout">
             <template #container="{ height }">
-                <workspace-management-table :table-height="height" />
+                <workspace-management-table :table-height="height"
+                                            @select-action="handleSelectAction"
+                />
             </template>
         </p-horizontal-layout>
-        <workspaces-create-modal :visible.sync="state.createModalVisible"
-                                 @refresh="handleUpdateList"
+        <workspaces-create-modal :visible.sync="modalState.createModalVisible"
+                                 :create-type="modalState.createType"
                                  @confirm="handleConfirm"
+                                 @refresh="refreshWorkspaceList"
+        />
+        <workspaces-delete-modal :visible.sync="modalState.deleteModalVisible"
+                                 @refresh="refreshWorkspaceList"
+        />
+        <workspaces-set-enable-modal :visible.sync="modalState.setEnableModalVisible"
+                                     :enable-modal-type="modalState.enableState"
+                                     @refresh="refreshWorkspaceList"
         />
         <user-management-add-modal />
     </section>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import Vue, { computed, reactive } from 'vue';
+import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -26,12 +26,10 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useQueryTags } from '@/common/composables/query-tags';
 
-import WorkspacesDeleteModal from '@/services/administration/components/WorkspacesDeleteModal.vue';
-import WorkspacesSetEnableModal from '@/services/administration/components/WorkspacesSetEnableModal.vue';
 import { userStateFormatter } from '@/services/administration/composables/refined-table-data';
 import {
     EXCEL_TABLE_FIELDS,
-    WORKSPACE_SEARCH_HANDLERS, WORKSPACE_STATE,
+    WORKSPACE_SEARCH_HANDLERS,
     WORKSPACE_TABLE_FIELDS,
 } from '@/services/administration/constants/workspace-constant';
 import { useWorkspacePageStore } from '@/services/administration/store/workspace-page-store';
@@ -45,6 +43,8 @@ const props = withDefaults(defineProps<Props>(), {
     tableHeight: 400,
 });
 
+const emit = defineEmits<{(e: 'select-action', value: string): void; }>();
+
 const workspacePageStore = useWorkspacePageStore();
 const workspacePageState = workspacePageStore.$state;
 
@@ -56,12 +56,6 @@ queryTagsHelper.setURLQueryStringFilters(router.currentRoute.query.filters);
 
 const storeState = reactive({
     timezone: computed(() => store.state.user.timezone ?? 'UTC'),
-});
-
-const modalState = reactive({
-    deleteModalVisible: false,
-    setEnableModalVisible: false,
-    enableState: undefined as undefined| typeof WORKSPACE_STATE[keyof typeof WORKSPACE_STATE],
 });
 
 const dropdownMenu = computed<MenuItem[]>(() => ([
@@ -96,38 +90,8 @@ const dropdownMenu = computed<MenuItem[]>(() => ([
 
 const getRowSelectable = (item) => item.role_type === ROLE_TYPE.SYSTEM_ADMIN;
 
-const handleEditWorkspace = (id: string) => {
-    console.debug('handleEditWorkspace', id);
-};
-
-const handleSelectDropdown = (name) => {
-    switch (name) {
-    case 'edit':
-        handleEditWorkspace(workspacePageStore.selectedWorkspaces[0].workspace_id);
-        break;
-    case 'delete':
-        modalState.deleteModalVisible = true;
-        break;
-    case 'enable':
-        modalState.enableState = WORKSPACE_STATE.ENABLE;
-        modalState.setEnableModalVisible = true;
-        break;
-    case 'disable':
-        if (workspacePageState.workspaces.filter((workspace) => workspace.state === 'ENABLED').length === 1) {
-            Vue.notify({
-                group: 'toastTopCenter',
-                type: 'alert',
-                title: i18n.t('IAM.WORKSPACES.REQUIRED_ENABLE_WORKSPACE') as string,
-                duration: 2000,
-                speed: 1,
-            });
-        } else {
-            modalState.enableState = WORKSPACE_STATE.DISABLE;
-            modalState.setEnableModalVisible = true;
-        }
-        break;
-    default: break;
-    }
+const handleSelectDropdown = (name: string) => {
+    emit('select-action', name);
 };
 
 const handleSelect = (index: number[]) => {
@@ -147,13 +111,6 @@ const handleChange = async (options: ToolboxOptions = {}) => {
 
 const { queryTags } = queryTagsHelper;
 
-const getListWorkspaces = async () => {
-    workspaceListApiQueryHelper
-        .setPageStart(workspacePageState.pageStart).setPageLimit(workspacePageState.pageLimit)
-        .setFilters(queryTagsHelper.filters.value);
-    await workspacePageStore.listWorkspaces({ query: workspaceListApiQueryHelper.data });
-};
-
 const handleExport = async () => {
     try {
         await downloadExcel({
@@ -166,11 +123,6 @@ const handleExport = async () => {
         ErrorHandler.handleError(e);
     }
 };
-
-/* Init */
-(() => {
-    getListWorkspaces();
-})();
 
 </script>
 
@@ -215,13 +167,6 @@ const handleExport = async () => {
                 {{ iso8601Formatter(value, storeState.timezone) }}
             </template>
         </p-toolbox-table>
-        <workspaces-delete-modal :visible.sync="modalState.deleteModalVisible"
-                                 @refresh="handleChange()"
-        />
-        <workspaces-set-enable-modal :visible.sync="modalState.setEnableModalVisible"
-                                     :enable-modal-type="modalState.enableState"
-                                     @refresh="handleChange()"
-        />
     </section>
 </template>
 
