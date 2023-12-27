@@ -9,6 +9,7 @@ import type { ContextMenuType } from '@spaceone/design-system/src/inputs/context
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import { includes } from 'lodash';
 
+import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import { ROOT_ROUTE } from '@/router/constant';
@@ -152,6 +153,8 @@ const handleOpenMenu = (menuId: MenuId) => {
 const handleSelectGNBMenu = (menuId: string) => {
     if (router.currentRoute.name === menuId) return;
     const selectedRoute = state.invisibleGnbMenuList.find((menu) => menu.id === menuId)?.to;
+    const isDuplicatePath = SpaceRouter.router.currentRoute.name === selectedRoute.name;
+    if (isDuplicatePath) return;
     router.push(selectedRoute);
 };
 
