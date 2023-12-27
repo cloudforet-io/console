@@ -199,7 +199,7 @@ const handleConfirmInvite = () => {
                               #title-right-extra
                     >
                         <div class="action-button-wrapper">
-                            <p-button style-type="primary"
+                            <p-button style-type="tertiary"
                                       class="mr-4 add-btn"
                                       :disabled="!state.selectedItems.length"
                                       @click="handleClickRemoveMember"

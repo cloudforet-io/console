@@ -267,6 +267,17 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
             <template #menu-no-data-format>
                 <div />
             </template>
+            <template v-if="props.projectGroupSelectOptions && state.selectedItems.length"
+                      #dropdown-button
+            >
+                <p-badge v-if="props.projectGroupSelectOptions && state.selectedItems.some((d) => d.name === props.projectGroupSelectOptions.currentProjectGroupId)"
+                         badge-type="subtle"
+                         style-type="gray200"
+                >
+                    {{ $t('COMMON.PROJECT_SELECT_DROPDOWN.CURRENT') }}
+                </p-badge>
+                {{ state.selectedItems[0]?.label }}
+            </template>
             <template #menu-menu>
                 <div class="button-wrapper top">
                     <p-button icon-left="ic_refresh"
