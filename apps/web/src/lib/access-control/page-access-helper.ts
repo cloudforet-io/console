@@ -6,7 +6,7 @@ import type {
 import {
     DOMAIN_ADMIN_DEFAULT_PERMISSIONS,
     NO_ROLE_USER_DEFAULT_PERMISSIONS,
-    SYSTEM_USER_DEFAULT_PERMISSIONS, WORKSPACE_MEMBER_DEFAULT_PERMISSIONS, WORKSPACE_OWNER_DEFAULT_PERMISSIONS,
+    SYSTEM_USER_DEFAULT_PERMISSIONS, WORKSPACE_MEMBER_DEFAULT_PERMISSIONS, WORKSPACE_OWNER_DEFAULT_PERMISSIONS, WORKSPACE_USER_MINIMAL_PERMISSIONS,
 } from '@/lib/access-control/config';
 import type { Menu, MenuId } from '@/lib/menu/config';
 import { MENU_LIST } from '@/lib/menu/menu-architecture';
@@ -18,6 +18,14 @@ export const getDefaultPageAccessPermissionList = (roleType?: RoleType): MenuId[
     if (roleType === 'DOMAIN_ADMIN') return DOMAIN_ADMIN_DEFAULT_PERMISSIONS;
     if (roleType === 'WORKSPACE_OWNER') return WORKSPACE_OWNER_DEFAULT_PERMISSIONS;
     if (roleType === 'WORKSPACE_MEMBER') return WORKSPACE_MEMBER_DEFAULT_PERMISSIONS;
+    return NO_ROLE_USER_DEFAULT_PERMISSIONS;
+};
+
+export const getMinimalPageAccessPermissionList = (roleType?: RoleType): MenuId[] => {
+    if (roleType === 'SYSTEM_ADMIN') return SYSTEM_USER_DEFAULT_PERMISSIONS;
+    if (roleType === 'DOMAIN_ADMIN') return DOMAIN_ADMIN_DEFAULT_PERMISSIONS;
+    if (roleType === 'WORKSPACE_OWNER') return WORKSPACE_USER_MINIMAL_PERMISSIONS;
+    if (roleType === 'WORKSPACE_MEMBER') return WORKSPACE_USER_MINIMAL_PERMISSIONS;
     return NO_ROLE_USER_DEFAULT_PERMISSIONS;
 };
 
