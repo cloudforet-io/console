@@ -138,7 +138,7 @@ const selectWorkspace = (workspaceId: string): void => {
 
 <style scoped lang="postcss">
 .gnb-header {
-    @apply inline-flex items-center w-full;
+    @apply inline-flex items-center w-full h-full;
     max-width: 16.25rem;
     width: 16.25rem;
     padding: 0.625rem 1rem 0.625rem 1.25rem;

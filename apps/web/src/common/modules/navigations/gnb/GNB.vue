@@ -183,7 +183,7 @@ const updateGNBLayout = (gnbWidth: number) => {
 };
 
 
-watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {
+watch([containerWidth, () => store.getters['user/getCurrentRoleInfo']], async ([changedWidth]) => {
     if (!changedWidth) return;
     state.availableMenuCount = state.gnbMenuList.length;
     await nextTick();
@@ -196,46 +196,44 @@ watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {
     <div ref="gnbRef"
          :class="{'gnb': true, 'admin-gnb': state.isAdminMode}"
     >
-        <div class="left-part">
-            <div class="site-map-wrapper">
-                <site-map :menu-list="state.siteMapMenuList"
-                          :visible.sync="state.showSiteMap"
-                          :disabled="!state.hasPermission"
-                          :is-admin-mode="state.isAdminMode"
-                />
-            </div>
-
-            <g-n-b-header ref="gnbHeaderRef"
-                          :to="state.logoLink"
-                          :is-admin-mode="state.isAdminMode"
-            />
-
-            <g-n-b-menu v-for="(menu, idx) in state.visibleGnbMenuList"
-                        ref="gnbMenuRef"
-                        :key="`gnb-menu-${idx}`"
-                        :class="{ 'gnb-menu-list': true, 'gnb-first-menu': idx === 0 }"
-                        :is-admin-mode="state.isAdminMode"
-                        :show="menu.show"
-                        :menu-id="menu.id"
-                        :label="menu.label"
-                        :to="menu.to"
-                        :sub-menu-list="menu.subMenuList"
-                        :has-permission="state.hasPermission"
-                        :is-opened="state.openedMenu === menu.id"
-                        :is-selected="getMenuIsSelected(menu.id)"
-                        :highlight-tag="menu.highlightTag"
-                        @open-menu="handleOpenMenu"
-                        @hide-menu="hideMenu"
-            />
-            <g-n-b-invisible-menu-dropdown v-if="state.invisibleGnbMenuList.length"
-                                           :is-admin-mode="state.isAdminMode"
-                                           :menu="state.invisibleGnbMenuList"
-                                           :selected-menu-id="state.selectedInvisibleGNBMenuId"
-                                           @select-menu="handleSelectGNBMenu"
+        <div class="site-map-wrapper">
+            <site-map :menu-list="state.siteMapMenuList"
+                      :visible.sync="state.showSiteMap"
+                      :disabled="!state.hasPermission"
+                      :is-admin-mode="state.isAdminMode"
             />
         </div>
+
+        <g-n-b-header ref="gnbHeaderRef"
+                      :to="state.logoLink"
+                      :is-admin-mode="state.isAdminMode"
+        />
+
+        <g-n-b-menu v-for="(menu, idx) in state.visibleGnbMenuList"
+                    ref="gnbMenuRef"
+                    :key="`gnb-menu-${idx}`"
+                    :class="{ 'gnb-menu-list': true, 'gnb-first-menu': idx === 0 }"
+                    :is-admin-mode="state.isAdminMode"
+                    :show="menu.show"
+                    :menu-id="menu.id"
+                    :label="menu.label"
+                    :to="menu.to"
+                    :sub-menu-list="menu.subMenuList"
+                    :has-permission="state.hasPermission"
+                    :is-opened="state.openedMenu === menu.id"
+                    :is-selected="getMenuIsSelected(menu.id)"
+                    :highlight-tag="menu.highlightTag"
+                    @open-menu="handleOpenMenu"
+                    @hide-menu="hideMenu"
+        />
+        <g-n-b-invisible-menu-dropdown v-if="state.invisibleGnbMenuList.length"
+                                       :is-admin-mode="state.isAdminMode"
+                                       :menu="state.invisibleGnbMenuList"
+                                       :selected-menu-id="state.selectedInvisibleGNBMenuId"
+                                       @select-menu="handleSelectGNBMenu"
+        />
         <g-n-b-toolset ref="gnbToolsetRef"
-                       class="right-part"
+                       class="toolset"
                        :opened-menu="state.openedMenu"
                        @open-menu="handleOpenMenu"
                        @hide-menu="hideMenu"
@@ -255,30 +253,26 @@ watch([containerWidth, () => state.isAdminMode], async ([changedWidth]) => {
         box-shadow: 0 0.125rem 0.25rem 0 rgba(0, 0, 0, 0.12);
     }
 
-    .left-part {
-        @apply h-full w-full flex;
+    .site-map-wrapper {
+        @apply hidden;
+        padding-left: 1.25rem;
 
-        .site-map-wrapper {
-            @apply hidden;
-            padding-left: 1.25rem;
-
-            @screen mobile {
-                @apply inline-flex items-center;
-            }
-        }
-
-        .gnb-menu-list {
-            padding-right: 0.25rem;
-            &.gnb-first-menu {
-                padding-left: 0.75rem;
-            }
-
-            @screen mobile {
-                @apply hidden;
-            }
+        @screen mobile {
+            @apply inline-flex items-center;
         }
     }
-    .right-part {
+
+    .gnb-menu-list {
+        padding-right: 0.25rem;
+        &.gnb-first-menu {
+            padding-left: 0.75rem;
+        }
+
+        @screen mobile {
+            @apply hidden;
+        }
+    }
+    .toolset {
         @apply absolute inline-flex items-center;
         right: 0;
         padding-right: 1.5rem;
