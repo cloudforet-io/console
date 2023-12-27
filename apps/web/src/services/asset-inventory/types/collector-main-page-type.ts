@@ -1,5 +1,6 @@
 import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 
+import type { ResourceGroupType } from '@/schema/_common/type';
 import type {
     CollectorPluginModel,
 
@@ -8,21 +9,6 @@ import type { Schedule } from '@/schema/inventory/collector/type';
 import type { JobStatus } from '@/schema/inventory/job/type';
 
 import type { RouteQueryString } from '@/lib/router-query-string';
-
-
-
-
-
-export const COLLECTOR_QUERY_HELPER_SET = {
-    COLLECTOR_ID: 'collector_id',
-    NAME: 'name',
-    LAST_COLLECTED_AT: 'last_collected_at',
-    PROVIDER: 'provider',
-    TAGS: 'tags',
-    PLUGIN_INFO: 'plugin_info',
-    SCHEDULE: 'schedule',
-    SECRET_FILTER: 'secret_filter',
-} as const;
 
 interface CollectorPlugin {
     name?: string;
@@ -54,6 +40,7 @@ export interface CollectorItemInfo {
     detailLink: CollectorLink;
     schedule?: Schedule;
     recentJobAnalyze?: JobAnalyzeStatus[];
+    resourceGroup: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     hasJobList?: boolean
 }
 
