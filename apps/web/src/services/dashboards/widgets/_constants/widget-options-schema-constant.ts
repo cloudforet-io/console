@@ -19,6 +19,16 @@ export const COST_VALUE_WIDGET_OPTION_CONFIGS = {
 } as const;
 
 export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, WidgetOptionsSchemaProperty> = {
+    'filters.workspace': {
+        key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key,
+        name: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.name,
+        selection_type: 'MULTI',
+        inheritance_mode: 'KEY_MATCHING',
+        fixed: true,
+        item_options: [
+            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.workspace.key },
+        ],
+    },
     'filters.provider': {
         key: MANAGED_VARIABLE_MODEL_CONFIGS.provider.key,
         name: MANAGED_VARIABLE_MODEL_CONFIGS.provider.name,
@@ -44,15 +54,6 @@ export const WIDGET_FILTERS_SCHEMA_PROPERTIES: Record<WidgetFilterOptionKey, Wid
         inheritance_mode: 'KEY_MATCHING',
         item_options: [
             { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.service_account.key },
-        ],
-    },
-    'filters.project_group': {
-        key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key,
-        name: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.name,
-        selection_type: 'MULTI',
-        inheritance_mode: 'KEY_MATCHING',
-        item_options: [
-            { type: 'MANAGED', key: MANAGED_VARIABLE_MODEL_CONFIGS.project_group.key },
         ],
     },
     'filters.region': {

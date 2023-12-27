@@ -26,7 +26,6 @@ const widgetList: Parameters<typeof getDashboardLayoutWidgetInfoList>[0] = [
             'filters.cost_product',
             'filters.project',
             'filters.service_account',
-            'filters.project_group',
             'filters.region',
         ],
     }],
