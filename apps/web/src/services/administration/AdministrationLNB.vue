@@ -56,10 +56,10 @@ export default defineComponent({
                     type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.USER].translationId), id: MENU_ID.USER, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.USER._NAME) },
                 },
                 {
-                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ROLE].translationId), id: MENU_ID.ROLE, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME) },
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.APP].translationId), id: MENU_ID.APP, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.APP._NAME) },
                 },
                 {
-                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.APP].translationId), id: MENU_ID.APP, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.APP._NAME) },
+                    type: 'item', label: i18n.t(MENU_INFO_MAP[MENU_ID.ROLE].translationId), id: MENU_ID.ROLE, to: { name: makeAdminRouteName(ADMINISTRATION_ROUTE.IAM.ROLE._NAME) },
                 },
                 { type: 'divider' },
                 {
