@@ -9,7 +9,7 @@
             >
                 <span v-if="hasDefaultMessage">
                     <portal target="top-notification-message" />
-                    {{ $t('APP.TOP_NOTI.PERMISSION_DENIED') }}
+                    {{ notificationText }}
                 </span>
             </p-notification-bar>
         </p>
@@ -22,6 +22,7 @@ import { computed, reactive, toRefs } from 'vue';
 import { PNotificationBar } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
@@ -42,6 +43,12 @@ export default {
                     return !(store.getters['user/hasPermission'] || userWorkspaceStore.getters.workspaceList.length > 0) || store.state.error.visibleAuthorizationError;
                 },
                 set(val) { store.commit('error/setVisibleAuthorizationError', val); },
+            }),
+            notificationText: computed(() => {
+                if (userWorkspaceStore.getters.workspaceList.length === 0) {
+                    return i18n.t('APP.TOP_NOTI.NO_WORKSPACE');
+                }
+                return i18n.t('APP.TOP_NOTI.PERMISSION_DENIED');
             }),
         });
         const handleClose = () => {
