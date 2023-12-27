@@ -26,6 +26,10 @@ const state = reactive({
         }
         return undefined;
     }),
+    symbolFaviconUrl: computed<string|undefined>(() => {
+        const domainSettings = store.state.domain.config?.settings;
+        return domainSettings?.symbol_favicon_url;
+    }),
     wordTypeLogoUrl: computed<string|undefined>(() => {
         const domainSettings = store.state.domain.config?.settings;
         return domainSettings?.wordtype_logo_url;
@@ -49,7 +53,12 @@ watch(() => route.name, (name) => {
                 >
             </template>
             <template v-else>
-                <img class="logo-character"
+                <img v-if="state.symbolFaviconUrl"
+                     class="logo-character"
+                     :src="state.symbolFaviconUrl"
+                >
+                <img v-else
+                     class="logo-character"
                      src="@/assets/images/brand/brand_logo.png"
                 >
                 <img v-if="state.wordTypeLogoUrl"
