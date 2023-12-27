@@ -47,7 +47,7 @@
                     </template>
                     <template #button>
                         <router-link
-                            :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT.ADD._NAME, params: { provider: cloudServicePageState.selectedProvider}}"
+                            :to="{ name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME }"
                         >
                             <p-button style-type="substitutive"
                                       icon-left="ic_plus_bold"
