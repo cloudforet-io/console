@@ -28,6 +28,7 @@ import type { SecretListParameters } from '@/schema/secret/secret/api-verbs/list
 import type { SecretModel } from '@/schema/secret/secret/model';
 import type { TrustedSecretGetParameters } from '@/schema/secret/trusted-secret/api-verbs/get';
 import type { TrustedSecretListParameters } from '@/schema/secret/trusted-secret/api-verbs/list';
+import type { TrustedSecretUpdateParameters } from '@/schema/secret/trusted-secret/api-verbs/update';
 import type { TrustedSecretModel } from '@/schema/secret/trusted-secret/model';
 import { i18n } from '@/translations';
 
@@ -148,7 +149,7 @@ const updateGeneralSecret = async () => {
 };
 const updateTrustedSecret = async (): Promise<boolean> => {
     try {
-        await SpaceConnector.clientV2.secret.trustedSecret.update({
+        await SpaceConnector.clientV2.secret.trustedSecret.update<TrustedSecretUpdateParameters>({
             trusted_secret_id: state.credentialData?.trusted_secret_id,
             schema: state.credentialForm.selectedSecretSchema.schema_id,
         });

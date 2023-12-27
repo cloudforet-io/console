@@ -13,12 +13,6 @@ export interface CollectorPluginModel {
     options: CollectorOptions;
     metadata: CollectorMetadata;
     upgrade_mode: UpgradeMode;
-    secret_filter?: {
-        state: 'ENABLED'|'DISABLED';
-        service_accounts?: string[];
-        schemas?: string[];
-        secrets?: string[];
-    }
 }
 
 
@@ -27,13 +21,14 @@ export interface CollectorModel {
     name: string;
     provider: string;
     capability: Capability;
-    schedule?: Schedule;
     secret_filter: SecretFilter;
     plugin_info: CollectorPluginModel;
-    workspace_id: string;
+    schedule?: Schedule;
+    tags: Tags;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
+    domain_id: string;
+    workspace_id: string;
     created_at: string;
     last_collected_at: string;
-    tags: Tags;
 }
 

@@ -1,13 +1,13 @@
 import type { Query } from '@cloudforet/core-lib/space-connector/type';
 
-import type { CloudServiceQueryType } from '@/schema/inventory/cloud-service-query-set/type';
+import type { CloudServiceQueryType, CloudServiceQuerySetState } from '@/schema/inventory/cloud-service-query-set/type';
 
 
 export interface CloudServiceQuerySetListParameters {
     query?: Query;
     query_set_id?:string;
     name?: string;
-    state?: 'ENABLED' | 'DISABLED';
+    state?: CloudServiceQuerySetState;
     query_type?: CloudServiceQueryType;
     provider?: string;
     cloud_service_group?: string;
