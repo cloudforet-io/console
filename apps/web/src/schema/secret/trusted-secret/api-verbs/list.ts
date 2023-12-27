@@ -7,6 +7,6 @@ export interface TrustedSecretListParameters {
     name?: string;
     schema_id?: string;
     provider?: string;
-    trusted_account_id?: string,
     workspace_id?: string,
+    trusted_account_id?: string,
 }

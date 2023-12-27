@@ -10,9 +10,9 @@ export interface JobModel {
     success_tasks: number;
     failure_tasks: number;
     collector_id: string;
-    secret_id?: string;
+    secret_id: string;
     plugin_id: string;
-    resource_group: Extract<ResourceGroupType, 'DOMAIN' | 'WORKSPACE'>;
+    resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     workspace_id: string;
     domain_id: string;
     created_at?: string;

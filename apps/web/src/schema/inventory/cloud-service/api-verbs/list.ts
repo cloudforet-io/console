@@ -5,14 +5,13 @@ export interface CloudServiceListParameters {
     cloud_service_id?: string;
     name?: string;
     state?: string;
-    ip_addresses?: string[];
+    ip_address?: string;
     account?: string;
     instance_type?: string;
     cloud_service_type?: string;
     cloud_service_group?: string;
     provider?: string;
     region_code?: string;
-    project_id?: string;
-    project_group_id?: string;
     workspace_id?: string;
+    project_id?: string;
 }

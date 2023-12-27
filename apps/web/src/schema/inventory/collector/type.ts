@@ -5,7 +5,7 @@ import type { STATE } from '@/schema/inventory/collector/constant';
 export interface CollectorOptions {
     [key: string]: any;
 }
-export type State = typeof STATE[keyof typeof STATE];
+export type ScheduleState = typeof STATE[keyof typeof STATE];
 
 export interface CollectorMetadata {
     options_schema: JsonSchema;
@@ -14,17 +14,17 @@ export interface CollectorMetadata {
 }
 
 export interface SecretFilter {
-    state: State;
-    secrets?: string[];
-    service_accounts?: string[];
-    schemas?: string[];
-    exclude_secrets?: string[];
-    exclude_service_accounts?: string[];
-    exclude_schemas?: string[];
+    state: ScheduleState;
+    secrets: string[];
+    service_accounts: string[];
+    schemas: string[];
+    exclude_secrets: string[];
+    exclude_service_accounts: string[];
+    exclude_schemas: string[];
 }
 
 export interface Schedule {
-    state: State;
-    hours?: number[];
+    state: ScheduleState;
+    hours: number[];
 }
 

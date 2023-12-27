@@ -208,7 +208,7 @@ const getData = async () => {
         const params: any = { cloud_service_id: props.cloudServiceId, query: getQueryForGetDataAPI() };
         const keyPath = state.currentLayout.options?.root_path;
         if (keyPath) params.key_path = keyPath;
-        const res = await SpaceConnector.client.inventory.cloudService.getData(params);
+        const res = await SpaceConnector.clientV2.inventory.cloudService.getData(params);
         if (res.total_count !== undefined) state.totalCount = res.total_count;
         state.data = res.results;
     } else if (state.isTableTypeInDynamicLayout) {
