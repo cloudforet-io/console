@@ -28,8 +28,8 @@ export const getCustomTableSchema = async (userData:{userType:string, userId: st
         userConfig = await SpaceConnector.clientV2.config.userConfig.get<UserConfigGetParameters, UserConfigModel<DynamicLayout>>({
             name: getCustomTableSchemaKey(userData, resourceType, provider),
         });
-    } catch (e) {
-        ErrorHandler.handleError(e);
+    } catch (e:any) {
+        if (e?.status !== 404) ErrorHandler.handleError(e);
         return undefined;
     }
     return Object.keys(userConfig?.data ?? {}).length ? userConfig?.data : undefined;
