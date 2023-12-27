@@ -2467,6 +2467,7 @@
 				"COLLECT_DATA": "データ収集",
 				"CREATED": "作成日",
 				"DELETE_COLLECTOR": "コレクター削除",
+				"DETAIL_JOB_LINK": "",
 				"EDIT": "編集",
 				"EDIT_COLLECTOR_NAME": "コレクター名の編集",
 				"LAST_COLLECTED": "最後に収集した時間",

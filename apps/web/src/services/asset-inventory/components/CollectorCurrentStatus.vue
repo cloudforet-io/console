@@ -49,7 +49,7 @@
         <div v-if="state.status === JOB_STATE.IN_PROGRESS"
              class="mt-3"
         >
-            <p-link :text="$t('View job details')"
+            <p-link :text="$t('INVENTORY.COLLECTOR.DETAIL.DETAIL_JOB_LINK')"
                     size="sm"
                     :to="{ name: ASSET_INVENTORY_ROUTE.COLLECTOR.HISTORY.JOB._NAME, params: { jobId: props.recentJob?.job_id} }"
                     highlight
