@@ -30,14 +30,20 @@ import ServiceAccountCredentials
     from '@/services/asset-inventory/components/ServiceAccountCredentials.vue';
 import ServiceAccountDeleteModal
     from '@/services/asset-inventory/components/ServiceAccountDeleteModal.vue';
+import { useServiceAccountSchemaStore } from '@/services/asset-inventory/stores/service-account-schema-store';
 
 const props = defineProps<{
     serviceAccountId?: string;
 }>();
 
+const serviceAccountSchemaStore = useServiceAccountSchemaStore();
+
 const storeState = reactive({
     providerLoading: true,
     providers: computed<ProviderReferenceMap>(() => store.getters['reference/providerItems']),
+    providerExternalLink: computed(() => (state.serviceAccountType === ACCOUNT_TYPE.TRUSTED
+        ? serviceAccountSchemaStore.getters.trustedAccountSchema?.options?.external_link
+        : serviceAccountSchemaStore.getters.generalAccountSchema?.options?.external_link)),
 });
 const state = reactive({
     loading: true,
@@ -56,7 +62,7 @@ const state = reactive({
     providerKey: computed(() => state.provider?.key),
     providerIcon: computed(() => state.provider?.icon),
     consoleLink: computed(() => {
-        if (state.provider?.linkTemplate) return render(state.provider.linkTemplate, state.item);
+        if (storeState.providerExternalLink) return render(storeState.providerExternalLink, state.item);
         return '';
     }),
     projectId: computed(() => state.item.project_info?.project_id),
