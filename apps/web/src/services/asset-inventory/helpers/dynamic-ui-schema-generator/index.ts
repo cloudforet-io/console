@@ -90,7 +90,7 @@ export const getServiceAccountTableSchema = async ({
     let schemaData = getDefaultTableSchema(fields, isTrustedAccount);
 
     const customSchemaData = accountSchema?.provider ? await getCustomTableSchema(userData, resourceType, accountSchema?.provider) : undefined;
-    if (customSchemaData) schemaData = customSchemaData;
+    if (customSchemaData && !options?.include_optional_fields) schemaData = customSchemaData;
 
     const searchSchemaData = getDefaultSearchSchema(fields, isTrustedAccount);
     if (schemaData.options) schemaData.options.search = searchSchemaData.search;

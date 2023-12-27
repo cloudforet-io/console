@@ -12,46 +12,26 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
                 translation_id: 'PAGE_SCHEMA.BASE_INFO',
                 fields: [
                     {
-                        key: isTrustedAccount ? 'trusted_account_id' : 'service_account_id',
-                        name: 'ID',
+                        key: 'account_type',
+                        name: 'Account Type',
                         type: 'text',
-                        options: {
-                            translation_id: 'PAGE_SCHEMA.ID',
-                        },
-                    },
-                    {
-                        key: 'name',
-                        name: 'Name',
-                        type: 'text',
-                        options: {
-                            translation_id: 'PAGE_SCHEMA.NAME',
-                        },
                     },
                     ...((isTrustedAccount && [{
                         key: 'resource_group',
-                        name: 'Account Type',
+                        name: 'Scope',
                         type: 'enum',
                         options: {
-                            translation_id: 'PAGE_SCHEMA.SERVICE_ACCOUNT_TYPE',
                             items: {
                                 WORKSPACE: {
-                                    name: 'Trusted Account',
-                                    type: 'badge',
-                                    options: {
-                                        text_color: 'blue.600',
-                                        background_color: 'blue.200',
-                                    },
-                                },
-                                DOMAIN: {
-                                    name: 'Trusted Account - Managed',
+                                    name: 'Workspace',
                                     type: 'badge',
                                     options: {
                                         text_color: 'violet.600',
                                         background_color: 'violet.200',
                                     },
                                 },
-                                GENERAL: {
-                                    name: 'General Account',
+                                DOMAIN: {
+                                    name: 'Domain',
                                     type: 'badge',
                                     options: {
                                         text_color: 'gray.900',
@@ -78,15 +58,6 @@ export const getDefaultDetailSchema = (fields: DynamicField[], isTrustedAccount:
                             reference_key: 'project_id',
                         },
                     }]) || []),
-                    {
-                        key: 'created_at',
-                        name: 'Created',
-                        type: 'datetime',
-                        options: {
-                            translation_id: 'PAGE_SCHEMA.CREATED_AT',
-                            source_type: 'iso8601',
-                        },
-                    },
                     {
                         key: 'tags',
                         name: 'Tags',
@@ -115,24 +86,24 @@ export const getDefaultTableSchema = (fields: DynamicField[], isTrustedAccount: 
             },
             ...((isTrustedAccount && [{
                 key: 'resource_group',
-                name: 'Account Type',
+                name: 'Scope',
                 type: 'enum',
                 options: {
                     items: {
                         WORKSPACE: {
-                            name: 'Trusted Account',
-                            type: 'badge',
-                            options: {
-                                text_color: 'blue.600',
-                                background_color: 'blue.200',
-                            },
-                        },
-                        DOMAIN: {
-                            name: 'Trusted Account - Managed',
+                            name: 'Workspace',
                             type: 'badge',
                             options: {
                                 text_color: 'violet.600',
                                 background_color: 'violet.200',
+                            },
+                        },
+                        DOMAIN: {
+                            name: 'Domain',
+                            type: 'badge',
+                            options: {
+                                text_color: 'gray.900',
+                                background_color: 'gray.200',
                             },
                         },
                     },
