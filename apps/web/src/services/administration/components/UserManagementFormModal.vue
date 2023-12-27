@@ -248,7 +248,7 @@ watch(() => userPageState.modal.visible.form, async (visible) => {
     </p-button-modal>
 </template>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .user-management-modal {
     .input-form-wrapper {
         @apply flex flex-col bg-gray-100 rounded-lg;
