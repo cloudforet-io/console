@@ -54,9 +54,7 @@ export const postValidationMfaCode = async (body: UserProfileConfirmMfaParameter
 
 export const postUserDisableMfa = async (params: UserDisableMfaParameters): Promise<UserState|Error> => {
     try {
-        const response = await SpaceConnector.clientV2.identity.user.disableMfa<UserDisableMfaParameters>(params);
-        showSuccessMessage(i18n.t('COMMON.MFA_MODAL.ALT_S_SENT_EMAIL'), '');
-        return response;
+        return await SpaceConnector.clientV2.identity.user.disableMfa<UserDisableMfaParameters>(params);
     } catch (e: any) {
         showErrorMessage(e.message, e);
         ErrorHandler.handleError(e);

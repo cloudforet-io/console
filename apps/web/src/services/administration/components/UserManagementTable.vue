@@ -65,6 +65,7 @@ const state = reactive({
     }))),
 });
 const tableState = reactive({
+    removeLoading: false,
     userTableFields: computed(() => {
         const additionalFields: DefinitionField[] = [];
         if (userPageState.isAdminMode) {
@@ -171,6 +172,7 @@ const handleChange = async (options: any = {}) => {
     }
 };
 const handleClickButton = async (value: RoleBindingModel) => {
+    tableState.removeLoading = true;
     try {
         await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
             role_binding_id: value.role_binding_id,
@@ -180,6 +182,8 @@ const handleClickButton = async (value: RoleBindingModel) => {
     } catch (e) {
         showErrorMessage(i18n.t('IDENTITY.USER.MAIN.ALT_E_REMOVE_USER'), '');
         ErrorHandler.handleError(e);
+    } finally {
+        tableState.removeLoading = false;
     }
 };
 </script>
@@ -301,8 +305,9 @@ const handleClickButton = async (value: RoleBindingModel) => {
             <template #col-remove_button-format="value">
                 <p-button style-type="tertiary"
                           size="sm"
+                          :loading="tableState.removeLoading"
                           class="remove-button"
-                          @click="handleClickButton(value.role_binding_info.role_binding_id)"
+                          @click.stop="handleClickButton(value.item.role_binding_info)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
