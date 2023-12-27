@@ -93,13 +93,15 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
         return _dashboardWidgetInfoList.find((w) => w.widget_key === state.widgetKey);
     });
     const dashboardScope = computed<DashboardScope>(() => {
-        let scope: DashboardScope = 'WORKSPACE';
-        if (appContextGetters.isAdminMode) {
-            scope = 'DOMAIN';
-        } else if (dashboardDetailState.dashboardScope === 'PROJECT') {
-            scope = 'PROJECT';
+        if (appContextGetters.isAdminMode) return 'DOMAIN';
+
+        // update case
+        if (dashboardDetailState.dashboardInfo) {
+            return dashboardDetailState.dashboardInfo.resource_group;
         }
-        return scope;
+
+        // create case
+        return dashboardDetailState.dashboardScope;
     });
     const mergedWidgetState = computed<UnwrapRef<MergedBaseWidgetState>|undefined>(() => {
         if (!state.widgetConfigId) return undefined;
