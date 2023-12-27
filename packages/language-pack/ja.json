@@ -29,6 +29,7 @@
 			}
 		},
 		"TOP_NOTI": {
+			"NO_WORKSPACE": "",
 			"PERMISSION_DENIED": "Permission denied. Please, Contact administrator to get a role."
 		}
 	},
