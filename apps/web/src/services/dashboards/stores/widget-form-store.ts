@@ -1,9 +1,7 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import {
-    flattenDeep,
-} from 'lodash';
+import { flattenDeep } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
@@ -15,13 +13,20 @@ import type {
     WidgetOptionsSchemaProperty,
 } from '@/schema/dashboard/_types/widget-type';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+
 import {
     useWidgetTitleInput,
 } from '@/services/dashboards/composables/use-widget-title-input';
 import { getUpdatedWidgetInfo } from '@/services/dashboards/helpers/dashboard-widget-info-helper';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
-import { mergeBaseWidgetState } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
+import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
+import type {
+    MergedBaseWidgetState,
+} from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
+import {
+    mergeBaseWidgetState,
+} from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
@@ -40,7 +45,6 @@ export interface PartialDashboardLayoutWidgetInfo extends DashboardLayoutWidgetI
 
 interface Getters {
     widgetConfig: ComputedRef<WidgetConfig|undefined>;
-    _dashboardWidgetInfo: ComputedRef<DashboardLayoutWidgetInfo|undefined>;
     mergedWidgetInfo: ComputedRef<PartialDashboardLayoutWidgetInfo|undefined>;
     updatedWidgetInfo: ComputedRef<UpdatableWidgetInfo|undefined>;
     title: ComputedRef<string>;
@@ -61,6 +65,8 @@ interface GlobalOptionInfo {
     initiatedAndHasValue?: boolean;
 }
 export const useWidgetFormStore = defineStore('widget-form', () => {
+    const appContextStore = useAppContextStore();
+    const appContextGetters = appContextStore.getters;
     const dashboardDetailStore = useDashboardDetailInfoStore();
     const dashboardDetailState = dashboardDetailStore.state;
     const {
@@ -81,41 +87,50 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 
     const state = reactive(initialState);
 
+    const dashboardWidgetInfo = computed<DashboardLayoutWidgetInfo|undefined>(() => {
+        if (!state.widgetKey) return undefined;
+        const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
+        return _dashboardWidgetInfoList.find((w) => w.widget_key === state.widgetKey);
+    });
+    const dashboardScope = computed<DashboardScope>(() => {
+        let scope: DashboardScope = 'WORKSPACE';
+        if (appContextGetters.isAdminMode) {
+            scope = 'DOMAIN';
+        } else if (dashboardDetailState.dashboardScope === 'PROJECT') {
+            scope = 'PROJECT';
+        }
+        return scope;
+    });
+    const mergedWidgetState = computed<UnwrapRef<MergedBaseWidgetState>|undefined>(() => {
+        if (!state.widgetConfigId) return undefined;
+        return mergeBaseWidgetState({
+            inheritOptions: dashboardWidgetInfo.value?.inherit_options,
+            widgetOptions: dashboardWidgetInfo.value?.widget_options,
+            widgetName: state.widgetConfigId,
+            dashboardSettings: dashboardDetailState.settings,
+            dashboardVariablesSchema: dashboardDetailState.variablesSchema,
+            dashboardVariables: dashboardDetailState.variables,
+            title: dashboardWidgetInfo.value?.title,
+            schemaProperties: dashboardWidgetInfo.value?.schema_properties,
+            dashboardScope,
+        });
+    });
+
     const getters: UnwrapRef<Getters> = reactive({
-        widgetConfig: computed<WidgetConfig|undefined>(() => (state.widgetConfigId ? getWidgetConfig(state.widgetConfigId) : undefined)),
+        widgetConfig: computed<WidgetConfig|undefined>(() => mergedWidgetState.value?.widgetConfig),
         //
-        _dashboardWidgetInfo: computed<DashboardLayoutWidgetInfo|undefined>(() => {
-            if (!state.widgetKey) return undefined;
-            const _dashboardWidgetInfoList = flattenDeep(dashboardDetailState.dashboardWidgetInfoList ?? []);
-            return _dashboardWidgetInfoList.find((w) => w.widget_key === state.widgetKey);
-        }),
         mergedWidgetInfo: computed<PartialDashboardLayoutWidgetInfo|undefined>(() => {
             if (!state.widgetConfigId) return undefined;
 
-            const mergedWidgetState = mergeBaseWidgetState({
-                inheritOptions: getters._dashboardWidgetInfo?.inherit_options,
-                widgetOptions: getters._dashboardWidgetInfo?.widget_options,
-                widgetName: state.widgetConfigId,
-                dashboardSettings: dashboardDetailState.settings,
-                dashboardVariablesSchema: dashboardDetailState.variablesSchema,
-                dashboardVariables: dashboardDetailState.variables,
-                title: getters._dashboardWidgetInfo?.title,
-                schemaProperties: getters._dashboardWidgetInfo?.schema_properties,
-            });
-
-            // refine inheritOptions to make inherit project variable from dashboard if it is project dashboard.
-            const projectId = dashboardDetailState.projectId;
-            const refinedInheritOptions = projectId ? getProjectCaseInheritOptions(mergedWidgetState.inheritOptions) : mergedWidgetState.inheritOptions;
-
             return {
-                ...(getters._dashboardWidgetInfo ?? {}),
+                ...(dashboardWidgetInfo.value ?? {}),
                 widget_key: state.widgetKey,
                 widget_name: state.widgetConfigId,
-                version: getters._dashboardWidgetInfo?.version ?? '1',
-                title: mergedWidgetState.title,
-                inherit_options: refinedInheritOptions,
-                widget_options: mergedWidgetState.options,
-                schema_properties: mergedWidgetState.schemaProperties,
+                version: dashboardWidgetInfo.value?.version ?? '1',
+                title: mergedWidgetState.value?.title,
+                inherit_options: mergedWidgetState.value?.inheritOptions,
+                widget_options: mergedWidgetState.value?.options,
+                schema_properties: mergedWidgetState.value?.schemaProperties,
             };
         }),
         updatedWidgetInfo: computed<UpdatableWidgetInfo|undefined>(() => {
@@ -290,9 +305,5 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     };
 });
 
-const getProjectCaseInheritOptions = (inheritOptions: InheritOptions): InheritOptions => ({
-    ...inheritOptions,
-    'filters.project': {
-        enabled: true,
-    },
-});
+
+
