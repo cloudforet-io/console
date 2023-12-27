@@ -23,6 +23,8 @@ import { PNotificationBar } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
+
 export default {
     name: 'TopNotification',
     components: { PNotificationBar },
@@ -33,9 +35,12 @@ export default {
         },
     },
     setup() {
+        const userWorkspaceStore = useUserWorkspaceStore();
         const state = reactive({
             visible: computed({
-                get() { return !store.getters['user/hasPermission'] || store.state.error.visibleAuthorizationError; },
+                get() {
+                    return !(store.getters['user/hasPermission'] || userWorkspaceStore.getters.workspaceList.length > 0) || store.state.error.visibleAuthorizationError;
+                },
                 set(val) { store.commit('error/setVisibleAuthorizationError', val); },
             }),
         });

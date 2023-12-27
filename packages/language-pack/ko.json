@@ -29,6 +29,7 @@
 			}
 		},
 		"TOP_NOTI": {
+			"NO_WORKSPACE": "",
 			"PERMISSION_DENIED": "권한이 없습니다. 관리자를 통해 필요한 권한을 받으세요."
 		}
 	},
