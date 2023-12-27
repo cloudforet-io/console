@@ -1052,6 +1052,7 @@
 			"SUCCESS": "確認コードが通知メールに送信されました。",
 			"TITLE": "通知メールを確認する",
 			"VERIFICATION_CODE": "認証コード",
+			"VERIFY_FORCE": "",
 			"VERIFY_NOW": "認証"
 		},
 		"POPUP": {

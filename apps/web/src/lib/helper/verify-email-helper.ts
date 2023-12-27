@@ -35,7 +35,7 @@ export const postValidationCode = async (params: UserProfileConfirmEmailParamete
 export const postUserValidationEmail = async (params: UserVerifyEmailParameters): Promise<void|Error> => {
     try {
         await SpaceConnector.clientV2.identity.user.verifyEmail<UserVerifyEmailParameters>(params);
-        showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.SUCCESS'), '');
+        showSuccessMessage(i18n.t('COMMON.NOTIFICATION_MODAL.VERIFY_FORCE'), '');
         return undefined;
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);

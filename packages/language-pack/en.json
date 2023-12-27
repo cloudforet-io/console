@@ -1052,6 +1052,7 @@
 			"SUCCESS": "A verification code has been sent to your notification email.",
 			"TITLE": "Verify Notification Email",
 			"VERIFICATION_CODE": "Verification Code",
+			"VERIFY_FORCE": "Notification email successfully verified.",
 			"VERIFY_NOW": "Verify Now"
 		},
 		"POPUP": {
