@@ -388,6 +388,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
         left: 0;
     }
     &.is-admin-mode {
+        margin-bottom: 0;
         .invalid-feedback {
             left: 6.75rem;
         }

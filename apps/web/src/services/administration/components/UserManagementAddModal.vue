@@ -182,6 +182,7 @@ const fetchCreateRoleBinding = async (userItem: AddModalMenuItem, item?: AddModa
                                           @change-input="handleChangeInput"
                 />
                 <user-management-add-tag v-if="userPageState.isAdminMode"
+                                         is-bordered
                                          :tags.sync="state.tags"
                 />
             </div>

@@ -12,12 +12,14 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 interface Props {
     tags: Tags;
+    isBordered?: boolean;
     isEdit?: boolean;
     isFormVisible?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     tags: undefined,
+    isBordered: false,
     isEdit: false,
     isFormVisible: false,
 });
@@ -59,7 +61,9 @@ watch(() => props.isFormVisible, (value) => {
 </script>
 
 <template>
-    <div class="user-add-tag-wrapper">
+    <div class="user-add-tag-wrapper"
+         :class="{'is-bordered': props.isBordered}"
+    >
         <p-text-button v-if="!state.formVisible"
                        icon-left="ic_plus_bold"
                        style-type="highlight"
@@ -92,13 +96,18 @@ watch(() => props.isFormVisible, (value) => {
         margin: auto;
     }
     .user-add-tag-form {
-        @apply flex flex-col bg-white border border-primary-3 rounded-md;
+        @apply flex flex-col bg-white rounded-md;
         padding: 0.75rem;
         .input-form {
             margin-bottom: 0;
             .text-input {
                 margin-top: 0.25rem;
             }
+        }
+    }
+    &.is-bordered {
+        .user-add-tag-form {
+            @apply border border-primary-3;
         }
     }
 }

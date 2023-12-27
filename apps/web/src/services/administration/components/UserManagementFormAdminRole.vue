@@ -171,7 +171,7 @@ const fetchListRoles = async (inputText: string) => {
 
 <style scoped lang="postcss">
 .user-admin-role-wrapper {
-    @apply flex flex-col bg-white border border-primary-3 rounded-md;
+    @apply flex flex-col bg-white rounded-md;
     padding: 0.75rem;
     gap: 0.75rem;
     .title-wrapper {

@@ -1052,6 +1052,7 @@
 			"SUCCESS": "인증 코드가 알림 이메일로 전송되었습니다.",
 			"TITLE": "알림전용 이메일 인증",
 			"VERIFICATION_CODE": "인증 코드",
+			"VERIFY_FORCE": "",
 			"VERIFY_NOW": "인증"
 		},
 		"POPUP": {
