@@ -1,6 +1,8 @@
 <script setup lang="ts">
 
-import { computed, reactive } from 'vue';
+import {
+    computed, reactive, watch,
+} from 'vue';
 
 import {
     PButtonModal, PFieldGroup, PTextarea, PTextInput,
@@ -11,6 +13,7 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { WorkspaceCreateParameters } from '@/schema/identity/workspace/api-verbs/create';
+import type { WorkspaceUpdateParameters } from '@/schema/identity/workspace/api-verbs/update';
 import { i18n } from '@/translations';
 
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -23,10 +26,12 @@ import { useWorkspacePageStore } from '@/services/administration/store/workspace
 
 interface Props {
     visible: boolean;
+    createType: 'CREATE'|'EDIT';
 }
 
 const props = withDefaults(defineProps<Props>(), {
     visible: false,
+    createType: 'CREATE',
 });
 
 const emit = defineEmits<{(e: 'update:visible', value: boolean): void;
@@ -45,9 +50,24 @@ const state = reactive({
 });
 
 const validationState = reactive({
-    isAllValid: computed(() => state.name && !validationState.nameInvalid && !validationState.isDuplicatedName),
-    isDuplicatedName: computed(() => workspacePageState.workspaces.some((workspace) => workspace.name === state.name)),
+    isAllValid: computed(() => {
+        if (props.createType === 'EDIT') {
+            const isChanged = state.name !== workspacePageStore.selectedWorkspaces[0].name
+                || state.description !== workspacePageStore.selectedWorkspaces[0].tags?.description;
+            return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName && isChanged;
+        }
+        return state.name && !validationState.nameInvalid && !validationState.isDuplicatedName;
+    }),
+    isDuplicatedName: computed(() => {
+        if (props.createType === 'EDIT') {
+            return workspacePageState.workspaces.filter((workspace) => workspace.name !== workspacePageStore.selectedWorkspaces[0].name).some((workspace) => workspace.name === state.name);
+        }
+        return workspacePageState.workspaces.some((workspace) => workspace.name === state.name);
+    }),
     nameInvalidText: computed(() => {
+        if (props.createType === 'EDIT') {
+            if (state.name === workspacePageStore.selectedWorkspaces[0].name) return undefined;
+        }
         if (!state.name?.trim()) return i18n.t('IAM.WORKSPACES.FORM.REQUIRED_NAME');
         if (validationState.isDuplicatedName) return i18n.t('IAM.WORKSPACES.FORM.DUPLICATED_NAME');
         return undefined;
@@ -57,20 +77,44 @@ const validationState = reactive({
 
 const handleConfirm = async () => {
     try {
-        await SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters>({
-            name: state.name ?? '',
-            tags: {
-                description: state.description ?? '',
-            },
-        });
-        state.proxyVisible = false;
-        showSuccessMessage(i18n.t('Workspace successfully created'), '');
-        emit('refresh');
-        emit('confirm');
+        if (props.createType === 'EDIT') {
+            await SpaceConnector.clientV2.identity.workspace.update<WorkspaceUpdateParameters>({
+                workspace_id: workspacePageStore.selectedWorkspaces[0].workspace_id,
+                name: state.name ?? '',
+                tags: {
+                    description: state.description ?? '',
+                },
+            });
+            showSuccessMessage(i18n.t('Workspace successfully updated'), '');
+        } else {
+            await SpaceConnector.clientV2.identity.workspace.create<WorkspaceCreateParameters>({
+                name: state.name ?? '',
+                tags: {
+                    description: state.description ?? '',
+                },
+            });
+            showSuccessMessage(i18n.t('Workspace successfully created'), '');
+            emit('confirm');
+        }
     } catch (e) {
         ErrorHandler.handleError(e);
+    } finally {
+        emit('refresh');
+        state.proxyVisible = false;
     }
 };
+
+watch(() => props.visible, (visible) => {
+    if (!visible) return;
+    if (props.createType === 'CREATE') {
+        state.name = undefined;
+        state.description = '';
+    } else {
+        state.name = workspacePageStore.selectedWorkspaces[0].name;
+        state.description = workspacePageStore.selectedWorkspaces[0].tags?.description ?? '';
+    }
+}, { immediate: true });
+
 
 </script>
 

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 
+import type { ConsoleFilter } from '@cloudforet/core-lib/query/type';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
@@ -15,6 +16,7 @@ interface WorkspacePageState {
     selectedIndices: number[];
     pageStart: number,
     pageLimit: number,
+    searchFilters: ConsoleFilter[],
 }
 
 export const useWorkspacePageStore = defineStore('workspace-page', {
@@ -25,6 +27,7 @@ export const useWorkspacePageStore = defineStore('workspace-page', {
         selectedIndices: [] as number[],
         pageStart: 1,
         pageLimit: 15,
+        searchFilters: [],
     }),
     getters: {
         selectedWorkspaces: (state) => state.selectedIndices.reduce((refined: WorkspaceModel[], idx: number) : WorkspaceModel[] => {
