@@ -1,10 +1,8 @@
 import type { RouteConfig } from 'vue-router';
 
-import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
-import { getRedirectRouteByPagePermission } from '@/lib/access-control/redirect-route-helper';
 import { MENU_ID } from '@/lib/menu/config';
 
 import type { Breadcrumb } from '@/common/modules/page-layouts/type';
@@ -21,7 +19,9 @@ const dashboardsRoute: RouteConfig = {
     path: 'dashboards',
     name: DASHBOARDS_ROUTE._NAME,
     meta: { menuId: MENU_ID.DASHBOARDS, accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
-    redirect: (to) => getRedirectRouteByPagePermission(to, store.getters['user/pageAccessPermissionMap']),
+    redirect: () => ({
+        name: DASHBOARDS_ROUTE.ALL._NAME,
+    }),
     component: DashboardsContainer,
     children: [
         {

@@ -7,16 +7,18 @@ import {
     PDivider, PSelectDropdown, PTooltip,
 } from '@spaceone/design-system';
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
+import { clone } from 'lodash';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
 import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 
+import type { MenuId } from '@/lib/menu/config';
+import { MENU_ID } from '@/lib/menu/config';
+import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
+
 import { violet } from '@/styles/colors';
-
-import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
-
 
 interface Props {
     isAdminMode: boolean;
@@ -52,10 +54,13 @@ const state = reactive({
 });
 
 const selectWorkspace = (workspaceId: string): void => {
+    const reversedMatched = clone(router.currentRoute.matched).reverse();
+    const closestRoute = reversedMatched.find((d) => d.meta?.menuId !== undefined);
+    const closestMenuId: MenuId = closestRoute?.meta?.menuId || MENU_ID.HOME_DASHBOARD;
     if (workspaceId) {
         if (workspaceId === state.selectedWorkspace?.workspace_id) return;
         userWorkspaceStore.setCurrentWorkspace(workspaceId);
-        router.push({ name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId } });
+        router.push({ name: MENU_INFO_MAP[closestMenuId].routeName, params: { workspaceId } });
     }
 };
 
