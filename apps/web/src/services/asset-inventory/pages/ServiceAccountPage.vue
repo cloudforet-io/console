@@ -247,7 +247,7 @@ watch(() => state.selectedProvider, (provier) => {
 watch(() => state.selectedProvider, async (after, before) => {
     if (after && after !== before) {
         await replaceUrlQuery('provider', after);
-        await listServiceAccountData();
+        await reloadTable();
     }
 }, { immediate: true });
 watch(() => tableState.searchFilters, (searchFilters) => {
