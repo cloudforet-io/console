@@ -15,6 +15,7 @@ import type { Sort, Query } from '@cloudforet/core-lib/space-connector/type';
 
 import { SpaceRouter } from '@/router';
 import type { AnalyzeResponse } from '@/schema/_common/api-verbs/analyze';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type {
     BudgetUsageAnalyzeParameters,
     BudgetUsageAnalyzeResult,
@@ -70,7 +71,7 @@ const fetchBudgetUsages = async (): Promise<AnalyzeResponse<BudgetUsageAnalyzeRe
         if (storeState.isAdminMode) {
             budgetUsageApiQueryHelper.addFilter({
                 k: 'resource_group',
-                v: 'WORKSPACE',
+                v: RESOURCE_GROUP.WORKSPACE,
             });
         }
         const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
@@ -121,14 +122,12 @@ const handleRefresh = () => {
     listBudgets();
 };
 
-const budgetUsageExportQueryHelper = new QueryHelper();
 const handleExport = async () => {
     const targetFields: ExcelDataField[] = [];
     if (storeState.isAdminMode) {
         targetFields.push({ key: 'workspace_id', name: 'Workspace ID' });
     } else {
         targetFields.push({ key: 'project_id', name: 'Project', reference: { reference_key: 'project_id', resource_type: 'identity.Project' } });
-        targetFields.push({ key: 'project_group_id', name: 'Project Group', reference: { reference_key: 'project_group_id', resource_type: 'identity.ProjectGroup' } });
     }
     const excelFields: ExcelDataField[] = [
         { key: 'budget_id', name: 'Budget ID' },
@@ -140,20 +139,10 @@ const handleExport = async () => {
         { key: 'total_budget', name: 'Total Budget' },
         { key: 'budget_usage', name: 'Usage (%)' },
     ];
-    budgetUsageExportQueryHelper.setFilters(state.queryFilters);
-    const _query = getBudgetUsageAnalyzeRequestQuery(state.sort, state.period);
     await downloadExcel({
-        url: '/cost-analysis/budget-usage/analyze',
-        param: {
-            query: {
-                ..._query,
-                filter: budgetUsageExportQueryHelper.apiQuery.filter,
-            },
-        },
+        data: state.budgetUsages,
         fields: excelFields,
         file_name_prefix: FILE_NAME_PREFIX.budget,
-        version: 'v2',
-        timezone: state.timezone,
     });
 };
 
