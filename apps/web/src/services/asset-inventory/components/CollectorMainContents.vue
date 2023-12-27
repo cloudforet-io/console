@@ -33,7 +33,6 @@ import CollectorScheduleModal
 import { ASSET_INVENTORY_ROUTE } from '@/services/asset-inventory/routes/route-constant';
 import { useCollectorPageStore } from '@/services/asset-inventory/stores/collector-page-store';
 import type { CollectorItemInfo } from '@/services/asset-inventory/types/collector-main-page-type';
-import { COLLECTOR_QUERY_HELPER_SET } from '@/services/asset-inventory/types/collector-main-page-type';
 
 /** * @function
  *   @name makePluginReferenceValueHandler
@@ -124,7 +123,7 @@ const state = reactive({
         return collectorPageState.collectors?.map((d) => {
             historyLinkQueryHelper.setFilters([
                 {
-                    k: COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
+                    k: 'collector_id',
                     v: d.collector_id,
                     o: '=',
                 },
@@ -165,13 +164,15 @@ const state = reactive({
 const searchQueryHelper = new QueryHelper().setKeyItemSets(keyItemSets);
 const collectorApiQueryHelper = new ApiQueryHelper()
     .setOnly(
-        COLLECTOR_QUERY_HELPER_SET.COLLECTOR_ID,
-        COLLECTOR_QUERY_HELPER_SET.NAME,
-        COLLECTOR_QUERY_HELPER_SET.SCHEDULE,
-        COLLECTOR_QUERY_HELPER_SET.PLUGIN_INFO,
-        COLLECTOR_QUERY_HELPER_SET.LAST_COLLECTED_AT,
-        COLLECTOR_QUERY_HELPER_SET.PROVIDER,
-        COLLECTOR_QUERY_HELPER_SET.SECRET_FILTER,
+        'collector_id',
+        'name',
+        'last_collected_at',
+        'provider',
+        'tags',
+        'plugin_info',
+        'schedule',
+        'secret_filter',
+        'workspace_id',
     )
     .setPage(collectorPageState.pageStart, collectorPageState.pageLimit)
     .setSort(collectorPageState.sortBy, true);
