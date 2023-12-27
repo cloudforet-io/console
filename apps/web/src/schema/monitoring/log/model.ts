@@ -1,4 +1,4 @@
 export interface LogDataModel {
-    logs: object[];
+    logs: Record<string, any>[];
     domain_id: string;
 }

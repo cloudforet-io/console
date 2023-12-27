@@ -1,6 +1,6 @@
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
-import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
-import type { EscalationPolicyResourceGroup } from '@/schema/monitoring/escalation-policy/type';
+import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 
 
 
@@ -25,7 +25,7 @@ export const alertStateBadgeStyleTypeFormatter = (alertState) => {
     return style;
 };
 
-export const alertResourceGroupBadgeStyleTypeFormatter = (resourceGroup: EscalationPolicyResourceGroup) => {
-    if (resourceGroup === ESCALATION_POLICY_RESOURCE_GROUP.WORKSPACE) return 'green200';
+export const alertResourceGroupBadgeStyleTypeFormatter = (resourceGroup: EscalationPolicyModel['resource_group']) => {
+    if (resourceGroup === RESOURCE_GROUP.WORKSPACE) return 'green200';
     return 'primary3';
 };

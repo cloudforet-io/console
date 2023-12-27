@@ -4,6 +4,6 @@ export interface MonitoringLogListParameters {
     keyword?: string;
     start: string;
     end: string;
-    sort?: object;
+    sort?: Record<string, any>;
     limit?: number;
 }

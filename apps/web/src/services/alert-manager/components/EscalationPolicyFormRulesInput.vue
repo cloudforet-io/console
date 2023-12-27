@@ -13,7 +13,7 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
-import { ESCALATION_POLICY_RESOURCE_GROUP } from '@/schema/monitoring/escalation-policy/constant';
+import { RESOURCE_GROUP } from '@/schema/_common/constant';
 import type { EscalationPolicyRule } from '@/schema/monitoring/escalation-policy/type';
 import type { ProjectChannelListParameters } from '@/schema/notification/project-channel/api-verbs/list';
 import type { ProjectChannelModel } from '@/schema/notification/project-channel/model';
@@ -163,7 +163,7 @@ watch(() => isAllValid.value, (_isAllValid) => {
             <span class="col-rule">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
-            <p-link v-if="escalationPolicyFormState.resourceGroup === ESCALATION_POLICY_RESOURCE_GROUP.PROJECT && escalationPolicyFormState.projectId"
+            <p-link v-if="escalationPolicyFormState.resourceGroup === RESOURCE_GROUP.PROJECT && escalationPolicyFormState.projectId"
                     class="link-text"
                     :action-icon="ACTION_ICON.INTERNAL_LINK"
                     new-tab

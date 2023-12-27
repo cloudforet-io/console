@@ -12,7 +12,6 @@ import { ALERT_STATE } from '@/schema/monitoring/alert/constants';
 import type { EscalationPolicyModel } from '@/schema/monitoring/escalation-policy/model';
 import type {
     EscalationPolicyFinishCondition,
-    EscalationPolicyResourceGroup,
 } from '@/schema/monitoring/escalation-policy/type';
 import { i18n } from '@/translations';
 
@@ -47,7 +46,7 @@ const state = reactive({
         ACKNOWLEDGED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.ACKNOWLEDGED'),
         RESOLVED: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.RESOLVED'),
     })),
-    resourceGroups: computed<Record<EscalationPolicyResourceGroup, TranslateResult>>(() => ({
+    resourceGroups: computed<Record<EscalationPolicyModel['resource_group'], TranslateResult>>(() => ({
         WORKSPACE: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.WORKSPACE'),
         PROJECT: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.PROJECT'),
     })),

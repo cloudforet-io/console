@@ -5,7 +5,6 @@ export interface AlertUpdateParameters {
     title?: string;
     state?: AlertState;
     description?: string;
-    reset_description?: boolean;
     urgency?: AlertUrgency;
     project_id?: string;
 }
