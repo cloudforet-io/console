@@ -111,7 +111,7 @@ export class SpaceRouter {
             * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent
             * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
              */
-            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && isAdminMode && to.name && !to.name?.startsWith('admin.') && isNotErrorRoute) {
+            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && routeAccessLevel >= ACCESS_LEVEL.WORKSPACE_PERMISSION && isAdminMode && to.name && !to.name?.startsWith('admin.')) {
                 const adminRouteName = makeAdminRouteName(to.name);
                 const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
                 const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
