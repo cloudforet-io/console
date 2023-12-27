@@ -75,6 +75,7 @@ export class SpaceRouter {
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
             const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
+            const accessibleWorkspaceList = SpaceRouter.router.app?.$pinia.state.value['user-workspace-store']?.getters.workspaceList;
             const isTokenAlive = SpaceConnector.isTokenAlive;
             const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
             const beforeRoutePathByRawUrl = window.location.pathname;
@@ -138,9 +139,14 @@ export class SpaceRouter {
                 // When a user is already signed in and tries to go to sign in page, redirect to home-dashboard page
                 } else if (to.meta?.isSignInPage) {
                     nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME };
-                // When a user tries to go to inaccessible page, redirect to error page
+                // When a user tries to go to inaccessible page, redirect to error page (Exclude Admin Mode)
                 } else if (userAccessLevel < routeAccessLevel) {
-                    nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
+                    // When a user tries to another available workspace without target page's access permission.
+                    // e.g. In A workspace Dashboard, try to toggle B workspace without dashboard access permission.
+                    const isAccessibleWorkspace = accessibleWorkspaceList?.some((workspace) => workspace.workspace_id === to.params.workspaceId);
+                    if (isAccessibleWorkspace) {
+                        nextLocation = { name: HOME_DASHBOARD_ROUTE._NAME, params: { workspaceId: to.params.workspaceId } };
+                    } else nextLocation = { name: ERROR_ROUTE._NAME, params: { statusCode: '403' } };
                 }
             // When an unauthenticated(or token expired) user tries to access a page that only authenticated users can enter, refresh token
             } else if (routeAccessLevel >= ACCESS_LEVEL.AUTHENTICATED) {
