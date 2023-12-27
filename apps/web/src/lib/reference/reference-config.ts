@@ -1,3 +1,4 @@
+// NOTE: Deprecated. Use MANAGED_VARIABLE_MODEL_CONFIGS instead.
 export const REFERENCE_TYPE_INFO = {
     project_group: {
         type: 'project_group',
