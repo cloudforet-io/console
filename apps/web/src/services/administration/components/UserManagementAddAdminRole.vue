@@ -179,6 +179,8 @@ watch(() => state.proxyIsSetAdminRole, () => {
                                    :search-text.sync="workspaceState.searchText"
                                    :selected.sync="workspaceState.selectedItems"
                                    :handler="workspaceMenuHandler"
+                                   show-select-marker
+                                   show-select-header
                                    is-filterable
                                    multi-selectable
                                    appearance-type="badge"
