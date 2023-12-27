@@ -2,13 +2,14 @@ import { useFavicon } from '@vueuse/core';
 
 
 export const initDomainSettings = (store) => {
-    const domainSettings = store.state.domain.config?.settings;
+    const domainSymbolImage = store.getters['domain/domainSymbolImage'];
+    const domainDisplayName = store.getters['domain/domainDisplayName'];
 
-    if (domainSettings?.symbol_favicon_url) {
+    if (domainSymbolImage) {
         const favicon = useFavicon();
-        favicon.value = domainSettings.symbol_favicon_url;
+        favicon.value = domainSymbolImage;
     }
-    if (domainSettings?.display_name) {
-        document.title = domainSettings.display_name;
+    if (domainDisplayName) {
+        document.title = domainDisplayName;
     }
 };

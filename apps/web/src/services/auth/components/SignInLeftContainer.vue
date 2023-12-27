@@ -53,17 +53,7 @@ const props = withDefaults(defineProps<Props>(), {
 const state = reactive({
     // eslint-disable-next-line no-undef
     version: VITE_APP_VER,
-    signInImage: computed<string|undefined>(() => {
-        const domainSettings = store.state.domain.config?.settings;
-        if (domainSettings?.login_page_image_url) {
-            return domainSettings.login_page_image_url;
-        }
-
-        const configImage = config.get('DOMAIN_IMAGE.SIGN_IN');
-        if (configImage) return configImage;
-
-        return undefined;
-    }),
+    signInImage: computed<string|undefined>(() => store.getters['domain/domainSignInImage']),
     contactLink: computed(() => config.get('CONTACT_LINK')),
 });
 </script>

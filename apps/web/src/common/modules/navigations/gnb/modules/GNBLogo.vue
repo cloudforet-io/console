@@ -7,18 +7,18 @@
                    :to="to"
         >
             <div class="logo-wrapper">
-                <img v-if="ciLogoImage"
+                <img v-if="symbolImage"
                      class="logo-character"
-                     :src="ciLogoImage"
+                     :src="symbolImage"
                 >
                 <img v-else
                      class="logo-character"
                      src="@/assets/images/brand/brand_logo.png"
                 >
 
-                <img v-if="ciTextImage"
+                <img v-if="wordTypeLogoImage"
                      class="logo-text"
-                     :src="ciTextImage"
+                     :src="wordTypeLogoImage"
                 >
                 <img v-else
                      class="logo-text"
@@ -35,7 +35,7 @@ import {
     reactive, toRefs,
 } from 'vue';
 
-import config from '@/lib/config';
+import { store } from '@/store';
 
 export default defineComponent({
     name: 'GNBLogo',
@@ -47,8 +47,8 @@ export default defineComponent({
     },
     setup() {
         const state = reactive({
-            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
-            ciTextImage: computed(() => config.get('DOMAIN_IMAGE.CI_TEXT')),
+            symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+            wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
         });
 
         return {

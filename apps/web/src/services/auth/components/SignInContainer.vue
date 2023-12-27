@@ -4,8 +4,6 @@ import { useRoute } from 'vue-router/composables';
 
 import { store } from '@/store';
 
-import config from '@/lib/config';
-
 import SignInLeftContainer from '@/services/auth/components/SignInLeftContainer.vue';
 
 
@@ -13,24 +11,8 @@ const route = useRoute();
 
 const state = reactive({
     isDomainAdmin: false,
-    logoImage: computed<string|undefined>(() => {
-        const domainSettings = store.state.domain.config?.settings;
-        if (domainSettings?.symbol_favicon_url) return domainSettings.symbol_favicon_url;
-
-        const configImage = config.get('DOMAIN_IMAGE.CI_LOGO');
-        if (configImage) return configImage;
-
-        return undefined;
-    }),
-    textImage: computed<string|undefined>(() => {
-        const domainSettings = store.state.domain.config?.settings;
-        if (domainSettings?.wordtype_logo_url) return domainSettings?.wordtype_logo_url;
-
-        const configImage = config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE');
-        if (configImage) return configImage;
-
-        return undefined;
-    }),
+    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
+    wordTypeLogoImage: computed<string|undefined>(() => store.getters['domain/domainWordTypeLogoImage']),
 });
 
 watch(() => route.name, (name) => {
@@ -42,18 +24,18 @@ watch(() => route.name, (name) => {
     <div class="sign-in-container">
         <div class="ci-wrapper">
             <!--logo image-->
-            <img v-if="state.logoImage"
+            <img v-if="state.symbolImage"
                  class="logo-image"
-                 :src="state.logoImage"
+                 :src="state.symbolImage"
             >
             <img v-else
                  class="logo-image"
                  src="@/assets/images/brand/brand_logo.png"
             >
             <!--logo text image-->
-            <img v-if="state.textImage"
+            <img v-if="state.wordTypeLogoImage"
                  class="text-image"
-                 :src="state.textImage"
+                 :src="state.wordTypeLogoImage"
             >
             <img v-else
                  class="text-image"

@@ -14,9 +14,9 @@
                 </div>
 
                 <div class="hidden mobile:flex">
-                    <img v-if="ciLogoImage"
+                    <img v-if="symbolImage"
                          class="logo-character"
-                         :src="ciLogoImage"
+                         :src="symbolImage"
                     >
                     <img v-else
                          class="logo-character"
@@ -81,8 +81,6 @@ import {
 
 import { store } from '@/store';
 
-import config from '@/lib/config';
-
 import { AUTH_ROUTE } from '@/services/auth/routes/route-constant';
 
 export default {
@@ -103,7 +101,7 @@ export default {
     setup() {
         const vm = getCurrentInstance()?.proxy as Vue;
         const state = reactive({
-            ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+            symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
         });
 
         /* event */

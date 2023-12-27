@@ -1,9 +1,8 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
-import config from '@/lib/config';
+import { store } from '@/store';
 
 interface Props {
     to: Location;
@@ -12,8 +11,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const state = reactive({
-    ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
-
+    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
 });
 
 
@@ -26,9 +24,9 @@ const state = reactive({
                    :to="props.to"
         >
             <div class="logo-wrapper">
-                <img v-if="state.ciLogoImage"
+                <img v-if="state.symbolImage"
                      class="logo-character"
-                     :src="state.ciLogoImage"
+                     :src="state.symbolImage"
                 >
                 <img v-else
                      class="logo-character"

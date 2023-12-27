@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router';
 import { useRouter } from 'vue-router/composables';
@@ -10,14 +9,14 @@ import {
 import type { SelectDropdownMenuItem } from '@spaceone/design-system/src/inputs/dropdown/select-dropdown/type';
 
 import type { WorkspaceModel } from '@/schema/identity/workspace/model';
+import { store } from '@/store';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
-
-import config from '@/lib/config';
 
 import { violet } from '@/styles/colors';
 
 import { HOME_DASHBOARD_ROUTE } from '@/services/home-dashboard/routes/route-constant';
+
 
 interface Props {
     isAdminMode: boolean;
@@ -32,7 +31,7 @@ const workspaceStoreState = userWorkspaceStore.$state;
 const router = useRouter();
 
 const state = reactive({
-    ciLogoImage: computed(() => config.get('DOMAIN_IMAGE.CI_LOGO')),
+    symbolImage: computed<string|undefined>(() => store.getters['domain/domainSymbolImage']),
     workspaceList: computed<WorkspaceModel[]>(() => [...workspaceStoreState.getters.workspaceList]),
     selectedWorkspace: computed<WorkspaceModel|undefined>(() => workspaceStoreState.getters.currentWorkspace),
     workspaceMenuList: computed<SelectDropdownMenuItem[]>(() => state.workspaceList.map((_workspace) => {
@@ -78,9 +77,9 @@ const selectWorkspace = (workspaceId: string): void => {
             <div v-else
                  class="logo-wrapper"
             >
-                <img v-if="state.ciLogoImage"
+                <img v-if="state.symbolImage"
                      class="logo-character"
-                     :src="state.ciLogoImage"
+                     :src="state.symbolImage"
                 >
                 <img v-else
                      class="logo-character"
