@@ -105,8 +105,7 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
 
             const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
             commit('setCurrentRoleInfo', roleInfo);
-        }
-        commit('setCurrentRoleInfo', undefined);
+        } else commit('setCurrentRoleInfo', undefined);
     } catch (e) {
         commit('setCurrentRoleInfo', undefined);
         console.error(`Role Grant Error: ${e}`);
