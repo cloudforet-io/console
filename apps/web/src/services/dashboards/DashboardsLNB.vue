@@ -201,6 +201,7 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
 
 <template>
     <l-n-b class="dashboards-lnb"
+           :class="{'admin-mode': storeState.isAdminMode}"
            :menu-set="state.menuSet"
            :show-favorite-only.sync="state.showFavoriteOnly"
     >
@@ -221,6 +222,13 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
     .header-wrapper {
         @apply flex justify-between items-center font-bold;
         padding-right: 1.25rem;
+    }
+
+    /* custom lnb */
+    &.admin-mode {
+        :deep(.favorite-only-wrapper) {
+            padding-bottom: 0.5rem;
+        }
     }
 }
 </style>
