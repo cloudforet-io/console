@@ -114,9 +114,6 @@ const handleClose = () => {
 
         .right-area {
             @apply flex items-center;
-            :first-child {
-                margin-right: 1rem;
-            }
         }
     }
 }
@@ -136,6 +133,11 @@ const handleClose = () => {
 
             .step-left-text-button {
                 display: none;
+            }
+
+            .right-area {
+                @apply flex justify-between;
+                width: 100%;
             }
         }
     }
