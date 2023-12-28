@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -147,7 +147,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
         const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
             role_binding_id: state.refinedUserItems[rowIndex].role_binding_info?.role_binding_id || '',
-            role_id: value.name || '',
+            role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
         const roleName = userPageState.roles.find((role) => role.role_id === response.role_id)?.name ?? '';
@@ -191,11 +191,6 @@ const handleClickButton = async (value: RoleBindingModel) => {
         tableState.removeLoading = false;
     }
 };
-
-/* Init */
-onMounted(() => {
-    dropdownMenuHandler('');
-});
 </script>
 
 <template>
@@ -255,11 +250,13 @@ onMounted(() => {
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
-                                       :selected="dropdownState.menuItems.filter((item) => item.label === value.name)"
                                        :handler="dropdownMenuHandler"
                                        class="role-select-dropdown"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
                     >
+                        <template #dropdown-button>
+                            <span>{{ value.name }}</span>
+                        </template>
                         <template #menu-item--format="{item}">
                             <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
@@ -359,6 +356,13 @@ onMounted(() => {
                 }
             }
         }
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .no-data {
+        position: initial;
     }
 }
 </style>

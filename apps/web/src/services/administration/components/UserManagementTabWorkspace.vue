@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-    computed, onMounted, reactive, watch,
+    computed, reactive, watch,
 } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
@@ -182,7 +182,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
         const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
             role_binding_id: state.items[rowIndex].role_binding.role_binding_id,
-            role_id: value.name || '',
+            role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
         const roleName = userPageState.roles.find((role) => role.role_id === response.role_id)?.name ?? '';
@@ -212,11 +212,6 @@ const handleClickButton = async (value: string) => {
 watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
     await getWorkspaceList();
 }, { immediate: true });
-
-/* Init */
-onMounted(() => {
-    dropdownMenuHandler('');
-});
 </script>
 
 <template>
@@ -261,12 +256,14 @@ onMounted(() => {
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
-                                       :selected="dropdownState.menuItems.filter((item) => item.label === value.name)"
                                        :handler="dropdownMenuHandler"
                                        class="role-select-dropdown"
                                        @update:visible-menu="handleMenuVisible(rowIndex)"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
                     >
+                        <template #dropdown-button>
+                            <span>{{ value.name }}</span>
+                        </template>
                         <template #menu-item--format="{item}">
                             <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
@@ -334,6 +331,13 @@ onMounted(() => {
     }
     .icon-link {
         @apply cursor-pointer;
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .no-data {
+        position: initial;
     }
 }
 </style>
