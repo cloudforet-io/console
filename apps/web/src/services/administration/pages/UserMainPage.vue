@@ -68,9 +68,7 @@ onUnmounted(() => {
         <user-management-header />
         <p-horizontal-layout class="user-toolbox-layout">
             <template #container="{ height }">
-                <user-management-table :table-height="height"
-                                       @confirm="refreshUserList"
-                />
+                <user-management-table :table-height="height" />
             </template>
         </p-horizontal-layout>
         <user-management-tab />

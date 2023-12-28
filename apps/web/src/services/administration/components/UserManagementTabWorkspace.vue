@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue';
+import {
+    computed, onMounted, reactive, watch,
+} from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
@@ -17,7 +19,6 @@ import { iso8601Formatter } from '@cloudforet/utils';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import { RESOURCE_GROUP } from '@/schema/_common/constant';
-import type { TimeStamp } from '@/schema/_common/model';
 import type { RoleBindingDeleteParameters } from '@/schema/identity/role-binding/api-verbs/delete';
 import type { RoleBindingListParameters } from '@/schema/identity/role-binding/api-verbs/list';
 import type { RoleBindingUpdateRoleParameters } from '@/schema/identity/role-binding/api-verbs/update-role';
@@ -40,11 +41,15 @@ interface WorkspaceItem {
     name: string;
     id: string;
 }
+interface RoleBindingItem {
+    type: string;
+    name: string;
+    role_binding_id: string;
+}
 interface TableItem {
     workspace: WorkspaceItem;
-    role_type: string;
-    created_at: TimeStamp;
-    role_binding_id: string;
+    role_binding: RoleBindingItem;
+    created_at: string;
 }
 interface Props {
     activeTab: string;
@@ -55,6 +60,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const userPageStore = useUserPageStore();
+const userPageState = userPageStore.$state;
 
 const router = useRouter();
 
@@ -72,7 +78,7 @@ const state = reactive({
 const tableState = reactive({
     fields: computed(() => [
         { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
-        { name: 'role_type', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') as string, sortable: false },
+        { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
         { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
         { name: 'remove_button', label: ' ', sortable: false },
     ]),
@@ -125,9 +131,12 @@ const getWorkspaceList = async () => {
                 name: workspaceResults?.find((w) => w.workspace_id === k.workspace_id)?.name || '',
                 id: k.workspace_id,
             },
-            role_type: k.role_type,
+            role_binding: {
+                type: k.role_type,
+                name: userPageState.roles.find((r) => r.role_id === k.role_id)?.name || '',
+                role_binding_id: k.role_binding_id,
+            },
             created_at: k.created_at,
-            role_binding_id: k.role_binding_id,
         }));
     } catch (e) {
         state.items = [];
@@ -171,17 +180,22 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
-            role_binding_id: state.items[rowIndex].role_binding_id,
+        const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
+            role_binding_id: state.items[rowIndex].role_binding.role_binding_id,
             role_id: value.name || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        await getWorkspaceList();
+        const roleName = userPageState.roles.find((role) => role.role_id === response.role_id)?.name ?? '';
+        state.items[rowIndex].role_binding = {
+            name: roleName,
+            type: response.role_type,
+            role_binding_id: response.role_binding_id,
+        };
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
 };
-const handleClickButton = async (value: RoleBindingModel) => {
+const handleClickButton = async (value: string) => {
     try {
         await SpaceConnector.clientV2.identity.roleBinding.delete<RoleBindingDeleteParameters>({
             role_binding_id: value,
@@ -198,6 +212,11 @@ const handleClickButton = async (value: RoleBindingModel) => {
 watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
     await getWorkspaceList();
 }, { immediate: true });
+
+/* Init */
+onMounted(() => {
+    dropdownMenuHandler('');
+});
 </script>
 
 <template>
@@ -230,21 +249,19 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                     </router-link>
                 </span>
             </template>
-            <template #col-role_type-format="{value, rowIndex}">
+            <template #col-role_binding-format="{value, rowIndex}">
                 <span class="role-type">
-                    <img :src="useRoleFormatter(value).image"
+                    <img :src="useRoleFormatter(value.type).image"
                          alt="role-type-icon"
                          class="role-type-icon"
                     >
-                    <span>{{ useRoleFormatter(value).name }}</span>
                     <p-select-dropdown is-filterable
                                        use-fixed-menu-style
-                                       menu-position="right"
-                                       style-type="icon-button"
+                                       style-type="transparent"
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
-                                       :selected="dropdownState.selectedItems"
+                                       :selected="dropdownState.menuItems.filter((item) => item.label === value.name)"
                                        :handler="dropdownMenuHandler"
                                        class="role-select-dropdown"
                                        @update:visible-menu="handleMenuVisible(rowIndex)"
@@ -272,7 +289,7 @@ watch([() => props.activeTab, () => state.selectedUser.user_id], async () => {
                 <p-button style-type="tertiary"
                           size="sm"
                           class="remove-button"
-                          @click="handleClickButton(item.role_binding_id)"
+                          @click="handleClickButton(item.role_binding.role_binding_id)"
                 >
                     {{ $t('IAM.USER.REMOVE') }}
                 </p-button>
