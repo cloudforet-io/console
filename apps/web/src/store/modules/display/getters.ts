@@ -22,6 +22,7 @@ import type { Menu, MenuId, MenuInfo } from '@/lib/menu/config';
 import { ADMIN_MENU_LIST, MENU_LIST } from '@/lib/menu/menu-architecture';
 import { MENU_INFO_MAP } from '@/lib/menu/menu-info';
 
+export const isGrantInProgress: Getter<DisplayState, any> = (state): boolean => state.isGrantInProgress;
 export const hasUncheckedNotifications: Getter<DisplayState, any> = (state): boolean => state.uncheckedNotificationCount > 0;
 
 export const isHandbookVisible: Getter<DisplayState, any> = (state): boolean => state.visibleSidebar && state.sidebarType === SIDEBAR_TYPE.handbook;

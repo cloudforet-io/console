@@ -3,6 +3,7 @@ import type { Action } from 'vuex';
 import jwtDecode from 'jwt-decode';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
+import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
 import type { RoleGetParameters } from '@/schema/identity/role/api-verbs/get';
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -87,23 +88,30 @@ const getRoleTypeFromToken = (token: string): RoleType => {
     const decodedToken = jwtDecode<JWTPayload>(token);
     return decodedToken.rol;
 };
-export const grantRole: Action<UserState, any> = async ({ commit }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
+    const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant);
+
     try {
-        const response = await SpaceConnector.clientV2.identity.token.grant<TokenGrantParameters, TokenGrantModel>({
+        await dispatch('display/startGrantRole', undefined, { root: true });
+        const { status, response } = await fetcher<TokenGrantParameters, TokenGrantModel>({
             grant_type: 'REFRESH_TOKEN',
             scope: grantRequest.scope,
             token: grantRequest.token,
             workspace_id: grantRequest.workspace_id,
         }, { skipAuthRefresh: true });
+        if (status === 'succeed') {
+            SpaceConnector.setToken(response.access_token);
+            const currentRoleType = getRoleTypeFromToken(response.access_token);
 
-        SpaceConnector.setToken(response.access_token);
-        const currentRoleType = getRoleTypeFromToken(response.access_token);
-
-        const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
-        commit('setCurrentRoleInfo', roleInfo);
+            const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
+            commit('setCurrentRoleInfo', roleInfo);
+        }
+        commit('setCurrentRoleInfo', undefined);
     } catch (e) {
         commit('setCurrentRoleInfo', undefined);
         console.error(`Role Grant Error: ${e}`);
+    } finally {
+        await dispatch('display/finishGrantRole', undefined, { root: true });
     }
 };
 
