@@ -35,7 +35,7 @@ const state = reactive({
     loading: computed(() => dashboardState.loading),
     isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     workspaceDashboardList: computed<DashboardModel[]>(() => {
-        if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE' && !state.isWorkspaceOwner) return [];
+        if (dashboardState.scope && dashboardState.scope !== 'WORKSPACE') return [];
         let target = dashboardGetters.workspaceItems || [];
         if (dashboardState.scope) target = target.filter((d) => d.resource_group === dashboardState.scope);
         return target as DashboardModel[];
