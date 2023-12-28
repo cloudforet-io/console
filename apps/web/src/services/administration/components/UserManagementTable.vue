@@ -215,8 +215,10 @@ const handleClickButton = async (value: RoleBindingModel) => {
             @change="handleChange"
             @refresh="handleChange()"
         >
-            <template #toolbox-left>
-                <user-management-table-toolbox v-if="userPageState.isAdminMode" />
+            <template v-if="userPageState.isAdminMode"
+                      #toolbox-left
+            >
+                <user-management-table-toolbox />
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
