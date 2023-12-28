@@ -37,7 +37,11 @@ const handleClickConfirm = async () => {
 };
 const handleFormValidate = (isAllValid) => { state.isAllValid = isAllValid; };
 const handleUpdateForm = (data: RoleCreateParameters) => {
-    state.formData = data;
+    // TODO: will be updated in the next step.
+    state.formData = {
+        ...data,
+        permissions: [],
+    };
 };
 </script>
 

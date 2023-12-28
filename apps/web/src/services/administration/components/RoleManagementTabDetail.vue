@@ -19,6 +19,8 @@ import { i18n } from '@/translations';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+import { green, red } from '@/styles/colors';
+
 import {
     usePageAccessDefinitionTableData,
 } from '@/services/administration/composables/page-access-definition-table-data';
@@ -157,7 +159,20 @@ watch(() => state.selectedRole.role_id, async (roleId) => {
                                             v-on="$listeners"
                         >
                             <template #data="{ data }">
-                                {{ data ? 'O' : 'X' }}
+                                <p-i v-if="data"
+                                     name="ic_check"
+                                     height="1rem"
+                                     width="1rem"
+                                     class="check-icon"
+                                     :color="green[500]"
+                                />
+                                <p-i v-else
+                                     name="ic_limit-filled"
+                                     height="1rem"
+                                     width="1rem"
+                                     class="check-icon"
+                                     :color="red[300]"
+                                />
                             </template>
                         </p-definition-table>
                     </div>

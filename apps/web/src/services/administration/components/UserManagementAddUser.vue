@@ -353,7 +353,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
         margin: auto;
     }
     .selected-user-list {
-        @apply overflow-y-scroll;
+        @apply overflow-y-auto;
         height: 12.5rem;
         margin-top: 1rem;
         .selected-user-list-item {

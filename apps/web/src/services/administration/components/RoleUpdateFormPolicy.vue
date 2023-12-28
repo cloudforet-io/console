@@ -2,7 +2,7 @@
 import { reactive, watch } from 'vue';
 
 import {
-    PButton, PFieldTitle, PI, PTextEditor,
+    PFieldTitle, PI,
 } from '@spaceone/design-system';
 
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
@@ -18,8 +18,9 @@ const props = withDefaults(defineProps<Props>(), {
     initialPermissions: undefined,
 });
 
-const emit = defineEmits<{(e: 'update', value: string): void,
-}>();
+// TODO: will be updated in the next step.
+// const emit = defineEmits<{(e: 'update', value: string): void,
+// }>();
 
 const state = reactive({
     code: '',
@@ -27,14 +28,15 @@ const state = reactive({
 });
 
 /* Component */
-const handleCodeUpdate = (modifiedCode: string) => {
-    if (!modifiedCode) return;
-    state.code = modifiedCode;
-    emit('update', modifiedCode);
-};
-const handleClickEdit = () => {
-    state.isEdit = true;
-};
+// TODO: will be updated in the next step.
+// const handleCodeUpdate = (modifiedCode: string) => {
+//     if (!modifiedCode) return;
+//     state.code = modifiedCode;
+//     emit('update', modifiedCode);
+// };
+// const handleClickEdit = () => {
+//     state.isEdit = true;
+// };
 
 /* Watcher */
 watch(() => props.initialPermissions, (value) => {
@@ -51,9 +53,7 @@ watch(() => props.initialPermissions, (value) => {
         <p-field-title class="policy-type"
                        :label="$t('IAM.ROLE.DETAIL.API_POLICY')"
         />
-        <div v-if="props.roleType === ROLE_TYPE.DOMAIN_ADMIN && !state.isEdit"
-             class="has-all-permissions"
-        >
+        <div class="has-all-permissions">
             <p-i name="ic_plugs"
                  width="2rem"
                  height="2rem"
@@ -62,20 +62,22 @@ watch(() => props.initialPermissions, (value) => {
             <span class="text">
                 {{ $t('IAM.ROLE.FORM.DEFAULT_API_POLICY_HELP_TEXT') }}
             </span>
-            <p-button class="edit-button"
-                      style-type="tertiary"
-                      size="md"
-                      icon-left="ic_edit"
-                      @click="handleClickEdit"
-            >
-                <span>{{ $t('IAM.ROLE.FORM.EDIT') }}</span>
-            </p-button>
+            <!--            TODO: will be updated in the next step. -->
+            <!--            <p-button class="edit-button"-->
+            <!--                      style-type="tertiary"-->
+            <!--                      size="md"-->
+            <!--                      icon-left="ic_edit"-->
+            <!--                      @click="handleClickEdit"-->
+            <!--            >-->
+            <!--                <span>{{ $t('IAM.ROLE.FORM.EDIT') }}</span>-->
+            <!--            </p-button>-->
         </div>
-        <p-text-editor v-else
-                       :code="state.code"
-                       class="content-wrapper"
-                       @update:code="handleCodeUpdate"
-        />
+        <!--        TODO: will be updated in the next step.-->
+        <!--        <p-text-editor v-else-->
+        <!--                       :code="state.code"-->
+        <!--                       class="content-wrapper"-->
+        <!--                       @update:code="handleCodeUpdate"-->
+        <!--        />-->
     </div>
 </template>
 
