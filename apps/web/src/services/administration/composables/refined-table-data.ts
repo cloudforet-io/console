@@ -31,7 +31,7 @@ const colorBindFactory = (colorMapping, textFnc) => (value) => ({
 export const userStateFormatter = colorBindFactory(USER_STATE_COLOR, (value) => value.toLowerCase());
 export const userMfaFormatter = colorBindFactory(USER_MFA_COLOR, (value) => value.toLowerCase());
 export const useRoleFormatter = (type: RoleType, isWorkspace?: boolean) => {
-    const name = type.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
+    const name = type?.toLowerCase().replace(/_/g, ' ').replace(/(?:^|\s)\w/g, (match) => match.toUpperCase());
 
     switch (type) {
     case ROLE_TYPE.SYSTEM_ADMIN: return {

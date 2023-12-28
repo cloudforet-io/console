@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, reactive,
+    computed, onMounted, reactive,
 } from 'vue';
 
 import {
@@ -101,7 +101,6 @@ const dropdownState = reactive({
     loading: false,
     visibleMenu: false,
     searchText: '',
-    selectedItems: [] as SelectDropdownMenuItem[],
     menuItems: [] as SelectDropdownMenuItem[],
 });
 
@@ -146,12 +145,18 @@ const dropdownMenuHandler: AutocompleteHandler = async (inputText: string) => {
 };
 const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
-        await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
+        const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
             role_binding_id: state.refinedUserItems[rowIndex].role_binding_info?.role_binding_id || '',
             role_id: value.name || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
-        emit('confirm');
+        const roleName = userPageState.roles.find((role) => role.role_id === response.role_id)?.name ?? '';
+        userPageStore.$patch((_state) => {
+            _state.users[rowIndex].role_binding = {
+                name: roleName,
+                type: response.role_type,
+            };
+        });
     } catch (e: any) {
         ErrorHandler.handleRequestError(e, e.message);
     }
@@ -186,6 +191,11 @@ const handleClickButton = async (value: RoleBindingModel) => {
         tableState.removeLoading = false;
     }
 };
+
+/* Init */
+onMounted(() => {
+    dropdownMenuHandler('');
+});
 </script>
 
 <template>
@@ -238,16 +248,14 @@ const handleClickButton = async (value: RoleBindingModel) => {
                              class="role-type-icon"
                         >
                     </p-tooltip>
-                    <span>{{ value.name }}</span>
                     <p-select-dropdown v-if="userPageStore.isWorkspaceOwner && state.refinedUserItems[rowIndex].user_id !== storeState.loginUserId"
                                        is-filterable
                                        use-fixed-menu-style
-                                       menu-position="right"
-                                       style-type="icon-button"
+                                       style-type="transparent"
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
-                                       :selected="dropdownState.selectedItems"
+                                       :selected="dropdownState.menuItems.filter((item) => item.label === value.name)"
                                        :handler="dropdownMenuHandler"
                                        class="role-select-dropdown"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
@@ -265,6 +273,7 @@ const handleClickButton = async (value: RoleBindingModel) => {
                             </div>
                         </template>
                     </p-select-dropdown>
+                    <span v-else>{{ value.name }}</span>
                 </div>
             </template>
             <template #col-mfa-format="{value}">
