@@ -262,7 +262,8 @@ const handleUpdateViewModalVisible = async (visible: boolean) => {
                 </template>
             </div>
         </p-data-loader>
-        <widget-view-mode-modal :visible="widgetViewState.visibleModal"
+        <widget-view-mode-modal v-if="widgetViewState.visibleModal"
+                                :visible="widgetViewState.visibleModal"
                                 :widget-key="widgetViewState.targetWidget?.widget_key"
                                 :size="widgetViewState.targetWidget?.size"
                                 :theme="widgetViewState.targetWidget?.theme"

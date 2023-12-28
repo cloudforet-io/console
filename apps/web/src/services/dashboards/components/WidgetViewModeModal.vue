@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AsyncComponent, ComponentPublicInstance } from 'vue';
 import {
-    computed, nextTick, reactive, toRef, watch,
+    computed, nextTick, onBeforeMount, onBeforeUnmount, reactive, toRef,
 } from 'vue';
 
 import {
@@ -114,26 +114,22 @@ const handleUpdateValidation = (widgetKey: string, isValid: boolean) => {
     dashboardDetailStore.updateWidgetValidation(isValid, widgetKey);
 };
 
-watch(() => props.visible, async (visible) => {
+onBeforeMount(() => {
     if (!state.originWidgetInfo) return;
     state.sidebarVisible = false;
-    if (visible) {
-        initSnapshot();
-        state.component = getWidgetComponent(state.originWidgetInfo.widget_name);
-    } else {
-        state.loadingWidget = true;
-        state.component = null;
-        emit('update:visible', false);
-    }
+    initSnapshot();
+    state.component = getWidgetComponent(state.originWidgetInfo.widget_name);
 });
-
+onBeforeUnmount(() => {
+    state.loadingWidget = true;
+    state.component = null;
+    emit('update:visible', false);
+});
 </script>
 
 <template>
     <transition name="slide-up">
-        <div v-show="props.visible"
-             class="widget-view-mode-modal"
-        >
+        <div class="widget-view-mode-modal">
             <div class="content-wrapper">
                 <div class="top-wrapper">
                     <p-button icon-left="ic_arrow-left"
