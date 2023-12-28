@@ -9,6 +9,7 @@ import {
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -29,7 +30,7 @@ import UserManagementTableToolbox from '@/services/administration/components/Use
 import {
     calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
 } from '@/services/administration/composables/refined-table-data';
-import { USER_SEARCH_HANDLERS } from '@/services/administration/constants/user-constant';
+import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
@@ -95,6 +96,19 @@ const tableState = reactive({
                 { name: 'remove_button', label: ' ', sortable: false },
             ]
             : baseFields;
+    }),
+    valueHandlerMap: computed(() => {
+        const resourceType = userPageState.isAdminMode ? 'identity.User' : 'identity.WorkspaceUser';
+        return {
+            user_id: makeDistinctValueHandler(resourceType, 'user_id'),
+            name: makeDistinctValueHandler(resourceType, 'name'),
+            state: makeEnumValueHandler(USER_STATE),
+            email: makeDistinctValueHandler(resourceType, 'email'),
+            auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
+            last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime'),
+            timezone: makeDistinctValueHandler(resourceType, 'timezone'),
+            tags: makeDistinctValueHandler(resourceType, 'tags'),
+        };
     }),
 });
 const dropdownState = reactive({
@@ -208,7 +222,7 @@ const handleClickButton = async (value: RoleBindingModel) => {
             :sort-desc="true"
             :total-count="userPageState.totalCount"
             :key-item-sets="USER_SEARCH_HANDLERS.keyItemSets"
-            :value-handler-map="USER_SEARCH_HANDLERS.valueHandlerMap"
+            :value-handler-map="tableState.valueHandlerMap"
             :query-tags="queryTags"
             :style="{height: `${props.tableHeight}px`}"
             @select="handleSelect"

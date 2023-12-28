@@ -1,10 +1,5 @@
 import type { KeyItemSet } from '@spaceone/design-system/types/inputs/search/query-search/type';
 
-import {
-    makeDistinctValueHandler,
-    makeEnumValueHandler,
-} from '@cloudforet/core-lib/component-util/query-search';
-
 import * as styles from '@/styles/colors';
 
 export const PASSWORD_TYPE = {
@@ -80,16 +75,6 @@ export const USER_SEARCH_HANDLERS = {
                 dataType: 'object',
             }],
         }] as KeyItemSet[],
-    valueHandlerMap: {
-        user_id: makeDistinctValueHandler('identity.User', 'user_id'),
-        name: makeDistinctValueHandler('identity.User', 'name'),
-        state: makeEnumValueHandler(USER_STATE),
-        email: makeDistinctValueHandler('identity.User', 'email'),
-        auth_type: makeDistinctValueHandler('identity.User', 'auth_type'),
-        last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at', 'datetime'),
-        timezone: makeDistinctValueHandler('identity.User', 'timezone'),
-        tags: makeDistinctValueHandler('identity.User', 'tags'),
-    },
 };
 
 export const USER_STATUS_TABLE_FIELDS = [
