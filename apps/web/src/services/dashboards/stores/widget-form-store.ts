@@ -1,7 +1,7 @@
 import type { ComputedRef, UnwrapRef } from 'vue';
 import { computed, reactive } from 'vue';
 
-import { flattenDeep } from 'lodash';
+import { flattenDeep, union } from 'lodash';
 import { defineStore } from 'pinia';
 
 import type { DashboardLayoutWidgetInfo } from '@/schema/dashboard/_types/dashboard-type';
@@ -27,6 +27,7 @@ import type {
 import {
     mergeBaseWidgetState,
 } from '@/services/dashboards/widgets/_composables/use-widget/merge-base-widget-state';
+import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/widget-options-schema-generator';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 
@@ -105,7 +106,7 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
     });
     const mergedWidgetState = computed<UnwrapRef<MergedBaseWidgetState>|undefined>(() => {
         if (!state.widgetConfigId) return undefined;
-        return mergeBaseWidgetState({
+        const merged = mergeBaseWidgetState({
             inheritOptions: dashboardWidgetInfo.value?.inherit_options,
             widgetOptions: dashboardWidgetInfo.value?.widget_options,
             widgetName: state.widgetConfigId,
@@ -114,8 +115,14 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
             dashboardVariables: dashboardDetailState.variables,
             title: dashboardWidgetInfo.value?.title,
             schemaProperties: dashboardWidgetInfo.value?.schema_properties,
-            dashboardScope,
         });
+        const refined = {
+            ...merged,
+            widgetConfig: getWidgetConfigByDashboardScope(merged.widgetConfig, dashboardScope.value),
+            inheritOptions: getInheritOptionsByDashboardScope(merged.inheritOptions, dashboardScope.value),
+            schemaProperties: getSchemaPropertiesByDashboardScope(merged.schemaProperties, dashboardScope.value),
+        };
+        return refined;
     });
 
     const getters: UnwrapRef<Getters> = reactive({
@@ -308,4 +315,48 @@ export const useWidgetFormStore = defineStore('widget-form', () => {
 });
 
 
+
+
+const getWidgetConfigByDashboardScope = (config: WidgetConfig, dashboardScope: DashboardScope): WidgetConfig => {
+    if (dashboardScope === 'DOMAIN') {
+        const extraOptionsSchema = getWidgetOptionsSchema(['filters.workspace']);
+        return {
+            ...config,
+            options_schema: {
+                properties: { ...(config.options_schema?.properties ?? {}), ...extraOptionsSchema.properties },
+                order: ['filters.workspace', ...(config.options_schema?.order ?? [])],
+            },
+        };
+    }
+    if (dashboardScope === 'PROJECT') {
+        const extraOptionsSchema = getWidgetOptionsSchema([['filters.project', { fixed: true, optional: false, readonly: true }]]);
+        return {
+            ...config,
+            options_schema: {
+                properties: { ...(config.options_schema?.properties ?? {}), ...extraOptionsSchema.properties },
+                order: ['filters.project', ...(config.options_schema?.order ?? [])],
+            },
+        };
+    }
+    return config;
+};
+const getInheritOptionsByDashboardScope = (inheritOptions: InheritOptions, dashboardScope: DashboardScope): InheritOptions => {
+    if (dashboardScope === 'DOMAIN') {
+        return { ...inheritOptions, 'filters.workspace': { enabled: true, variable_key: 'workspace' } };
+    }
+    if (dashboardScope === 'PROJECT') {
+        return { ...inheritOptions, 'filters.project': { enabled: true, variable_key: 'project' } };
+    }
+    return inheritOptions;
+};
+
+const getSchemaPropertiesByDashboardScope = (schemaProperties: string[], dashboardScope: DashboardScope): string[] => {
+    if (dashboardScope === 'DOMAIN') {
+        return union(['filters.workspace'], schemaProperties);
+    }
+    if (dashboardScope === 'PROJECT') {
+        return union(['filters.project'], schemaProperties);
+    }
+    return schemaProperties;
+};
 

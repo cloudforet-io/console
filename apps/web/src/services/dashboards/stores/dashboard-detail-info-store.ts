@@ -103,10 +103,7 @@ export const useDashboardDetailInfoStore = defineStore('dashboard-detail-info', 
 
     const getters = reactive({
         isWidgetLayoutValid: computed(() => Object.values(state.widgetValidMap).every((d) => d === true)),
-        isAllVariablesInitialized: computed(() => {
-            if (!state.dashboardInfo) return false;
-            return Object.values(state.variablesInitMap).every((d) => d === true);
-        }),
+        isAllVariablesInitialized: computed(() => Object.values(state.variablesInitMap).every((d) => d === true)),
     });
 
     /* Mutations */
