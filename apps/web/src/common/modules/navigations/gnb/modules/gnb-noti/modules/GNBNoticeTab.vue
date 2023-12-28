@@ -131,13 +131,13 @@ const init = async () => {
                                      :key="`${item.postId}-${idx}`"
                                      :title="item.title"
                                      :created-at="item.createdAt"
-                                     :is-read="noticeGetters.isReadMap[item.postId]"
+                                     :is-read="!!noticeGetters.isReadMap[item.postId]"
                                      :writer="item.writer"
                                      @select="handleSelectNotice(item.postId)"
                     />
                     <p-divider class="divider" />
                 </template>
-                <g-n-b-noti-item v-for="(item, idx) in items"
+                <g-n-b-noti-item v-for="(item, idx) in state.items"
                                  :key="`${item.postId}-${idx}`"
                                  :title="item.title"
                                  :created-at="item.createdAt"
