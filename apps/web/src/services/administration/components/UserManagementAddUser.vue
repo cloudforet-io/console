@@ -8,7 +8,6 @@ import type { TranslateResult } from 'vue-i18n';
 import {
     PContextMenu, PEmpty, PFieldGroup, PIconButton, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
-import { debounce } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 
@@ -66,14 +65,11 @@ const handleClickTextInput = async () => {
     validationState.userIdInvalid = false;
     validationState.userIdInvalidText = '';
 };
-const handleChangeTextInput = debounce(async (searchText: string) => {
-    formState.searchText = searchText;
-    validationState.userIdInvalid = false;
-    validationState.userIdInvalidText = '';
+const handleChangeTextInput = () => {
     if (!userPageState.isAdminMode && !userPageState.afterWorkspaceCreated) {
-        await fetchListUsers();
+        fetchListUsers();
     }
-}, 200);
+};
 const handleEnterTextInput = () => {
     if (formState.searchText === '') return;
     const { isValid, invalidText } = checkEmailFormat(formState.searchText);
@@ -207,8 +203,6 @@ const fetchGetUsers = async (userId: string) => {
     }
 };
 
-
-
 onClickOutside(containerRef, clickOutside);
 
 watch(() => state.menuVisible, async (menuVisible) => {
@@ -235,6 +229,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
         <p-field-group required
                        :invalid="validationState.userIdInvalid"
                        :invalid-text="validationState.userIdInvalidText"
+                       class="user-info-field-group"
                        :class="{'is-admin-mode': userPageState.isAdminMode}"
         >
             <template #label>
@@ -261,11 +256,12 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     <div class="input-form-wrapper">
                         <p-text-input ref="targetRef"
                                       :invalid="invalid"
-                                      :value="formState.searchText"
+                                      :value.sync="formState.searchText"
+                                      block
                                       class="user-id-input"
                                       @click="handleClickTextInput"
-                                      @keyup.enter="handleEnterTextInput"
-                                      @update:value="handleChangeTextInput"
+                                      @keydown.enter="handleEnterTextInput"
+                                      @input="handleChangeTextInput"
                         />
                         <p-context-menu v-if="state.menuVisible && state.menuItems.length > 0"
                                         ref="contextMenuRef"
@@ -325,6 +321,9 @@ watch(() => state.menuVisible, async (menuVisible) => {
     @apply flex flex-col bg-white border border-primary-3 rounded-md;
     height: 18rem;
     padding: 0.75rem;
+    .user-info-field-group {
+        margin-bottom: 0;
+    }
     .and-mark {
         @apply font-normal;
         margin-right: 0.25rem;
@@ -388,7 +387,6 @@ watch(() => state.menuVisible, async (menuVisible) => {
         left: 0;
     }
     &.is-admin-mode {
-        margin-bottom: 0;
         .invalid-feedback {
             left: 6.75rem;
         }
