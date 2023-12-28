@@ -8,6 +8,7 @@ import { cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
@@ -40,13 +41,14 @@ const modalState = reactive({
 const workspaceListApiQueryHelper = new ApiQueryHelper()
     .setSort('name', true);
 
-const refreshWorkspaceList = () => {
+const refreshWorkspaceList = async () => {
     workspacePageStore.$patch({ loading: true });
     workspaceListApiQueryHelper
         .setPageStart(workspacePageStore.$state.pageStart).setPageLimit(workspacePageStore.$state.pageLimit)
         .setFilters(workspacePageStore.searchFilters);
     try {
-        workspacePageStore.listWorkspaces({ query: workspaceListApiQueryHelper.data });
+        await workspacePageStore.listWorkspaces({ query: workspaceListApiQueryHelper.data });
+        await userWorkspaceStore.load(store.state.user.userId);
     } finally {
         workspacePageStore.$patch({ loading: false });
     }
@@ -58,7 +60,6 @@ const handleCreateWorkspace = () => {
 };
 
 const handleConfirm = async () => {
-    await userWorkspaceStore.load();
     userPageStore.$patch((_state) => {
         _state.modal.type = USER_MODAL_TYPE.ADD;
         _state.modal.title = i18n.t('IAM.USER.MAIN.MODAL.CREATE_TITLE') as string;
