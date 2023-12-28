@@ -482,6 +482,7 @@
 						"LABEL_CURRENCY": "통화",
 						"LABEL_NAME": "이름",
 						"LABEL_TARGET": "타겟",
+						"NO_DATA_SOURCE": "",
 						"PRODUCT": "제품",
 						"PROJECT": "프로젝트",
 						"PROJECT_GROUP": "프로젝트 그룹",

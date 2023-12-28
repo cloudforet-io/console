@@ -45,7 +45,7 @@ const state = reactive({
         if (storeState.isAdminMode && !props.workspaceId) return [];
         let _costDataSourceList = Object.entries(storeState.costDataSource);
         if (storeState.isAdminMode) {
-            _costDataSourceList = Object.entries(storeState.costDataSource).filter(([, v]) => v.data.workspace_id === props.workspaceId);
+            _costDataSourceList = Object.entries(storeState.costDataSource).filter(([, v]) => [props.workspaceId, '*'].includes(v.data.workspace_id));
         }
         return _costDataSourceList.map(([key, dataSource]) => ({
             name: key,
