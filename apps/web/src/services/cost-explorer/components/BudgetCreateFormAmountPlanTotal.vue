@@ -42,7 +42,7 @@ const state = reactive({
         set: (val: string) => { setForm('amount', getNumberFromString(val)); },
     }),
     currencyText: computed<string>(() => {
-        if (!props.dataSourceId) return '';
+        if (!props.dataSourceId) return '--';
         const dataSourceItem:CostDataSourceItems = storeState.costDataSource[props.dataSourceId];
         const currency = dataSourceItem?.data.plugin_info.metadata?.currency ?? CURRENCY_SYMBOL.USD;
         return CURRENCY_SYMBOL[currency];

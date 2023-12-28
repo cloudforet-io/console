@@ -97,7 +97,6 @@ watch([() => selectedTargets.value, () => isAllValid.value], debounce(([targets,
                            :loading="state.loading"
                            show-select-marker
                            use-fixed-menu-style
-                           selection-highlight
                            :page-size="10"
                            @update:selected="handleSelectWorkspace"
         />

@@ -93,9 +93,19 @@ const containerRef = ref<HTMLElement|null>(null);
 onClickOutside(containerRef, hideContextMenu);
 
 // event
-const handleSelectOption = (_selected: MenuItem[]) => {
+const handleSelectOption = (item: MenuItem, index: number, isSelected: boolean) => {
+    let _selected = cloneDeep(state.selected);
+    if (isSelected) {
+        _selected = [..._selected, item];
+    } else {
+        _selected = _selected.splice(index, 1);
+    }
     state.selected = _selected;
     changeVariables(_selected);
+};
+const handleClearSelection = () => {
+    state.selected = [];
+    changeVariables([]);
 };
 
 // helper
@@ -219,7 +229,7 @@ const {
                         :disabled="props.disabled"
                         class="option-delete-button"
                         :class="{'disabled': props.disabled}"
-                        @click.stop="handleSelectOption([])"
+                        @click.stop="handleClearSelection"
                 >
                     <p-i name="ic_close"
                          width="1rem"
@@ -248,7 +258,7 @@ const {
                         :show-clear-selection="variableProperty?.selection_type === 'MULTI' && !variableProperty?.fixed"
                         @click-show-more="handleClickShowMore"
                         @keyup:down:end="focusOnContextMenu()"
-                        @update:selected="handleSelectOption"
+                        @select="handleSelectOption"
                         @update:search-text="handleUpdateSearchText"
         />
     </div>
