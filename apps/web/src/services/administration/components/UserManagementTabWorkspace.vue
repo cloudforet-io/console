@@ -78,7 +78,7 @@ const state = reactive({
 const tableState = reactive({
     fields: computed(() => [
         { name: 'workspace', label: i18n.t('IAM.USER.MAIN.WORKSPACE') as string },
-        { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE_TYPE') as string, sortable: false },
+        { name: 'role_binding', label: i18n.t('IAM.USER.MAIN.ROLE') as string, sortable: false },
         { name: 'created_at', label: i18n.t('IAM.USER.MAIN.INVITED') as string, sortable: false },
         { name: 'remove_button', label: ' ', sortable: false },
     ]),
