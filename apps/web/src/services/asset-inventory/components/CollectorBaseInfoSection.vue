@@ -2,6 +2,7 @@
     <p-pane-layout>
         <collector-detail-section-header :title="$t('INVENTORY.COLLECTOR.DETAIL.BASE_INFO')"
                                          :edit-mode="state.isEditMode"
+                                         :hide-edit-button="!collectorDetailPageStore.getters.isEditableCollector"
                                          @click-edit="handleClickEdit"
         />
 
@@ -87,6 +88,7 @@ import CollectorDetailSectionHeader from '@/services/asset-inventory/components/
 import CollectorTags from '@/services/asset-inventory/components/CollectorDetailTags.vue';
 import CollectorTagForm from '@/services/asset-inventory/components/CollectorFormTag.vue';
 import CollectorVersionForm from '@/services/asset-inventory/components/CollectorFormVersion.vue';
+import { useCollectorDetailPageStore } from '@/services/asset-inventory/stores/collector-detail-page-store';
 import { useCollectorFormStore } from '@/services/asset-inventory/stores/collector-form-store';
 import { useCollectorJobStore } from '@/services/asset-inventory/stores/collector-job-store';
 
@@ -100,6 +102,8 @@ const collectorFormState = collectorFormStore.$state;
 
 const collectorJobStore = useCollectorJobStore();
 const collectorJobState = collectorJobStore.$state;
+
+const collectorDetailPageStore = useCollectorDetailPageStore();
 
 const state = reactive({
     collectorPluginInfo: computed<CollectorPluginModel|null>(() => collectorFormState.originCollector?.plugin_info ?? null),
