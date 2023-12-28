@@ -3444,6 +3444,7 @@
 			"ALT_S_DELETE_PROJECT_GROUP": "Project Group successfully deleted ",
 			"ALT_S_UPDATE_PROJECT": "Project successfully updated ",
 			"ALT_S_UPDATE_PROJECT_GROUP": "Project Group successfully updated  ",
+			"CAN_ACCESS_TO_THIS_PROJECT": "can access to this project",
 			"CLOUD_SERVICES": "Cloud Services",
 			"COMPUTE": "Compute",
 			"CREATE": "Create",

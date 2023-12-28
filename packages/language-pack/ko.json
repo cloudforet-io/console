@@ -3444,6 +3444,7 @@
 			"ALT_S_DELETE_PROJECT_GROUP": "프로젝트 그룹 삭제 완료",
 			"ALT_S_UPDATE_PROJECT": "프로젝트 업데이트 완료",
 			"ALT_S_UPDATE_PROJECT_GROUP": "프로젝트 그룹 업데이트 완료",
+			"CAN_ACCESS_TO_THIS_PROJECT": "",
 			"CLOUD_SERVICES": "클라우드 서비스 ",
 			"COMPUTE": "컴퓨트",
 			"CREATE": "생성 ",
