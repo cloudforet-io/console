@@ -1,6 +1,7 @@
 <template>
     <l-n-b :header="header"
            :menu-set="menuSet"
+           hide-header
     >
         <template #default>
             <div class="member-profile">
