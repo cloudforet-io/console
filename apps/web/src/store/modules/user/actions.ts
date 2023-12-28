@@ -110,7 +110,9 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
         commit('setCurrentRoleInfo', undefined);
         console.error(`Role Grant Error: ${e}`);
     } finally {
-        await dispatch('display/finishGrantRole', undefined, { root: true });
+        setTimeout(() => {
+            dispatch('display/finishGrantRole', undefined, { root: true });
+        }, 500);
     }
 };
 
