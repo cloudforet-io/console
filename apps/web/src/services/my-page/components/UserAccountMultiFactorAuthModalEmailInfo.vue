@@ -93,7 +93,7 @@ const handleClickSendCodeButton = async () => {
             </p-field-group>
             <p-button style-type="secondary"
                       :loading="state.loading"
-                      :disabled="email === ''"
+                      :disabled="email === '' || state.proxyIsSentCode"
                       @click="handleClickSendCodeButton"
             >
                 {{ $t('COMMON.MFA_MODAL.SEND_CODE') }}

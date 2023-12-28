@@ -27,7 +27,9 @@ const router = useRouter();
 const userWorkspaceStore = useUserWorkspaceStore();
 
 
-const { password, userId, authType } = route.params;
+const {
+    password, userId, mfaEmail, authType,
+} = route.params;
 
 const credentials = {
     user_id: userId,
@@ -132,7 +134,7 @@ const handleClickConfirmButton = async () => {
                          class="icon-envelope"
                     />
                     <strong class="email-text">
-                        {{ userId }}
+                        {{ mfaEmail }}
                     </strong>
                 </div>
             </div>
