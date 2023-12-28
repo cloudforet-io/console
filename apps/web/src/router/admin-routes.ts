@@ -1,7 +1,7 @@
 import type { RouteConfig } from 'vue-router';
 
 import adminAdministrationRoute from '@/services/administration/routes/admin/routes';
-import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
+// import adminAssetInventoryRoutes from '@/services/asset-inventory/routes/admin/routes';
 import adminCostExplorerRoutes from '@/services/cost-explorer/routes/admin/routes';
 import adminDashboardsRoutes from '@/services/dashboards/routes/admin/routes';
 import adminHomeDashboardRoutes from '@/services/home-dashboard/routes/admin/routes';
@@ -15,7 +15,7 @@ export const adminRoutes: RouteConfig[] = [
     adminHomeDashboardRoutes,
     adminDashboardsRoutes,
     adminCostExplorerRoutes,
-    adminAssetInventoryRoutes,
+    // adminAssetInventoryRoutes,
     adminAdministrationRoute,
     adminInfoRoute,
 ];
