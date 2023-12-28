@@ -24,6 +24,8 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { useFormValidator } from '@/common/composables/form-validator';
 import { useProxyValue } from '@/common/composables/proxy-state';
 
+import { gray, indigo } from '@/styles/colors';
+
 import { useProjectPageStore } from '@/services/project/stores/project-page-store';
 
 
@@ -52,11 +54,13 @@ const state = reactive({
             name: 'PRIVATE',
             label: i18n.t('PROJECT.LANDING.ONLY_PEOPLE_INVITED'),
             icon: 'ic_lock-filled',
+            iconColor: gray[800],
         },
         {
             name: 'PUBLIC',
             label: i18n.t('PROJECT.LANDING.EVERYONE_AT_THIS_WORKSPACE'),
             icon: 'ic_globe-filled',
+            iconColor: indigo[600],
         },
     ])),
     selectedAccess: 'PRIVATE' as ProjectType,
@@ -205,11 +209,19 @@ watch(() => projectStore.state.items, (items) => {
                                        @select="handleSelectAccess"
                     >
                         <template #dropdown-button>
-                            <p-i :name="state.selectedAccess === 'PRIVATE' ? 'ic_lock-filled' : 'ic_globe-filled'"
-                                 width="1rem"
-                                 height="1rem"
-                            />
-                            {{ state.selectedAccess === 'PRIVATE' ? $t('PROJECT.LANDING.ONLY_PEOPLE_INVITED') : $t('PROJECT.LANDING.EVERYONE_AT_THIS_WORKSPACE') }}
+                            <div class="text-wrapper">
+                                <p-i :name="state.selectedAccess === 'PRIVATE' ? 'ic_lock-filled' : 'ic_globe-filled'"
+                                     color="inherit"
+                                     width="1rem"
+                                     height="1rem"
+                                />
+                                <span>{{ state.selectedAccess === 'PRIVATE' ? $t('PROJECT.LANDING.ONLY_PEOPLE_INVITED') : $t('PROJECT.LANDING.EVERYONE_AT_THIS_WORKSPACE') }}</span>
+                                <span v-if="state.selectedAccess === 'PRIVATE'"
+                                      class="sub-text"
+                                >
+                                    {{ $t('PROJECT.LANDING.CAN_ACCESS_TO_THIS_PROJECT') }}
+                                </span>
+                            </div>
                         </template>
                     </p-select-dropdown>
                 </template>
@@ -222,6 +234,15 @@ watch(() => projectStore.state.items, (items) => {
 .project-form-modal {
     .access-dropdown {
         width: 100%;
+        .text-wrapper {
+            @apply text-gray-800 text-label-md;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .sub-text {
+            @apply text-gray-500;
+        }
     }
 }
 </style>
