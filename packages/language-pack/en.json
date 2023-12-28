@@ -482,6 +482,7 @@
 						"LABEL_CURRENCY": "Currency",
 						"LABEL_NAME": "Name",
 						"LABEL_TARGET": "Target",
+						"NO_DATA_SOURCE": "No data source",
 						"PRODUCT": "Product",
 						"PROJECT": "Project",
 						"PROJECT_GROUP": "Project Group",
