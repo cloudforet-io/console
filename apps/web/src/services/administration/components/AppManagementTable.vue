@@ -223,7 +223,7 @@ const getListApps = async () => {
             .setFilters(queryTagHelper.filters.value);
         await appPageStore.listApps({
             query: appListApiQuery,
-            role_type: !storeState.isAdminMode && ROLE_TYPE.WORKSPACE_OWNER || undefined,
+            role_type: !storeState.isAdminMode && ROLE_TYPE.WORKSPACE_OWNER || ROLE_TYPE.DOMAIN_ADMIN,
         });
     } finally {
         state.loading = false;
