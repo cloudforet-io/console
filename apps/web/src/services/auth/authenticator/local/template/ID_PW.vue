@@ -90,10 +90,13 @@ const signIn = async () => {
         }
     } catch (e: any) {
         if (e.message.includes('MFA')) {
+            const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+            const userEmail = e.message.match(emailRegex);
             await router.push({
                 name: AUTH_ROUTE.SIGN_IN.MULTI_FACTOR_AUTH._NAME,
                 params: {
                     password: credentials.password,
+                    mfaEmail: userEmail[0],
                     userId: state.userId?.trim() as string,
                     authType: 'LOCAL',
                 },
