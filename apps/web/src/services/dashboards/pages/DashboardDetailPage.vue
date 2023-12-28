@@ -58,13 +58,7 @@ const handleUpdateLabels = async (labels: string[]) => {
 
 
 watch(() => props.dashboardId, async (dashboardId, prevDashboardId) => {
-    /* NOTE: The dashboard data is reset in three cases.
-        1. the dashboard is changed from project dashboard to domain dashboard
-        2. vice versa
-        3. first entering case
-    * This is because in case of project dashboard, there are some different variables settings, so it is not safe to reuse dashboard store data with domain dashboard.
-    * But in case of the same type of dashboard, the dashboard store must be reused to smoothly update the dashboard data without blinking.
-     */
+    /* NOTE: The dashboard data is reset in first entering case */
     if (dashboardId && !prevDashboardId) { // this includes all three cases
         dashboardDetailStore.reset();
     }
