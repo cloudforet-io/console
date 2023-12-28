@@ -2,6 +2,8 @@
 import { computed, reactive } from 'vue';
 import type { Location } from 'vue-router/types/router';
 
+import { PDivider } from '@spaceone/design-system';
+
 import { store } from '@/store';
 
 interface Props {
@@ -34,6 +36,12 @@ const state = reactive({
                 >
             </div>
         </component>
+        <p-divider class="logo-divider"
+                   vertical
+        />
+        <p class="my-page-text-title">
+            {{ $t('MENU.MY_PAGE') }}
+        </p>
     </div>
 </template>
 
@@ -61,6 +69,22 @@ const state = reactive({
                 width: 2rem;
                 height: 2rem;
             }
+        }
+    }
+
+    .logo-divider {
+        margin: 0 0.75rem;
+        height: 2rem;
+
+        @screen tablet {
+            display: none;
+        }
+    }
+    .my-page-text-title {
+        @apply text-label-lg font-bold text-gray-900;
+
+        @screen tablet {
+            display: none;
         }
     }
 }
