@@ -26,7 +26,7 @@ export const useBreadcrumbs = () => {
                     const routeRegexRes = matched[matched.length - 1].regex.exec(vm.$route.path) ?? [];
                     currentRegexRes.forEach((param, i) => {
                         if (i !== 0) {
-                            path = path.replace(param, routeRegexRes[i]);
+                            path = path?.replace(param, routeRegexRes[i]) ?? '';
                         }
                     });
                     location.path = path;

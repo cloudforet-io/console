@@ -2,10 +2,10 @@
 import {
     computed, onBeforeMount, reactive,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PButton, PHeading } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -18,13 +18,14 @@ import NoticeDetail from '@/services/info/components/NoticeDetail.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 import { useNoticeDetailStore } from '@/services/info/stores/notice-detail-store';
 
-
 const props = defineProps<{
     postId: string;
 }>();
 
 const noticeDetailStore = useNoticeDetailStore();
 const noticeDetailState = noticeDetailStore.state;
+
+const router = useRouter();
 
 const state = reactive({
     hasPermissionToEditOrDelete: computed<boolean>(() => store.getters['user/isDomainAdmin']),
@@ -36,7 +37,7 @@ const handleClickEditButton = () => {
         ErrorHandler.handleError(new Error('postId is undefined'));
         return;
     }
-    SpaceRouter.router.push({
+    router.push({
         name: INFO_ROUTE.NOTICE.UPDATE._NAME,
         params: { postId: props.postId },
     });
@@ -51,7 +52,7 @@ const handleDeleteNoticeConfirm = async () => {
         if (!props.postId) throw new Error('postId is undefined');
         await noticeDetailStore.deleteNoticePost(props.postId);
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_DELETE_NOTICE'), '');
-        await SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE._NAME });
+        await router.push({ name: INFO_ROUTE.NOTICE._NAME });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_DELETE_NOTICE'));
     } finally {
