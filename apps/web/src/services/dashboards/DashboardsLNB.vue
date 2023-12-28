@@ -6,6 +6,7 @@ import {
 import { PIconButton } from '@spaceone/design-system';
 
 import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -31,6 +32,7 @@ const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
 const dashboardGetters = dashboardStore.getters;
 const storeState = reactive({
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     projects: computed(() => allReferenceStore.getters.project),
 });
@@ -118,7 +120,7 @@ const state = reactive({
         }
         return [
             ...defaultMenuSet,
-            ...filterLNBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)),
+            ...(storeState.isWorkspaceOwner ? filterLNBItemsByPagePermission('WORKSPACE', filterFavoriteItems(state.workspaceMenuSet)) : []),
             ...filterLNBItemsByPagePermission('PROJECT', filterFavoriteItems(state.projectMenuSet)),
             ...filterLNBItemsByPagePermission('PRIVATE', filterFavoriteItems(state.privateMenuSet)),
         ];
