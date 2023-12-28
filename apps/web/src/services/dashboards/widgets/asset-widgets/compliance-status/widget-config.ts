@@ -4,9 +4,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const complianceStatusWidgetConfig: WidgetConfig = {
     widget_config_id: 'complianceStatus',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/asset-widgets/compliance-status/ComplianceStatusWidget.vue'),
-    }),
     title: 'Compliance Status',
     labels: ['Asset'],
     description: {

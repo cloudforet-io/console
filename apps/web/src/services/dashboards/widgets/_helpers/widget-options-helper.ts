@@ -3,7 +3,8 @@ import { isEqual, merge } from 'lodash';
 import type { DashboardVariables } from '@/schema/dashboard/_types/dashboard-type';
 import type { InheritOptions, WidgetConfig, WidgetOptions } from '@/schema/dashboard/_types/widget-type';
 
-import { getWidgetFilterDataKey } from '@/services/dashboards/widgets/_helpers/widget-filters-helper';
+import type { ManagedVariableModelKey } from '@/lib/variable-models/managed';
+import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 export const getRefinedWidgetOptions = (
     widgetConfig?: WidgetConfig,
@@ -50,7 +51,11 @@ const getRefinedParentOptions = (
 
         if (filterKey.startsWith('filters.')) {
             const _filterKey = filterKey.replace('filters.', '');
-            const filterDataKey = getWidgetFilterDataKey(_filterKey);
+            const filterDataKey = MANAGED_VARIABLE_MODEL_CONFIGS[_filterKey as ManagedVariableModelKey]?.idKey;
+            if (!filterDataKey) {
+                console.error(new Error(`No filter data key for ${_filterKey}`));
+                return;
+            }
             result.filters = {
                 ...result.filters,
                 [_filterKey]: [{ k: filterDataKey, v: variableValue, o: '=' }],

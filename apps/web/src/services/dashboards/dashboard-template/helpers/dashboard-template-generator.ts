@@ -12,7 +12,7 @@ import getRandomId from '@/lib/random-id-generator';
 import { MANAGED_VARIABLE_MODEL_CONFIGS } from '@/lib/variable-models/managed';
 
 import { MANAGED_DASH_VAR_SCHEMA } from '@/services/dashboards/constants/managed-variables-schema';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 
 const ERROR_CASE_WIDGET_INFO: Omit<DashboardLayoutWidgetInfo, 'version'|'widget_key'> = {

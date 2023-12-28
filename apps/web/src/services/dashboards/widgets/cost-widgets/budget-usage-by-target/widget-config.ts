@@ -6,9 +6,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 const budgetUsageByTargetWidgetConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageByTarget',
     title: 'Budget Usage by Target',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/budget-usage-by-target/BudgetUsageByTargetWidget.vue'),
-    }),
     labels: ['Cost', 'Budget'],
     description: {
         translation_id: 'DASHBOARDS.WIDGET.BUDGET_USAGE_WITH_FORECAST.DESC',
@@ -28,7 +25,6 @@ const budgetUsageByTargetWidgetConfig: WidgetConfig = {
         'cost_data_field',
         ['granularity', { fixed: true, readonly: true }],
         'filters.project',
-        'filters.project_group',
     ]),
 };
 

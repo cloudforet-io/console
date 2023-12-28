@@ -29,7 +29,7 @@ import DashboardVariables from '@/services/dashboards/components/DashboardVariab
 import WidgetViewModeModalSidebar from '@/services/dashboards/components/WidgetViewModeModalSidebar.vue';
 import { useDashboardDetailInfoStore } from '@/services/dashboards/stores/dashboard-detail-info-store';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetComponent } from '@/services/dashboards/widgets/_helpers/widget-component-helper';
 import type {
     UpdatableWidgetInfo, WidgetExpose, WidgetProps, WidgetTheme,
 } from '@/services/dashboards/widgets/_types/widget-type';

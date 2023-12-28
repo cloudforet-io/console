@@ -29,7 +29,6 @@ import { green, red, gray } from '@/styles/colors';
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetColorSet } from '@/services/dashboards/widgets/_composables/use-widget-color-set';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import { getRefinedXYChartData } from '@/services/dashboards/widgets/_helpers/widget-chart-data-helper';
 import { getDateAxisSettings } from '@/services/dashboards/widgets/_helpers/widget-chart-helper';

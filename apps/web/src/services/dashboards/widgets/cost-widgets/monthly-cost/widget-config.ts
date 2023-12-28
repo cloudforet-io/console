@@ -6,9 +6,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const monthlyCostWidgetConfig: WidgetConfig = {
     widget_config_id: 'monthlyCost',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/monthly-cost/MonthlyCostWidget.vue'),
-    }),
     title: 'Monthly Cost',
     labels: ['Cost'],
     description: {
@@ -31,7 +28,6 @@ const monthlyCostWidgetConfig: WidgetConfig = {
         'filters.project',
         'filters.service_account',
         'filters.region',
-        'filters.project_group',
         'filters.cost_product',
         'filters.cost_usage_type',
         'filters.cost_additional_info_value',

@@ -5,9 +5,6 @@ import { getWidgetOptionsSchema } from '@/services/dashboards/widgets/_helpers/w
 
 const budgetUsageSummaryConfig: WidgetConfig = {
     widget_config_id: 'budgetUsageSummary',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/cost-widgets/budget-usage-summary/BudgetUsageSummaryWidget.vue'),
-    }),
     title: 'Budget Usage Summary',
     labels: ['Cost', 'Budget'],
     description: {
@@ -26,7 +23,6 @@ const budgetUsageSummaryConfig: WidgetConfig = {
     options_schema: getWidgetOptionsSchema([
         'cost_data_source',
         'filters.project',
-        'filters.project_group',
     ]),
 };
 

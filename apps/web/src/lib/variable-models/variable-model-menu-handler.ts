@@ -2,6 +2,8 @@ import type { AutocompleteHandler } from '@spaceone/design-system/types/inputs/d
 
 import type { VariableModel } from '@/lib/variable-models/index';
 
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 export const getVariableModelMenuHandler = (variableModel: VariableModel|VariableModel[], options?: Record<string, any>): AutocompleteHandler => {
     const variableModels = Array.isArray(variableModel) ? variableModel : [variableModel];
     return async (inputText: string, pageStart, pageLimit, filters, resultIndex) => {
@@ -27,6 +29,12 @@ export const getVariableModelMenuHandler = (variableModel: VariableModel|Variabl
 
         // if resultIndex is given, just call the specific variableModel's list().
         const varModel = variableModels[resultIndex];
+
+        if (!varModel) {
+            ErrorHandler.handleError(new Error(`No variable model found for index ${resultIndex}`));
+            return [];
+        }
+
         const response = await varModel.list({
             start: pageStart,
             limit: pageLimit ?? 10,

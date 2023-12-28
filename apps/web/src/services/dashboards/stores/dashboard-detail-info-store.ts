@@ -25,7 +25,7 @@ import type {
     CreateDashboardParameters, DashboardModel, UpdateDashboardParameters, GetDashboardParameters,
 } from '@/services/dashboards/types/dashboard-api-schema-type';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 import type { UpdatableWidgetInfo } from '@/services/dashboards/widgets/_types/widget-type';
 
 

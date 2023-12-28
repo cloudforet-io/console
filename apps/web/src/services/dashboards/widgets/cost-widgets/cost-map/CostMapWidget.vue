@@ -19,7 +19,6 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import WidgetFrame from '@/services/dashboards/widgets/_components/WidgetFrame.vue';
 import { useWidgetLifecycle } from '@/services/dashboards/widgets/_composables/use-widget-lifecycle';
-// eslint-disable-next-line import/no-cycle
 import { useWidget } from '@/services/dashboards/widgets/_composables/use-widget/use-widget';
 import type {
     WidgetExpose, WidgetProps, WidgetEmit,

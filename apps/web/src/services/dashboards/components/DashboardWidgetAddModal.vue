@@ -15,7 +15,7 @@ import { useProxyValue } from '@/common/composables/proxy-state';
 
 import DashboardWidgetAddModalDefaultTab from '@/services/dashboards/components/DashboardWidgetAddModalDefaultTab.vue';
 import { useWidgetFormStore } from '@/services/dashboards/stores/widget-form-store';
-import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-helper';
+import { getWidgetConfig } from '@/services/dashboards/widgets/_helpers/widget-config-helper';
 
 
 interface Props {

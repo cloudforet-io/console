@@ -3,9 +3,6 @@ import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 
 const basePieWidgetConfig: WidgetConfig = {
     widget_config_id: 'basePie',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/base-widgets/base-pie/BasePieWidget.vue'),
-    }),
     scopes: ['PROJECT', 'WORKSPACE'],
     theme: {
         inherit: true,

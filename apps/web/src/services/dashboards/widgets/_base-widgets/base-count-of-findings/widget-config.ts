@@ -3,9 +3,6 @@ import type { WidgetConfig } from '@/schema/dashboard/_types/widget-type';
 
 const baseCountOfFindingsWidgetConfig: WidgetConfig = {
     widget_config_id: 'baseCountOfFindings',
-    widget_component: () => ({
-        component: import('@/services/dashboards/widgets/base-widgets/base-count-of-findings/BaseCountOfFindingsWidget.vue'),
-    }),
     scopes: ['WORKSPACE'],
     theme: {
         inherit: false,
