@@ -5,6 +5,7 @@ import {
 
 import { PSelectDropdown, PSelectStatus } from '@spaceone/design-system';
 
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -13,13 +14,22 @@ import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
+const storeState = reactive({
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
 const state = reactive({
-    scopeFilterList: computed(() => [
-        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: 'ALL' },
-        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: 'WORKSPACE' },
-        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: 'PROJECT' },
-        { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: 'PRIVATE' },
-    ]),
+    scopeFilterList: computed(() => {
+        const results = [
+            { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_ALL'), name: 'ALL' },
+            { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE'), name: 'WORKSPACE' },
+            { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_SINGLE_PROJECT'), name: 'PROJECT' },
+            { label: i18n.t('DASHBOARDS.ALL_DASHBOARDS.FILTER_PRIVATE'), name: 'PRIVATE' },
+        ];
+        if (!storeState.isWorkspaceOwner) {
+            return results.filter((d) => d.name !== 'WORKSPACE');
+        }
+        return results;
+    }),
     scopeStatus: computed(() => dashboardState.scope || 'ALL'),
     pagePermission: computed(() => store.getters['user/pageAccessPermissionMap']),
 });

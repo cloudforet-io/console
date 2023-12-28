@@ -1,7 +1,12 @@
 <script lang="ts" setup>
+import { computed, reactive, watch } from 'vue';
+
 import {
     PRadio, PRadioGroup, PFieldTitle, PI,
 } from '@spaceone/design-system';
+
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
+import { store } from '@/store';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
@@ -15,6 +20,9 @@ const emit = defineEmits<{(event: 'set-project', project: ProjectTreeNodeData): 
 
 const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
+const storeState = reactive({
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
+});
 
 /* Event */
 const handleSelectScope = (scopeType: DashboardScope) => {
@@ -29,6 +37,12 @@ const handleSelectScope = (scopeType: DashboardScope) => {
 const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
     emit('set-project', projects[0]);
 };
+
+watch(() => storeState.isWorkspaceOwner, (val) => {
+    if (!val) {
+        dashboardDetailStore.setDashboardScope('PROJECT');
+    }
+}, { immediate: true });
 </script>
 
 <template>
@@ -38,7 +52,8 @@ const handleSelectProjects = (projects: Array<ProjectTreeNodeData>) => {
             <p-radio-group direction="vertical"
                            class="dashboard-scope-radio-group"
             >
-                <p-radio :selected="dashboardDetailState.dashboardScope"
+                <p-radio v-if="storeState.isWorkspaceOwner"
+                         :selected="dashboardDetailState.dashboardScope"
                          value="WORKSPACE"
                          @change="handleSelectScope('WORKSPACE')"
                 >
