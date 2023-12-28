@@ -408,6 +408,7 @@ watch([() => projectPageState.isInitiated, () => state.groupId], async ([isIniti
 
 .card-top-wrapper {
     @apply flex-grow flex flex-col;
+    justify-content: space-between;
     margin: 1rem 1rem 0.5rem 1rem;
     .group-name-wrapper {
         @apply flex justify-between items-center;
