@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-    computed, onMounted, reactive,
+    computed, reactive,
 } from 'vue';
 
 import {
@@ -9,6 +9,7 @@ import {
 import type { DefinitionField } from '@spaceone/design-system/src/data-display/tables/definition-table/type';
 import type { SelectDropdownMenuItem, AutocompleteHandler } from '@spaceone/design-system/types/inputs/dropdown/select-dropdown/type';
 
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@cloudforet/core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@cloudforet/core-lib/component-util/toolbox';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -29,7 +30,7 @@ import UserManagementTableToolbox from '@/services/administration/components/Use
 import {
     calculateTime, userStateFormatter, useRoleFormatter, userMfaFormatter,
 } from '@/services/administration/composables/refined-table-data';
-import { USER_SEARCH_HANDLERS } from '@/services/administration/constants/user-constant';
+import { USER_SEARCH_HANDLERS, USER_STATE } from '@/services/administration/constants/user-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
 
 interface Props {
@@ -96,6 +97,19 @@ const tableState = reactive({
             ]
             : baseFields;
     }),
+    valueHandlerMap: computed(() => {
+        const resourceType = userPageState.isAdminMode ? 'identity.User' : 'identity.WorkspaceUser';
+        return {
+            user_id: makeDistinctValueHandler(resourceType, 'user_id'),
+            name: makeDistinctValueHandler(resourceType, 'name'),
+            state: makeEnumValueHandler(USER_STATE),
+            email: makeDistinctValueHandler(resourceType, 'email'),
+            auth_type: makeDistinctValueHandler(resourceType, 'auth_type'),
+            last_accessed_at: makeDistinctValueHandler(resourceType, 'last_accessed_at', 'datetime'),
+            timezone: makeDistinctValueHandler(resourceType, 'timezone'),
+            tags: makeDistinctValueHandler(resourceType, 'tags'),
+        };
+    }),
 });
 const dropdownState = reactive({
     loading: false,
@@ -147,7 +161,7 @@ const handleSelectDropdownItem = async (value, rowIndex) => {
     try {
         const response = await SpaceConnector.clientV2.identity.roleBinding.updateRole<RoleBindingUpdateRoleParameters, RoleBindingModel>({
             role_binding_id: state.refinedUserItems[rowIndex].role_binding_info?.role_binding_id || '',
-            role_id: value.name || '',
+            role_id: value || '',
         });
         showSuccessMessage(i18n.t('IAM.USER.MAIN.ALT_S_CHANGE_ROLE'), '');
         const roleName = userPageState.roles.find((role) => role.role_id === response.role_id)?.name ?? '';
@@ -191,11 +205,6 @@ const handleClickButton = async (value: RoleBindingModel) => {
         tableState.removeLoading = false;
     }
 };
-
-/* Init */
-onMounted(() => {
-    dropdownMenuHandler('');
-});
 </script>
 
 <template>
@@ -213,15 +222,17 @@ onMounted(() => {
             :sort-desc="true"
             :total-count="userPageState.totalCount"
             :key-item-sets="USER_SEARCH_HANDLERS.keyItemSets"
-            :value-handler-map="USER_SEARCH_HANDLERS.valueHandlerMap"
+            :value-handler-map="tableState.valueHandlerMap"
             :query-tags="queryTags"
             :style="{height: `${props.tableHeight}px`}"
             @select="handleSelect"
             @change="handleChange"
             @refresh="handleChange()"
         >
-            <template #toolbox-left>
-                <user-management-table-toolbox v-if="userPageState.isAdminMode" />
+            <template v-if="userPageState.isAdminMode"
+                      #toolbox-left
+            >
+                <user-management-table-toolbox />
             </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
@@ -255,11 +266,13 @@ onMounted(() => {
                                        :visible-menu="dropdownState.visibleMenu"
                                        :loading="dropdownState.loading"
                                        :search-text.sync="dropdownState.searchText"
-                                       :selected="dropdownState.menuItems.filter((item) => item.label === value.name)"
                                        :handler="dropdownMenuHandler"
                                        class="role-select-dropdown"
                                        @select="handleSelectDropdownItem($event, rowIndex)"
                     >
+                        <template #dropdown-button>
+                            <span>{{ value.name }}</span>
+                        </template>
                         <template #menu-item--format="{item}">
                             <div class="role-menu-item">
                                 <img :src="useRoleFormatter(item.role_type).image"
@@ -359,6 +372,13 @@ onMounted(() => {
                 }
             }
         }
+    }
+}
+
+/* custom design-system component - p-select-dropdown */
+:deep(.p-select-dropdown) {
+    .no-data {
+        position: initial;
     }
 }
 </style>

@@ -300,14 +300,14 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     <p-select-dropdown v-if="item.isNew"
                                        :selected="item.auth_type"
                                        :menu="authTypeMenuItem"
+                                       menu-position="right"
                                        class="auth-type-dropdown"
                                        style-type="transparent"
                                        @update:selected="handleSelectAuthTypeItem($event, idx)"
                     />
                     <p-icon-button name="ic_delete"
                                    class="delete-btn"
-                                   width="1.5rem"
-                                   height="1.5rem"
+                                   size="sm"
                                    @click="handleClickDeleteButton(idx)"
                     />
                 </div>
