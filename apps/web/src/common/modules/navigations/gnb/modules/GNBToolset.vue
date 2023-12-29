@@ -110,11 +110,11 @@ export default defineComponent({
 
         const toggleAdminMode = () => {
             if (state.isAdminMode) {
-                appContextStore.switchToWorkspaceMode();
+                appContextStore.exitAdminMode();
                 router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
                 return;
             }
-            appContextStore.switchToAdminMode();
+            appContextStore.enterAdminMode();
             router.push({ name: ROOT_ROUTE.ADMIN._NAME });
         };
 

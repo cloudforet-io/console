@@ -21,11 +21,11 @@ export const useAppContextStore = defineStore('app-context-store', () => {
     });
 
     const actions = {
-        switchToAdminMode() {
+        enterAdminMode() {
             userWorkspaceStore.setCurrentWorkspace();
             state.isAdminMode = true;
         },
-        switchToWorkspaceMode() {
+        exitAdminMode() {
             userWorkspaceStore.setCurrentWorkspace();
             state.isAdminMode = false;
         },
