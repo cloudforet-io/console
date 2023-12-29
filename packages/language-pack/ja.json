@@ -915,6 +915,7 @@
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",
+				"LABEL_ROLE_TYPE": "",
 				"LABEL_SIGN_OUT": "ログアウト",
 				"LABEL_TIMEZONE": "タイムゾーン",
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
@@ -1053,7 +1054,6 @@
 			"SUCCESS": "確認コードが通知メールに送信されました。",
 			"TITLE": "通知メールを確認する",
 			"VERIFICATION_CODE": "認証コード",
-			"VERIFY_FORCE": "",
 			"VERIFY_NOW": "認証"
 		},
 		"POPUP": {
@@ -2036,6 +2036,7 @@
 			"ENABLE": "",
 			"ENABLE_WORKSPACE": "",
 			"FORM": {
+				"DUPLICATED_NAME": "",
 				"LABEL_DESC": "",
 				"LABEL_NAME": "",
 				"PLACEHOLDER_DESC": "",
@@ -2469,7 +2470,6 @@
 				"COLLECT_DATA": "データ収集",
 				"CREATED": "作成日",
 				"DELETE_COLLECTOR": "コレクター削除",
-				"DETAIL_JOB_LINK": "",
 				"EDIT": "編集",
 				"EDIT_COLLECTOR_NAME": "コレクター名の編集",
 				"LAST_COLLECTED": "最後に収集した時間",

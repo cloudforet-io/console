@@ -915,6 +915,7 @@
 				"LABEL_LANGUAGE": "Language",
 				"LABEL_PROFILE": "Profile",
 				"LABEL_ROLE": "Role",
+				"LABEL_ROLE_TYPE": "Role Type",
 				"LABEL_SIGN_OUT": "Sign Out",
 				"LABEL_TIMEZONE": "Time zone",
 				"ROLE_DOMAIN_ADMIN": "Domain Admin",
@@ -1053,7 +1054,6 @@
 			"SUCCESS": "A verification code has been sent to your notification email.",
 			"TITLE": "Verify Notification Email",
 			"VERIFICATION_CODE": "Verification Code",
-			"VERIFY_FORCE": "Notification email successfully verified.",
 			"VERIFY_NOW": "Verify Now"
 		},
 		"POPUP": {
@@ -2036,6 +2036,7 @@
 			"ENABLE": "Enable",
 			"ENABLE_WORKSPACE": "Are you sure you want to enable selected workspace?",
 			"FORM": {
+				"DUPLICATED_NAME": "",
 				"LABEL_DESC": "Description",
 				"LABEL_NAME": "Name",
 				"PLACEHOLDER_DESC": "Workspace description",
@@ -2469,7 +2470,6 @@
 				"COLLECT_DATA": "Collect Data",
 				"CREATED": "Created",
 				"DELETE_COLLECTOR": "Delete Collector",
-				"DETAIL_JOB_LINK": "View job details",
 				"EDIT": "Edit",
 				"EDIT_COLLECTOR_NAME": "Edit Collector Name",
 				"LAST_COLLECTED": "Last Collected",

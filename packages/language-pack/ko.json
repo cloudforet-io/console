@@ -915,6 +915,7 @@
 				"LABEL_LANGUAGE": "언어",
 				"LABEL_PROFILE": "프로필",
 				"LABEL_ROLE": "역할",
+				"LABEL_ROLE_TYPE": "",
 				"LABEL_SIGN_OUT": "로그아웃",
 				"LABEL_TIMEZONE": "타임존",
 				"ROLE_DOMAIN_ADMIN": "도메인 관리자",
@@ -1053,7 +1054,6 @@
 			"SUCCESS": "인증 코드가 알림 이메일로 전송되었습니다.",
 			"TITLE": "알림전용 이메일 인증",
 			"VERIFICATION_CODE": "인증 코드",
-			"VERIFY_FORCE": "",
 			"VERIFY_NOW": "인증"
 		},
 		"POPUP": {
@@ -2036,6 +2036,7 @@
 			"ENABLE": "",
 			"ENABLE_WORKSPACE": "",
 			"FORM": {
+				"DUPLICATED_NAME": "",
 				"LABEL_DESC": "",
 				"LABEL_NAME": "이름",
 				"PLACEHOLDER_DESC": "",
@@ -2469,7 +2470,6 @@
 				"COLLECT_DATA": "데이터 수집",
 				"CREATED": "생성 날짜",
 				"DELETE_COLLECTOR": "컬렉터 삭제",
-				"DETAIL_JOB_LINK": "",
 				"EDIT": "수정",
 				"EDIT_COLLECTOR_NAME": "컬렉터 이름 수정",
 				"LAST_COLLECTED": "최근 수집 시간",
