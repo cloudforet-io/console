@@ -14,6 +14,9 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE, FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 import type { PluginReferenceMap } from '@/store/modules/reference/plugin/type';
@@ -60,10 +63,12 @@ const costQuerySetState = costQuerySetStore.state;
 const costExplorerSettingsStore = useCostExplorerSettingsStore();
 const costExplorerSettingsState = costExplorerSettingsStore.$state;
 const allReferenceStore = useAllReferenceStore();
+const appContextStore = useAppContextStore();
 
 const router = useRouter();
 
 const state = reactive({
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     loading: true,
     header: computed<string>(() => i18n.t(MENU_INFO_MAP[MENU_ID.COST_EXPLORER].translationId) as string),
     menuSet: computed<LNBMenu[]>(() => [
@@ -73,7 +78,7 @@ const state = reactive({
                 type: 'item',
                 id: MENU_ID.BUDGET,
                 label: i18n.t(MENU_INFO_MAP[MENU_ID.BUDGET].translationId),
-                to: { name: COST_EXPLORER_ROUTE.BUDGET._NAME },
+                to: { name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.BUDGET._NAME) : COST_EXPLORER_ROUTE.BUDGET._NAME },
             },
         ], store.getters['user/pageAccessPermissionList']),
     ]),
@@ -104,7 +109,7 @@ const state = reactive({
                         color: gray[500],
                     },
                     to: {
-                        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                        name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                         params: {
                             dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
                             costQuerySetId: d.cost_query_set_id,
@@ -121,7 +126,7 @@ const state = reactive({
                 id: d.cost_query_set_id,
                 label: d.name,
                 to: {
-                    name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+                    name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
                         dataSourceId: costQuerySetState.selectedDataSourceId ?? '',
                         costQuerySetId: d.cost_query_set_id,

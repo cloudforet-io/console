@@ -13,6 +13,8 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -115,7 +117,7 @@ const convertBoardItemButtonSet = (dashboardItem: DashboardModel) => [
 /* EVENT */
 const handleClickBoardItem = (item: DashboardModel) => {
     router.push({
-        name: DASHBOARDS_ROUTE.DETAIL._NAME,
+        name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
         params: {
             dashboardId: item.public_dashboard_id || item.private_dashboard_id || '',
         },
