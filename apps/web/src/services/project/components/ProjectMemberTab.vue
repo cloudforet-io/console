@@ -65,6 +65,7 @@ const state = reactive({
     fields: [
         { label: 'User ID', name: 'user_id' },
         { label: 'User Name', name: 'user_name' },
+        { label: 'Role', name: 'role_type' },
         { label: ' ', name: 'delete', sortable: false },
     ] as DataTableFieldType[],
     workspaceUserIdList: [] as string[],
@@ -72,7 +73,8 @@ const state = reactive({
     refinedItems: computed<UserItem[]>(() => {
         const users: UserItem[] = state.projectUserIdList.map((d) => ({
             user_id: d,
-            user_name: storeState.users[d]?.name ?? d,
+            user_name: storeState.users[d]?.name ?? '',
+            role_type: storeState.users[d]?.data.roleInfo?.name ?? '',
         }));
         const filteredUsers = users.filter((d) => {
             const searchText = state.searchText.toLowerCase();
