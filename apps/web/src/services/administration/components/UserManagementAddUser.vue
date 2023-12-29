@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core';
 import {
+    onMounted,
     reactive, ref, watch,
 } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
@@ -16,6 +17,7 @@ import type { UserModel } from '@/schema/identity/user/model';
 import type { AuthType } from '@/schema/identity/user/type';
 import type { WorkspaceUserGetParameters } from '@/schema/identity/workspace-user/api-verbs/get';
 import type { SummaryWorkspaceUserModel, WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
@@ -145,15 +147,15 @@ const handleSelectMenuItem = async (menuItem: AddModalMenuItem) => {
     state.selectedItems.push(menuItem);
     await hideMenu();
 };
-// TODO: Will be Improved in the next step.
-// const initAuthTypeList = async () => {
-//     if (store.state.domain.extendedAuthType !== undefined) {
-//         authTypeMenuItem.value = [
-//             { label: store.getters['domain/extendedAuthTypeLabel'], name: 'EXTERNAL' },
-//             ...authTypeMenuItem.value,
-//         ];
-//     }
-// };
+
+const initAuthTypeList = async () => {
+    if (store.state.domain.extendedAuthType !== undefined) {
+        authTypeMenuItem.value = [
+            { label: store.getters['domain/extendedAuthTypeLabel'], name: 'EXTERNAL' },
+            ...authTypeMenuItem.value,
+        ];
+    }
+};
 
 /* API */
 const fetchListUsers = async () => {
@@ -218,10 +220,9 @@ watch(() => state.menuVisible, async (menuVisible) => {
     }
 });
 
-// TODO: Will be Improved in the next step.
-// onMounted(() => {
-//     initAuthTypeList();
-// });
+onMounted(() => {
+    initAuthTypeList();
+});
 </script>
 
 <template>
@@ -249,6 +250,7 @@ watch(() => state.menuVisible, async (menuVisible) => {
                     <div v-if="userPageState.isAdminMode">
                         <p-select-dropdown :menu="authTypeMenuItem"
                                            :selected="authTypeState.selectedMenuItem"
+                                           is-fixed-width
                                            class="type-dropdown"
                                            @update:selected="handleSelectDropdownItem"
                         />
