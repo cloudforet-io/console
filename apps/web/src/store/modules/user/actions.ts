@@ -89,11 +89,11 @@ const getRoleTypeFromToken = (token: string): RoleType => {
     return decodedToken.rol;
 };
 export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, grantRequest: Omit<TokenGrantParameters, 'grant_type'>) => {
-    const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant);
+    const fetcher = getCancellableFetcher(SpaceConnector.clientV2.identity.token.grant)<TokenGrantParameters, TokenGrantModel>;
 
     try {
         await dispatch('display/startGrantRole', undefined, { root: true });
-        const { status, response } = await fetcher<TokenGrantParameters, TokenGrantModel>({
+        const { status, response } = await fetcher({
             grant_type: 'REFRESH_TOKEN',
             scope: grantRequest.scope,
             token: grantRequest.token,
@@ -105,11 +105,15 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
 
             const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
             commit('setCurrentRoleInfo', roleInfo);
-        } else commit('setCurrentRoleInfo', undefined);
+        }
     } catch (e) {
         commit('setCurrentRoleInfo', undefined);
         console.error(`Role Grant Error: ${e}`);
     } finally {
+        /*
+        * Implemented a global loading with a minimum duration of 500 milliseconds
+        * during the grant process to prevent rendering of services until the process is complete.
+        * */
         setTimeout(() => {
             dispatch('display/finishGrantRole', undefined, { root: true });
         }, 500);
