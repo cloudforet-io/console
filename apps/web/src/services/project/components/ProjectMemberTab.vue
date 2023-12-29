@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, reactive } from 'vue';
+import { computed, reactive, watch } from 'vue';
 
 import {
     PButton, PHeading, PI, PTableCheckModal, PToolboxTable,
@@ -13,8 +13,10 @@ import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { ProjectGetParameters } from '@/schema/identity/project/api-verbs/get';
 import type { ProjectRemoveUsersParameters } from '@/schema/identity/project/api-verbs/remove-users';
 import type { ProjectModel } from '@/schema/identity/project/model';
+import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import type { WorkspaceUserListParameters } from '@/schema/identity/workspace-user/api-verbs/list';
 import type { WorkspaceUserModel } from '@/schema/identity/workspace-user/model';
+import { store } from '@/store';
 import { i18n as _i18n } from '@/translations';
 
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -51,10 +53,10 @@ const emit = defineEmits<{(e: 'update-filters', filters: any): void;
 
 const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
-const projectPageState = projectPageStore.state;
 const projectDetailPageStore = useProjectDetailPageStore();
 const projectDetailPageGetters = projectDetailPageStore.getters;
 const storeState = reactive({
+    isWorkspaceOwner: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType === ROLE_TYPE.WORKSPACE_OWNER),
     users: computed<UserReferenceMap>(() => allReferenceStore.getters.user),
 });
 const state = reactive({
@@ -174,10 +176,15 @@ const handleConfirmInvite = () => {
     fetchUserList();
 };
 
-/* Watcher */
+/* Init */
 (async () => {
     fetchUserList();
 })();
+
+/* Watcher */
+watch(() => projectDetailPageGetters.projectType, () => {
+    fetchUserList();
+}, { immediate: false });
 </script>
 
 <template>
@@ -233,7 +240,7 @@ const handleConfirmInvite = () => {
                     <span class="text">
                         <i18n :path="projectDetailPageGetters.projectType === 'PRIVATE' ? 'PROJECT.DETAIL.MEMBER.PRIVATE_MEMBER_DESC' : 'PROJECT.DETAIL.MEMBER.PUBLIC_MEMBER_DESC'">
                             <template #settings>
-                                <span v-if="projectPageState.isWorkspaceOwner"
+                                <span v-if="storeState.isWorkspaceOwner"
                                       class="link-text"
                                       @click="projectPageStore.openProjectFormModal()"
                                 >
