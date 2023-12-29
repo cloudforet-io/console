@@ -74,16 +74,18 @@ watch(() => storeState.isWorkspaceOwner, (val) => {
                          value="PRIVATE"
                          @change="handleSelectScope('PRIVATE')"
                 >
-                    <p-i name="ic_lock-filled"
-                         width="0.875rem"
-                         height="0.875rem"
-                         class="mr-1 mb-1 ml-1 gray-500"
-                    />
-                    <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
+                    <div class="private-radio">
+                        <span>{{ $t('DASHBOARDS.CREATE.PRIVATE') }}</span>
+                        <p-i name="ic_lock-filled"
+                             width="0.875rem"
+                             height="0.875rem"
+                             color="inherit"
+                        />
+                    </div>
+                    <p class="viewer-description">
+                        {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
+                    </p>
                 </p-radio>
-                <p class="viewer-description">
-                    {{ $t('DASHBOARDS.CREATE.PRIVATE_DESC') }}
-                </p>
             </p-radio-group>
         </div>
     </section>
@@ -97,6 +99,12 @@ watch(() => storeState.isWorkspaceOwner, (val) => {
         .dashboard-scope-radio-group {
             @apply flex flex-col;
             gap: 0.5rem;
+        }
+        .private-radio {
+            display: inline-flex;
+            gap: 0.25rem;
+            align-items: center;
+            margin-left: 0.25rem;
         }
         .viewer-description {
             @apply text-xs text-gray-500;

@@ -81,7 +81,7 @@ const state = reactive({
         },
     }))),
     projectMenuSet: computed<LNBMenu[]>(() => mashUpProjectGroup(dashboardGetters.projectItems)),
-    privateMenuSet: computed(() => dashboardGetters.privateItems.map((d) => ({
+    privateMenuSet: computed<LNBMenu[]>(() => dashboardGetters.privateItems.map((d) => ({
         type: 'item',
         id: d.private_dashboard_id,
         label: d.name,
@@ -131,10 +131,16 @@ const filterLNBItemsByPagePermission = (scope: DashboardScope, items: LNBMenu[])
     let label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.WORKSPACE');
     if (scope === 'PROJECT') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.SINGLE_PROJECT');
     else if (scope === 'PRIVATE') label = i18n.t('DASHBOARDS.ALL_DASHBOARDS.PRIVATE');
-    const topTitle = {
+    const topTitle: LNBMenu = {
         type: 'top-title',
         label,
-    } as LNBItem;
+    };
+    if (scope === 'PRIVATE') {
+        topTitle.icon = {
+            name: 'ic_lock-filled',
+            color: 'gray900',
+        };
+    }
     return [topTitle, ...items];
 };
 
