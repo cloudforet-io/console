@@ -51,6 +51,7 @@ const state = reactive({
         if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'img_avatar_workspace-member';
         return 'img_avatar_no-role';
     }),
+    baseRoleType: computed(() => store.state.user.roleType),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
     language: computed(() => store.getters['user/languageLabel']),
@@ -162,10 +163,12 @@ const handleClickSignOut = async () => {
                     <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
                     <span class="value">{{ state.domainId }}</span>
                 </div>
-                <!--                <div class="info-menu">-->
-                <!--                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>-->
-                <!--                    <span class="value">{{ state.role }}</span>-->
-                <!--                </div>-->
+                <div v-if="state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN"
+                     class="info-menu"
+                >
+                    <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE_TYPE') }}</span>
+                    <span class="value">Admin</span>
+                </div>
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"
                      @click.stop="handleLanguageDropdownClick"

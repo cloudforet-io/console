@@ -16165,6 +16165,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>LABEL_ROLE_TYPE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>LABEL_SIGN_OUT</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -18374,27 +18395,6 @@
                                     <translation>
                                         <language>ko-KR</language>
                                         <approved>true</approved>
-                                    </translation>
-                                </translations>
-                            </concept_node>
-                            <concept_node>
-                                <name>VERIFY_FORCE</name>
-                                <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
-                                <translations>
-                                    <translation>
-                                        <language>en-US</language>
-                                        <approved>false</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ja-JP</language>
-                                        <approved>false</approved>
-                                    </translation>
-                                    <translation>
-                                        <language>ko-KR</language>
-                                        <approved>false</approved>
                                     </translation>
                                 </translations>
                             </concept_node>
@@ -36080,6 +36080,27 @@
                                 <name>FORM</name>
                                 <children>
                                     <concept_node>
+                                        <name>DUPLICATED_NAME</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>LABEL_DESC</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -43985,27 +44006,6 @@
                                             <translation>
                                                 <language>ko-KR</language>
                                                 <approved>true</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>DETAIL_JOB_LINK</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
                                             </translation>
                                         </translations>
                                     </concept_node>
