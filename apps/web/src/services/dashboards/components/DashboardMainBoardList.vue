@@ -14,6 +14,7 @@ import { QueryHelper } from '@cloudforet/core-lib/query';
 import { i18n } from '@/translations';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -28,7 +29,6 @@ import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-
 
 
 const PAGE_SIZE = 10;
-const WORKSPACE_SCOPE_NAME = 'Workspace';
 
 interface Props {
     scopeType?: DashboardScope;
@@ -46,10 +46,12 @@ const router = useRouter();
 
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
+const userWorkspaceStore = useUserWorkspaceStore();
 const dashboardStore = useDashboardStore();
 const dashboardState = dashboardStore.state;
 const storeState = reactive({
     isAdminMode: computed(() => appContextStore.getters.isAdminMode),
+    currentWorkspace: computed(() => userWorkspaceStore.getters.currentWorkspace),
 });
 const state = reactive({
     thisPage: 1,
@@ -171,6 +173,13 @@ watch(() => props.dashboardList, () => {
                     </div>
                     <p class="board-item-title">
                         {{ board.name }}
+                        <p-i v-if="scopeType === 'PRIVATE'"
+                             name="ic_lock-filled"
+                             width="0.75rem"
+                             height="0.75rem"
+                             color="gray900"
+                             class="private-icon"
+                        />
                     </p>
                 </div>
                 <div class="board-item-description">
@@ -182,7 +191,7 @@ watch(() => props.dashboardList, () => {
                              width="0.125rem"
                              height="0.125rem"
                         />
-                        <span v-if="props.scopeType === 'WORKSPACE'">{{ WORKSPACE_SCOPE_NAME }}</span>
+                        <span v-if="props.scopeType !== 'PROJECT'">{{ storeState.currentWorkspace?.name }}</span>
                         <span v-else>{{ board.label }}</span>
                     </template>
                 </div>

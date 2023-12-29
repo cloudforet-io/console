@@ -83,7 +83,16 @@ const handleSelect = (id: string, selected: string) => {
             <p v-else-if="item.type === MENU_ITEM_TYPE.TOP_TITLE"
                class="top-title-wrapper"
             >
-                <span class="top-title">{{ item.label }}</span>
+                <span class="top-title">
+                    {{ item.label }}
+                </span>
+                <p-i v-if="item.icon"
+                     :name="item.icon.name"
+                     class="top-title-icon"
+                     width="1rem"
+                     height="1rem"
+                     :color="item.icon.color"
+                />
             </p>
             <div v-else-if="item.type === MENU_ITEM_TYPE.DROPDOWN"
                  class="select-options-wrapper"
@@ -143,6 +152,9 @@ const handleSelect = (id: string, selected: string) => {
         padding-top: 1.25rem;
         padding-left: 0.5rem;
         padding-bottom: 0.75rem;
+        .top-title-icon {
+            margin-left: 0.25rem;
+        }
     }
     .select-options-wrapper {
         padding: 0 0.5rem;
