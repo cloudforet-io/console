@@ -10,7 +10,7 @@ import {
 } from '@spaceone/design-system';
 import type { Route } from '@spaceone/design-system/types/navigation/breadcrumbs/type';
 import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/type';
-import { find } from 'lodash';
+import { find, isEmpty } from 'lodash';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { numberFormatter } from '@cloudforet/utils';
@@ -58,16 +58,16 @@ const storeState = reactive({
 });
 const state = reactive({
     item: computed<ProjectModel|null>(() => projectDetailPageState.currentProject),
-    projectGroupId: computed<string>(() => state.item?.project_group_id || ''),
+    projectGroupId: computed<string|undefined>(() => state.item?.project_group_id),
     projectGroupInfo: computed<ProjectGroupReferenceItem>(() => storeState.projectGroups?.[state.projectGroupId] ?? {}),
     pageNavigation: computed<Route[]>(() => {
         const results: Route[] = [
             { name: i18n.t('MENU.PROJECT') as string, path: '/project' },
         ];
-        if (state.projectGroupId?.length) {
-            results.push({ name: state.projectGroupInfo?.name || '', path: `/project?select_pg=${state.projectGroupId}` });
+        if (!isEmpty(state.projectGroupInfo)) {
+            results.push({ name: state.projectGroupInfo.name, path: `/project?select_pg=${state.projectGroupId}` });
         }
-        results.push({ name: state.item?.name || '' });
+        results.push({ name: state.item?.name });
         return results;
     }),
     counts: computed(() => ({
