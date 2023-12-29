@@ -2131,7 +2131,7 @@
 				"ENABLE_MODAL_TITLE": "API 키 활성화",
 				"ENDPOINTS": "엔드포인트 ",
 				"HIDE": "숨기기 ",
-				"ID": "API Key ID",
+				"ID": "Client ID",
 				"MODAL_TITLE": "API 키 생성 완료",
 				"SHOW": "더 보기 ",
 				"SPACECTL": "Spacectl (CLI)",

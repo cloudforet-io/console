@@ -2131,7 +2131,7 @@
 				"ENABLE_MODAL_TITLE": "Enable API Key",
 				"ENDPOINTS": "Endpoints",
 				"HIDE": "hide",
-				"ID": "API Key ID",
+				"ID": "Client ID",
 				"MODAL_TITLE": "API Key successfully created",
 				"SHOW": "show ",
 				"SPACECTL": "Spacectl (CLI)",

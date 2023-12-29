@@ -2131,7 +2131,7 @@
 				"ENABLE_MODAL_TITLE": "API Key有効化",
 				"ENDPOINTS": "エンドポイント",
 				"HIDE": "非表示",
-				"ID": "API Key ID",
+				"ID": "Client ID",
 				"MODAL_TITLE": "API Keyが作成されました",
 				"SHOW": "もっと見る",
 				"SPACECTL": "Spacectl (CLI)",
