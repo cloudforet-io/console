@@ -46,12 +46,19 @@ const state = reactive({
     userIcon: computed<string>(() => {
         if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
         if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';
-        const currentRoleType = store.getters['user/getCurrentRoleInfo']?.roleType;
+        const currentRoleType = state.currentRoleType;
         if (currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'img_avatar_workspace-owner';
         if (currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'img_avatar_workspace-member';
         return 'img_avatar_no-role';
     }),
     baseRoleType: computed(() => store.state.user.roleType),
+    currentRoleType: computed(() => store.getters['user/getCurrentRoleInfo']?.roleType),
+    visibleRoleType: computed(() => {
+        if (state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN) return 'Admin';
+        if (state.currentRoleType === ROLE_TYPE.WORKSPACE_OWNER) return 'Workspace Owner';
+        if (state.currentRoleType === ROLE_TYPE.WORKSPACE_MEMBER) return 'Workspace Member';
+        return 'User';
+    }),
     name: computed(() => store.state.user.name),
     email: computed(() => store.state.user.email),
     language: computed(() => store.getters['user/languageLabel']),
@@ -124,12 +131,12 @@ const handleLanguageClick = async (language) => {
 };
 
 const handleClickSignOut = async () => {
+    if (state.isAdminMode) appContextStore.switchToWorkspaceMode();
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { nextPath: route.fullPath },
     };
     await router.push(res);
-    if (state.isAdminMode) appContextStore.switchToWorkspaceMode();
 };
 </script>
 
@@ -163,11 +170,11 @@ const handleClickSignOut = async () => {
                     <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
                     <span class="value">{{ state.domainId }}</span>
                 </div>
-                <div v-if="state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN"
+                <div v-if="state.currentRoleType || state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN"
                      class="info-menu"
                 >
                     <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE_TYPE') }}</span>
-                    <span class="value">Admin</span>
+                    <span class="value">{{ state.visibleRoleType }}</span>
                 </div>
                 <div v-on-click-outside="handleClickOutsideLanguageMenu"
                      class="info-menu language"
