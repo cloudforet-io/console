@@ -8,7 +8,7 @@ import type { Location } from 'vue-router';
 import { useRoute, useRouter } from 'vue-router/composables';
 
 import {
-    PI, PDivider, PButton,
+    PI, PDivider, PButton, PCopyButton,
 } from '@spaceone/design-system';
 import ejs from 'ejs';
 
@@ -168,7 +168,13 @@ const handleClickSignOut = async () => {
             <div class="info-wrapper">
                 <div class="info-menu">
                     <span class="label">{{ $t('IDENTITY.USER.MAIN.DOMAIN_ID') }}</span>
-                    <span class="value">{{ state.domainId }}</span>
+                    <span class="value">
+                        <p-copy-button size="sm"
+                                       style="vertical-align: unset; display: inline-flex; align-items: center;"
+                        >
+                            {{ state.domainId }}
+                        </p-copy-button>
+                    </span>
                 </div>
                 <div v-if="state.currentRoleType || state.baseRoleType === ROLE_TYPE.DOMAIN_ADMIN"
                      class="info-menu"
