@@ -5,11 +5,11 @@ import type { RoleType } from '@/schema/identity/role/type';
 
 export interface AppModel {
     app_id: string;
-    api_key?: string;
+    client_secret?: string;
     name: string;
     state: AppStatusType;
     role_type: RoleType;
-    api_key_id: string;
+    client_id: string;
     role_id: string;
     resource_group: Extract<ResourceGroupType, 'DOMAIN'|'WORKSPACE'>;
     workspace_id: string;
