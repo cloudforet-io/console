@@ -23,6 +23,7 @@ export interface DisplayState {
     uncheckedNotificationCount: number;
     isSignInFailed: boolean;
     visibleMobileGuideModal: boolean;
+    isGrantInProgress: boolean;
 }
 
 export interface SidebarProps {

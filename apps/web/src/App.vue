@@ -53,6 +53,7 @@ const state = reactive({
     notificationEmailModalVisible: false,
     smtpEnabled: computed(() => config.get('SMTP_ENABLED')),
     hasNoWorkspace: false,
+    isGrantInProgress: computed(() => store.getters['display/isGrantInProgress']),
 });
 
 const userWorkspaceStore = useUserWorkspaceStore();
@@ -114,7 +115,8 @@ watch(() => state.userId, (userId) => {
                 <g-n-b v-else
                        class="gnb"
                 />
-                <div class="app-body"
+                <div v-if="!state.isGrantInProgress"
+                     class="app-body"
                      :style="{ height: globalUIGetters.appBodyHeight }"
                 >
                     <p-sidebar :visible="store.state.display.visibleSidebar"
