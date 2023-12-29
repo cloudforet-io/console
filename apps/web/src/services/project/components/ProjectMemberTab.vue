@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import {
     PButton, PHeading, PI, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
-import type { DataTableField } from '@spaceone/design-system/types/data-display/tables/data-table/type';
+import type { DataTableFieldType } from '@spaceone/design-system/src/data-display/tables/data-table/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
@@ -63,7 +63,8 @@ const state = reactive({
     fields: [
         { label: 'User ID', name: 'user_id' },
         { label: 'User Name', name: 'user_name' },
-    ] as DataTableField[],
+        { label: ' ', name: 'delete', sortable: false },
+    ] as DataTableFieldType[],
     workspaceUserIdList: [] as string[],
     projectUserIdList: [] as string[],
     refinedItems: computed<UserItem[]>(() => {
@@ -129,7 +130,7 @@ const fetchWorkspaceUserList = async () => {
         state.loading = false;
     }
 };
-const deleteProjectUser = async (items) => {
+const deleteProjectUsers = async (items: UserItem[]) => {
     try {
         await SpaceConnector.clientV2.identity.project.removeUsers<ProjectRemoveUsersParameters>({
             project_id: props.projectId,
@@ -152,15 +153,19 @@ const handleChangeTable = async (options: ToolboxOptions = {}) => {
     if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
     if (options.pageStart !== undefined) state.pageStart = options.pageStart;
 };
-const handleClickRemoveMember = () => {
+const handleClickRemoveMember = async (item: UserItem) => {
+    await deleteProjectUsers([item]);
+    fetchUserList();
+};
+const handleClickRemoveMembers = () => {
     state.memberDeleteModalVisible = true;
 };
 const handleClickInviteMember = () => {
     state.memberInviteFormVisible = true;
 };
 
-const handleConfirmDeleteMember = async (items) => {
-    await deleteProjectUser(items);
+const handleConfirmDeleteMember = async (items: UserItem[]) => {
+    await deleteProjectUsers(items);
 
     state.memberDeleteModalVisible = false;
     fetchUserList();
@@ -202,7 +207,7 @@ const handleConfirmInvite = () => {
                             <p-button style-type="tertiary"
                                       class="mr-4 add-btn"
                                       :disabled="!state.selectedItems.length"
-                                      @click="handleClickRemoveMember"
+                                      @click="handleClickRemoveMembers"
                             >
                                 {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
                             </p-button>
@@ -242,6 +247,16 @@ const handleConfirmInvite = () => {
                     </span>
                 </div>
             </template>
+            <template #col-delete-format="{ item }">
+                <div class="remove-button-wrapper">
+                    <p-button style-type="tertiary"
+                              class="mr-4"
+                              @click="handleClickRemoveMember(item)"
+                    >
+                        {{ $t('PROJECT.DETAIL.MEMBER.REMOVE') }}
+                    </p-button>
+                </div>
+            </template>
         </p-toolbox-table>
 
         <project-member-invite-modal
@@ -256,7 +271,6 @@ const handleConfirmInvite = () => {
                              :fields="state.fields"
                              :items="state.selectedItems"
                              :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE')"
-                             :sub-title="$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT')"
                              @confirm="handleConfirmDeleteMember"
         />
     </div>
@@ -309,6 +323,9 @@ const handleConfirmInvite = () => {
     }
     .action-button-wrapper {
         display: inline-flex;
+        float: right;
+    }
+    .remove-button-wrapper {
         float: right;
     }
 }
