@@ -106,7 +106,7 @@ const handleChange = async (options: ToolboxOptions = {}) => {
     }
     if (options.pageStart !== undefined) workspacePageStore.$patch({ pageStart: options.pageStart });
     if (options.pageLimit !== undefined) workspacePageStore.$patch({ pageLimit: options.pageLimit });
-    await workspacePageStore.listWorkspaces({ query: workspaceListApiQueryHelper.data });
+    await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
 };
 
 const { queryTags } = queryTagsHelper;
