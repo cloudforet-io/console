@@ -72,6 +72,7 @@
 import type { SetupContext } from 'vue';
 import { computed, reactive, toRefs } from 'vue';
 import type { TranslateResult } from 'vue-i18n';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PDataLoader, PEmpty, PI, PIconButton,
@@ -137,6 +138,7 @@ export default {
         const allReferenceStore = useAllReferenceStore();
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
+        const router = useRouter();
 
         const state = reactive({
             loading: true,
@@ -287,25 +289,26 @@ export default {
         };
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
+            console.debug('handleSelect', item);
             if (item.itemType === SUGGESTION_TYPE.MENU) {
                 const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
-                if (menuInfo && SpaceRouter.router.currentRoute.name !== itemName) {
-                    SpaceRouter.router.push({ name: itemName }).catch(() => {});
+                if (menuInfo && router.currentRoute.name !== itemName) {
+                    router.push({ name: menuInfo.routeName }).catch(() => {});
                 }
             } else if (item.itemType === SUGGESTION_TYPE.DASHBOARD) {
-                SpaceRouter.router.push({
+                router.push({
                     name: DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: {
                         dashboardId: itemName,
                     },
                 }).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT) {
-                SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
+                router.push(referenceRouter(itemName, { resource_type: 'identity.Project' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.PROJECT_GROUP) {
-                SpaceRouter.router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
+                router.push(referenceRouter(itemName, { resource_type: 'identity.ProjectGroup' })).catch(() => {});
             } else if (item.itemType === SUGGESTION_TYPE.CLOUD_SERVICE) {
                 const itemInfo: string[] = itemName.split('.');
-                SpaceRouter.router.push({
+                router.push({
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
                         provider: itemInfo[0],
@@ -316,7 +319,7 @@ export default {
             } else if (item.itemType === SUGGESTION_TYPE.COST_ANALYSIS) {
                 const dataSourceId = state.favoriteCostAnalysisItems.find((d) => d.name === itemName)?.dataSourceId;
                 const parsedKeys = getParsedKeysWithManagedCostQueryFavoriteKey(itemName);
-                SpaceRouter.router.push({
+                router.push({
                     name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
                     params: {
                         dataSourceId,
