@@ -2030,6 +2030,9 @@
 			"DELETE": "削除",
 			"DELETE_WORKSPACE": "",
 			"DELETE_WORKSPACE_DESC": "",
+			"DETAIL": {
+				"USERS": ""
+			},
 			"DISABLE": "",
 			"DISABLE_WORKSPACE": "",
 			"EDIT": "編集",
