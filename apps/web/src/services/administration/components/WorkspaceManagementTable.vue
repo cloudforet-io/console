@@ -4,7 +4,7 @@ import { computed, reactive } from 'vue';
 import { useRouter } from 'vue-router/composables';
 
 import {
-    PSelectDropdown, PStatus, PToolboxTable,
+    PSelectDropdown, PStatus, PToolboxTable, PLink,
 } from '@spaceone/design-system';
 import type { MenuItem } from '@spaceone/design-system/types/inputs/context-menu/type';
 import type { ToolboxOptions } from '@spaceone/design-system/types/navigation/toolbox/type';
@@ -124,6 +124,7 @@ const handleExport = async () => {
     }
 };
 
+
 </script>
 
 <template>
@@ -158,9 +159,21 @@ const handleExport = async () => {
                                    @select="handleSelectDropdown"
                 />
             </template>
+            <template #col-name-format="{value}">
+                <p-link :text="value"
+                        action-icon="internal-link"
+                        new-tab
+                />
+            </template>
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)"
                           class="capitalize"
+                />
+            </template>
+            <template #col-users-format="{value}">
+                <p-link :text="value"
+                        action-icon="internal-link"
+                        new-tab
                 />
             </template>
             <template #col-created_at-format="{value}">
