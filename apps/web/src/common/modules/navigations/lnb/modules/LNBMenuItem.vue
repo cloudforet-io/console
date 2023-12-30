@@ -5,7 +5,7 @@ import {
 
 import { PI, PSelectDropdown } from '@spaceone/design-system';
 
-import { store } from '@/store';
+import { useAppContextStore } from '@/store/app-context/app-context-store';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
@@ -27,9 +27,9 @@ const props = withDefaults(defineProps<Props>(), {
     depth: 1,
 });
 const emit = defineEmits<{(e: 'select', id: string, selected: string|number): void}>();
-
+const appContextStore = useAppContextStore();
 const state = reactive({
-    isAdminMode: computed(() => store.getters['display/isAdminMode']),
+    isAdminMode: computed(() => appContextStore.getters.isAdminMode),
     processedMenuData: computed<LNBMenu>(() => (Array.isArray(props.menuData) ? props.menuData : [props.menuData])),
     isFolded: false,
     isFoldableMenu: computed(() => state.processedMenuData?.some((item) => item.foldable)),
@@ -107,7 +107,7 @@ const handleSelect = (id: string, selected: string) => {
             <l-n-b-router-menu-item v-else-if="item.type === MENU_ITEM_TYPE.ITEM && state.showMenu"
                                     :item="item"
                                     :depth="depth"
-                                    :is-domain-owner="state.isDomainOwner"
+                                    :is-admin-mode="state.isAdminMode"
                                     :idx="idx"
                                     :current-path="currentPath"
             >
