@@ -13,6 +13,7 @@ import type { SelectDropdownMenuItem } from '@spaceone/design-system/types/input
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
 import { useAllReferenceStore } from '@/store/reference/all-reference-store';
@@ -47,6 +48,7 @@ const allReferenceStore = useAllReferenceStore();
 const projectPageStore = useProjectPageStore();
 const projectPageGetters = projectPageStore.getters;
 const projectPageState = projectPageStore.state;
+const userWorkspaceStore = useUserWorkspaceStore();
 
 /* Query String */
 watch(() => projectPageState.selectedItem, (selectedItem: ProjectGroupTreeItem) => {
@@ -117,7 +119,11 @@ onClickOutside(menuRef, hideContextMenu);
 
 /* Favorite */
 const handleDeleteFavorite = (item: FavoriteItem) => {
-    store.dispatch('favorite/removeItem', item);
+    const _item = {
+        ...item,
+        worksapceId: userWorkspaceStore.getters.currentWorkspaceId,
+    };
+    store.dispatch('favorite/removeItem', _item);
 };
 
 const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {

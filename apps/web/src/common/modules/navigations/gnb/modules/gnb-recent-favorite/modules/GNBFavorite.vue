@@ -81,10 +81,10 @@ import {
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { FavoriteItem } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE } from '@/store/modules/favorite/type';
@@ -138,6 +138,7 @@ export default {
         const allReferenceStore = useAllReferenceStore();
         const dashboardStore = useDashboardStore();
         const dashboardGetters = dashboardStore.getters;
+        const userWorkspaceStore = useUserWorkspaceStore();
         const router = useRouter();
 
         const state = reactive({
@@ -218,34 +219,52 @@ export default {
             projectGroups: computed<ProjectGroupReferenceMap>(() => allReferenceStore.getters.projectGroup),
             costQuerySets: [] as CostQuerySetModel[],
             //
-            favoriteMenuItems: computed<FavoriteItem[]>(() => convertMenuConfigToReferenceData(
-                store.state.favorite.menuItems,
-                store.getters['display/allMenuList'],
-            )),
+            currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
+            favoriteItemsMapFilterByWorkspaceId: computed(() => ({
+                [FAVORITE_TYPE.MENU]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
+                [FAVORITE_TYPE.PROJECT]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
+                [FAVORITE_TYPE.PROJECT_GROUP]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
+                [FAVORITE_TYPE.CLOUD_SERVICE]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
+                [FAVORITE_TYPE.DASHBOARD]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
+                [FAVORITE_TYPE.COST_ANALYSIS]: (store.state.favorite.menuItems ?? []).filter((item) => item.workspaceId === state.currentWorkspaceId),
+            })),
+            favoriteMenuItems: computed<FavoriteItem[]>(() => {
+                console.debug('GNBFavorite.favoriteMenuItems', state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU]);
+                return convertMenuConfigToReferenceData(
+                    state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.MENU],
+                    store.getters['display/allMenuList'],
+                );
+            }),
             favoriteCostAnalysisItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.COST_ANALYSIS, store.getters['user/pageAccessPermissionList']);
-                return isUserAccessible ? convertCostAnalysisConfigToReferenceData(store.state.favorite.costAnalysisItems, state.costQuerySets, state.dataSourceMap) : [];
+                return isUserAccessible
+                    ? convertCostAnalysisConfigToReferenceData(
+                        state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.COST_ANALYSIS],
+                        state.costQuerySets,
+                        state.dataSourceMap,
+                    )
+                    : [];
             }),
             favoriteDashboardItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessibleToDashboards = isUserAccessibleToMenu(MENU_ID.DASHBOARDS, store.getters['user/pageAccessPermissionList']);
                 if (!isUserAccessibleToDashboards) return [];
                 return convertDashboardConfigToReferenceData(
-                    store.state.favorite.dashboardItems,
+                    state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.DASHBOARD],
                     dashboardGetters.allItems,
                 );
             }),
             favoriteCloudServiceItems: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.CLOUD_SERVICE, store.getters['user/pageAccessPermissionList']);
                 return isUserAccessible ? convertCloudServiceConfigToReferenceData(
-                    store.state.favorite.cloudServiceItems,
+                    state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.CLOUD_SERVICE],
                     state.cloudServiceTypes,
                 ) : [];
             }),
             favoriteProjects: computed<FavoriteItem[]>(() => {
                 const isUserAccessible = isUserAccessibleToMenu(MENU_ID.PROJECT, store.getters['user/pageAccessPermissionList']);
                 if (!isUserAccessible) return [];
-                const favoriteProjectItems = convertProjectConfigToReferenceData(store.state.favorite.projectItems, state.projects);
-                const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(store.state.favorite.projectGroupItems, state.projectGroups);
+                const favoriteProjectItems = convertProjectConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT], state.projects);
+                const favoriteProjectGroupItems = convertProjectGroupConfigToReferenceData(state.favoriteItemsMapFilterByWorkspaceId[FAVORITE_TYPE.PROJECT_GROUP], state.projectGroups);
                 return [...favoriteProjectGroupItems, ...favoriteProjectItems];
             }),
             dataSourceMap: computed<CostDataSourceReferenceMap>(() => allReferenceStore.getters.costDataSource),
@@ -265,11 +284,11 @@ export default {
         const handleClickMenuButton = (type: SuggestionType) => {
             // Dashboard and Cost Analysis are added after (Planning).
             if (type === SUGGESTION_TYPE.PROJECT) {
-                SpaceRouter.router.replace({
+                router.replace({
                     name: PROJECT_ROUTE._NAME,
                 });
             } else if (type === SUGGESTION_TYPE.CLOUD_SERVICE) {
-                SpaceRouter.router.replace({
+                router.replace({
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                 });
             }
@@ -289,7 +308,6 @@ export default {
         };
         const handleSelect = (item: SuggestionItem) => {
             const itemName = item.name as string;
-            console.debug('handleSelect', item);
             if (item.itemType === SUGGESTION_TYPE.MENU) {
                 const menuInfo: MenuInfo = MENU_INFO_MAP[itemName];
                 if (menuInfo && router.currentRoute.name !== itemName) {
