@@ -17,30 +17,33 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import {
     PButton, PHeading,
 } from '@spaceone/design-system';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import NoticeList from '@/services/info/components/NoticeList.vue';
 import { INFO_ROUTE } from '@/services/info/routes/route-constant';
 
 export default {
-    name: 'NoticeMainPage',
+    name: 'AdminNoticeMainPage',
     components: {
         PHeading,
         PButton,
         NoticeList,
     },
     setup() {
+        const router = useRouter();
         const state = reactive({
             hasDomainRoleUser: computed(() => store.getters['user/isDomainAdmin']),
         });
         const handleCreateNotice = () => {
-            SpaceRouter.router.push({ name: INFO_ROUTE.NOTICE.CREATE._NAME });
+            router.push({ name: makeAdminRouteName(INFO_ROUTE.NOTICE.CREATE._NAME) });
         };
 
         return {
