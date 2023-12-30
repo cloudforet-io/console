@@ -30,7 +30,7 @@ const state = reactive({
 });
 const router = useRouter();
 const handleMoveCreateWorkspace = () => {
-    appContextStore.switchToAdminMode();
+    appContextStore.enterAdminMode();
     router.push({
         name: makeAdminRouteName(ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME),
         query: {

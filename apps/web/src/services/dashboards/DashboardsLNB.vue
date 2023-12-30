@@ -2,6 +2,7 @@
 import {
     computed, reactive,
 } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { PIconButton } from '@spaceone/design-system';
 
@@ -9,6 +10,8 @@ import type { PublicDashboardModel } from '@/schema/dashboard/public-dashboard/m
 import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
@@ -26,7 +29,7 @@ import { MENU_ITEM_TYPE } from '@/common/modules/navigations/lnb/type';
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import type { DashboardScope } from '@/services/dashboards/types/dashboard-view-type';
 
-
+const router = useRouter();
 const allReferenceStore = useAllReferenceStore();
 const appContextStore = useAppContextStore();
 const dashboardStore = useDashboardStore();
@@ -55,7 +58,7 @@ const state = reactive({
         id: d.public_dashboard_id,
         label: d.name,
         to: {
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: d.public_dashboard_id,
             },
@@ -70,7 +73,7 @@ const state = reactive({
         id: d.public_dashboard_id,
         label: d.name,
         to: {
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: d.public_dashboard_id,
             },
@@ -86,7 +89,7 @@ const state = reactive({
         id: d.private_dashboard_id,
         label: d.name,
         to: {
-            name: DASHBOARDS_ROUTE.DETAIL._NAME,
+            name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
             params: {
                 dashboardId: d.private_dashboard_id,
             },
@@ -104,7 +107,7 @@ const state = reactive({
                 id: MENU_ID.DASHBOARDS,
                 foldable: false,
                 to: {
-                    name: DASHBOARDS_ROUTE.ALL._NAME,
+                    name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME,
                 },
                 hideFavorite: true,
             },
@@ -172,7 +175,7 @@ const mashUpProjectGroup = (dashboardList: PublicDashboardModel[] = []): LNBMenu
                 id: board.public_dashboard_id,
                 label: board.name,
                 to: {
-                    name: DASHBOARDS_ROUTE.DETAIL._NAME,
+                    name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.DETAIL._NAME) : DASHBOARDS_ROUTE.DETAIL._NAME,
                     params: {
                         dashboardId: board.public_dashboard_id,
                     },
@@ -202,6 +205,11 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
     return result;
 };
 
+const handleClickCreateDashboard = () => {
+    router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME });
+};
+
+
 (async () => {
     await dashboardStore.load();
 })();
@@ -218,7 +226,7 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
                 <span>{{ state.header }}</span>
                 <p-icon-button name="ic_plus_bold"
                                size="sm"
-                               @click="$router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME, path: DASHBOARDS_ROUTE.CREATE._NAME })"
+                               @click="handleClickCreateDashboard"
                 />
             </div>
         </template>

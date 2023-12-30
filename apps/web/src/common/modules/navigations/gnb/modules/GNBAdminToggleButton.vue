@@ -21,7 +21,7 @@ const state = reactive({
 const handleToggleAdminMode = async () => {
     if (state.isAdminMode) {
         await userWorkspaceStore.load(store.state.user.userId);
-        appContextStore.switchToWorkspaceMode();
+        appContextStore.exitAdminMode();
         await router.push({ name: ROOT_ROUTE.WORKSPACE._NAME });
         Vue.notify({
             group: 'toastTopCenter',
@@ -32,7 +32,7 @@ const handleToggleAdminMode = async () => {
         });
         return;
     }
-    appContextStore.switchToAdminMode();
+    appContextStore.enterAdminMode();
     await router.push({ name: ROOT_ROUTE.ADMIN._NAME });
     Vue.notify({
         group: 'toastTopCenter',

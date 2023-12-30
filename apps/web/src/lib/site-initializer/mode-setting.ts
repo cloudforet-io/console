@@ -10,6 +10,6 @@ export const initModeSetting = () => {
     const { pathname } = window.location;
     const modePath = pathname?.split('/')[1];
     if (modePath === 'admin') {
-        appContextStore.switchToAdminMode();
+        appContextStore.enterAdminMode();
     }
 };
