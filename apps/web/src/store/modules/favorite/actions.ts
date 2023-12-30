@@ -11,20 +11,22 @@ import {
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-const createFavorite = async (itemType: FavoriteType, itemId: string) => {
+const createFavorite = async (itemType: FavoriteType, workspaceId: string, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.favorite.create({
             type: itemType,
+            workspace_id: workspaceId,
             id: itemId,
         });
     } catch (e) {
         ErrorHandler.handleError(e);
     }
 };
-const deleteFavorite = async (itemType: FavoriteType, itemId: string) => {
+const deleteFavorite = async (itemType: FavoriteType, workspaceId: string, itemId: string) => {
     try {
         await SpaceConnector.client.addOns.favorite.delete({
             type: itemType,
+            workspace_id: workspaceId,
             id: itemId,
         });
     } catch (e) {
@@ -42,8 +44,9 @@ const addCommitsByItemType = {
 };
 export const addItem: Action<FavoriteState, any> = async ({ commit }, favorite: FavoriteConfig): Promise<void> => {
     const itemType = favorite.itemType;
+    const workspaceId = favorite.workspaceId;
     const itemId = favorite.itemId;
-    await createFavorite(itemType, itemId);
+    await createFavorite(itemType, workspaceId, itemId);
     commit(addCommitsByItemType[itemType], favorite);
 };
 
@@ -57,8 +60,9 @@ const removeCommitsByItemType = {
 };
 export const removeItem: Action<FavoriteState, any> = async ({ commit }, favorite: FavoriteConfig): Promise<void> => {
     const itemType = favorite.itemType;
+    const workspaceId = favorite.workspaceId;
     const itemId = favorite.itemId;
-    await deleteFavorite(itemType, itemId);
+    await deleteFavorite(itemType, workspaceId, itemId);
     commit(removeCommitsByItemType[itemType], favorite);
 };
 
@@ -94,6 +98,7 @@ export const load: Action<FavoriteState, any> = async ({ state, commit }, itemTy
         });
         const favorites: FavoriteConfig[] = results?.map((d) => ({
             itemType: d.data.type,
+            workspaceId: d.data.workspace_id,
             itemId: d.data.id,
         })) ?? [];
         commit(setCommitsByItemType[itemType], favorites);

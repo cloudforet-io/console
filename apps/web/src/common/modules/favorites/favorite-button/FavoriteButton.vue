@@ -22,6 +22,7 @@ import { PI } from '@spaceone/design-system';
 
 import { store } from '@/store';
 
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { FavoriteConfig } from '@/store/modules/favorite/type';
 import { FAVORITE_TYPE_TO_STATE_NAME } from '@/store/modules/favorite/type';
 
@@ -53,7 +54,9 @@ export default defineComponent<FavoriteButtonProps>({
         },
     },
     setup(props) {
+        const userWorkspaceStore = useUserWorkspaceStore();
         const state = reactive({
+            currentWorkspaceId: computed(() => userWorkspaceStore.getters.currentWorkspaceId),
             isLoading: computed(() => store.state.favorite.isLoading[props.favoriteType]),
             hasLoaded: computed(() => Array.isArray(state.favoriteItems)),
             favoriteItems: computed<FavoriteConfig[]|null>(() => {
@@ -78,11 +81,13 @@ export default defineComponent<FavoriteButtonProps>({
             if (props.readOnly) return;
             if (state.favoriteItemMap[props.itemId]) {
                 await store.dispatch('favorite/removeItem', {
+                    workspaceId: state.currentWorkspaceId,
                     itemId: props.itemId,
                     itemType: props.favoriteType,
                 });
             } else {
                 await store.dispatch('favorite/addItem', {
+                    workspaceId: state.currentWorkspaceId,
                     itemId: props.itemId,
                     itemType: props.favoriteType,
                 });
