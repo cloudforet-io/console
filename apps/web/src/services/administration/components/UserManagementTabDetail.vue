@@ -213,7 +213,6 @@ const handleClickVerifyButton = async () => {
         @apply relative;
         .not-verified {
             @apply absolute bg-yellow-200 text-label-sm;
-            width: 5.375rem;
             height: 1.25rem;
             padding: 0.15rem 0.5rem;
             border-radius: 6.25rem;
