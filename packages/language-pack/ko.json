@@ -1089,7 +1089,7 @@
 			"TITLE": "개인 정보"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "프로젝트 생성",
+			"CREAT_PROJECT": "프로젝트 / 그룹 생성",
 			"CURRENT": "",
 			"PLACEHOLDER": "프로젝트 선택",
 			"RELOAD_PROJECT": "프로젝트 불러오기"

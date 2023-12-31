@@ -359,8 +359,7 @@ if (!props.keepAlive) {
                     </div>
                 </template>
                 <template #toolbox-left>
-                    <p-button class="mr-4"
-                              style-type="primary"
+                    <p-button style-type="primary"
                               icon-left="ic_plus_bold"
                               :disabled="props.manageDisabled"
                               @click="state.visibleAlertFormModal = true"

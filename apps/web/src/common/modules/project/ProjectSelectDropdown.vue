@@ -343,20 +343,32 @@ watch(() => state._selectedProjectIds, (selectedProjectIds) => {
 .project-select-dropdown {
     .button-wrapper {
         padding: 0.5rem;
+
         &.top {
             padding-bottom: 0.25rem;
         }
+
         .create-button {
             width: 100%;
         }
     }
 
     /* custom design-system component - p-tree */
+
     :deep(.p-tree) {
         padding: 0.25rem;
         min-height: 12rem;
+
         .toggle-right {
             @apply flex-shrink-0;
+        }
+    }
+
+    /* custom design-system component - p-context-menu */
+
+    :deep(.p-context-menu) {
+        .no-data {
+            padding: 0;
         }
     }
 }
