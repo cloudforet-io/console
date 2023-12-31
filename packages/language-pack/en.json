@@ -1089,7 +1089,7 @@
 			"TITLE": "Profile"
 		},
 		"PROJECT_SELECT_DROPDOWN": {
-			"CREAT_PROJECT": "Create Project",
+			"CREAT_PROJECT": "Create Project / Group",
 			"CURRENT": "Current",
 			"PLACEHOLDER": "Select Project",
 			"RELOAD_PROJECT": "Reload Projects"
