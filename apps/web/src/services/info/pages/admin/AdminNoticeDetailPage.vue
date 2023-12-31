@@ -9,6 +9,8 @@ import { PButton, PHeading } from '@spaceone/design-system';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
@@ -38,7 +40,7 @@ const handleClickEditButton = () => {
         return;
     }
     router.push({
-        name: INFO_ROUTE.NOTICE.UPDATE._NAME,
+        name: makeAdminRouteName(INFO_ROUTE.NOTICE.UPDATE._NAME),
         params: { postId: props.postId },
     });
 };
