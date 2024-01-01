@@ -3,7 +3,9 @@
 import Vue, { onMounted, onUnmounted, reactive } from 'vue';
 import { useRoute } from 'vue-router/composables';
 
-import { PButton, PHeading, PHorizontalLayout } from '@spaceone/design-system';
+import {
+    PButton, PHeading, PHorizontalLayout,
+} from '@spaceone/design-system';
 import { cloneDeep } from 'lodash';
 
 import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
@@ -18,6 +20,7 @@ import WorkspaceManagementTable from '@/services/administration/components/Works
 import WorkspacesCreateModal from '@/services/administration/components/WorkspacesCreateModal.vue';
 import WorkspacesDeleteModal from '@/services/administration/components/WorkspacesDeleteModal.vue';
 import WorkspacesSetEnableModal from '@/services/administration/components/WorkspacesSetEnableModal.vue';
+import WorkspacesUserManagementTab from '@/services/administration/components/WorkspacesUserManagementTab.vue';
 import { USER_MODAL_TYPE } from '@/services/administration/constants/user-constant';
 import { WORKSPACE_STATE } from '@/services/administration/constants/workspace-constant';
 import { useUserPageStore } from '@/services/administration/store/user-page-store';
@@ -47,7 +50,7 @@ const refreshWorkspaceList = async () => {
         .setPageStart(workspacePageStore.$state.pageStart).setPageLimit(workspacePageStore.$state.pageLimit)
         .setFilters(workspacePageStore.searchFilters);
     try {
-        await workspacePageStore.listWorkspaces({ query: workspaceListApiQueryHelper.data });
+        await workspacePageStore.load({ query: workspaceListApiQueryHelper.data });
         await userWorkspaceStore.load(store.state.user.userId);
     } finally {
         workspacePageStore.$patch({ loading: false });
@@ -134,10 +137,12 @@ onUnmounted(() => {
                 />
             </template>
         </p-horizontal-layout>
-        <workspaces-create-modal :visible.sync="modalState.createModalVisible"
-                                 :create-type="modalState.createType"
-                                 @confirm="handleConfirm"
-                                 @refresh="refreshWorkspaceList"
+        <workspaces-user-management-tab />
+        <workspaces-create-modal
+            :visible.sync="modalState.createModalVisible"
+            :create-type="modalState.createType"
+            @confirm="handleConfirm"
+            @refresh="refreshWorkspaceList"
         />
         <workspaces-delete-modal :visible.sync="modalState.deleteModalVisible"
                                  @refresh="refreshWorkspaceList"
