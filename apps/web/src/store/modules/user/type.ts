@@ -1,4 +1,5 @@
 import type { RoleType } from '@/schema/identity/role/type';
+import type { GrantScope } from '@/schema/identity/token/type';
 import type { AuthType, UserType } from '@/schema/identity/user/type';
 
 export type LanguageCode = 'ko' | 'en' | string;
@@ -8,6 +9,11 @@ export interface RoleInfo {
     roleType: RoleType;
     roleId: string;
     pageAccess: string[];
+}
+
+export interface GrantInfo {
+    scope: GrantScope;
+    workspaceId?: string;
 }
 
 export interface UserState {
@@ -20,6 +26,7 @@ export interface UserState {
     email?: string;
     language?: string;
     timezone?: string;
+    currentGrantInfo?: GrantInfo;
     currentRoleInfo?: RoleInfo;
     requiredActions?: string[];
     emailVerified?: boolean;

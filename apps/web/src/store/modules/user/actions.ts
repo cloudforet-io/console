@@ -103,6 +103,12 @@ export const grantRole: Action<UserState, any> = async ({ commit, dispatch }, gr
             SpaceConnector.setToken(response.access_token);
             const currentRoleType = getRoleTypeFromToken(response.access_token);
 
+            const grantInfo = {
+                scope: grantRequest.scope,
+                workspaceId: grantRequest.workspace_id,
+            };
+            commit('setCurrentGrantInfo', grantInfo);
+
             const roleInfo = await getGrantedRole(response.role_id, currentRoleType, response.role_type);
             commit('setCurrentRoleInfo', roleInfo);
         }
