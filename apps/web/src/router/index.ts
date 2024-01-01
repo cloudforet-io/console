@@ -8,9 +8,11 @@ import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import type { GrantScope } from '@/schema/identity/token/type';
 
 import { ERROR_ROUTE } from '@/router/constant';
-import { makeAdminRouteName } from '@/router/helpers/route-helper';
 
+import { useAppContextStore } from '@/store/app-context/app-context-store';
+import { useUserWorkspaceStore } from '@/store/app-context/workspace/user-workspace-store';
 import type { RoleInfo } from '@/store/modules/user/type';
+import { pinia } from '@/store/pinia';
 
 import { getRouteAccessLevel, getUserAccessLevel } from '@/lib/access-control';
 import { ACCESS_LEVEL } from '@/lib/access-control/config';
@@ -24,11 +26,17 @@ const CHUNK_LOAD_REFRESH_STORAGE_KEY = 'SpaceRouter/ChunkLoadFailRefreshed';
 
 const getCurrentTime = (): number => Math.floor(Date.now() / 1000);
 const grantCurrentScope = async (scope: GrantScope, token: string, workspaceId?: string): Promise<RoleInfo|undefined> => {
+    const existingGrantInfo = SpaceRouter.router.app?.$store.getters['user/getCurrentGrantInfo'];
+    const isDuplicateScope = scope !== 'WORKSPACE' && existingGrantInfo?.scope === scope;
+    const isDuplicateWorkspace = workspaceId && workspaceId === existingGrantInfo?.workspaceId;
+    if (isDuplicateScope || isDuplicateWorkspace) return undefined;
+
     const grantRequest = {
         scope,
         token,
         workspace_id: workspaceId,
     };
+
     await SpaceRouter.router.app?.$store.dispatch('user/grantRole', grantRequest);
     return SpaceRouter.router.app?.$store.getters['user/getCurrentRoleInfo'];
 };
@@ -73,21 +81,35 @@ export class SpaceRouter {
         });
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
+            const appContextStore = useAppContextStore(pinia);
+            const userWorkspaceStore = useUserWorkspaceStore(pinia);
+            const isAdminMode = appContextStore.getters.isAdminMode;
+            const accessibleWorkspaceList = userWorkspaceStore.getters.workspaceList;
+
+
+            /* Browser Back Button Case
+            *  isAdminMode state is not changed when browser back button is clicked. (route: admin <-> workspace)
+            *  So, when the user clicks the browser back button, the isAdminMode state is changed to the correct state.
+            *  This is allowed ONLY THIS CASE
+            * */
+            // [CASE] Admin Mode -> Workspace Mode -> (back button) Admin Mode
+            if (to.name?.startsWith('admin.') && !isAdminMode) {
+                appContextStore.enterAdminMode();
+            }
+            // [CASE] Workspace Mode -> Admin Mode -> (back button) Workspace Mode
+            if (!to.name?.startsWith('admin.') && isAdminMode) {
+                appContextStore.exitAdminMode();
+            }
+
+
             nextPath = to.fullPath;
-            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['app-context-store']?.getters.isAdminMode;
-            const accessibleWorkspaceList = SpaceRouter.router.app?.$pinia.state.value['user-workspace-store']?.getters.workspaceList;
             const isTokenAlive = SpaceConnector.isTokenAlive;
             const isNotErrorRoute = to.name !== ERROR_ROUTE._NAME;
-            const beforeRoutePathByRawUrl = window.location.pathname;
-
-
 
             // Grant Refresh Token
             const refreshToken = SpaceConnector.getRefreshToken();
-            const isContinuedAdminRoute = to.name?.startsWith('admin.') && beforeRoutePathByRawUrl.startsWith('/admin');
-            const isWorkspaceIdUnchanged = (to.params.workspaceId && from.params.workspaceId) && to.params.workspaceId === from.params.workspaceId;
-            const isGrantRoleSkipLogic = isContinuedAdminRoute || isWorkspaceIdUnchanged;
-            if (refreshToken && isTokenAlive && !isGrantRoleSkipLogic && isNotErrorRoute) {
+
+            if (refreshToken && isTokenAlive && isNotErrorRoute) {
                 let scope: GrantScope;
                 if (to.name?.startsWith('admin.') || isAdminMode) {
                     scope = 'DOMAIN';
@@ -107,29 +129,35 @@ export class SpaceRouter {
             const userNeedPwdReset = SpaceRouter.router.app?.$store.getters['user/isUserNeedPasswordReset'];
             let nextLocation;
 
+
+
+            /* After applied Browser Back Button Case, this logic is not working.
+            * So, this needs to be refactored.
+            * */
+
             /* Redirect Logic for Workspace and Admin Modes
             * The router automatically converts a 'workspace' route (e.g., 'dashboards.all') to its 'admin' equivalent
             * (e.g., 'admin.dashboards.all') when in admin mode, ensuring mode-appropriate navigation.
              */
-            const isWorkspaceOrHigherAccessLevelRoute = routeAccessLevel >= ACCESS_LEVEL.WORKSPACE_PERMISSION;
-            if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && isWorkspaceOrHigherAccessLevelRoute && isAdminMode && to.name && !to.name?.startsWith('admin.')) {
-                const adminRouteName = makeAdminRouteName(to.name);
-                const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
-                const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
-                const adminUserAccessLevel = getUserAccessLevel(resolved.route, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
-
-                if (adminRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
-                    nextLocation = {
-                        ...to,
-                        name: adminRouteName,
-                    };
-                } else {
-                    nextLocation = {
-                        name: ERROR_ROUTE._NAME,
-                        params: { statusCode: '404' },
-                    };
-                }
-            }
+            // const isWorkspaceOrHigherAccessLevelRoute = routeAccessLevel >= ACCESS_LEVEL.WORKSPACE_PERMISSION;
+            // if (userAccessLevel >= ACCESS_LEVEL.AUTHENTICATED && isWorkspaceOrHigherAccessLevelRoute && isAdminMode && to.name && !to.name?.startsWith('admin.')) {
+            //     const adminRouteName = makeAdminRouteName(to.name);
+            //     const resolved = SpaceRouter.router.resolve({ name: adminRouteName });
+            //     const adminRouteAccessLevel = getRouteAccessLevel(resolved.route);
+            //     const adminUserAccessLevel = getUserAccessLevel(resolved.route, SpaceRouter.router.app?.$store.getters['user/isDomainAdmin'], userPagePermissions, isTokenAlive);
+            //
+            //     if (adminRouteAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION && adminUserAccessLevel === ACCESS_LEVEL.ADMIN_PERMISSION) {
+            //         nextLocation = {
+            //             ...to,
+            //             name: adminRouteName,
+            //         };
+            //     } else {
+            //         nextLocation = {
+            //             name: ERROR_ROUTE._NAME,
+            //             params: { statusCode: '404' },
+            //         };
+            //     }
+            // }
 
 
             // When a user is authenticated
