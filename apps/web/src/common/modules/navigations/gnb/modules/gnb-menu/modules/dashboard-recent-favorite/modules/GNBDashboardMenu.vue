@@ -49,6 +49,8 @@ import type { TabItem } from '@spaceone/design-system/types/navigation/tabs/tab/
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { useDashboardStore } from '@/store/dashboard/dashboard-store';
 import type { DisplayMenu } from '@/store/modules/display/type';
@@ -88,11 +90,11 @@ export default defineComponent({
             subMenuList: computed(() => [
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.VIEW_ALL'),
-                    to: { name: DASHBOARDS_ROUTE.ALL._NAME },
+                    to: { name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME },
                 },
                 {
                     label: i18n.t('COMMON.GNB.DASHBOARDS.CREATE_DASHBOARDS'),
-                    to: { name: DASHBOARDS_ROUTE.CREATE._NAME },
+                    to: { name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME) : DASHBOARDS_ROUTE.CREATE._NAME },
                 },
             ] as DisplayMenu[]),
             isOverflown: false,

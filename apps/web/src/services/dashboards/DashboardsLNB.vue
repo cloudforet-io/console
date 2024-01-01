@@ -206,7 +206,7 @@ const filterFavoriteItems = (menuItems: LNBMenu[] = []): LNBMenu[] => {
 };
 
 const handleClickCreateDashboard = () => {
-    router.push({ name: DASHBOARDS_ROUTE.CREATE._NAME });
+    router.push({ name: storeState.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.CREATE._NAME) : DASHBOARDS_ROUTE.CREATE._NAME });
 };
 
 

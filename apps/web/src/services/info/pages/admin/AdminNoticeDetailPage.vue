@@ -54,7 +54,7 @@ const handleDeleteNoticeConfirm = async () => {
         if (!props.postId) throw new Error('postId is undefined');
         await noticeDetailStore.deleteNoticePost(props.postId);
         showSuccessMessage(i18n.t('INFO.NOTICE.FORM.ALT_S_DELETE_NOTICE'), '');
-        await router.push({ name: INFO_ROUTE.NOTICE._NAME });
+        await router.push({ name: makeAdminRouteName(INFO_ROUTE.NOTICE._NAME) });
     } catch (e) {
         ErrorHandler.handleRequestError(e, i18n.t('INFO.NOTICE.FORM.ALT_E_DELETE_NOTICE'));
     } finally {

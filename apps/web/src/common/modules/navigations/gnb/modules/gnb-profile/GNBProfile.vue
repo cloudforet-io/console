@@ -16,6 +16,8 @@ import { ROLE_TYPE } from '@/schema/identity/role/constant';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
+import { makeAdminRouteName } from '@/router/helpers/route-helper';
+
 import { useAppContextStore } from '@/store/app-context/app-context-store';
 import { languages } from '@/store/modules/user/config';
 
@@ -112,6 +114,12 @@ const handleClickOutsideLanguageMenu = (e: PointerEvent) => {
 };
 const handleLanguageDropdownClick = () => {
     setLanguageMenuVisible(!state.languageMenuVisible);
+};
+
+const handleClickGoToMyPage = () => {
+    if (state.isAdminMode) appContextStore.exitAdminMode();
+    router.push({ name: MY_PAGE_ROUTE._NAME });
+    hideProfileMenu();
 };
 
 const handleLanguageClick = async (language) => {
@@ -242,23 +250,20 @@ const handleClickSignOut = async () => {
                     <span class="value">{{ state.timezone }}</span>
                 </div>
                 <div class="info-menu">
-                    <router-link :to="{name: MY_PAGE_ROUTE._NAME }"
-                                 @click.native="hideProfileMenu"
+                    <p-button style-type="secondary"
+                              size="sm"
+                              class="my-page-button"
+                              @click="handleClickGoToMyPage"
                     >
-                        <p-button style-type="secondary"
-                                  size="sm"
-                                  class="my-page-button"
-                        >
-                            {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
-                        </p-button>
-                    </router-link>
+                        {{ $t('COMMON.GNB.ACCOUNT.GO_TO_MYPAGE') }}
+                    </p-button>
                 </div>
             </div>
             <template v-if="!state.isMyPage">
                 <p-divider />
                 <div class="sub-menu-wrapper">
                     <router-link class="sub-menu"
-                                 :to="{name: INFO_ROUTE.NOTICE._NAME}"
+                                 :to="{name: state.isAdminMode ? makeAdminRouteName(INFO_ROUTE.NOTICE._NAME) : INFO_ROUTE.NOTICE._NAME}"
                                  @click.native="hideProfileMenu"
                     >
                         {{ $t('MENU.INFO_NOTICE') }}

@@ -190,7 +190,7 @@ const relocateNotificationState = reactive({
             id: MENU_ID.DASHBOARDS,
             label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.RELOCATE_DASHBOARD_LABEL'),
             to: {
-                name: DASHBOARDS_ROUTE.ALL._NAME,
+                name: state.isAdminMode ? makeAdminRouteName(DASHBOARDS_ROUTE.ALL._NAME) : DASHBOARDS_ROUTE.ALL._NAME,
                 query: {
                     filters: dashboardQuery,
                 },
@@ -230,7 +230,7 @@ const handleSelectDataSource = (selected: string) => {
     if (!selected) return;
     costQuerySetStore.setSelectedDataSourceId(selected);
     router.push({
-        name: COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
+        name: state.isAdminMode ? makeAdminRouteName(COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME) : COST_EXPLORER_ROUTE.COST_ANALYSIS.QUERY_SET._NAME,
         params: {
             dataSourceId: selected,
             costQuerySetId: costQuerySetGetters.managedCostQuerySets[0].cost_query_set_id,
