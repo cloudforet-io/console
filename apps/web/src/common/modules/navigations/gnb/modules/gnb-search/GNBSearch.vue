@@ -62,6 +62,7 @@ import {
     reactive, toRefs, watch,
 } from 'vue';
 import type { DirectiveFunction, SetupContext } from 'vue';
+import { useRouter } from 'vue-router/composables';
 
 import { getTextHighlightRegex, PI, screens } from '@spaceone/design-system';
 import { debounce, throttle } from 'lodash';
@@ -69,7 +70,6 @@ import { debounce, throttle } from 'lodash';
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
 import { getCancellableFetcher } from '@cloudforet/core-lib/space-connector/cancallable-fetcher';
 
-import { SpaceRouter } from '@/router';
 import { store } from '@/store';
 
 import type { RecentConfig } from '@/store/modules/recent/type';
@@ -135,6 +135,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props, { emit }: SetupContext) {
+        const router = useRouter();
         const state = reactive({
             isFocusOnInput: false,
             isFocusOnSuggestion: false,
@@ -348,8 +349,8 @@ export default defineComponent<Props>({
                 if (!menuId) return;
 
                 const menuInfo: MenuInfo = MENU_INFO_MAP[menuId];
-                if (menuInfo && SpaceRouter.router.currentRoute.name !== menuId) {
-                    SpaceRouter.router.push({ name: menuId }).catch(() => {});
+                if (menuInfo && router.currentRoute.name !== menuId) {
+                    router.push({ name: menuInfo.routeName }).catch(() => {});
                     if (!state.showRecent) createSearchRecent(type, menuId);
                 }
             } else {
@@ -363,7 +364,7 @@ export default defineComponent<Props>({
                 }
                 if (cloudServiceTypekey) {
                     const itemInfo: string[] = cloudServiceTypekey.split('.');
-                    SpaceRouter.router.push({
+                    router.push({
                         name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: itemInfo[0],
