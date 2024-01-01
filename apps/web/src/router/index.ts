@@ -173,12 +173,14 @@ export class SpaceRouter {
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
 
-            const isDomainAdmin = store.getters['user/isDomainAdmin'];
-            if (!isDomainAdmin) {
+            const isAdminMode = SpaceRouter.router.app?.$pinia.state.value['user-workspace-store']?.getters.isAdminMode;
+            const currentWorkspaceId = SpaceRouter.router.app?.$pinia.state.value['user-workspace-store']?.currentWorkspaceId;
+            if (!isAdminMode) {
                 const recent = getRecentConfig(to);
                 if (recent) {
                     store.dispatch('recent/addItem', {
                         itemType: recent.itemType,
+                        workspaceId: currentWorkspaceId,
                         itemId: recent.itemId,
                     });
                 }

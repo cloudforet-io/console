@@ -13,7 +13,7 @@ import { COST_EXPLORER_ROUTE } from '@/services/cost-explorer/routes/route-const
 import { DASHBOARDS_ROUTE } from '@/services/dashboards/routes/route-constant';
 import { PROJECT_ROUTE } from '@/services/project/routes/route-constant';
 
-export const getRecentConfig = (to: Route): RecentConfig | undefined => {
+export const getRecentConfig = (to: Route): Omit<RecentConfig, 'workspaceId'> | undefined => {
     /* DASHBOARD */
     if (to.name === DASHBOARDS_ROUTE.DETAIL._NAME) {
         const dashboardId = to?.params?.dashboardId;
