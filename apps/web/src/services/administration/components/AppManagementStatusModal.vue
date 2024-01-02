@@ -107,6 +107,7 @@ const checkModalConfirm = async () => {
                     modal-size="md"
                     @confirm="checkModalConfirm"
                     @cancel="handleClose"
+                    @close="handleClose"
     >
         <template #body>
             <p-definition-table :fields="definitionFields"

@@ -80,6 +80,7 @@ watch(() => props.isFormVisible, (value) => {
             >
                 <p-text-input class="text-input"
                               multi-input
+                              :placeholder="$t('IDENTITY.TAGS_PLACEHOLDER')"
                               :selected="selected"
                               appearance-type="stack"
                               block

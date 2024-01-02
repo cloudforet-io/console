@@ -2116,6 +2116,7 @@
 				"TITLE": "{provider}アカウント"
 			}
 		},
+		"TAGS_PLACEHOLDER": "",
 		"USER": {
 			"API_KEY": {
 				"ALERT_MSG": "JSONか設定ファイルをダウンロードしてください。このページを閉めたらファイルのダウンロードができません。",

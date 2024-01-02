@@ -2116,6 +2116,7 @@
 				"TITLE": "{provider} Accounts"
 			}
 		},
+		"TAGS_PLACEHOLDER": "key:value key:value2...",
 		"USER": {
 			"API_KEY": {
 				"ALERT_MSG": "You have to download the JSON or Config file before you continue. You will not be able to download the file again after close this.",
