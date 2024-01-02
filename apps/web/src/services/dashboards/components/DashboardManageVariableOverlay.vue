@@ -17,6 +17,7 @@ import { i18n } from '@/translations';
 import getRandomId from '@/lib/random-id-generator';
 
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import { useProperRouteLocation } from '@/common/composables/proper-route-location';
 import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
 
 import DashboardManageVariableForm from '@/services/dashboards/components/DashboardManageVariableForm.vue';
@@ -30,6 +31,7 @@ import type {
 } from '@/services/dashboards/types/dashboard-model-type';
 import type { ManageVariableOverlayStatus } from '@/services/dashboards/types/manage-variable-type';
 
+
 interface Props {
     visible: boolean;
 }
@@ -41,6 +43,7 @@ const dashboardDetailStore = useDashboardDetailInfoStore();
 const dashboardDetailState = dashboardDetailStore.state;
 
 const route = useRoute();
+const { getProperRouteLocation } = useProperRouteLocation();
 
 const state = reactive({
     contentType: 'LIST' as ManageVariableOverlayStatus,
@@ -148,14 +151,14 @@ const handleClickGoBackButton = () => {
         return;
     }
     if (route.name === DASHBOARDS_ROUTE.CREATE._NAME) {
-        SpaceRouter.router.replace({
+        SpaceRouter.router.replace(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.CREATE._NAME,
-        });
+        }));
     } else {
-        SpaceRouter.router.replace({
+        SpaceRouter.router.replace(getProperRouteLocation({
             name: DASHBOARDS_ROUTE.CUSTOMIZE._NAME,
             params: { dashboardId: dashboardDetailState.dashboardId ?? '' },
-        });
+        }));
     }
 };
 const handleClickCancel = () => {
