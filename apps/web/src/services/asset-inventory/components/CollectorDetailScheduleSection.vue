@@ -117,7 +117,7 @@ watch(() => collectorFormState.schedulePower, (schedulePower) => {
 
 <style lang="postcss" scoped>
 .schedule-wrapper {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     .button-group {
         margin-bottom: 1.5rem;
         .save-changes-button {

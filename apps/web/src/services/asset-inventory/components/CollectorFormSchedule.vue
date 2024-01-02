@@ -159,6 +159,7 @@ watch([() => collectorFormStore.collectorId, () => props.hoursReadonly], ([colle
 
 <style lang="postcss" scoped>
 .collector-schedule-edit-form {
+    min-height: 4.2rem;
     .schedule-desc {
         margin-bottom: 0.5rem;
     }
