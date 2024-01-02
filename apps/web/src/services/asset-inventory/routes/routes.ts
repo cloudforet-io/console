@@ -49,7 +49,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.CLOUD_SERVICE },
                     component: CloudServicePage as any,
                 },
                 {
@@ -100,7 +100,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.COLLECTOR._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.COLLECTOR },
                     props: true,
                     component: CollectorMainPage as any,
                 },
@@ -147,7 +147,7 @@ const assetInventoryRoute: RouteConfig = {
                 {
                     path: '/',
                     name: ASSET_INVENTORY_ROUTE.SERVICE_ACCOUNT._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.SERVICE_ACCOUNT },
                     props: true,
                     component: ServiceAccountPage as any,
                 },

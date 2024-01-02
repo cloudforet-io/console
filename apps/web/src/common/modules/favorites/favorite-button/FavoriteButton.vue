@@ -62,7 +62,8 @@ export default defineComponent<FavoriteButtonProps>({
             favoriteItems: computed<FavoriteConfig[]|null>(() => {
                 const stateName = FAVORITE_TYPE_TO_STATE_NAME[props.favoriteType];
                 if (!stateName) return [];
-                return store.state.favorite[stateName].filter((item) => item.workspaceId === state.currentWorkspaceId);
+                const items = store.state.favorite[stateName];
+                return items ? store.state.favorite[stateName].filter((item) => item.workspaceId === state.currentWorkspaceId) : null;
             }),
             favoriteItemMap: computed<Record<string, FavoriteConfig>>(() => {
                 const result: Record<string, FavoriteConfig> = {};

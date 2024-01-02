@@ -56,9 +56,10 @@ export const getRecentConfig = (to: Route): RecentConfig | undefined => {
     }
 
     /* MENU */
-    const menu = MENU_INFO_MAP[to.meta?.menuId as MenuId];
+
+    const menu = to.meta?.menuId && MENU_INFO_MAP[to.meta?.menuId as MenuId];
     if (menu) {
-        return { itemType: RECENT_TYPE.MENU, workspaceId, itemId: to.name as MenuId };
+        return { itemType: RECENT_TYPE.MENU, workspaceId, itemId: to.meta?.menuId as MenuId };
     }
     return undefined;
 };

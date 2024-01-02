@@ -36,7 +36,7 @@ const alertManagerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: ALERT_MANAGER_ROUTE.ALERT._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.ALERT },
                     component: AlertMainPage as any,
                 },
                 {

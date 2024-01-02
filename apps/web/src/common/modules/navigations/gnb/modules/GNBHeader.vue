@@ -97,7 +97,7 @@ const selectWorkspace = (workspaceId: string): void => {
                    vertical
         />
         <p-select-dropdown v-if="!props.isAdminMode"
-                           class="worksapce-dropdown"
+                           class="workspace-dropdown"
                            style-type="transparent"
                            is-filterable
                            :search-text.sync="state.searchText"
@@ -182,7 +182,7 @@ const selectWorkspace = (workspaceId: string): void => {
         margin: 0 0.75rem;
         height: 2rem;
     }
-    .worksapce-dropdown {
+    .workspace-dropdown {
         @apply inline-flex;
 
         @screen tablet {

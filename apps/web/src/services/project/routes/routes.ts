@@ -28,7 +28,7 @@ export default {
         {
             path: '/',
             name: PROJECT_ROUTE._NAME,
-            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION },
+            meta: { accessLevel: ACCESS_LEVEL.WORKSPACE_PERMISSION, menuId: MENU_ID.PROJECT },
             props: true,
             component: ProjectPage,
         },

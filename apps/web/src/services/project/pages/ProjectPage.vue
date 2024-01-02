@@ -121,7 +121,7 @@ onClickOutside(menuRef, hideContextMenu);
 const handleDeleteFavorite = (item: FavoriteItem) => {
     const _item = {
         ...item,
-        worksapceId: userWorkspaceStore.getters.currentWorkspaceId,
+        workspaceId: userWorkspaceStore.getters.currentWorkspaceId,
     };
     store.dispatch('favorite/removeItem', _item);
 };

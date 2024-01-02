@@ -171,8 +171,10 @@ export class SpaceRouter {
             const store = SpaceRouter.router.app?.$store;
             if (!store) return;
             const isAdminMode = appContextStore.getters.isAdminMode;
+            const routeAccessLevel = getRouteAccessLevel(to);
+            const isWorkspaceRoute = routeAccessLevel >= ACCESS_LEVEL.WORKSPACE_PERMISSION;
 
-            if (!isAdminMode) {
+            if (!isAdminMode && isWorkspaceRoute) {
                 const recent = getRecentConfig(to);
                 if (recent) {
                     store.dispatch('recent/addItem', {

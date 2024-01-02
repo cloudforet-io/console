@@ -99,7 +99,7 @@ const costExplorerRoutes: RouteConfig = {
                 {
                     path: '/',
                     name: COST_EXPLORER_ROUTE.BUDGET._NAME,
-                    meta: { lnbVisible: true },
+                    meta: { lnbVisible: true, menuId: MENU_ID.BUDGET },
                     component: BudgetMainPage as any,
                 },
                 {
