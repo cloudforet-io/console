@@ -8,7 +8,6 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@cloudforet/core-lib/space-connector';
-import { ApiQueryHelper } from '@cloudforet/core-lib/space-connector/helper';
 
 import type { ListResponse } from '@/schema/_common/api-verbs/list';
 import type { Tags } from '@/schema/_common/model';
@@ -64,8 +63,6 @@ const state = reactive({
 });
 
 /* api */
-const listApiQuery = new ApiQueryHelper();
-
 const getRepositoryID = async () => {
     const res = await SpaceConnector.clientV2.repository.repository.list<RepositoryListParameters, ListResponse<RepositoryModel>>({
         repository_type: 'remote',
@@ -75,13 +72,12 @@ const getRepositoryID = async () => {
 };
 const getListWebhookType = async () => {
     try {
-        listApiQuery.setFilters([{ k: 'resource_type', v: 'monitoring.Webhook', o: '=' }]);
         const repositoryId = await getRepositoryID();
         const { results } = await SpaceConnector.clientV2.repository.plugin.list<PluginListParameters, ListResponse<PluginModel>>({
             repository_id: repositoryId,
-            query: listApiQuery.data,
+            resource_type: 'monitoring.Webhook',
         });
-        state.webhookTypeList = results;
+        state.webhookTypeList = results ?? [];
     } catch (e) {
         ErrorHandler.handleError(e);
         state.webhookTypeList = [];
