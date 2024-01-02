@@ -69,21 +69,21 @@ export default defineComponent({
                 const allLnbMenu: LNBMenu[] = [
                     {
                         type: 'title',
-                        label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT].translationId),
-                        id: MENU_ID.ACCOUNT,
+                        label: i18n.t(MENU_INFO_MAP[MENU_ID.MY_PAGE].translationId),
+                        id: MENU_ID.MY_PAGE,
                         foldable: false,
                     },
                     {
                         type: 'item',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.ACCOUNT_PROFILE].translationId),
                         id: MENU_ID.ACCOUNT_PROFILE,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.ACCOUNT_PROFILE._NAME },
+                        to: { name: MY_PAGE_ROUTE.ACCOUNT_PROFILE._NAME },
                     },
                     {
                         type: 'item',
                         label: i18n.t(MENU_INFO_MAP[MENU_ID.NOTIFICATIONS].translationId),
                         id: MENU_ID.NOTIFICATIONS,
-                        to: { name: MY_PAGE_ROUTE.MY_ACCOUNT.NOTIFICATION._NAME },
+                        to: { name: MY_PAGE_ROUTE.NOTIFICATION._NAME },
                         hightlightTag: 'beta',
                     },
                 ];
