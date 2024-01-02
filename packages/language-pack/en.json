@@ -2036,6 +2036,7 @@
 			"DISABLE": "Disable",
 			"DISABLE_WORKSPACE": "Are you sure you want to disable selected workspace?",
 			"EDIT": "Edit",
+			"EDIT_WORKSPACE": "Edit Workspace",
 			"ENABLE": "Enable",
 			"ENABLE_WORKSPACE": "Are you sure you want to enable selected workspace?",
 			"FORM": {

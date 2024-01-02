@@ -2027,7 +2027,7 @@
 			"ACTION": "작업",
 			"CREATE": "생성",
 			"CREATE_WORKSPACE": "",
-			"DELETE": "삭",
+			"DELETE": "삭제",
 			"DELETE_WORKSPACE": "",
 			"DELETE_WORKSPACE_DESC": "",
 			"DETAIL": {
@@ -2036,6 +2036,7 @@
 			"DISABLE": "",
 			"DISABLE_WORKSPACE": "",
 			"EDIT": "수정",
+			"EDIT_WORKSPACE": "",
 			"ENABLE": "",
 			"ENABLE_WORKSPACE": "",
 			"FORM": {
