@@ -117,7 +117,7 @@ const handleLanguageDropdownClick = () => {
 
 const handleClickGoToMyPage = () => {
     if (isAdminMode.value) appContextStore.exitAdminMode();
-    router.push({ name: MY_PAGE_ROUTE._NAME });
+    router.push({ name: MY_PAGE_ROUTE._NAME }).catch(() => {});
     hideProfileMenu();
 };
 

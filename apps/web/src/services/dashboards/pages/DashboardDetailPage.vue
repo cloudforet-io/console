@@ -81,6 +81,7 @@ onUnmounted(() => {
         <div class="dashboard-selectors">
             <dashboard-variables class="variable-selector-wrapper"
                                  :dashboard-id="props.dashboardId"
+                                 is-manageable
             />
             <dashboard-refresh-dropdown :dashboard-id="props.dashboardId"
                                         :loading="dashboardDetailState.loadingWidgets"

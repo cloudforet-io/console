@@ -22,13 +22,13 @@ const domainConfigStore = useDomainSettingsStore();
 const domainConfigGetters = domainConfigStore.getters;
 const state = reactive({
     isChanged: computed(() => {
-        if ([state.selectedTimezone[0]?.name, state.selectedLanguage,
+        if ([state.selectedTimezone, state.selectedLanguage,
             domainConfigGetters.timezone, domainConfigGetters.language]
             .every((d) => !d)) return false;
-        return (state.selectedTimezone[0]?.name !== domainConfigGetters.timezone)
+        return (state.selectedTimezone !== domainConfigGetters.timezone)
             || (state.selectedLanguage !== domainConfigGetters.language);
     }),
-    selectedTimezone: [] as SelectDropdownMenuItem[],
+    selectedTimezone: undefined as string | undefined,
     selectedLanguage: undefined as LanguageCode | undefined,
     languageMenuList: map(languages, (d, k) => ({
         type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
@@ -42,7 +42,7 @@ const state = reactive({
 const handleSaveChanges = async () => {
     try {
         await domainConfigStore.updateDomainSettings({
-            timezone: state.selectedTimezone[0]?.name,
+            timezone: state.selectedTimezone,
             language: state.selectedLanguage,
         });
         showSuccessMessage(i18n.t('IAM.DOMAIN_SETTINGS.ALT_S_UPDATE_TIMEZONE_AND_LANGUAGE'), '');
@@ -53,7 +53,7 @@ const handleSaveChanges = async () => {
 
 /* Watcher */
 watch(() => domainConfigGetters.timezone, (val) => {
-    if (val) state.selectedTimezone = [{ name: val }];
+    if (val) state.selectedTimezone = val;
 }, { immediate: true });
 watch(() => domainConfigGetters.language, (val) => {
     state.selectedLanguage = val;
