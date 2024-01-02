@@ -164,12 +164,11 @@ watch(() => props.dashboardList, () => {
         >
             <template #item-content="{board}">
                 <div class="board-item-title-wrapper">
-                    <div class="favorite-button-wrapper">
-                        <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
-                                         :favorite-type="FAVORITE_TYPE.DASHBOARD"
-                                         scale="0.666"
-                        />
-                    </div>
+                    <favorite-button :item-id="board.public_dashboard_id || board.private_dashboard_id"
+                                     :favorite-type="FAVORITE_TYPE.DASHBOARD"
+                                     scale="0.666"
+                                     class="favorite-button"
+                    />
                     <p class="board-item-title">
                         {{ board.name }}
                         <p-i v-if="scopeType === 'PRIVATE'"
@@ -245,11 +244,10 @@ watch(() => props.dashboardList, () => {
     .board {
         .board-item-title-wrapper {
             @apply flex w-full;
+            align-items: center;
             min-height: 1.25rem;
-            .favorite-button-wrapper {
-                @apply flex items-center justify-center;
-                width: 1.25rem;
-                height: 1.25rem;
+            .favorite-button {
+                margin-right: 0.25rem;
             }
             .board-item-title {
                 @apply flex-grow w-full;
