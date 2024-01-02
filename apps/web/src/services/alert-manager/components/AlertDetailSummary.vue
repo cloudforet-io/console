@@ -181,6 +181,7 @@ const changeAlertUrgency = async (alertUrgency: AlertUrgency) => {
     padding-left: 1rem;
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
+    justify-content: space-between;
     .state-dropdown {
         width: 9rem;
         .text-alert, .selected-urgency {
