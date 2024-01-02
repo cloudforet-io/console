@@ -44,7 +44,10 @@ const workspacePageState = workspacePageStore.$state;
 
 const state = reactive({
     proxyVisible: useProxyValue('visible', props, emit),
-    headerTitle: computed(() => i18n.t('IAM.WORKSPACES.CREATE_WORKSPACE')),
+    headerTitle: computed(() => {
+        if (props.createType === 'EDIT') return i18n.t('IAM.WORKSPACES.EDIT_WORKSPACE');
+        return i18n.t('IAM.WORKSPACES.CREATE_WORKSPACE');
+    }),
     name: undefined as undefined|string,
     description: '',
 });
