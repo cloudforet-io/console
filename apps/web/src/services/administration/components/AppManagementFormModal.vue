@@ -213,6 +213,7 @@ watch(() => storeState.isEdit, (isEdit) => {
                     >
                         <p-text-input class="text-input"
                                       multi-input
+                                      :placeholder="$t('IDENTITY.TAGS_PLACEHOLDER')"
                                       appearance-type="stack"
                                       block
                                       :selected="storeState.isEdit ? formState.selectedTags : []"
