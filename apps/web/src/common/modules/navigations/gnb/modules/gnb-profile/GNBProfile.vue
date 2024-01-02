@@ -116,7 +116,7 @@ const handleLanguageDropdownClick = () => {
 };
 
 const handleClickGoToMyPage = () => {
-    if (isAdminMode) appContextStore.exitAdminMode();
+    if (isAdminMode.value) appContextStore.exitAdminMode();
     router.push({ name: MY_PAGE_ROUTE._NAME });
     hideProfileMenu();
 };
@@ -138,7 +138,7 @@ const handleLanguageClick = async (language) => {
 };
 
 const handleClickSignOut = async () => {
-    if (isAdminMode) appContextStore.exitAdminMode();
+    if (isAdminMode.value) appContextStore.exitAdminMode();
     const res: Location = {
         name: AUTH_ROUTE.SIGN_OUT._NAME,
         query: { nextPath: route.fullPath },
