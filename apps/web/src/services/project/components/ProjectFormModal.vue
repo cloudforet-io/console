@@ -211,14 +211,12 @@ watch(() => projectStore.state.items, (items) => {
                         <template #dropdown-button>
                             <div class="text-wrapper">
                                 <p-i :name="state.selectedAccess === 'PRIVATE' ? 'ic_lock-filled' : 'ic_globe-filled'"
-                                     color="inherit"
                                      width="1rem"
                                      height="1rem"
+                                     :color="state.selectedAccess === 'PRIVATE' ? gray[900] : indigo[600]"
                                 />
                                 <span>{{ state.selectedAccess === 'PRIVATE' ? $t('PROJECT.LANDING.ONLY_PEOPLE_INVITED') : $t('PROJECT.LANDING.EVERYONE_AT_THIS_WORKSPACE') }}</span>
-                                <span v-if="state.selectedAccess === 'PRIVATE'"
-                                      class="sub-text"
-                                >
+                                <span class="sub-text">
                                     {{ $t('PROJECT.LANDING.CAN_ACCESS_TO_THIS_PROJECT') }}
                                 </span>
                             </div>
