@@ -125,7 +125,7 @@ watch(() => store.state.user.isSessionExpired, (isSessionExpired) => {
                :active-tab.sync="state.activeTab"
         >
             <template #extra="tab">
-                <p-badge v-if="state.count[tab.name] !== 0"
+                <p-badge v-if="!!state.count[tab.name]"
                          :style-type="tab.name === state.activeTab ? 'primary3' : 'gray200'"
                          badge-type="subtle"
                 >
