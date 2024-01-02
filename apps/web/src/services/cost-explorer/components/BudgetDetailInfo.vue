@@ -76,7 +76,7 @@ const state = reactive({
                 { resource_type: 'identity.Project' },
             );
         }
-        if (isAdminMode) {
+        if (isAdminMode.value) {
             queryHelper.setFilters([{ k: 'workspace_id', v: state.budgetData?.workspace_id, o: '=' }]);
             return getProperRouteLocation({
                 name: ADMINISTRATION_ROUTE.PREFERENCE.WORKSPACES._NAME,

@@ -140,7 +140,7 @@ export default defineComponent({
                 const result = [
                     (state.isCloudServiceDetailPage ? state.cloudServiceDetailMenuSet : []),
                     ...filterLNBMenuByAccessPermission(menu.concat(
-                        isAdminMode ? state.adminModeMenuSet : state.userModeMenuSet,
+                        isAdminMode.value ? state.adminModeMenuSet : state.userModeMenuSet,
                     ), store.getters['user/pageAccessPermissionList']),
                 ];
                 return result;

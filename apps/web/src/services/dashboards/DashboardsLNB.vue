@@ -112,7 +112,7 @@ const state = reactive({
             { type: 'favorite-only' },
         ];
 
-        if (isAdminMode) {
+        if (isAdminMode.value) {
             return [
                 ...defaultMenuSet,
                 ...state.domainMenuSet,
