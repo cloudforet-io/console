@@ -55,7 +55,6 @@ export default defineComponent({
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
-            userRoleType: computed(() => store.state.user.roleType),
             icon: computed<string>(() => {
                 if (store.getters['user/isSystemAdmin']) return 'img_avatar_system-admin';
                 if (store.getters['user/isDomainAdmin']) return 'img_avatar_admin';

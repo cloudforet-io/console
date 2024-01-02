@@ -944,8 +944,9 @@
 				"SHOW_ALL": "모두 보기"
 			},
 			"MY_PAGE": {
-				"BACK_LINK": "",
-				"BACK_LINK_SHORT": ""
+				"BACK_LINK_ADMIN": "",
+				"BACK_LINK_SHORT": "",
+				"BACK_LINK_WORKSPACE": ""
 			},
 			"NOTICE": {
 				"DETAIL_LINK": "상세 링크:",

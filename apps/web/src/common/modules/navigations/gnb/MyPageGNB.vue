@@ -2,9 +2,11 @@
 import {
     reactive, computed,
 } from 'vue';
-import { useRouter } from 'vue-router/composables';
+import { useRoute, useRouter } from 'vue-router/composables';
 
 import { PButton } from '@spaceone/design-system';
+
+import { i18n } from '@/translations';
 
 import { ROOT_ROUTE } from '@/router/constant';
 
@@ -17,19 +19,33 @@ import MyPageGNBToolset from '@/common/modules/navigations/gnb/modules/MyPageGNB
 
 const userWorkspaceStore = useUserWorkspaceStore();
 const router = useRouter();
+const route = useRoute();
 
 const state = reactive({
     workspaceLink: computed(() => (state.hasRole ? { name: ROOT_ROUTE._NAME } : null)),
     hasRole: computed(() => userWorkspaceStore.getters.workspaceList.length > 0),
+    beforeWorkspace: computed(() => route.query?.beforeWorkspace as string|undefined),
+    backLinkText: computed(() => {
+        if (state.beforeWorkspace === 'admin') {
+            return i18n.t('COMMON.GNB.MY_PAGE.BACK_LINK_ADMIN');
+        }
+        return i18n.t('COMMON.GNB.MY_PAGE.BACK_LINK_WORKSPACE');
+    }),
 });
 
 const handleBackToWorkspace = () => {
     if (state.hasRole) {
+        if (state.beforeWorkspace === 'admin') {
+            router.push({ name: ROOT_ROUTE.ADMIN._NAME });
+            return;
+        }
+        if (state.beforeWorkspace) {
+            router.push({ name: ROOT_ROUTE.WORKSPACE._NAME, params: { workspaceId: state.beforeWorkspace } });
+            return;
+        }
         router.push({ name: ROOT_ROUTE._NAME });
     }
 };
-
-
 </script>
 
 <template>
@@ -43,7 +59,7 @@ const handleBackToWorkspace = () => {
                       icon-left="ic_arrow-left"
                       @click="handleBackToWorkspace"
             >
-                <span class="link-text">{{ $t('COMMON.GNB.MY_PAGE.BACK_LINK') }}</span>
+                <span class="link-text">{{ state.backLinkText }}</span>
                 <span class="link-text-mobile">{{ $t('COMMON.GNB.MY_PAGE.BACK_LINK_SHORT') }}</span>
             </p-button>
         </div>

@@ -117,7 +117,15 @@ const handleLanguageDropdownClick = () => {
 
 const handleClickGoToMyPage = () => {
     if (isAdminMode.value) appContextStore.exitAdminMode();
-    router.push({ name: MY_PAGE_ROUTE._NAME }).catch(() => {});
+    const currentWorkspace = route.params?.workspaceId ?? 'admin';
+    router.push({
+        name: MY_PAGE_ROUTE._NAME,
+        ...(currentWorkspace && {
+            query: {
+                beforeWorkspace: currentWorkspace,
+            },
+        }),
+    }).catch(() => {});
     hideProfileMenu();
 };
 
