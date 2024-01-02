@@ -2981,6 +2981,7 @@
 			"SAVE_CHANGES": "変更事項を保存",
 			"TIMEZONE_INVALID": "タイムゾーンが正しく設定されました。"
 		},
+		"ADMIN": "",
 		"MFA": {
 			"BTN_CHANGE": "変更",
 			"BTN_SEND_MAIL": "認証コード送信",
@@ -3015,7 +3016,6 @@
 		"NOTIFICATION_EMAIL": {
 			"EMAIL_INVALID": "無効なメール形式です"
 		},
-		"ROOT_ACCOUNT": "Root account",
 		"SPACEONE_USER": "SpaceONEユーザー"
 	},
 	"PAGE_SCHEMA": {

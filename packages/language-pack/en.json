@@ -2981,6 +2981,7 @@
 			"SAVE_CHANGES": "Save Changes",
 			"TIMEZONE_INVALID": "The time zone is set incorrectly."
 		},
+		"ADMIN": "Admin",
 		"MFA": {
 			"BTN_CHANGE": "Change",
 			"BTN_SEND_MAIL": "Send Verification Code",
@@ -3015,7 +3016,6 @@
 		"NOTIFICATION_EMAIL": {
 			"EMAIL_INVALID": "Invalid e-mail format."
 		},
-		"ROOT_ACCOUNT": "Root Account",
 		"SPACEONE_USER": "SpaceONE User "
 	},
 	"PAGE_SCHEMA": {

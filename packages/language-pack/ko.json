@@ -2981,6 +2981,7 @@
 			"SAVE_CHANGES": "변경사항 저장 ",
 			"TIMEZONE_INVALID": "타임존이 잘못 설정되었습니다."
 		},
+		"ADMIN": "",
 		"MFA": {
 			"BTN_CHANGE": "변경",
 			"BTN_SEND_MAIL": "인증 코드 전송",
@@ -3015,7 +3016,6 @@
 		"NOTIFICATION_EMAIL": {
 			"EMAIL_INVALID": "잘못된 이메일 형식입니다. "
 		},
-		"ROOT_ACCOUNT": "루트 어카운트 ",
 		"SPACEONE_USER": "스페이스원 사용자 "
 	},
 	"PAGE_SCHEMA": {
