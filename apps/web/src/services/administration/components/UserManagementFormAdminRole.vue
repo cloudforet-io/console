@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{(e: 'update:role', formState): void,
-    (e: 'update:isChangedToggle', type: string): void,
+    (e: 'update:is-changed-toggle', type: string): void,
 }>();
 
 const roleState = reactive({

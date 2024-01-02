@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const userPageStore = useUserPageStore();
 
-const emit = defineEmits<{(e: 'update:isChangedToggle', type: string): void }>();
+const emit = defineEmits<{(e: 'update:is-changed-toggle', type: string): void }>();
 
 const state = reactive({
     data: computed<UserListItemType>(() => userPageStore.selectedUsers[0]),
